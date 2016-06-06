@@ -55,35 +55,35 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	private final Network network;
 	private final Vehicles emissionVehicles;
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
-	
+
 	private int linkLeaveCnt = 0;
 	private int linkLeaveFirstActWarnCnt = 0;
-    private int linkLeaveSomeActWarnCnt = 0;
+	private int linkLeaveSomeActWarnCnt = 0;
 
-    private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkenter = new HashMap<>();
+	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkenter = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleLeavesTraffic = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
-    
+
 	public WarmEmissionHandler(
 			Vehicles emissionVehicles,
 			final Network network, 
 			WarmEmissionAnalysisModuleParameter parameterObject,
 			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
-		
+
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);	
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		linkLeaveCnt = 0;
 		linkLeaveFirstActWarnCnt = 0;
-		
+
 		linkenter.clear();
 		vehicleLeavesTraffic.clear();
 		vehicleEntersTraffic.clear();
-		
+
 		warmEmissionAnalysisModule.reset();
 	}
 
@@ -94,6 +94,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		}
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
 		this.vehicleLeavesTraffic.put(event.getVehicleId(), linkId2Time);
+
+		// yyyyyy This event should also trigger an emissions calculation, from link entry up to here.  Probably not done since this particular
+		// event did not exist when the emissions contrib was programmed.  Would be easy to do: calculate the emission and remove
+		// the vehicle from the linkenter data structure so that no second emission event is computed for travel from parking to
+		// link leave.  (This could also be done, but the excellent should not be in the way of the good.)  kai, may'16
 	}
 
 	@Override
@@ -132,24 +137,24 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		}
 
 		if(!this.linkenter.containsKey(vehicleId)){
-            int maxLinkLeaveFirstActWarnCnt = 3;
-            if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
+			int maxLinkLeaveFirstActWarnCnt = 3;
+			if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
 				logger.info("Vehicle " + vehicleId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
 				logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
 				logger.info("Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveFirstActWarnCnt == maxLinkLeaveFirstActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveFirstActWarnCnt++;
-        } else if (!this.linkenter.get(vehicleId).getFirst().equals(linkId)){
-            int maxLinkLeaveSomeActWarnCnt = 3;
-            if(linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt){
+		} else if (!this.linkenter.get(vehicleId).getFirst().equals(linkId)){
+			int maxLinkLeaveSomeActWarnCnt = 3;
+			if(linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt){
 				logger.warn("Vehicle " + vehicleId + " is ending an activity other than the first and leaving link " + linkId + " without having entered.");
 				logger.warn("This indicates that there is some inconsistency in vehicle use; please check your inital plans file for consistency.");
 				logger.warn("Thus, no emissions are calculated neither for this link leave event nor for the last link that was entered.");
 				if (linkLeaveSomeActWarnCnt == maxLinkLeaveSomeActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveSomeActWarnCnt++;
-        } else {
+		} else {
 			double enterTime = this.linkenter.get(vehicleId).getSecond();
 			double travelTime;
 			if(!this.vehicleLeavesTraffic.containsKey(vehicleId) || !this.vehicleEntersTraffic.containsKey(vehicleId)){
@@ -171,7 +176,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 						EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 			}
 			Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-			
+
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 					vehicle,
 					roadType,

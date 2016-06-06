@@ -66,7 +66,7 @@ public class KNAccidentScenario {
 	public static void main(String[] args) {
 		replanningLinkIds.add( Id.createLinkId("4068014_26836040_26836036-4068014_26836036_251045850-4068014_251045850_251045852") ) ;
 
-		// ---
+		// ===
 		
 		final Config config = ConfigUtils.loadConfig("/Users/nagel/kairuns/telematics/baseconfig.xml") ;
 		
@@ -99,7 +99,7 @@ public class KNAccidentScenario {
 		OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 		otfConfig.setAgentSize(200);
 		
-		// ---
+		// ===
 		
 		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		preparePopulation(scenario);
@@ -112,7 +112,7 @@ public class KNAccidentScenario {
 		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
 								  // means that the router finds a wider variety of alternative routes.)
 		
-		// ---
+		// ===
 		
 		final Controler controler = new Controler( scenario ) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
@@ -126,10 +126,9 @@ public class KNAccidentScenario {
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
-//				this.bind(Mobsim.class).toProvider(KNMobsimProvider.class) ;
 				
 //				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
-				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
+//				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
 
 				this.addEventHandlerBinding().toInstance( travelTime ) ;
 				this.addMobsimListenerBinding().toInstance( travelTime );
@@ -139,7 +138,7 @@ public class KNAccidentScenario {
 		
 		
 		
-		// ---
+		// ===
 		
 		controler.run() ;
 		

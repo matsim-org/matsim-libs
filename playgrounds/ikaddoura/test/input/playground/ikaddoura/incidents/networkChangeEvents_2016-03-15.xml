@@ -3,14 +3,14 @@
 
 	<networkChangeEvent startTime="07:15:33">
 		<link refId="36087"/>
-		<flowCapacity type="absolute" value="1.0"/>
+		<flowCapacity type="absolute" value="0.0"/>
 		<freespeed type="absolute" value="0.22227"/>
 		<lanes type="absolute" value="1.0"/>
 	</networkChangeEvent>
 
 	<networkChangeEvent startTime="14:37:16">
 		<link refId="36087"/>
-		<flowCapacity type="absolute" value="4700.0"/>
+		<flowCapacity type="absolute" value="1.306"/>
 		<freespeed type="absolute" value="13.88888888888889"/>
 		<lanes type="absolute" value="3.0"/>
 	</networkChangeEvent>

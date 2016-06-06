@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -35,7 +34,6 @@ import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
@@ -49,8 +47,7 @@ import com.google.inject.name.Named;
 public class TaxiQSimProvider
     implements Provider<Mobsim>
 {
-    private final Scenario scenario;
-    private final EventsManager events;
+    private final MatsimServices matsimServices;
     private final Collection<AbstractQSimPlugin> plugins;
 
     private final TaxiData taxiData;
@@ -60,25 +57,20 @@ public class TaxiQSimProvider
     private final VehicleType vehicleType;
     private final TaxiOptimizerFactory optimizerFactory;
 
-    private final MatsimServices matsimServices;
-
 
     @Inject
-    public TaxiQSimProvider(Scenario scenario, EventsManager events,
-            Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
-            @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxiConfigGroup taxiCfg,
-            @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
-            TaxiOptimizerFactory optimizerFactory, MatsimServices matsimServices)
+    public TaxiQSimProvider(MatsimServices matsimServices, Collection<AbstractQSimPlugin> plugins,
+            TaxiData taxiData, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
+            TaxiConfigGroup taxiCfg, @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
+            TaxiOptimizerFactory optimizerFactory)
     {
-        this.scenario = scenario;
-        this.events = events;
+        this.matsimServices = matsimServices;
         this.plugins = plugins;
         this.taxiData = taxiData;
         this.travelTime = travelTime;
         this.taxiCfg = taxiCfg;
         this.vehicleType = vehicleType;
         this.optimizerFactory = optimizerFactory;
-        this.matsimServices = matsimServices;
     }
 
 
@@ -89,7 +81,8 @@ public class TaxiQSimProvider
             throw new IllegalStateException("Diversion requires online tracking");
         }
 
-        QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
+        QSim qSim = QSimUtils.createQSim(matsimServices.getScenario(), matsimServices.getEvents(),
+                plugins);
 
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);
         qSim.addQueueSimulationListeners(optimizer);
@@ -111,10 +104,10 @@ public class TaxiQSimProvider
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-        TaxiScheduler scheduler = new TaxiScheduler(scenario, taxiData, qSim.getSimTimer(),
-                schedulerParams, travelTime, travelDisutility);
+        TaxiScheduler scheduler = new TaxiScheduler(matsimServices.getScenario(), taxiData,
+                qSim.getSimTimer(), schedulerParams, travelTime, travelDisutility);
 
-        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, scenario,
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices,
                 qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
         return optimizerFactory.createTaxiOptimizer(optimContext,
                 taxiCfg.getOptimizerConfigGroup());
@@ -123,8 +116,9 @@ public class TaxiQSimProvider
 
     private PassengerEngine createPassengerEngine(TaxiOptimizer optimizer)
     {
-        return new PassengerEngine(TaxiModule.TAXI_MODE, events, new TaxiRequestCreator(),
-                optimizer, taxiData, scenario.getNetwork());
+        return new PassengerEngine(TaxiModule.TAXI_MODE, matsimServices.getEvents(),
+                new TaxiRequestCreator(), optimizer, taxiData,
+                matsimServices.getScenario().getNetwork());
     }
 
 

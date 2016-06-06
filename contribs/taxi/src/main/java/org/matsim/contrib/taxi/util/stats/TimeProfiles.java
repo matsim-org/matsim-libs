@@ -29,7 +29,7 @@ import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.EnumCounter;
+import org.matsim.contrib.util.*;
 
 import com.google.common.collect.Iterables;
 
@@ -77,7 +77,7 @@ public class TimeProfiles
             @Override
             public String calcCurrentPoint()
             {
-                EnumCounter<TaxiTaskType> counter = new EnumCounter<>(TaxiTaskType.class);
+                LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
 
                 for (Vehicle veh : taxiData.getVehicles().values()) {
                     if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
@@ -89,7 +89,7 @@ public class TimeProfiles
 
                 String s = "";
                 for (TaxiTaskType e : TaxiTaskType.values()) {
-                    s += counter.getCount(e) + "\t";
+                    s += counter.getLong(e) + "\t";
                 }
                 return s;
             }

@@ -29,7 +29,7 @@ public class ActivityChains {
 		Set<String> activityChains = new HashSet<String>();
 		Map<String, Integer> actPerType = new HashMap<String, Integer>();
 		
-		int[] sizeChain = new int[20];
+		int[] sizeChain = new int[30];
 		
 		stageTypes.addActivityTypes( new StageActivityTypesImpl( "pt interaction" ) );
 

@@ -33,7 +33,7 @@ public class KeepOnlySelectedPlan {
 		
 		
 		
-		new PopulationWriter(scenario2.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_normal.xml.gz");		
+		new PopulationWriter(scenario2.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_optimized.xml.gz");		
 
 	}
 

@@ -15,6 +15,7 @@ import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
@@ -31,8 +32,7 @@ import playground.dhosse.prt.scheduler.PrtScheduler;
 public class PrtQSimProvider
     implements Provider<Mobsim>
 {
-    private final Scenario scenario;
-    private final EventsManager events;
+    private final MatsimServices matsimServices;
     private final Collection<AbstractQSimPlugin> plugins;
 
     private final TaxiData taxiData;
@@ -44,13 +44,12 @@ public class PrtQSimProvider
 
 
     @Inject
-    public PrtQSimProvider(Scenario scenario, EventsManager events,
+    public PrtQSimProvider(MatsimServices matsimServices,
             Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
-            @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxiConfigGroup taxiCfg,
+            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxiConfigGroup taxiCfg,
             TaxiOptimizerFactory optimizerFactory)
     {
-        this.scenario = scenario;
-        this.events = events;
+        this.matsimServices = matsimServices;
         this.plugins = plugins;
         this.taxiData = taxiData;
         this.travelTime = travelTime;
@@ -67,13 +66,13 @@ public class PrtQSimProvider
             throw new IllegalStateException("Diversion requires online tracking");
         }
 
-        QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
+        QSim qSim = QSimUtils.createQSim(matsimServices.getScenario(), matsimServices.getEvents(), plugins);
 
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);
         qSim.addQueueSimulationListeners(optimizer);
 
-        PassengerEngine passengerEngine = new PassengerEngine(PrtRequestCreator.MODE, events,
-                new TaxiRequestCreator(), optimizer, taxiData, scenario.getNetwork());
+        PassengerEngine passengerEngine = new PassengerEngine(PrtRequestCreator.MODE, matsimServices.getEvents(),
+                new TaxiRequestCreator(), optimizer, taxiData, matsimServices.getScenario().getNetwork());
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
 
@@ -98,19 +97,19 @@ public class PrtQSimProvider
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
         if (prtConfig.getVehicleCapacity() > 1) {
-            PrtScheduler scheduler = new PrtScheduler(scenario, taxiData, qSim.getSimTimer(),
+            PrtScheduler scheduler = new PrtScheduler(matsimServices.getScenario(), taxiData, qSim.getSimTimer(),
                     schedulerParams, travelTime, travelDisutility);
-            TaxiOptimizerContext optimContext = new PrtOptimizerContext(taxiData, scenario,
+            TaxiOptimizerContext optimContext = new PrtOptimizerContext(taxiData, matsimServices,
                     qSim.getSimTimer(), travelTime, travelDisutility, scheduler, prtConfig);
             
             return optimizerFactory.createTaxiOptimizer(optimContext,
                     taxiCfg.getOptimizerConfigGroup());
         }
         else {
-            TaxiScheduler scheduler = new TaxiScheduler(scenario, taxiData, qSim.getSimTimer(),
+            TaxiScheduler scheduler = new TaxiScheduler(matsimServices.getScenario(), taxiData, qSim.getSimTimer(),
                     schedulerParams, travelTime, travelDisutility);
 
-            TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, scenario,
+            TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices,
                     qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
             return optimizerFactory.createTaxiOptimizer(optimContext,
                     taxiCfg.getOptimizerConfigGroup());

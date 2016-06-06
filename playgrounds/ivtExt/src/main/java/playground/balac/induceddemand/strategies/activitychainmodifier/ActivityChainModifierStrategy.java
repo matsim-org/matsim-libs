@@ -1,5 +1,6 @@
 package playground.balac.induceddemand.strategies.activitychainmodifier;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Provider;
@@ -18,6 +19,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
 
 import com.google.inject.Inject;
@@ -34,14 +36,15 @@ public class ActivityChainModifierStrategy implements PlanStrategy{
 			Provider<TripRouter> tripRouterProvider, @Named("shopQuadTree") QuadTree shopFacilityQuadTree,
 			   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree,
 			   LeastCostPathCalculatorFactory pathCalculatorFactory, Map<String,TravelTime> travelTimes,
-			   Map<String,TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory) {
+			   Map<String,TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory,
+			   @Named("scoreChangeMap") HashMap scoreChange, CharyparNagelScoringParametersForPerson parametersForPerson) {
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
 		
 		
 		
 	    ModifyActivityChain mac = new ModifyActivityChain(scenario, tripRouterProvider,
 	    		shopFacilityQuadTree, leisureFacilityQuadTree, pathCalculatorFactory, travelTimes,
-	    		travelDisutilityFactories,scoringFunctionFactory);
+	    		travelDisutilityFactories,scoringFunctionFactory, scoreChange, parametersForPerson);
 	    
 		builder.addStrategyModule(mac);
 		builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));

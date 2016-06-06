@@ -104,17 +104,13 @@ public class RunPrismicTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new MainModeIdentifierImpl() );
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new MainModeIdentifierImpl(),
+									group.getModes() ) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()

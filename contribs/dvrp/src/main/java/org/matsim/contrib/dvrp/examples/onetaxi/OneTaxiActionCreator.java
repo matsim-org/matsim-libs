@@ -54,15 +54,15 @@ public class OneTaxiActionCreator
 
                     if (serveTask.isPickup()) {
                         return new SinglePassengerPickupActivity(passengerEngine, serveTask,
-                                request, OneTaxiOptimizer.PICKUP_DURATION);
+                                request, OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
                     }
                     else {
                         return new SinglePassengerDropoffActivity(passengerEngine, serveTask,
-                                request);
+                                request, "OneTaxiDropoff");
                     }
                 }
                 else { //WAIT
-                    return new VrpActivity("StayTask", (StayTask)task);
+                    return new VrpActivity("OneTaxiStay", (StayTask)task);
                 }
         }
 

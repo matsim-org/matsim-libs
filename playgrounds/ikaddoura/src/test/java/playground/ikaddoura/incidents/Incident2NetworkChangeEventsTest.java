@@ -23,22 +23,21 @@
 package playground.ikaddoura.incidents;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.xml.stream.XMLStreamException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -52,7 +51,7 @@ public class Incident2NetworkChangeEventsTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void test1() throws XMLStreamException, IOException{
+	public final void test1() throws XMLStreamException, IOException, ParseException{
 		
 		String networkFile = testUtils.getPackageInputDirectory() + "network.xml";
 		String inputDirectory = testUtils.getPackageInputDirectory() + "incidentsXML/";
@@ -60,9 +59,12 @@ public class Incident2NetworkChangeEventsTest {
 		
 		String startDateTime = "2016-03-15";
 		String endDateTime = "2016-03-15";
+
+		String crs = TransformationFactory.DHDN_GK4;
 		
 		IncidentDataAnalysis analysis = new IncidentDataAnalysis(
 				networkFile,
+				crs,
 				inputDirectory,
 				outputDirectory,
 				false,
@@ -99,12 +101,14 @@ public class Incident2NetworkChangeEventsTest {
 //		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity.", 4700., link.getCapacity(), MatsimTestUtils.EPSILON);
 		
-		Assert.assertEquals("Wrong capacity during the morning.", 0.1, link.getFlowCapacityPerSec(10 * 3600.), MatsimTestUtils.EPSILON);		
-		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity (after first network change event).", 0., link.getFlowCapacityPerSec(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong freespeed (after first network change event).", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
+	
+		Assert.assertEquals("Wrong capacity (after second network change event).", 1.306, link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong freespeed (after second network change event).", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
+		
 	}
 	
 	@Test
@@ -119,11 +123,14 @@ public class Incident2NetworkChangeEventsTest {
 //		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity. Check if the flow capacity is given in 'vehicles per hour' 'vehicles per second'.", 4700. / 3600., link.getFlowCapacityPerSec(3 * 3600.), MatsimTestUtils.EPSILON);
 		
-		Assert.assertEquals("Wrong capacity during the morning.", 1., link.getFlowCapacityPerSec(10 * 3600.), MatsimTestUtils.EPSILON);		
-		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity (after first network change event).", 0., link.getFlowCapacityPerSec(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong freespeed (after first network change event).", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
+	
+		Assert.assertEquals("Wrong capacity (after second network change event).", 1.306, link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong freespeed (after second network change event).", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
+		
 	}
 		
 }

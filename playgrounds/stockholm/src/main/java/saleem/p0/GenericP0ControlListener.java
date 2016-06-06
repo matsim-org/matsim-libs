@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -21,13 +22,15 @@ import org.matsim.core.network.NetworkImpl;
 public class GenericP0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
 	public NetworkImpl network;
 	GenericP0ControlHandler handler;
-	public GenericP0ControlListener(NetworkImpl network){
+	Scenario scenario;
+	public GenericP0ControlListener(Scenario scenario, NetworkImpl network){
 		this.network = network;
+		this.scenario=scenario;
 	}
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		//handler = new P0QueueDelayControl(network, event.getIteration());
-		handler.initialise(event.getIteration());//To avoid creating objects every time, to save memory
+		handler.initialise();//To avoid creating objects every time, to save memory
 	    network.setNetworkChangeEvents(handler.events);
 //	    GenericP0ControlHandler.events.removeAll(GenericP0ControlHandler.events);
 		
@@ -64,7 +67,7 @@ public class GenericP0ControlListener implements StartupListener, IterationStart
 				outLinks.add(link);
 			}
 		}
-		handler = new GenericP0ControlHandler(inLinks, outLinks, network);
+		handler = new GenericP0ControlHandler(scenario, inLinks, outLinks, network);
 	    event.getServices().getEvents().addHandler(handler);
 	    handler.readCapacitiesFromFiles();//For already written Non P0 Capacities
 	    handler.readDelaysFromFiles();//For already written Non P0 delays

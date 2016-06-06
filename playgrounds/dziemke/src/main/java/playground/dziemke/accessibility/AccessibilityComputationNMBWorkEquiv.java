@@ -31,14 +31,15 @@ import javax.inject.Provider;
 public class AccessibilityComputationNMBWorkEquiv {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBWorkEquiv.class);
 	
-	private static final double cellSize = 1000.;
+//	private static final double cellSize = 1000.;
+	private static final double cellSize = 10000.;
 
 	
 	public static void main(String[] args) {
 		// Input and output	
-		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
-		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../accessibility-sa/data/12/";
+		String networkFile = "../../../matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
+		String facilitiesFile = "../../../matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
+		String outputDirectory = "../../../accessibility-sa/data/12/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";

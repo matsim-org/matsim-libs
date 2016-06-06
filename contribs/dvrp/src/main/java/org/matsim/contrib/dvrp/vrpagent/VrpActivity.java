@@ -20,19 +20,18 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.AbstractDynActivity;
 
 
 public class VrpActivity
-    implements DynActivity
+    extends AbstractDynActivity
 {
     private final StayTask stayTask;
-    private final String activityType;
 
 
     public VrpActivity(String activityType, StayTask stayTask)
     {
-        this.activityType = activityType;
+        super(activityType);
         this.stayTask = stayTask;
     }
 
@@ -42,21 +41,4 @@ public class VrpActivity
     {
         return stayTask.getEndTime();
     }
-
-
-    @Override
-    public String getActivityType()
-    {
-        return activityType;
-    }
-
-
-    @Override
-    public void doSimStep(double now)
-    {}
-
-
-    @Override
-    public void finalizeAction(double now)
-    {}
 }

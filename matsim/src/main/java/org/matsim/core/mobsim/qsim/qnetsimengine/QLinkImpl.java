@@ -262,7 +262,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 			QLaneI.VisData roadVisData = getAcceptingQLane().getVisData() ;
 			if (visLink != null) {
-				((QueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord(), visLink.getEuklideanDistance()) ;
+				((QueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord()) ;
 				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
 			}
 

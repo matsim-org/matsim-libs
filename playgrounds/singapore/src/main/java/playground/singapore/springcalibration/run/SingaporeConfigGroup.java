@@ -37,8 +37,10 @@ public class SingaporeConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "singapore";
 
 	public static final String TAXI_WAITING_TIMES_FILE = "taxi_waitingtimes_file";
+	public static final String VALIDATION_PATH = "validation_path";
 	
 	private String taxiWaitingTimeFile = "";
+	private String validationPath = "";
 	
 	public SingaporeConfigGroup() {
 		super(GROUP_NAME);
@@ -49,6 +51,9 @@ public class SingaporeConfigGroup extends ConfigGroup {
 		// for variables that have getters, this is not needed (and should probably be avoided).  kai, jan'11
 		if (TAXI_WAITING_TIMES_FILE.equals(key)) {
 			return this.taxiWaitingTimeFile;
+		} 
+		else if (VALIDATION_PATH.equals(key)) {
+			return this.validationPath;
 		} else {
 			throw new IllegalArgumentException(key + ".  There may exist a direct getter.");
 		}
@@ -63,6 +68,9 @@ public class SingaporeConfigGroup extends ConfigGroup {
 		if (TAXI_WAITING_TIMES_FILE.equals(key)) {
 			this.taxiWaitingTimeFile = value;
 		} 
+		else if (VALIDATION_PATH.equals(key)) {
+			this.validationPath = value;
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -74,6 +82,7 @@ public class SingaporeConfigGroup extends ConfigGroup {
 		
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put(TAXI_WAITING_TIMES_FILE, this.getTaxiWaitingTimeFile());
+		map.put(VALIDATION_PATH, this.getValidationPath());
 		return map;
 	}
 
@@ -81,6 +90,7 @@ public class SingaporeConfigGroup extends ConfigGroup {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(TAXI_WAITING_TIMES_FILE, "Taxi waiting times from shape file");
+		map.put(VALIDATION_PATH, "Path to folder containing HITS validation analyses");
 		return map ;
 	}
 
@@ -92,6 +102,14 @@ public class SingaporeConfigGroup extends ConfigGroup {
 
 	public String getTaxiWaitingTimeFile() {
 		return this.taxiWaitingTimeFile;
+	}
+
+	public String getValidationPath() {
+		return this.validationPath;
+	}
+
+	public void setValidationPath(String validationPath) {
+		this.validationPath = validationPath;
 	}
 
 

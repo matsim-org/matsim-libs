@@ -47,14 +47,15 @@ public class CreateMatrixBasedPtInputs {
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
 		
 //		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/transit/matrix/07/";
-		String outputRoot = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/matrix_03/";
+		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/";
 //		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2016-01-05/";
 //		String outputFileRoot = "../../data/accessibility/be_002/";
 		LogToOutputSaver.setOutputDirectory(outputRoot);
 		
 		// Parameters
-		Boolean measuringPointsAsPTStops = true;
-		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
+		Boolean measuringPointsAsPTStops = true; // if "true" -> use regular, user-defined locations instead of stops from schedule
+//		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
+		Double cellSize = 500.; // only relevant if "meauringPointsAsPTStops = true"
 		Double departureTime = 8. * 60 * 60;
 		Integer numberOfThreads = 1;
 //		Integer numberOfThreads = 20;
@@ -98,7 +99,7 @@ public class CreateMatrixBasedPtInputs {
 		 * defines the iteration ordering, which is normally the order in which keys were inserted into the map insertion order. */
 		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new LinkedHashMap<Id<Coord>, Coord>();
 		
-		if (measuringPointsAsPTStops == true) { // i.e. use regular, user-defined locations instead of stops from schedule
+		if (measuringPointsAsPTStops == true) { 
 			
 			BoundingBox boundingBox;
 			if (bounds == "network") {

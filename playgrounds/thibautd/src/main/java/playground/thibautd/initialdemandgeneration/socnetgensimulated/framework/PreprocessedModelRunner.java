@@ -216,7 +216,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 		for ( int i=0; i < nThreads; i++ ) {
 			final int startThreadAgents = i * population.size() / nThreads;
-			final int endThreadAgents = i == nThreads ? population.size() : (i + 1) * population.size() / nThreads;
+			final int endThreadAgents = (i + 1) * population.size() / nThreads;
 
 			threads.add(
 					() -> {

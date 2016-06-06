@@ -50,7 +50,7 @@ public class PrepareTaxiPlans {
 		Random rnd = MatsimRandom.getLocalInstance();
 		for (double d = 0.0; d <= 1.0; d = d + 0.10) {
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimPopulationReader(scenario).readFile("D:/runs-svn/avsim/prerun02_10pct/output_plans.xml.gz");
+			new MatsimPopulationReader(scenario).readFile("D:/runs-svn/avsim/prerun02_10pct_0.15fc/output_plans.xml.gz");
 			Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 			List<Person> taxiriders = new ArrayList<>();
 			for (Person p : scenario.getPopulation().getPersons().values()) {
@@ -77,7 +77,7 @@ public class PrepareTaxiPlans {
 			Locale.setDefault(Locale.US);
 			DecimalFormat df = new DecimalFormat("####0.00");
 
-			new PopulationWriter(pop2).write("../../../shared-svn/projects/audi_av/scenario/flowpaper/plansCarsRoutesAV"
+			new PopulationWriter(pop2).write("../../../shared-svn/projects/audi_av/scenario/flowpaper/taxiplans/fc0.15/plansCarsRoutesAV"
 					+ df.format(d) + ".xml.gz");
 
 		}

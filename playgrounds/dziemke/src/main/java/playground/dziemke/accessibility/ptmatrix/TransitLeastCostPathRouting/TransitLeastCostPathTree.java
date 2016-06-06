@@ -41,7 +41,7 @@ import java.util.*;
 
 /**
  * This class is based on and similar to org.matsim.pt.router.MultiNodeDijkstra
- * 
+ *
  * In contrast to org.matsim.pt.router.MultiNodeDijkstra, however, it stores the last
  * LeastCostPathTree. It is, therefore, much faster than it, in cases where many routes
  * starting with the same fromNode are calculated subsequently as every route from that
@@ -148,7 +148,7 @@ public class TransitLeastCostPathTree {
 	public void createLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
 		this.resetNetworkVisited();
 		this.person = person;
-		this.customDataManager.reset();
+//TODO		this.customDataManager.reset();
 		this.fromCoord = fromCoord;
 		this.fromNodes = fromNodes;
 
@@ -218,10 +218,10 @@ public class TransitLeastCostPathTree {
 				toNodeData.getCost() - startNodeData.getCost());
 	}
 
-	@SuppressWarnings("unchecked")
-	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
-		this.person = person;
-		this.customDataManager.reset();
+    @SuppressWarnings("unchecked")
+    public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
+        this.person = person;
+//TODO        this.customDataManager.reset();
 
 		Set<Node> endNodes = new HashSet<>(toNodes.keySet());
 
@@ -368,22 +368,22 @@ public class TransitLeastCostPathTree {
 			final RouterPriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost) {
 
-		this.customDataManager.initForLink(l);
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
-		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle, this.customDataManager);
-		DijkstraNodeData data = getData(n);
-		double nCost = data.getCost();
-		if (!data.isVisited(getIterationId())) {
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
-			this.customDataManager.storeTmpData();
-			return true;
-		}
-		double totalCost = currCost + travelCost;
-		if (totalCost < nCost) {
-			revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
-			this.customDataManager.storeTmpData();
-			return true;
-		}
+//TODO        this.customDataManager.initForLink(l);
+        double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
+        double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle, this.customDataManager);
+        DijkstraNodeData data = getData(n);
+        double nCost = data.getCost();
+        if (!data.isVisited(getIterationId())) {
+            visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
+//TODO            this.customDataManager.storeTmpData();
+            return true;
+        }
+        double totalCost = currCost + travelCost;
+        if (totalCost < nCost) {
+            revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
+//TODO            this.customDataManager.storeTmpData();
+            return true;
+        }
 
 		return false;
 	}

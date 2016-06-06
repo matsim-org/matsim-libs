@@ -75,13 +75,14 @@ public class Incident2CSVWriter {
 				bw.newLine();
 			}
 			log.info("Traffic items written to " + outputFile);
+			bw.close();
 		}
 	}
 
 	public static void writeProcessedNetworkIncidents(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay, String outputFile) throws IOException {
 		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
 			
-			bw.write("Link Id;Incident Id;Original Capacity;"
+			bw.write("Link Id;Incident Id;Start Time; End Time;Original Capacity;"
 					+ "Original Freespeed;Original Number Of Lanes;Incident Capacity;Incident Freespeed; Incident Number Of Lanes");
 			bw.newLine();
 			
@@ -89,6 +90,8 @@ public class Incident2CSVWriter {
 				for (NetworkIncident incident : linkId2processedIncidentsCurrentDay.get(linkId)) {
 					bw.write(incident.getLink().getId().toString() + ";"
 							+ incident.getId() + ";"
+							+ incident.getStartTime() + ";"
+							+ incident.getEndTime() + ";"
 							+ incident.getLink().getCapacity()
 							+ ";" + incident.getLink().getFreespeed()
 							+ ";" + incident.getLink().getNumberOfLanes()
@@ -98,6 +101,7 @@ public class Incident2CSVWriter {
 					bw.newLine();
 				}
 			}
+			bw.close();
 		}
 		log.info("Traffic incidents written to " + outputFile);
 	}

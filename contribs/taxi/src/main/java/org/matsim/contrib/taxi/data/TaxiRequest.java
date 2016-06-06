@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -54,12 +55,18 @@ public class TaxiRequest
 
     private final MobsimPassengerAgent passenger;
     private final Link fromLink;
-    private final Link toLink;
+    private Link toLink;//toLink may be provided during the pickup
 
     private TaxiPickupTask pickupTask;
-    private TaxiDriveWithPassengerTask driveWithPassengerTask;
+    private TaxiOccupiedDriveTask occupiedDriveTask;
     private TaxiDropoffTask dropoffTask;
 
+
+    public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
+            double t0, double submissionTime)
+    {
+        this(id, passenger, fromLink, null, t0, submissionTime);
+    }
 
     public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
             double t0, double submissionTime)
@@ -85,6 +92,12 @@ public class TaxiRequest
     }
 
 
+    public void setToLink(Link toLink)
+    {
+        this.toLink = toLink;
+    }
+
+
     @Override
     public MobsimPassengerAgent getPassenger()
     {
@@ -104,15 +117,15 @@ public class TaxiRequest
     }
 
 
-    public TaxiDriveWithPassengerTask getDriveWithPassengerTask()
+    public TaxiOccupiedDriveTask getDriveWithPassengerTask()
     {
-        return driveWithPassengerTask;
+        return occupiedDriveTask;
     }
 
 
-    public void setDriveWithPassengerTask(TaxiDriveWithPassengerTask driveWithPassengerTask)
+    public void setOccupiedDriveTask(TaxiOccupiedDriveTask occupiedDriveTask)
     {
-        this.driveWithPassengerTask = driveWithPassengerTask;
+        this.occupiedDriveTask = occupiedDriveTask;
     }
 
 
@@ -128,7 +141,6 @@ public class TaxiRequest
     }
 
 
-    //@SuppressWarnings("incomplete-switch")
     public TaxiRequestStatus getStatus()
     {
         if (pickupTask == null) {
@@ -137,8 +149,12 @@ public class TaxiRequest
 
         switch (pickupTask.getStatus()) {
             case PLANNED:
+                if (pickupTask.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
+                    return TaxiRequestStatus.PLANNED;
+                }
+                
                 TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
-                if (currentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_EMPTY && //
+                if (currentTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE && //
                         pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
                     return TaxiRequestStatus.TAXI_DISPATCHED;
                 }
@@ -151,7 +167,7 @@ public class TaxiRequest
             case PERFORMED://continue
         }
 
-        if (driveWithPassengerTask.getStatus() == TaskStatus.STARTED) {
+        if (occupiedDriveTask.getStatus() == TaskStatus.STARTED) {
             return TaxiRequestStatus.RIDE;
         }
 

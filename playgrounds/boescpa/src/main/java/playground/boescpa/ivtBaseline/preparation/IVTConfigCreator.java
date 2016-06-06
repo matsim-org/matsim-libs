@@ -1,6 +1,7 @@
 package playground.boescpa.ivtBaseline.preparation;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -94,10 +95,18 @@ public class IVTConfigCreator {
 		timeMutationBlackList.add(ESCORT_OTHER);
 		blTAM.setBlackList(timeMutationBlackList);
 		config.addModule(blTAM);
+		// Add location choice
+		DestinationChoiceConfigGroup destChoiConfigGroup = new DestinationChoiceConfigGroup();
+		destChoiConfigGroup.setFlexibleTypes("remote_work, leisure, shop, escort_kids, escort_other");
+		destChoiConfigGroup.setEpsilonScaleFactors("0.3, 0.1, 0.1, 0.1, 0.2");
+		destChoiConfigGroup.setTravelTimeApproximationLevel(DestinationChoiceConfigGroup.ApproximationLevel.localRouting);
+		destChoiConfigGroup.setPrefsFile(INBASE_FILES + POPULATION_ATTRIBUTES);
+		config.addModule(destChoiConfigGroup);
         // Activate transit and correct it to ivt-experience
 		config.transit().setUseTransit(true);
 		config.planCalcScore().setUtilityOfLineSwitch(-2.0);
 		config.transitRouter().setSearchRadius(2000.0);
+		config.transitRouter().setAdditionalTransferTime(0.5);
 		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = getModeParamsTransitWalk(config);
 		transitWalkSet.setMarginalUtilityOfTraveling(-12.0);
 		// Add scoring for subpopulations
@@ -138,22 +147,26 @@ public class IVTConfigCreator {
 
 	protected List<StrategyConfigGroup.StrategySettings> getStrategyDescr() {
 		List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
-		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.5));
+		// main pop
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.2));
 		strategySettings.add(getStrategySetting("ReRoute", 0.2));
 		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
 		strategySettings.add(getStrategySetting("SubtourModeChoice", 0.1));
+		strategySettings.add(getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 0.1));
 		// cb pop
-		StrategyConfigGroup.StrategySettings strategySetting =
-				getStrategySetting("ChangeExpBeta", 0.01);
-		strategySetting.setSubpopulation(CreateCBPop.CB_TAG);
-		strategySettings.add(strategySetting);
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.2, CreateCBPop.CB_TAG));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2, CreateCBPop.CB_TAG));
 		// freight pop
-		strategySetting =
-				getStrategySetting("ChangeExpBeta", 0.01);
-		strategySetting.setSubpopulation(CreateFreightTraffic.FREIGHT_TAG);
-		strategySettings.add(strategySetting);
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.2, CreateFreightTraffic.FREIGHT_TAG));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2, CreateCBPop.CB_TAG));
         return strategySettings;
     }
+
+	protected static StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight, String subPopulation) {
+		StrategyConfigGroup.StrategySettings strategySetting = getStrategySetting(strategyName, strategyWeight);
+		strategySetting.setSubpopulation(subPopulation);
+		return strategySetting;
+	}
 
 	protected static StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight) {
 		StrategyConfigGroup.StrategySettings strategySetting = new StrategyConfigGroup.StrategySettings();

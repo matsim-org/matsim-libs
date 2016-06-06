@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -55,6 +56,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.singapore.springcalibration.run.SingaporeControlerListener;
+
 
 /**
  * @author anhorni
@@ -68,10 +70,11 @@ public class SingaporeDistributions implements IterationEndsListener {
 	private final StageActivityTypes stageActivityTypes;
 	private final List<DistributionClass> classes;
 	private DecimalFormat df = new DecimalFormat("0.00");
+	private DecimalFormat dfpercent = new DecimalFormat("0.0");
 	private String measure = "";
-	private Counter counter = new Counter();
-	
+	private Counter counter = new Counter();	
 	private DistributionClass transit_walk_class = new DistributionClass();
+	private ModesHistoryPlotter modesHistoryPlotter = new ModesHistoryPlotter();
 	
 	public SingaporeDistributions(final Population population,
 			final MainModeIdentifier mainModeIdentifier, final StageActivityTypes stageActivityTypes, String measure) {
@@ -108,11 +111,14 @@ public class SingaporeDistributions implements IterationEndsListener {
 		for (Trip trip : trips) {
 			String originActivityType = trip.getOriginActivity().getType();
 			String destinationActivityType = trip.getDestinationActivity().getType();
-			
+						
 			originActivityType = this.mapActivity(originActivityType);
 			destinationActivityType = this.mapActivity(destinationActivityType);
 												
 			String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+			
+			//log.info(plan.getPerson().getId().toString() + ": " + mainMode + " - " + originActivityType + " - " + destinationActivityType);
+			
 			Tuple<String, String> tuple = new Tuple<String, String>(originActivityType, destinationActivityType);
 			for (DistributionClass distributionClass : classes) {
 				boolean containsMainMode = distributionClass.mainModes.contains(mainMode);
@@ -125,9 +131,18 @@ public class SingaporeDistributions implements IterationEndsListener {
 							transit_walk_class.values.add(leg.getTravelTime());
 							//log.info("transit_walk_leg" + leg.getTravelTime());
 						}
+						
+						if (leg.getTravelTime() > 120.0 * 60.0) {
+							log.warn("Agent " + plan.getPerson().getId().toString() + " has a huge travel time for mode " +  
+						leg.getMode() + ": distance " + leg.getRoute().getDistance() + " travel time " + leg.getTravelTime() / 60.0 + " min");
+						}
 							
 						duration += leg.getTravelTime() / 60.0;												
 					}
+					
+					
+					
+					
 					for (Bin durationBin : distributionClass.distributionBins) {
 						if (duration >= durationBin.low && duration < durationBin.high) {
 							durationBin.count++;
@@ -196,6 +211,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 			for (Bin bin : distributionClass.distributionBins) {
 				bin.count = 0;
 			}
+			distributionClass.values.clear();
 		}
 		
 		for (String mode : SingaporeControlerListener.modes) {
@@ -205,13 +221,18 @@ public class SingaporeDistributions implements IterationEndsListener {
 		}
 		
 		List<Plan> plans = new ArrayList<Plan>();
-		for (Person person : this.population.getPersons().values()) plans.add(person.getSelectedPlan());
+		for (Person person : this.population.getPersons().values()) {
+			Plan bestPlan = new BestPlanSelector<Plan, Person>().selectPlan(person);
+			plans.add(bestPlan);
+		}
 		this.analyzePlans(plans);
 		
 		for (DistributionClass distributionClass : classes) {
 			writeDistributionClass(distributionClass, event.getIteration(), event.getServices().getControlerIO());
 		}		
 		this.writeCounter(event.getServices().getControlerIO(), event.getIteration());
+		this.updateAndRunModesHistoryPlotter(event.getServices().getControlerIO(), event.getIteration());
+		
 	}
 	
 	private void writeDistributionClass(DistributionClass distributionClass, int iteration, 
@@ -237,7 +258,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName + ".txt");
 			
 			int i = 0;
-			log.info(measure + " distribution for class " + distributionClass.name);
+			log.info(measure + " best plan distribution for class " + distributionClass.name);
 			
 			StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("low" + "\t");
@@ -271,7 +292,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 		Percentile percentile = new Percentile();
 		Double[] valuesarray = distributionClass.values.toArray(new Double[distributionClass.values.size()]);
 		percentile.setData(ArrayUtils.toPrimitive(valuesarray));
-		String title = measure + " distribution for class " + distributionClass.name;
+		String title = measure + " best plan distribution for class " + distributionClass.name;
 		String xAxisLabel = measure + " class:" + "\n" + " mean: " + df.format(distributionClass.mean.getResult()) + unit 
 				+ " - 50% percentile: " + df.format(percentile.evaluate(50)) + unit +
 				" # values: " + distributionClass.values.size();
@@ -385,14 +406,22 @@ public class SingaporeDistributions implements IterationEndsListener {
 		}
 	}
 	
+	private void updateAndRunModesHistoryPlotter(OutputDirectoryHierarchy outputDirectoryHierarchy, int iteration) {
+		for (String mode : SingaporeControlerListener.modes) {
+			double share = this.counter.getShare(mode, "counts");
+			this.modesHistoryPlotter.addModeShare(iteration, mode, share);
+		}
+		this.modesHistoryPlotter.writeModesHistory(outputDirectoryHierarchy.getOutputPath(), iteration);
+	}
+	
 	private void writeCounter(OutputDirectoryHierarchy outputDirectoryHierarchy, int iteration) {
 		String path = outputDirectoryHierarchy.getIterationPath(iteration);
 		String fileName = path + "/counter_" + measure;		
 		
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(fileName + ".txt");
+			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("mode" + "\t" + "counts" + "\t" + this.measure);			
+			stringBuffer.append("mode" + "\t" + "best_plan_counts" + "\t" + this.measure);			
 			writer.write(stringBuffer.toString());
 			writer.newLine();
 			
@@ -400,9 +429,9 @@ public class SingaporeDistributions implements IterationEndsListener {
 			for (String mode : SingaporeControlerListener.modes) {
 				stringBuffer = new StringBuffer();
 				stringBuffer.append(mode + "\t");
-				stringBuffer.append(df.format(this.counter.getShare(mode, "counts")) + "\t");
-				if (measure.equals("distance")) stringBuffer.append(df.format(this.counter.getShare(mode, "distance")) + "\t");
-				if (measure.equals("time")) stringBuffer.append(df.format(this.counter.getShare(mode, "time")));
+				stringBuffer.append(dfpercent.format(100.0 * this.counter.getShare(mode, "counts")) + "\t");
+				if (measure.equals("distance")) stringBuffer.append(dfpercent.format(100.0 * this.counter.getShare(mode, "distance")) + "\t");
+				if (measure.equals("time")) stringBuffer.append(dfpercent.format(100.0 * this.counter.getShare(mode, "time")));
 				writer.write(stringBuffer.toString());
 				writer.newLine();
 			}

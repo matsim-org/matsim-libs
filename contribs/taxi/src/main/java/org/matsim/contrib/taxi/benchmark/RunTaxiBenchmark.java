@@ -59,7 +59,7 @@ public class RunTaxiBenchmark
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(VrpTravelTimeModules.createFreespeedTravelTimeModule(false));
+        controler.addOverridingModule(VrpTravelTimeModules.createFreespeedTravelTimeModule(true));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         controler.addOverridingModule(new AbstractModule() {

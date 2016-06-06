@@ -111,7 +111,7 @@ public class PrefsCreator {
                         ActivityImpl act = (ActivityImpl) pe;
                         actChain = actChain.concat(actCharacteristics.valueOf(act.getType().toUpperCase()).getAbbr());
                         actStartTime = (act.getStartTime() > 0) ? act.getStartTime() : 0;
-                        actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 30*3600;
+                        actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 24*3600;
                         actDuration = actEndTime - actStartTime;
                         switch (act.getType()) {
                             case HOME:

@@ -2,12 +2,9 @@ package saleem.p0;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import org.apache.log4j.Logger;
+import java.util.Scanner;
 
 public class TextReaderWriter {
 	public void writeToTextFile(ArrayList<Double> values, String path){
@@ -29,17 +26,17 @@ public class TextReaderWriter {
 	}
 	public ArrayList<Double> readFromTextFile(String path){
 		ArrayList<Double> values = new ArrayList<>();
-		try { 
-			for (String line : Files.readAllLines(Paths.get(path), null)) {
-				Logger.getLogger(this.getClass()).fatal("the above line did not compile because second argument was missing "
-						+ "in readAllLines( arg1, arg2 ).  I added `null' to make it compile but do not know if this is the right choice. "
-						+ "kai, sep'15");
-			    for (String part : line.split(" ")) {
-			        Double i = Double.valueOf(part);
-			        values.add(i);
-			    }
-			}
-	       
+		Scanner scan;
+	    File file = new File(path);
+	    try {
+	        scan = new Scanner(file);
+
+	        while(scan.hasNext())
+	        {
+	        	values.add(Double.parseDouble(scan.next()));
+	        }
+	        scan.close();
+
 	    } catch(Exception ex) {
 	        //catch logic here
 	    }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,71 +19,52 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.EnumMap;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.util.EnumAdder;
 
 
 public class TaxiStats
 {
-    public final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
-    public final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
+    public final String id;
+
+    public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
+
+    public final EnumAdder<TaxiTask.TaxiTaskType, ?> taskTimeSumsByType;
+
+    public final DescriptiveStatistics vehicleEmptyDriveRatio = new DescriptiveStatistics();
+
+    public final DescriptiveStatistics vehicleStayRatio = new DescriptiveStatistics();
 
 
-    public TaxiStats()
+    public TaxiStats(String id, EnumAdder<TaxiTask.TaxiTaskType, ?> taskTimeSumsByType)
     {
-        timesByTaskType = new EnumMap<>(TaxiTaskType.class);
-        for (TaxiTaskType t : TaxiTaskType.values()) {
-            timesByTaskType.put(t, new DescriptiveStatistics());
-        }
+        this.id = id;
+        this.taskTimeSumsByType = taskTimeSumsByType;
     }
 
 
-    public void addTask(TaxiTask task)
+    public double getFleetEmptyDriveRatio()
     {
-        double time = task.getEndTime() - task.getBeginTime();
-        timesByTaskType.get(task.getTaxiTaskType()).addValue(time);
-    }
-
-
-    public double getDriveEmptyRatio()
-    {
-        double empty = timesByTaskType.get(TaxiTaskType.DRIVE_EMPTY).getSum();//not mean!
-        double occupied = timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED).getSum();//not mean!
+        double empty = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.EMPTY_DRIVE).doubleValue();
+        double occupied = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
         return empty / (empty + occupied);
     }
 
 
-    public double getStayTime()
+    public double getFleetStayRatio()
     {
-        return timesByTaskType.get(TaxiTaskType.STAY).getSum();//not mean!
+        double stay = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.STAY).doubleValue();
+        double total = taskTimeSumsByType.getTotal().doubleValue();
+        return stay / total;
     }
 
 
-    public DescriptiveStatistics getDriveOccupiedTimes()
+    public double getOccupiedDriveRatio()
     {
-        return timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED);
-    }
-
-
-    public static final String HEADER = "WaitT\t" //
-            + "95pWaitT\t"//
-            + "MaxWaitT\t"//
-            + "OccupiedT\t"//
-            + "%EmptyDrive\t";
-
-
-    @Override
-    public String toString()
-    {
-        return new StringBuilder()//
-                .append(passengerWaitTimes.getMean()).append('\t') //
-                .append(passengerWaitTimes.getPercentile(95)).append('\t') //
-                .append(passengerWaitTimes.getMax()).append('\t') //
-                .append(getDriveOccupiedTimes().getMean()).append('\t') //
-                .append(getDriveEmptyRatio()).append('\t') //
-                .toString();
+        double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
+        double total = taskTimeSumsByType.getTotal().doubleValue();
+        return occupied / total;
     }
 }

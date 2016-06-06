@@ -31,10 +31,7 @@ public class StandardController {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]) ;
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 	}
 }

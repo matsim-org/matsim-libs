@@ -318,6 +318,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 				for ( Modes4Accessibility mode : config.getIsComputingMode() ) {
 					if(!useRawSum){ 	// get log sum
+//						System.err.println(" ------------------ gcs[mode.ordinal()].getSum() = " + gcs[mode.ordinal()].getSum());
+						// does not seem to ever be "-infinity"
+//						System.err.println(" ------------- inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) = " + inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ));
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
@@ -347,6 +350,8 @@ import java.util.concurrent.ConcurrentHashMap;
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
 			if ( !this.config.getIsComputingMode().contains(calculatorEntry.getKey()) ) continue; // XXX should be configured by adding only the relevant calculators
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
+			//System.err.println("--------------- expVhk " + expVhk);
+			// does not seem to be "-infinity"
 			gcs[ calculatorEntry.getKey().ordinal() ].addExpUtils( expVhk );
 		}
 	}

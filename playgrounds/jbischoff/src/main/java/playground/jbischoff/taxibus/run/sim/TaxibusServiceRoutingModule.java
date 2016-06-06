@@ -35,6 +35,8 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
+import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
+
 /**
  * @author balac,jbischoff
  *
@@ -55,7 +57,7 @@ public class TaxibusServiceRoutingModule implements RoutingModule {
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		
-		Leg taxiLeg = new LegImpl("taxibus");
+		Leg taxiLeg = new LegImpl(TaxibusUtils.TAXIBUS_MODE);
 		taxiLeg.setTravelTime( travelTime );
 		NetworkRoute route = 
 				((PopulationFactoryImpl)controler.getScenario().getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());

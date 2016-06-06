@@ -43,10 +43,10 @@ public class SplitDays {
     private static final Logger logger = Logger.getLogger(SplitSeason.class);
 
     public static void main(String args[]) throws IOException {
-        String sourceFile = "/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix-season.txt";
-        String targetFile = "/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix-day.txt";
-        String shareFile = "/Users/johannes/gsv/matrix2014/sim/output/day-share.txt";
-        String zoneFile = "/Users/johannes/gsv/gis/zones/geojson/tomtom.de.gk3.geojson";
+        String sourceFile = args[0];// "/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix-season.txt";
+        String targetFile = args[3];//"/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix-day.txt";
+        String shareFile = args[1];//"/Users/johannes/gsv/matrix2014/sim/output/day-share.txt";
+        String zoneFile = args[2];//"/Users/johannes/gsv/gis/zones/geojson/tomtom.de.gk3.geojson";
         /*
         Load share table.
          */

@@ -101,7 +101,7 @@ public class PreparationScript {
                 createPrefsForPopulation();
 				mergeInSubpopulations();
                 createDefaultIVTConfig(prctScenario);
-				createIVTLCConfig(prctScenario);
+				//createIVTLCConfig(prctScenario);
 				testScenario(true);
                 // to finish the process copy all files together to the final scenario
                 createNewScenario();
@@ -139,7 +139,7 @@ public class PreparationScript {
         Files.copy(Paths.get(pathResources + VEHICLES), Paths.get(pathScenario + VEHICLES));
     }
 
-	private static void createIVTLCConfig(int prctScenario) {
+	/*private static void createIVTLCConfig(int prctScenario) {
 		log.info(" ------- Create LC IVT Config ------- ");
 		pathLCConfig = tempFolder + LC_CONFIG;
 		final String[] args = {
@@ -147,7 +147,7 @@ public class PreparationScript {
 				Integer.toString(prctScenario)
 		};
 		ChooseSecondaryFacilitiesConfigCreator.main(args);
-	}
+	}*/
 
     private static void createDefaultIVTConfig(int prctScenario) {
         log.info(" ------- Create Default IVT Config ------- ");

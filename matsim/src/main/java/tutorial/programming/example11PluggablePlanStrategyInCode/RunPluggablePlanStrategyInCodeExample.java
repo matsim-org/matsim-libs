@@ -24,12 +24,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 public class RunPluggablePlanStrategyInCodeExample {
 	private static final String STRATEGY_NAME = "doSomethingSpecial";
 
 	public static void main(final String[] args) {
+		ControlerUtils.initializeOutputLogging();
+		
 
 		Config config;
 		if ( args.length==0 ) {

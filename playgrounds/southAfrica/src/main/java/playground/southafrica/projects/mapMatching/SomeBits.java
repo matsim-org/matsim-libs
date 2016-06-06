@@ -63,6 +63,12 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+
 import playground.southafrica.projects.digicore.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
@@ -82,15 +88,15 @@ public class SomeBits {
 	public static void main(String[] args) {
 		Header.printHeader(SomeBits.class.toString(), args);
 		
-		Map<String, Integer> map = new TreeMap<String, Integer>();
-		File file = new File(args[0]);
-		String id = file.getName().substring(0, file.getName().indexOf("."));
-		if(!map.containsKey(id)){
-			map.put(id, map.size()+1);
-		}
-		int newId = map.get(id);
-		
-		splitTrips(file, String.valueOf(newId));
+//		Map<String, Integer> map = new TreeMap<String, Integer>();
+//		File file = new File(args[0]);
+//		String id = file.getName().substring(0, file.getName().indexOf("."));
+//		if(!map.containsKey(id)){
+//			map.put(id, map.size()+1);
+//		}
+//		int newId = map.get(id);
+//		
+//		splitTrips(file, String.valueOf(newId));
 		
 //		/* Read in the network. */ 
 //		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -99,7 +105,42 @@ public class SomeBits {
 //		QuadTree<Link> qt = buildQuadTreeFromNetwork(sc.getNetwork());
 //		findRouteBetweenRandomPoints(sc.getNetwork());
 		
+		/* Coordinates. */
+		Coord c1 = CoordUtils.createCoord(1.0, 1.0);
+		Coord c2 = CoordUtils.createCoord(11.0, 1.0);
+		/* MATSim version. */
+		Coord a = CoordUtils.createCoord(0.0, 0.0);
+		Coord b = CoordUtils.createCoord(10.0, 0.0);
+		Network net = NetworkUtils.createNetwork();
+		NetworkFactory nf = net.getFactory();
+		Node na = nf.createNode(Id.createNodeId("a"), a);
+		Node nb = nf.createNode(Id.createNodeId("b"), b);
+		net.addNode(na);
+		net.addNode(nb);
+		Link link = nf.createLink(Id.createLinkId("ab"), na, nb);
+		net.addLink(link);
+		checkCoords(c1, link);
+		checkCoords(c2, link);
+		
 		Header.printFooter();
+	}
+	
+	public static Coord checkCoords(Coord c, Link link){
+		
+		/* Vividsolutions version. */
+		GeometryFactory gf = new GeometryFactory();
+		Coordinate ca = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+		Coordinate cb = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+		
+		LineSegment seg = new LineSegment(ca, cb);
+		
+		Coordinate cu = new Coordinate(c.getX(), c.getY());
+		Coordinate cp = seg.project(cu);
+		
+//		LOG.info(String.format("Distance: %.2f (%.1f,%.1f)", seg.distancePerpendicular(cu), cp.x, cp.y));
+		
+		Coord rc = CoordUtils.createCoord(cp.x, cp.y);
+		return rc;
 	}
 	
 

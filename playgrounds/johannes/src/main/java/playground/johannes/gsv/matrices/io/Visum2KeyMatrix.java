@@ -23,8 +23,9 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
+import playground.johannes.synpop.matrix.NumericMatrixIO;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -45,15 +46,16 @@ public class Visum2KeyMatrix {
 		return keyMatrix;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Matrix visumMatrix = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
-		reader.readFile("/home/johannes/gsv/prognose-update/iv-2030.txt");
+		reader.readFile("/Users/johannes/gsv/miv-matrix/raw/modena/miv.edu.txt");
 		
 		NumericMatrix keyMatrix = convert(visumMatrix);
 		
-		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
-		writer.write(keyMatrix, "/home/johannes/gsv/prognose-update/iv-2030.xml");
+//		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
+		NumericMatrixIO.write(keyMatrix, "/Users/johannes/gsv/miv-matrix/raw/modena/miv.edu.2.txt");
+//		writer.write(keyMatrix, "/Users/johannes/Desktop/rail.2013.txt");
 	}
 
 }

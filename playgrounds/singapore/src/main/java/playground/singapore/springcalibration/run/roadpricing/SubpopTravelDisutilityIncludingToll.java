@@ -37,6 +37,7 @@ import org.matsim.vehicles.Vehicle;
 class SubpopTravelDisutilityIncludingToll implements TravelDisutility {
 
 	private static final Logger log = Logger.getLogger( SubpopTravelDisutilityIncludingToll.class ) ;
+	private double tollCostFactor = 1.0;
 
 	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
@@ -77,7 +78,7 @@ class SubpopTravelDisutilityIncludingToll implements TravelDisutility {
 		
 		double marginalUtilityOfMoney = parameters.getScoringParameters(person).marginalUtilityOfMoney;
 		//log.info("mom: " + marginalUtilityOfMoney);
-		return normalTravelDisutilityForLink + tollCost * marginalUtilityOfMoney;
+		return normalTravelDisutilityForLink + this.tollCostFactor * tollCost * marginalUtilityOfMoney;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}
 

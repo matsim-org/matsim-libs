@@ -52,7 +52,7 @@ public class LinesUtils {
 				Id<TaxibusLine> id = Id.create(from+"_"+to,TaxibusLine.class);
 				Id<Link> holdingPosition = Id.createLinkId(row[2]);
 				double twMax = Double.parseDouble(row[3]);
-				TaxibusLine line = new TaxibusLineImpl(id,holdingPosition, zones.get(Id.create(from,Zones.class)).getMultiPolygon(), zones.get(Id.create(to,Zones.class)).getMultiPolygon(),twMax,tbcg.getNumberOfVehiclesDispatchedAtSameTime());
+				TaxibusLine line = new TaxibusLineImpl(id,holdingPosition, zones.get(Id.create(from,Zones.class)).getMultiPolygon(), zones.get(Id.create(to,Zones.class)).getMultiPolygon(),twMax,tbcg.getNumberOfVehiclesDispatchedAtSameTime(),tbcg.getVehCap());
 				Id<TaxibusLine> rid = Id.create(to+"_"+from,TaxibusLine.class);
 				
 				line.setReturnRouteId(rid);

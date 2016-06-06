@@ -81,7 +81,7 @@ public class MIPTaxiStats
 
     public void print(PrintWriter pw)
     {
-        pw.println("state\t" + TaxiStats.HEADER);
+        pw.println("state\t");
         pw.println("initial\t" + statsToString(initial));
         pw.println("solved\t" + statsToString(solved));
         pw.println("simulated\t" + statsToString(simulated));
@@ -90,12 +90,12 @@ public class MIPTaxiStats
 
     private String statsToString(TaxiStats stats)
     {
-        return stats == null ? "---" : stats.toString();
+        return stats == null ? "---" : (stats.passengerWaitTime.getMean() + "");
     }
 
 
     private TaxiStats calcTaxiStats()
     {
-        return new TaxiStatsCalculator(data.getVehicles().values()).getStats();
+        return new TaxiStatsCalculator(data.getVehicles().values()).getDailyStats();
     }
 }

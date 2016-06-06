@@ -126,6 +126,7 @@ public class ZHCutter {
 		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.5));
 		strategySettings.add(getStrategySetting("ReRoute", 0.2));
 		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
+		strategySettings.add(getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 0.1));
 		for (StrategyConfigGroup.StrategySettings strategy : strategySettings) {
 			strategy.setSubpopulation(cutterConfig.commuterTag);
 			config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategy);
@@ -351,15 +352,19 @@ public class ZHCutter {
 					filteredPopulation.addPerson(p);
 					filteredAgents.put(p.getId(), p);
 					if (actNotInArea) {
-						personAttributes.putAttribute(p.toString(), "subpopulation", commuterTag);
+						if (personAttributes.getAttribute(p.getId().toString(), "subpopulation") == null) {
+							personAttributes.putAttribute(p.getId().toString(), "subpopulation", commuterTag);
+						}
 					}
 				} else if (checkForRouteIntersection(p.getSelectedPlan())) {
 					filteredPopulation.addPerson(p);
 					filteredAgents.put(p.getId(), p);
-					personAttributes.putAttribute(p.toString(), "subpopulation", commuterTag);
+					if (personAttributes.getAttribute(p.getId().toString(), "subpopulation") == null) {
+						personAttributes.putAttribute(p.getId().toString(), "subpopulation", commuterTag);
+					}
 				}
 				else {
-					personAttributes.removeAllAttributes(p.toString());
+					personAttributes.removeAllAttributes(p.getId().toString());
 				}
 			}
 		}

@@ -57,7 +57,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
 		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		
 		double effectiveCellSize = ((NetworkImpl) network ).getEffectiveCellSize() ;
 		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;

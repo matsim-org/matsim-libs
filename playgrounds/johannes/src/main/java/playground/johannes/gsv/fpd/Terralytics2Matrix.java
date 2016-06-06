@@ -32,8 +32,8 @@ import java.io.IOException;
 public class Terralytics2Matrix {
 
     public static void main(String[] args) throws IOException {
-        String inFile = "/Users/johannes/Desktop/20160330_Lieferung_Deutschland/od_weekly_zip5.csv";
-        String outFile = "/Users/johannes/Desktop/20160330_Lieferung_Deutschland/plz4.6week.txt";
+        String inFile = "/Users/johannes/gsv/fpd/telefonica/032016/data/raw/od_weekly_zip5.csv";
+        String outFile = "/Users/johannes/gsv/fpd/telefonica/032016/data/plz5.rail.6week.txt";
 
         BufferedReader reader = new BufferedReader(new FileReader(inFile));
         String line = reader.readLine();
@@ -56,7 +56,7 @@ public class Terralytics2Matrix {
 
             String mode = tokens[2];
 
-            if(mode.equalsIgnoreCase("IV")) {
+            if(mode.equalsIgnoreCase("Bahn")) {
                 String week = tokens[3];
                 if(!week.equalsIgnoreCase("W1-2") && !week.equalsIgnoreCase("W2-2")) {
                     double volume = Double.parseDouble(tokens[4]);

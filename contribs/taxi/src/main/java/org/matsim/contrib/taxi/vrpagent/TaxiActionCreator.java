@@ -29,6 +29,10 @@ import org.matsim.contrib.taxi.schedule.*;
 public class TaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
+    public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
+    public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
+    public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
+
     private final PassengerEngine passengerEngine;
     private final VrpLegs.LegCreator legCreator;
     private final double pickupDuration;
@@ -49,21 +53,22 @@ public class TaxiActionCreator
         TaxiTask tt = (TaxiTask)task;
 
         switch (tt.getTaxiTaskType()) {
-            case DRIVE_EMPTY:
-            case DRIVE_OCCUPIED:
+            case EMPTY_DRIVE:
+            case OCCUPIED_DRIVE:
                 return legCreator.createLeg((DriveTask)task);
 
             case PICKUP:
                 final TaxiPickupTask pst = (TaxiPickupTask)task;
                 return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
-                        pickupDuration);
+                        pickupDuration, PICKUP_ACTIVITY_TYPE);
 
             case DROPOFF:
                 final TaxiDropoffTask dst = (TaxiDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
+                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest(),
+                        DROPOFF_ACTIVITY_TYPE);
 
             case STAY:
-                return new VrpActivity("Stay", (TaxiStayTask)task);
+                return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask)task);
 
             default:
                 throw new IllegalStateException();

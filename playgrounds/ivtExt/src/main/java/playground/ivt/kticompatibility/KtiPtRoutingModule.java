@@ -39,9 +39,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.pt.PtConstants;
-import playground.balmermi.world.Layer;
-import playground.balmermi.world.World;
-import playground.balmermi.world.Zone;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
@@ -107,12 +105,15 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		// pt
 		// ---------------------------------------------------------------------
-		final Layer municipalities = info.world.getLayer("municipality");
-		final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
-		final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
-		final Zone fromMunicipality = froms.get(0);
-		final Zone toMunicipality = tos.get(0);
+		if (true)
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
 
+	//	final Layer municipalities = info.world.getLayer("municipality");
+	//	final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
+	//	final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
+	//	final Zone fromMunicipality = froms.get(0);
+	//	final Zone toMunicipality = tos.get(0);
+/*
 		final Entry ptTravelTimeEntry =
 			info.ptTravelTimes.getEntry(
 					fromMunicipality.getId().toString(),
@@ -161,7 +162,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		route2.setDistance( distanceLeg2 );
 		walk2.setRoute( route2 );
 		trip.add( walk2 );
-
+*/
 		return trip;
 	}
 
@@ -181,7 +182,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 	public static class KtiPtRoutingModuleInfo {
 		private final Matrix ptTravelTimes;
 		private final SwissHaltestellen ptStops;
-		private final World world;
+		//private final World world;
 		private final double intrazonalSpeed;
 
 		public KtiPtRoutingModuleInfo(
@@ -213,7 +214,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 			this.ptTravelTimes = ptInfo.getPtTravelTimes();
 			this.ptStops = ptInfo.getHaltestellen();
-			this.world = ptInfo.getLocalWorld();
+			//this.world = ptInfo.getLocalWorld();
 		}
 	}
 }

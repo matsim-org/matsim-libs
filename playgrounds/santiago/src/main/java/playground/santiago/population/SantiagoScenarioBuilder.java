@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/run34/";
+	final String pathForMatsim = "../../../runs-svn/santiago/casoBase5_NP/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
@@ -107,6 +107,9 @@ public class SantiagoScenarioBuilder {
 	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
 	final String boundariesInputDir = svnWorkingDir + "inputFromElsewhere/exported_boundaries/";
 	final String databaseFilesDir = svnWorkingDir + "inputFromElsewhere/exportedFilesFromDatabase/";
+	final String allTogether = databaseFilesDir + "All/Original/";
+	final String Normal = databaseFilesDir + "Normal/";
+	final String Summer = databaseFilesDir + "Summer/";
 	final String outputDir = svnWorkingDir + "inputForMATSim/";
 	
 	final String popA0eAX = "A0equalAX";		//Population with first Activity = last Activity
@@ -141,11 +144,11 @@ public class SantiagoScenarioBuilder {
 		CSVToPlans converter = new CSVToPlans(config,
 											  outputDir + "plans/",
 											  boundariesInputDir + "Boundaries_20150428_085038.shp");
-		converter.run(databaseFilesDir + "Hogar.csv",
-					  databaseFilesDir + "Persona.csv",
-					  databaseFilesDir + "Export_Viaje.csv",
-					  databaseFilesDir + "Etapa.csv",
-					  databaseFilesDir + "comunas.csv");
+		converter.run(Normal + "Hogar.csv",
+					  Normal + "Persona.csv",
+					  Normal + "Export_Viaje.csv",
+					  Normal + "Etapa.csv",
+					  Normal + "comunas.csv");
 		
 		Scenario scenarioFromEOD = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenarioFromEOD).readFile(outputDir + "plans/plans_eod.xml.gz");
@@ -166,7 +169,7 @@ public class SantiagoScenarioBuilder {
 		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
 		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
 		
-		randomizeEndTimes(populationTmp);
+		//randomizeEndTimes(populationTmp);
 		
 		//finish population
 		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);

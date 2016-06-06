@@ -53,13 +53,16 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import analysis.TtAnalyzedGeneralResultsWriter;
 import analysis.TtGeneralAnalysis;
 import analysis.TtListenerToBindGeneralAnalysis;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -75,30 +78,33 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static ScenarioType SCENARIO_TYPE = ScenarioType.BaseCaseContinued_BtuRoutes;
-	private enum ScenarioType {
+	private final static ScenarioType SCENARIO_TYPE = ScenarioType.BaseCase;
+	public enum ScenarioType {
 		BaseCase, BaseCaseContinued_MatsimRoutes, BaseCaseContinued_BtuRoutes
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.BTU_OPT;
-	private enum SignalType {
+	private final static SignalType SIGNAL_TYPE = SignalType.MS;
+	public enum SignalType {
 		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT
 	}
 	
 	// defines which kind of pricing should be used
 	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	private enum PricingType {
-		NONE, V3, V4, V8, V9, FLOWBASED
+		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED
 	}
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/cottbus/BaseCaseContinued/";
-	private static String inputBaseDir;	
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/cottbus/createNewBC/";
+	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
+	private static final String BTU_BASE_DIR = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 	
 	private static final boolean WRITE_INITIAL_FILES = true;
+	private static final boolean USE_COUNTS = true;
+	private static final double SCALING_FACTOR = 0.7;
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -112,25 +118,26 @@ public class TtRunCottbusSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-			inputBaseDir = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
-			config.network().setInputFile(inputBaseDir + "network_wgs84_utm33n.xml");
-			config.network().setLaneDefinitionsFile(inputBaseDir + "lanes.xml");
-			config.plans().setInputFile(inputBaseDir + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+//			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml.gz");
+			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v2.xml");
+//			config.network().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/network_improved.xml");
+//			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
+			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v2.1.xml");
+			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
 //			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/commuter_population_wgs84_utm33n_car_only.xml.gz");
 //			config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
 		} else { // BaseCaseContinued
-			inputBaseDir = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
-			config.network().setInputFile(inputBaseDir + "network_small_simplified.xml.gz");
-			config.network().setLaneDefinitionsFile(inputBaseDir + "lanes_network_small.xml.gz");
+			config.network().setInputFile(BTU_BASE_DIR + "network_small_simplified.xml.gz");
+			config.network().setLaneDefinitionsFile(BTU_BASE_DIR + "lanes_network_small.xml.gz");
 			if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_MatsimRoutes))
-				config.plans().setInputFile(inputBaseDir + "trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
+				config.plans().setInputFile(BTU_BASE_DIR + "trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
 			else // BtuRoutes	
-				config.plans().setInputFile(inputBaseDir + "routeComparison/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
+				config.plans().setInputFile(BTU_BASE_DIR + "routeComparison/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
 		}
 		
 		// set number of iterations
 		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-			config.controler().setLastIteration(400);
+			config.controler().setLastIteration(100);
 		} else { // BaseCaseContinued
 			config.controler().setFirstIteration(1000);
 			config.controler().setLastIteration(1400);
@@ -140,26 +147,36 @@ public class TtRunCottbusSimulation {
 		config.qsim().setUseLanes( true );
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalType.NONE) ? false : true);
-		switch (SIGNAL_TYPE) {
-		case MS:
-			if (SCENARIO_TYPE.equals(ScenarioType.BaseCase))
-				setSignalFiles(signalConfigGroup, "signal_systems_no_13.xml", "signal_groups_no_13.xml", "signal_control_no_13.xml");
-			else // BaseCaseContinued
-				setSignalFiles(signalConfigGroup, "output_signal_systems_v2.0.xml.gz", "output_signal_groups_v2.0.xml.gz", "output_signal_control_v2.0.xml.gz");
-			break;
-		case MS_RANDOM_OFFSETS:
-			if (SCENARIO_TYPE.equals(ScenarioType.BaseCase))
-				setSignalFiles(signalConfigGroup, "signal_systems_no_13.xml", "signal_groups_no_13.xml", "signal_control_no_13_random_offsets.xml");
-			else // BaseCaseContinued
-				// TODO random file is normally not contained in this dir...
-				setSignalFiles(signalConfigGroup, "output_signal_systems_v2.0.xml.gz", "output_signal_groups_v2.0.xml.gz", "signal_control_no_13_random_offsets.xml");
-			break;
-		case BTU_OPT:
-			setSignalFiles(signalConfigGroup, "output_signal_systems_v2.0.xml.gz", "output_signal_groups_v2.0.xml.gz", "btu/signal_control_opt.xml");
-			break;
-		default:
-			break;
+		// set signal files
+		if (!SIGNAL_TYPE.equals(SignalType.NONE)) {
+			// the signal system file depends on the network
+			if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
+//				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13.xml");
+//				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_new2222.xml");
+				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.1.xml");
+			} else { // BaseCaseContinued, i.e. smaller network
+				signalConfigGroup.setSignalSystemFile(BTU_BASE_DIR + "output_signal_systems_v2.0.xml.gz");
+			}
+			// the signal groups file is always the same			
+//			signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13.xml");
+			signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13_v2.xml");
+			// the signal control file depends on the signal type
+			switch (SIGNAL_TYPE) {
+			case MS:
+//				signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13.xml");
+				signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_v2.xml");
+				break;
+			case MS_RANDOM_OFFSETS:
+				signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_random_offsets.xml");
+				break;
+			case BTU_OPT:
+				signalConfigGroup.setSignalControlFile(BTU_BASE_DIR + "btu/signal_control_opt.xml");
+				break;
+			default:
+				break;
+			}
 		}
+		
 		
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 2 );
@@ -185,7 +202,7 @@ public class TtRunCottbusSimulation {
 			if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
 				strat.setWeight(0.0); // no ReRoute, fix route choice set
 			else // MatsimRoutes or BaseCase
-				strat.setWeight(0.1);
+				strat.setWeight(0.05);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
@@ -200,7 +217,7 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
-			strat.setWeight(0.9);
+			strat.setWeight(0.95);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
@@ -223,14 +240,14 @@ public class TtRunCottbusSimulation {
 		if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
 			config.strategy().setMaxAgentPlanMemorySize(0); //unlimited because ReRoute is switched off anyway
 		else 
-			config.strategy().setMaxAgentPlanMemorySize(4);
+			config.strategy().setMaxAgentPlanMemorySize( 5 );
 
 		config.qsim().setStuckTime( 3600 );
 		config.qsim().setRemoveStuckVehicles(false);
 		
 		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-			config.qsim().setStorageCapFactor( 0.7 );
-			config.qsim().setFlowCapFactor( 0.7 );
+			config.qsim().setStorageCapFactor( SCALING_FACTOR );
+			config.qsim().setFlowCapFactor( SCALING_FACTOR );
 		} else { // BaseCaseContinued
 			// use default: 1.0 (i.e. as it is in the BTU network)
 		}
@@ -250,7 +267,7 @@ public class TtRunCottbusSimulation {
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
 
 		config.vspExperimental().setWritingOutputEvents(true);
-		config.planCalcScore().setWriteExperiencedPlans(false);
+		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setCreateGraphs(true);
 
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
@@ -275,6 +292,24 @@ public class TtRunCottbusSimulation {
 			workAct.setOpeningTime(7 * 3600);
 			workAct.setClosingTime(17.5 * 3600);
 			config.planCalcScore().addActivityParams(workAct);
+		}
+		
+		config.global().setCoordinateSystem("EPSG:25833"); //UTM33
+		
+		// add counts module
+		if (USE_COUNTS) {
+			if (!SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
+				throw new UnsupportedOperationException("In this scenario, counts can only be used together with ScenarioType.BaseCase"
+						+ " because they are not available for the simplified network of other scenario types.");
+			}
+			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted_addedLinks.xml");
+//			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_test.xml");
+			config.counts().setCountsScaleFactor(1.0 / SCALING_FACTOR); // sample size
+			config.counts().setWriteCountsInterval(config.controler().getLastIteration());
+//			config.counts().setWriteCountsInterval(1);
+			config.counts().setOutputFormat("all");
+//			config.counts().setInputCRS(inputCRS);
+			config.counts().setAverageCountsOverIterations(1);
 		}
 		
 		return config;
@@ -351,12 +386,20 @@ public class TtRunCottbusSimulation {
 				congestionHandler = new CongestionHandlerImplV4(controler.getEvents(), 
 						controler.getScenario());
 				break;
+			case V7:
+				congestionHandler = new CongestionHandlerImplV7(controler.getEvents(), 
+						controler.getScenario());
+				break;
 			case V8:
 				congestionHandler = new CongestionHandlerImplV8(controler.getEvents(), 
 						controler.getScenario());
 				break;
 			case V9:
 				congestionHandler = new CongestionHandlerImplV9(controler.getEvents(), 
+						controler.getScenario());
+				break;
+			case V10:
+				congestionHandler = new CongestionHandlerImplV10(controler.getEvents(), 
 						controler.getScenario());
 				break;
 			default:
@@ -498,6 +541,10 @@ public class TtRunCottbusSimulation {
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)
 			runName += "_" + config.strategy().getMaxAgentPlanMemorySize() + "plans";
 
+		if (USE_COUNTS){
+			runName += "_counts";
+		}
+		
 		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
 		// create directory
 		new File(outputDir).mkdirs();
@@ -529,12 +576,6 @@ public class TtRunCottbusSimulation {
 		
 		// write config
 		new ConfigWriter(scenario.getConfig()).write(outputDir + "config.xml");
-	}
-
-	private static void setSignalFiles(SignalSystemsConfigGroup signalConfigGroup, String signalSystemFile, String signalGroupFile, String signalControlFile) {
-		signalConfigGroup.setSignalSystemFile(inputBaseDir + signalSystemFile);
-		signalConfigGroup.setSignalGroupsFile(inputBaseDir + signalGroupFile);
-		signalConfigGroup.setSignalControlFile(inputBaseDir + signalControlFile);
 	}
 
 }

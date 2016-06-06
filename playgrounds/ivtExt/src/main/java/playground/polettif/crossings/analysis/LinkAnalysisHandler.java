@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -11,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import java.util.*;
 
 
-public class LinkAnalysisHandler extends AnalysisHandler {
+public class LinkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private static final Logger log = Logger.getLogger(LinkAnalysisHandler.class);
 
@@ -96,7 +98,7 @@ public class LinkAnalysisHandler extends AnalysisHandler {
 
 		// time-space-diagram for all agents
 		Map<Double, Double> agentMap = getTreeMap(event.getVehicleId().toString(), timeSpaceMap);
-		Double xPos = CoordUtils.calcEuclideanDistance(network.getNodes().get(Id.createNodeId("0")).getCoord(), network.getLinks().get(event.getLinkId()).getToNode().getCoord());
+		Double xPos = CoordUtils.calcEuclideanDistance(network.getNodes().get(Id.createNodeId("1")).getCoord(), network.getLinks().get(event.getLinkId()).getToNode().getCoord());
 		agentMap.put(event.getTime(), xPos);
 	}
 

@@ -2,6 +2,7 @@ package saleem.p0;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +56,7 @@ public class PlotStatistics {
 		chart.addMatsimLogo();
         chart.saveAsPng("H:\\Mike Work\\output\\ITERS\\it." + iter + "\\AverageDelaysStats" + ".png", 800, 600);
 	}
-	public void PlotCapacitiesGeneric(int iter, Map<Id<Link>, Map<Double, Double>> capacities, Map<Id<Link>, List<Double>> withoutP0capacities){
+	public void PlotCapacitiesGeneric(String path, Map<Id<Link>, Map<Double, Double>> capacities, Map<Id<Link>, List<Double>> withoutP0capacities){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		 XYLineChart chart = new XYLineChart("Capacities Statistics", "Time", "Capacity");
 		 XYPlot plot = (XYPlot)chart.getChart().getPlot();
@@ -72,9 +73,9 @@ public class PlotStatistics {
 			chart.addSeries("P0 Not Applied: Capacity Link " + linkid.toString(), cutil.toArray(times), cutil.toArray(capacitiesNoP0));
 			stroke++;
 		 }
-		 chart.saveAsPng("H:\\Mike Work\\output\\ITERS\\it." + iter + "\\CapacitiesStats" + ".png", 800, 600);
+		 chart.saveAsPng(path, 800, 600);
 	}
-	public void PlotDelaysGeneric(int iter, Map<Id<Link>, Map<Double, Double>> delays, Map<Id<Link>, List<Double>> withoutP0delayLinks){
+	public void PlotDelaysGeneric(String path, Map<Id<Link>, Map<Double, Double>> delays, Map<Id<Link>, List<Double>> withoutP0delayLinks){
 		XYLineChart chart = new XYLineChart("Average Delays Statistics", "Time", "Delay");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
@@ -91,9 +92,9 @@ public class PlotStatistics {
 			chart.addSeries("P0 Not Applied: Average Delay  Link " + linkid.toString(), cutil.toArray(times), cutil.toArray(delayslinkNoP0));
 			stroke++;
 		}
-        chart.saveAsPng("H:\\Mike Work\\output\\ITERS\\it." + iter + "\\AverageDelaysStats" + ".png", 800, 600);
+        chart.saveAsPng(path, 800, 600);
 	}
-	public void PlotAbsPresGeneric(int iteration, Iterator<Link> iterlinks, Map<Double, Double> dailyavgabspres, Map<Double, Map<Id<Link>, Double>> dailyabspreslinks){
+	public void PlotAbsPresGeneric(String path,  Iterator<Link> iterlinks, Map<Double, Double> dailyavgabspres, Map<Double, Map<Id<Link>, Double>> dailyabspreslinks){
 		XYLineChart chart = new XYLineChart("Average Absloute Pressure Difference", "Time", "Avg Abs Pres Difference");
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		ArrayList<Double> iterations = cutil.toArrayList(dailyavgabspres.keySet().iterator());
@@ -109,7 +110,7 @@ public class PlotStatistics {
 			chart.addSeries("Daily Average Absoloute Pressure Link: " + linkid, cutil.toArray(iterations), cutil.toArray(abspres));
 		}
 		chart.addSeries("Daily Average Absoloute Pressure  Difference ", cutil.toArray(iterations), cutil.toArray(values));
-        chart.saveAsPng("H:\\Mike Work\\output\\ITERS\\it." + iteration + "\\DailyAvgAbsPres" + ".png", 800, 600);
+        chart.saveAsPng(path, 800, 600);
 	}
 	public void plotAbsolutePressures(int iter, ArrayList<Double> times, ArrayList<Double> abspreslink2, ArrayList<Double> abspreslink4){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();

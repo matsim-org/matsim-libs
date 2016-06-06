@@ -84,7 +84,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
             //			new TravelDisutilityIncludingTollFactoryProvider(scenario, roadPricingScheme, parameters, config));
             	
             	addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class);
-            	
+            	addTravelDisutilityFactoryBinding("freight").toProvider(TravelDisutilityIncludingTollFactoryProvider.class);
             	// we do not need taxi here as the customer does pay a fare not a toll!
             }
         }));

@@ -66,6 +66,7 @@ public class RunTaxibusPolicyCase {
 			configFileName = args[0];
 		}
 		Config config = ConfigUtils.loadConfig(configFileName, new TaxibusConfigGroup());
+		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);

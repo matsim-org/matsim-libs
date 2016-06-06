@@ -90,7 +90,7 @@ public class AccessibilityBasedLocationOptimizer {
 
 			if ((i % searchInterval) == 0) { // if e.g. searchInterval = 7, only look at 7th measurePoint
 
-				final ActivityFacilities activityFacilites = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
+				final ActivityFacilities activityFacilites = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType);
 
 				ActivityOption activityOption = activityFacilityFactory.createActivityOption(actType);
 

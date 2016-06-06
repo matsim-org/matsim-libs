@@ -61,7 +61,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -179,7 +179,7 @@ public class QNetsimEngine implements MobsimEngine {
 			EventsManager events = sim.getEventsManager() ;
 			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
 			Network net = scenario.getNetwork() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( qsimConfig, events, net, scenario );
+			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
 			MobsimTimer mobsimTimer = sim.getSimTimer() ;
 			AgentCounter agentCounter = sim.getAgentCounter() ;
 			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
@@ -207,20 +207,20 @@ public class QNetsimEngine implements MobsimEngine {
 		qlink.addParkedVehicle(veh);
 	}
 
-	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
+	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch(snapshotStyle) {
 		case queue:
-			return new QueueAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			// ??? kai, nov'15
-			return new WithHolesAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case equiDist:
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		default:
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		}
 	}
 

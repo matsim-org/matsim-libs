@@ -72,7 +72,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -351,7 +350,6 @@ public class CreateAutomatedFDTest {
 			} else if(LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId )){
 				return BASE_LINK_ID;
 			} else return null; // returning null so that agent will arrive.
-
 		}
 
 		@Override
@@ -433,13 +431,11 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}
@@ -479,11 +475,12 @@ public class CreateAutomatedFDTest {
 		Node node3 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 500, 866.0));
 		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
 
-		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, 60, 27000, 1);
-		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, 60, 27000, 1);
+		double freeSpeedOnLink = 60/3.6;
+		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, freeSpeedOnLink, 7200, 1);
+		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, freeSpeedOnLink, 1600, 1);
+		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, freeSpeedOnLink, 1600, 1);
+		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, freeSpeedOnLink, 1600, 1);
+		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, freeSpeedOnLink, 7200, 1);
 
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.addAll(Arrays.asList(travelModes));
@@ -517,7 +514,7 @@ public class CreateAutomatedFDTest {
 		flowDataset.addSeries(bikeFlow);
 
 		NumberAxis flowAxis = new NumberAxis("Flow (PCU/h)");
-		flowAxis.setRange(0.0, 2100.0);
+		flowAxis.setRange(0.0, 1400.0);
 
 		XYPlot plot1 = new XYPlot(flowDataset, null, flowAxis, new XYLineAndShapeRenderer(false,true));
 		plot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -534,7 +531,7 @@ public class CreateAutomatedFDTest {
 		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
 
 		NumberAxis densityAxis = new NumberAxis("Overall density (PCU/km)");
-		densityAxis.setRange(0.0,150.00);
+		densityAxis.setRange(0.0,140.00);
 
 		CombinedDomainXYPlot plot = new CombinedDomainXYPlot(densityAxis);
 		plot.setGap(10.);
