@@ -73,7 +73,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 	public CorrectedUtility<N> createCorrectedUtility( final NestedLogitModel<N> model ) {
 		// initialize D_i
 		final Demand<N> demand = new Demand<>( model , scenario );
-		final IterationInformation iterationInformation = new IterationInformation();
+		final IterationInformation iterationInformation = new IterationInformation( demand );
 
 		// compute initial Constrained? (ex-ante)
 
