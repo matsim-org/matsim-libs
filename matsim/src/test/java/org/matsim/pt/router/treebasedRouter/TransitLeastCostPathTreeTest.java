@@ -15,12 +15,11 @@ import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.router.treebasedRouter.TransitLeastCostPathTree;
+import org.matsim.pt.router.TransitLeastCostPathTree;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
