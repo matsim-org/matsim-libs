@@ -18,17 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting;
+package org.matsim.pt.router.treebasedRouter;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.DijkstraNodeData;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
@@ -37,7 +35,10 @@ import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is based on and similar to org.matsim.pt.router.MultiNodeDijkstra
@@ -63,8 +64,6 @@ import java.util.*;
  */
 public class TransitLeastCostPathTree {
 
-	private static final Logger log = Logger.getLogger(TransitLeastCostPathTree.class);
-
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
 	 * have to reset all nodes at the beginning of each re-routing but can use the
@@ -75,8 +74,7 @@ public class TransitLeastCostPathTree {
 	/**
 	 * The network on which we find routes.
 	 */
-	//TODO changed to final and added a getter for the network doesn't have to be chached twice(like in TransitRouterImpl)
-	protected final Network network;
+	protected Network network;
 
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
@@ -92,15 +90,34 @@ public class TransitLeastCostPathTree {
 	private Person person = null;
 	private Vehicle vehicle = null;
 	private CustomDataManager customDataManager = new CustomDataManager();
-	private Coord fromCoord = null;
 	private Map<Node, InitialNode> fromNodes = null;
 
-	public TransitLeastCostPathTree(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
+	public TransitLeastCostPathTree(final Network network, final TransitTravelDisutility costFunction,
+									final TravelTime timeFunction,
+									final Map<Node, InitialNode> fromNodes, final Person person) {
 		this.network = network;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
 
 		this.nodeData = new HashMap<>((int)(network.getNodes().size() * 1.1), 0.95f);
+
+		//create tree
+		this.resetNetworkVisited();
+		this.person = person;
+//TODO		this.customDataManager.reset();
+		this.fromNodes = fromNodes;
+
+		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
+		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
+			DijkstraNodeData data = getData(entry.getKey());
+			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
+		}
+
+		// do the real work
+		while (pendingNodes.size() > 0) {
+			Node outNode = pendingNodes.poll();
+			relaxNode(outNode, pendingNodes);
+		}
 	}
 
 	/**
@@ -127,41 +144,6 @@ public class TransitLeastCostPathTree {
 		for (Node node : this.network.getNodes().values()) {
 			DijkstraNodeData data = getData(node);
 			data.resetVisited();
-		}
-	}
-
-	/**
-	 * TODO changed
-	 * Creates and caches a new LeastCostPathTree.
-	 *
-	 * @param fromNodes
-	 *          The nodes that are the next stops to the fromCoord and you like to route from.
-	 * @param person
-	 *          The person that you want to route for.
-	 *          Could easily be null.
-	 * @param fromCoord
-	 *          Operates as a primary key to determine on whithc LeastCostPathTree you are working on.
-	 *          You could just pass the original requested origin here.
-	 *          Requestable with (Your-TransitLeastCostPathTree-Object).getFromCoord().
-	 */
-	@SuppressWarnings("unchecked")
-	public void createLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
-		this.resetNetworkVisited();
-		this.person = person;
-//TODO		this.customDataManager.reset();
-		this.fromCoord = fromCoord;
-		this.fromNodes = fromNodes;
-
-		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
-		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
-			DijkstraNodeData data = getData(entry.getKey());
-			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
-		}
-
-		// do the real work
-		while (pendingNodes.size() > 0) {
-			Node outNode = pendingNodes.poll();
-			relaxNode(outNode, pendingNodes);
 		}
 	}
 
@@ -216,75 +198,6 @@ public class TransitLeastCostPathTree {
 
 		return new Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(),
 				toNodeData.getCost() - startNodeData.getCost());
-	}
-
-    @SuppressWarnings("unchecked")
-    public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
-        this.person = person;
-//TODO        this.customDataManager.reset();
-
-		Set<Node> endNodes = new HashSet<>(toNodes.keySet());
-
-		augmentIterationId();
-
-		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
-		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
-			DijkstraNodeData data = getData(entry.getKey());
-			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
-		}
-
-		// find out which one is the cheapest end node
-		double minCost = Double.POSITIVE_INFINITY;
-		Node minCostNode = null;
-
-		// do the real work
-		while (endNodes.size() > 0) {
-			Node outNode = pendingNodes.poll();
-
-			if (outNode == null) {
-				// seems we have no more nodes left, but not yet reached all endNodes...
-				endNodes.clear();
-			} else {
-				DijkstraNodeData data = getData(outNode);
-				boolean isEndNode = endNodes.remove(outNode);
-				if (isEndNode) {
-					InitialNode initData = toNodes.get(outNode);
-					double cost = data.getCost() + initData.initialCost;
-					if (cost < minCost) {
-						minCost = cost;
-						minCostNode = outNode;
-					}
-				}
-				if (data.getCost() > minCost) {
-					endNodes.clear(); // we can't get any better now
-				} else {
-					relaxNode(outNode, pendingNodes);
-				}
-			}
-		}
-
-		if (minCostNode == null) {
-			log.trace("No route was found");
-			return null;
-		}
-		Node toNode = minCostNode;
-
-		// now construct the path
-		List<Node> nodes = new LinkedList<>();
-		List<Link> links = new LinkedList<>();
-
-		nodes.add(0, toNode);
-		Link tmpLink = getData(toNode).getPrevLink();
-		while (tmpLink != null) {
-			links.add(0, tmpLink);
-			nodes.add(0, tmpLink.getFromNode());
-			tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
-		}
-		DijkstraNodeData startNodeData = getData(nodes.get(0));
-		DijkstraNodeData toNodeData = getData(toNode);
-		Path path = new LeastCostPathCalculator.Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(), toNodeData.getCost() - startNodeData.getCost());
-
-		return path;
 	}
 
 	/**
@@ -448,21 +361,5 @@ public class TransitLeastCostPathTree {
 		}
 		return r;
 	}
-
-	/**
-	 * TODO changed
-	 * Returns the orignal fromCoord as a primary Key to check if the cached LeastCostPathTree is the one you created
-	 * for excactly this fromCoord.
-	 *
-	 *  @return the fromCoord
-	 */
-	public Coord getFromCoord() { return fromCoord; }
-
-	/**
-	 * TODO changed to final and added a getter for the network doesn't have to be chached twice(like in TransitRouterImpl)
-	 *
-	 *  @return the network
-	 */
-	public Network getNetwork() { return network; }
 
 }

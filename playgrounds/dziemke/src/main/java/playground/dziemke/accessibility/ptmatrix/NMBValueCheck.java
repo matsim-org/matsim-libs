@@ -17,8 +17,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.*;
-//import org.matsim.pt.router.TransitRouterImpl;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
+//import org.matsim.pt.router.TreebasedTransitRouterImpl;
+import org.matsim.pt.router.treebasedRouter.TreebasedTransitRouterImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +49,11 @@ public class NMBValueCheck {
         reader.readFile(transitScheduleFile);
         TransitSchedule transitSchedule = scenario.getTransitSchedule();
 
-        // constructor of TransitRouterImpl needs TransitRouterConfig. This is why it is instantiated here.
+        // constructor of TreebasedTransitRouterImpl needs TransitRouterConfig. This is why it is instantiated here.
         TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig());
         transitRouterConfig.setSearchRadius(20000);
 //        System.out.println("additional tranfer time = " + transitRouterConfig.getAdditionalTransferTime());
-        TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
+        TransitRouter transitRouter = new TreebasedTransitRouterImpl(transitRouterConfig, transitSchedule);
 
         Double departureTime = 8. * 60 * 60;
 //        Coord origin = new Coord(137547.07266149623,-3706738.5909946687);

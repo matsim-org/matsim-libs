@@ -1,4 +1,4 @@
-package playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting;
+package org.matsim.pt.router.treebasedRouter;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -7,18 +7,20 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.*;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.treebasedRouter.TransitLeastCostPathTree;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +31,6 @@ import java.util.Map;
  */
 public class TransitLeastCostPathTreeTest {
 
-    private TransitLeastCostPathTree tree;
     private TransitRouterNetwork network;
     private TransitRouterNetworkTravelTimeAndDisutility travelDisutility;
 
@@ -38,10 +39,10 @@ public class TransitLeastCostPathTreeTest {
      * Instantiates a new TransitLeastCostPathTree object with a sample transitSchedule and default configuration.
      */
     @Before
-    public void instantiateTree() {
-        String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
+    public void instantiateNetworkAndTravelDisutility() {
+        String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
 
-        Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+        Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.loadScenario(config);
         scenario.getConfig().transit().setUseTransit(true);
         TransitScheduleReader reader = new TransitScheduleReader(scenario);
@@ -52,29 +53,15 @@ public class TransitLeastCostPathTreeTest {
 
         PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(transitSchedule);
         travelDisutility = new TransitRouterNetworkTravelTimeAndDisutility(transitRouterConfig, preparedTransitSchedule);
-
-        TransitTravelDisutility costFunction = travelDisutility;
-        TravelTime timeFunction = travelDisutility;
-        tree = new TransitLeastCostPathTree(network, costFunction, timeFunction);
     }
 
     /**
-     * Check whether the @Before-instantiation is instantiating a TransitLeastCostPathTree-object.
+     * Check whether the @Before-instantiation is instantiating a network and a travelDisutility.
      */
     @Test
-    public void TestTreeInstantiated() {
-        Assert.assertNotNull(tree);
-    }
-
-    /**
-     * Create a tree and verify it.
-     */
-    @Test
-    public void TestCreateLeastCostPathTree() {
-        Coord fromCoord = new Coord(1050d, 1050d);
-        Map<Node, TransitLeastCostPathTree.InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNode(null, fromCoord, 28800);
-        tree.createLeastCostPathTree(wrappedFromNodes, null, fromCoord);
-        Assert.assertEquals("Coords differ.", fromCoord, tree.getFromCoord());
+    public void TestNetworkAndTravelDisutilityInstantiated() {
+        Assert.assertNotNull(network);
+        Assert.assertNotNull(travelDisutility);
     }
 
     /**
@@ -95,30 +82,13 @@ public class TransitLeastCostPathTreeTest {
     }
 
     /**
-     * Try to access a path without initially creating the tree.
-     * Should throw a java.lang.NullPointerException.
-     */
-    @Test
-    public void TestGetPathWithoutTree() {
-        Coord toCoord = new Coord(3950d, 1050d);
-        Map<Node, TransitLeastCostPathTree.InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNode(null, toCoord, 28800);
-        String exceptionMessage = "";
-        try {
-            tree.getPath(wrappedToNodes);
-        } catch (Exception e) {
-            exceptionMessage = e.toString();
-        }
-        Assert.assertEquals("java.lang.NullPointerException", exceptionMessage);
-    }
-
-    /**
      * Try to route a standard connection.
      */
     @Test
     public void TestValidRouting() {
         Coord fromCoord = new Coord(1050d, 1050d);
         Map<Node, TransitLeastCostPathTree.InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNode(null, fromCoord, 28800);
-        tree.createLeastCostPathTree(wrappedFromNodes, null, fromCoord);
+		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(network, travelDisutility, travelDisutility, wrappedFromNodes, null);
         Coord toCoord = new Coord(3950d, 1050d);
         Map<Node, TransitLeastCostPathTree.InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNode(null, toCoord, 28800);
         Path path = tree.getPath(wrappedToNodes);
@@ -136,7 +106,7 @@ public class TransitLeastCostPathTreeTest {
     public void TestValidRoutingWithInterchange() {
         Coord fromCoord = new Coord(1050d, 1050d);
         Map<Node, TransitLeastCostPathTree.InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNode(null, fromCoord, 28800);
-        tree.createLeastCostPathTree(wrappedFromNodes, null, fromCoord);
+		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(network, travelDisutility, travelDisutility, wrappedFromNodes, null);
         Coord toCoord = new Coord(2050d, 2960d);
         Map<Node, TransitLeastCostPathTree.InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNode(null, toCoord, 28800);
         Path path = tree.getPath(wrappedToNodes);

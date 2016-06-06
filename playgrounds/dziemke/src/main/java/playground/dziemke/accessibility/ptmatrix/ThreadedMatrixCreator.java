@@ -19,7 +19,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
+import org.matsim.pt.router.treebasedRouter.TreebasedTransitRouterImpl;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
@@ -58,7 +58,7 @@ class ThreadedMatrixCreator implements Runnable {
 	public void run() {
 		TransitSchedule transitSchedule = this.scenario.getTransitSchedule();
 		
-		// constructor of TransitRouterImpl needs TransitRouterConfig. This is why it is instantiated here.
+		// constructor of TreebasedTransitRouterImpl needs TransitRouterConfig. This is why it is instantiated here.
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig());
 		
 		// TODO check if it is worth setting the following paramters to something other than their defaults
@@ -67,7 +67,7 @@ class ThreadedMatrixCreator implements Runnable {
 //		transitRouterConfig.setExtensionRadius(extensionRadius);
 //		transitRouterConfig.setSearchRadius(200);
 		
-		TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
+		TransitRouter transitRouter = new TreebasedTransitRouterImpl(transitRouterConfig, transitSchedule);
 	    
 	    final CSVFileWriter travelTimeMatrixWriter = new CSVFileWriter(
 	    		this.outputRoot + "travelTimeMatrix_" + this.threadName + ".csv", this.separator);
