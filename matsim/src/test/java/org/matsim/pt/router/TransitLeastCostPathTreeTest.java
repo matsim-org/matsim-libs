@@ -1,4 +1,4 @@
-package org.matsim.pt.router.treebasedRouter;
+package org.matsim.pt.router;
 
 import org.junit.Assert;
 import org.junit.Before;
