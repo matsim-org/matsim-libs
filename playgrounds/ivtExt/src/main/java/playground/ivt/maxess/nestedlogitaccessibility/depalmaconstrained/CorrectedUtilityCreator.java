@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.google.inject.Inject;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.TDoubleList;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.sun.org.apache.xml.internal.security.keys.keyresolver.KeyResolver.iterator;
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
 import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.w;
 
 /**
@@ -51,21 +53,30 @@ import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.w;
  */
 public class CorrectedUtilityCreator<N extends Enum<N>> {
 	private final ConstrainedAccessibilityConfigGroup configGroup;
-	private final Population population;
-	private final ActivityFacilities alternatives;
+	private final Scenario scenario;
+	private final String activityType = null;
 
 	@Inject
-	public CorrectedUtilityCreator( final ConstrainedAccessibilityConfigGroup configGroup,
-			final Population population,
-			final ActivityFacilities alternatives ) {
+	public CorrectedUtilityCreator(
+			final ConstrainedAccessibilityConfigGroup configGroup,
+			final Scenario scenario ) {
 		this.configGroup = configGroup;
-		this.population = population;
-		this.alternatives = alternatives;
+		this.scenario = scenario;
 	}
 
-	public Utility<N> createCorrectedUtility( final Utility<N> u ) {
+	/**
+	 * Creates a utility function taking constraints into account the de Palma et Al 2007 way.
+	 * This assumes the generated choice sets are stable!
+	 */
+	public CorrectedUtility<N> createCorrectedUtility( final NestedLogitModel<N> model ) {
 		// initialize D_i
+		final Demand<N> demand = new Demand<>( model , scenario );
+		final IterationInformation iterationInformation = new IterationInformation();
+
 		// compute initial Constrained? (ex-ante)
+
+		iterationInformation.updateIndividualOmegas( demand );
+
 		// compute personal Omegas
 		// compute facilities Omegas
 		// iterate
@@ -77,10 +88,40 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		return null;
 	}
 
-	private static class IterationInformation {
-		private final TObjectDoubleMap<Id<ActivityFacility>> demands = new TObjectDoubleHashMap<>();
+	private class IterationInformation {
 		private final TObjectDoubleMap<Id<Person>> individualOmegas = new TObjectDoubleHashMap<>();
 		private final Set<Id<ActivityFacility>> constrainedExPost = new HashSet<>();
+
+		void updateConstrained( final Demand<?> demand ) {
+			throw new UnsupportedOperationException(  );
+		}
+
+		void updateIndividualOmegas(
+				final Demand<?> demand ) {
+			for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
+				final TObjectDoubleMap<Id<ActivityFacility>> probabilities =
+						demand.getProbabilitiesForIndividual( p );
+
+				final AtomicDouble sumConstrained = new AtomicDouble( 0 );
+				final AtomicDouble sumUnconstrained = new AtomicDouble( 0 );
+
+				probabilities.forEachEntry(
+						(facility, probability) -> {
+							if ( constrainedExPost.contains( facility ) ) {
+								final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
+								final double supply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+								sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
+							}
+							else {
+								sumUnconstrained.addAndGet( probability );
+							}
+							return true;
+						}
+				);
+
+				individualOmegas.put( p , (1 - sumConstrained.get()) / (1 - sumUnconstrained.get()) );
+			}
+		}
 	}
 
 	public static class CorrectedUtility<N extends Enum<N>> implements Utility<N> {
@@ -91,6 +132,8 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		private final Utility<N> delegateUtility = null;
 		private final String activityType = null;
 
+		private final ConstrainedAccessibilityConfigGroup configGroup = null;
+
 		public double calcUncorrectedUtility( final Person p , final Alternative<N> a ) {
 			return delegateUtility.calcUtility( p , a );
 		}
@@ -99,7 +142,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 			final ActivityFacility f = a.getAlternative().getDestination();
 
 			if ( constrainedExPost.contains( f.getId() ) ) {
-				final double supply = f.getActivityOptions().get( activityType ).getCapacity();
+				final double supply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
 				final double demand = demands.get( f.getId() );
 				return Math.log( supply / demand );
 			}

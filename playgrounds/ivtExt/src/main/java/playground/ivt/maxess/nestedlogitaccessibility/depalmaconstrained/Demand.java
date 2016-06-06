@@ -32,12 +32,16 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author thibautd
  */
 class Demand<N extends Enum<N>> {
+	// store with "situation" strings, but for the moment only provide accessors for "unique" case
 	private final Map<Id<Person>, Map<String, TObjectDoubleMap<Id<ActivityFacility>>>> probas = new HashMap<>();
+
+	private final TObjectDoubleMap<Id<ActivityFacility>> demands = new TObjectDoubleHashMap<>();
 
 	public Demand( final NestedLogitModel<N> model, final Scenario scenario ) {
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
@@ -47,6 +51,26 @@ class Demand<N extends Enum<N>> {
 							p,
 							model ) );
 		}
+
+		probas.values().stream()
+				.flatMap( m -> m.values().stream() )
+				.forEach( indivProbas -> {
+					indivProbas.forEachEntry( (facility, proba) -> {
+						demands.adjustOrPutValue( facility , proba , proba );
+						return true;
+					} );
+				} );
+	}
+
+	public double getDemand( final Id<ActivityFacility> facilityId ) {
+		return demands.containsKey( facilityId ) ? demands.get( facilityId ) : 0;
+	}
+
+	public TObjectDoubleMap<Id<ActivityFacility>> getProbabilitiesForIndividual( final Id<Person> person ) {
+		final Map<String, TObjectDoubleMap<Id<ActivityFacility>>> situations = probas.get( person );
+		if ( situations.size() != 1 ) throw new IllegalStateException( "unhandled size "+situations.size() );
+
+		return situations.values().iterator().next();
 	}
 
 	private Map<String, TObjectDoubleMap<Id<ActivityFacility>>> computeChoiceProbas(
@@ -57,6 +81,10 @@ class Demand<N extends Enum<N>> {
 				model.getChoiceSetIdentifier().identifyChoiceSet( p );
 
 		final Map<String, TObjectDoubleMap<Id<ActivityFacility>>> map = new HashMap<>();
+
+		if ( choiceSets.size() != 1 ) {
+			throw new UnsupportedOperationException( "constrained accessibility with more than one situation is not yet implemented" );
+		}
 
 		for ( Map.Entry<String, NestedChoiceSet<N>> choiceSet : choiceSets.entrySet() ) {
 			map.put(
