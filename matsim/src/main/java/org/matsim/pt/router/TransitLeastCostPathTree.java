@@ -20,7 +20,6 @@
 
 package org.matsim.pt.router;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,8 +30,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
-import org.matsim.pt.router.CustomDataManager;
-import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;
@@ -63,13 +60,6 @@ import java.util.Map;
  * @author gthunig
  */
 public class TransitLeastCostPathTree {
-
-	/**
-	 * Provides an unique id (loop number) for each routing request, so we don't
-	 * have to reset all nodes at the beginning of each re-routing but can use the
-	 * loop number instead.
-	 */
-	private int iterationID = Integer.MIN_VALUE + 1;
 
 	/**
 	 * The network on which we find routes.
@@ -120,21 +110,10 @@ public class TransitLeastCostPathTree {
 		}
 	}
 
-	/**
-	 * Augments the iterationID and checks whether the visited information in
-	 * the nodes in the nodes have to be reset.
-	 */
-	private void augmentIterationId() {
-		if (getIterationId() == Integer.MAX_VALUE) {
-			this.iterationID = Integer.MIN_VALUE + 1;
-			resetNetworkVisited();
-		} else {
-			this.iterationID++;
-		}
-	}
-
 	private int getIterationId() {
-		return this.iterationID;
+//		TODO could delete all the now unnecessary occurrences of the IterationID especially in DijkstraNodeData and
+//		TODO replace it with a flag visited but that would interfere the useage of th MultiNodeDijkstra
+		return 0;
 	}
 
 	/**
@@ -291,7 +270,7 @@ public class TransitLeastCostPathTree {
             this.customDataManager.storeTmpData();
             return true;
         }
-        double totalCost = currCost + travelCost;
+		double totalCost = currCost + travelCost;
         if (totalCost < nCost) {
             revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
             this.customDataManager.storeTmpData();

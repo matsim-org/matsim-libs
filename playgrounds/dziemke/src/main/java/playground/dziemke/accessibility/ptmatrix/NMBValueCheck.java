@@ -16,7 +16,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.treebasedRouter.TransitRouterImpl;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.api.*;
 //import org.matsim.pt.router.TransitRouterImpl;
 
