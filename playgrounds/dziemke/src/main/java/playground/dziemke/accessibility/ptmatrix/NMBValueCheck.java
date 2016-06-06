@@ -16,6 +16,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.transitSchedule.api.*;
 //import org.matsim.pt.router.TransitRouterImpl;
 import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
@@ -68,7 +69,7 @@ public class NMBValueCheck {
         System.out.print("\n\nOrigin = " + invertCoord(origin, coordinateTransformation));
         System.out.println("StartLink Alberts origin " + origin);
 
-        List<Leg> legList = transitRouter.calcRoute(origin, destination, departureTime, null);
+        List<Leg> legList = transitRouter.calcRoute(new FakeFacility(origin), new FakeFacility(destination), departureTime, null);
         ArrayList<Coord> legEnds = new ArrayList<>();
         ArrayList<Coord> ptStops = new ArrayList<>();
         legEnds.add(origin);
