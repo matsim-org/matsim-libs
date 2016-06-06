@@ -112,7 +112,7 @@ public class TransitRouterImpl implements TransitRouter {
 		// find possible end stops
 		Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
 
-//		TODO create transitNetwork with transitSchedule here for threadsafety!?
+//		TODO create transitNetwork with transitSchedule here?
 //		TODO this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
 		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(transitNetwork, travelDisutility, travelTime,
 				wrappedFromNodes, person);
