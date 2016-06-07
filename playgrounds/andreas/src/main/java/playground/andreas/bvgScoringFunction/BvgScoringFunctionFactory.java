@@ -59,7 +59,7 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunction(person.getSelectedPlan(), charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(person.getSelectedPlan(), charyparNagelConfigParameters, this.bvgParameters, charyparNagelConfigParameters.utilityOfLineSwitch, this.network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;
 	}

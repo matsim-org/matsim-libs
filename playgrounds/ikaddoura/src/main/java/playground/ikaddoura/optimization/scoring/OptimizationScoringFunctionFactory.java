@@ -50,7 +50,7 @@ public class OptimizationScoringFunctionFactory implements ScoringFunctionFactor
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring(this.params.getScoringParameters( person ), network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.params.getScoringParameters( person )));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(this.params.getScoringParameters( person )));
 		scoringFunctionAccumulator.addScoringFunction(new OptimizationAgentStuckScoringFunction(this.params.getScoringParameters( person ), this.STUCKING_SCORE));
 		scoringFunctionAccumulator.addScoringFunction(new OptimizationActivityScoringFunction(this.params.getScoringParameters( person )));
 		

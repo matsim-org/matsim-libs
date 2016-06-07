@@ -36,17 +36,16 @@ import org.matsim.facilities.OpeningTime;
  * @author meisterk
  *
  */
-public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
+public final class FacilityOpeningIntervalCalculator implements OpeningIntervalCalculator {
 
 	private final ActivityFacilities facilities;
 
-	public CharyparNagelOpenTimesActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
-		super(params);
+	public FacilityOpeningIntervalCalculator(final ActivityFacilities facilities) {
 		this.facilities = facilities;
 	}
 
 	@Override
-	protected double[] getOpeningInterval(Activity act) {
+	public double[] getOpeningInterval(Activity act) {
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time

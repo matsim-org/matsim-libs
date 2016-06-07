@@ -75,7 +75,7 @@ public class HerbieScoringFunctionFactory implements ScoringFunctionFactory {
 				config,
 				this.network,
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
 		
 		return scoringFunctionAccumulator;

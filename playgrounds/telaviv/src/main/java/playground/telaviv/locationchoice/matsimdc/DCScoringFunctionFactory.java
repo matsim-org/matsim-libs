@@ -117,7 +117,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(activityScoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(params));
 		return scoringFunctionAccumulator;
 		
 //		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();

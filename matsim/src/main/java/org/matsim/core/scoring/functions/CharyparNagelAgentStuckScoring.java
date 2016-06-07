@@ -26,7 +26,7 @@ package org.matsim.core.scoring.functions;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelAgentStuckScoring implements org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
+public final class CharyparNagelAgentStuckScoring implements org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
 
 	protected double score;
 

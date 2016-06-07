@@ -38,7 +38,7 @@ import org.matsim.facilities.OpeningTime;
  * @author meisterk
  *
  */
-public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
+public class CharyparNagelOpenTimesActivityScoring extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	private final ActivityFacilities facilities;
 	

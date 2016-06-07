@@ -30,8 +30,7 @@ import org.matsim.core.utils.misc.Time;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
-	// yy should be final.  kai, oct'14
+public final class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
 
 	protected double score;
 	private double currentActivityStartTime;
@@ -45,12 +44,17 @@ public class CharyparNagelActivityScoring implements org.matsim.core.scoring.Sum
 	private static short firstLastActOpeningTimesWarning = 0;
 
 	private final CharyparNagelScoringParameters params;
+	private final OpeningIntervalCalculator openingIntervalCalculator;
 
 	private Activity firstActivity;
 
 	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
 
 	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params) {
+		this(params, new ActivityTypeOpeningIntervalCalculator(params));
+	}
+
+	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
 		this.params = params;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
@@ -58,6 +62,7 @@ public class CharyparNagelActivityScoring implements org.matsim.core.scoring.Sum
 
 		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
+		this.openingIntervalCalculator = openingIntervalCalculator;
 	}
 
 	@Override
@@ -115,7 +120,7 @@ public class CharyparNagelActivityScoring implements org.matsim.core.scoring.Sum
 			 * assume A <= D
 			 */
 
-			double[] openingInterval = this.getOpeningInterval(act);
+			double[] openingInterval = openingIntervalCalculator.getOpeningInterval(act);
 			double openingTime = openingInterval[0];
 			double closingTime = openingInterval[1];
 
@@ -214,24 +219,6 @@ public class CharyparNagelActivityScoring implements org.matsim.core.scoring.Sum
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Activity act) {
-
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
-		if (actParams == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
-					"(module name=\"planCalcScore\" in the config file).");
-		}
-
-		double openingTime = actParams.getOpeningTime();
-		double closingTime = actParams.getClosingTime();
-
-		// openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
-
-		return new double[]{openingTime, closingTime};
-	}
-
 	private void handleOvernightActivity(Activity lastActivity) {
 		assert firstActivity != null;
 		assert lastActivity != null;
@@ -240,7 +227,7 @@ public class CharyparNagelActivityScoring implements org.matsim.core.scoring.Sum
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
 			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
-				double[] openInterval = this.getOpeningInterval(lastActivity);
+				double[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
 				if (openInterval[0] >= 0 || openInterval[1] >= 0){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
 					log.warn("first activity: " + firstActivity ) ;
