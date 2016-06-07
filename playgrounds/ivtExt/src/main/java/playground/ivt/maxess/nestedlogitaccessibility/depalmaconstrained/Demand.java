@@ -78,6 +78,10 @@ class Demand<N extends Enum<N>> {
 				} );
 	}
 
+	public TObjectDoubleMap<Id<ActivityFacility>> getSumedDemandPerFacility() {
+		return demands;
+	}
+
 	public double getDemand( final Id<ActivityFacility> facilityId ) {
 		return demands.containsKey( facilityId ) ? demands.get( facilityId ) : 0;
 	}

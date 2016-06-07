@@ -20,17 +20,20 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.inject.Inject;
+import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,14 +42,16 @@ import java.util.Set;
 public class CorrectedUtilityCreator<N extends Enum<N>> {
 	private final ConstrainedAccessibilityConfigGroup configGroup;
 	private final Scenario scenario;
-	private final String activityType = null;
+	private final String activityType;
 
 	@Inject
 	public CorrectedUtilityCreator(
 			final ConstrainedAccessibilityConfigGroup configGroup,
-			final Scenario scenario ) {
+			final Scenario scenario,
+			final String activityType ) {
 		this.configGroup = configGroup;
 		this.scenario = scenario;
+		this.activityType = activityType;
 	}
 
 	/**
@@ -56,21 +61,32 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 	public CorrectedUtility<N> createCorrectedUtility( final NestedLogitModel<N> model ) {
 		// initialize D_i
 		final Demand<N> demand = new Demand<>( model , scenario );
+		// this initializes omegas to 1 and derives the constrained set
 		final IterationInformation iterationInformation = new IterationInformation( demand );
 
-		// compute initial Constrained? (ex-ante)
+		final Counter counter = new Counter( "Compute capacity-constrained utility correction: iteration # ");
+		for ( int lastSize = -1,
+			  	newSize = iterationInformation.constrainedExPost.size();
+			  lastSize != newSize; ) {
+			counter.incCounter();
+			// update omegas based on the constrained set
+			iterationInformation.updateIndividualOmegas( demand );
+			// update constrained set based on new corrected choice probabilities
+			iterationInformation.updateConstrained( demand );
 
-		iterationInformation.updateIndividualOmegas( demand );
-
-		// compute personal Omegas
-		// compute facilities Omegas
-		// iterate
-		//    compute Constrained
-		//    update Omegas
-		// until constrained set stable
+			lastSize = newSize;
+			newSize = iterationInformation.constrainedExPost.size();
+		}
+		counter.printCounter();
 
 		// compute correction factors: use Constrained, D, S and Omegas
-		return null;
+		return new CorrectedUtility<N>(
+				demand,
+				iterationInformation.individualOmegas,
+				iterationInformation.constrainedExPost,
+				model.getUtility(),
+				activityType,
+				configGroup );
 	}
 
 	private class IterationInformation {
@@ -85,7 +101,25 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		}
 
 		void updateConstrained( final Demand<?> demand ) {
-			throw new UnsupportedOperationException(  );
+			final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = demand.getDemandPerFacility();
+
+			for ( Map.Entry<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> entry : demandPerFacility.entrySet() ) {
+				// constrained set can only grow --- do not bother if constrained in previous iteration
+				if ( constrainedExPost.contains( entry.getKey() ) ) continue;
+
+				final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
+				final double supply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+
+				double correctedDemand = 0;
+				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
+						iterator.hasNext();
+						iterator.advance()) {
+					final double omega = individualOmegas.get( iterator.key() );
+					final double proba = iterator.value();
+					correctedDemand += omega * proba;
+				}
+				if ( supply <= correctedDemand ) constrainedExPost.add( entry.getKey() );
+			}
 		}
 
 		void updateIndividualOmegas(
@@ -117,14 +151,29 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 	}
 
 	public static class CorrectedUtility<N extends Enum<N>> implements Utility<N> {
-		private final TObjectDoubleMap<Id<ActivityFacility>> demands = new TObjectDoubleHashMap<>();
-		private final TObjectDoubleMap<Id<Person>> individualOmegas = new TObjectDoubleHashMap<>();
-		private final Set<Id<ActivityFacility>> constrainedExPost = new HashSet<>();
+		private final TObjectDoubleMap<Id<ActivityFacility>> demands;
+		private final TObjectDoubleMap<Id<Person>> individualOmegas;
+		private final Set<Id<ActivityFacility>> constrainedExPost;
 
-		private final Utility<N> delegateUtility = null;
-		private final String activityType = null;
+		private final Utility<N> delegateUtility;
+		private final String activityType;
 
-		private final ConstrainedAccessibilityConfigGroup configGroup = null;
+		private final ConstrainedAccessibilityConfigGroup configGroup;
+
+		private CorrectedUtility(
+				final Demand<N> demand,
+				final TObjectDoubleMap<Id<Person>> individualOmegas,
+				final Set<Id<ActivityFacility>> constrainedExPost,
+				final Utility<N> delegateUtility,
+				final String activityType,
+				final ConstrainedAccessibilityConfigGroup configGroup ) {
+			this.demands = demand.getSumedDemandPerFacility();
+			this.individualOmegas = individualOmegas;
+			this.constrainedExPost = constrainedExPost;
+			this.delegateUtility = delegateUtility;
+			this.activityType = activityType;
+			this.configGroup = configGroup;
+		}
 
 		public double calcUncorrectedUtility( final Person p , final Alternative<N> a ) {
 			return delegateUtility.calcUtility( p , a );
