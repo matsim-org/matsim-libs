@@ -94,7 +94,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		//counter.printCounter();
 
 		// compute correction factors: use Constrained, D, S and Omegas
-		return new CorrectedUtility<N>(
+		return new CorrectedUtility<>(
 				demand,
 				iterationInformation.individualOmegas,
 				iterationInformation.constrainedExPost,
@@ -122,7 +122,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				if ( constrainedExPost.contains( entry.getKey() ) ) continue;
 
 				final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
-				final double supply = getSupply( f );
+				final double supply = getSupply( f, activityType, configGroup );
 
 				double correctedDemand = 0;
 				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
@@ -150,7 +150,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 						(facility, probability) -> {
 							if ( constrainedExPost.contains( facility ) ) {
 								final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
-								final double supply = getSupply( f );
+								final double supply = getSupply( f, activityType, configGroup );
 								sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
 							}
 							else {
@@ -165,7 +165,9 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		}
 	}
 
-	private double getSupply( final ActivityFacility f ) {
+	private static double getSupply( final ActivityFacility f,
+			final String activityType,
+			final ConstrainedAccessibilityConfigGroup configGroup ) {
 		return f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
 	}
 
@@ -202,13 +204,14 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 			final ActivityFacility f = a.getAlternative().getDestination();
 
 			if ( constrainedExPost.contains( f.getId() ) ) {
-				final double supply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+				final double supply = getSupply( f, activityType, configGroup );
 				final double demand = demands.get( f.getId() );
 				return Math.log( supply / demand );
 			}
 
 			return Math.log( individualOmegas.get( p.getId() ) );
 		}
+
 
 		@Override
 		public double calcUtility( final Person p, final Alternative<N> a ) {

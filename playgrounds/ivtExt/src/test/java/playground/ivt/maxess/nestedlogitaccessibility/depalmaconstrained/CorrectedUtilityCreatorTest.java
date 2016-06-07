@@ -19,6 +19,7 @@
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.testcases.MatsimTestUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
@@ -48,7 +50,6 @@ public class CorrectedUtilityCreatorTest {
 
 	enum NestId {first,second}
 
-
 	@Test
 	public void simpleTest() {
 		final Scenario scenario = loadScenario();
@@ -56,12 +57,27 @@ public class CorrectedUtilityCreatorTest {
 		final NestedLogitModel<NestId> model =
 				new NestedLogitModel<>(
 						// "random" utilities, identical for all agents to foster competition
-						( p, a ) -> a.getAlternative().getDestination().getId().hashCode(),
+						( p, a ) -> Double.parseDouble( a.getAlternative().getDestination().getId().toString() ),
 						p -> createChoiceSet( p , scenario ) );
 
 		final CorrectedUtilityCreator.CorrectedUtility<NestId> correctedUtil =
 				new CorrectedUtilityCreator<NestId>( scenario , "work" ).createCorrectedUtility( model );
 
+		final Demand<NestId> resultingDemand =
+				new Demand<>(
+						new NestedLogitModel<>(
+								correctedUtil,
+								p -> createChoiceSet( p , scenario ) ),
+						scenario );
+
+		final ConstrainedAccessibilityConfigGroup configGroup = (ConstrainedAccessibilityConfigGroup) scenario.getConfig().getModule( ConstrainedAccessibilityConfigGroup.GROUP_NAME );
+		resultingDemand.getSummedDemandPerFacility().forEachValue(
+				d -> {
+					Assert.assertTrue(
+							"got a demand exceeding capacity: "+d+" > "+(configGroup.getCapacityScalingFactor() * CAPACITY),
+							d <= configGroup.getCapacityScalingFactor() * CAPACITY + MatsimTestUtils.EPSILON );
+					return true;
+				} );
 	}
 
 	private Map<String,NestedChoiceSet<NestId>> createChoiceSet(
@@ -94,7 +110,7 @@ public class CorrectedUtilityCreatorTest {
 						new Nest<>(
 								NestId.second,
 								2,
-								secondList ) );
+								firstList ) );
 
 		return Collections.singletonMap( "default" , choiceSet );
 	}
@@ -120,7 +136,7 @@ public class CorrectedUtilityCreatorTest {
 		log.info( "test instance has "+nFacilities+" facilities to choose from" );
 
 		// adapt scaling ratio to be tight
-		configGroup.setCapacityScalingFactor( scenario.getPopulation().getPersons().size() / (double) (CAPACITY * nFacilities ) );
+		configGroup.setCapacityScalingFactor( 1.1 * scenario.getPopulation().getPersons().size() / (double) (CAPACITY * nFacilities ) );
 
 		return scenario;
 	}
