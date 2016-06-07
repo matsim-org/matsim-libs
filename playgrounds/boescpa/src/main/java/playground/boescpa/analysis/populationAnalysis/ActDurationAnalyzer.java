@@ -23,26 +23,27 @@ package playground.boescpa.analysis.populationAnalysis;
 
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Analyses departure times for a given plans-file.
+ * Analyses activity durations for a given plans-file.
  *
  * @author boescpa
  */
-public class DepartureTimeAnalyzer extends PopulationAnalyzer{
+public class ActDurationAnalyzer extends PopulationAnalyzer{
 
-	private final Map<String, long[]> depTimes = new HashMap<>();
-	private final int statisticInterval = 60; // mins
+	private final Map<String, long[]> durations = new HashMap<>();
+	private final int statisticInterval = 30; // mins
 
-	public DepartureTimeAnalyzer(Population population) {
+	public ActDurationAnalyzer(Population population) {
 		super(population);
 		getCharts = true;
 	}
 
-	public DepartureTimeAnalyzer(String pop2bAnalyzed) {
+	public ActDurationAnalyzer(String pop2bAnalyzed) {
 		super(pop2bAnalyzed);
 		getCharts = true;
 	}
@@ -51,72 +52,69 @@ public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 		final String pop2bAnalyzed = args[0];
 		final String resultsDest = args[1];
 		final String actTypeToAnalyze = args.length > 2 ? args[2] : null;
-		new DepartureTimeAnalyzer(pop2bAnalyzed).analyzePopulation(resultsDest, actTypeToAnalyze);
+		new ActDurationAnalyzer(pop2bAnalyzed).analyzePopulation(resultsDest, actTypeToAnalyze);
 	}
 
 	@Override
 	final protected void reset() {
-		depTimes.clear();
+		durations.clear();
 	}
 
 	@Override
 	final protected void analyzeAgent(Person person) {
-		double formerActDepTime = 0;
-		String mode = null;
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (mode != null && (getActivityType() == null || activity.getType().equals(getActivityType()))) {
-					classifyDepTime(formerActDepTime, "total");
-					classifyDepTime(formerActDepTime, mode);
+				if (getActivityType() == null || activity.getType().equals(getActivityType())) {
+					if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
+						double duration = activity.getEndTime() - activity.getStartTime();
+						if (getActivityType() == null) classifyDuration(duration, "total");
+						classifyDuration(duration, activity.getType());
+					}
 				}
-				formerActDepTime = activity.getEndTime();
 			} else if (planElement instanceof Leg){
-				mode = ((Leg)planElement).getMode();
 			} else {
 				log.error("Unhandled implementation of PlanElement: " + planElement.toString());
 			}
 		}
 	}
 
-	private void classifyDepTime(double formerActDepTime, String mode) {
-		double corrDepTime = formerActDepTime > (30*60*60) ? (30*60*60) : formerActDepTime;
-		int depTime = (int)Math.floor(corrDepTime/(statisticInterval*60));
-		synchronized (depTimes) {
-			if (!depTimes.keySet().contains(mode)) {
-				depTimes.put(mode, new long[(30*60/statisticInterval) + 1]);
-				modes.add(mode);
+	private void classifyDuration(double duration, String activity) {
+		int durInterval = (int) duration / (60*statisticInterval);
+		synchronized (durations) {
+			if (!durations.keySet().contains(activity)) {
+				durations.put(activity, new long[(30*60/statisticInterval) + 1]);
+				modes.add(activity);
 			}
-			depTimes.get(mode)[depTime]++;
+			durations.get(activity)[durInterval]++;
 		}
 	}
 
 	@Override
-	final protected String getResultString(final String mode) {
-		String modeString = "************************" + "\n" + "departures " + mode + ": " + "\n" + "\n";
-		// times
-		modeString = modeString + "time  " + "\t";
-		for (int i = 0; i < depTimes.get(mode).length; i++) {
-			int hour = i*statisticInterval/60;
-			int min = (i*statisticInterval)-(hour*60);
-			modeString = modeString + hour + ":" + min + "\t";
+	final protected String getResultString(final String activity) {
+		String resultString = "************************" + "\n" + "departures " + activity + ": " + "\n" + "\n";
+		// intervals
+		resultString = resultString + "duration" + "\t";
+		for (int i = 0; i < durations.get(activity).length; i++) {
+			double duration = i*statisticInterval/60.0;
+			resultString = resultString + duration + "\t";
 		}
-		modeString = modeString + "\n";
+		resultString = resultString + "\n";
 		// counts
-		modeString = modeString + "counts" + "\t";
-		for (int i = 0; i < depTimes.get(mode).length; i++) {
-			modeString = modeString + depTimes.get(mode)[i] + "\t";
+		resultString = resultString + "counts  " + "\t";
+		for (int i = 0; i < durations.get(activity).length; i++) {
+			resultString = resultString + durations.get(activity)[i] + "\t";
 		}
-		modeString = modeString + "\n";
-		return modeString;
+		resultString = resultString + "\n";
+		return resultString;
 	}
 
 	@Override
-	final protected Tuple<String, double[]> getSeries(String mode) {
-		double[] series = new double[depTimes.get(mode).length];
-		for (int i = 0; i < depTimes.get(mode).length; i++) {
-			series[i] = depTimes.get(mode)[i];
+	final protected Tuple<String, double[]> getSeries(String activity) {
+		double[] series = new double[durations.get(activity).length];
+		for (int i = 0; i < durations.get(activity).length; i++) {
+			series[i] = durations.get(activity)[i];
 		}
-		return new Tuple<>("departures " + mode, series);
+		return new Tuple<>("durations " + activity, series);
 	}
 }

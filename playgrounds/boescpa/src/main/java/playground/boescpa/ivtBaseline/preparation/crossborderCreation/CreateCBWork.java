@@ -171,13 +171,12 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 		Plan plan = new PlanImpl();
 
 		double departureTime = getDepartureTime();
-		double actDuration = (8 + random.nextInt(12) + random.nextDouble())
-			* PrefsCreator.actCharacteristics.valueOf(WORK.toUpperCase()).getMinDur();
+		double actDuration = getWorkDuration();
 		double returnTime = departureTime + actDuration;
-		if (returnTime > 24.0 * 3600.0) {
+		/*if (returnTime > 24.0 * 3600.0) {
 			returnTime = 24.0 * 3600.0;
 			departureTime = returnTime - actDuration;
-		}
+		}*/
 
 		ActivityImpl actStart = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
@@ -205,5 +204,18 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
 		plan.addActivity(actEnd);
 		return plan;
+	}
+
+	private double getWorkDuration() {
+		double randDur = random.nextDouble();
+		// identify selected hour of day
+		int durInterval = 0;
+		while (durInterval < 48 && cummulativeDurationProbability[durInterval + 1] < randDur) {
+			durInterval++;
+		}
+		double duration = durInterval*60*30;
+		// random assignment within that hour of the day
+		duration += random.nextInt(1800);
+		return duration;
 	}
 }
