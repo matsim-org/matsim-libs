@@ -122,7 +122,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				if ( constrainedExPost.contains( entry.getKey() ) ) continue;
 
 				final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
-				final double supply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+				final double supply = getSupply( f );
 
 				double correctedDemand = 0;
 				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
@@ -150,7 +150,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 						(facility, probability) -> {
 							if ( constrainedExPost.contains( facility ) ) {
 								final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
-								final double supply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+								final double supply = getSupply( f );
 								sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
 							}
 							else {
@@ -160,9 +160,13 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 						}
 				);
 
-				individualOmegas.put( p , (1 - sumConstrained.get()) / (1 - sumUnconstrained.get()) );
+				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}
 		}
+	}
+
+	private double getSupply( final ActivityFacility f ) {
+		return f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
 	}
 
 	public static class CorrectedUtility<N extends Enum<N>> implements Utility<N> {

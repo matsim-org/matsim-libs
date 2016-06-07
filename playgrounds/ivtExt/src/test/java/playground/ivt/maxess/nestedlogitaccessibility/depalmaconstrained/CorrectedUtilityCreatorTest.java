@@ -44,7 +44,11 @@ import java.util.stream.Collectors;
  */
 public class CorrectedUtilityCreatorTest {
 	private static final Logger log = Logger.getLogger( CorrectedUtilityCreatorTest.class );
+	private static final int CAPACITY = 15;
+
 	enum NestId {first,second}
+
+
 	@Test
 	public void simpleTest() {
 		final Scenario scenario = loadScenario();
@@ -55,8 +59,9 @@ public class CorrectedUtilityCreatorTest {
 						( p, a ) -> a.getAlternative().getDestination().getId().hashCode(),
 						p -> createChoiceSet( p , scenario ) );
 
-		new CorrectedUtilityCreator<NestId>( scenario , "work" ).createCorrectedUtility( model );
-		// TODO check result
+		final CorrectedUtilityCreator.CorrectedUtility<NestId> correctedUtil =
+				new CorrectedUtilityCreator<NestId>( scenario , "work" ).createCorrectedUtility( model );
+
 	}
 
 	private Map<String,NestedChoiceSet<NestId>> createChoiceSet(
@@ -110,12 +115,12 @@ public class CorrectedUtilityCreatorTest {
 					.collect( Collectors.toList() );
 
 		facilitiesWithWork.stream()
-				.forEach( f -> f.getActivityOptions().get( "work" ).setCapacity( 15 ) );
+				.forEach( f -> f.getActivityOptions().get( "work" ).setCapacity( CAPACITY ) );
 		final int nFacilities = facilitiesWithWork.size();
 		log.info( "test instance has "+nFacilities+" facilities to choose from" );
 
 		// adapt scaling ratio to be tight
-		configGroup.setCapacityScalingFactor( scenario.getPopulation().getPersons().size() / (15d * nFacilities ) );
+		configGroup.setCapacityScalingFactor( scenario.getPopulation().getPersons().size() / (double) (CAPACITY * nFacilities ) );
 
 		return scenario;
 	}
