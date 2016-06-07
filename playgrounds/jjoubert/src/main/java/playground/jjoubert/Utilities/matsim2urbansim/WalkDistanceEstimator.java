@@ -46,7 +46,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -133,7 +133,7 @@ public class WalkDistanceEstimator {
 		 *---------------------------------------------------------------------*/
 		// Set up router.
 		TravelTimeCalculator ttc = TravelTimeCalculator.create(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new Builder( TransportMode.car, sAll.getConfig().planCalcScore() );
+		TravelDisutilityFactory tccf = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, sAll.getConfig().planCalcScore() );
 		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes());
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(ttc);

@@ -39,7 +39,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -221,7 +221,7 @@ public class BikeSharingScenarioUtils {
 			final PlanCalcScoreConfigGroup cnScoringGroup ) {
 		return new SlopeAwareTravelDisutilityFactory(
 				scorer,
-				new RandomizingTimeDistanceTravelDisutility.Builder( mode, cnScoringGroup ) ) ;
+				new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) ) ;
 	}
 }
 

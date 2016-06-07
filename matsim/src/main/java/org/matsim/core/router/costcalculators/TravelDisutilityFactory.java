@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router.costcalculators;
 
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -36,7 +37,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author dgrether
  *
  */
-public interface TravelDisutilityFactory extends MatsimFactory {
+public interface TravelDisutilityFactory extends MatsimFactory, MatsimExtensionPoint {
 	
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator);
 

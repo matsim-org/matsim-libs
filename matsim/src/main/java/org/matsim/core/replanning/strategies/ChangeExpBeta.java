@@ -22,18 +22,18 @@ package org.matsim.core.replanning.strategies;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SelectExpBetaPlanStrategyProvider implements Provider<PlanStrategy> {
+public class ChangeExpBeta implements Provider<PlanStrategy> {
 
     @Inject private PlanCalcScoreConfigGroup config;
 
     @Override
 	public PlanStrategy get() {
-        return new PlanStrategyImpl(new ExpBetaPlanSelector(config));
+        return new PlanStrategyImpl(new ExpBetaPlanChanger(config.getBrainExpBeta()));
 	}
 
 }

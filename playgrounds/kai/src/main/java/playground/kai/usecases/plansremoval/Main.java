@@ -23,6 +23,8 @@
 package playground.kai.usecases.plansremoval;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -59,7 +61,7 @@ public class Main {
 		AbstractModule modules2 = new AbstractModule(){
 			@Override
 			public void install() {
-				PlanSelector selector = new MySelectorForRemoval() ;
+				PlanSelector<Plan,Person> selector = new MySelectorForRemoval() ;
 				if (getConfig().strategy().getPlanSelectorForRemoval().equals(selectorName)) {
 					bindPlanSelectorForRemoval().toInstance( selector);
 				}

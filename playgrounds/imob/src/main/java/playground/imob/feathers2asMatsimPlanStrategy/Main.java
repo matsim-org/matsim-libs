@@ -31,7 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -78,7 +78,7 @@ class Main {
 		final javax.inject.Provider<PlanStrategy> planStrategyFactory = new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
-				GenericPlanSelector<Plan, Person> planSelector = new RandomPlanSelector<>() ;
+				PlanSelector<Plan, Person> planSelector = new RandomPlanSelector<>() ;
 				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(planSelector) ;
 				PlanStrategyModule module = new PlanStrategyModule() {
 					@Override

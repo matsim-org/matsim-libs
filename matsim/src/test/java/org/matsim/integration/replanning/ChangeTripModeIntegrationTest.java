@@ -33,7 +33,10 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerModule;
+import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
@@ -44,6 +47,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ExperiencedPlanElementsModule;
+import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.testcases.MatsimTestCase;
@@ -87,6 +92,11 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
             @Override
             public void install() {
                 install(new ScenarioByInstanceModule(scenario));
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ExperiencedPlanElementsModule());
+				install(new ExperiencedPlansModule());
+				install(new DefaultMobsimModule());
                 install(new EventsManagerModule());
                 install(new StrategyManagerModule());
 				install(new CharyparNagelScoringFunctionModule());
