@@ -19,23 +19,27 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
+
 /**
  * @author amit
  */
 
 public class PatnaCalibrationUtils {
-	
+
+	PatnaCalibrationUtils(){}
+
 	public enum PatnaDemandLabels {
 		ward, // residence
 		member, // household size
 		sex, age, occupation, //pretty obvious
-		monthlyInc, // current monthly income, splitted into several intervals 
-		dailyCost, // current daily transport cost, splitted into several intervals
-		originWard, // origin
-		destiWard, //destination
-		purpose,  // HBW, HBE, HBS, HBO, see PatnaUrbanActivityTypes
+		monthlyIncome, // current monthly income, splitted into several intervals 
+		dailyTransportCost, // current daily transport cost, splitted into several intervals
+		originZone, // origin ward 
+		destinationZone, //destination ward
+		tripPurpose,  // HBW, HBE, HBS, HBO, see PatnaUrbanActivityTypes
 		mode, // travel mode
-		freq // trip fequency
+		tripFrequency // trip fequency
 	}
 
 	public static String getTravelModeFromCode( final String travelModeCode) {
@@ -61,7 +65,7 @@ public class PatnaCalibrationUtils {
 	}
 
 	public static int getIncomeInterval( final String monthlyIncome){
-		
+
 		int inc = Integer.valueOf(monthlyIncome);
 
 		if( inc <= 500) return 1;
@@ -72,17 +76,27 @@ public class PatnaCalibrationUtils {
 		else if (inc <= 1000) return 6;
 		else  return 7;
 	}
-	
+
 	public static int getDailyExpenditureInterval( final String dailyExpenditure){
-		
+
 		int cost = Integer.valueOf(dailyExpenditure);
-		
+
 		if( cost <= 10) return 1;
 		else if (cost <= 25) return 2;
 		else if (cost <= 50) return 3;
 		else if (cost <= 100) return 4;
 		else  return 5;
 	}
+
+	public static String getTripPurpose(final String inputCode) {
+		switch (inputCode) {
+		case "1": return PatnaUrbanActivityTypes.work.toString();
+		case "2": return PatnaUrbanActivityTypes.educational.toString();
+		case "3": return PatnaUrbanActivityTypes.social.toString();
+		case "4": return PatnaUrbanActivityTypes.other.toString();
+		case "9999": 
+		default:
+			return PatnaUrbanActivityTypes.unknown.toString();
+		}
+	}
 }
-
-

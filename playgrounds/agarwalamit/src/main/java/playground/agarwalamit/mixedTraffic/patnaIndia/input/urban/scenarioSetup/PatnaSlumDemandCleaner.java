@@ -32,7 +32,7 @@ import java.util.TreeMap;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup.PatnaCalibrationUtils.PatnaDemandLabels;
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.RandomNumberUtils;
 
 /**
@@ -51,8 +51,8 @@ public class PatnaSlumDemandCleaner {
 	}
 
 	public static void main(String[] args) {
-		String inputFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/slum_allZones_uncleanedData.txt"; 
-		String outFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/slum_allZones_cleanedData.txt";
+		String inputFile = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/raw_uncleanData/slum_allZones_uncleanedData.txt"; 
+		String outFile = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/slum_allZones_cleanedData.txt";
 
 		PatnaSlumDemandCleaner pdfc = new PatnaSlumDemandCleaner(outFile);
 		pdfc.run(inputFile);
@@ -151,18 +151,16 @@ public class PatnaSlumDemandCleaner {
 				String age = strs.get( labels.indexOf( PatnaDemandLabels.age.toString() ));
 				String occupation = strs.get( labels.indexOf( PatnaDemandLabels.occupation.toString() ));
 
-				String originWard = strs.get( labels.indexOf( PatnaDemandLabels.originWard.toString() ));
-				String destinationWard = strs.get( labels.indexOf( PatnaDemandLabels.destiWard.toString() ));
-				String tripPurpose = strs.get( labels.indexOf( PatnaDemandLabels.purpose.toString() ));
+				String originWard = strs.get( labels.indexOf( PatnaDemandLabels.originZone.toString() ));
+				String destinationWard = strs.get( labels.indexOf( PatnaDemandLabels.destinationZone.toString() ));
+				String tripPurpose = strs.get( labels.indexOf( PatnaDemandLabels.tripPurpose.toString() ));
 				String mode = strs.get( labels.indexOf( PatnaDemandLabels.mode.toString() ));
-				String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyInc.toString() )); 
-				String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyCost.toString() ));
+				String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyIncome.toString() )); 
+				String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyTransportCost.toString() ));
 
-				String tripFreq = strs.get( labels.indexOf( PatnaDemandLabels.freq.toString() ));
+				String tripFreq = strs.get( labels.indexOf( PatnaDemandLabels.tripFrequency.toString() ));
 
-				if(tripPurpose.equals("9999")) {
-					tripPurpose = PatnaUrbanActivityTypes.unknown.toString();
-				}
+				tripPurpose = PatnaCalibrationUtils.getTripPurpose(tripPurpose);
 
 				if (mode.equals("9999")) {
 					mode = randomModes.remove(0); // always take what is on top.

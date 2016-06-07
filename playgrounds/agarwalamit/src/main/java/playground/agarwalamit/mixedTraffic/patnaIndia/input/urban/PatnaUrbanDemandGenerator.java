@@ -254,7 +254,6 @@ public class PatnaUrbanDemandGenerator {
 		default : throw new RuntimeException("Trip purpose input code "+tripPurpose+" is not recognized. Aborting ...");
 		}
 
-
 		Activity homeAct = populationFactory.createActivityFromCoord(PatnaUrbanActivityTypes.valueOf("home").toString(), fromZoneFeatureCoord);
 		homeAct.setEndTime(homeActEndTime); 								
 		plan.addActivity(homeAct);

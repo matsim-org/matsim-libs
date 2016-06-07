@@ -52,11 +52,11 @@ public class PatnaNonSlumDemandCleaner {
 	}
 
 	public static void main(String[] args) {
-		String inputFile1 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
-		String inputFile2 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
-		String inputFile3 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
-		
-		String outFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
+		String inputFile1 = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
+		String inputFile2 = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
+		String inputFile3 = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
+
+		String outFile = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
 
 		PatnaNonSlumDemandCleaner pdfc = new PatnaNonSlumDemandCleaner(outFile);
 		pdfc.run(inputFile1, inputFile2, inputFile3);
@@ -129,7 +129,7 @@ public class PatnaNonSlumDemandCleaner {
 	}
 
 	public void readZonesFileAndWriteData(final String inputFile, 
-			final boolean allTripsWorkTrip // only HBW trips are available for 27 to 42; rest is imputed.
+			final boolean isZoneBW27To42 // only HBW trips are available for 27 to 42; rest is imputed.
 			) {
 
 		BufferedReader reader = IOUtils.getBufferedReader(inputFile);
@@ -161,19 +161,18 @@ public class PatnaNonSlumDemandCleaner {
 				String age = strs.get( labels.indexOf( PatnaDemandLabels.age.toString() ));
 				String occupation = strs.get( labels.indexOf( PatnaDemandLabels.occupation.toString() ));
 
-				String originWard = strs.get( labels.indexOf( PatnaDemandLabels.originWard.toString() ));
-				String destinationWard = strs.get( labels.indexOf( PatnaDemandLabels.destiWard.toString() ));
-				String tripPurpose = strs.get( labels.indexOf( PatnaDemandLabels.purpose.toString() ));
+				String originWard = strs.get( labels.indexOf( PatnaDemandLabels.originZone.toString() ));
+				String destinationWard = strs.get( labels.indexOf( PatnaDemandLabels.destinationZone.toString() ));
+				String tripPurpose = strs.get( labels.indexOf( PatnaDemandLabels.tripPurpose.toString() ));
 				String mode = strs.get( labels.indexOf( PatnaDemandLabels.mode.toString() ));
-				String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyInc.toString() )); 
-				String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyCost.toString() ));
+				String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyIncome.toString() )); 
+				String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyTransportCost.toString() ));
 
-				String tripFreq = strs.get( labels.indexOf( PatnaDemandLabels.freq.toString() ));
+				String tripFreq = strs.get( labels.indexOf( PatnaDemandLabels.tripFrequency.toString() ));
 
-				if(tripPurpose.equals("9999")) {
-					if (allTripsWorkTrip) tripPurpose = PatnaUrbanActivityTypes.work.toString();
-					else tripPurpose = PatnaUrbanActivityTypes.unknown.toString();
-				}
+				if(tripPurpose.equals("9999") && isZoneBW27To42 ) {
+					tripPurpose = PatnaUrbanActivityTypes.work.toString();
+				} else tripPurpose = PatnaCalibrationUtils.getTripPurpose(tripPurpose);
 
 				if (mode.equals("9999")) {
 					mode = randomModes.remove(0); // always take what is on top.
