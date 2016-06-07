@@ -354,8 +354,8 @@ public final class RunBraessSimulation {
 			
 			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
 			
-			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
+			final RandomizingTimeDistanceTravelDisutilityFactory builder =
+					new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

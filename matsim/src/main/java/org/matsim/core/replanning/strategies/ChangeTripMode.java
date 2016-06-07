@@ -41,7 +41,7 @@ public class ChangeTripMode implements Provider<PlanStrategy> {
 	private ActivityFacilities activityFacilities;
 
 	@Inject
-    protected ChangeTripMode(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+    protected ChangeTripMode(GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
 		this.activityFacilities = activityFacilities;
