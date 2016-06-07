@@ -230,8 +230,6 @@ public class PTMapperUtils {
 	 * Checks for each child stop facility if the link before or after is closer to the facility
 	 * than its referenced link. If so, the child stop facility is replaced with the one closer
 	 * to the facility coordinates.<p/>
-	 * <p/>
-	 * Since all links are part of the route, no rerouting has to be done.
 	 */
 	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
 		log.info("Pulling child stop facilities...");

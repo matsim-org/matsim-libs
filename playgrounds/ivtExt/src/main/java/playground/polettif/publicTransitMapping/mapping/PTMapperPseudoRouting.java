@@ -43,7 +43,6 @@ import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandi
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoGraph;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
-import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
@@ -263,7 +262,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 				routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
 				log.info("Router for " + routingTransportModes);
 
-				finalRouters.put(modeAssignment.getKey(), new ModeDependentRouter(network, routingTransportModes));
+//				finalRouters.put(modeAssignment.getKey(), new ModeDependentRouter(network, routingTransportModes));
+				finalRouters.put(modeAssignment.getKey(), new FastAStarRouter(NetworkTools.filterNetworkByLinkMode(network, routingTransportModes)));
 			}
 		}
 
@@ -280,6 +280,12 @@ public class PTMapperPseudoRouting extends PTMapper {
 		 * a link closer to a stop facility than its referenced link.
 		 */
 		PTMapperUtils.pullChildStopFacilitiesTogether(this.schedule, this.network);
+
+		/**
+		 * Route the schedule again since the previous step might have changed
+		 * some referenced links
+		 */
+		ScheduleTools.routeSchedule(this.schedule, this.network, finalRouters, false);
 
 		/** [10]
 		 * After all lines are created, clean the schedule and network. Removing

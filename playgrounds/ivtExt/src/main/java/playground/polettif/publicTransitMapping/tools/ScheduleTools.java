@@ -166,9 +166,13 @@ public class ScheduleTools {
 	 *                 defined in the transitRoute).
 	 */
 	public static void routeSchedule(TransitSchedule schedule, Network network, Map<String, Router> routers) {
+		routeSchedule(schedule, network, routers, true);
+	}
+
+	public static void routeSchedule(TransitSchedule schedule, Network network, Map<String, Router> routers, boolean logging) {
 		Counter counterRoute = new Counter("route # ");
 
-		log.info("Routing all routes with referenced links...");
+		if(logging) log.info("Routing all routes with referenced links...");
 
 		if(routers == null) {
 			log.error("No routers given, routing cannot be completed!");
@@ -181,9 +185,9 @@ public class ScheduleTools {
 					throw new RuntimeException("No router defined for " + transitRoute.getTransportMode());
 				}
 				if(transitRoute.getStops().size() > 0) {
-					Router router = routers.get(transitRoute.getTransportMode());
+					Router modeDependentRouter = routers.get(transitRoute.getTransportMode());
 
-					counterRoute.incCounter();
+					if(logging) counterRoute.incCounter();
 
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					List<Id<Link>> linkIdSequence = new LinkedList<>();
@@ -207,7 +211,7 @@ public class ScheduleTools {
 						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
 
 
-						LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
+						LeastCostPathCalculator.Path leastCostPath = modeDependentRouter.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
 
 						List<Id<Link>> path = null;
 						if(leastCostPath != null) {
@@ -229,7 +233,7 @@ public class ScheduleTools {
 				}
 			} // -route
 		} // -line
-		log.info("Routing all routes with referenced links... done");
+		if(logging) log.info("Routing all routes with referenced links... done");
 	}
 
 	/**
