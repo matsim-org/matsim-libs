@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  *
  * @author mrieser
  */
-public class BestPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
+public class BestPlanSelector<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
 	/**
 	 * selects the plan with the highest score from the person

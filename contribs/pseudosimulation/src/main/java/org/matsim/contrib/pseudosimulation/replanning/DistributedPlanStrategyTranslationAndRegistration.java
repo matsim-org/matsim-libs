@@ -50,19 +50,19 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     }
 
     static void initMaps() {
-        SupportedSelectors.put("KeepLastSelected", KeepLastSelectedPlanStrategyProvider.class);
-        SupportedSelectors.put("BestScore", SelectBestPlanStrategyProvider.class);
-        SupportedSelectors.put("ChangeExpBeta", ChangeExpBetaPlanStrategyProvider.class);
-        SupportedSelectors.put("SelectExpBeta", SelectExpBetaPlanStrategyProvider.class);
-        SupportedSelectors.put("SelectRandom", SelectRandomPlanStrategyProvider.class);
-        SupportedSelectors.put("SelectPathSizeLogit", SelectPathSizeLogitPlanStrategyProvider.class);
+        SupportedSelectors.put("KeepLastSelected", KeepLastSelected.class);
+        SupportedSelectors.put("BestScore", SelectBest.class);
+        SupportedSelectors.put("ChangeExpBeta", ChangeExpBeta.class);
+        SupportedSelectors.put("SelectExpBeta", SelectExpBeta.class);
+        SupportedSelectors.put("SelectRandom", SelectRandom.class);
+        SupportedSelectors.put("SelectPathSizeLogit", SelectPathSizeLogit.class);
 
-        SupportedMutators.put("ReRoute", ReRoutePlanStrategyProvider.class);
-        SupportedMutators.put("TimeAllocationMutator", TimeAllocationMutatorPlanStrategyProvider.class);
-        SupportedMutators.put("TimeAllocationMutator_ReRoute", TimeAllocationMutatorReRoutePlanStrategyProvider.class);
-        SupportedMutators.put("ChangeSingleTripMode", ChangeSingleTripModePlanStrategyProvider.class);
-        SupportedMutators.put("SubtourModeChoice", SubtourModeChoicePlanStrategyProvider.class);
-        SupportedMutators.put("ChangeTripMode", ChangeTripModePlanStrategyProvider.class);
+        SupportedMutators.put("ReRoute", ReRoute.class);
+        SupportedMutators.put("TimeAllocationMutator", TimeAllocationMutator.class);
+        SupportedMutators.put("TimeAllocationMutator_ReRoute", TimeAllocationMutatorReRoute.class);
+        SupportedMutators.put("ChangeSingleTripMode", ChangeSingleTripMode.class);
+        SupportedMutators.put("SubtourModeChoice", SubtourModeChoice.class);
+        SupportedMutators.put("ChangeTripMode", ChangeTripMode.class);
 
         SupportedMutatorGenes.put("ReRoute", new Character('A'));
         SupportedMutatorGenes.put("TimeAllocationMutator", new Character('B'));

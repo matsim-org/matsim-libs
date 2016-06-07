@@ -22,6 +22,8 @@ package playground.jjoubert.projects.wasteCollection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -45,7 +47,7 @@ public class MclarpifPlanStrategyFactory implements Provider<PlanStrategy> {
 		log.warn("Instantiating the MCLARPIF plan strategy factory.");
 		
 		/* Plans selector. */
-		PlanSelector planSelector = new MclarpifPlanSelector();
+		PlanSelector<Plan,Person> planSelector = new MclarpifPlanSelector();
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(planSelector);
 		
 		/* Doing something with that selected plan. */

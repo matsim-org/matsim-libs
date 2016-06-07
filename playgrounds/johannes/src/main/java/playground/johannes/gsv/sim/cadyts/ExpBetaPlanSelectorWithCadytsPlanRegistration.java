@@ -14,7 +14,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * @author nagel
  *
  */
-public final class ExpBetaPlanSelectorWithCadytsPlanRegistration<T> implements PlanSelector {
+public final class ExpBetaPlanSelectorWithCadytsPlanRegistration<T> implements PlanSelector<Plan, Person> {
 
 	private final ExpBetaPlanSelector<Plan, Person> delegate ;
 	private final CadytsContextI<T> cContext;

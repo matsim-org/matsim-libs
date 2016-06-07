@@ -19,31 +19,17 @@
 
 package org.matsim.core.replanning.strategies;
 
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SubtourModeChoicePlanStrategyProvider implements Provider<PlanStrategy> {
+public class SelectBest implements Provider<PlanStrategy> {
 
-	@Inject private Provider<TripRouter> tripRouterProvider;
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
-	@Inject private ActivityFacilities facilities;
-
-    @Override
+	@Override
 	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new SubtourModeChoice(tripRouterProvider, globalConfigGroup, subtourModeChoiceConfigGroup));
-		strategy.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup));
+		PlanStrategy strategy = new PlanStrategyImpl(new BestPlanSelector());
 		return strategy;
 	}
 

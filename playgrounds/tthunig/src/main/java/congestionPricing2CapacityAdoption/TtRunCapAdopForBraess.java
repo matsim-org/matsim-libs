@@ -44,8 +44,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import analysis.TtStaticLinkFlowValues;
@@ -360,7 +359,7 @@ public class TtRunCapAdopForBraess {
 			for (int i = 0; i < strategies.length; i++) {
 				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())) {
 					if (strategies[i].getWeight() > 0.0) { // ReRoute is used
-						final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder(TransportMode.car, config.planCalcScore()),
+						final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
 								tollHandler, config.planCalcScore());
 						factory.setSigma(SIGMA);
 						controler.addOverridingModule(new AbstractModule() {
@@ -402,8 +401,8 @@ public class TtRunCapAdopForBraess {
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing
-			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
+			final RandomizingTimeDistanceTravelDisutilityFactory builder =
+					new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

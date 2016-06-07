@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -142,8 +142,8 @@ public abstract class AbstractModule implements Module {
 	 * 
 	 * @see {@link StrategyManagerModule}
 	 */
-	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
-		return bind(new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
+	protected final com.google.inject.binder.LinkedBindingBuilder<PlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
+		return bind(new TypeLiteral<PlanSelector<Plan, Person>>(){});
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {

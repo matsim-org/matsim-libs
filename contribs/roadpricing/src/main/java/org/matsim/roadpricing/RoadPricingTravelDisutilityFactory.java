@@ -25,7 +25,7 @@ package org.matsim.roadpricing;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -56,8 +56,8 @@ public class RoadPricingTravelDisutilityFactory implements TravelDisutilityFacto
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		if ( this.sigma != 0. ) {
-			if ( previousTravelDisutilityFactory instanceof Builder) {
-				((Builder) previousTravelDisutilityFactory).setSigma( this.sigma );
+			if ( previousTravelDisutilityFactory instanceof RandomizingTimeDistanceTravelDisutilityFactory) {
+				((RandomizingTimeDistanceTravelDisutilityFactory) previousTravelDisutilityFactory).setSigma( this.sigma );
 			} else {
 				throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
 			}

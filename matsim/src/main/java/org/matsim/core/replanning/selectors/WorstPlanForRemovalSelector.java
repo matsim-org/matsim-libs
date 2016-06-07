@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * <p>Selects the worst plan of a person (most likely for removal), but respects
@@ -39,7 +38,7 @@ import org.matsim.core.population.PlanImpl;
  *
  * @author mrieser
  */
-public class WorstPlanForRemovalSelector implements GenericPlanSelector<Plan, Person> {
+public class WorstPlanForRemovalSelector implements PlanSelector<Plan, Person> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 

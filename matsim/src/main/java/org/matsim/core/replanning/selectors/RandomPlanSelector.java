@@ -30,7 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author mrieser
  */
-public class RandomPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
+public class RandomPlanSelector<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
 	/**
 	 * Choose a random plan from the person and return it.
