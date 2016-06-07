@@ -54,11 +54,21 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		this.activityType = activityType;
 	}
 
+	public CorrectedUtilityCreator(
+			final Scenario scenario,
+			final String activityType ) {
+		this(
+				(ConstrainedAccessibilityConfigGroup) scenario.getConfig().getModule( ConstrainedAccessibilityConfigGroup.GROUP_NAME ),
+				scenario,
+				activityType );
+	}
+
 	/**
 	 * Creates a utility function taking constraints into account the de Palma et Al 2007 way.
 	 * This assumes the generated choice sets are stable!
 	 */
 	public CorrectedUtility<N> createCorrectedUtility( final NestedLogitModel<N> model ) {
+		// TODO check that supply can acomodate demand (otherwise algorithm will never converge)
 		// initialize D_i
 		final Demand<N> demand = new Demand<>( model , scenario );
 		// this initializes omegas to 1 and derives the constrained set
@@ -67,6 +77,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		final Counter counter = new Counter( "Compute capacity-constrained utility correction: iteration # ");
 		for ( int lastSize = -1,
 			  	newSize = iterationInformation.constrainedExPost.size();
+			  // TODO: less restrictive criterion?
 			  lastSize != newSize; ) {
 			counter.incCounter();
 			// update omegas based on the constrained set
@@ -113,7 +124,8 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				double correctedDemand = 0;
 				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
 						iterator.hasNext();
-						iterator.advance()) {
+						) {
+					iterator.advance();
 					final double omega = individualOmegas.get( iterator.key() );
 					final double proba = iterator.value();
 					correctedDemand += omega * proba;

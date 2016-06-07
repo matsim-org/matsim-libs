@@ -40,7 +40,7 @@ public class ConstrainedAccessibilityConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("capacityScalingFactor")
 	public void setCapacityScalingFactor( final double capacityScalingFactor ) {
 		if ( capacityScalingFactor <= 0 || capacityScalingFactor > 1 ) {
-			throw new IllegalArgumentException( "capacity scaling factor must be between 0 and 1" );
+			throw new IllegalArgumentException( "capacity scaling factor must be between 0 and 1, but got "+capacityScalingFactor );
 		}
 
 		this.capacityScalingFactor = capacityScalingFactor;
