@@ -19,7 +19,7 @@
 
  */
 
-package org.matsim.deprecated;
+package org.matsim.deprecated.scoring;
 
 
 import org.matsim.api.core.v01.population.Activity;

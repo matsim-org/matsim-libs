@@ -94,12 +94,10 @@ public class CharyparNagelLegScoringPtChangeTest {
 		scoring2.handleEvent( arrival );
 
 		// "scoring"
-		scoring1.startLeg( leg.getDepartureTime() , leg );
-		scoring1.endLeg( leg.getDepartureTime() + leg.getTravelTime() );
+		scoring1.handleLeg(leg);
 		scoring1.finish();
 
-		scoring2.startLeg( leg.getDepartureTime() , leg );
-		scoring2.endLeg( leg.getDepartureTime() + leg.getTravelTime() );
+		scoring2.handleLeg(leg);
 		scoring2.finish();
 
 		// here, we should get the same score.

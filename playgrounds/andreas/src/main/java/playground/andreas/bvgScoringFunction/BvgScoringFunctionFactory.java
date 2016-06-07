@@ -24,9 +24,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.deprecated.ScoringFunctionAccumulator;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
@@ -61,7 +60,7 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunction(person.getSelectedPlan(), charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(person.getSelectedPlan(), charyparNagelConfigParameters, this.bvgParameters, charyparNagelConfigParameters.utilityOfLineSwitch, this.network));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(charyparNagelConfigParameters));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;
 	}
 

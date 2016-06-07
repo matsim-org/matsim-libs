@@ -22,7 +22,6 @@ package org.matsim.core.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.deprecated.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -31,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
+public class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
 	// yy should be final.  kai, oct'14
 
 	protected double score;
@@ -46,8 +45,6 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	private static short firstLastActOpeningTimesWarning = 0;
 
 	private final CharyparNagelScoringParameters params;
-	private Activity currentActivity;
-	private boolean firstAct = true;
 
 	private Activity firstActivity;
 
@@ -55,63 +52,28 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 
 	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
-		this.reset();
-	}
-
-	@Override
-	public void reset() {
-		this.firstAct = true;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
 		this.score = INITIAL_SCORE;
-		
+
 		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
 	}
 
 	@Override
-	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
-	public void startActivity(final double time, final Activity act) {
-		assert act != null;
-		this.currentActivity = act;
-		this.currentActivityStartTime = time;
-	}
-
-	@Override
-	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
-	public void endActivity(final double time, final Activity act) {
-		assert act != null;
-		assert currentActivity == null || currentActivity.getType().equals(act.getType());
-		if (this.firstAct) {
-			this.firstActivityEndTime = time;
-			this.firstActivity = act;
-			this.firstAct = false;
-		} else {
-			this.score += calcActScore(this.currentActivityStartTime, time, act);
-		}
-		currentActivity = null;
-	}
-
-	@Override
 	public void finish() {
-		if (this.currentActivity != null) {
-			handleOvernightActivity(this.currentActivity); 
-		} else {
-			if (this.firstActivity != null) {
-				handleMorningActivity();
-			}
-			// Else, no activity has started so far.
-			// This probably means that the plan contains at most one activity.
-			// We cannot handle that correctly, because we do not know what it is.
+		if (this.firstActivity != null) {
+			handleMorningActivity();
 		}
+		// Else, no activity has started so far.
+		// This probably means that the plan contains at most one activity.
+		// We cannot handle that correctly, because we do not know what it is.
 	}
 
 	@Override
 	public double getScore() {
 		return this.score;
 	}
-	
-	private static int wrnCnt = 0 ;
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
@@ -266,12 +228,11 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{openingTime, closingTime};
 
-		return openInterval;
+		return new double[]{openingTime, closingTime};
 	}
 
-	private final void handleOvernightActivity(Activity lastActivity) {
+	private void handleOvernightActivity(Activity lastActivity) {
 		assert firstActivity != null;
 		assert lastActivity != null;
 
@@ -317,7 +278,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		}
 	}
 
-	private final void handleMorningActivity() {
+	private void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
 		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
@@ -328,8 +289,6 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		assert act != null;
 		this.firstActivityEndTime = act.getEndTime();
 		this.firstActivity = act;
-		this.firstAct = false;
-
 	}
 
 	@Override

@@ -18,63 +18,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.scoring.income;
+package org.matsim.deprecated.scoring.functions;
 
-import org.apache.log4j.Logger;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
  * modular approach.
- * 
- * ATTENTION:
- * This class is only supposed to work as expected if there are NO OTHER money events than those from road pricing!
- * 
- * @see http://www.matsim.org/node/263
- * @author bkick and michaz after rashid_waraich
+ * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
+ * @author rashid_waraich
  */
-public class ScoringFromToll implements MoneyScoring, BasicScoring {
-	
-	final static private Logger log = Logger.getLogger(ScoringFromToll.class);
+public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
 
-	private double score = 0.0;
-	
-	/*	in order to convert utility units into money terms, this parameter has to be equal
-	to the one in ScoringFromToll, ScoringFromDailyIncome and other money related parts of the scoring function.
-	"Car" in the parameter name is not relevant for the same reason.*/
-	private double betaIncomeCar = 4.58;
-	
-	private double incomePerDay;
-	
-	
+	protected double score;
+
+	private static final double INITIAL_SCORE = 0.0;
+
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public ScoringFromToll(final CharyparNagelScoringParameters params, double householdIncomePerDay) {
+	public CharyparNagelAgentStuckScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
-		this.incomePerDay = householdIncomePerDay;
-	}	
-	
+		this.reset();
+	}
+
+	@Override
 	public void reset() {
-		
+		this.score = INITIAL_SCORE;
 	}
 
-	public void addMoney(final double amount) {
-		
-		//Attention: negative income could cause utility gains due to toll!
-		this.score += (betaIncomeCar / incomePerDay) * amount;
-		
-//		log.info("toll paid: " + amount + " CHF; resulting utility change: " + this.score );
+	@Override
+	public void agentStuck(final double time) {
+
+		this.score += getStuckPenalty();
 	}
 
+	@Override
 	public void finish() {
 
 	}
-	
+
+	@Override
 	public double getScore() {
 		return this.score;
+	}
+
+	private double getStuckPenalty() {
+		return this.params.abortedPlanScore;
 	}
 
 }

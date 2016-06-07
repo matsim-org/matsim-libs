@@ -63,8 +63,7 @@ public class ExternalParametersMatsim2010ScoringFunctionFactory implements Scori
 		scoringFunctionAccumulator.addScoringFunction(
 				new CharyparNagelLegScoring(
 						params,
-						scenario.getNetwork(),
-						scenario.getTransitSchedule() ) );
+						scenario.getNetwork() ) );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new LineChangeScoringFunction(

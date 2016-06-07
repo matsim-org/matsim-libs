@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.deprecated;
+package org.matsim.deprecated.scoring;
 
 import java.util.ArrayList;
 
