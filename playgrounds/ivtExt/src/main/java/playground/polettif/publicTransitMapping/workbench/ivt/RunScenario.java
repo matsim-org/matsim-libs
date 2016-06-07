@@ -19,30 +19,16 @@
 
 package playground.polettif.publicTransitMapping.workbench.ivt;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.pt.PtConstants;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
-import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 
 public class RunScenario {
 
 	public static void main(String[] args) {
 		double percentage = Double.parseDouble(args[1]);
-
+/*
 		final Config config = ConfigUtils.loadConfig(args[0], new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -77,6 +63,7 @@ public class RunScenario {
 
 		// run
 		controler.run();
+		*/
 	}
 
 	public static void connectFacilitiesWithNetwork(MatsimServices controler) {
