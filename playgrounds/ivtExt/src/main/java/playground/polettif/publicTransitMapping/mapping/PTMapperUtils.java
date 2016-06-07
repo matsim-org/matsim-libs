@@ -51,6 +51,7 @@ public class PTMapperUtils {
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
 	private static String suffixChildStopFacilities = ".link:";
 	private static String suffixChildStopFacilitiesRegex = "[.]link:";
+	private static Set<String> loopLinkModes = null;
 
 	public static void setSuffixChildStopFacilities(String suffix, String suffixRegex) {
 		suffixChildStopFacilities = suffix;
@@ -61,7 +62,7 @@ public class PTMapperUtils {
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
 	 * no link can be found within nodeSearchRadius an artificial node and loop
-	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink(TransitStopFacility, Network, String, double)}.
+	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink}.
 	 * For each link candiate a child stop facility is generated and referenced to
 	 * the link. Link candidates for different modes with the same link use the same
 	 * child stop facility. Child stop facilities are not created and added to the schedule!
@@ -77,6 +78,12 @@ public class PTMapperUtils {
 	 */
 	public static Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> generateModeLinkCandidates(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config) {
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> tree = new HashMap<>();
+
+		if(loopLinkModes == null) {
+			loopLinkModes = new HashSet<>();
+			loopLinkModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+			loopLinkModes.add(PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
+		}
 
 		/**
 		 * get closest links for each stop facility (separated by mode)
@@ -101,7 +108,7 @@ public class PTMapperUtils {
 
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
-								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), config.getFreespeedArtificial());
+								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), config.getFreespeedArtificial(), loopLinkModes);
 								closestLinks.add(loopLink);
 							}
 

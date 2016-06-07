@@ -27,13 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.boescpa.lib.tools.coordUtils.CoordFilter;
 
@@ -110,7 +106,6 @@ public class ScheduleCutter {
 
 		// Identify all routes not crossing area and therefore to remove:
 		int routesRemoved = 0;
-		int vehiclesRemoved = 0;
 		Set<TransitLine> linesToRemove = new HashSet<>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			Set<TransitRoute> routesToRemove = new HashSet<>();
@@ -128,10 +123,6 @@ public class ScheduleCutter {
 			// Remove identified routes (and their vehicles):
 			for (TransitRoute routeToRemove : routesToRemove) {
 				line.removeRoute(routeToRemove);
-				if (vehicles != null) {
-					vehicles.removeVehicle(routeToRemove.getRoute().getVehicleId());
-					vehiclesRemoved++;
-				}
 				routesRemoved++;
 			}
 			if (line.getRoutes().isEmpty()) {
@@ -139,7 +130,6 @@ public class ScheduleCutter {
 			}
 		}
 		log.info(" Routes removed: " + routesRemoved);
-		log.info(" Vehicles removed: " + vehiclesRemoved);
 		// Remove empty lines:
 		for (TransitLine lineToRemove : linesToRemove) {
 			schedule.removeTransitLine(lineToRemove);

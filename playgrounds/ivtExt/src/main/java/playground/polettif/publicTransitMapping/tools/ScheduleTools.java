@@ -116,6 +116,15 @@ public class ScheduleTools {
 		return vehicles;
 	}
 
+	/**
+	 * @return the vehicles from a given vehicles file.
+	 */
+	public static Vehicles readVehicles(String vehiclesFile) {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		new VehicleReaderV1(vehicles).readFile(vehiclesFile);
+		return vehicles;
+	}
+
 
 	/**
 	 * Add mode "pt" to any link of the network that is
@@ -178,6 +187,7 @@ public class ScheduleTools {
 
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					List<Id<Link>> linkIdSequence = new LinkedList<>();
+					linkIdSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
 					// route
 					for(int i = 0; i < routeStops.size() - 1; i++) {
@@ -192,28 +202,20 @@ public class ScheduleTools {
 							break;
 						}
 
-						// add very first link
-						if(i == 0) linkIdSequence.add(routeStops.get(0).getStopFacility().getLinkId());
-
-						Id<Link> currentLinkId = routeStops.get(i).getStopFacility().getLinkId();
+						Id<Link> currentLinkId = Id.createLinkId(routeStops.get(i).getStopFacility().getLinkId().toString());
 						Link currentLink = network.getLinks().get(currentLinkId);
 						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
 
+
 						LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
 
+						List<Id<Link>> path = null;
 						if(leastCostPath != null) {
-							List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
-							if(path != null) {
-								linkIdSequence.addAll(path);
-							} else {
-								linkIdSequence = null;
-								break;
-							}
-						} else if(!currentLink.getToNode().getOutLinks().containsKey(nextLink.getId())){
-							linkIdSequence = null;
-							log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
-							break;
+							path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
 						}
+
+						if(path != null)
+							linkIdSequence.addAll(path);
 
 						linkIdSequence.add(nextLink.getId());
 					} // -for stops
