@@ -50,18 +50,17 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class PatnaJointDemandGenerator {
 
 	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_ctd/output_plans.xml.gz"; // calibrated from cadyts.
-	private static final String JOINT_PLANS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_vehicles_10pct.xml.gz";
 	private static Scenario sc;
-	private final static String subPopAttributeName = "userGroup";
-
+	
 	public static void main(String[] args) {
 		PatnaJointDemandGenerator pjdg = new PatnaJointDemandGenerator();
 		pjdg.combinedPlans();
 		pjdg.createSubpopulationAttributes();
 		new PopulationWriter(sc.getPopulation()).write(JOINT_PLANS_10PCT);
-		sc.getPopulation().getPersonAttributes().getAttribute("nonSlum_15", subPopAttributeName);
+		sc.getPopulation().getPersonAttributes().getAttribute("nonSlum_15", PatnaUtils.SUBPOP_ATTRIBUTE);
 		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
 		pjdg.createAndWriteVehiclesFile();
 	}
@@ -73,10 +72,10 @@ public class PatnaJointDemandGenerator {
 	}
 	
 	public void createSubpopulationAttributes(){
-		sc.getConfig().plans().setSubpopulationAttributeName(subPopAttributeName);
+		sc.getConfig().plans().setSubpopulationAttributeName(PatnaUtils.SUBPOP_ATTRIBUTE);
 		Population pop = sc.getPopulation();
 		for(Person p : pop.getPersons().values()){
-			pop.getPersonAttributes().putAttribute(p.getId().toString(), subPopAttributeName, PatnaPersonFilter.getUserGroup(p.getId()).toString() );	
+			pop.getPersonAttributes().putAttribute(p.getId().toString(), PatnaUtils.SUBPOP_ATTRIBUTE, PatnaPersonFilter.getUserGroup(p.getId()).toString() );	
 		}
 	}
 
@@ -88,7 +87,13 @@ public class PatnaJointDemandGenerator {
 
 		for(Person p : popUrban.getPersons().values()){
 			sc.getPopulation().addPerson(p);
+			// also put all person attributes to scenario.
+			sc.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), PatnaUtils.INCOME_ATTRIBUTE, 
+					popUrban.getPersonAttributes().getAttribute(p.getId().toString(), PatnaUtils.INCOME_ATTRIBUTE));
+			sc.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), PatnaUtils.TRANSPORT_COST_ATTRIBUTE, 
+					popUrban.getPersonAttributes().getAttribute(p.getId().toString(), PatnaUtils.TRANSPORT_COST_ATTRIBUTE));
 		}
+
 
 		for(Person p : popExtDemand.getPersons().values()){
 			sc.getPopulation().addPerson(p);

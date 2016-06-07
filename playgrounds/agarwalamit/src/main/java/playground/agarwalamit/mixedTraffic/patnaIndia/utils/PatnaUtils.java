@@ -50,6 +50,7 @@ public final class PatnaUtils {
 
 	public static final String INCOME_ATTRIBUTE = "monthlyIncome";
 	public static final String TRANSPORT_COST_ATTRIBUTE = "dailyTransportCost";
+	public final static String SUBPOP_ATTRIBUTE = "userGroup";
 	
 	public enum PatnaUrbanActivityTypes {
 		home, work, educational, social, other, unknown;
@@ -62,6 +63,7 @@ public final class PatnaUtils {
 
 	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck_ext","car_ext","motorbike_ext","bike_ext");
 	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
+	
 
 	private PatnaUtils(){} 
 
