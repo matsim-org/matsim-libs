@@ -40,7 +40,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 
@@ -219,7 +218,7 @@ public class NetworkTools {
 	 *
 	 * @return the new Link.
 	 */
-	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix, double freespeed) {
+	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix, double freespeed, Set<String> transportModes) {
 		NetworkFactory networkFactory = network.getFactory();
 
 		Coord coord = stopFacility.getCoord();
@@ -227,7 +226,7 @@ public class NetworkTools {
 		Node dummyNode = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node"), coord);
 		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix + stopFacility.getId() + "_link"), dummyNode, dummyNode);
 
-		dummyLink.setAllowedModes(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
+		dummyLink.setAllowedModes(transportModes);
 		dummyLink.setLength(5);
 		dummyLink.setFreespeed(freespeed);
 		dummyLink.setCapacity(9999); // todo param default values in config

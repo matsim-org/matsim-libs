@@ -32,9 +32,8 @@ import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class Basic {
 
@@ -42,10 +41,12 @@ public class Basic {
 
 	public static void main(final String[] args) {
 //		createConfig();
-//		adaptPop();
+		adaptPop("population_Orig.xml.gz", "network.xml", "plans.xml.gz");
 
-		runScenario(args[0]);
+//		runScenario("config.xml");
 	}
+
+
 
 
 	private static void runScenario(String configFile) {
@@ -64,17 +65,15 @@ public class Basic {
 	/**
 	 * modifiy population
 	 */
-	private static void adaptPop() {
+	private static void adaptPop(String inputPopulationFile, String networkFile, String outputPopulationFile) {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		PopulationReader reader = new PopulationReaderMatsimV5(sc);
-		reader.readFile("population_original.xml.gz");
+		reader.readFile(inputPopulationFile);
 		Population population = sc.getPopulation();
 
-
-		Network network = NetworkTools.readNetwork("network.xml.gz");
-
-		Set<String> actTypes = new HashSet<>();
+		Network network = NetworkTools.readNetwork(networkFile);
+		Network carNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("car"));
 
 		// only home and work activities
 		for(Person person : population.getPersons().values()) {
@@ -91,11 +90,13 @@ public class Basic {
 						default :
 							activity.setType("work");
 					}
+					activity.setFacilityId(null);
+					activity.setLinkId(NetworkTools.getNearestLink(carNetwork, activity.getCoord()).getId());
 				}
 			}
 		}
 
-		new PopulationWriter(population, network).write("plans.xml.gz");
+		new PopulationWriter(population, network).write(outputPopulationFile);
 	}
 	
 }

@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.lib2;
+package playground.polettif.publicTransitMapping.hafas.v2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,19 +38,16 @@ import java.util.Set;
 /**
  * Reads the transit lines from a given FPLAN file.
  *
- * @author boescpa
+ * @author polettif
  */
-public class FPLANReader2 {
-	protected static Logger log = Logger.getLogger(FPLANReader2.class);
+public class FPLANReader {
+	protected static Logger log = Logger.getLogger(FPLANReader.class);
 
 	/**
 	 * Only reads the PtRoutes and leaves line/route
 	 * separation to a later process
 	 *
-	 * @param bitfeldNummern
-	 * @param operators
-	 * @param FPLANfile
-	 * @return
+	 * @return the list of FPLANRoutes
 	 */
 	public static List<FPLANRoute> parseFPLAN(Set<Integer> bitfeldNummern, Map<String, String> operators, String FPLANfile) {
 		List<FPLANRoute> hafasRoutes = new ArrayList<>();
@@ -74,29 +71,12 @@ public class FPLANReader2 {
 					 27−29 	INT16 	Taktzeit in Minuten (Abstand zwischen zwei Fahrten).
 					 */
 					if(newLine.charAt(1) == 'Z') {
-						// Get the appropriate transit line...
-						/*
-						Id<TransitLine> lineId = Id.create(operators.get(newLine.substring(9, 15).trim()), TransitLine.class);
-						PtLineFPLAN lineFPLAN;
-						if (linesFPLAN.containsKey(lineId)) {
-							lineFPLAN = linesFPLAN.get(lineId);
-						} else {
-							lineFPLAN = new PtLineFPLAN(lineId);
-							linesFPLAN.put(lineId, lineFPLAN);
-						}
-						*/
-
 						// get operator
 						String operator = operators.get(newLine.substring(9, 15).trim());
 
-						// Create the new route...
-//						int routeNr = 0;
-//						Id<TransitRoute> routeId = Id.create(newLine.substring(3, 8).trim() + "_" + String.format("%03d", routeNr), TransitRoute.class);
-						String routeName = newLine.substring(3, 8).trim();
-//						while (lineFPLAN.getIdRoutesFPLAN().contains(routeId)) {
-//							routeNr++;
-//							routeId = Id.create(newLine.substring(3, 8).trim() + "_" + String.format("%03d", routeNr), TransitRoute.class);
-//						}
+						// get the fahrtnummer
+						String fahrtnummer = newLine.substring(3, 8).trim();
+
 						int numberOfDepartures = 0;
 						int cycleTime = 0;
 						try {
@@ -104,7 +84,7 @@ public class FPLANReader2 {
 							cycleTime = Integer.parseInt(newLine.substring(26, 29));
 						} catch (Exception e) {
 						}
-						currentFPLANRoute = new FPLANRoute(operator, routeName, numberOfDepartures, cycleTime);
+						currentFPLANRoute = new FPLANRoute(operator, fahrtnummer, numberOfDepartures, cycleTime);
 						hafasRoutes.add(currentFPLANRoute);
 					}
 
@@ -147,7 +127,7 @@ public class FPLANReader2 {
 								localBitfeldnr = Integer.parseInt(newLine.substring(22, 28));
 							}
 							if(!bitfeldNummern.contains(localBitfeldnr)) {
-								// Linie gefunden, die nicht werk-täglich verkehrt... => Ignorieren wir...
+								// Linie gefunden, die nicht werktäglich verkehrt... => Ignorieren wir...
 								hafasRoutes.remove(currentFPLANRoute);
 								currentFPLANRoute = null;
 							}

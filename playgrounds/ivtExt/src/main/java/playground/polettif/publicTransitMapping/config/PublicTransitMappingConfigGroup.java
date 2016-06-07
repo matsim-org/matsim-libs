@@ -21,7 +21,6 @@ package playground.polettif.publicTransitMapping.config;
 
 import com.opencsv.CSVReader;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.MapUtils;
 
@@ -39,6 +38,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "PublicTransitMapping";
 
 	public static final String ARTIFICIAL_LINK_MODE = "artificial";
+	public static final String STOP_FACILITY_LOOP_LINK = "stopFacilityLink";
 	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
 
 	private static final String MODE_ROUTING_ASSIGNMENT ="modeRoutingAssignment";

@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.lib;
+package playground.polettif.publicTransitMapping.hafas.v1;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,8 +41,8 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class FPLANReader {
-	protected static Logger log = Logger.getLogger(FPLANReader.class);
+public class FPLANReaderV1 {
+	protected static Logger log = Logger.getLogger(FPLANReaderV1.class);
 
 	/**
 	 * Only reads the PtRoutes and leaves line/route

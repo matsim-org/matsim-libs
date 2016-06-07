@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.lib2;
+package playground.polettif.publicTransitMapping.hafas.v2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -94,8 +94,12 @@ public class FPLANRoute {
 		vehicleTypeId = typeId;
 	}
 
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
 	public String getVehicleId() {
-		return vehicleTypeId + "_" + operator + "_" + routeDescription;
+		return vehicleTypeId + "_" + operator;
 	}
 
 	/**

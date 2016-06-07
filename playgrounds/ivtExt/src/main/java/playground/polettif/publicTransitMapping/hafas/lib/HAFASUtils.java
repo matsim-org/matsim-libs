@@ -21,26 +21,24 @@
 
 package playground.polettif.publicTransitMapping.hafas.lib;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Different methods for the Schedule creation from HAFAS.
  *
  * @author boescpa
  */
+@Deprecated
 public class HAFASUtils {
-	protected static Logger log = Logger.getLogger(HAFASUtils.class);
 
 	public static void removeNonUsedStopFacilities(TransitSchedule schedule) {
 		// Collect all used stop facilities:
@@ -63,127 +61,6 @@ public class HAFASUtils {
 		for (TransitStopFacility facility : unusedStopFacilites) {
 			schedule.removeStopFacility(facility);
 		}
-	}
-
-	public static void cleanVehicles(TransitSchedule schedule, Vehicles vehicles) {
-		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					usedVehicles.add(departure.getVehicleId());
-				}
-			}
-		}
-		final Set<Id<Vehicle>> vehicles2Remove = new HashSet<>();
-		for (Id<Vehicle> vehicleId : vehicles.getVehicles().keySet()) {
-			if (!usedVehicles.contains(vehicleId)) {
-				vehicles2Remove.add(vehicleId);
-			}
-		}
-		for (Id<Vehicle> vehicleId : vehicles2Remove) {
-			if (!usedVehicles.contains(vehicleId)) {
-				vehicles.removeVehicle(vehicleId);
-			}
-		}
-
-		final Set<VehicleType> vehicleTypes2Remove = new HashSet<>();
-		for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
-			if(!HafasDefinitions.Vehicles.valueOf(vehicleType.getId().toString()).addToSchedule) {
-				vehicleTypes2Remove.add(vehicleType);
-			}
-		}
-		for (VehicleType vehicleType : vehicleTypes2Remove) {
-			// TODO implement vehicle removal correctly
-//				vehicles.removeVehicleType(vehicleType.getId());
-		}
-	}
-
-	public static void cleanDepartures(TransitSchedule schedule) {
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				final Set<Double> departureTimes = new HashSet<>();
-				final List<Departure> departuresToRemove = new ArrayList<>();
-				for (Departure departure : route.getDepartures().values()) {
-					double dt = departure.getDepartureTime();
-					if (departureTimes.contains(dt)) {
-						departuresToRemove.add(departure);
-					} else {
-						departureTimes.add(dt);
-					}
-				}
-				for (Departure departure2Remove : departuresToRemove) {
-					route.removeDeparture(departure2Remove);
-				}
-			}
-		}
-	}
-
-	public static void uniteSameRoutesWithJustDifferentDepartures(TransitSchedule schedule) {
-		long totalNumberOfDepartures = 0;
-		long departuresWithChangedSchedules = 0;
-		long totalNumberOfStops = 0;
-		long stopsWithChangedTimes = 0;
-		double changedTotalTimeAtStops = 0.;
-		List<Double> timeChanges = new ArrayList<>();
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			// Collect all route profiles
-			final Map<String, List<TransitRoute>> routeProfiles = new HashMap<>();
-			for (TransitRoute route : line.getRoutes().values()) {
-				totalNumberOfDepartures += route.getDepartures().size();
-				totalNumberOfStops += route.getDepartures().size() * route.getStops().size();
-				String routeProfile = route.getStops().get(0).getStopFacility().getId().toString();
-				for (int i = 1; i < route.getStops().size(); i++) {
-					//routeProfile = routeProfile + "-" + route.getStops().get(i).toString() + ":" + route.getStops().get(i).getDepartureOffset();
-					routeProfile = routeProfile + "-" + route.getStops().get(i).getStopFacility().getId().toString();
-				}
-				List<TransitRoute> profiles = routeProfiles.get(routeProfile);
-				if (profiles == null) {
-					profiles = new ArrayList<>();
-					routeProfiles.put(routeProfile, profiles);
-				}
-				profiles.add(route);
-			}
-			// Check profiles and if the same, add latter to former.
-			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
-				TransitRoute finalRoute = routesToUnite.get(0);
-				for (int i = 1; i < routesToUnite.size(); i++) {
-					TransitRoute routeToAdd = routesToUnite.get(i);
-					// unite departures
-					for (Departure departure : routeToAdd.getDepartures().values()) {
-						finalRoute.addDeparture(departure);
-					}
-					line.removeRoute(routeToAdd);
-					// make analysis
-					int numberOfDepartures = routeToAdd.getDepartures().size();
-					boolean departureWithChangedDepartureTimes = false;
-					for (int j = 0; j < finalRoute.getStops().size(); j++) {
-						double changedTotalTimeAtStop =
-								Math.abs(finalRoute.getStops().get(j).getArrivalOffset() - routeToAdd.getStops().get(j).getArrivalOffset())
-										+ Math.abs(finalRoute.getStops().get(j).getDepartureOffset() - routeToAdd.getStops().get(j).getDepartureOffset());
-						if (changedTotalTimeAtStop > 0) {
-							stopsWithChangedTimes += numberOfDepartures;
-							changedTotalTimeAtStops += changedTotalTimeAtStop*numberOfDepartures;
-							for (int k = 0; k < numberOfDepartures; k++) {
-								timeChanges.add(changedTotalTimeAtStop);
-							}
-							departureWithChangedDepartureTimes = true;
-						}
-					}
-					if (departureWithChangedDepartureTimes) {
-						departuresWithChangedSchedules += numberOfDepartures;
-					}
-				}
-			}
-		}
-		log.info("LINE UNIFICATION: Total Number of Departures: " + totalNumberOfDepartures);
-		log.info("LINE UNIFICATION: Number of Departures with changed schedule: " + departuresWithChangedSchedules);
-		log.info("LINE UNIFICATION: Total Number of Stops: " + totalNumberOfStops);
-		log.info("LINE UNIFICATION: Number of Stops with changed departure or arrival times: " + stopsWithChangedTimes);
-		log.info("LINE UNIFICATION: Total time difference caused by changed departure or arrival times: " + changedTotalTimeAtStops);
-		log.info("LINE UNIFICATION: Average time difference caused by changed times: " + (changedTotalTimeAtStops/stopsWithChangedTimes));
-		log.info("LINE UNIFICATION: Average time difference over all stops caused by changed times: " +
-				(changedTotalTimeAtStops/totalNumberOfStops));
-		//writeChangedTimes(timeChanges);
 	}
 
 	private static void writeChangedTimes(List<Double> timeChanges) {
