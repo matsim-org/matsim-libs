@@ -26,7 +26,7 @@ import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.deprecated.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.utils.misc.Time;
