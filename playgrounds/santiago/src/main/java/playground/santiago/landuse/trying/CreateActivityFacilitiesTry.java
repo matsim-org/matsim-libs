@@ -23,14 +23,14 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class CreateActivityFacilityTry {
+public class CreateActivityFacilitiesTry {
 	
 	
-	final String STGO_SHAPE_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/5_ShapeManzanasWithInfo_Modified4/ShapeManzanasWithInfo_Modified4.shp" ;
+	final String STGO_SHAPE_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/4_finalShapeSantiago/finalShapeSantiago.shp" ;
 	final String OUTPUT_FACILITIES_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/";
 
 	
-	private CreateActivityFacilityTry() {
+	private CreateActivityFacilitiesTry() {
 		
 }
 	
@@ -53,8 +53,8 @@ public class CreateActivityFacilityTry {
 	
 	
 	public static void main(String[] args) {
-		 CreateActivityFacilityTry createActivityFacilityTry = new CreateActivityFacilityTry();
-		 createActivityFacilityTry.Run();
+		 CreateActivityFacilitiesTry createActivityFacilitiesTry = new CreateActivityFacilitiesTry();
+		 createActivityFacilitiesTry.Run();
 	}
 	
 
@@ -80,22 +80,22 @@ public class CreateActivityFacilityTry {
 	
 	ArrayList <String> attributeCaptions = new ArrayList <>();
 	
-	attributeCaptions.add("Comercio_1"); 
-	attributeCaptions.add("adminpub_1"); 
-	attributeCaptions.add("bodega_f_1");
-	attributeCaptions.add("culto_fi_1");
-	attributeCaptions.add("deporte__1");
-	attributeCaptions.add("educacio_1");
-	attributeCaptions.add("estacion_1");
-	attributeCaptions.add("hogar_fi_1");
-	attributeCaptions.add("hotel_fi_1");
-	attributeCaptions.add("industri_1");
-	attributeCaptions.add("mineria__1");
-	attributeCaptions.add("oficina__1");
-	attributeCaptions.add("otros_fi_1");
-	attributeCaptions.add("salud_fi_1");
-	attributeCaptions.add("sitioeri_1");
-	attributeCaptions.add("transpor_1");
+	attributeCaptions.add("comByArea"); 
+	attributeCaptions.add("admByArea"); 
+	attributeCaptions.add("bodByArea");
+	attributeCaptions.add("cultByArea");
+	attributeCaptions.add("depByArea");
+	attributeCaptions.add("edByArea");
+	attributeCaptions.add("estByArea");
+	attributeCaptions.add("hogByArea");
+	attributeCaptions.add("hotByArea");
+	attributeCaptions.add("indByArea");
+	attributeCaptions.add("minByArea");
+	attributeCaptions.add("ofByArea");
+	attributeCaptions.add("otrByArea");
+	attributeCaptions.add("salByArea");
+	attributeCaptions.add("sitByArea");
+	attributeCaptions.add("traByArea");
 	
 	return attributeCaptions;
 	
@@ -106,11 +106,11 @@ public class CreateActivityFacilityTry {
 		
 		ShapeFileReader reader = new ShapeFileReader();
 		Collection<SimpleFeature> features = reader.readFileAndInitialize(shapeFileName);
-		Map <String,String> utilInfo = new HashMap<>();
+		Map <String, String> utilInfo = new HashMap<>();
 		
 		for (SimpleFeature feature : features) {
 			
-			utilInfo.put((String) feature.getAttribute("CMN_MZ_AR"),(String) feature.getAttribute(attributeCaption));
+			utilInfo.put((String) feature.getAttribute("CMN_MZ_AR"), feature.getAttribute(attributeCaption).toString());
 						
 		}
 		
@@ -153,7 +153,7 @@ public class CreateActivityFacilityTry {
 				
 				for (int n=1 ; n<=numberOfBuildingsById; n++){
 					
-					Id<ActivityFacility> id = Id.create(blockId+"-"+n, ActivityFacility.class);
+					Id<ActivityFacility> id = Id.create(blockId+"-"+nameOfFacility.substring(0,2)+n, ActivityFacility.class);
 					Coord coord = shoot(geometry); 	
 					ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, coord);
 					activityFacilities.addActivityFacility(activityFacility);

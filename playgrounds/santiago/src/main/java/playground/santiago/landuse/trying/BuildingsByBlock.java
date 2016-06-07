@@ -13,53 +13,27 @@ import org.matsim.core.utils.io.IOUtils;
 
 
 
-public class PreProcessingLandUseInfoTry {
+public class BuildingsByBlock {
 
 	final String OUTPUT_PATH = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/";	
-	final String BUILDINGS_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/PREDIOS.csv";
+	final String BUILDINGS_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/infoSII/BRORGA2441N_00000_2014.csv";
 	
 
 
-	private final static Logger log = Logger.getLogger(PreProcessingLandUseInfoTry.class);
+	private final static Logger log = Logger.getLogger(BuildingsByBlock.class);
 	
-	private PreProcessingLandUseInfoTry() {
-	
-}
+	private BuildingsByBlock() {}
 	
 	
 	public static void main(String[] args) {
-	PreProcessingLandUseInfoTry landUse = new PreProcessingLandUseInfoTry();
+	BuildingsByBlock landUse = new BuildingsByBlock();
 	landUse.Run();
-}
+	}
 	
 	private void Run(){
-		
-		try {
-			
-		BufferedReader br = IOUtils.getBufferedReader( BUILDINGS_FILE );
-		PrintWriter pr = new PrintWriter(new FileWriter ( OUTPUT_PATH + "PREDIOS_UTIL.csv"));
-		String line;
-			while ((line = br.readLine()) != null) {
-				String[] entries = line.split(";");
-				entries[1].replaceFirst("^0+(?!$)", ""); //deleting the leading zeros...
-				//the new file has info. about comuna ; manzana ; predio ; clave ( = comuna + "-" + manzana ) ; tipo.
-				pr.println( entries[0].concat(";" + entries[1] + ";" + entries[2] + ";" + entries[0]+"-"+entries[1] +";" + entries [5] ) );	
-
-			}
-
-		br.close();
-		pr.close();
-			
-		} catch (IOException e) {
-			
-			log.error(new Exception(e));
-		
-		}
-		
-
-		getBuildingsByBlock( OUTPUT_PATH + "PREDIOS_UTIL.csv" , OUTPUT_PATH );
+		getBuildingsByBlock( BUILDINGS_FILE , OUTPUT_PATH );
 	}
-
+	
 	private void getBuildingsByBlock( String utilFile , String outputPath ){
 		
 		Map <String , Integer> comercioByBlock = new HashMap <String , Integer> ();
