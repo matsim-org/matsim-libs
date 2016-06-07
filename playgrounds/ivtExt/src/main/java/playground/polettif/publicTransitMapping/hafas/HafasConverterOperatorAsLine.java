@@ -25,6 +25,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.hafas.lib.*;
+import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 
 import java.util.Map;
 import java.util.Set;
@@ -34,9 +35,9 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class HafasConverter extends Hafas2TransitSchedule {
+public class HafasConverterOperatorAsLine extends Hafas2TransitSchedule {
 
-	public HafasConverter(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public HafasConverterOperatorAsLine(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		super(schedule, vehicles, transformation);
 	}
 
@@ -66,8 +67,8 @@ public class HafasConverter extends Hafas2TransitSchedule {
 
 		// 5. Clean schedule
 		HAFASUtils.removeNonUsedStopFacilities(schedule);
-		HAFASUtils.uniteSameRoutesWithJustDifferentDepartures(schedule);
-		HAFASUtils.cleanDepartures(schedule);
+		ScheduleCleaner.uniteSameRoutesWithJustDifferentDepartures(schedule);
+		ScheduleCleaner.cleanDepartures(schedule);
 		HAFASUtils.cleanVehicles(schedule, vehicles);
 
 		log.info("Creating the schedule based on HAFAS... done.");

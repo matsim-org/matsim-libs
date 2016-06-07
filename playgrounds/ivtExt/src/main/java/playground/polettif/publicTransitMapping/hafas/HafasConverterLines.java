@@ -36,6 +36,7 @@ import playground.polettif.publicTransitMapping.hafas.lib.OperatorReader;
 import playground.polettif.publicTransitMapping.hafas.lib.StopReader;
 import playground.polettif.publicTransitMapping.hafas.lib2.FPLANReader2;
 import playground.polettif.publicTransitMapping.hafas.lib2.FPLANRoute;
+import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 
 import java.util.HashMap;
 import java.util.List;
@@ -88,8 +89,8 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 
 		// 5. Clean schedule
 		HAFASUtils.removeNonUsedStopFacilities(schedule);
-		HAFASUtils.uniteSameRoutesWithJustDifferentDepartures(schedule);
-		HAFASUtils.cleanDepartures(schedule);
+		ScheduleCleaner.combineIdenticalTransitRoutes(schedule);
+		ScheduleCleaner.cleanDepartures(schedule);
 		HAFASUtils.cleanVehicles(schedule, vehicles);
 
 		log.info("Creating the schedule based on HAFAS... done.");
@@ -98,7 +99,7 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 	private void createTransitRoutesFromFPLAN(List<FPLANRoute> routes) {
 		Map<Id<TransitLine>, Integer> routeNrs = new HashMap<>();
 
-		Counter lineCounter = new Counter("");
+		Counter lineCounter = new Counter(" TransitLine # ");
 
 		// set schedule so fplanRoutes have stopfacilities available
 		FPLANRoute.setSchedule(schedule);
@@ -144,7 +145,6 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 			int routeNr = MapUtils.getInteger(lineId, routeNrs, 0);
 			Id<TransitRoute> routeId = createRouteId(fplanRoute, ++routeNr);
 			routeNrs.put(lineId, routeNr);
-			log.info(lineId+ " "+routeNr);
 
 			TransitRoute transitRoute = scheduleFactory.createTransitRoute(routeId, null, fplanRoute.getTransitRouteStops(), fplanRoute.getMode());
 				for(Departure departure : fplanRoute.getDepartures()) {
@@ -156,12 +156,7 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 						fplanRoute.getDepartures();
 					}
 				}
-
-			try {
-				transitLine.addRoute(transitRoute);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			transitLine.addRoute(transitRoute);
 		}
 	}
 
