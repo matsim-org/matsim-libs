@@ -1,32 +1,13 @@
 package playground.artemc.analysis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
@@ -38,18 +19,24 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.artemc.heterogeneity.scoring.DisaggregatedSumScoringFunction;
+import playground.artemc.heterogeneity.scoring.DisaggregatedSumScoringFunctionForCrowding;
 import playground.artemc.heterogeneity.scoring.PersonalScoringFunctionFactory;
 import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters;
 import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters.Mode;
 
-public class ScheduleDelayCostHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, ScheduleDelayCostHandlerFactory{
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+
+public class ScheduleDelayCostWithCrowdingHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, ScheduleDelayCostHandlerFactory{
 
 	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
-	
+
 	private double headway = 300.0;
-	
+
 	private HashMap<Id<Person>, LinkedList<String>> personActivities;
 	private HashMap<Id<Person>, Activity> activities;
 	private HashMap<Id<Person>, Journey> journeys;
@@ -65,10 +52,10 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 	private Journey currentJourney;
 	private ArrayList<Id<Person>> stuckedAgents;
 
-	public ScheduleDelayCostHandler(){
+	public ScheduleDelayCostWithCrowdingHandler(){
 		this.personActivities = new HashMap<Id<Person>, LinkedList<String>>();
 		this.activities = new HashMap<Id<Person>, Activity>();
-		this.journeys = new HashMap<Id<Person>, ScheduleDelayCostHandler.Journey>();
+		this.journeys = new HashMap<Id<Person>, ScheduleDelayCostWithCrowdingHandler.Journey>();
 		this.ttc_morning = new HashMap<Id<Person>, Double>();
 		this.ttc_evening = new HashMap<Id<Person>, Double>();
 		this.sdc_morning = new HashMap<Id<Person>, Double>();
@@ -241,7 +228,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		}
 
 		if(!scoringParameters.containsKey(perosnId)){
-			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(perosnId);
+			DisaggregatedSumScoringFunctionForCrowding sf = (DisaggregatedSumScoringFunctionForCrowding) disScoringFactory.getPersonScoringFunctions().get(perosnId);
 			scoringParameters.put(perosnId, sf.getParams());
 		}
 
@@ -461,13 +448,14 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		this.controler = controler;
 	}
 
-	public HashSet<String> getUsedModes() {
-		return usedModes;
-	}
-
 	@Override
 	public void setControler(Controler controler) {
 
+	}
+
+	@Override
+	public HashSet<String> getUsedModes() {
+		return usedModes;
 	}
 
 	public ArrayList<Id<Person>> getStuckedAgents() {
