@@ -21,10 +21,8 @@
 
 package playground.polettif.publicTransitMapping.hafas.lib;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedWriter;
@@ -39,8 +37,8 @@ import java.util.Set;
  *
  * @author boescpa
  */
+@Deprecated
 public class HAFASUtils {
-	protected static Logger log = Logger.getLogger(HAFASUtils.class);
 
 	public static void removeNonUsedStopFacilities(TransitSchedule schedule) {
 		// Collect all used stop facilities:
@@ -63,40 +61,6 @@ public class HAFASUtils {
 		for (TransitStopFacility facility : unusedStopFacilites) {
 			schedule.removeStopFacility(facility);
 		}
-	}
-
-	public static void cleanVehicles(TransitSchedule schedule, Vehicles vehicles) {
-		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					usedVehicles.add(departure.getVehicleId());
-				}
-			}
-		}
-		final Set<Id<Vehicle>> vehicles2Remove = new HashSet<>();
-		for (Id<Vehicle> vehicleId : vehicles.getVehicles().keySet()) {
-			if (!usedVehicles.contains(vehicleId)) {
-				vehicles2Remove.add(vehicleId);
-			}
-		}
-		for (Id<Vehicle> vehicleId : vehicles2Remove) {
-			if (!usedVehicles.contains(vehicleId)) {
-				vehicles.removeVehicle(vehicleId);
-			}
-		}
-/*
-		final Set<VehicleType> vehicleTypes2Remove = new HashSet<>();
-		for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
-			if(!HafasDefinitions.Vehicles.valueOf(vehicleType.getId().toString()).addToSchedule) {
-				vehicleTypes2Remove.add(vehicleType);
-			}
-		}
-		for (VehicleType vehicleType : vehicleTypes2Remove) {
-			// TODO implement vehicle removal correctly
-//				vehicles.removeVehicleType(vehicleType.getId());
-		}
-		*/
 	}
 
 	private static void writeChangedTimes(List<Double> timeChanges) {

@@ -24,7 +24,10 @@ package playground.polettif.publicTransitMapping.hafas;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.hafas.lib.*;
+import playground.polettif.publicTransitMapping.hafas.lib.BitfeldAnalyzer;
+import playground.polettif.publicTransitMapping.hafas.lib.OperatorReader;
+import playground.polettif.publicTransitMapping.hafas.lib.StopReader;
+import playground.polettif.publicTransitMapping.hafas.v1.FPLANReaderV1;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 
 import java.util.Map;
@@ -62,14 +65,14 @@ public class HafasConverterOperatorAsLine extends Hafas2TransitSchedule {
 
 		// 4. Create all lines from HAFAS-Schedule
 		log.info("  Read transit lines...");
-		FPLANReader.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "FPLAN");
+		FPLANReaderV1.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "FPLAN");
 		log.info("  Read transit lines... done.");
 
 		// 5. Clean schedule
-		HAFASUtils.removeNonUsedStopFacilities(schedule);
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleCleaner.uniteSameRoutesWithJustDifferentDepartures(schedule);
 		ScheduleCleaner.cleanDepartures(schedule);
-		HAFASUtils.cleanVehicles(schedule, vehicles);
+		ScheduleCleaner.cleanVehicles(schedule, vehicles);
 
 		log.info("Creating the schedule based on HAFAS... done.");
 	}

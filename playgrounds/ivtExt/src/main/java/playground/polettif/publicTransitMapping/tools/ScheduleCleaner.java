@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 import java.util.*;
 
@@ -322,5 +324,28 @@ public class ScheduleCleaner {
 		log.info("   Total time difference caused by changed departure or arrival times: " + changedTotalTimeAtStops);
 		log.info("   Average time difference caused by changed times: " + (changedTotalTimeAtStops / stopsWithChangedTimes));
 		log.info("   Average time difference over all stops caused by changed times: " + (changedTotalTimeAtStops / totalNumberOfStops));
+	}
+
+	/**
+	 * Removes vehicles that are not used in the schedule
+	 */
+	public static void cleanVehicles(TransitSchedule schedule, Vehicles vehicles) {
+		log.info("Removing not used vehicles...");
+		int removed = 0;
+		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					usedVehicles.add(departure.getVehicleId());
+				}
+			}
+		}
+		for (Id<Vehicle> vehicleId : new HashSet<>(vehicles.getVehicles().keySet())) {
+			if (!usedVehicles.contains(vehicleId)) {
+				vehicles.removeVehicle(vehicleId);
+				removed++;
+			}
+		}
+		log.info(removed + " vehicles removed");
 	}
 }

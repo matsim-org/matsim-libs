@@ -39,6 +39,7 @@ import java.io.IOException;
  *
  * @author boescpa
  */
+@Deprecated
 public class VehicleTypesReader {
 
 	protected static void readVehicles(Vehicles vehicles, String vehicleFile) {

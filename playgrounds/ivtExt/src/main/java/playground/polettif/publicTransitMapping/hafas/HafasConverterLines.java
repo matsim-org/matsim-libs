@@ -22,6 +22,7 @@
 package playground.polettif.publicTransitMapping.hafas;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
@@ -31,11 +32,10 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import playground.polettif.publicTransitMapping.hafas.lib.BitfeldAnalyzer;
-import playground.polettif.publicTransitMapping.hafas.lib.HAFASUtils;
 import playground.polettif.publicTransitMapping.hafas.lib.OperatorReader;
 import playground.polettif.publicTransitMapping.hafas.lib.StopReader;
-import playground.polettif.publicTransitMapping.hafas.lib2.FPLANReader2;
-import playground.polettif.publicTransitMapping.hafas.lib2.FPLANRoute;
+import playground.polettif.publicTransitMapping.hafas.v2.FPLANReader;
+import playground.polettif.publicTransitMapping.hafas.v2.FPLANRoute;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 
 import java.util.HashMap;
@@ -80,7 +80,7 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 
 		// 4. Create all lines from HAFAS-Schedule
 		log.info("  Read transit lines...");
-		List<FPLANRoute> routes = FPLANReader2.parseFPLAN(bitfeldNummern, operators, pathToInputFiles + "FPLAN");
+		List<FPLANRoute> routes = FPLANReader.parseFPLAN(bitfeldNummern, operators, pathToInputFiles + "FPLAN");
 		log.info("  Read transit lines... done.");
 
 		log.info("  Creating Transit Routes...");
@@ -88,10 +88,10 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 		log.info("  Creating Transit Routes... done.");
 
 		// 5. Clean schedule
-		HAFASUtils.removeNonUsedStopFacilities(schedule);
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleCleaner.combineIdenticalTransitRoutes(schedule);
 		ScheduleCleaner.cleanDepartures(schedule);
-		HAFASUtils.cleanVehicles(schedule, vehicles);
+		ScheduleCleaner.cleanVehicles(schedule, vehicles);
 
 		log.info("Creating the schedule based on HAFAS... done.");
 	}
@@ -105,48 +105,55 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 		FPLANRoute.setSchedule(schedule);
 
 		for(FPLANRoute fplanRoute : routes) {
-			Id<TransitLine> lineId = createLineId(fplanRoute);
-
-			// create or get TransitLine
-			TransitLine transitLine;
-			if(!schedule.getTransitLines().containsKey(lineId)) {
-				transitLine = scheduleFactory.createTransitLine(lineId);
-				schedule.addTransitLine(transitLine);
-				lineCounter.incCounter();
-			} else {
-				transitLine = schedule.getTransitLines().get(lineId);
-			}
-
-			// create vehicle type if needed
 			Id<VehicleType> vehicleTypeId = fplanRoute.getVehicleTypeId();
-			VehicleType vehicleType = vehicles.getVehicleTypes().get(vehicleTypeId);
-			if(vehicleType == null) {
-				String typeIdstr = vehicleTypeId.toString();
+			String transportMode = TransportMode.pt;
 
-				vehicleType = vehicleFactory.createVehicleType(Id.create(vehicleTypeId.toString(), VehicleType.class));
+			// get wheter the route using this vehicle type should be added & set transport mode
+			if(HafasDefinitions.Vehicles.valueOf(vehicleTypeId.toString()).addToSchedule) {
+				transportMode = HafasDefinitions.Vehicles.valueOf(vehicleTypeId.toString()).transportMode.modeName;
 
-				// using default values for vehicle type
-				vehicleType.setLength(HafasDefinitions.Vehicles.valueOf(typeIdstr).length);
-				vehicleType.setWidth(HafasDefinitions.Vehicles.valueOf(typeIdstr).width);
-				vehicleType.setAccessTime(HafasDefinitions.Vehicles.valueOf(typeIdstr).accessTime);
-				vehicleType.setEgressTime(HafasDefinitions.Vehicles.valueOf(typeIdstr).egressTime);
-				vehicleType.setDoorOperationMode(HafasDefinitions.Vehicles.valueOf(typeIdstr).doorOperation);
-				vehicleType.setPcuEquivalents(HafasDefinitions.Vehicles.valueOf(typeIdstr).pcuEquivalents);
+				Id<TransitLine> lineId = createLineId(fplanRoute);
 
-				VehicleCapacity vehicleCapacity = vehicleFactory.createVehicleCapacity();
-				vehicleCapacity.setSeats(HafasDefinitions.Vehicles.valueOf(typeIdstr).capacitySeats);
-				vehicleCapacity.setStandingRoom(HafasDefinitions.Vehicles.valueOf(typeIdstr).capacityStanding);
-				vehicleType.setCapacity(vehicleCapacity);
+				// create or get TransitLine
+				TransitLine transitLine;
+				if(!schedule.getTransitLines().containsKey(lineId)) {
+					transitLine = scheduleFactory.createTransitLine(lineId);
+					schedule.addTransitLine(transitLine);
+					lineCounter.incCounter();
+				} else {
+					transitLine = schedule.getTransitLines().get(lineId);
+				}
 
-				vehicles.addVehicleType(vehicleType);
-			}
+				// create vehicle type if needed
+				VehicleType vehicleType = vehicles.getVehicleTypes().get(vehicleTypeId);
+				if(vehicleType == null) {
+					String typeIdstr = vehicleTypeId.toString();
 
-			// create actual TransitRoute
-			int routeNr = MapUtils.getInteger(lineId, routeNrs, 0);
-			Id<TransitRoute> routeId = createRouteId(fplanRoute, ++routeNr);
-			routeNrs.put(lineId, routeNr);
+					vehicleType = vehicleFactory.createVehicleType(Id.create(vehicleTypeId.toString(), VehicleType.class));
 
-			TransitRoute transitRoute = scheduleFactory.createTransitRoute(routeId, null, fplanRoute.getTransitRouteStops(), fplanRoute.getMode());
+					// using default values for vehicle type
+					vehicleType.setLength(HafasDefinitions.Vehicles.valueOf(typeIdstr).length);
+					vehicleType.setWidth(HafasDefinitions.Vehicles.valueOf(typeIdstr).width);
+					vehicleType.setAccessTime(HafasDefinitions.Vehicles.valueOf(typeIdstr).accessTime);
+					vehicleType.setEgressTime(HafasDefinitions.Vehicles.valueOf(typeIdstr).egressTime);
+					vehicleType.setDoorOperationMode(HafasDefinitions.Vehicles.valueOf(typeIdstr).doorOperation);
+					vehicleType.setPcuEquivalents(HafasDefinitions.Vehicles.valueOf(typeIdstr).pcuEquivalents);
+
+					VehicleCapacity vehicleCapacity = vehicleFactory.createVehicleCapacity();
+					vehicleCapacity.setSeats(HafasDefinitions.Vehicles.valueOf(typeIdstr).capacitySeats);
+					vehicleCapacity.setStandingRoom(HafasDefinitions.Vehicles.valueOf(typeIdstr).capacityStanding);
+					vehicleType.setCapacity(vehicleCapacity);
+
+					vehicles.addVehicleType(vehicleType);
+				}
+
+				// get route id
+				int routeNr = MapUtils.getInteger(lineId, routeNrs, 0);
+				Id<TransitRoute> routeId = createRouteId(fplanRoute, ++routeNr);
+				routeNrs.put(lineId, routeNr);
+
+				// create actual TransitRoute
+				TransitRoute transitRoute = scheduleFactory.createTransitRoute(routeId, null, fplanRoute.getTransitRouteStops(), fplanRoute.getMode());
 				for(Departure departure : fplanRoute.getDepartures()) {
 					transitRoute.addDeparture(departure);
 					try {
@@ -156,7 +163,11 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 						fplanRoute.getDepartures();
 					}
 				}
-			transitLine.addRoute(transitRoute);
+
+				transitRoute.setTransportMode(transportMode);
+
+				transitLine.addRoute(transitRoute);
+			}
 		}
 	}
 
