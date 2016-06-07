@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,12 +39,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
-
 /**
  * @author thibautd
  */
 public class CorrectedUtilityCreatorTest {
+	private static final Logger log = Logger.getLogger( CorrectedUtilityCreatorTest.class );
 	enum NestId {first,second}
 	@Test
 	public void simpleTest() {
@@ -111,9 +111,11 @@ public class CorrectedUtilityCreatorTest {
 
 		facilitiesWithWork.stream()
 				.forEach( f -> f.getActivityOptions().get( "work" ).setCapacity( 15 ) );
+		final int nFacilities = facilitiesWithWork.size();
+		log.info( "test instance has "+nFacilities+" facilities to choose from" );
 
 		// adapt scaling ratio to be tight
-		configGroup.setCapacityScalingFactor( 1.2 * scenario.getPopulation().getPersons().size() / (15 * facilitiesWithWork.size() ) );
+		configGroup.setCapacityScalingFactor( scenario.getPopulation().getPersons().size() / (15d * nFacilities ) );
 
 		return scenario;
 	}

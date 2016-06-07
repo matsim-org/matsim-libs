@@ -78,7 +78,7 @@ class Demand<N extends Enum<N>> {
 				} );
 	}
 
-	public TObjectDoubleMap<Id<ActivityFacility>> getSumedDemandPerFacility() {
+	public TObjectDoubleMap<Id<ActivityFacility>> getSummedDemandPerFacility() {
 		return demands;
 	}
 

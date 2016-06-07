@@ -23,10 +23,10 @@ import com.google.inject.Inject;
 import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
@@ -40,6 +40,7 @@ import java.util.Set;
  * @author thibautd
  */
 public class CorrectedUtilityCreator<N extends Enum<N>> {
+	private static final Logger log = Logger.getLogger( CorrectedUtilityCreator.class );
 	private final ConstrainedAccessibilityConfigGroup configGroup;
 	private final Scenario scenario;
 	private final String activityType;
@@ -74,12 +75,14 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		// this initializes omegas to 1 and derives the constrained set
 		final IterationInformation iterationInformation = new IterationInformation( demand );
 
-		final Counter counter = new Counter( "Compute capacity-constrained utility correction: iteration # ");
+		//final Counter counter = new Counter( "Compute capacity-constrained utility correction: iteration # ");
+		int iteration = 0;
 		for ( int lastSize = -1,
 			  	newSize = iterationInformation.constrainedExPost.size();
 			  // TODO: less restrictive criterion?
 			  lastSize != newSize; ) {
-			counter.incCounter();
+			log.info( "Iteration "+(iteration++)+": constrained set has size "+newSize );
+			//counter.incCounter();
 			// update omegas based on the constrained set
 			iterationInformation.updateIndividualOmegas( demand );
 			// update constrained set based on new corrected choice probabilities
@@ -88,7 +91,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 			lastSize = newSize;
 			newSize = iterationInformation.constrainedExPost.size();
 		}
-		counter.printCounter();
+		//counter.printCounter();
 
 		// compute correction factors: use Constrained, D, S and Omegas
 		return new CorrectedUtility<N>(
@@ -179,7 +182,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				final Utility<N> delegateUtility,
 				final String activityType,
 				final ConstrainedAccessibilityConfigGroup configGroup ) {
-			this.demands = demand.getSumedDemandPerFacility();
+			this.demands = demand.getSummedDemandPerFacility();
 			this.individualOmegas = individualOmegas;
 			this.constrainedExPost = constrainedExPost;
 			this.delegateUtility = delegateUtility;
