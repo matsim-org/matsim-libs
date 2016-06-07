@@ -48,6 +48,9 @@ public final class PatnaUtils {
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
 	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";
 
+	public static final String INCOME_ATTRIBUTE = "monthlyIncome";
+	public static final String TRANSPORT_COST_ATTRIBUTE = "dailyTransportCost";
+	
 	public enum PatnaUrbanActivityTypes {
 		home, work, educational, social, other, unknown;
 	}
@@ -91,7 +94,31 @@ public final class PatnaUtils {
 		}
 	}
 
-	public static int getIncomeInterval(final double income){
+	public static int getAverageIncome(final String incomeCode){
+		switch (incomeCode) {
+		case "1": return 500;
+		case "2": return 750;
+		case "3": return 2000;
+		case "4": return 4000;
+		case "5": return 6250;
+		case "6": return 8750;
+		case "7": return 20000;
+		default : throw new IllegalArgumentException("Unknown income code "+ incomeCode);
+		}
+	}
+	
+	public static double getAverageDailyTranportCost(final String dailyTranportCostCode){
+		switch (dailyTranportCostCode) {
+		case "1": return 10.00;
+		case "2": return 17.50;
+		case "3": return 37.5;
+		case "4": return 75.0;
+		case "5": return 200.0;
+		default : throw new IllegalArgumentException("Unknown daily transport cost code "+ dailyTranportCostCode);
+		}
+	}
+
+	public static int getIncomeIntervalCode(final double income){
 		if (income < 500 ) return 1;
 		else if(income < 1000) return 2;
 		else if(income < 3000) return 3;
@@ -100,8 +127,8 @@ public final class PatnaUtils {
 		else if(income < 10000) return 6;
 		else return 7;
 	}
-	
-	public static int getDailyExpenditure(final double dailyTransportCost){
+
+	public static int getDailyTransportCost(final double dailyTransportCost){
 		if (dailyTransportCost < 10 ) return 1;
 		else if(dailyTransportCost < 25) return 2;
 		else if(dailyTransportCost < 50) return 3;

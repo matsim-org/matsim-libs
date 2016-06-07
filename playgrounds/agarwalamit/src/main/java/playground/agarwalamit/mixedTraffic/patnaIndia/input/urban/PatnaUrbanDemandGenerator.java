@@ -43,6 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
@@ -94,7 +95,8 @@ public class PatnaUrbanDemandGenerator {
 
 	public void writePlans(final String outputDir){
 		new PopulationWriter(scenario.getPopulation()).write(outputDir+"/initial_urban_plans_"+cloningFactor+"pct.xml.gz");
-		LOG.info("Writing Plan file is finished.");
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputDir+"/initial_urban_persionAttributes_"+cloningFactor+"pct.xml.gz");
+		LOG.info("Writing Plan and person attributes files are finished.");
 	}
 
 	public Population getPopulation(){
@@ -113,7 +115,7 @@ public class PatnaUrbanDemandGenerator {
 		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(planFile)) ) {
 			line = bufferedReader.readLine();
 			List<String> labels = new ArrayList<>();
-			
+
 			while (line != null ) {
 				String row [] = line.split("\t");
 				List<String> strs = Arrays.asList(row);
@@ -130,6 +132,9 @@ public class PatnaUrbanDemandGenerator {
 					String fromZoneId = strs.get(labels.indexOf(PatnaDemandLabels.originZone.toString())); //parts [5];
 					String toZoneId = strs.get(labels.indexOf(PatnaDemandLabels.destinationZone.toString())); //parts [6]; 
 					String tripPurpose = strs.get(labels.indexOf(PatnaDemandLabels.tripPurpose.toString())); //parts [7];
+
+					double monthlyIncome = PatnaUtils.getAverageIncome( strs.get(labels.indexOf(PatnaDemandLabels.monthlyIncome.toString())) );
+					double dailyTransportCost = PatnaUtils.getAverageDailyTranportCost( strs.get(labels.indexOf(PatnaDemandLabels.dailyTransportCost.toString())) ) ;
 
 					Coord homeZoneCoordTransform = null ;
 					Coord workZoneCoordTransform = null ;
@@ -184,6 +189,10 @@ public class PatnaUrbanDemandGenerator {
 
 						Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
 						person.addPlan(plan);
+
+						// attributes
+						population.getPersonAttributes().putAttribute(person.getId().toString(), PatnaUtils.INCOME_ATTRIBUTE, monthlyIncome);
+						population.getPersonAttributes().putAttribute(person.getId().toString(), PatnaUtils.TRANSPORT_COST_ATTRIBUTE, dailyTransportCost);
 					}
 				}
 				line = bufferedReader.readLine();
