@@ -48,7 +48,8 @@ public class CorrectedUtilityCreatorTest {
 	private static final Logger log = Logger.getLogger( CorrectedUtilityCreatorTest.class );
 	private static final int CAPACITY = 15;
 
-	enum NestId {first,second}
+	// Only one nest: theory would need to be adapted for logit
+	enum NestId {first}
 
 	@Test
 	public void simpleTest() {
@@ -84,7 +85,6 @@ public class CorrectedUtilityCreatorTest {
 			final Person person,
 			final Scenario scenario ) {
 		final List<Alternative<NestId>> firstList = new ArrayList<>(  );
-		final List<Alternative<NestId>> secondList = new ArrayList<>(  );
 
 		scenario.getActivityFacilities().getFacilities().values().stream()
 				.filter( f -> f.getActivityOptions().containsKey( "work" ) )
@@ -94,11 +94,6 @@ public class CorrectedUtilityCreatorTest {
 									NestId.first ,
 									Id.create( f.getId().toString()+"-1" , Alternative.class ) ,
 									new Trip( f , Collections.emptyList() , f )));
-					secondList.add(
-							new Alternative<>(
-									NestId.second ,
-									Id.create( f.getId().toString()+"-2" , Alternative.class ) ,
-									new Trip( f , Collections.emptyList() , f )));
 				} );
 
 		final NestedChoiceSet<NestId> choiceSet =
@@ -106,10 +101,6 @@ public class CorrectedUtilityCreatorTest {
 						new Nest<>(
 								NestId.first,
 								1,
-								firstList ),
-						new Nest<>(
-								NestId.second,
-								2,
 								firstList ) );
 
 		return Collections.singletonMap( "default" , choiceSet );
