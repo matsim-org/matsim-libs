@@ -154,6 +154,27 @@ public class MiscUtils {
 	}
 
 	/**
+	 * Sorts a map by its values.
+	 *
+	 * @param unsortMap the unsortedMap
+	 * @return the sorted map
+	 */
+	public static <K, V extends Comparable<V>> Map<K, V> sortDescendingByValue(Map<K, V> unsortMap) {
+		// Convert Map to List
+		List<Map.Entry<K, V>> list = new LinkedList<>(unsortMap.entrySet());
+
+		// Sort list with comparator, to compare the Map values
+		Collections.sort(list, (o1, o2) -> -(o1.getValue()).compareTo(o2.getValue()));
+
+		// Convert sorted map back to a Map
+		Map<K, V> sortedMap = new LinkedHashMap<>();
+		for(Map.Entry<K, V> entry : list) {
+			sortedMap.put(entry.getKey(), entry.getValue());
+		}
+		return sortedMap;
+	}
+
+	/**
 	 * Checks whether list1 is a subset of list2. Returns false
 	 * if list1 is greater than list 2. Returns true if the reversed
 	 * list1 is a subset of list2

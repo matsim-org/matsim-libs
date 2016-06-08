@@ -155,15 +155,17 @@ public class ScheduleCleaner {
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		if(keepOppositeLinks) {
 			for(Id<Link> linkId : new HashSet<>(usedTransitLinkIds)) {
-				usedTransitLinkIds.add(NetworkTools.getOppositeLink(links.get(linkId)).getId());
+				Link oppositeLink = NetworkTools.getOppositeLink(links.get(linkId));
+				if(oppositeLink != null) usedTransitLinkIds.add(oppositeLink.getId());
 			}
 		}
 
 		Set<Id<Link>> linksToRemove = new HashSet<>();
-		for(Link link : network.getLinks().values()) {
+		for(Link link : new HashSet<>(network.getLinks().values())) {
 			// only remove link if there are only modes to remove on it
 			if(!MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
-				linksToRemove.add(link.getId());
+//				linksToRemove.add(link.getId());
+				network.removeLink(link.getId());
 			}
 			// only retain modes that are actually used
 			else if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
@@ -171,19 +173,15 @@ public class ScheduleCleaner {
 			}
 		}
 
-		for(Id<Link> linkId : linksToRemove) {
-			network.removeLink(linkId);
-		}
+//		for(Id<Link> linkId : linksToRemove) {
+//			network.removeLink(linkId);
+//		}
 
 		// removing nodes
-		Set<Id<Node>> nodesToRemove = new HashSet<>();
-		for(Node n : network.getNodes().values()) {
+		for(Node n : new HashSet<>(network.getNodes().values())) {
 			if(n.getOutLinks().size() == 0 && n.getInLinks().size() == 0) {
-				nodesToRemove.add(n.getId());
+				network.removeNode(n.getId());
 			}
-		}
-		for(Id<Node> nodeId : nodesToRemove) {
-			network.removeNode(nodeId);
 		}
 
 		log.info("    " + linksToRemove.size() + " links removed");
