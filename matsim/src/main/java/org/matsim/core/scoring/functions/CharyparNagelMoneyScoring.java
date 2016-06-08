@@ -20,8 +20,7 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
+import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -29,9 +28,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
-
-	private static final double INITIAL_SCORE = 0.0;
+public final class CharyparNagelMoneyScoring implements SumScoringFunction.MoneyScoring {
 
 	private double score;
 
@@ -39,17 +36,10 @@ public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring, or
 
 	public CharyparNagelMoneyScoring(final CharyparNagelScoringParameters params) {
 		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
-		this.reset();
 	}
 
 	public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-		this.reset();
-	}
-
-	@Override
-	public void reset() {
-		this.score = INITIAL_SCORE;
 	}
 
 	@Override

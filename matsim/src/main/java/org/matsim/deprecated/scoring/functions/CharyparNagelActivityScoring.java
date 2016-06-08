@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CharyparNagelOpenTimesScoringFunction.java
+ * CharyparNagelOpenTimesScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,51 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.weeklySimulation.scoring;
-
-import java.util.Iterator;
-import java.util.Set;
+package org.matsim.deprecated.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.OpeningTime;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 
 /**
- * Same as CharyparNagelScoringFunction, but retrieves opening time information
- * from facility object of an activity instead of the config file.
- *
- * @author meisterk
- *
+ * This is a re-implementation of the original CharyparNagel function, based on a
+ * modular approach.
+ * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
+ * @author rashid_waraich
  */
-public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
+public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
+	// yy should be final.  kai, oct'14
 
-	private static final Logger log = Logger.getLogger(CharyparNagelWeekActivityScoring.class);
-	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_END_TIME = Time.UNDEFINED_TIME;
-	private static final double INITIAL_SCORE = 0.0;
-	private static int firstLastActWarning = 0;
-	private static short firstLastActOpeningTimesWarning = 0;
-	
-	private final ActivityFacilities facilities;
 	protected double score;
 	private double currentActivityStartTime;
 	private double firstActivityEndTime;
+
+	private static final double INITIAL_LAST_TIME = 0.0;
+	private static final double INITIAL_FIRST_ACT_END_TIME = Time.UNDEFINED_TIME;
+	private static final double INITIAL_SCORE = 0.0;
+
+	private static int firstLastActWarning = 0;
+	private static short firstLastActOpeningTimesWarning = 0;
+
 	private final CharyparNagelScoringParameters params;
 	private Activity currentActivity;
 	private boolean firstAct = true;
+
 	private Activity firstActivity;
-	
-	public CharyparNagelWeekActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+
+	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
+
+	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
-		this.facilities = facilities;
 	}
 
 	@Override
@@ -75,6 +70,7 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
 	}
+
 	@Override
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void startActivity(final double time, final Activity act) {
@@ -82,6 +78,7 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 		this.currentActivity = act;
 		this.currentActivityStartTime = time;
 	}
+
 	@Override
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void endActivity(final double time, final Activity act) {
@@ -96,6 +93,7 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 		}
 		currentActivity = null;
 	}
+
 	@Override
 	public void finish() {
 		if (this.currentActivity != null) {
@@ -109,10 +107,12 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 			// We cannot handle that correctly, because we do not know what it is.
 		}
 	}
+
 	@Override
 	public double getScore() {
 		return this.score;
 	}
+	
 	private static int wrnCnt = 0 ;
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -208,13 +208,13 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 					// also removing the "wait" alternative scoring.
 					tmpScore += utilPerf ;
 				} else {
-					if ( wrnCnt < 1 ) {
-						wrnCnt++ ;
-						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov 2013.") ;
-						log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
-								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
-						log.warn( Gbl.ONLYONCE ) ;
-					}
+//					if ( wrnCnt < 1 ) {
+//						wrnCnt++ ;
+//						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov 2013.") ;
+//						log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
+//								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
+//						log.warn( Gbl.ONLYONCE ) ;
+//					}
 					
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
@@ -253,68 +253,36 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 		}
 		return tmpScore;
 	}
-	protected double[] getOpeningInterval(Activity act) {
+
+	protected double[] getOpeningInterval(final Activity act) {
+
+		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+		if (actParams == null) {
+			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
+					"(module name=\"planCalcScore\" in the config file).");
+		}
+
+		double openingTime = actParams.getOpeningTime();
+		double closingTime = actParams.getClosingTime();
+
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
-		boolean foundAct = false;
-		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
-		String facilityActType = null;
-		Set<OpeningTime> opentimes = null;
-		while (facilityActTypeIterator.hasNext() && !foundAct) {
-			facilityActType = facilityActTypeIterator.next();
-			if (act.getType().equals(facilityActType)) {
-				foundAct = true;
-				opentimes = facility.getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes != null && opentimes.size()>0)
-					for (OpeningTime opentime : opentimes)
-						//Assumes just first interval which intersects the activity can be scored
-						if(intersects(act.getStartTime(), act.getEndTime(), opentime.getStartTime(), opentime.getEndTime())) {
-							openInterval[0] = opentime.getStartTime();
-							openInterval[1] = opentime.getEndTime();
-							return openInterval;
-						}
-			}
-		}
-		if (!foundAct)
-			throw new RuntimeException("No suitable facility activity type found. Aborting...");
+		double[] openInterval = new double[]{openingTime, closingTime};
+
 		return openInterval;
 	}
 
-	private boolean intersects(double startTime, double endTime, double startTime2, double endTime2) {
-		return endTime>=startTime2 && endTime2>=startTime;
-	}
-	@Override
-	public void handleFirstActivity(Activity act) {
-		assert act != null;
-		this.firstActivityEndTime = act.getEndTime();
-		this.firstActivity = act;
-		this.firstAct = false;
-
-	}
-	@Override
-	public void handleLastActivity(Activity act) {
-		this.currentActivityStartTime = act.getStartTime();
-		this.handleOvernightActivity(act);
-		this.firstActivity = null;
-	}
-	private void handleMorningActivity() {
-		assert firstActivity != null;
-		// score first activity
-		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
-	}
-	private void handleOvernightActivity(Activity lastActivity) {
+	private final void handleOvernightActivity(Activity lastActivity) {
 		assert firstActivity != null;
 		assert lastActivity != null;
 
 
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
-			// the first Act and the last Act have the same type
+			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
 				double[] openInterval = this.getOpeningInterval(lastActivity);
-				if (openInterval[0] != Time.UNDEFINED_TIME || openInterval[1] != Time.UNDEFINED_TIME){
+				if (openInterval[0] >= 0 || openInterval[1] >= 0){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;
@@ -325,12 +293,15 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 				}
 			}
 			
-			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 7*24*3600, lastActivity);
+			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
 			this.score += calcActScore; // SCENARIO_DURATION
 		} else {
+			// the first Act and the last Act have NOT the same type:
 			if (this.params.scoreActs) {
 				if (firstLastActWarning <= 10) {
-					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+					log.warn("The first and the last activity do not have the same type. "
+							+ "Will score the first activity from midnight to its end, and the last activity from its start "
+							+ "to midnight.  Because of the nonlinear function, this is not the same as scoring from start to end.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;
 					log.warn("This may also happen when plans are not completed when the simulation ends.") ;
@@ -343,13 +314,37 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 				// score first activity
 				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
 				// score last activity
-				this.score += calcActScore(this.currentActivityStartTime, 7*24*3600, lastActivity); // SCENARIO_DURATION
+				this.score += calcActScore(this.currentActivityStartTime, this.params.simulationPeriodInDays * 24*3600, lastActivity);
 			}
 		}
 	}
+
+	private final void handleMorningActivity() {
+		assert firstActivity != null;
+		// score first activity
+		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+	}
+
+	@Override
+	public void handleFirstActivity(Activity act) {
+		assert act != null;
+		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivity = act;
+		this.firstAct = false;
+
+	}
+
 	@Override
 	public void handleActivity(Activity act) {
 		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
 	}
-	
+
+	@Override
+	public void handleLastActivity(Activity act) {
+		this.currentActivityStartTime = act.getStartTime();
+		this.handleOvernightActivity(act);
+		this.firstActivity = null;
+	}
+
 }
+

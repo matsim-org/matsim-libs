@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 
 /**
  * @author nagel

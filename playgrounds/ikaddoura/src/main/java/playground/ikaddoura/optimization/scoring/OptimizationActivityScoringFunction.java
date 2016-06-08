@@ -21,11 +21,10 @@
 package playground.ikaddoura.optimization.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
 
-public class OptimizationActivityScoringFunction extends CharyparNagelActivityScoring {
+public class OptimizationActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	public OptimizationActivityScoringFunction(CharyparNagelScoringParameters params) {
 		super(params);

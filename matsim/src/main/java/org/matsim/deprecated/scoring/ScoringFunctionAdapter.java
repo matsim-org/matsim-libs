@@ -19,11 +19,12 @@
 
  */
 
-package org.matsim.core.scoring;
+package org.matsim.deprecated.scoring;
 
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 
 /**

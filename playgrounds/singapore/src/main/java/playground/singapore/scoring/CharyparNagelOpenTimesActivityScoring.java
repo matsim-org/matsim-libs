@@ -41,7 +41,7 @@ import playground.singapore.springcalibration.run.RunSingapore;
  * @author meisterk
  *
  */
-public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
+public class CharyparNagelOpenTimesActivityScoring extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	private final ActivityFacilities facilities;
 	private final static Logger log = Logger.getLogger(RunSingapore.class);

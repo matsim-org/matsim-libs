@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
+import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring;
 
 public class MixedScoringFunction implements ScoringFunction {
 

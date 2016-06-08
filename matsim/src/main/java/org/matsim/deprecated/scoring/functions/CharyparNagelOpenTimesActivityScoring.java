@@ -18,15 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.pseudosimulation.distributed.scoring;
+package org.matsim.deprecated.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.misc.Time;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -38,11 +37,11 @@ import java.util.Set;
  * @author meisterk
  *
  */
-public class CharyparNagelOpenTimesActivityScoringWithDiagnostics extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
+public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
 
 	private final ActivityFacilities facilities;
 
-	public CharyparNagelOpenTimesActivityScoringWithDiagnostics(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public CharyparNagelOpenTimesActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
 		this.facilities = facilities;
 	}
@@ -68,13 +67,10 @@ public class CharyparNagelOpenTimesActivityScoringWithDiagnostics extends org.ma
 			if (act.getType().equals(facilityActType)) {
 				foundAct = true;
 
-				// choose appropriate opentime:
-				// either wed or wkday
-				// if none is given, use undefined opentimes
 				opentimes = facility.getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes != null && opentimes.size()>0) {
+				if (opentimes != null && !opentimes.isEmpty()) {
 					// ignoring lunch breaks with the following procedure:
-					// if there is only one wed/wkday open time interval, use it
+					// if there is only one open time interval, use it
 					// if there are two or more, use the earliest start time and the latest end time
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
@@ -92,16 +88,13 @@ public class CharyparNagelOpenTimesActivityScoringWithDiagnostics extends org.ma
 		}
 
 		if (!foundAct) {
-			return new double[]{0, Double.MAX_VALUE};
+			throw new RuntimeException("No suitable facility activity type found. Aborting...");
 		}
 
 		return openInterval;
 
 	}
 
-    @Override
-    public void handleActivity(Activity act) {
-        getScore();
-        super.handleActivity(act);
-    }
+
+
 }

@@ -21,99 +21,49 @@
 package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.scoring.ScoringFunctionAdapter;
+import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * A Scoring Function that only respects the travel time.
  * 
  * @author cdobler
  */
-public class OnlyTravelTimeDependentScoringFunction extends ScoringFunctionAdapter {
+public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 	
 	protected double score;
 	protected double startTime;
 	
 	public OnlyTravelTimeDependentScoringFunction() {
 	}
-	
-	/**
-	 * Tells the scoring function that the agent begins with an activity.
-	 *
-	 * @param time The time at which the mentioned activity starts.
-	 * @param act The activity the agent starts. Can be used to get the activity
-	 * type, exact location, facility, opening times and other information.
-	 */
+
 	@Override
-	public void startActivity(final double time, final Activity activity) {
+	public void handleActivity(Activity activity) {
+
 	}
 
-    /**
-	 * Tells the scoring function that the agents starts a new leg.
-	 *
-	 * @param time The time at which the agent starts the new leg.
-	 * @param leg The leg the agent starts. Can be used to get leg mode and other
-	 * information about the leg.
-	 */
 	@Override
-	public void startLeg(double time, Leg leg) {
-		startTime = time;
-	}
-
-	/**
-	 * Tells the scoring function that the current leg ends.
-	 * 
-	 * Score is just the sum of all traveltimes. 
-	 * 
-	 * @param time The time at which the current leg ends.
-	 */
-	@Override
-	public void endLeg(double time) {
-		score = score - (time - startTime);
+	public void handleLeg(Leg leg) {
+		startTime = leg.getDepartureTime();
+		score = score - (leg.getDepartureTime() + leg.getTravelTime() - startTime);
 		startTime = Double.NaN;
 	}
 
-	/**
-	 * Tells the scoring function that the agent got stuck in the simulation and
-	 * is removed from the simulation. This should usually lead to a high penalty
-	 * in the score, as the agent was not able to perform its plan as wanted.
-	 * An agent can get stuck while performing an activity or while driving.
-	 *
-	 * @param time The time at which the agent got stuck and was removed from the
-	 * simulation.
-	 */
 	@Override
 	public void agentStuck(final double time) {
 	}
 
-	/**
-	 * Adds the specified amount of utility to the agent's score. This is mostly
-	 * used for handling {@link PersonMoneyEvent}s, allowing other parts of the
-	 * code to influence an agent's score.
-	 *
-	 * @param amount amount to be added to the agent's score
-	 */
 	@Override
 	public void addMoney(final double amount) {
 	}
 
-	/**
-	 * Tells the scoring function that no more information will be given to it
-	 * and that the final score should be calculated.  But the score must <b>not</b>
-	 * be written to the plan!
-	 */
+
 	@Override
 	public void finish() {
 		
 	}
 
-	/**
-	 * Returns the score for this plan.
-
-	 * @return the score
-	 */
 	@Override
 	public double getScore() {
 		return score;
@@ -124,14 +74,8 @@ public class OnlyTravelTimeDependentScoringFunction extends ScoringFunctionAdapt
 	}
 
 	@Override
-	public void endActivity(double time, Activity activity) {
-		
-	}
-
-	@Override
 	public void handleEvent(Event event) {
-		// TODO Auto-generated method stub
-		
+
 	}
 	
 }
