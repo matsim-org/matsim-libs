@@ -64,7 +64,7 @@ public class TaxibusQSimProvider
     @Inject
     TaxibusQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, VrpData vrpData,
-            @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxibusConfigGroup tbcg,
+            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
             LineDispatcher dispatcher, TaxibusPassengerOrderManager orderManager)
     {
         this.scenario = scenario;

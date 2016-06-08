@@ -66,7 +66,7 @@ public class TaxiQSimProvider
     @Inject
     public TaxiQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
-            @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxiConfigGroup taxiCfg,
+            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxiConfigGroup taxiCfg,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
             TaxiOptimizerFactory optimizerFactory, MatsimServices matsimServices)
     {
