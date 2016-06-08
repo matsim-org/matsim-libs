@@ -128,11 +128,11 @@ public class PTMapperUtils {
 	 * @param schedule                where the facilities should be replaced
 	 * @param pseudoSchedule          defines the actual sequence of pseudoRouteStops
 	 */
-	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule) {
+	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule) {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
-		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
+		List<Tuple<Id<TransitLine>, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
+		for(Map.Entry<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
 			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
 
 				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
@@ -170,7 +170,7 @@ public class PTMapperUtils {
 				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
 
 				// remove the old route
-				schedule.getTransitLines().get(lineEntry.getKey().getId()).removeRoute(routeEntry.getKey());
+				schedule.getTransitLines().get(lineEntry.getKey()).removeRoute(routeEntry.getKey());
 
 				// add new route to container
 				newRoutes.add(new Tuple<>(lineEntry.getKey(), newRoute));
@@ -178,8 +178,8 @@ public class PTMapperUtils {
 		}
 
 		// add transit lines and routes again
-		for(Tuple<TransitLine, TransitRoute> entry : newRoutes) {
-			schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
+		for(Tuple<Id<TransitLine>, TransitRoute> entry : newRoutes) {
+			schedule.getTransitLines().get(entry.getFirst()).addRoute(entry.getSecond());
 		}
 	}
 
@@ -222,12 +222,14 @@ public class PTMapperUtils {
 	/**
 	 * Checks for each child stop facility if the link before or after is closer to the facility
 	 * than its referenced link. If so, the child stop facility is replaced with the one closer
-	 * to the facility coordinates.<p/>
+	 * to the facility coordinates. Transit routes with loop route profiles (i.e. a stop is accessed
+	 * twice in a stop sequence) are ignored.
 	 */
 	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
 		log.info("Pulling child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
+				boolean hasStopLoop = ScheduleTools.routeHasStopSequenceLoop(transitRoute);
 				if(transitRoute.getRoute() != null) {
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
@@ -236,31 +238,41 @@ public class PTMapperUtils {
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
 					TransitRouteStop currentStop = stopsIterator.next();
-					Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
-					if(closerLinkBefore != null) {
-						linkIdList.add(0, closerLinkBefore);
+
+					// look for a closer link before the route's start
+					if(!hasStopLoop) {
+						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
+						if(closerLinkBefore != null) {
+							linkIdList.add(0, closerLinkBefore);
+						}
+						currentStop = stopsIterator.next();
 					}
-					currentStop = stopsIterator.next();
 
+					// optimize referenced links between start and end
 					for(int i = 1; i < linkList.size()-1; i++) {
-
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
 							testSet.add(linkList.get(i-1));
 							testSet.add(linkList.get(i+1));
 							useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), testSet);
-							// setCloserStopFacility(schedule, transitRoute, currentStop.getStopFacility(), linkList.get(i), , linkList.get(i + 1));
+
 							if(stopsIterator.hasNext()) {
 								currentStop = stopsIterator.next();
 							}
 						}
 					}
-					currentStop = routeStops.get(routeStops.size() - 1);
-					Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
-					if(closerLinkAfter != null) {
-						linkIdList.add(closerLinkAfter);
+
+					// look for a closer link after the route's end
+					if(!hasStopLoop) {
+						currentStop = routeStops.get(routeStops.size() - 1);
+						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
+						if(closerLinkAfter != null) {
+							linkIdList.add(closerLinkAfter);
+						}
 					}
+
+					// set the new link list
 					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdList, network));
 				}
 			}

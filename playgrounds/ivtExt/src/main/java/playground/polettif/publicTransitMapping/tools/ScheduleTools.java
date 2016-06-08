@@ -35,6 +35,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 
@@ -391,5 +392,28 @@ public class ScheduleTools {
 	public static void writeVehicles(Vehicles vehicles, String filePath) {
 		log.info("Writing vehicles to file " + filePath);
 		new VehicleWriterV1(vehicles).writeFile(filePath);
+	}
+
+	/**
+	 * checks if a stop is accessed twice in a stop sequence
+	 */
+	public static boolean routeHasStopSequenceLoop(TransitRoute transitRoute) {
+		Set<String> parentFacilities = new HashSet<>();
+		for(TransitRouteStop stop : transitRoute.getStops()) {
+			if(!parentFacilities.add(getParentId(stop.getStopFacility().getId().toString()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * @return the parent id of a stop facility id. This is the part befor the
+	 * child stop facility suffix ".link:"
+	 */
+	public static String getParentId(String stopFacilityId) {
+		String[] childStopSplit = stopFacilityId.split(PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX);
+		return childStopSplit[0];
 	}
 }

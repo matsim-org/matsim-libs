@@ -99,17 +99,18 @@ public class ScheduleCleaner {
 
 		int removed = 0;
 
-		for(TransitLine line : schedule.getTransitLines().values()) {
-			Set<TransitRoute> toRemove = new HashSet<>();
-			for(TransitRoute transitRoute : line.getRoutes().values()) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : new HashSet<>(transitLine.getRoutes().values())) {
 				boolean removeRoute = false;
 				NetworkRoute networkRoute = transitRoute.getRoute();
 				if(networkRoute == null) {
 					removeRoute = true;
-				} else if(networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
+				}
+				List<Id<Link>> linkIds = ScheduleTools.getLinkIds(transitRoute);
+				if(linkIds.size() == 0) {
 					removeRoute = true;
-
-					for(Id<Link> linkId : ScheduleTools.getLinkIds(transitRoute)) {
+				} else {
+					for(Id<Link> linkId : linkIds) {
 						if(linkId == null) {
 							removeRoute = true;
 						}
@@ -117,19 +118,11 @@ public class ScheduleCleaner {
 				}
 
 				if(removeRoute) {
-					toRemove.add(transitRoute);
-				}
-			}
-
-			removed += toRemove.size();
-
-			if(!toRemove.isEmpty()) {
-				for(TransitRoute transitRoute : toRemove) {
-					line.removeRoute(transitRoute);
+					transitLine.removeRoute(transitRoute);
+					removed++;
 				}
 			}
 		}
-
 		log.info("... " + removed + " transit routes removed");
 
 		return removed;
@@ -160,22 +153,18 @@ public class ScheduleCleaner {
 			}
 		}
 
-		Set<Id<Link>> linksToRemove = new HashSet<>();
+		int linksRemoved = 0;
 		for(Link link : new HashSet<>(network.getLinks().values())) {
 			// only remove link if there are only modes to remove on it
 			if(!MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
-//				linksToRemove.add(link.getId());
 				network.removeLink(link.getId());
+				linksRemoved++;
 			}
 			// only retain modes that are actually used
 			else if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
 				link.setAllowedModes(MiscUtils.getSharedSetStringEntries(link.getAllowedModes(), modesToKeep));
 			}
 		}
-
-//		for(Id<Link> linkId : linksToRemove) {
-//			network.removeLink(linkId);
-//		}
 
 		// removing nodes
 		for(Node n : new HashSet<>(network.getNodes().values())) {
@@ -184,14 +173,12 @@ public class ScheduleCleaner {
 			}
 		}
 
-		log.info("    " + linksToRemove.size() + " links removed");
+		log.info("    " + linksRemoved + " links removed");
 	}
 
 	/**
 	 * Changes the schedule to an unmapped schedule by removes all link sequences
 	 * from a transit schedule and removing referenced links from stop facilities.
-	 *
-	 * @param schedule
 	 */
 	public static void removeMapping(TransitSchedule schedule) {
 		log.info("... Removing reference links and link sequences from schedule");

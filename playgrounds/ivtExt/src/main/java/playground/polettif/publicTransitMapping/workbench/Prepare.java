@@ -19,30 +19,21 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.editor.BasicScheduleEditor;
-import playground.polettif.publicTransitMapping.editor.ScheduleEditor;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.Collections;
@@ -50,75 +41,44 @@ import java.util.List;
 
 /**
  * workbench class to do some scenario preparation
+ *
+ * @author polettif
  */
 public class Prepare {
 
 	protected static Logger log = Logger.getLogger(Prepare.class);
-	
+
+	private static Config config;
+
 	public static void main(final String[] args) {
-		Network network = NetworkTools.readNetwork("../output/2016-06-08-1018/ch_network.xml.gz");
-		TransitSchedule schedule = ScheduleTools.readTransitSchedule("../output/2016-06-08-1018/ch_schedule.xml.gz");
+		config = ConfigUtils.loadConfig("config.xml");
 
-		for(Link l : network.getLinks().values()) {
-			if(l.getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
-				l.setCapacity(9999);
-			}
-		}
+		prepareNetworkAndSchedule("../../output/2016-06-08/ch_network.xml.gz", "../../output/2016-06-08/ch_schedule.xml.gz");
 
-//		NetworkTools.replaceNonCarModesWithPT(network);
+		preparePopulation("population_Orig.xml.gz");
 
-		ScheduleCleaner.replaceScheduleModes(schedule, TransportMode.pt);
-
-		ScheduleEditor editor = new BasicScheduleEditor(schedule, network);
-		Link l = network.getLinks().get(Id.createLinkId("350213"));
-		editor.addLink(Id.createLinkId("350213-2"), l.getToNode().getId(), l.getFromNode().getId(), l.getId());
-		editor.refreshSchedule();
-
-		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateAll(schedule, network);
-		TransitScheduleValidator.printResult(result);
-
-		ScheduleTools.writeTransitSchedule(schedule, "prepared/ch_pt_schedule.xml.gz");
-		NetworkTools.writeNetwork(network, "prepared/ch_pt_network.xml.gz");
-
-
-		//		createConfig();
-//		adaptPop("population_Orig.xml.gz", "zurich_hafas_network.xml", "plans.xml.gz");
-//		adaptVehicles("../../data/vehicles/zurich_hafas_vehicles.xml.gz", "zurich_hafas_vehicles.xml.gz", 0.01);
-
+		prepareVehicles("../../data/vehicles/ch_vehicles.xml.gz", 0.005);
 	}
 
-	private static void adaptVehicles(String inputVehicleFile, String outputVehicleFile, double percentage) {
+	private static void prepareVehicles(String inputVehicleFile, double percentage) {
 		Vehicles transitVehicles = ScheduleTools.readVehicles(inputVehicleFile);
 		for(VehicleType vt : transitVehicles.getVehicleTypes().values()) {
 			vt.setPcuEquivalents(vt.getPcuEquivalents()*percentage);
 		}
-		ScheduleTools.writeVehicles(transitVehicles, outputVehicleFile);
-	}
-
-	private static void runScenario(String configFile) {
-		final Config config = ConfigUtils.loadConfig(configFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		controler.run();
-	}
-
-	private static void createConfig() {
-		Config config = ConfigUtils.createConfig();
-		new ConfigWriter(config).write("config.xml");
+		ScheduleTools.writeVehicles(transitVehicles, config.vehicles().getVehiclesFile());
 	}
 
 	/**
 	 * modifiy population
 	 */
-	private static void adaptPop(String inputPopulationFile, String networkFile, String outputPopulationFile) {
+	private static void preparePopulation(String inputPopulationFile) {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		PopulationReader reader = new PopulationReaderMatsimV5(sc);
 		reader.readFile(inputPopulationFile);
 		Population population = sc.getPopulation();
 
-		Network network = NetworkTools.readNetwork(networkFile);
+		Network network = NetworkTools.readNetwork(config.network().getInputFile());
 		log.info("creating car only network");
 		Network carNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("car"));
 
@@ -147,9 +107,38 @@ public class Prepare {
 		}
 
 		log.info("writing new plans file");
-		new PopulationWriter(population, network).write(outputPopulationFile);
+		new PopulationWriter(population, network).write(config.plans().getInputFile());
 	}
 
+	private static void createConfig() {
+		Config config = ConfigUtils.createConfig();
+		new ConfigWriter(config).write("config.xml");
+	}
+
+	private static void prepareNetworkAndSchedule(String n, String s) {
+		Network network = NetworkTools.readNetwork(n);
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(s);
+
+//		NetworkTools.replaceNonCarModesWithPT(network);
+//		ScheduleCleaner.replaceScheduleModes(schedule, TransportMode.pt);
+
+		ScheduleTools.writeTransitSchedule(schedule, config.transit().getTransitScheduleFile());
+		NetworkTools.writeNetwork(network, config.network().getInputFile());
+	}
+
+	private void editSchedule() {
+		/*
+		Network network = null;
+		TransitSchedule schedule = null;
+		ScheduleEditor editor = new BasicScheduleEditor(schedule, network);
+		Link l = network.getLinks().get(Id.createLinkId("350213"));
+		editor.addLink(Id.createLinkId("350213-2"), l.getToNode().getId(), l.getFromNode().getId(), l.getId());
+		editor.refreshSchedule();
+
+		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateAll(schedule, network);
+		TransitScheduleValidator.printResult(result);
+		*/
+	}
 
 
 	

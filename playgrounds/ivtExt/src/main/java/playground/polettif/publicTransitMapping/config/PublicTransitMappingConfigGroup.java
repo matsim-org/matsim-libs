@@ -130,8 +130,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"If all paths between two stops have a [length] > [beelineDistanceMaxFactor] * [beelineDistance], \n" +
 						"\t\tan artificial link is created.");
 		map.put(MULTI_THREAD,
-				"Defines the number of threads that should be used for each schedule transport mode. Default: 2.\n" +
-						"\t\tNote: The actual number of threads is <threads> * <nrOfScheduleTransportModes> + 1");
+				"Defines the number of threads that should be used for pseudoRouting. Default: 2.");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
