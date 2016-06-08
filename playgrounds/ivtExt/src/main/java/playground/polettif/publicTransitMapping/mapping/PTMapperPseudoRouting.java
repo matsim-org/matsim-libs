@@ -301,13 +301,13 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 		// Remove unnecessary parts of schedule
 		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
-		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
+		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
 		// change the network transport modes
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 		if(config.getCombinePtModes()) {
-			ScheduleTools.replaceNonCarModesWithPT(network);
+			NetworkTools.replaceNonCarModesWithPT(network);
 		} else if(config.getAddPtMode()) {
 			ScheduleTools.addPTModeToNetwork(schedule, network);
 		}
@@ -456,6 +456,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 			newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
 			double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getBeelineDistanceMaxFactor();
 			newLink.setLength(l);
+			newLink.setCapacity(9999);
 			// needs to be set low so busses don't use those links during modeRouting.
 			newLink.setFreespeed(0.5);
 			this.network.addLink(newLink);

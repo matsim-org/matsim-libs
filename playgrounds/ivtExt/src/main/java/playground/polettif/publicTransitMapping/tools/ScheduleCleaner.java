@@ -137,9 +137,10 @@ public class ScheduleCleaner {
 
 	/**
 	 * Removes links that are not used by public transit. Links which have a mode defined
-	 * in modesToKeep are kept regardless of public transit usage.
+	 * in modesToKeep are kept regardless of public transit usage. Opposite links of used
+	 * links are kept if keepOppositeLinks is true.
 	 */
-	public static void removeNotUsedTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToKeep) {
+	public static void removeNotUsedTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToKeep, boolean keepOppositeLinks) {
 		log.info("... Removing links that are not used by public transit");
 
 		Set<Id<Link>> usedTransitLinkIds = new HashSet<>();
@@ -148,6 +149,13 @@ public class ScheduleCleaner {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null)
 					usedTransitLinkIds.addAll(ScheduleTools.getLinkIds(route));
+			}
+		}
+
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		if(keepOppositeLinks) {
+			for(Id<Link> linkId : usedTransitLinkIds) {
+				usedTransitLinkIds.add(NetworkTools.getOppositeLink(links.get(linkId)).getId());
 			}
 		}
 
@@ -201,12 +209,16 @@ public class ScheduleCleaner {
 		}
 	}
 
+	/**
+	 * Removes duplicate departures (with the same departure time)
+	 * from a transit route.
+	 */
 	public static void cleanDepartures(TransitSchedule schedule) {
-		for(TransitLine line : schedule.getTransitLines().values()) {
-			for(TransitRoute route : line.getRoutes().values()) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				final Set<Double> departureTimes = new HashSet<>();
 				final List<Departure> departuresToRemove = new ArrayList<>();
-				for(Departure departure : route.getDepartures().values()) {
+				for(Departure departure : transitRoute.getDepartures().values()) {
 					double dt = departure.getDepartureTime();
 					if(departureTimes.contains(dt)) {
 						departuresToRemove.add(departure);
@@ -215,7 +227,7 @@ public class ScheduleCleaner {
 					}
 				}
 				for(Departure departure2Remove : departuresToRemove) {
-					route.removeDeparture(departure2Remove);
+					transitRoute.removeDeparture(departure2Remove);
 				}
 			}
 		}
@@ -240,7 +252,7 @@ public class ScheduleCleaner {
 			for(List<TransitRoute> routeList : profiles.values()) {
 				if(routeList.size() > 1) {
 					TransitRoute finalRoute = routeList.get(0);
-					for(int i=1; i < routeList.size(); i++) {
+					for(int i = 1; i < routeList.size(); i++) {
 
 						combined++;
 						transitLine.removeRoute(routeList.get(i));
@@ -333,19 +345,32 @@ public class ScheduleCleaner {
 		log.info("Removing not used vehicles...");
 		int removed = 0;
 		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				for(Departure departure : transitRoute.getDepartures().values()) {
 					usedVehicles.add(departure.getVehicleId());
 				}
 			}
 		}
-		for (Id<Vehicle> vehicleId : new HashSet<>(vehicles.getVehicles().keySet())) {
-			if (!usedVehicles.contains(vehicleId)) {
+		for(Id<Vehicle> vehicleId : new HashSet<>(vehicles.getVehicles().keySet())) {
+			if(!usedVehicles.contains(vehicleId)) {
 				vehicles.removeVehicle(vehicleId);
 				removed++;
 			}
 		}
 		log.info(removed + " vehicles removed");
+	}
+
+
+	/**
+	 * Replaces all schedule transport modes (i.e. bus or rail)
+	 * with <tt>mode</tt> (normally pt).
+	 */
+	public static void replaceScheduleModes(TransitSchedule schedule, String mode) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				transitRoute.setTransportMode(mode);
+			}
+		}
 	}
 }
