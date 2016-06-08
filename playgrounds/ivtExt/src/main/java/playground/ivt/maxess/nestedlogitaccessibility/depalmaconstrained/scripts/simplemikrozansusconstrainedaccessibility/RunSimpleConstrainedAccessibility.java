@@ -29,6 +29,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
+import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.ConstrainedAccessibilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
@@ -57,6 +58,7 @@ public class RunSimpleConstrainedAccessibility {
 			final Config config = ConfigUtils.loadConfig(
 					configFile,
 					new UtilityConfigGroup(),
+					new ConstrainedAccessibilityConfigGroup(),
 					new NestedAccessibilityConfigGroup() );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 

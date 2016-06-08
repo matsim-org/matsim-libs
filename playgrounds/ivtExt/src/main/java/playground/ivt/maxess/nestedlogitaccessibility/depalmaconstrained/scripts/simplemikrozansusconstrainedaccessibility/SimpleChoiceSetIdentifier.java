@@ -21,11 +21,9 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.script
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
@@ -93,7 +91,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 		final Collection<Alternative<SingleNest>> alternatives = new ArrayList<>( prism.size() );
 		int i = 0;
 		for ( ActivityFacility destination : prism ) {
-			alternatives.add(
+			final Alternative<SingleNest> alternative =
 					new Alternative<>(
 							SingleNest.nest,
 							Id.create( i++ , Alternative.class ),
@@ -105,7 +103,22 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 											destination,
 											12 * 3600,
 											p ),
-									destination ) ) );
+									destination ) );
+
+			// quick and dirty
+			if ( mode.equals( "pt" ) ) {
+				alternative.getAlternative().getTrip().stream()
+						.filter( pe -> pe instanceof Leg )
+						.map( pe -> (Leg) pe )
+						.filter( l -> l.getMode().equals( "walk" ) )
+						.forEach( l -> l.setMode( "transit_walk" ) );
+			}
+
+
+			assert mode.equals( router.getMainModeIdentifier().identifyMainMode( alternative.getAlternative().getTrip() ) ) :
+					mode +" != "+router.getMainModeIdentifier().identifyMainMode( alternative.getAlternative().getTrip() )
+					+" for "+alternative.getAlternative().getTrip();
+			alternatives.add( alternative );
 		}
 		return alternatives;
 	}

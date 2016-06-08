@@ -38,7 +38,7 @@ import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilit
 public class SimpleConstrainedLogitModule extends AbstractModule {
 	@Override
 	protected void configure() {
-		bind( new TypeLiteral<Utility<SingleNest>>() {} );
+		//bind( new TypeLiteral<Utility<SingleNest>>() {} );
 		bind( new TypeLiteral<ChoiceSetIdentifier<SingleNest>>() {} )
 				.to( SimpleChoiceSetIdentifier.class );
 	}

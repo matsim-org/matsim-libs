@@ -30,7 +30,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 
 import java.util.ArrayList;
 import java.util.Collection;
