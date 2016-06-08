@@ -46,7 +46,7 @@ public class PrtQSimProvider
     @Inject
     public PrtQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
-            @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxiConfigGroup taxiCfg,
+            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxiConfigGroup taxiCfg,
             TaxiOptimizerFactory optimizerFactory)
     {
         this.scenario = scenario;
