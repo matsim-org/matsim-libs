@@ -190,7 +190,7 @@ public class ScheduleShapeFileWriter {
 
 	private Coordinate[] getCoordinatesFromRoute(TransitRoute transitRoute) {
 		List<Coordinate> coordList = new ArrayList<>();
-		List<Id<Link>> linkList = ScheduleTools.getLinkIds(transitRoute);
+		List<Id<Link>> linkList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 
 		if(linkList.size() > 0) {
 			for(Id<Link> linkId : linkList) {

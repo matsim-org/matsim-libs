@@ -140,7 +140,7 @@ public class ScheduleTools {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				if(transitRoute.getRoute() != null) {
-					transitLinkIds.addAll(getLinkIds(transitRoute));
+					transitLinkIds.addAll(getTransitRouteLinkIds(transitRoute));
 				}
 			}
 		}
@@ -251,7 +251,7 @@ public class ScheduleTools {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null) {
-					for(Id<Link> linkId : getLinkIds(route)) {
+					for(Id<Link> linkId : getTransitRouteLinkIds(route)) {
 						MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode());
 					}
 				}
@@ -293,7 +293,7 @@ public class ScheduleTools {
 	 * links are included). Returns an empty list if no links are assigned
 	 * to the route.
 	 */
-	public static List<Id<Link>> getLinkIds(TransitRoute transitRoute) {
+	public static List<Id<Link>> getTransitRouteLinkIds(TransitRoute transitRoute) {
 		List<Id<Link>> list = new ArrayList<>();
 		if(transitRoute.getRoute() == null) { return list;	}
 		NetworkRoute networkRoute = transitRoute.getRoute();
@@ -338,7 +338,7 @@ public class ScheduleTools {
 			toLinkId = route.getEndLinkId();
 		}
 
-		List<Id<Link>> linkIdList = getLinkIds(transitRoute);
+		List<Id<Link>> linkIdList = getTransitRouteLinkIds(transitRoute);
 
 		/**
 		 * the index where the link after fromLinkId can be found in the route:

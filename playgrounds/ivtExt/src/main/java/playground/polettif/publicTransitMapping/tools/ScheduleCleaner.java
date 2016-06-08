@@ -106,7 +106,7 @@ public class ScheduleCleaner {
 				if(networkRoute == null) {
 					removeRoute = true;
 				}
-				List<Id<Link>> linkIds = ScheduleTools.getLinkIds(transitRoute);
+				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 				if(linkIds.size() == 0) {
 					removeRoute = true;
 				} else {
@@ -141,7 +141,7 @@ public class ScheduleCleaner {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null)
-					usedTransitLinkIds.addAll(ScheduleTools.getLinkIds(route));
+					usedTransitLinkIds.addAll(ScheduleTools.getTransitRouteLinkIds(route));
 			}
 		}
 
@@ -358,4 +358,14 @@ public class ScheduleCleaner {
 			}
 		}
 	}
+
+	/**
+	 * Removes the given route from the schedule
+	 */
+	public static void removeRoute(TransitSchedule schedule, Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
+		TransitLine transitLine = schedule.getTransitLines().get(transitLineId);
+		TransitRoute transitRoute = transitLine.getRoutes().get(transitRouteId);
+		transitLine.removeRoute(transitRoute);
+	}
+
 }

@@ -284,8 +284,14 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("Clean schedule and network...");
 
 		// changing the freespeed of the artificial links (value is used in simulations)
-		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
 		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+//		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
+		// todo move to config
+		Set<String> freeSpeedModes = new HashSet<>();
+		freeSpeedModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		freeSpeedModes.add("rail");
+		freeSpeedModes.add("light_rail");
+		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, freeSpeedModes);
 
 		// Remove unnecessary parts of schedule
 		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
@@ -370,7 +376,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 				nRoutes++;
 
 				boolean noArtificial = true;
-				List<Id<Link>> linkIds = ScheduleTools.getLinkIds(transitRoute);
+				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 				for(Id<Link> linkId : linkIds) {
 					if(!network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
 						noArtificial = false;

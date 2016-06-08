@@ -460,7 +460,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		Set<TransitRoute> transitRoutesOnLink = new HashSet<>();
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				if(ScheduleTools.getLinkIds(transitRoute).contains(linkId)) {
+				if(ScheduleTools.getTransitRouteLinkIds(transitRoute).contains(linkId)) {
 					transitRoutesOnLink.add(transitRoute);
 				}
 			}

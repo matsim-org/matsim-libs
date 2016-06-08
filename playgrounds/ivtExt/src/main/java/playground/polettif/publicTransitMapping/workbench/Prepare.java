@@ -19,7 +19,10 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -30,12 +33,19 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
+import playground.polettif.boescpa.lib.tools.coordUtils.CoordFilter;
+import playground.polettif.boescpa.lib.tools.spatialCutting.ScheduleCutter;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,37 +58,82 @@ public class Prepare {
 
 	protected static Logger log = Logger.getLogger(Prepare.class);
 
-	private static Config config;
+	private Config config;
+
+	private Network network;
+	private TransitSchedule schedule;
+	private Vehicles vehicles;
+	private Population population;
+
 
 	public static void main(final String[] args) {
-		config = ConfigUtils.loadConfig("config.xml");
 
-		prepareNetworkAndSchedule("../../output/2016-06-08/ch_network.xml.gz", "../../output/2016-06-08/ch_schedule.xml.gz");
+		String inputNetwork = "../../output/2016-06-08/ch_busOnly_network.xml.gz";
+		String inputSchedule = "../../output/2016-06-08/ch_busOnly_schedule.xml.gz";
+		String inputVehicles = "../../data/vehicles/ch_hafas_vehicles.xml.gz";
+		String inputPopulation = "population_Orig.xml.gz";
 
-		preparePopulation("population_Orig.xml.gz");
-
-		prepareVehicles("../../data/vehicles/ch_vehicles.xml.gz", 0.005);
+		Prepare prepare = new Prepare("config.xml", inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		prepare.networkAndSchedule();
+		prepare.removeInvalidLines();
+		prepare.population();
+		prepare.vehicles(0.005);
+		prepare.writeFiles();
 	}
 
-	private static void prepareVehicles(String inputVehicleFile, double percentage) {
-		Vehicles transitVehicles = ScheduleTools.readVehicles(inputVehicleFile);
-		for(VehicleType vt : transitVehicles.getVehicleTypes().values()) {
+	private void removeInvalidLines() {
+		List<String> list = new ArrayList<>();
+
+		// copy/paste
+//		list.add("asd");
+
+		for(String e : list) {
+			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
+			schedule.removeTransitLine(tl);
+		}
+	}
+
+	private void removeInvalidRoutes() {
+		List<String[]> list = new ArrayList<>();
+
+		// copy/paste
+//		list.add(new String[]{	"asd", "fad"	});
+
+		for(String[] e : list) {
+			ScheduleCleaner.removeRoute(schedule, Id.create(e[0], TransitLine.class), Id.create(e[2], TransitRoute.class));
+		}
+	}
+
+	public Prepare(String scenarioConfig, String inputNetwork, String inputSchedule, String inputVehicles, String inputPopulation) {
+		config = ConfigUtils.loadConfig(scenarioConfig);
+
+		network = NetworkTools.readNetwork(inputNetwork);
+		schedule = ScheduleTools.readTransitSchedule(inputSchedule);
+		vehicles = ScheduleTools.readVehicles(inputVehicles);
+
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		reader.readFile(inputPopulation);
+		population = sc.getPopulation();
+	}
+
+	private void writeFiles() {
+		ScheduleTools.writeVehicles(vehicles, config.transit().getVehiclesFile());
+		ScheduleTools.writeTransitSchedule(schedule, config.transit().getTransitScheduleFile());
+		NetworkTools.writeNetwork(network, config.network().getInputFile());
+		new PopulationWriter(population, network).write(config.plans().getInputFile());
+	}
+
+	private void vehicles(double percentage) {
+		for(VehicleType vt : vehicles.getVehicleTypes().values()) {
 			vt.setPcuEquivalents(vt.getPcuEquivalents()*percentage);
 		}
-		ScheduleTools.writeVehicles(transitVehicles, config.vehicles().getVehiclesFile());
 	}
 
 	/**
 	 * modifiy population
 	 */
-	private static void preparePopulation(String inputPopulationFile) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		PopulationReader reader = new PopulationReaderMatsimV5(sc);
-		reader.readFile(inputPopulationFile);
-		Population population = sc.getPopulation();
-
-		Network network = NetworkTools.readNetwork(config.network().getInputFile());
+	private void population() {
 		log.info("creating car only network");
 		Network carNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("car"));
 
@@ -105,25 +160,24 @@ public class Prepare {
 				}
 			}
 		}
-
-		log.info("writing new plans file");
-		new PopulationWriter(population, network).write(config.plans().getInputFile());
 	}
 
-	private static void createConfig() {
-		Config config = ConfigUtils.createConfig();
-		new ConfigWriter(config).write("config.xml");
-	}
-
-	private static void prepareNetworkAndSchedule(String n, String s) {
-		Network network = NetworkTools.readNetwork(n);
-		TransitSchedule schedule = ScheduleTools.readTransitSchedule(s);
-
+	private void networkAndSchedule() {
 //		NetworkTools.replaceNonCarModesWithPT(network);
 //		ScheduleCleaner.replaceScheduleModes(schedule, TransportMode.pt);
 
-		ScheduleTools.writeTransitSchedule(schedule, config.transit().getTransitScheduleFile());
-		NetworkTools.writeNetwork(network, config.network().getInputFile());
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().contains("rail") || link.getAllowedModes().contains("light_rail")) {
+				link.setCapacity(9999);
+			}
+		}
+
+		Coord effretikon = new Coord(2693780.0, 1253409.0);
+		double radius = 20000;
+
+		new ScheduleCutter(schedule, vehicles, new CoordFilter.CoordFilterCircle(effretikon, radius)).cutSchedule();
+
+		ScheduleCleaner.cleanVehicles(schedule, vehicles);
 	}
 
 	private void editSchedule() {
@@ -140,6 +194,10 @@ public class Prepare {
 		*/
 	}
 
+	private static void createConfig() {
+		Config config = ConfigUtils.createConfig();
+		new ConfigWriter(config).write("config.xml");
+	}
 
 	
 }

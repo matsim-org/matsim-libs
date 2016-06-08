@@ -46,7 +46,7 @@ import playground.polettif.publicTransitMapping.mapping.router.Router;
 
 import java.util.*;
 
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Provides Tools for analysing and manipulating networks.
@@ -569,7 +569,7 @@ public class NetworkTools {
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				Set<String> usedNetworkModes = MapUtils.getSet(transitRoute.getTransportMode(), modeAssignments);
-				List<Link> links = getLinksFromIds(network, getLinkIds(transitRoute));
+				List<Link> links = getLinksFromIds(network, getTransitRouteLinkIds(transitRoute));
 				for(Link link : links) {
 					usedNetworkModes.addAll(link.getAllowedModes());
 				}

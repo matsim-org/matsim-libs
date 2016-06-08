@@ -35,6 +35,7 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
+import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
@@ -234,7 +235,7 @@ public class PTMapperUtils {
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
 
-					List<Id<Link>> linkIdList = ScheduleTools.getLinkIds(transitRoute);
+					List<Id<Link>> linkIdList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
 					TransitRouteStop currentStop = stopsIterator.next();
@@ -378,4 +379,47 @@ public class PTMapperUtils {
 			}
 		}
 	}
+
+	/**
+	 * Changes the free speed of links based on the necessary travel times
+	 * given by the schedule. Highly experimental and only recommended for
+	 * artificial and rail links.
+	 */
+	public static void setFreeSpeedBasedOnSchedule(Network network, TransitSchedule schedule, Set<String> networkModes) {
+		Map<Id<Link>, Double> necessaryMinSpeeds = new HashMap<>();
+
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
+
+				List<Link> links = NetworkTools.getLinksFromIds(network, linkIds);
+				double totalLength = 0;
+				for(Link link : links) {
+					totalLength += link.getLength();
+				}
+
+				List<TransitRouteStop> stops = transitRoute.getStops();
+				double timeDiff = stops.get(stops.size()-1).getArrivalOffset();
+
+				double theoreticalMinSpeed = (totalLength / timeDiff) * 1.1;
+
+				for(Id<Link> linkId : linkIds) {
+					double setMinSpeed = MapUtils.getDouble(linkId, necessaryMinSpeeds, 0);
+					if(theoreticalMinSpeed > setMinSpeed) {
+						necessaryMinSpeeds.put(linkId, theoreticalMinSpeed);
+					}
+				}
+			}
+		}
+
+		for(Link link : network.getLinks().values()) {
+			if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), networkModes)) {
+				double necessaryMinSpeed = necessaryMinSpeeds.get(link.getId());
+				if(necessaryMinSpeed > link.getFreespeed()) {
+					link.setFreespeed(Math.ceil(necessaryMinSpeed));
+				}
+			}
+		}
+	}
+
 }

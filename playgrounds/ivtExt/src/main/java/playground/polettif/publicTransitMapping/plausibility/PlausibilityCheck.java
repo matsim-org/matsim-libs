@@ -43,20 +43,17 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
-import org.xml.sax.SAXException;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.*;
 import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuthDiff;
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Performs a plausibility check on the given schedule
@@ -169,7 +166,7 @@ public class PlausibilityCheck {
 
 				Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
 
-				List<Link> links = NetworkTools.getLinksFromIds(network, getLinkIds(transitRoute));
+				List<Link> links = NetworkTools.getLinksFromIds(network, getTransitRouteLinkIds(transitRoute));
 				Map<Node, Tuple<Link, Link>> nodesInRoute = new HashMap<>();
 				Set<List<Id<Link>>> loops = new HashSet<>();
 
