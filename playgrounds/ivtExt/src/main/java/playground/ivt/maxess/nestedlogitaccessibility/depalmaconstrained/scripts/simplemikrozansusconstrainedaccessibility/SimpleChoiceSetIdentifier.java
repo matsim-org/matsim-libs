@@ -18,8 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -30,9 +34,11 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentif
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.PrismSampler;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,16 +51,19 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 	private final PrismSampler prismSampler;
 	private final TripRouter router;
 
-	public  SimpleChoiceSetIdentifier(
+	@Inject
+	public SimpleChoiceSetIdentifier(
 			final TripRouter tripRouter,
-			final String activityType,
-			final int nSamples,
-			final ActivityFacilities facilities,
-			final int budget_m,
-			final ObjectAttributes personAttributes ) {
+			final Scenario scenario,
+			final NestedAccessibilityConfigGroup configGroup) {
 		this.router = tripRouter;
-		this.personAttributes = personAttributes;
-		this.prismSampler = new PrismSampler( activityType, nSamples , facilities , budget_m );
+		this.personAttributes = scenario.getPopulation().getPersonAttributes();
+		this.prismSampler =
+				new PrismSampler(
+						configGroup.getActivityType(),
+						configGroup.getChoiceSetSize(),
+						scenario.getActivityFacilities(),
+						configGroup.getDistanceBudget() );
 	}
 
 	@Override
@@ -81,7 +90,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 		final String mode = isCarAvailable( p ) && hasLicense( p ) ?
 				"car" : "pt";
 
-		final List<Alternative<SingleNest>> alternatives = new ArrayList<>( prism.size() );
+		final Collection<Alternative<SingleNest>> alternatives = new ArrayList<>( prism.size() );
 		int i = 0;
 		for ( ActivityFacility destination : prism ) {
 			alternatives.add(

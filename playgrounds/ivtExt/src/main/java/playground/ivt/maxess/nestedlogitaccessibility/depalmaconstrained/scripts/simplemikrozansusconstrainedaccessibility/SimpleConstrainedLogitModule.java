@@ -18,67 +18,54 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
-import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
-import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 
-import java.util.List;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.MainModeIdentifier;
+import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.ConstrainedAccessibilityConfigGroup;
+import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.CorrectedUtilityCreator;
+import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 
 /**
  * @author thibautd
  */
-public class SimpleUtility implements Utility<SingleNest> {
-	private final UtilityConfigGroup configGroup;
-	private final ObjectAttributes personAttributes;
-	private final MainModeIdentifier modeIdentifier;
-
-	public SimpleUtility(
-			final UtilityConfigGroup configGroup,
-			final ObjectAttributes personAttributes,
-			final MainModeIdentifier modeIdentifier ) {
-		this.configGroup = configGroup;
-		this.personAttributes = personAttributes;
-		this.modeIdentifier = modeIdentifier;
-	}
-
+public class SimpleConstrainedLogitModule extends AbstractModule {
 	@Override
-	public double calcUtility( final Person p, final Alternative<SingleNest> a ) {
-		final double travelTime = getTravelTime( a );
-		final String mode = modeIdentifier.identifyMainMode( a.getAlternative().getTrip() );
-
-		switch ( mode ) {
-			case "car":
-				return configGroup.getBetaTtCar() * travelTime;
-			case "pt":
-				return configGroup.getBetaTtPt() * travelTime;
-			default:
-				throw new IllegalArgumentException( mode );
-		}
+	protected void configure() {
+		bind( new TypeLiteral<Utility<SingleNest>>() {} );
+		bind( new TypeLiteral<ChoiceSetIdentifier<SingleNest>>() {} )
+				.to( SimpleChoiceSetIdentifier.class );
 	}
 
-	private double getTravelTime( Alternative<SingleNest> a ) {
-		final List<? extends PlanElement> trip = a.getAlternative().getTrip();
+	@Provides
+	private Utility<SingleNest> createUtility(
+			final Scenario scenario,
+			final ConstrainedAccessibilityConfigGroup configGroup,
+			final NestedAccessibilityConfigGroup accessibilityConfigGroup,
+			final UtilityConfigGroup utilityConfigGroup,
+			final MainModeIdentifier modeIdentifier,
+			final ChoiceSetIdentifier<SingleNest> choiceSetIdentifier ) {
+		final CorrectedUtilityCreator<SingleNest> creator =
+				new CorrectedUtilityCreator<>(
+						configGroup,
+						scenario,
+						accessibilityConfigGroup.getActivityType() );
 
-		double tt = 0;
+		final Utility<SingleNest> baseUtility =
+				new SimpleUtility(
+						utilityConfigGroup,
+						scenario.getPopulation().getPersonAttributes(),
+						modeIdentifier );
 
-		for ( PlanElement pe : trip ) {
-			if ( pe instanceof Leg )  {
-				tt += ( (Leg) pe ).getTravelTime();
-			}
-		}
-
-		switch ( configGroup.getFunctionalForm() ) {
-			case linear:
-				return tt;
-			case log:
-				return Math.log( 1 + tt );
-			default:
-				throw new IllegalArgumentException( configGroup.getFunctionalForm()+"?" );
-		}
+		return creator.createCorrectedUtility(
+				new NestedLogitModel<>(
+						baseUtility,
+						choiceSetIdentifier ) );
 	}
 }
