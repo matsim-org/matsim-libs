@@ -88,9 +88,7 @@ public interface ScheduleEditor {
 	void addLink(Id<Link> newLinkId, Id<Node> fromNodeId, Id<Node> toNodeId, Id<Link> attributeLinkId);
 
 	/**
-	 *
-	 * @param transitRoute
+	 *	Reroutes between all referenced stop links for the given transit route.
 	 */
 	void refreshTransitRoute(TransitRoute transitRoute);
-
 }

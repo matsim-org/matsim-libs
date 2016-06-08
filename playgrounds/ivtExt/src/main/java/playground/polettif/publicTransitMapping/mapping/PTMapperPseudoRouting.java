@@ -115,7 +115,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("   max link candidate distance: " + config.getMaxLinkCandidateDistance());
 		log.info("   link distance tolerance: " + config.getLinkDistanceTolerance());
 		log.info("   Note: loop links for stop facilities are created if no link candidate can be found.");
-		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
 		linkCandidates = PTMapperUtils.generateModeLinkCandidates(this.schedule, this.network, this.config);
 
 		/**
@@ -239,7 +238,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		 */
 		log.info("========================================================================");
 		log.info("Replacing parent StopFacilities in schedule with child StopFacilities...");
-		PTMapperUtils.createAndReplaceFacilities(schedule, pseudoSchedule, config.getSuffixChildStopFacilities());
+		PTMapperUtils.createAndReplaceFacilities(schedule, pseudoSchedule);
 
 
 		/** [7]

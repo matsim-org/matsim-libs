@@ -27,7 +27,6 @@ import org.matsim.core.utils.collections.MapUtils;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**
@@ -41,6 +40,12 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public static final String STOP_FACILITY_LOOP_LINK = "stopFacilityLink";
 	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
 
+	/**
+	 * Suffix used for child stop facilities. The id of the referenced link is appended (i.e. stop0123.link:7852).
+	 */
+	public static final String SUFFIX_CHILD_STOP_FACILITIES = ".link:";
+	public static final String SUFFIX_CHILD_STOP_FACILITIES_REGEX = "[.]link:";
+
 	private static final String MODE_ROUTING_ASSIGNMENT ="modeRoutingAssignment";
 	private static final String MODES_TO_KEEP_ON_CLEAN_UP = "modesToKeepOnCleanUp";
 	private static final String NODE_SEARCH_RADIUS = "nodeSearchRadius";
@@ -48,7 +53,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_NCLOSEST_LINKS = "maxNClosestLinks";
 	private static final String MAX_LINK_CANDIDATE_DISTANCE = "maxLinkCandidateDistance";
 	private static final String PREFIX_ARTIFICIAL = "prefixArtificial";
-	private static final String SUFFIX_CHILD_STOP_FACILITIES = "suffixChildStopFacilities";
+	private static final String SUFFIX_CHILD_STOP_FACILITIES_TAG = "suffixChildStopFacilities";
 	private static final String BEELINE_DISTANCE_MAX_FACTOR = "beelineDistanceMaxFactor";
 	private static final String NETWORK_FILE = "networkFile";
 	private static final String SCHEDULE_FILE = "scheduleFile";
@@ -121,9 +126,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(FREESPEED_ARTIFICIAL,
 				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes.");
-		map.put(SUFFIX_CHILD_STOP_FACILITIES,
-				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
-						"\t\t(i.e. stop0123.link:LINKID20123).");
 		map.put(BEELINE_DISTANCE_MAX_FACTOR ,
 				"If all paths between two stops have a [length] > [beelineDistanceMaxFactor] * [beelineDistance], \n" +
 						"\t\tan artificial link is created.");
@@ -136,6 +138,9 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(OUTPUT_STREET_NETWORK_FILE, "Path to the output car only network file. The input multimodal map is filtered. \n" +
 				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
+//		map.put(SUFFIX_CHILD_STOP_FACILITIES_TAG,
+//				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
+//						"\t\t(i.e. stop0123.link:LINKID20123).");
 		return map;
 	}
 
@@ -421,23 +426,19 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * Suffix used for child stop facilities. A number for each child of a
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
-	// TODO remove suffix from config file and set as static to ensure other parts of the package work
-	private String suffixChildStopFacilities = ".link:";
-	private String suffixRegexEscaped = "[.]link:";
-
-	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
+//	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES_TAG)
 	public String getSuffixChildStopFacilities() {
-		return suffixChildStopFacilities;
+		return SUFFIX_CHILD_STOP_FACILITIES;
 	}
 
-	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES)
-	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
-		this.suffixChildStopFacilities = suffixChildStopFacilities;
-		this.suffixRegexEscaped = Pattern.quote(suffixChildStopFacilities);
-	}
+//	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES_TAG)
+//	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
+//		this.suffixChildStopFacilities = suffixChildStopFacilities;
+//		this.suffixRegexEscaped = Pattern.quote(suffixChildStopFacilities);
+//	}
 
 	public String getSuffixRegexEscaped() {
-		return suffixRegexEscaped;
+		return SUFFIX_CHILD_STOP_FACILITIES_REGEX;
 	}
 
 	/**

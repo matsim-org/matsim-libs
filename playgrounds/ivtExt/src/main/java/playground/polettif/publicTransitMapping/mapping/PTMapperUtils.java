@@ -49,15 +49,9 @@ import java.util.stream.Collectors;
 public class PTMapperUtils {
 
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
-	private static String suffixChildStopFacilities = ".link:";
-	private static String suffixChildStopFacilitiesRegex = "[.]link:";
+	private static String suffixChildStopFacilities = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES;
+	private static String suffixChildStopFacilitiesRegex = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
 	private static Set<String> loopLinkModes = null;
-
-	public static void setSuffixChildStopFacilities(String suffix, String suffixRegex) {
-		suffixChildStopFacilities = suffix;
-		suffixChildStopFacilitiesRegex = suffixRegex;
-	}
-
 
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
@@ -133,9 +127,8 @@ public class PTMapperUtils {
 	 *
 	 * @param schedule                where the facilities should be replaced
 	 * @param pseudoSchedule          defines the actual sequence of pseudoRouteStops
-	 * @param childStopFacilitySuffix what suffix the child facility should get in the id
 	 */
-	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule, String childStopFacilitySuffix) {
+	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule) {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
 
@@ -146,7 +139,7 @@ public class PTMapperUtils {
 				List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
 				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
-					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + childStopFacilitySuffix + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
+					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + suffixChildStopFacilities + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
 
 					// if child stop facility for this link has not yet been generated
 					if(!schedule.getFacilities().containsKey(childStopFacilityId)) {
