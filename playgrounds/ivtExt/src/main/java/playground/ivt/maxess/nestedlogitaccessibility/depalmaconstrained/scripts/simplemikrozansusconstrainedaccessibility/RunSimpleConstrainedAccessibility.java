@@ -34,11 +34,7 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityCom
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure.SimpleNestedLogitModule;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure.SimpleNestedLogitUtilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
@@ -46,7 +42,6 @@ import playground.ivt.utils.MoreIOUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd
