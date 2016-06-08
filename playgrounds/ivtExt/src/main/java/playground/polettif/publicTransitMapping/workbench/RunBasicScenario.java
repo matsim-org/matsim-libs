@@ -1,10 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParsimoniousControler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,18 +16,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.meisterk.org.matsim.controler;
+package playground.polettif.publicTransitMapping.workbench;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
-public class ParsimoniousControler {
+public class RunBasicScenario {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
+		final Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(args);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.run();
-
+		Controler controler = new Controler(scenario);
+		controler.run();
 	}
 
 }

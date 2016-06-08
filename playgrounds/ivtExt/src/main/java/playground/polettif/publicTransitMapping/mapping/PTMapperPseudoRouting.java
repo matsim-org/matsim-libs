@@ -630,7 +630,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 					threadPseudoSchedule.put(tuple, pseudoPath);
 				}
 
-				counterPseudoRouting.incCounter();
+				increaseCounter();
 			}
 		}
 
@@ -641,6 +641,10 @@ public class PTMapperPseudoRouting extends PTMapper {
 		public Map<Tuple<TransitLine, TransitRoute>, List<PseudoRouteStop>> getPseudoSchedule() {
 			return threadPseudoSchedule;
 		}
+	}
+
+	private synchronized void increaseCounter() {
+		counterPseudoRouting.incCounter();
 	}
 
 	private static void setLogLevels() {

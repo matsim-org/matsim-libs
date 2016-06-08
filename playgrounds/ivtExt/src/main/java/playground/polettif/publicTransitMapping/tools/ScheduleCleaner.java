@@ -154,7 +154,7 @@ public class ScheduleCleaner {
 
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 		if(keepOppositeLinks) {
-			for(Id<Link> linkId : usedTransitLinkIds) {
+			for(Id<Link> linkId : new HashSet<>(usedTransitLinkIds)) {
 				usedTransitLinkIds.add(NetworkTools.getOppositeLink(links.get(linkId)).getId());
 			}
 		}

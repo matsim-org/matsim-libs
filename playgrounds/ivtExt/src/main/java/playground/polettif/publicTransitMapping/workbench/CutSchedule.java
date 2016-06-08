@@ -38,7 +38,7 @@ public class CutSchedule {
 
 //		Coord city = new Coord(2683518.0, 1246836.0);
 		Coord effretikon = new Coord(2693780.0, 1253409.0);
-		double radius = 8000;
+		double radius = 15000;
 
 		new ScheduleCutter(schedule, vehicles, new CoordFilter.CoordFilterCircle(effretikon, radius)).cutSchedule();
 
