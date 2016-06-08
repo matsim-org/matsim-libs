@@ -79,8 +79,8 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		int iteration = 0;
 		for ( int lastSize = -1,
 			  	newSize = iterationInformation.constrainedExPost.size();
-			  // TODO: less restrictive criterion?
-			  lastSize != newSize; ) {
+				// TODO: less restrictive criterion?
+				lastSize != newSize; ) {
 			log.info( "Iteration "+(iteration++)+": constrained set has size "+newSize );
 			//counter.incCounter();
 			// update omegas based on the constrained set
