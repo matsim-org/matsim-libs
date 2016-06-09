@@ -29,7 +29,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	// this property can be used for applications where the grid operation/simulation is integrated
 	// each Utility Operator can be modelled as a separate entity which drives the prices of its
 	// charging points
-	abstract ChargingNetworkOperator getChargingNetworktOperator();
+	abstract ChargingNetworkOperator getChargingNetworkOperator();
 	
 	double getParkingPriceQuote(double time, double duration);
 	
@@ -38,6 +38,8 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	ChargingSitePolicy getChargingSitePolicy();
 
 	abstract Collection<ChargingPlugType> getAllAvailableChargingPlugTypes();
+
+	abstract double estimateChargingSessionDuration(ChargingPlug plug);
 
 	
 }

@@ -77,7 +77,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double chargeVehicle(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
-			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 1000) && socInJoules > getUsableBatteryCapacityInJoules()) {
+			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
 				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
 			}
 		}
@@ -85,10 +85,6 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return energyChargeInJoule;
 	}
 	
-	public double chargeVehicle(double duration, double chargerPowerInWatt){
-		return chargeVehicle(duration*chargerPowerInWatt);
-	}
-
 	public double getUsableBatteryCapacityInJoules() {
 		return usableBatteryCapacityInJoules;
 	}
