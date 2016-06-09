@@ -23,7 +23,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
@@ -69,7 +69,7 @@ public class PatnaUrbanControler {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		final RandomizingTimeDistanceTravelDisutility.Builder builder =  new RandomizingTimeDistanceTravelDisutility.Builder("bike", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
  */
 public class MiscUtils {
 
+	private MiscUtils() {}
+
 	/**
 	 * @return true, if two sets (e.g. scheduleTransportModes and
 	 * networkTransportModes) have at least one identical entry.
@@ -142,6 +144,27 @@ public class MiscUtils {
 				return (o1.getValue()).compareTo(o2.getValue());
 			}
 		});
+
+		// Convert sorted map back to a Map
+		Map<K, V> sortedMap = new LinkedHashMap<>();
+		for(Map.Entry<K, V> entry : list) {
+			sortedMap.put(entry.getKey(), entry.getValue());
+		}
+		return sortedMap;
+	}
+
+	/**
+	 * Sorts a map by its values.
+	 *
+	 * @param unsortMap the unsortedMap
+	 * @return the sorted map
+	 */
+	public static <K, V extends Comparable<V>> Map<K, V> sortDescendingByValue(Map<K, V> unsortMap) {
+		// Convert Map to List
+		List<Map.Entry<K, V>> list = new LinkedList<>(unsortMap.entrySet());
+
+		// Sort list with comparator, to compare the Map values
+		Collections.sort(list, (o1, o2) -> -(o1.getValue()).compareTo(o2.getValue()));
 
 		// Convert sorted map back to a Map
 		Map<K, V> sortedMap = new LinkedHashMap<>();

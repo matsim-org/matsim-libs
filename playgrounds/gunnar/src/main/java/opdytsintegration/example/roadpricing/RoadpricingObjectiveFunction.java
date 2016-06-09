@@ -9,7 +9,6 @@ import com.google.inject.Inject;
 
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import floetteroed.utilities.math.Vector;
 
 /**
  * Returns the negative sum of the scores of the selected plans of all agents,

@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CoordTools {
+
+	private CoordTools() {}
+
 	/**
 	 * @return the azimuth in [rad] of a line defined by two points.
 	 */

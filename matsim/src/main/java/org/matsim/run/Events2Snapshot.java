@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
@@ -119,10 +119,10 @@ public class Events2Snapshot {
 		MatsimRandom.reset(this.config.global().getRandomSeed());
 		scenario = ScenarioUtils.createScenario(this.config);
 
-		if (((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod() <= 0.0) {
-			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
-			return;
-		}
+//		if (((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod() <= 0.0) {
+//			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
+//			return;
+//		}
 
 		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());

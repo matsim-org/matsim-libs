@@ -18,8 +18,7 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-import playground.polettif.publicTransitMapping.hafas.Hafas2TransitSchedule;
-import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
+import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
 /**
@@ -53,20 +52,21 @@ public class Run {
 		String outputFolder = "";
 		String outputSystem = "CH1903_LV03_Plus";
 
-		Hafas2TransitSchedule.run(hafasFolder, outputFolder, outputSystem);
+//		Hafas2TransitSchedule.run(hafasFolder, outputFolder, outputSystem);
 	}
 
 	public void osm2network() {
 		String configFile = "";
-		Osm2MultimodalNetworkConverter.run(configFile);
+		OsmMultimodalNetworkConverter.run(configFile);
 	}
 
 	public void plausibilityCheck() {
 		String scheduleFile = "";
 		String networkFile = "";
+		String coordinateSystem = "EPSG:2056";
 		String outputFolder = "";
 
-		PlausibilityCheck.run(scheduleFile, networkFile, outputFolder);
+		PlausibilityCheck.run(scheduleFile, networkFile, coordinateSystem, outputFolder);
 	}
 
 	public void editSchedule() {

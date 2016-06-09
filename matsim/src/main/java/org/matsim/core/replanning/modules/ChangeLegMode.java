@@ -20,13 +20,9 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.ChooseRandomLegMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 

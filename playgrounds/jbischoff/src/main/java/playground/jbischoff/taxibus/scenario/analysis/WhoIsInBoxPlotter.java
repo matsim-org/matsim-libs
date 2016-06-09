@@ -59,10 +59,10 @@ public class WhoIsInBoxPlotter {
 		String eventsFile = "D:/runs-svn/braunschweig/output/bs05/output_events.xml.gz";
 		String networkF = "D:/runs-svn/vw_rufbus/VW79BC/VW79BC.output_network.xml.gz";
 		String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/vehonroad/quader.shp";
-		String outputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/vehonroad/vehiclesInBoxBS.csv";
+		String outputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/vehonroad/vehiclesInBox_gliesmarode.csv";
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(networkF);
-		Geometry geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "id").get("1");
+		Geometry geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "id").get("3");
 		List<Id<Link>> relevantLinkIds = extractRelevantLinks(network,geo);
 		EventsManager events = EventsUtils.createEventsManager();
 		BoxHandler boxHandler = new BoxHandler(relevantLinkIds);

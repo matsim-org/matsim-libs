@@ -20,16 +20,13 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
  * modular approach.
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
+public final class CharyparNagelAgentStuckScoring implements org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
 
 	protected double score;
 
@@ -40,17 +37,11 @@ public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicS
 
 	public CharyparNagelAgentStuckScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
-		this.reset();
-	}
-
-	@Override
-	public void reset() {
 		this.score = INITIAL_SCORE;
 	}
 
 	@Override
 	public void agentStuck(final double time) {
-
 		this.score += getStuckPenalty();
 	}
 

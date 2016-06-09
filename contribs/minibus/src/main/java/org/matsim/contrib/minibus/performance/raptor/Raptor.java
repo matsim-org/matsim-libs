@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -89,11 +91,11 @@ public class Raptor implements TransitRouter {
     }
 
     @Override
-    public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
+    public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
         // find possible start stops
-        Map<TransitStopFacility, InitialNode> fromStops = this.locateWrappedNearestTransitStops(person, fromCoord, departureTime);
+        Map<TransitStopFacility, InitialNode> fromStops = this.locateWrappedNearestTransitStops(person, fromFacility.getCoord(), departureTime);
         // find possible end stops
-        Map<TransitStopFacility, InitialNode> toStops = this.locateWrappedNearestTransitStops(person, toCoord, departureTime);
+        Map<TransitStopFacility, InitialNode> toStops = this.locateWrappedNearestTransitStops(person, toFacility.getCoord(), departureTime);
 
         // find routes between start and end stops
         RaptorRoute p = this.raptorWalker.calcLeastCostPath(fromStops, toStops);
@@ -102,13 +104,13 @@ public class Raptor implements TransitRouter {
             return null;
         }
 
-        double directWalkCost = getWalkDisutility(fromCoord, toCoord);
+        double directWalkCost = getWalkDisutility(fromFacility.getCoord(), toFacility.getCoord());
         double pathCost = p.getTravelCost();
 
         if (directWalkCost < pathCost) {
-            return this.createDirectWalkLegList(null, fromCoord, toCoord);
+            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
-        return convertPathToLegList(departureTime, p, fromCoord, toCoord, person);
+        return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
     }
 
     private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {

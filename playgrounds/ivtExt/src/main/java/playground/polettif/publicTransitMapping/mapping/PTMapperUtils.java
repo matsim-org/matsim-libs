@@ -23,16 +23,19 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.publicTransitMapping.config.ManualLinkCandidates;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
+import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
@@ -47,19 +50,14 @@ import java.util.stream.Collectors;
 public class PTMapperUtils {
 
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
-	private static String suffixChildStopFacilities = ".link:";
-	private static String suffixChildStopFacilitiesRegex = "[.]link:";
-
-	public static void setSuffixChildStopFacilities(String suffix, String suffixRegex) {
-		suffixChildStopFacilities = suffix;
-		suffixChildStopFacilitiesRegex = suffixRegex;
-	}
-
+	private static String suffixChildStopFacilities = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES;
+	private static String suffixChildStopFacilitiesRegex = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
+	private static Set<String> loopLinkModes = null;
 
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
 	 * no link can be found within nodeSearchRadius an artificial node and loop
-	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink(TransitStopFacility, Network, String)}.
+	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink}.
 	 * For each link candiate a child stop facility is generated and referenced to
 	 * the link. Link candidates for different modes with the same link use the same
 	 * child stop facility. Child stop facilities are not created and added to the schedule!
@@ -75,6 +73,12 @@ public class PTMapperUtils {
 	 */
 	public static Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> generateModeLinkCandidates(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config) {
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> tree = new HashMap<>();
+
+		if(loopLinkModes == null) {
+			loopLinkModes = new HashSet<>();
+			loopLinkModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+			loopLinkModes.add(PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
+		}
 
 		/**
 		 * get closest links for each stop facility (separated by mode)
@@ -94,12 +98,13 @@ public class PTMapperUtils {
 						if(stopFacility.getLinkId() != null) {
 							modeLinkCandidates.add(new LinkCandidate(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
 						} else {
-							// limits number of links, for all links within search radius use networkTools.findClosestLinks()
+
+							// limits number of links, for all links within search radius
 							List<Link> closestLinks = findClosestLinksByScheduleMode(network, stopFacility.getCoord(), scheduleTransportMode, config);
 
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
-								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial());
+								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), 20, loopLinkModes);
 								closestLinks.add(loopLink);
 							}
 
@@ -124,21 +129,19 @@ public class PTMapperUtils {
 	 *
 	 * @param schedule                where the facilities should be replaced
 	 * @param pseudoSchedule          defines the actual sequence of pseudoRouteStops
-	 * @param childStopFacilitySuffix what suffix the child facility should get in the id
 	 */
-	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule, String childStopFacilitySuffix) {
-		log.info("Replacing parent StopFacilities with child StopFacilities...");
+	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule) {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
-		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
+		List<Tuple<Id<TransitLine>, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
+		for(Map.Entry<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
 			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
 
 				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
 				List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
 				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
-					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + childStopFacilitySuffix + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
+					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + suffixChildStopFacilities + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
 
 					// if child stop facility for this link has not yet been generated
 					if(!schedule.getFacilities().containsKey(childStopFacilityId)) {
@@ -169,7 +172,7 @@ public class PTMapperUtils {
 				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
 
 				// remove the old route
-				schedule.getTransitLines().get(lineEntry.getKey().getId()).removeRoute(routeEntry.getKey());
+				schedule.getTransitLines().get(lineEntry.getKey()).removeRoute(routeEntry.getKey());
 
 				// add new route to container
 				newRoutes.add(new Tuple<>(lineEntry.getKey(), newRoute));
@@ -177,8 +180,8 @@ public class PTMapperUtils {
 		}
 
 		// add transit lines and routes again
-		for(Tuple<TransitLine, TransitRoute> entry : newRoutes) {
-			schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
+		for(Tuple<Id<TransitLine>, TransitRoute> entry : newRoutes) {
+			schedule.getTransitLines().get(entry.getFirst()).addRoute(entry.getSecond());
 		}
 	}
 
@@ -221,50 +224,63 @@ public class PTMapperUtils {
 	/**
 	 * Checks for each child stop facility if the link before or after is closer to the facility
 	 * than its referenced link. If so, the child stop facility is replaced with the one closer
-	 * to the facility coordinates.<p/>
-	 * <p/>
-	 * Since all links are part of the route, no rerouting has to be done.
-	 *
-	 * @param schedule
-	 * @param network
+	 * to the facility coordinates. Transit routes with loop route profiles (i.e. a stop is accessed
+	 * twice in a stop sequence) are ignored.
 	 */
 	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
-		log.info("Concentrating child stop facilities...");
+		log.info("Pulling child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
+				boolean hasStopLoop = ScheduleTools.routeHasStopSequenceLoop(transitRoute);
 				if(transitRoute.getRoute() != null) {
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
 
-					List<Id<Link>> linkIdList = ScheduleTools.getLinkIds(transitRoute);
+					List<Id<Link>> linkIdList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
 					TransitRouteStop currentStop = stopsIterator.next();
-					Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
-					if(closerLinkBefore != null) {
-						linkIdList.add(0, closerLinkBefore);
+
+					// look for a closer link before the route's start
+					// removed because it messes up more than it solves...
+					/*
+					if(!hasStopLoop) {
+						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
+						if(closerLinkBefore != null) {
+							linkIdList.add(0, closerLinkBefore);
+						}
+						currentStop = stopsIterator.next();
 					}
-					currentStop = stopsIterator.next();
+					*/
 
+					// optimize referenced links between start and end
 					for(int i = 1; i < linkList.size()-1; i++) {
-
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
 							testSet.add(linkList.get(i-1));
 							testSet.add(linkList.get(i+1));
 							useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), testSet);
-							// setCloserStopFacility(schedule, transitRoute, currentStop.getStopFacility(), linkList.get(i), , linkList.get(i + 1));
+
 							if(stopsIterator.hasNext()) {
 								currentStop = stopsIterator.next();
 							}
 						}
 					}
-					currentStop = routeStops.get(routeStops.size() - 1);
-					Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
-					if(closerLinkAfter != null) {
-						linkIdList.add(closerLinkAfter);
+
+					// look for a closer link after the route's end
+					// removed because it messes up more than it solves...
+					/*
+					if(!hasStopLoop) {
+						currentStop = routeStops.get(routeStops.size() - 1);
+						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
+						if(closerLinkAfter != null) {
+							linkIdList.add(closerLinkAfter);
+						}
 					}
+					*/
+
+					// set the new link list
 					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdList, network));
 				}
 			}
@@ -274,12 +290,6 @@ public class PTMapperUtils {
 	/**
 	 * If a link of <tt>comparingLinks</tt> is closer to the stop facility than
 	 * its currently referenced link, the closest link is used.
-	 * @param schedule
-	 * @param network
-	 * @param transitRoute
-	 * @param stopFacility
-	 * @param comparingLinks
-	 * @return
 	 */
 	private static Id<Link> useCloserRefLinkForChildStopFacility(TransitSchedule schedule, Network network, TransitRoute transitRoute, TransitStopFacility stopFacility, Collection<? extends Link> comparingLinks) {
 		// check if previous link is closer to stop facility
@@ -344,4 +354,81 @@ public class PTMapperUtils {
 				config.getMaxLinkCandidateDistance()
 		);
 	}
+
+	/**
+	 * adds manually defined link candidates from config (if available)
+	 */
+	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
+		for(ConfigGroup e : config.getParameterSets(ManualLinkCandidates.SET_NAME)) {
+			ManualLinkCandidates manualCandidates = (ManualLinkCandidates) e;
+
+			Set<String> modes = manualCandidates.getModes();
+			if(modes.size() == 0) {
+				modes = linkCandidates.keySet();
+			}
+
+			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
+			if(parentStopFacility == null) {
+				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
+			} else {
+				for(String mode : modes) {
+					Set<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
+					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
+						Link link = network.getLinks().get(linkId);
+						if(link == null) {
+							log.warn("link " + manualCandidates.getStopFacilityId() + " not found in network.");
+						} else {
+							lcSet.add(new LinkCandidate(link, parentStopFacility));
+						}
+					}
+					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Changes the free speed of links based on the necessary travel times
+	 * given by the schedule. Highly experimental and only recommended for
+	 * artificial and possibly rail links.
+	 */
+	public static void setFreeSpeedBasedOnSchedule(Network network, TransitSchedule schedule, Set<String> networkModes) {
+		Map<Id<Link>, Double> necessaryMinSpeeds = new HashMap<>();
+
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
+
+				List<Link> links = NetworkTools.getLinksFromIds(network, linkIds);
+				double totalLength = 0;
+				for(Link link : links) {
+					totalLength += link.getLength();
+				}
+
+				List<TransitRouteStop> stops = transitRoute.getStops();
+				double timeDiff = stops.get(stops.size()-1).getArrivalOffset();
+
+				double theoreticalMinSpeed = (totalLength / timeDiff) * 1.05;
+
+				for(Id<Link> linkId : linkIds) {
+					double setMinSpeed = MapUtils.getDouble(linkId, necessaryMinSpeeds, 0);
+					if(theoreticalMinSpeed > setMinSpeed) {
+						necessaryMinSpeeds.put(linkId, theoreticalMinSpeed);
+					}
+				}
+			}
+		}
+
+		for(Link link : network.getLinks().values()) {
+			if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), networkModes)) {
+				if(necessaryMinSpeeds.containsKey(link.getId())) {
+					double necessaryMinSpeed = necessaryMinSpeeds.get(link.getId());
+					if(necessaryMinSpeed > link.getFreespeed()) {
+						link.setFreespeed(Math.ceil(necessaryMinSpeed));
+					}
+				}
+			}
+		}
+	}
+
 }

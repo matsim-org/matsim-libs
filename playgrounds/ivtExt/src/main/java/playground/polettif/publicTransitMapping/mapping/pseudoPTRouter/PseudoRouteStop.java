@@ -24,6 +24,9 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A RouteStop used in the pseudoGraph.
  * <p/>
@@ -34,10 +37,18 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
  *
  * @author polettif
  */
-public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
+public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
 
 	private static PublicTransitMappingConfigGroup config;
 
+	// dijkstra
+	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
+	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
+	public PseudoRouteStop previous = null;
+
+	private final double linkWeight;
+
+	// schedule values
 	public final Id<PseudoRouteStop> id;
 	private final String name;
 
@@ -53,7 +64,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 	private final String stopPostAreaId;
 	private final String parentStopFacilityId;
 	private final String linkCandidateId;
-	private final double linkWeight;
 	private final double stopFacilityDistance;
 
 	public static void setConfig(PublicTransitMappingConfigGroup configGroup) {
@@ -61,14 +71,11 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 	}
 
 	/**
-	 * Constructor. All values are stored here as well to make access easier during
+	 * Constructor. All primitive values are stored
+	 * as well to make access easier during
 	 * stop facility replacement.
-	 *
-	 * @param order
-	 * @param routeStop
-	 * @param linkCandidate
 	 */
-	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+	/*package*/ PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
@@ -89,7 +96,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 
 		// link value
 		this.linkWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
-//		this.linkWeight = linkCandidate.getLinkLength();
 	}
 
 	/**
@@ -100,11 +106,15 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 	public PseudoRouteStop(String id) {
 		if(id.equals(PseudoGraph.SOURCE)) {
 			this.id = Id.create(PseudoGraph.SOURCE, PseudoRouteStop.class);
+			this.distToSource = 0;
 		} else {
 			this.id = Id.create(PseudoGraph.DESTINATION, PseudoRouteStop.class);
 		}
 		this.name = id;
 		this.linkCandidateId = null;
+
+		previous = null;
+
 		this.linkId = null;
 		this.stopFacilityDistance = 0.0;
 
@@ -124,6 +134,22 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 		this.linkWeight = 0.0;
 	}
 
+	@Override
+	public Id<PseudoRouteStop> getId() {
+		return id;
+	}
+
+	@Override
+	public int compareTo(PseudoRouteStop other) {
+		if(other.getId().equals(this.id)) {
+			return 0;
+		}
+		return Double.compare(distToSource, other.distToSource);
+	}
+
+	public double getLinkWeight() {
+		return linkWeight;
+	}
 
 	public double getDepartureOffset() {
 		return departureOffset;
@@ -140,10 +166,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 	@Deprecated
 	public String getChildStopFacilityId() {
 		return linkCandidateId;
-	}
-
-	public Id<PseudoRouteStop> getId() {
-		return id;
 	}
 
 	public Coord getCoord() {
@@ -172,7 +194,7 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 
 	@Override
 	public String toString() {
-		return name;
+		return facilityName + " " + id;
 	}
 
 	@Override
@@ -191,10 +213,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop> {
 		} else if(!id.toString().equals(other.id.toString()))
 			return false;
 		return true;
-	}
-
-	public double getLinkWeight() {
-		return linkWeight;
 	}
 
 	public double getStopFacilityDistance() {

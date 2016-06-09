@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
+import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
@@ -67,6 +69,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private Double beelineDistanceFactor = 1.3 ;
 
 	private boolean insertingAccessEgressWalk = false ;
+	
+	// ---
+	
+	private static final String RANDOMNESS = "routingRandomness" ;
+	private double routingRandomness = 3. ;
+
+	// ---
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
@@ -365,7 +374,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
-
+	        map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
+	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
+	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
 		return map;
 	}
 
@@ -456,5 +467,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		this.insertingAccessEgressWalk = val ;
 	}
 
+	@StringGetter(RANDOMNESS)
+	public double getRoutingRandomness() {
+		return routingRandomness;
+	}
+	@StringSetter(RANDOMNESS)
+	public void setRoutingRandomness(double routingRandomness) {
+		this.routingRandomness = routingRandomness;
+	}
 
 }

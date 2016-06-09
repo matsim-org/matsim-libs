@@ -39,6 +39,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.PreparedTransitSchedule;
@@ -92,48 +94,47 @@ class PtSubModeRouter implements TransitRouter {
 		this.travelDisutility = travelDisutility;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
 	}
-
 	@Override
-	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
 		// find possible start stops
-		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.getSearchRadius());
+		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromFacility.getCoord(), this.config.getSearchRadius());
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromCoord);
+			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromFacility.getCoord());
 			double distance;
 			if(nearestNode == null){
 				// there is no nearest node...
 				distance = this.config.getSearchRadius() + this.config.getExtensionRadius();
 			}else{
-				distance = CoordUtils.calcEuclideanDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+				distance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), nearestNode.stop.getStopFacility().getCoord());
 			}
-			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.getExtensionRadius());
+			fromNodes = this.transitNetwork.getNearestNodes(fromFacility.getCoord(), distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
-			double distance = CoordUtils.calcEuclideanDistance(fromCoord, node.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
 		// find possible end stops
-		Collection<TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toCoord, this.config.getSearchRadius());
+		Collection<TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toFacility.getCoord(), this.config.getSearchRadius());
 		if (toNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
+			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toFacility.getCoord());
 			double distance;
 			if(nearestNode == null){
 				// there is no nearest node...
 				distance = this.config.getSearchRadius() + this.config.getExtensionRadius();
 			}else{
-				distance = CoordUtils.calcEuclideanDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+				distance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), nearestNode.stop.getStopFacility().getCoord());
 			}
-			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.getExtensionRadius());
+			toNodes = this.transitNetwork.getNearestNodes(toFacility.getCoord(), distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
-			double distance = CoordUtils.calcEuclideanDistance(toCoord, node.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(toFacility.getCoord(), node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
@@ -146,12 +147,12 @@ class PtSubModeRouter implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord()) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+			double walkTime = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord()) / this.config.getBeelineWalkSpeed();
 			Route walkRoute = new GenericRouteImpl(null, null);
 			leg.setRoute(walkRoute);
 			leg.setTravelTime(walkTime);
@@ -159,7 +160,7 @@ class PtSubModeRouter implements TransitRouter {
 			return legs;
 		}
 
-		return convert( departureTime, p, fromCoord, toCoord ) ;
+		return convert( departureTime, p, fromFacility.getCoord(), toFacility.getCoord() ) ;
 	}
 
 	protected List<Leg> convert( double departureTime, Path p, Coord fromCoord, Coord toCoord ) {

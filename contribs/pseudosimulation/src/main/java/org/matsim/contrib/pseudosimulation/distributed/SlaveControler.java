@@ -37,7 +37,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -230,8 +230,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 if (IntelligentRouters)
                     install(new TravelDisutilityModule());
                 else{
-                    final Builder disutilityFactory =
-                            new Builder( TransportMode.car, config.planCalcScore() );
+                    final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
+                            new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
@@ -272,8 +272,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 }
             });
         } else {
-            final Builder disutilityFactory =
-                    new Builder( TransportMode.car, config.planCalcScore() );
+            final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
+                    new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {

@@ -55,7 +55,7 @@ import java.util.TreeSet;
  * @author bvitins, anhorni
  *
  */
-public class LegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
+public class LegScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring {
 
 	private final HerbieConfigGroup ktiConfigGroup;
 	private Config config;

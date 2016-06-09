@@ -2,11 +2,12 @@ package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
 import static java.lang.Double.parseDouble;
-import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
-import floetteroed.utilities.tabularfileparser.TabularFileParser;
 
 import java.io.IOException;
 import java.util.Map;
+
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
+import floetteroed.utilities.tabularfileparser.TabularFileParser;
 
 /**
  * 

@@ -33,8 +33,11 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.workbench.Run;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,20 +54,19 @@ public class ModeDependentRouter implements Router {
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
+	private static PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType = PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength;
+
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
-		if(!(routingTransportModes.size() == 1 && routingTransportModes.contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE))) {
-			routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		this.routingTransportModes = new HashSet<>();
+		this.routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		if(routingTransportModes != null) {
+			this.routingTransportModes.addAll(routingTransportModes);
 		}
-		this.routingTransportModes = routingTransportModes;
+
 		paths = new HashMap<>();
 
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(network, this);
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
-
-		// Suppress statements...
-		Logger.getLogger( Dijkstra.class ).setLevel( Level.ERROR );
-		Logger.getLogger( PreProcessEuclidean.class ).setLevel( Level.ERROR );
-		Logger.getLogger( PreProcessLandmarks.class ).setLevel( Level.ERROR );
 	}
 
     @Override
@@ -76,7 +78,7 @@ public class ModeDependentRouter implements Router {
             }
             return paths.get(nodes);
         } else {
-            return null;
+			throw new RuntimeException("Both nodes are null!");
         }
     }
 
@@ -104,7 +106,7 @@ public class ModeDependentRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-		return (linkHasRoutingMode(link) ? 1 : 10000) * link.getLength();
+		return (linkHasRoutingMode(link) ? 1 : 100000) * link.getLength() / link.getFreespeed();
 	}
 
 	/**

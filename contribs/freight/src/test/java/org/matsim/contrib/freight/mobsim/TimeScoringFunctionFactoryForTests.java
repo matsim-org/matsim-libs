@@ -15,10 +15,10 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;

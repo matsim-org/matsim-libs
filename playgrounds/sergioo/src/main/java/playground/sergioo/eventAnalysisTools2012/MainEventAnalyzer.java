@@ -23,8 +23,10 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 
@@ -372,7 +374,9 @@ public class MainEventAnalyzer {
 			Coord start = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3])));
 			Coord end = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[4]), Double.parseDouble(parts[5])));
 			double distance = 0;
-			List<Leg> legs = transitRouter.calcRoute(start, end, new Double(parts[6]), null);
+			final Coord fromCoord = start;
+			final Coord toCoord = end;
+			List<Leg> legs = transitRouter.calcRoute( new FakeFacility(fromCoord), new FakeFacility(toCoord), new Double(parts[6]), null );
 			double distancePT = 0, timePT = 0;
 			if(legs!=null) {
 				for(Leg leg:legs) {

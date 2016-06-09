@@ -22,15 +22,22 @@
 
 package org.matsim.core.replanning;
 
+import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
 class ReplanningContextImpl implements ReplanningContext, IterationStartsListener {
 
     private int iteration;
+
+    @Inject
+    ReplanningContextImpl(ControlerListenerManager controlerListenerManager) {
+        controlerListenerManager.addControlerListener(this);
+    }
 
     @Override
     public int getIteration() {

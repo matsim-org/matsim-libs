@@ -93,10 +93,56 @@ public class CreateCBPop {
 		cbWork.runPopulationCreation();
 		cbWork.writeOutput();
 
+		// CB-PT-SecondaryActivities
+		//	config creation
+		CreateSingleTripPopulationConfigGroup saPtConfig = configGroup.copy();
+		saPtConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilitySecondaryActivityDeparture.txt");
+		saPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_SecondaryActivities_PT.txt");
+		saPtConfig.setMode("pt");
+		saPtConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_SA_PT.xml.gz");
+		//	population creation
+		CreateCBSecondaryActivities cbPtSecondaryActivities = new CreateCBSecondaryActivities(saPtConfig);
+		cbPtSecondaryActivities.runPopulationCreation();
+		cbPtSecondaryActivities.writeOutput();
 
+		// CB-PT-Work
+		//	config creation
+		CreateSingleTripPopulationConfigGroup workPtConfig = configGroup.copy();
+		workPtConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityWorkDeparture.txt");
+		workPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "O_CB-Agents_Work_PT.txt");
+		workPtConfig.setPathToDestinationsFile(configGroup.getPathToDestinationsFile() + "D_CB-Agents_Work.txt");
+		workPtConfig.setMode("pt");
+		workPtConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Work_PT.xml.gz");
+		//	population creation
+		CreateCBWork cbPtWork = new CreateCBWork(workPtConfig);
+		cbPtWork.runPopulationCreation();
+		cbPtWork.writeOutput();
+
+		// CB-PT-Transit
+		//	config creation
+		CreateSingleTripPopulationConfigGroup transitPtConfig = configGroup.copy();
+		transitPtConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityTransitDeparture.txt");
+		transitPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_Transit_PT.txt");
+		transitPtConfig.setMode("pt");
+		transitPtConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Transit_PT.xml.gz");
+		//	population creation
+		CreateCBTransitPT cbPtTransit = new CreateCBTransitPT(transitPtConfig);
+		cbPtTransit.runPopulationCreation();
+		cbPtTransit.writeOutput();
+
+		// MERGE THE POPULATIONS
 		mergeFacilities(pathToOutput_CBPopulation);
 		mergeSubpopulations(transitConfig.getPathToOutput(), saConfig.getPathToOutput(), pathToOutput_CBPopulation);
 		mergeSubpopulations(pathToOutput_CBPopulation, workConfig.getPathToOutput(), pathToOutput_CBPopulation);
+		mergeSubpopulations(pathToOutput_CBPopulation, saPtConfig.getPathToOutput(), pathToOutput_CBPopulation);
+		mergeSubpopulations(pathToOutput_CBPopulation, workPtConfig.getPathToOutput(), pathToOutput_CBPopulation);
+		mergeSubpopulations(pathToOutput_CBPopulation, transitPtConfig.getPathToOutput(), pathToOutput_CBPopulation);
 	}
 
 	private static void mergeFacilities(String pathToOutput_CBPopulation) {
@@ -114,6 +160,21 @@ public class CreateCBPop {
 		ActivityFacilities workFacilities = FacilityUtils.readFacilities(
 				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Work_Facilities.xml.gz");
 		for (ActivityFacility facility : workFacilities.getFacilities().values()) {
+			addFacility(cbFacilities, facility);
+		}
+		ActivityFacilities saPtFacilities = FacilityUtils.readFacilities(
+				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_SA_PT_Facilities.xml.gz");
+		for (ActivityFacility facility : saPtFacilities.getFacilities().values()) {
+			addFacility(cbFacilities, facility);
+		}
+		ActivityFacilities workPtFacilities = FacilityUtils.readFacilities(
+				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Work_PT_Facilities.xml.gz");
+		for (ActivityFacility facility : workPtFacilities.getFacilities().values()) {
+			addFacility(cbFacilities, facility);
+		}
+		ActivityFacilities transitPtFacilities = FacilityUtils.readFacilities(
+				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Transit_PT_Facilities.xml.gz");
+		for (ActivityFacility facility : transitPtFacilities.getFacilities().values()) {
 			addFacility(cbFacilities, facility);
 		}
 

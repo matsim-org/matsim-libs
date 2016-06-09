@@ -35,6 +35,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 
@@ -49,15 +50,14 @@ public class ScheduleTools {
 
 	protected static Logger log = Logger.getLogger(ScheduleTools.class);
 
-	private ScheduleTools() {
-	}
+	private ScheduleTools() {}
 
 	/**
 	 * @return the transitSchedule from scheduleFile.
 	 */
-	public static TransitSchedule readTransitSchedule(String scheduleFile) {
+	public static TransitSchedule readTransitSchedule(String fileName) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario).readFile(scheduleFile);
+		new TransitScheduleReader(scenario).readFile(fileName);
 
 		return scenario.getTransitSchedule();
 	}
@@ -74,9 +74,10 @@ public class ScheduleTools {
 	/**
 	 * Writes the transit schedule to filePath.
 	 */
-	public static void writeTransitSchedule(TransitSchedule schedule, String filePath) {
-		log.info("Writing transit schedule to file " + filePath);
-		new TransitScheduleWriter(schedule).writeFile(filePath);
+	public static void writeTransitSchedule(TransitSchedule schedule, String fileName) {
+		log.info("Writing transit schedule to file " + fileName);
+		new TransitScheduleWriter(schedule).writeFile(fileName);
+		log.info("done.");
 	}
 
 	/**
@@ -116,6 +117,15 @@ public class ScheduleTools {
 		return vehicles;
 	}
 
+	/**
+	 * @return the vehicles from a given vehicles file.
+	 */
+	public static Vehicles readVehicles(String vehiclesFile) {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		new VehicleReaderV1(vehicles).readFile(vehiclesFile);
+		return vehicles;
+	}
+
 
 	/**
 	 * Add mode "pt" to any link of the network that is
@@ -130,7 +140,7 @@ public class ScheduleTools {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				if(transitRoute.getRoute() != null) {
-					transitLinkIds.addAll(getLinkIds(transitRoute));
+					transitLinkIds.addAll(getTransitRouteLinkIds(transitRoute));
 				}
 			}
 		}
@@ -147,8 +157,9 @@ public class ScheduleTools {
 	}
 
 	/**
-	 * Generates link sequences for all transit routes in the schedule, modifies the schedule.
-	 * All stopFacilities used by a route must have a link referenced.
+	 * Generates link sequences (network route) for all transit routes in
+	 * the schedule, modifies the schedule. All stopFacilities used by a
+	 * route must have a link referenced.
 	 *
 	 * @param schedule where transitRoutes should be routed
 	 * @param network  the network where the routes should be routed
@@ -156,9 +167,13 @@ public class ScheduleTools {
 	 *                 defined in the transitRoute).
 	 */
 	public static void routeSchedule(TransitSchedule schedule, Network network, Map<String, Router> routers) {
+		routeSchedule(schedule, network, routers, true);
+	}
+
+	public static void routeSchedule(TransitSchedule schedule, Network network, Map<String, Router> routers, boolean logging) {
 		Counter counterRoute = new Counter("route # ");
 
-		log.info("Routing all routes with referenced links...");
+		if(logging) log.info("Routing all routes with referenced links...");
 
 		if(routers == null) {
 			log.error("No routers given, routing cannot be completed!");
@@ -167,66 +182,59 @@ public class ScheduleTools {
 
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				if(routers.containsKey(transitRoute.getTransportMode()) && transitRoute.getStops().size() > 0) {
-					Router router = routers.get(transitRoute.getTransportMode());
+				if(!routers.containsKey(transitRoute.getTransportMode())) {
+					throw new RuntimeException("No router defined for " + transitRoute.getTransportMode());
+				}
+				if(transitRoute.getStops().size() > 0) {
+					Router modeDependentRouter = routers.get(transitRoute.getTransportMode());
 
-					counterRoute.incCounter();
+					if(logging) counterRoute.incCounter();
 
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
-					List<Id<Link>> linkSequence = null;
+					List<Id<Link>> linkIdSequence = new LinkedList<>();
+					linkIdSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
-					// add very first link
-					if(routeStops.get(0).getStopFacility().getLinkId() == null) {
-						linkSequence = new ArrayList<>();
-						linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
-
-						// route
-						for(int i = 0; i < routeStops.size() - 1; i++) {
-							if(routeStops.get(i).getStopFacility().getLinkId() == null) {
-								log.warn("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + ") not referenced!");
-								linkSequence = null;
-								break;
-							}
-							if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
-								log.warn("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
-								linkSequence = null;
-								break;
-							}
-
-							Id<Link> currentLinkId = Id.createLinkId(routeStops.get(i).getStopFacility().getLinkId().toString());
-
-							Link currentLink = network.getLinks().get(currentLinkId);
-							Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
-
-							LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
-
-							if(leastCostPath != null) {
-								List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
-								if(path != null) {
-									linkSequence.addAll(path);
-								} else {
-									linkSequence = null;
-									break;
-								}
-							} else {
-								linkSequence = null;
-								break;
-							}
-
-							linkSequence.add(nextLink.getId());
+					// route
+					for(int i = 0; i < routeStops.size() - 1; i++) {
+						if(routeStops.get(i).getStopFacility().getLinkId() == null) {
+							log.warn("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + ") not referenced!");
+							linkIdSequence = null;
+							break;
 						}
-					}
+						if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
+							log.warn("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
+							linkIdSequence = null;
+							break;
+						}
+
+						Id<Link> currentLinkId = Id.createLinkId(routeStops.get(i).getStopFacility().getLinkId().toString());
+						Link currentLink = network.getLinks().get(currentLinkId);
+						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
+
+
+						LeastCostPathCalculator.Path leastCostPath = modeDependentRouter.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
+
+						List<Id<Link>> path = null;
+						if(leastCostPath != null) {
+							path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
+						}
+
+						if(path != null)
+							linkIdSequence.addAll(path);
+
+						linkIdSequence.add(nextLink.getId());
+					} // -for stops
 
 					// add link sequence to schedule
-					if(linkSequence != null) {
-						transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
-					} else {
-						log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
+					if(linkIdSequence != null) {
+						transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdSequence, network));
 					}
+				} else {
+					log.warn("Route " + transitRoute.getId() + " on line " + transitLine.getId() + " has no stop sequence");
 				}
-			}
-		}
-		log.info("Routing all routes with referenced links... done");
+			} // -route
+		} // -line
+		if(logging) log.info("Routing all routes with referenced links... done");
 	}
 
 	/**
@@ -243,7 +251,7 @@ public class ScheduleTools {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null) {
-					for(Id<Link> linkId : getLinkIds(route)) {
+					for(Id<Link> linkId : getTransitRouteLinkIds(route)) {
 						MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode());
 					}
 				}
@@ -261,33 +269,6 @@ public class ScheduleTools {
 				}
 
 				link.setAllowedModes(modes);
-			}
-		}
-	}
-
-	/**
-	 * Replaces all non-car link modes with "pt"
-	 */
-	public static void replaceNonCarModesWithPT(Network network) {
-		log.info("... Replacing all non-car link modes with \"pt\"");
-
-		Set<String> modesCar = Collections.singleton(TransportMode.car);
-
-		Set<String> modesCarPt = new HashSet<>();
-		modesCarPt.add(TransportMode.car);
-		modesCarPt.add(TransportMode.pt);
-
-		Set<String> modesPt = new HashSet<>();
-		modesPt.add(TransportMode.pt);
-
-		for(Link link : network.getLinks().values()) {
-			if(link.getAllowedModes().size() == 0 && link.getAllowedModes().contains(TransportMode.car)) {
-				link.setAllowedModes(modesCar);
-			}
-			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains(TransportMode.car)) {
-				link.setAllowedModes(modesCarPt);
-			} else if(!link.getAllowedModes().contains(TransportMode.car)) {
-				link.setAllowedModes(modesPt);
 			}
 		}
 	}
@@ -312,7 +293,7 @@ public class ScheduleTools {
 	 * links are included). Returns an empty list if no links are assigned
 	 * to the route.
 	 */
-	public static List<Id<Link>> getLinkIds(TransitRoute transitRoute) {
+	public static List<Id<Link>> getTransitRouteLinkIds(TransitRoute transitRoute) {
 		List<Id<Link>> list = new ArrayList<>();
 		if(transitRoute.getRoute() == null) { return list;	}
 		NetworkRoute networkRoute = transitRoute.getRoute();
@@ -357,7 +338,7 @@ public class ScheduleTools {
 			toLinkId = route.getEndLinkId();
 		}
 
-		List<Id<Link>> linkIdList = getLinkIds(transitRoute);
+		List<Id<Link>> linkIdList = getTransitRouteLinkIds(transitRoute);
 
 		/**
 		 * the index where the link after fromLinkId can be found in the route:
@@ -411,5 +392,28 @@ public class ScheduleTools {
 	public static void writeVehicles(Vehicles vehicles, String filePath) {
 		log.info("Writing vehicles to file " + filePath);
 		new VehicleWriterV1(vehicles).writeFile(filePath);
+	}
+
+	/**
+	 * checks if a stop is accessed twice in a stop sequence
+	 */
+	public static boolean routeHasStopSequenceLoop(TransitRoute transitRoute) {
+		Set<String> parentFacilities = new HashSet<>();
+		for(TransitRouteStop stop : transitRoute.getStops()) {
+			if(!parentFacilities.add(getParentId(stop.getStopFacility().getId().toString()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * @return the parent id of a stop facility id. This is the part befor the
+	 * child stop facility suffix ".link:"
+	 */
+	public static String getParentId(String stopFacilityId) {
+		String[] childStopSplit = stopFacilityId.split(PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX);
+		return childStopSplit[0];
 	}
 }

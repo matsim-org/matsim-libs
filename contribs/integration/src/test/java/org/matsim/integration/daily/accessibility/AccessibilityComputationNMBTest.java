@@ -111,6 +111,9 @@ public class AccessibilityComputationNMBTest {
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 //		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.paratransit, true);
 		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// yy For a test, "abort" may be too strict.  kai, may'16
+
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		
 		// matrix-based pt

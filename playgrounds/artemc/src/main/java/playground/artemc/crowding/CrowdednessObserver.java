@@ -144,35 +144,35 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 			return;
 		}
 
-		Vehicle v = getVehicle(event.getVehicleId());
+		Vehicle vehicle = getVehicle(event.getVehicleId());
 	
 		double time = event.getTime();
 		Id facility = event.getFacilityId();
 
-		VehicleStateAdministrator vehicle = vehicleStates.get(v);
-		vehicle.addBusFacilityDeparture(facility, time);
+		VehicleStateAdministrator vehicleAdmin = vehicleStates.get(vehicle);
+		vehicleAdmin.addBusFacilityDeparture(facility, time);
 		
 		if(facility.toString().equals("1")){
-			vehicleStates.get(v).setRouteDepartureTime(time);
+			vehicleStates.get(vehicle).setRouteDepartureTime(time);
 		}
 		
 		// TRICKY! Here, there is no personId available. FacilityId is written in the event, 
 		// but there is no consequence on the scoring functions, because the personId is not called
 		// (grerat)
-		if(boardingOrAlightingAtFacility.get(v).equals(true)){
+		if(boardingOrAlightingAtFacility.get(vehicle).equals(true)){
 			pushEvents(event.getFacilityId(), event.getVehicleId(), event.getTime(), false);	
 		}
 		
-		if (v != null)
+		if (vehicle != null)
 		{
 			// If there is already a pending observation and we observe
 			// another departure, no one has left or entered the vehicle 
 			// in the meantime. This implies that no events were generated.
 			// We thus do not need to update the lastDeparture.
-			if (!pendingObservation.contains(v))
+			if (!pendingObservation.contains(vehicle))
 			{
-				lastDeparture.put(v, event.getTime());
-				pendingObservation.add(v);
+				lastDeparture.put(vehicle, event.getTime());
+				pendingObservation.add(vehicle);
 			}
 		}
 	}
@@ -194,18 +194,18 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private void pushEvents(Id personId, Id vehicleId, double time, boolean leavingVehicle)
 	{
-		Vehicle v = this.vehs.getVehicles().get(vehicleId);
+		Vehicle vehicle = this.vehs.getVehicles().get(vehicleId);
 	
-		if (v != null)
+		if (vehicle != null)
 		{
 			
 			// Check whether there was a departure in the past. If so
-			if (pendingObservation.contains(v))
+			if (pendingObservation.contains(vehicle))
 			{
 
 				// Get the administration
 
-				VehicleStateAdministrator vehicleAdmin = vehicleStates.get(v);
+				VehicleStateAdministrator vehicleAdmin = vehicleStates.get(vehicle);
 				
 				// Get the last facility saved (the facility where the agent is)
 				Set<Entry<Id, BusFacilityInteractionEvent>> mapValues = vehicleAdmin.getFacilityStates().entrySet();
@@ -223,12 +223,12 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 				
 				// Get the time difference between now and the last departure
 				// we have registered.
-				double travelTime = time - lastDeparture.get(v);
+				double travelTime = time - lastDeparture.get(vehicle);
 				double dwellTime = 0;
 				
 
 				// Now if any persons are in the vehicle
-				if (vehicleAdmin != null && !boardingOrAlightingAtFacility.get(v).equals(true))
+				if (vehicleAdmin != null && !boardingOrAlightingAtFacility.get(vehicle).equals(true))
 				{
 					for (Id person : vehicleAdmin.getSittingSet())
 					{	
@@ -253,15 +253,15 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 						}
 				}
 
-				pendingObservation.remove(v);
+				pendingObservation.remove(vehicle);
 			}
 
 			// Send an event that give the vehicle state during dwell time
-			if(boardingOrAlightingAtFacility.get(v).equals(true)) {
+			if(boardingOrAlightingAtFacility.get(vehicle).equals(true)) {
 
 				// Get the administration
 
-				VehicleStateAdministrator vehicleAdmin = vehicleStates.get(v);
+				VehicleStateAdministrator vehicleAdmin = vehicleStates.get(vehicle);
 
 				// Get the last facility saved (the facility where the agent is)
 				Set<Entry<Id, BusFacilityInteractionEvent>> mapValues = vehicleAdmin.getFacilityStates().entrySet();
@@ -279,7 +279,7 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 				// Get the time difference between now and the last departure we have registered.
 				double travelTime = 0;
-				double dwellTime = time - lastArrival.get(v);
+				double dwellTime = time - lastArrival.get(vehicle);
 
 
 				// Now if any persons are in the vehicle
@@ -297,7 +297,7 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 					}
 				}
 
-				boardingOrAlightingAtFacility.put(v, false);		
+				boardingOrAlightingAtFacility.put(vehicle, false);
 			}
 			
 			// To allow scoring of the following agents alighting (only useful for SecondBestPricing)
@@ -348,31 +348,31 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 
 		Id vehId = event.getVehicleId() ;
-		Vehicle v = this.vehs.getVehicles().get(vehId) ;
+		Vehicle vehicle = this.vehs.getVehicles().get(vehId) ;
 
 		// Somehow, cars return null, but it would be better
 		// to distinguish PT-vehicles and cars in a more clever way.
-		if (v != null)
+		if (vehicle != null)
 		{
 			Id person = event.getPersonId();
 
 			//if(!boardingOrAlightingAtFacility.containsKey(v)){
-				boardingOrAlightingAtFacility.put(v, false);
+				boardingOrAlightingAtFacility.put(vehicle, false);
 			//}
 				
 			// If any observations are pending, push PersonCrowdednessEvents before updating the seat administration.
 			pushEvents(person, vehId, event.getTime(), false);
 			
 			//if(!boardingOrAlightingAtFacility.containsKey(v)){
-			boardingOrAlightingAtFacility.put(v, true);
-			lastArrival.put(v, event.getTime());
+			boardingOrAlightingAtFacility.put(vehicle, true);
+			lastArrival.put(vehicle, event.getTime());
 			//}
 
-			VehicleStateAdministrator vehicleAdmin = vehicleStates.get(v);
+			VehicleStateAdministrator vehicleAdmin = vehicleStates.get(vehicle);
 			if (vehicleAdmin == null)
 			{
-				vehicleAdmin = new VehicleStateAdministrator(v,rule);
-				vehicleStates.put(v, vehicleAdmin);
+				vehicleAdmin = new VehicleStateAdministrator(vehicle,rule);
+				vehicleStates.put(vehicle, vehicleAdmin);
 			}
 
 			vehicleAdmin.addPerson(person);
@@ -389,16 +389,16 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 		}
 
 		Id vehId = event.getVehicleId() ;
-		Vehicle v = this.vehs.getVehicles().get(vehId);
+		Vehicle vehicle = this.vehs.getVehicles().get(vehId);
 		
-		if (v != null)
+		if (vehicle != null)
 		{
 			Id person = event.getPersonId();
-			boardingOrAlightingAtFacility.put(v, false);
+			boardingOrAlightingAtFacility.put(vehicle, false);
 			
 			// Used for the implementation of the Second-Best pricing strategy. 
 			// No effect on the other simulations 
-			if (!pendingObservation.contains(v))
+			if (!pendingObservation.contains(vehicle))
 			{
 				nextAgentAlighting.add(person);
 			}
@@ -406,10 +406,10 @@ PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 			// If any observations are pending, push PersonCrowdednessEvents before updating the seat administration.
 			pushEvents(person, vehId, event.getTime(), true);
 
-			boardingOrAlightingAtFacility.put(v, true);
-			lastArrival.put(v, event.getTime());
+			boardingOrAlightingAtFacility.put(vehicle, true);
+			lastArrival.put(vehicle, event.getTime());
 			
-			vehicleStates.get(v).remove(person);
+			vehicleStates.get(vehicle).remove(person);
 		
 		}
 	}

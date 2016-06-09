@@ -155,6 +155,10 @@
 			<id>matsim</id>
 			<url>http://matsim.org/m2repo</url>
 		</repository>
+		<repository>
+			<id>bintray</id>
+			<url>http://dl.bintray.com/matsim/matsim</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>

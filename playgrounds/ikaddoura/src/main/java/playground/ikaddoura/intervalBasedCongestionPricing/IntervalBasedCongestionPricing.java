@@ -37,6 +37,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.ikaddoura.intervalBasedCongestionPricing.data.CongestionInfo;
+import playground.ikaddoura.intervalBasedCongestionPricing.data.CongestionInfo.DelayInternalizationApproach;
 import playground.ikaddoura.intervalBasedCongestionPricing.handler.DelayComputation;
 import playground.ikaddoura.intervalBasedCongestionPricing.handler.PersonVehicleTracker;
 import playground.ikaddoura.intervalBasedCongestionPricing.handler.TimeTracker;
@@ -57,6 +58,10 @@ public class IntervalBasedCongestionPricing implements StartupListener, AfterMob
 	private TimeTracker timeTracker;
 	private DelayComputation delayComputation;
 
+	public IntervalBasedCongestionPricing(Scenario scenario, DelayInternalizationApproach approach, double timeBinSize, int writeOutputIteration){
+		this.congestionInfo = new CongestionInfo(scenario, approach, timeBinSize, writeOutputIteration);
+	}
+	
 	public IntervalBasedCongestionPricing(Scenario scenario){
 		this.congestionInfo = new CongestionInfo(scenario);
 	}

@@ -24,6 +24,8 @@ package org.matsim.contrib.matrixbasedptrouter;
 
 
 import java.io.BufferedReader;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,13 +34,20 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.matsim.vehicles.Vehicle;
 
 /**
  *
@@ -285,6 +294,35 @@ public final class PtMatrix {
 			ptStopHashMap.put(ptStop.getId(), ptStop);
 		}
 		return ptStopHashMap;
+	}
+
+	public LeastCostPathCalculator asPathCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
+		final double betaWalkTT	= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		final double betaWalkTD	= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		final double betaPtTT = planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		final double betaPtTD = planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
+		final double constPt = planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getConstant();
+
+		return new LeastCostPathCalculator() {
+			@Override
+			public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person, Vehicle vehicle) {
+				// travel time with pt:
+				double ptTravelTime_h = getPtTravelTime_seconds(fromNode.getCoord(), toNode.getCoord()) / 3600.;
+				// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+				double ptTotalWalkTime_h = getTotalWalkTravelTime_seconds(fromNode.getCoord(), toNode.getCoord()) / 3600.;
+				// total travel distance including walking and pt distance from/to origin/destination location:
+				double ptTravelDistance_meter = getTotalWalkTravelDistance_meter(fromNode.getCoord(), toNode.getCoord());
+				// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+				double ptTotalWalkDistance_meter= getPtTravelDistance_meter(fromNode.getCoord(), toNode.getCoord());
+
+				return new Path(
+						Arrays.asList(fromNode, toNode),
+						Collections.<Link>emptyList(),
+						getTotalTravelTime_seconds(fromNode.getCoord(), toNode.getCoord()),
+						constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD)
+				);
+			}
+		};
 	}
 
 }

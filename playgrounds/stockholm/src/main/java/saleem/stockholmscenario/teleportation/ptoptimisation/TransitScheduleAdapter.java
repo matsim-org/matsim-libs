@@ -80,28 +80,21 @@ public class TransitScheduleAdapter {
 		}
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
-	//With 5% chance of selecting a line, and 50% chance of randomly adding vehicles to it and adjusting departure times.
-		public PTSchedule updateScheduleDeleteRoute(Scenario scenario, TransitSchedule schedule){
-			CollectionUtil<TransitLine> cutilforlines = new CollectionUtil<TransitLine>();
-			CollectionUtil<TransitRoute> cutilforroutes = new CollectionUtil<TransitRoute>();
-			ArrayList<TransitLine> lines = cutilforlines.toArrayList(schedule.getTransitLines().values().iterator());
-			int size = lines.size();
-			for(int i=0;i<size;i++) {
-				TransitLine tline = lines.get(i);
-				if(Math.random()<=0.1){//With 10% probability
-					ArrayList<TransitRoute> routes = cutilforroutes.toArrayList(tline.getRoutes().values().iterator());
-					int sizer = routes.size();
-					for(int j=0;j<sizer;j++) {
-						TransitRoute troute = routes.get(j);
-						if(Math.random()<=0.1){
-							tline.removeRoute(troute);
-						}
-					}
-				}
-			}
-			writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\AdaptedTransitSchedule.xml");
-			return new PTSchedule(scenario, schedule, scenario.getTransitVehicles());
+	//With 10 % chance of selecting a line, and 10% chance of removing each of its route.
+	public PTSchedule updateScheduleDeleteRoute(Scenario scenario, Vehicles vehicles, TransitSchedule schedule){
+		RouteAdderRemover routeremover = new RouteAdderRemover();
+		routeremover.deleteRandomRoutes(schedule, vehicles);
+		writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\TransitScheduleRoutesRemoved.xml");
+		return new PTSchedule(scenario, schedule, vehicles);
 	}
+		//With 10 % chance of selecting a line, and 10% chance of removing each of its route.
+	public PTSchedule updateScheduleAddRoute(Scenario scenario, Vehicles vehicles, TransitSchedule schedule){
+		RouteAdderRemover routeremover = new RouteAdderRemover();
+		routeremover.addRandomRoutes(scenario, schedule, vehicles);
+		writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\TransitScheduleRoutesAdded.xml");
+		return new PTSchedule(scenario, schedule, vehicles);
+	}
+
 	public void writeSchedule(TransitSchedule schedule, String path){
 		
 		TransitScheduleWriter tw = new TransitScheduleWriter(schedule);

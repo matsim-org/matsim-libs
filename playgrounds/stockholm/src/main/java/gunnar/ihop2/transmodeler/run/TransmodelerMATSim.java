@@ -1,10 +1,5 @@
 package gunnar.ihop2.transmodeler.run;
 
-import floetteroed.utilities.SimpleLogFormatter;
-import floetteroed.utilities.config.Config;
-import floetteroed.utilities.config.ConfigReader;
-import gunnar.ihop2.integration.MATSimDummy;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -20,6 +15,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 
 import cadyts.utilities.misc.StreamFlushHandler;
+import floetteroed.utilities.SimpleLogFormatter;
+import floetteroed.utilities.config.Config;
+import floetteroed.utilities.config.ConfigReader;
+import gunnar.ihop2.integration.MATSimDummy;
 
 /**
  * 

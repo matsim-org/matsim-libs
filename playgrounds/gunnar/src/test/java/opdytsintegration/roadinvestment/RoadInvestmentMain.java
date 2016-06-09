@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
@@ -29,6 +26,8 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 
@@ -97,7 +96,7 @@ class RoadInvestmentMain {
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
 		Simulator system = new MATSimSimulator(stateFactory, scenario,
-				new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
+				new TimeDiscretization(5 * 3600, 10 * 60, 18)); // , null, null);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
@@ -127,7 +126,7 @@ class RoadInvestmentMain {
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
 		Simulator system = new MATSimSimulator(stateFactory, scenario,
-				new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
+				new TimeDiscretization(5 * 3600, 10 * 60, 18)); // , null, null);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
@@ -179,7 +178,7 @@ class RoadInvestmentMain {
 
 		Simulator system = new MATSimSimulator(// decisionVariables,
 				stateFactory, scenario, new TimeDiscretization(5 * 3600,
-						10 * 60, 18), null);
+						10 * 60, 18)); // , null, null);
 		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {
 			// public RoadInvestmentDecisionVariable newRandomDecisionVariable()
 			// {

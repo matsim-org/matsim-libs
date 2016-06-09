@@ -34,12 +34,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 
@@ -140,7 +139,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		this.plans.clear();
 	}
 
-	public GenericPlanSelector<Plan, Person> getPlanSelector() {
+	public PlanSelector<Plan, Person> getPlanSelector() {
 		return this.selector;
 	}
 

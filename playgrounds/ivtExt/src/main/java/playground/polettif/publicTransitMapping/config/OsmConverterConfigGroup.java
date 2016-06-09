@@ -24,7 +24,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
+import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
 
@@ -34,7 +34,7 @@ import java.util.Set;
 
 
 /**
- * Config group for osm conversion {@link Osm2MultimodalNetworkConverter}
+ * Config group for osm conversion {@link OsmMultimodalNetworkConverter}
  * @author polettif
  */
 public class OsmConverterConfigGroup extends ReflectiveConfigGroup {
@@ -175,11 +175,11 @@ public class OsmConverterConfigGroup extends ReflectiveConfigGroup {
 		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.UNCLASSIFIED,	OsmTag.HIGHWAY, 1, 50.0 / 3.6, 1.0, 600, 	false, carSingleton));
 		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.RESIDENTIAL,	OsmTag.HIGHWAY, 1, 30.0 / 3.6, 1.0, 600, 	false, carSingleton));
 		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.LIVING_STREET,	OsmTag.HIGHWAY, 1, 15.0 / 3.6, 1.0, 300, 	false, carSingleton));
-		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.SERVICE,		OsmTag.HIGHWAY, 1, 15.0 / 3.6, 1.0, 200, 	false, carSingleton));
+//		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.SERVICE,		OsmTag.HIGHWAY, 1, 15.0 / 3.6, 1.0, 200, 	false, carSingleton));
 
-		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.RAIL,			OsmTag.RAILWAY,	1, 160.0 / 3.6, 1.0, 100, false, railSingleton));
-		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.TRAM,			OsmTag.RAILWAY,	1, 40.0 / 3.6, 1.0, 100, true, railSingleton));
-		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.LIGHT_RAIL,		OsmTag.RAILWAY,	1, 80.0 / 3.6, 1.0, 100, false, railSingleton));
+		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.RAIL,			OsmTag.RAILWAY,	1, 160.0 / 3.6, 1.0, 9999, false, railSingleton));
+		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.TRAM,			OsmTag.RAILWAY,	1, 40.0 / 3.6, 1.0, 9999, true, railSingleton));
+		defaultConfig.addParameterSet(new OsmWayParams(OsmValue.LIGHT_RAIL,		OsmTag.RAILWAY,	1, 80.0 / 3.6, 1.0, 9999, false, railSingleton));
 
 		return defaultConfig;
 	}

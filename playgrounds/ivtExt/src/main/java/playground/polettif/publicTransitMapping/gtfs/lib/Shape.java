@@ -20,6 +20,7 @@
 
 package playground.polettif.publicTransitMapping.gtfs.lib;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -74,10 +75,15 @@ public class Shape {
 	}
 
 	public Coordinate[] getCoordinates() {
-		Coordinate[] coordinates = new Coordinate[points.size()];
-		for(Map.Entry<Integer, Coord> entry : points.entrySet()) {
-			coordinates[entry.getKey()-1] = MGC.coord2Coordinate(entry.getValue());
+		if(points.size() == 0) {
+			return null;
+		} else {
+			int i = 0;
+			Coordinate[] coordinates = new Coordinate[points.values().size()];
+			for(Coord coord : points.values()) {
+				coordinates[i++] = MGC.coord2Coordinate(coord);
+			}
+			return coordinates;
 		}
-		return coordinates;
 	}
 }

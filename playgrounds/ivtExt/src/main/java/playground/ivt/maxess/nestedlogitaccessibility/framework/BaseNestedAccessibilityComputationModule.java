@@ -25,13 +25,9 @@ import com.google.inject.util.Types;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ExplodedConfigModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.lang.reflect.ParameterizedType;

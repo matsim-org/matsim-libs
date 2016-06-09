@@ -68,12 +68,13 @@ public class StopReader {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(pathToBFKOORD_GEOFile), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
-				/*Spalte Typ Bedeutung
+				/**
 				1−7 INT32 Nummer der Haltestelle
 				9−18 FLOAT X-Koordinate
 				20−29 FLOAT Y-Koordinate
-				31−36 INT16 Z-Koordinate (optional)
-				38ff CHAR Kommentarzeichen "%"gefolgt vom Klartext des Haltestellennamens (optional zur besseren Lesbarkeit)*/
+				31−36 INT16 Z-Koordinate (Tunnel und andere Streckenelemente ohne eigentliche Haltestelle haben keine Z-Koordinate)
+				38ff CHAR Kommentarzeichen "%"gefolgt vom Klartext des Haltestellennamens (optional zur besseren Lesbarkeit)
+				 */
 				Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
 				double xCoord = Double.parseDouble(newLine.substring(8, 18));
 				double yCoord = Double.parseDouble(newLine.substring(19, 29));

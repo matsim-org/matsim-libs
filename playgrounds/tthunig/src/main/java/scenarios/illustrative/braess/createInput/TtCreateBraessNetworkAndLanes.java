@@ -73,7 +73,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	
 	// capacity at the links that all agents have to use
 	private double capFirstLast; // [veh/h]
-	// capacity at middle link
+	// capacity at middle link (use the default capacity if it is 0.0)
 	private double capZ; // [veh/h]
 	// capacity at all other links
 	private double capMain; // [veh/h]
@@ -117,7 +117,7 @@ public final class TtCreateBraessNetworkAndLanes {
 		if (btuRun){
 			capFirstLast = numberOfPersons;
 			capMain = numberOfPersons;
-			capZ = capMain;
+			if (capZ == 0.0) capZ = capMain; // use the default capacity if it is 0.0
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 200;
 			linkTTMid = 1;
@@ -125,9 +125,9 @@ public final class TtCreateBraessNetworkAndLanes {
 			linkTTBig = 20;
 			minimalLinkTT = 1;
 		} else {
-			capFirstLast = numberOfPersons + 400;
+			capFirstLast = numberOfPersons + 400; // TODO check
 			capMain = (numberOfPersons / 2 ) * (1 + capTolerance);
-			capZ = capMain;
+			if (capZ == 0.0) capZ = capMain; // use the default capacity if it is 0.0
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 1000;
 			linkLengthBig = 10000;
@@ -217,6 +217,7 @@ public final class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(4)));
 			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+//			setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 			net.addLink(l);
 		}
 		
@@ -232,6 +233,7 @@ public final class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(5)));
 		setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+//		setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 		net.addLink(l);
 		
 		if (simulateInflowCap){
