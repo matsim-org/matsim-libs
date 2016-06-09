@@ -383,7 +383,7 @@ public class PTMapperUtils {
 	/**
 	 * Changes the free speed of links based on the necessary travel times
 	 * given by the schedule. Highly experimental and only recommended for
-	 * artificial and rail links.
+	 * artificial and possibly rail links.
 	 */
 	public static void setFreeSpeedBasedOnSchedule(Network network, TransitSchedule schedule, Set<String> networkModes) {
 		Map<Id<Link>, Double> necessaryMinSpeeds = new HashMap<>();
@@ -401,7 +401,7 @@ public class PTMapperUtils {
 				List<TransitRouteStop> stops = transitRoute.getStops();
 				double timeDiff = stops.get(stops.size()-1).getArrivalOffset();
 
-				double theoreticalMinSpeed = (totalLength / timeDiff) * 1.1;
+				double theoreticalMinSpeed = (totalLength / timeDiff) * 1.05;
 
 				for(Id<Link> linkId : linkIds) {
 					double setMinSpeed = MapUtils.getDouble(linkId, necessaryMinSpeeds, 0);
@@ -414,9 +414,11 @@ public class PTMapperUtils {
 
 		for(Link link : network.getLinks().values()) {
 			if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), networkModes)) {
-				double necessaryMinSpeed = necessaryMinSpeeds.get(link.getId());
-				if(necessaryMinSpeed > link.getFreespeed()) {
-					link.setFreespeed(Math.ceil(necessaryMinSpeed));
+				if(necessaryMinSpeeds.containsKey(link.getId())) {
+					double necessaryMinSpeed = necessaryMinSpeeds.get(link.getId());
+					if(necessaryMinSpeed > link.getFreespeed()) {
+						link.setFreespeed(Math.ceil(necessaryMinSpeed));
+					}
 				}
 			}
 		}

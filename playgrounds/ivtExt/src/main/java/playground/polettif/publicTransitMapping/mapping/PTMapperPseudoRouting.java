@@ -236,7 +236,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("Replacing parent StopFacilities in schedule with child StopFacilities...");
 		PTMapperUtils.createAndReplaceFacilities(schedule, pseudoSchedule);
 
-
 		/** [7]
 		 * The final routing should be done on the merged network, so a mode dependent
 		 * router for each schedule mode is initialized using the same merged network.
@@ -283,6 +282,14 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("=============================");
 		log.info("Clean schedule and network...");
 
+		// change the network transport modes
+		ScheduleTools.assignScheduleModesToLinks(schedule, network);
+		if(config.getCombinePtModes()) {
+			NetworkTools.replaceNonCarModesWithPT(network);
+		} else if(config.getAddPtMode()) {
+			ScheduleTools.addPTModeToNetwork(schedule, network);
+		}
+
 		// changing the freespeed of the artificial links (value is used in simulations)
 		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
 //		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
@@ -298,13 +305,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
-		// change the network transport modes
-		ScheduleTools.assignScheduleModesToLinks(schedule, network);
-		if(config.getCombinePtModes()) {
-			NetworkTools.replaceNonCarModesWithPT(network);
-		} else if(config.getAddPtMode()) {
-			ScheduleTools.addPTModeToNetwork(schedule, network);
-		}
 
 		/**
 		 * Validate the schedule

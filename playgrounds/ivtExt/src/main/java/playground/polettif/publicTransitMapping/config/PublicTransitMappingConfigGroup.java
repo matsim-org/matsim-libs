@@ -467,7 +467,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * The freespeed of artificially created links.
 	 */
-	private double freespeedArtificialLinks = 50;
+	private double freespeedArtificialLinks = 40;
 
 	@StringGetter(FREESPEED_ARTIFICIAL)
 	public double getFreespeedArtificial() {
