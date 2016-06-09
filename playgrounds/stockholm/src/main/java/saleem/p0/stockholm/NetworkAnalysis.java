@@ -45,9 +45,10 @@ public class NetworkAnalysis {
 		Map<String, List<Link>> inlinksforjunctions = sth.getInLinksForJunctions(timednodes, network);
 		Iterator<String> nodes = inlinksforjunctions.keySet().iterator();//List of incoming links for each pretimed node
 		while(nodes.hasNext()){
-			List<Link> inlinks = inlinksforjunctions.get(nodes.next());
+			String node = nodes.next();
+			List<Link> inlinks = inlinksforjunctions.get(node);
 			if(inlinks.size()<2){
-				;
+				System.out.println(node);
 			}
 			else{
 				Iterator<Link> linksiter = inlinks.iterator();
@@ -56,55 +57,55 @@ public class NetworkAnalysis {
 				}
 			}
 		}
-		final EventsManager eventsNoP0 = EventsUtils.createEventsManager(config);
-		EventsHandler handlerNoP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
-		eventsNoP0.addHandler(handlerNoP0);
-		//events.addHandler(handler);
-		final MatsimEventsReader readerNoP0 = new MatsimEventsReader(eventsNoP0);
-		readerNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpNoP01\\it.1000\\1000.events.xml.gz");
-		
+//		final EventsManager eventsNoP0 = EventsUtils.createEventsManager(config);
+//		EventsHandler handlerNoP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
+//		eventsNoP0.addHandler(handlerNoP0);
+//		//events.addHandler(handler);
+//		final MatsimEventsReader readerNoP0 = new MatsimEventsReader(eventsNoP0);
+//		readerNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\NP01\\it.1000\\1000.events.xml.gz");
+//		
 		final EventsManager eventsPlainNoP0 = EventsUtils.createEventsManager(config);
 		EventsHandler handlerPlainNoP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
 		eventsPlainNoP0.addHandler(handlerPlainNoP0);
 		//events.addHandler(handler);
 		final MatsimEventsReader readerPlainNoP0 = new MatsimEventsReader(eventsPlainNoP0);
-		readerPlainNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpPlainNoP01\\it.1000\\1000.events.xml.gz");
+		readerPlainNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\PNP02\\it.1000\\1000.events.xml.gz");
 		
 		final EventsManager eventsP0 = EventsUtils.createEventsManager(config);
 		EventsHandler handlerP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
 		eventsP0.addHandler(handlerP0);
 		final MatsimEventsReader readerP0 = new MatsimEventsReader(eventsP0);
-		readerP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpP01\\it.1000\\1000.events.xml.gz");
-		plotDelays("./ihop2/matsim-input/delays.png",handlerP0.getTimes(), handlerP0.getDelays(),handlerNoP0.getDelays(), handlerPlainNoP0.getDelays());
-		plotTravellersThroughNodes("./ihop2/matsim-input/travellersthrooughnodes.png",handlerP0.getTimes(), handlerP0.getNumAgentsThroughIntersections(),handlerNoP0.getNumAgentsThroughIntersections(), handlerPlainNoP0.getNumAgentsThroughIntersections());
-		plotTravellersOnIncomingLinks("./ihop2/matsim-input/travellersonincominglinks.png",handlerP0.getTimes(), handlerP0.getAgentsOnIncomingLinks(),handlerNoP0.getAgentsOnIncomingLinks(), handlerPlainNoP0.getAgentsOnIncomingLinks());
+		readerP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P02\\it.1000\\1000.events.xml.gz");
+		plotDelays("./ihop2/matsim-input/delays.png",handlerP0.getTimes(), handlerP0.getDelays(),handlerPlainNoP0.getDelays());
+		plotTravellersThroughNodes("./ihop2/matsim-input/travellersthrooughnodes.png",handlerP0.getTimes(), handlerP0.getNumAgentsThroughIntersections(), handlerPlainNoP0.getNumAgentsThroughIntersections());
+		plotTravellersOnIncomingLinks("./ihop2/matsim-input/travellersonincominglinks.png",handlerP0.getTimes(), handlerP0.getAgentsOnIncomingLinks(),handlerPlainNoP0.getAgentsOnIncomingLinks());
 		System.out.println();
 
 	}
-	public void plotDelays(String path, List<Double> times, List<Double> delaysp0, List<Double> delaysnop0, List<Double> delaysplainnop0){
+	public void plotDelays(String path, List<Double> times, List<Double> delaysp0, List<Double> delaysplainnop0){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		XYLineChart chart = new XYLineChart("Delay Statistics", "Time (Hour)", "Delay (Sec)");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		chart.addSeries("P0 Applied", cutil.toArray(times), cutil.toArray(delaysp0));
-		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(delaysnop0));
+//		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(delaysnop0));
 		chart.addSeries("Plain P0 Not Applied", cutil.toArray(times), cutil.toArray(delaysplainnop0));
 		chart.saveAsPng(path, 800, 600);
 	}
-	public void plotTravellersThroughNodes(String path, List<Double> times, List<Double> nump0, List<Double> numnop0, List<Double> numplainnop0){
+	public void plotTravellersThroughNodes(String path, List<Double> times, List<Double> nump0, List<Double> numplainnop0){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		XYLineChart chart = new XYLineChart("Number of Travellers Through Pretimed Nodes", "Time (Hour)", "Number");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		chart.addSeries("P0 Applied", cutil.toArray(times), cutil.toArray(nump0));
-		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
+//		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
 		chart.addSeries("Plain P0 Not Applied", cutil.toArray(times), cutil.toArray(numplainnop0));
 		chart.saveAsPng(path, 800, 600);
 	}
-	public void plotTravellersOnIncomingLinks(String path, List<Double> times, List<Double> nump0, List<Double> numnop0, List<Double> numplainnop0){
+	public void plotTravellersOnIncomingLinks(String path, List<Double> times, List<Double> nump0, List<Double> numplainnop0){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		XYLineChart chart = new XYLineChart("Number of Travellers On Incoming Links", "Time (Hour)", "Number");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		chart.addSeries("P0 Applied", cutil.toArray(times), cutil.toArray(nump0));
-		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
+//		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
 		chart.addSeries("Plain P0 Not Applied", cutil.toArray(times), cutil.toArray(numplainnop0));
 		chart.saveAsPng(path, 800, 600);
 	}
@@ -118,7 +119,7 @@ public class NetworkAnalysis {
 	    scenario.getPopulation().getPersons().clear();
 	    final MatsimPopulationReader popReader = new MatsimPopulationReader(
 				scenario);
-		popReader.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpP01\\it.1000\\1000.plans.xml.gz");
+		popReader.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\PNP04\\it.1000\\1000.plans.xml.gz");
 //	    popReader.readFile("./ihop2/matsim-input/5.plans.xml.gz");
 		Population population = scenario.getPopulation();
 		ArrayList<Person> persons = cutil.toArrayList((Iterator<Person>) population.getPersons().values().iterator());
