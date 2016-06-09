@@ -98,12 +98,13 @@ public class PTMapperUtils {
 						if(stopFacility.getLinkId() != null) {
 							modeLinkCandidates.add(new LinkCandidate(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
 						} else {
-							// limits number of links, for all links within search radius use networkTools.findClosestLinks()
+
+							// limits number of links, for all links within search radius
 							List<Link> closestLinks = findClosestLinksByScheduleMode(network, stopFacility.getCoord(), scheduleTransportMode, config);
 
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
-								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), config.getFreespeedArtificial(), loopLinkModes);
+								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), 20, loopLinkModes);
 								closestLinks.add(loopLink);
 							}
 
@@ -241,6 +242,8 @@ public class PTMapperUtils {
 					TransitRouteStop currentStop = stopsIterator.next();
 
 					// look for a closer link before the route's start
+					// removed because it messes up more than it solves...
+					/*
 					if(!hasStopLoop) {
 						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
 						if(closerLinkBefore != null) {
@@ -248,6 +251,7 @@ public class PTMapperUtils {
 						}
 						currentStop = stopsIterator.next();
 					}
+					*/
 
 					// optimize referenced links between start and end
 					for(int i = 1; i < linkList.size()-1; i++) {
@@ -265,6 +269,8 @@ public class PTMapperUtils {
 					}
 
 					// look for a closer link after the route's end
+					// removed because it messes up more than it solves...
+					/*
 					if(!hasStopLoop) {
 						currentStop = routeStops.get(routeStops.size() - 1);
 						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
@@ -272,6 +278,7 @@ public class PTMapperUtils {
 							linkIdList.add(closerLinkAfter);
 						}
 					}
+					*/
 
 					// set the new link list
 					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdList, network));

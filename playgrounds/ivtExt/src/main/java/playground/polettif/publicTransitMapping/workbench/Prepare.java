@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -36,18 +35,13 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.boescpa.lib.tools.coordUtils.CoordFilter;
-import playground.polettif.boescpa.lib.tools.spatialCutting.ScheduleCutter;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * workbench class to do some scenario preparation
@@ -68,28 +62,55 @@ public class Prepare {
 
 	public static void main(final String[] args) {
 
-		String inputNetwork = "../../output/2016-06-08/ch_busOnly_network.xml.gz";
-		String inputSchedule = "../../output/2016-06-08/ch_busOnly_schedule.xml.gz";
+		String inputNetwork = "../../output/2016-06-09/ch_ll_network.xml.gz";
+		String inputSchedule = "../../output/2016-06-09/ch_ll_schedule.xml.gz";
 		String inputVehicles = "../../data/vehicles/ch_hafas_vehicles.xml.gz";
-		String inputPopulation = "population_Orig.xml.gz";
+		String inputPopulation = "../original/population_1prct_zh.xml.gz";
 
 		Prepare prepare = new Prepare("config.xml", inputNetwork, inputSchedule, inputVehicles, inputPopulation);
-		prepare.networkAndSchedule();
 		prepare.removeInvalidLines();
+		prepare.networkAndSchedule();
 		prepare.population();
 		prepare.vehicles(0.005);
 		prepare.writeFiles();
 	}
 
 	private void removeInvalidLines() {
-		List<String> list = new ArrayList<>();
+		Set<String> set = new HashSet<>();
 
 		// copy/paste
-//		list.add("asd");
+		set.add("AB-_line21");
+		set.add("AB-_line21");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("SBG_line7312");
+		set.add("SBG_line7312");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("PAG_line212");
+		set.add("PAG_line212");
+		set.add("PAG_line212");
+		set.add("PAG_line212");
+		set.add("PAG_line581");
 
-		for(String e : list) {
+		for(String e : set) {
 			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
-			schedule.removeTransitLine(tl);
+			if(tl != null) schedule.removeTransitLine(tl);
 		}
 	}
 
@@ -166,17 +187,15 @@ public class Prepare {
 //		NetworkTools.replaceNonCarModesWithPT(network);
 //		ScheduleCleaner.replaceScheduleModes(schedule, TransportMode.pt);
 
-		for(Link link : network.getLinks().values()) {
-			if(link.getAllowedModes().contains("rail") || link.getAllowedModes().contains("light_rail")) {
-				link.setCapacity(9999);
-			}
-		}
-
 		Coord effretikon = new Coord(2693780.0, 1253409.0);
 		double radius = 20000;
 
-		new ScheduleCutter(schedule, vehicles, new CoordFilter.CoordFilterCircle(effretikon, radius)).cutSchedule();
-
+		ScheduleCleaner.cutSchedule(schedule, effretikon, radius);
+		Set<String> modesToKeep = new HashSet<>();
+		modesToKeep.add("car");
+		modesToKeep.add("rail");
+		modesToKeep.add("light_rail");
+		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, modesToKeep, true);
 		ScheduleCleaner.cleanVehicles(schedule, vehicles);
 	}
 

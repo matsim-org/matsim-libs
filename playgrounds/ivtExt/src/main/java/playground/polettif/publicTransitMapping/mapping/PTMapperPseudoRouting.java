@@ -292,13 +292,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 		// changing the freespeed of the artificial links (value is used in simulations)
 		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-//		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
-		// todo move to config
-		Set<String> freeSpeedModes = new HashSet<>();
-		freeSpeedModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-		freeSpeedModes.add("rail");
-		freeSpeedModes.add("light_rail");
-		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, freeSpeedModes);
+		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
 
 		// Remove unnecessary parts of schedule
 		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
@@ -513,7 +507,13 @@ public class PTMapperPseudoRouting extends PTMapper {
 						Set<LinkCandidate> linkCandidatesNext = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i + 1).getStopFacility());
 
 						final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
-						final double maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
+
+						double maxAllowedPathCost;
+						if(config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime)) {
+							maxAllowedPathCost = (routeStops.get(i+1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getBeelineDistanceMaxFactor();
+						} else {
+							maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
+						}
 
 						//Check if one of the two stops is outside the network
 						boolean bothStopsInsideArea = !(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility));

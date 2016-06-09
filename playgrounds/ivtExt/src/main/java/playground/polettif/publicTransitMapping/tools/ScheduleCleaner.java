@@ -19,12 +19,14 @@
 package playground.polettif.publicTransitMapping.tools;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -366,6 +368,66 @@ public class ScheduleCleaner {
 		TransitLine transitLine = schedule.getTransitLines().get(transitLineId);
 		TransitRoute transitRoute = transitLine.getRoutes().get(transitRouteId);
 		transitLine.removeRoute(transitRoute);
+	}
+
+	/**
+	 * cuts the schedule
+	 */
+	public static void cutSchedule(TransitSchedule schedule, Coord center, double radius) {
+		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
+		for (TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			if(CoordUtils.calcEuclideanDistance(center, stopFacility.getCoord()) <= radius) {
+				stopsInArea.add(stopFacility.getId());
+			}
+		}
+		cutSchedule(schedule, stopsInArea);
+	}
+
+	public static void cutSchedule(TransitSchedule schedule, Coord SWcorner, Coord NEcorner) {
+		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
+		for (TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			if(CoordTools.isInArea(stopFacility.getCoord(), SWcorner, NEcorner)) {
+				stopsInArea.add(stopFacility.getId());
+			}
+		}
+		cutSchedule(schedule, stopsInArea);
+	}
+
+	/**
+	 * cuts the schedule, retains routes that pass stops defined in stopsInArea
+	 */
+	public static void cutSchedule(TransitSchedule schedule, Set<Id<TransitStopFacility>> stopsInArea) {
+		log.info("Cutting schedule...");
+		log.info("   area contains " + stopsInArea.size() + " stops.");
+
+		// Identify all routes not crossing area and therefore to remove:
+		int routesRemoved = 0;
+		Set<TransitLine> linesToRemove = new HashSet<>();
+		for (TransitLine transitLine : schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : new HashSet<>(transitLine.getRoutes().values())) {
+				boolean toKeep = false;
+				for (TransitRouteStop stop : transitRoute.getStops()) {
+					if (stopsInArea.contains(stop.getStopFacility().getId())) {
+						toKeep = true;
+					}
+				}
+				if (!toKeep) {
+					transitLine.removeRoute(transitRoute);
+					routesRemoved++;
+				}
+			}
+			if (transitLine.getRoutes().isEmpty()) {
+				linesToRemove.add(transitLine);
+			}
+		}
+		log.info("   routes removed: " + routesRemoved);
+
+		for (TransitLine lineToRemove : linesToRemove) {
+			schedule.removeTransitLine(lineToRemove);
+		}
+		log.info("   lines removed: " + linesToRemove.size());
+
+		removeNotUsedStopFacilities(schedule);
 	}
 
 }

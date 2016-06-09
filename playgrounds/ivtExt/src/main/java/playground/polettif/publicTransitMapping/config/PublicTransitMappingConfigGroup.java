@@ -22,6 +22,7 @@ package playground.polettif.publicTransitMapping.config;
 import com.opencsv.CSVReader;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 
 import java.io.FileReader;
@@ -53,7 +54,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_NCLOSEST_LINKS = "maxNClosestLinks";
 	private static final String MAX_LINK_CANDIDATE_DISTANCE = "maxLinkCandidateDistance";
 	private static final String PREFIX_ARTIFICIAL = "prefixArtificial";
-	private static final String SUFFIX_CHILD_STOP_FACILITIES_TAG = "suffixChildStopFacilities";
 	private static final String BEELINE_DISTANCE_MAX_FACTOR = "beelineDistanceMaxFactor";
 	private static final String NETWORK_FILE = "networkFile";
 	private static final String SCHEDULE_FILE = "scheduleFile";
@@ -62,11 +62,13 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
+	private static final String SCHEDULE_FREESPEED_MODES = "scheduleFreespeedModes";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
 	private static final String ADD_PT_MODE = "addPtMode";
 	private static final String MULTI_THREAD = "threads";
 	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 	private static final String MANUAL_LINK_CANDIDATE_CSV_FILE = "manualLinkCandidateCsvFile";
+	private static final String SUFFIX_CHILD_STOP_FACILITIES_TAG = "suffixChildStopFacilities";
 
 	public PublicTransitMappingConfigGroup() {
 		super(GROUP_NAME);
@@ -118,17 +120,24 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 						"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
 						"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
 		map.put(NODE_SEARCH_RADIUS,
-				"(concerns Link Candidates)Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
-						"\t\tvalue for performance.");
+				"(concerns Link Candidates) Defines the radius [meter] from a stop facility within nodes are searched. Values up to 2000 do" +
+				"\t\tdon't have a significant impact on performance.");
 		map.put(MAX_LINK_CANDIDATE_DISTANCE,
 				"(concerns Link Candidates) The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
-		map.put(FREESPEED_ARTIFICIAL,
-				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes.");
-		map.put(BEELINE_DISTANCE_MAX_FACTOR ,
+//		map.put(FREESPEED_ARTIFICIAL,
+//				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes. Is ignored if" +
+//				"\t\t"+SCHEDULE_FREESPEED_MODES + "is set.");
+		map.put(SCHEDULE_FREESPEED_MODES,
+				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel" +
+				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all" +
+				"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional" +
+				"\t\tmodes (rail is recommended) can be added, separated by commas.");
+		map.put(BEELINE_DISTANCE_MAX_FACTOR,
 				"If all paths between two stops have a [length] > [beelineDistanceMaxFactor] * [beelineDistance], \n" +
-						"\t\tan artificial link is created.");
+				"\t\tan artificial link is created. If "+PSEUDO_ROUTE_WEIGHT_TYPE+" is " + PseudoRouteWeightType.travelTime +
+				"\t\tthe check is [travelTime] > [beelineDistanceMaxFactor] * [travelTime between stops from schedule]");
 		map.put(MULTI_THREAD,
 				"Defines the number of threads that should be used for pseudoRouting. Default: 2.");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
@@ -445,7 +454,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * an artificial link is created.
 	 */
 	private double beelineDistanceMaxFactor = 5.0;
-	private double beelineFreespeed = 50 / 3.6; // todo include in config
 
 	@StringGetter(BEELINE_DISTANCE_MAX_FACTOR)
 	public double getBeelineDistanceMaxFactor() {
@@ -460,23 +468,37 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
 	}
 
-	public double getBeelineFreespeed() {
-		return beelineFreespeed;
-	}
-
 	/**
 	 * The freespeed of artificially created links.
 	 */
-	private double freespeedArtificialLinks = 40;
+//	private double freespeedArtificialLinks = 40;
 
-	@StringGetter(FREESPEED_ARTIFICIAL)
-	public double getFreespeedArtificial() {
-		return freespeedArtificialLinks;
+//	@StringGetter(FREESPEED_ARTIFICIAL)
+//	public double getFreespeedArtificial() {
+//		return freespeedArtificialLinks;
+//	}
+
+//	@StringSetter(FREESPEED_ARTIFICIAL)
+//	public void setFreespeedArtificial(double freespeedArtificialLinks) {
+//		this.freespeedArtificialLinks = freespeedArtificialLinks;
+//	}
+
+	public Set<String> scheduleFreespeedModes = new HashSet<>(ARTIFICIAL_LINK_MODE_AS_SET);
+
+	@StringGetter(SCHEDULE_FREESPEED_MODES)
+	public String getScheduleFreespeedModesStr() {
+		return "";
+	}
+	public Set<String> getScheduleFreespeedModes() {
+		return scheduleFreespeedModes;
 	}
 
-	@StringSetter(FREESPEED_ARTIFICIAL)
-	public void setFreespeedArtificial(double freespeedArtificialLinks) {
-		this.freespeedArtificialLinks = freespeedArtificialLinks;
+	@StringSetter(SCHEDULE_FREESPEED_MODES)
+	public void setScheduleFreespeedModesStr(String modes) {
+		this.scheduleFreespeedModes.addAll(CollectionUtils.stringToSet(modes));
+	}
+	public void setScheduleFreespeedModes(Set<String> modes) {
+		this.scheduleFreespeedModes.addAll(modes);
 	}
 
 	/**
