@@ -32,17 +32,10 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -160,33 +153,19 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				final AtomicDouble sumConstrained = new AtomicDouble( 0 );
 				final AtomicDouble sumUnconstrained = new AtomicDouble( 0 );
 
-				// Unfortunately Trove collections do not support streams, so we cannot use the parallel feature directly
-				// not sure it anyway makes sense at this level, but Trove collection is also not thread safe,
-				// so parallel-iterating on the person level is not really an option
-				final ExecutorService executor = Executors.newFixedThreadPool( scenario.getConfig().global().getNumberOfThreads() );
 				probabilities.forEachEntry(
 						(facility, probability) -> {
-							executor.execute( () -> {
-								if ( constrainedExPost.contains( facility ) ) {
-									final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
-									final double supply = getSupply( f, activityType, configGroup );
-									sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
-								}
-								else {
-									sumUnconstrained.addAndGet( probability );
-								}
-							});
+							if ( constrainedExPost.contains( facility ) ) {
+								final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
+								final double supply = getSupply( f, activityType, configGroup );
+								sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
+							}
+							else {
+								sumUnconstrained.addAndGet( probability );
+							}
 							return true;
 						}
 				);
-				try {
-					// wait one century at most.
-					executor.awaitTermination( 365 * 100 , TimeUnit.DAYS );
-					executor.shutdown();
-				}
-				catch ( InterruptedException e ) {
-					throw new RuntimeException( e );
-				}
 
 				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}
