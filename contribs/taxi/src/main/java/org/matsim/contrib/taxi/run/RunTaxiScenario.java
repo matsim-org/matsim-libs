@@ -54,7 +54,9 @@ public class RunTaxiScenario
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+        double expAveragingAlpha = 0.05;//from the AV flow paper 
+        controler.addOverridingModule(
+                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         if (otfvis) {
