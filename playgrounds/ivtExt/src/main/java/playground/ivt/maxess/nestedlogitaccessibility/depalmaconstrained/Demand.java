@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.LogSumExpCalculator;
@@ -48,14 +49,16 @@ class Demand<N extends Enum<N>> {
 	private final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = new HashMap<>();
 
 	public Demand( final NestedLogitModel<N> model, final Scenario scenario ) {
-		log.info( "initialize demand" );
+		log.info( "initialize demand: "+scenario.getPopulation().getPersons().size()+" persons" );
 		log.info( "compute choice proba for each agent" );
 		// Trick to be able to set the number of desired threads. see http://stackoverflow.com/q/21163108
 		final ForkJoinPool fjp = new ForkJoinPool( scenario.getConfig().global().getNumberOfThreads() );
 
+		final Counter counter = new Counter( "look at agent # " );
 		fjp.submit( () -> {
 			scenario.getPopulation().getPersons().values().parallelStream()
 					.forEach( p -> {
+						counter.incCounter();
 						probas.put(
 								p.getId(),
 								computeChoiceProbas(
@@ -63,22 +66,28 @@ class Demand<N extends Enum<N>> {
 										model ) );
 					} );
 		}).join();
+		counter.printCounter();
 
 		fjp.shutdown();
 
 		log.info( "compute demand for each facility" );
+		counter.reset();
 		probas.values().stream()
 				.flatMap( m -> m.values().stream() )
 				.forEach( indivProbas -> {
+					counter.incCounter();
 					indivProbas.forEachEntry( (facility, proba) -> {
 						demands.adjustOrPutValue( facility , proba , proba );
 						return true;
 					} );
 				} );
+		counter.printCounter();
 
 		log.info( "compute disagregated demand for each facility" );
+		counter.reset();
 		probas.entrySet().stream()
 				.forEach( entry -> {
+					counter.incCounter();
 					if ( entry.getValue().size() != 1 ) throw new UnsupportedOperationException();
 					final TObjectDoubleMap<Id<ActivityFacility>> facilities = entry.getValue().values().stream().findAny().get();
 					facilities.forEachEntry( (facility , proba) -> {
@@ -92,6 +101,7 @@ class Demand<N extends Enum<N>> {
 						return true;
 					} );
 				} );
+		counter.printCounter();
 	}
 
 	public TObjectDoubleMap<Id<ActivityFacility>> getSummedDemandPerFacility() {
