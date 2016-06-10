@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -85,7 +86,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 		final ActivityFacility origin = prismSampler.getOrigin( p );
 		final List<ActivityFacility> prism = prismSampler.calcSampledPrism( origin );
 
-		final String mode = isCarAvailable( p ) && hasLicense( p ) ?
+		final String mode = isCarAvailable( p ) ?
 				"car" : "pt";
 
 		final Collection<Alternative<SingleNest>> alternatives = new ArrayList<>( prism.size() );
@@ -124,18 +125,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 	}
 
 	private boolean isCarAvailable( Person person ) {
-		final String avail = (String)
-				personAttributes.getAttribute(
-					person.getId().toString(),
-					"availability: car" );
-		return avail.equals( "always" );
+		return !PersonUtils.getCarAvail( person ).equals( "never" );
 	}
 
-	private boolean hasLicense( Person p ) {
-		final String avail = (String)
-				personAttributes.getAttribute(
-						p.getId().toString(),
-						"driving licence" );
-		return avail.equals( "yes" );
-	}
 }
