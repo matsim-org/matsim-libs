@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
@@ -149,7 +150,9 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		void updateIndividualOmegas(
 				final Demand<?> demand ) {
 			log.debug( "update individual omegas" );
+			final Counter counter = new Counter( "look at person # ");
 			for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
+				counter.incCounter();
 				final TObjectDoubleMap<Id<ActivityFacility>> probabilities =
 						demand.getProbabilitiesForIndividual( p );
 
@@ -172,6 +175,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}
+			counter.printCounter();
 		}
 	}
 
