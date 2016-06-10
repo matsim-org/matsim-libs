@@ -17,30 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.agentLogic;
+/**
+ * 
+ */
+package playground.jbischoff.parking.choice;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
-public class DynParkingAgent extends DynAgent {
 
-	public DynParkingAgent(Id<Person> id, Id<Link> startLinkId, EventsManager events, DynAgentLogic agentLogic) {
-		super(id, startLinkId, events, agentLogic);
-		// TODO Auto-generated constructor stub
+public class RandomParkingChoiceLogic implements ParkingChoiceLogic {
+
+	private final Network network;
+	private final Random random = MatsimRandom.getLocalInstance();
+
+	/**
+	 * {@link Network} the network
+	 */
+	public RandomParkingChoiceLogic(Network network) {
+
+		this.network = network;
 	}
-	
+
 	@Override
-	public boolean isWantingToArriveOnCurrentLink() {
-	return false;
-	
-	}
+	public Id<Link> getNextLink(Id<Link> currentLinkId) {
+		Link currentLink = network.getLinks().get(currentLinkId);
+		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
+		return randomKey;
 
+	}
 }

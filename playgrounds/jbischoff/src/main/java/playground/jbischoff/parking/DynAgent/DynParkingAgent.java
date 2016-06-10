@@ -17,22 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.manager;
+/**
+ * 
+ */
+package playground.jbischoff.parking.DynAgent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dynagent.DriverDynLeg;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentLogic;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+
+import playground.jbischoff.parking.events.StartParkingSearchEvent;
 
 /**
  * @author  jbischoff
  *
  */
-public interface ParkingManager {
+/**
+ * @author Joschka
+ *
+ */
+public class DynParkingAgent extends DynAgent {
 
-	boolean canVehicleParkHere(Id<Vehicle> vehicleId, Id<Link> linkId);
-	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);
-	boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
-	boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
-	
-	
+	private MobsimTimer timer;
+
+	/**
+	 * @param id
+	 * @param startLinkId
+	 * @param events
+	 * @param agentLogic
+	 */
+	public DynParkingAgent(Id<Person> id, Id<Link> startLinkId, EventsManager events, DynAgentLogic agentLogic,
+			MobsimTimer timer) {
+		super(id, startLinkId, events, agentLogic);
+		this.timer = timer;
+	}
+
+	@Override
+	public void notifyMoveOverNode(Id<Link> newLinkId) {
+		super.notifyMoveOverNode(newLinkId);
+		if (this.dynLeg instanceof ParkingDynLeg) {
+			if (this.getCurrentLinkId().equals(this.dynLeg.getDestinationLinkId())) {
+				this.events.processEvent(
+						new StartParkingSearchEvent(timer.getTimeOfDay(), getVehicle().getId(), getCurrentLinkId()));
+			}
+		}
+	}
+
 }

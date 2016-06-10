@@ -44,19 +44,19 @@ public class DynAgent
 
     private MobsimVehicle veh;
 
-    private EventsManager events;
+    protected EventsManager events;
 
     private MobsimAgent.State state;
 
     // =====
 
-    private DynLeg dynLeg;
 
     private Id<Link> currentLinkId;
 
     // =====
 
-    private DynActivity dynActivity;
+    protected DynLeg dynLeg;
+    protected DynActivity dynActivity;
 
 
     // =====

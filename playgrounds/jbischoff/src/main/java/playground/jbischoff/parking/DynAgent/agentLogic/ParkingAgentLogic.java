@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.agentLogic;
+package playground.jbischoff.parking.DynAgent.agentLogic;
 
 import java.util.Iterator;
 
@@ -36,7 +36,6 @@ import org.matsim.contrib.dynagent.StaticDriverDynLeg;
 import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.vehicles.Vehicle;
 
@@ -155,39 +154,54 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	}
 
 	private DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
-		//unpark activity, driving leg comes next
+		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
 		return new StaticDynActivity(ParkingUtils.UNPARKACTIVITYTYPE, now + ParkingUtils.UNPARKDURATION);
 	}
 
 	private DynAction nextStateAfterWalkFromPark(DynAction oldAction, double now) {
-		return null;
-		
-		
+		//walkleg complete, time to get the next activity from the plan Elements and start it, this is basically the same as arriving on any other mode
+		return nextStateAfterNonCarTrip(oldAction, now);
 	}
 
 	private DynAction nextStateAfterParkActivity(DynAction oldAction, double now) {
-		// TODO Auto-generated method stub
-		return null;
+		// add a walk leg after parking
+		Leg currentPlannedLeg = (Leg) currentPlanElement;
+		Id<Link> walkDestination = currentPlannedLeg.getRoute().getEndLinkId();
+		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.egress_walk);
+		this.lastParkActionState = LastParkActionState.WALKFROMPARK;
+		return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 	}
 
 	private DynAction nextStateAfterNonCarTrip(DynAction oldAction, double now) {
-		// TODO Auto-generated method stub
-		return null;
+		// switch back to activity
+		this.currentPlanElement = planElemIter.next();
+		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
+		this.lastParkActionState = LastParkActionState.ACTIVITY;
+		return new StaticDynActivity(nextPlannedActivity.getType(),nextPlannedActivity.getEndTime());
+		
 	}
 
 	private DynAction nextStateAfterCarTrip(DynAction oldAction, double now) {
-		// TODO Auto-generated method stub
-		return null;
+		// car trip is complete, we have found a parking space (not part of the logic), block it and start to park
+		if (this.parkingManager.parkVehicleHere(Id.create(this.agent.getId(), Vehicle.class), agent.getCurrentLinkId(), now)){
+		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
+		return new StaticDynActivity(ParkingUtils.PARKACTIVITYTYPE,now + ParkingUtils.PARKDURATION);}
+		else throw new RuntimeException ("No parking possible");
 	}
 
 	private DynAction nextStateAfterActivity(DynAction oldAction, double now) {
 		// we could either depart by car or not next
+		if (planElemIter.hasNext()){
 		this.currentPlanElement = planElemIter.next();
 		Leg currentLeg = (Leg) currentPlanElement;
 		if (currentLeg.getMode().equals(TransportMode.car)){
 			Id<Vehicle> vehicleId = Id.create(this.agent.getId(), Vehicle.class);
 			Id<Link> parkLink = this.parkingManager.getVehicleParkingLocation(vehicleId);
+			if (parkLink == null){
+				//this is the first activity of a day and our parking manager does not provide informations about initial stages. We suppose the car is parked where we are
+				parkLink = agent.getCurrentLinkId();
+			}
 			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), parkLink, now, TransportMode.access_walk);
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
 			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
@@ -208,6 +222,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			return new StaticPassengerDynLeg(currentLeg.getRoute(), currentLeg.getMode());
 		}
 		
+	}else throw new RuntimeException("no more leg to follow but activity is ending");
 	}
 
 }

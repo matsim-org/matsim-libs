@@ -17,9 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.manager;
+/**
+ * 
+ */
+package playground.jbischoff.parking.events;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
@@ -27,12 +33,49 @@ import org.matsim.vehicles.Vehicle;
  * @author  jbischoff
  *
  */
-public interface ParkingManager {
 
-	boolean canVehicleParkHere(Id<Vehicle> vehicleId, Id<Link> linkId);
-	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);
-	boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
-	boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
+public class StartParkingSearchEvent extends Event {
+	public static final String EVENT_TYPE = "started parkingSearch";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_LINK = "link";
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehicleId;
+	/**
+	 * 
+	 */
 	
+	/**
+	 * @param time
+	 */
+	public StartParkingSearchEvent(final double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
+		super(time);
+		this.linkId = linkId;
+		this.vehicleId = vehicleId;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.api.core.v01.events.Event#getEventType()
+	 */
+	@Override
+	public String getEventType() {
+		// TODO Auto-generated method stub
+		return EVENT_TYPE;
+	}
 	
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+	
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		return attr;
+	}
+
 }

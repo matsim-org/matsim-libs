@@ -17,22 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.manager;
+/**
+ * 
+ */
+package playground.jbischoff.parking.sim;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.vehicles.Vehicle;
+import java.util.Collection;
+import java.util.HashMap;
+
+import javax.inject.Inject;
+
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author  jbischoff
  *
  */
-public interface ParkingManager {
 
-	boolean canVehicleParkHere(Id<Vehicle> vehicleId, Id<Link> linkId);
-	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);
-	boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
-	boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
-	
-	
+public class ParkingAgentSource implements AgentSource {
+
+	private Population population;
+	private AgentFactory agentFactory;
+	private QSim qsim;
+	private HashMap modeVehicleTypes;
+	private Collection<String> mainModes;
+	@Inject
+	public ParkingAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
+		this.population = population;
+		this.agentFactory = agentFactory;
+		this.qsim = qsim;  
+		this.modeVehicleTypes = new HashMap<>();
+		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
+		for (String mode : mainModes) {
+			// initialize each mode with default vehicle type:
+			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+		}
+	}
+	@Override
+	public void insertAgentsIntoMobsim() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

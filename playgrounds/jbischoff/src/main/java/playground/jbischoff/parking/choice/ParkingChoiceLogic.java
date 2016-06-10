@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.network.Link;
  *
  */
 public interface ParkingChoiceLogic {
-
+	/**
+	 * currentLinkId link last visited
+	 */
 	Id<Link> getNextLink(Id<Link> currentLinkId);
 	
 }
