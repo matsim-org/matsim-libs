@@ -20,6 +20,7 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -32,26 +33,40 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * @author thibautd
  */
 class Demand<N extends Enum<N>> {
+	private static final Logger log = Logger.getLogger( Demand.class );
 	// store with "situation" strings, but for the moment only provide accessors for "unique" case
-	private final Map<Id<Person>, Map<String, TObjectDoubleMap<Id<ActivityFacility>>>> probas = new HashMap<>();
+	private final Map<Id<Person>, Map<String, TObjectDoubleMap<Id<ActivityFacility>>>> probas = new ConcurrentHashMap<>();
 
 	private final TObjectDoubleMap<Id<ActivityFacility>> demands = new TObjectDoubleHashMap<>();
 	private final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = new HashMap<>();
 
 	public Demand( final NestedLogitModel<N> model, final Scenario scenario ) {
-		for ( Person p : scenario.getPopulation().getPersons().values() ) {
-			probas.put(
-					p.getId(),
-					computeChoiceProbas(
-							p,
-							model ) );
-		}
+		log.info( "initialize demand" );
+		log.info( "compute choice proba for each agent" );
+		// Trick to be able to set the number of desired threads. see http://stackoverflow.com/q/21163108
+		final ForkJoinPool fjp = new ForkJoinPool( scenario.getConfig().global().getNumberOfThreads() );
 
+		fjp.submit( () -> {
+			scenario.getPopulation().getPersons().values().parallelStream()
+					.forEach( p -> {
+						probas.put(
+								p.getId(),
+								computeChoiceProbas(
+										p,
+										model ) );
+					} );
+		}).join();
+
+		fjp.shutdown();
+
+		log.info( "compute demand for each facility" );
 		probas.values().stream()
 				.flatMap( m -> m.values().stream() )
 				.forEach( indivProbas -> {
@@ -61,6 +76,7 @@ class Demand<N extends Enum<N>> {
 					} );
 				} );
 
+		log.info( "compute disagregated demand for each facility" );
 		probas.entrySet().stream()
 				.forEach( entry -> {
 					if ( entry.getValue().size() != 1 ) throw new UnsupportedOperationException();

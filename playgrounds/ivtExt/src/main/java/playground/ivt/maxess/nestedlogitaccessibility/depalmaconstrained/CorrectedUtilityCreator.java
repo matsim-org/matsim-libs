@@ -109,6 +109,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		private final Set<Id<ActivityFacility>> constrainedExPost = ConcurrentHashMap.newKeySet();
 
 		IterationInformation( Demand<?> demand ) {
+			log.info( "initialize iteration information");
 			for ( Id<Person> personId : scenario.getPopulation().getPersons().keySet() ) {
 				individualOmegas.put( personId , 1 );
 			}
@@ -116,6 +117,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		}
 
 		void updateConstrained( final Demand<?> demand ) {
+			log.debug( "update constrained set" );
 			final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = demand.getDemandPerFacility();
 
 			// Trick to be able to set the number of desired threads. see http://stackoverflow.com/q/21163108
@@ -146,6 +148,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 		void updateIndividualOmegas(
 				final Demand<?> demand ) {
+			log.debug( "update individual omegas" );
 			for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
 				final TObjectDoubleMap<Id<ActivityFacility>> probabilities =
 						demand.getProbabilitiesForIndividual( p );

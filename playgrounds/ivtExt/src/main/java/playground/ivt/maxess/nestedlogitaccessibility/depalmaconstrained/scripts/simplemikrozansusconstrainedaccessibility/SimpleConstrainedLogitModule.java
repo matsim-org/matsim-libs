@@ -22,6 +22,7 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.script
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.MainModeIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.ConstrainedAccessibilityConfigGroup;
@@ -36,6 +37,8 @@ import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilit
  * @author thibautd
  */
 public class SimpleConstrainedLogitModule extends AbstractModule {
+	private static final Logger log = Logger.getLogger( SimpleConstrainedLogitModule.class );
+
 	@Override
 	protected void configure() {
 		//bind( new TypeLiteral<Utility<SingleNest>>() {} );
@@ -51,18 +54,22 @@ public class SimpleConstrainedLogitModule extends AbstractModule {
 			final UtilityConfigGroup utilityConfigGroup,
 			final MainModeIdentifier modeIdentifier,
 			final ChoiceSetIdentifier<SingleNest> choiceSetIdentifier ) {
+		log.info( "start creating corrected utility");
+		log.info( "initialize corrector");
 		final CorrectedUtilityCreator<SingleNest> creator =
 				new CorrectedUtilityCreator<>(
 						configGroup,
 						scenario,
 						accessibilityConfigGroup.getActivityType() );
 
+		log.info( "initialize base utility");
 		final Utility<SingleNest> baseUtility =
 				new SimpleUtility(
 						utilityConfigGroup,
 						scenario.getPopulation().getPersonAttributes(),
 						modeIdentifier );
 
+		log.info( "start correcting");
 		return creator.createCorrectedUtility(
 				new NestedLogitModel<>(
 						baseUtility,
