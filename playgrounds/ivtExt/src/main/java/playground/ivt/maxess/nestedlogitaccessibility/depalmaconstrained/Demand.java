@@ -54,7 +54,7 @@ class Demand<N extends Enum<N>> {
 		// Trick to be able to set the number of desired threads. see http://stackoverflow.com/q/21163108
 		final ForkJoinPool fjp = new ForkJoinPool( scenario.getConfig().global().getNumberOfThreads() );
 
-		final Counter counter = new Counter( "look at agent # " );
+		final Counter counter = new Counter( "look at agent # " , " / "+scenario.getPopulation().getPersons().size() );
 		fjp.submit( () -> {
 			scenario.getPopulation().getPersons().values().parallelStream()
 					.forEach( p -> {

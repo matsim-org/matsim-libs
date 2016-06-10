@@ -150,7 +150,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		void updateIndividualOmegas(
 				final Demand<?> demand ) {
 			log.debug( "update individual omegas" );
-			final Counter counter = new Counter( "look at person # ");
+			final Counter counter = new Counter( "look at person # " , " / "+scenario.getPopulation().getPersons().size() );
 			for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
 				counter.incCounter();
 				final TObjectDoubleMap<Id<ActivityFacility>> probabilities =
