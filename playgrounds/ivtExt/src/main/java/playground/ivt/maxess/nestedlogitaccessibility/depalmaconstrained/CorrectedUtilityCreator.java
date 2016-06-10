@@ -35,6 +35,14 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -105,7 +113,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 	private class IterationInformation {
 		private final TObjectDoubleMap<Id<Person>> individualOmegas = new TObjectDoubleHashMap<>();
-		private final Set<Id<ActivityFacility>> constrainedExPost = new HashSet<>();
+		private final Set<Id<ActivityFacility>> constrainedExPost = ConcurrentHashMap.newKeySet();
 
 		IterationInformation( Demand<?> demand ) {
 			for ( Id<Person> personId : scenario.getPopulation().getPersons().keySet() ) {
@@ -117,24 +125,30 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		void updateConstrained( final Demand<?> demand ) {
 			final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = demand.getDemandPerFacility();
 
-			for ( Map.Entry<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> entry : demandPerFacility.entrySet() ) {
-				// constrained set can only grow --- do not bother if constrained in previous iteration
-				if ( constrainedExPost.contains( entry.getKey() ) ) continue;
+			// Trick to be able to set the number of desired threads. see http://stackoverflow.com/q/21163108
+			final ForkJoinPool fjp = new ForkJoinPool( scenario.getConfig().global().getNumberOfThreads() );
 
-				final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
-				final double supply = getSupply( f, activityType, configGroup );
+			fjp.submit( () -> {
+				demandPerFacility.entrySet().parallelStream().forEach( entry -> {
+					// constrained set can only grow --- do not bother if constrained in previous iteration
+					if ( constrainedExPost.contains( entry.getKey() ) ) return;
 
-				double correctedDemand = 0;
-				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
-						iterator.hasNext();
-						) {
-					iterator.advance();
-					final double omega = individualOmegas.get( iterator.key() );
-					final double proba = iterator.value();
-					correctedDemand += omega * proba;
-				}
-				if ( supply <= correctedDemand ) constrainedExPost.add( entry.getKey() );
-			}
+					final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
+					final double supply = getSupply( f, activityType, configGroup );
+
+					double correctedDemand = 0;
+					for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
+						  iterator.hasNext();
+							) {
+						iterator.advance();
+						final double omega = individualOmegas.get( iterator.key() );
+						final double proba = iterator.value();
+						correctedDemand += omega * proba;
+					}
+					if ( supply <= correctedDemand ) constrainedExPost.add( entry.getKey() );
+				} );
+			}).join();
+			fjp.shutdown();
 		}
 
 		void updateIndividualOmegas(
@@ -146,19 +160,33 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				final AtomicDouble sumConstrained = new AtomicDouble( 0 );
 				final AtomicDouble sumUnconstrained = new AtomicDouble( 0 );
 
+				// Unfortunately Trove collections do not support streams, so we cannot use the parallel feature directly
+				// not sure it anyway makes sense at this level, but Trove collection is also not thread safe,
+				// so parallel-iterating on the person level is not really an option
+				final ExecutorService executor = Executors.newFixedThreadPool( scenario.getConfig().global().getNumberOfThreads() );
 				probabilities.forEachEntry(
 						(facility, probability) -> {
-							if ( constrainedExPost.contains( facility ) ) {
-								final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
-								final double supply = getSupply( f, activityType, configGroup );
-								sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
-							}
-							else {
-								sumUnconstrained.addAndGet( probability );
-							}
+							executor.execute( () -> {
+								if ( constrainedExPost.contains( facility ) ) {
+									final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
+									final double supply = getSupply( f, activityType, configGroup );
+									sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
+								}
+								else {
+									sumUnconstrained.addAndGet( probability );
+								}
+							});
 							return true;
 						}
 				);
+				try {
+					// wait one century at most.
+					executor.awaitTermination( 365 * 100 , TimeUnit.DAYS );
+					executor.shutdown();
+				}
+				catch ( InterruptedException e ) {
+					throw new RuntimeException( e );
+				}
 
 				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}
