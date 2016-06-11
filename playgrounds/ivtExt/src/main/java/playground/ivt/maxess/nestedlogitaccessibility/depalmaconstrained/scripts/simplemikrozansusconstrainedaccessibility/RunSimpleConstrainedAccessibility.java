@@ -19,14 +19,18 @@
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
 import com.google.inject.TypeLiteral;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.ConstrainedAccessibilityConfigGroup;
@@ -43,6 +47,8 @@ import playground.ivt.utils.MoreIOUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * @author thibautd
@@ -61,6 +67,7 @@ public class RunSimpleConstrainedAccessibility {
 					new ConstrainedAccessibilityConfigGroup(),
 					new NestedAccessibilityConfigGroup() );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
+			cutScenario( scenario );
 
 			// Todo: put in a scenario provider
 			final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
@@ -93,5 +100,26 @@ public class RunSimpleConstrainedAccessibility {
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
 		}
+	}
+
+	private static void cutScenario(Scenario scenario) {
+		final Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator();
+
+		while ( iterator.hasNext() ) {
+			final Person person = iterator.next();
+			final Optional<Activity> home = person.getSelectedPlan().getPlanElements().stream()
+					.filter(pe -> pe instanceof Activity)
+					.map(pe -> (Activity) pe)
+					.filter(a -> a.getType().equals("home"))
+					.findAny();
+
+			final Coord center = new Coord( 683390 , 247154 );
+			if (!home.isPresent() ||
+					CoordUtils.calcEuclideanDistance( home.get().getCoord() , center ) > 80000) {
+				iterator.remove();
+			}
+
+		}
+
 	}
 }
