@@ -24,8 +24,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.*;
 
-import com.google.inject.name.Names;
-
 
 public class VrpTravelTimeModules
 {
@@ -50,39 +48,8 @@ public class VrpTravelTimeModules
             {
                 bind(Params.class).toInstance(new Params(initialTravelTime, expAveragingAlpha));
                 bind(VrpTravelTimeEstimator.class).asEagerSingleton();
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP_ESTIMATED))
-                        .to(VrpTravelTimeEstimator.class);
+                addTravelTimeBinding(DVRP_ESTIMATED).to(VrpTravelTimeEstimator.class);
                 addMobsimListenerBinding().to(VrpTravelTimeEstimator.class);
-            }
-        };
-    }
-
-
-    /**
-     * Travel times are fixed (useful for TimeVariantNetworks with variable free-flow speeds and no
-     * other traffic)
-     */
-    public static AbstractModule createFreespeedTravelTimeModule(boolean disableTTCalculator)
-    {
-        return createExternalTravelTimeModule(new FreeSpeedTravelTime(), disableTTCalculator);
-    }
-
-
-    /**
-     * Travel times are fixed
-     */
-    public static AbstractModule createExternalTravelTimeModule(final TravelTime travelTime,
-            final boolean disableTTCalculator)
-    {
-        return new AbstractModule() {
-            public void install()
-            {
-                if (disableTTCalculator) {//overwriting the default calculator
-                    bind(TravelTimeCalculator.class).to(InactiveTravelTimeCalculator.class);
-                }
-
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP_ESTIMATED))
-                        .toInstance(travelTime);
             }
         };
     }

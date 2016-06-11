@@ -50,7 +50,7 @@ public class DynQSimModule<T extends Mobsim>
     @Override
     public void install()
     {
-        bind(Mobsim.class).toProvider(providerClass);
+        bindMobsim().toProvider(providerClass);
     }
 
 

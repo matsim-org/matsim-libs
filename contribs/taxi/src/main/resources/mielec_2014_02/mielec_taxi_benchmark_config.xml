@@ -45,6 +45,11 @@
 	<module name="controler">
 		<param name="outputDirectory" value="test/output/mielec_2014_02_benchmark" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="writeEventsInterval" value="0" />
+		<param name="writePlansInterval" value="0" />
+		<param name="writeSnapshotsInterval" value="0" />
+		<param name="createGraphs" value="false" />
+		<param name="dumpDataAtEnd" value="false" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
