@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.router.DynRoutingModule;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
