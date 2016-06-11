@@ -55,12 +55,6 @@ public class SimpleConstrainedLogitModule extends AbstractModule {
 			final MainModeIdentifier modeIdentifier,
 			final ChoiceSetIdentifier<SingleNest> choiceSetIdentifier ) {
 		log.info( "start creating corrected utility");
-		log.info( "initialize corrector");
-		final CorrectedUtilityCreator<SingleNest> creator =
-				new CorrectedUtilityCreator<>(
-						configGroup,
-						scenario,
-						accessibilityConfigGroup.getActivityType() );
 
 		log.info( "initialize base utility");
 		final Utility<SingleNest> baseUtility =
@@ -68,6 +62,18 @@ public class SimpleConstrainedLogitModule extends AbstractModule {
 						utilityConfigGroup,
 						scenario.getPopulation().getPersonAttributes(),
 						modeIdentifier );
+
+		if ( !configGroup.isUseCapacityConstraints() ) {
+			log.info( "compute accessibility WITHOUT capcity correction" );
+			return baseUtility;
+		}
+
+		log.info( "initialize corrector");
+		final CorrectedUtilityCreator<SingleNest> creator =
+				new CorrectedUtilityCreator<>(
+						configGroup,
+						scenario,
+						accessibilityConfigGroup.getActivityType() );
 
 		log.info( "start correcting");
 		return creator.createCorrectedUtility(

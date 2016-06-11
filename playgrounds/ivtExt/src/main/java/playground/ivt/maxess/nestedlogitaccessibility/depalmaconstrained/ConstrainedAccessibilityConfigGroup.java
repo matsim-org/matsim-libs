@@ -27,6 +27,7 @@ public class ConstrainedAccessibilityConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "constrainedAccessibility";
 
 	private double capacityScalingFactor = 1;
+	private boolean useCapacityConstraints = true;
 
 	public ConstrainedAccessibilityConfigGroup( ) {
 		super( GROUP_NAME );
@@ -44,5 +45,15 @@ public class ConstrainedAccessibilityConfigGroup extends ReflectiveConfigGroup {
 		}
 
 		this.capacityScalingFactor = capacityScalingFactor;
+	}
+
+	@StringGetter("useCapacityConstraints")
+	public boolean isUseCapacityConstraints() {
+		return useCapacityConstraints;
+	}
+
+	@StringSetter("useCapacityConstraints")
+	public void setUseCapacityConstraints(boolean useCapacityConstraints) {
+		this.useCapacityConstraints = useCapacityConstraints;
 	}
 }
