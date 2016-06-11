@@ -50,6 +50,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 	private final ObjectAttributes personAttributes;
 	private final PrismSampler prismSampler;
 	private final ThreadLocal<TripRouter> router;
+	private final UtilityConfigGroup utilityConfigGroup;
 
 	@Inject
 	public SimpleChoiceSetIdentifier(
@@ -64,6 +65,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 						configGroup.getChoiceSetSize(),
 						scenario.getActivityFacilities(),
 						configGroup.getDistanceBudget() );
+		this.utilityConfigGroup = (UtilityConfigGroup) scenario.getConfig().getModule( UtilityConfigGroup.GROUP_NAME );
 	}
 
 	@Override
@@ -87,7 +89,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 		final ActivityFacility origin = prismSampler.getOrigin( p );
 		final List<ActivityFacility> prism = prismSampler.calcSampledPrism( origin );
 
-		final String mode = isCarAvailable( p ) ?
+		final String mode = utilityConfigGroup.getAlwaysUseCar() || isCarAvailable( p ) ?
 				"car" : "pt";
 
 		final Collection<Alternative<SingleNest>> alternatives = new ArrayList<>( prism.size() );

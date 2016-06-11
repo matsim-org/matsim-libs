@@ -31,6 +31,7 @@ public class UtilityConfigGroup extends ReflectiveConfigGroup {
 	private double betaTtCar = -1;
 	private double betaTtPt = -1;
 	private FunctionalForm functionalForm = FunctionalForm.log;
+	private boolean alwaysUseCar = false;
 
 	public UtilityConfigGroup() {
 		super( GROUP_NAME );
@@ -64,5 +65,15 @@ public class UtilityConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("functionalForm")
 	public void setFunctionalForm( final FunctionalForm functionalForm ) {
 		this.functionalForm = functionalForm;
+	}
+
+	@StringGetter("alwaysUseCar")
+	public boolean getAlwaysUseCar() {
+		return alwaysUseCar;
+	}
+
+	@StringSetter("alwaysUseCar")
+	public void setAlwaysUseCar(boolean alwaysUseCar) {
+		this.alwaysUseCar = alwaysUseCar;
 	}
 }
