@@ -182,7 +182,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 	private static double getSupply( final ActivityFacility f,
 			final String activityType,
 			final ConstrainedAccessibilityConfigGroup configGroup ) {
-		return Math.ceil( f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor() );
+		return f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
 	}
 
 	public static class CorrectedUtility<N extends Enum<N>> implements Utility<N> {
