@@ -103,8 +103,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
 						"\t\tshould be replaced with pt (true) or not. Default: false");
 		map.put(ADD_PT_MODE,
-				"Adds the mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
-						"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: false");
+				"The mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
+						"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: true");
 		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
 				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: true");
 		map.put(LINK_DISTANCE_TOLERANCE,
@@ -190,7 +190,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(MODE_ROUTING_ASSIGNMENT)
-	private String getModeRoutingAssignmentString() {
+	private String getModeRoutingAssignmentStr() {
 		String ret = "";
 		for(Map.Entry<String, Set<String>> entry : modeRoutingAssignment.entrySet()) {
 			ret += "|" + entry.getKey() + ":";
@@ -204,7 +204,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(MODE_ROUTING_ASSIGNMENT)
-	private void setModeRoutingAssignmentString(String modeRoutingAssignmentString) {
+	public void setModeRoutingAssignmentStr(String modeRoutingAssignmentString) {
 		if(modeRoutingAssignmentString == null) {
 			this.modeRoutingAssignment = null;
 			return;
@@ -282,7 +282,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 
-	private boolean addPtMode = false;
+	/**
+	 *
+	 */
+	private boolean addPtMode = true;
 
 	@StringGetter(ADD_PT_MODE)
 	public boolean getAddPtMode() {

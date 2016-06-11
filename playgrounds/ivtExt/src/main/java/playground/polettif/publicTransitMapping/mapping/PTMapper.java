@@ -75,19 +75,36 @@ public abstract class PTMapper {
 		new PTMapperPseudoRouting(configFile).run();
 	}
 
+	public static void run(PublicTransitMappingConfigGroup ptmConfig, TransitSchedule schedule, Network network) {
+		new PTMapperPseudoRouting(ptmConfig, schedule, network).run();
+	}
+
 	/**
-	 * The provided schedule is expected to contain the stops sequence and
-	 * the stop facilities each transit route. The routes will be newly routed.
-	 * Any former routes will be overwritten. Changes are done on the schedule
-	 * provided here.
+	 * If the config has schedule and network files defined, they are loaded.
 	 * <p/>
-	 * Use this constructor if you just want to use the config for parameters.
 	 *
-	 * @param schedule which will be newly routed.
+	 * @param config the config
+	 */
+	public PTMapper(PublicTransitMappingConfigGroup config) {
+		this.config = config;
+		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
+		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
+	}
+
+	/**
+	 * Use this constructor if you just want to use the config for mapping parameters.
+	 * The provided schedule is expected to contain the stops sequence and
+	 * the stop facilities each transit route. The routes will be newly routed,
+	 * any former routes will be overwritten. Changes are done on the schedule
+	 * network provided here.
+	 * <p/>
+	 *
 	 * @param config a PublicTransitMapping config that defines all parameters used
 	 *               for mapping.
+	 * @param schedule which will be newly routed.
+	 * @param network schedule is mapped to this network, is modified
 	 */
-	protected PTMapper(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
+	public PTMapper(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
 		this.config = config;
 		this.schedule = schedule;
 		this.network = network;
