@@ -72,7 +72,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
 	private Map<TransitStopFacility, Boolean> stopIsInArea;
 
-	protected PTMapperPseudoRouting(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
+	public PTMapperPseudoRouting(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
 		super(config, schedule, network);
 	}
 
@@ -245,10 +245,10 @@ public class PTMapperPseudoRouting extends PTMapper {
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
 
 		// create router for artificial network
-		FastAStarRouter artificialOnlyRouter = new FastAStarRouter(NetworkTools.filterNetworkByLinkMode(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET));
+		Router artificialOnlyRouter = new FastAStarRouter(NetworkTools.filterNetworkByLinkMode(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET));
 
 		// create router for other mode networks
-		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
+		for(Map.Entry<String, Set<String>> modeAssignment : modeRoutingAssignment.entrySet()) {
 			if(modeAssignment.getValue().size() == 1 && modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
 				finalRouters.put(modeAssignment.getKey(), artificialOnlyRouter);
 			} else {

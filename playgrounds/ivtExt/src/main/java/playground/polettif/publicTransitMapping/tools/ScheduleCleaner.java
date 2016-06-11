@@ -430,4 +430,16 @@ public class ScheduleCleaner {
 		removeNotUsedStopFacilities(schedule);
 	}
 
+	/**
+	 * Removes all transit routes using the given mode from the schedule
+	 */
+	public static void removeTransitRouteByMode(TransitSchedule schedule, Set<String> modesToRemove) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : new HashSet<>(transitLine.getRoutes().values())) {
+				if(modesToRemove.contains(transitRoute.getTransportMode())) {
+					transitLine.removeRoute(transitRoute);
+				}
+			}
+		}
+	}
 }

@@ -45,12 +45,14 @@ public class ScheduleShapeFileWriter {
 
 	private final TransitSchedule schedule;
 	private final Network network;
+	private final String crs;
 
 	private Map<TransitStopFacility, Set<Id<TransitRoute>>> routesOnStopFacility = new HashMap<>();
 
-	public ScheduleShapeFileWriter(final TransitSchedule schedule, final Network network) {
+	public ScheduleShapeFileWriter(final TransitSchedule schedule, final Network network, String crs) {
 		this.schedule = schedule;
 		this.network = network;
+		this.crs = crs;
 	}
 
 	/**
@@ -59,11 +61,12 @@ public class ScheduleShapeFileWriter {
 	 *
 	 * @param args	[0] input schedule
 	 *              [1] input network
-	 *              [2] output folder
+	 *              [2] coordinate reference system (EPSG=*)
+	 *              [3] output folder
 	 */
 	public static void main(final String[] args) {
 		if(args.length == 3) {
-			run(args[0], args[1], args[2]);
+			run(args[0], args[1], args[2], args[3]);
 		}
 	}
 
@@ -75,30 +78,30 @@ public class ScheduleShapeFileWriter {
 	 * @param networkFile   input network
 	 * @param outputFolder  output folder
 	 */
-	public static void run(String scheduleFile, String networkFile, String outputFolder) {
+	public static void run(String scheduleFile, String networkFile, String crs, String outputFolder) {
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(scheduleFile);
 		Network network = NetworkTools.readNetwork(networkFile);
 
-		ScheduleShapeFileWriter s2s = new ScheduleShapeFileWriter(schedule, network);
+		ScheduleShapeFileWriter s2s = new ScheduleShapeFileWriter(schedule, network, crs);
 
-		s2s.routes2Polylines(outputFolder+"transitLines.shp");
+		s2s.routes2Polylines(outputFolder+"transitRoutes.shp");
 		s2s.stopFacilities2Shapes(outputFolder+"stopFacilities.shp", "refLinks.shp");
 	}
 
-	public static void run(TransitSchedule schedule, Network network, String outputFolder) {
-		ScheduleShapeFileWriter s2s = new ScheduleShapeFileWriter(schedule, network);
+	public static void run(TransitSchedule schedule, Network network, String crs, String outputFolder) {
+		ScheduleShapeFileWriter s2s = new ScheduleShapeFileWriter(schedule, network, crs);
 
-		s2s.routes2Polylines("transitLines.shp");
-		s2s.stopFacilities2Shapes("stopFacilities.shp", "refLinks.shp");
+		s2s.routes2Polylines(outputFolder+"transitRoutes.shp");
+		s2s.stopFacilities2Shapes(outputFolder+"stopFacilities.shp", outputFolder+"refLinks.shp");
 	}
 
-	public void stopFacilities2Shapes(String pointOutputFile, String lineOutputFile) {
+		public void stopFacilities2Shapes(String pointOutputFile, String lineOutputFile) {
 		Collection<SimpleFeature> lineFeatures = new ArrayList<>();
 		Collection<SimpleFeature> pointFeatures = new ArrayList<>();
 
 		PointFeatureFactory pointFeatureFactory = new PointFeatureFactory.Builder()
 				.setName("StopFacilities")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS(crs))
 				.addAttribute("id", String.class)
 				.addAttribute("name", String.class)
 				.addAttribute("linkId", String.class)
@@ -109,7 +112,7 @@ public class ScheduleShapeFileWriter {
 
 		PolylineFeatureFactory polylineFeatureFactory = new PolylineFeatureFactory.Builder()
 				.setName("StopFacilities")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS(crs))
 				.addAttribute("id", String.class)
 				.addAttribute("name", String.class)
 				.addAttribute("linkId", String.class)
@@ -158,10 +161,11 @@ public class ScheduleShapeFileWriter {
 
 		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
 				.setName("TransitRoutes")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS(crs))
 				.addAttribute("line", String.class)
 				.addAttribute("route", String.class)
 				.addAttribute("mode", String.class)
+				.addAttribute("simLength", Double.class)
 				.create();
 
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
@@ -180,6 +184,7 @@ public class ScheduleShapeFileWriter {
 					f.setAttribute("line", transitLine.getId().toString());
 					f.setAttribute("route", transitRoute.getId().toString());
 					f.setAttribute("mode", transitRoute.getTransportMode());
+					f.setAttribute("simLength", getRouteLength(transitRoute));
 					features.add(f);
 				}
 			}
@@ -188,24 +193,35 @@ public class ScheduleShapeFileWriter {
 		ShapeFileWriter.writeGeometries(features, outFile);
 	}
 
+	private double getRouteLength(TransitRoute transitRoute) {
+		double length = 0;
+		for(Link l : NetworkTools.getLinksFromIds(network, ScheduleTools.getTransitRouteLinkIds(transitRoute))) {
+			length += l.getLength();
+		}
+		return length;
+	}
+
 	private Coordinate[] getCoordinatesFromRoute(TransitRoute transitRoute) {
 		List<Coordinate> coordList = new ArrayList<>();
-		List<Id<Link>> linkList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
+		List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 
-		if(linkList.size() > 0) {
-			for(Id<Link> linkId : linkList) {
+		if(transitRoute.getId().toString().equals("80.T0.31-650-P-j16-1.6.H")) {
+			log.debug("break");
+		}
+
+		if(linkIds.size() > 0) {
+			for(Id<Link> linkId : linkIds) {
 				if(network.getLinks().containsKey(linkId)) {
 					coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
 				} else {
-					log.warn("Link " + linkId + " not found in network");
-					return null;
+					throw new IllegalArgumentException("Link " + linkId + " not found in network");
 				}
 			}
-			coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkList.get(linkList.size() - 1)).getToNode().getCoord()));
-			Coordinate[] returnArray = new Coordinate[coordList.size()];
-
-			return coordList.toArray(returnArray);
+			coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkIds.get(linkIds.size() - 1)).getToNode().getCoord()));
+			Coordinate[] coordinates = new Coordinate[coordList.size()];
+			return coordList.toArray(coordinates);
 		}
 		return null;
 	}
+
 }

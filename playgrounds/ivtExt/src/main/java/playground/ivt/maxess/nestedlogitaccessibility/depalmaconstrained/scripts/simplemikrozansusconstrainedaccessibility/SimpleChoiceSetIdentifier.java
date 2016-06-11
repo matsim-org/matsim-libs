@@ -19,6 +19,7 @@
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,14 +49,15 @@ import java.util.Map;
 public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest> {
 	private final ObjectAttributes personAttributes;
 	private final PrismSampler prismSampler;
-	private final TripRouter router;
+	private final ThreadLocal<TripRouter> router;
+	private final UtilityConfigGroup utilityConfigGroup;
 
 	@Inject
 	public SimpleChoiceSetIdentifier(
-			final TripRouter tripRouter,
+			final Provider<TripRouter> tripRouter,
 			final Scenario scenario,
 			final NestedAccessibilityConfigGroup configGroup) {
-		this.router = tripRouter;
+		this.router = ThreadLocal.withInitial( tripRouter::get );
 		this.personAttributes = scenario.getPopulation().getPersonAttributes();
 		this.prismSampler =
 				new PrismSampler(
@@ -63,6 +65,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 						configGroup.getChoiceSetSize(),
 						scenario.getActivityFacilities(),
 						configGroup.getDistanceBudget() );
+		this.utilityConfigGroup = (UtilityConfigGroup) scenario.getConfig().getModule( UtilityConfigGroup.GROUP_NAME );
 	}
 
 	@Override
@@ -86,7 +89,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 		final ActivityFacility origin = prismSampler.getOrigin( p );
 		final List<ActivityFacility> prism = prismSampler.calcSampledPrism( origin );
 
-		final String mode = isCarAvailable( p ) ?
+		final String mode = utilityConfigGroup.getAlwaysUseCar() || isCarAvailable( p ) ?
 				"car" : "pt";
 
 		final Collection<Alternative<SingleNest>> alternatives = new ArrayList<>( prism.size() );
@@ -98,7 +101,7 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 							Id.create( i++ , Alternative.class ),
 							new Trip(
 									origin,
-									router.calcRoute(
+									router.get().calcRoute(
 											mode,
 											origin,
 											destination,
@@ -116,8 +119,8 @@ public class SimpleChoiceSetIdentifier implements ChoiceSetIdentifier<SingleNest
 			}
 
 
-			assert mode.equals( router.getMainModeIdentifier().identifyMainMode( alternative.getAlternative().getTrip() ) ) :
-					mode +" != "+router.getMainModeIdentifier().identifyMainMode( alternative.getAlternative().getTrip() )
+			assert mode.equals( router.get().getMainModeIdentifier().identifyMainMode( alternative.getAlternative().getTrip() ) ) :
+					mode +" != "+router.get().getMainModeIdentifier().identifyMainMode( alternative.getAlternative().getTrip() )
 					+" for "+alternative.getAlternative().getTrip();
 			alternatives.add( alternative );
 		}

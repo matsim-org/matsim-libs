@@ -52,6 +52,9 @@ public class FastAStarRouter implements Router {
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
 	}
 
+	/**
+	 * Synchronized since {@link org.matsim.core.router.Dijkstra} is not thread safe.
+	 */
 	@Override
 	public synchronized LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
 		if(fromNode != null && toNode != null) {

@@ -18,6 +18,10 @@
 
 package playground.polettif.publicTransitMapping.tools;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -34,7 +38,24 @@ import java.util.*;
  *
  * @author polettif
  */
-public class GtfsShapeFileTools {
+public class ShapeFileTools {
+
+	/**
+	 * Converts a list of link ids to an array of coordinates for shp features
+	 */
+	public static Coordinate[] linkIdList2Coordinates(Network network, List<Id<Link>> linkIdList) {
+		List<Coordinate> coordList = new ArrayList<>();
+		for(Id<Link> linkId : linkIdList) {
+			if(network.getLinks().containsKey(linkId)) {
+				coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
+			} else {
+				throw new IllegalArgumentException("Link " + linkId + " not found in network");
+			}
+		}
+		coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkIdList.get(linkIdList.size() - 1)).getToNode().getCoord()));
+		Coordinate[] coordinates = new Coordinate[coordList.size()];
+		return coordList.toArray(coordinates);
+	}
 
 	public static void writeGtfsTripsToFile(Map<String, GTFSRoute> gtfsRoutes, Set<String> serviceIds, String outputCoordinateSystem, String outFile) {
 		Collection<SimpleFeature> features = new ArrayList<>();
@@ -68,7 +89,7 @@ public class GtfsShapeFileTools {
 					Shape shape = trip.getShape();
 					if(shape != null) {
 						SimpleFeature f = ff.createPolyline(shape.getCoordinates());
-						f.setAttribute("id", shape.getId());
+						f.setAttribute("shape_id", shape.getId());
 						f.setAttribute("trip_id", trip.getId());
 						f.setAttribute("trip_name", trip.getName());
 						f.setAttribute("route_id", gtfsRoute.getRouteId());

@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-import playground.polettif.publicTransitMapping.tools.GtfsShapeFileTools;
+import playground.polettif.publicTransitMapping.tools.ShapeFileTools;
 
 /**
  * Contract class to read GTFS files and convert them to an unmapped MATSim Transit Schedule
@@ -39,9 +39,17 @@ public class Gtfs2TransitSchedule {
 
 	protected static Logger log = Logger.getLogger(Gtfs2TransitSchedule.class);
 
+	public static final String ALL_SERVICE_IDS = "all";
+	public static final String MOST_USED_SINGLE_ID = "mostUsedSingleId";
+	public static final String DAY_WITH_MOST_TRIPS = "dayWithMostTrips";
+	public static final String DAY_WITH_MOST_SERVICES = "dayWithMostServices";
+
+	public enum ServiceParam{dayWithMostTrips, dayWithMostServices, mostUsedSingleId, all}
+
 	protected TransitSchedule schedule;
 	protected Vehicles vehicles;
 	protected CoordinateTransformation transformation;
+
 
 	/**
 	 * Reads gtfs files in and converts them to an unmapped
@@ -110,11 +118,10 @@ public class Gtfs2TransitSchedule {
 		CoordinateTransformation transformation = outputCoordinateSystem != null ? TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem) : new IdentityTransformation();
 
 		GtfsConverter gtfsConverter = new GtfsConverter(schedule, vehicles, transformation);
-		String param = serviceIdsParam == null ? GtfsConverter.DAY_WITH_MOST_SERVICES : serviceIdsParam;
+		String param = serviceIdsParam == null ? DAY_WITH_MOST_SERVICES : serviceIdsParam;
 		gtfsConverter.run(gtfsFolder, param);
 
 		boolean authExists = true;
-
 		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), scheduleFile);
 		if(vehicleFile != null) {
 			ScheduleTools.writeVehicles(gtfsConverter.getVehicles(), vehicleFile);
@@ -127,7 +134,7 @@ public class Gtfs2TransitSchedule {
 				log.warn("Code " + outputCoordinateSystem + " not recognized by geotools. Shapefile not written.");
 			}
 			if(authExists)
-				GtfsShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeFile);
+				ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeFile);
 		}
 	}
 
