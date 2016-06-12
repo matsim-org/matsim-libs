@@ -363,11 +363,11 @@ public class ScheduleCleaner {
 
 	/**
 	 * Removes the given route from the schedule
+	 * @return true if the route could be removed
 	 */
-	public static void removeRoute(TransitSchedule schedule, Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
+	public static boolean removeRoute(TransitSchedule schedule, Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 		TransitLine transitLine = schedule.getTransitLines().get(transitLineId);
-		TransitRoute transitRoute = transitLine.getRoutes().get(transitRouteId);
-		transitLine.removeRoute(transitRoute);
+		return transitLine != null && transitLine.removeRoute(transitLine.getRoutes().get(transitRouteId));
 	}
 
 	/**

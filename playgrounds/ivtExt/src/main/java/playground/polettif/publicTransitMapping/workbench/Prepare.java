@@ -97,7 +97,7 @@ public class Prepare {
 
 		// Zurich 10%
 		// delayed pt
-		 scenName = "zurich_ten";
+		scenName = "zurich_ten";
 		inputPopulation = "population/zh_10prct.xml.gz";
 
 		final Config configZH10 = createConfig(scenName);
@@ -192,6 +192,7 @@ public class Prepare {
 		}
 
 		ScheduleCleaner.removeRoute(schedule, Id.create("VBZ_line31", TransitLine.class), Id.create("05060_155", TransitRoute.class));
+		ScheduleCleaner.removeRoute(schedule, Id.create("AAG_line401", TransitLine.class), Id.create("00001_001", TransitRoute.class));
 	}
 
 	private void writeFiles(String folder) {
