@@ -21,6 +21,7 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.script
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -46,7 +47,7 @@ public class SimpleConstrainedLogitModule extends AbstractModule {
 				.to( SimpleChoiceSetIdentifier.class );
 	}
 
-	@Provides
+	@Provides @Singleton
 	private Utility<SingleNest> createUtility(
 			final Scenario scenario,
 			final ConstrainedAccessibilityConfigGroup configGroup,
