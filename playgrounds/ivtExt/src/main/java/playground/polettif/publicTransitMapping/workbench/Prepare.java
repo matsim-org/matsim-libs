@@ -29,6 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReader;
@@ -273,11 +274,9 @@ public class Prepare {
 		PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		workParams.setActivityType(WORK);
 		workParams.setTypicalDuration(Time.parseTime("08:00:00"));
-
 		PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		homeParams.setActivityType(HOME);
 		homeParams.setTypicalDuration(Time.parseTime("8:00:00"));
-
 		config.planCalcScore().addActivityParams(homeParams);
 		config.planCalcScore().addActivityParams(workParams);
 
@@ -289,6 +288,20 @@ public class Prepare {
 		config.transit().setUseTransit(true);
 		config.transit().setTransitScheduleFile("transitSchedule.xml.gz");
 		config.transit().setVehiclesFile("transitVehicles.xml.gz");
+
+		// strategy
+		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+		changeExpBeta.setStrategyName("ChangeExpBeta");
+		changeExpBeta.setWeight(0.5);
+		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings();
+		reRoute.setStrategyName("ReRoute");
+		reRoute.setWeight(0.2);
+		StrategyConfigGroup.StrategySettings changeLegMode = new StrategyConfigGroup.StrategySettings();
+		changeLegMode.setStrategyName("ChangeLegMode");
+		changeLegMode.setWeight(0.2);
+		config.strategy().addStrategySettings(changeExpBeta);
+		config.strategy().addStrategySettings(reRoute);
+		config.strategy().addStrategySettings(changeLegMode);
 
 		return config;
 	}

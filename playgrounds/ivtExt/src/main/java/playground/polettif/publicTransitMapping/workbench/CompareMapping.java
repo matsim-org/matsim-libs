@@ -18,7 +18,6 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
@@ -26,26 +25,29 @@ import playground.polettif.publicTransitMapping.gtfs.Gtfs2TransitSchedule;
 import playground.polettif.publicTransitMapping.mapping.PTMapper;
 import playground.polettif.publicTransitMapping.mapping.PTMapperPseudoRouting;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
+import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class CompareMapping {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 		String inputGtfs = "data/gtfs/zvv/";
 		String ct = "EPSG:2056";
 		String unmappedMTS = "data/mts/fromGtfs/zvv_mostServices.xml.gz";
 		String networkFile = "data/network/mm/zurich.xml.gz";
-		String output = "analysis/compare/";
+		String output = "../Users/Flavio/polybox/MA/analysis/compare/";
 
 
 		// gtfs 2 matsim
-//		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, unmappedMTS, null, output+"gtfs.shp");
+		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, unmappedMTS, null, output+"gtfs.shp");
 
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(unmappedMTS);
 		Network network = NetworkTools.readNetwork(networkFile);
@@ -73,6 +75,10 @@ public class CompareMapping {
 
 		// shapeFile
 		ScheduleShapeFileWriter.run(schedule, network, ct, output);
+
+		// stop facilities histogram
+		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
+		histogram.createCsv(output+"stopFacilities.csv");
 
 		// check and shapefile
 //		PlausibilityCheck check = new PlausibilityCheck(schedule, network, ct);

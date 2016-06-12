@@ -30,7 +30,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.publicTransitMapping.config.ManualLinkCandidates;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
@@ -359,8 +358,8 @@ public class PTMapperUtils {
 	 * adds manually defined link candidates from config (if available)
 	 */
 	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
-		for(ConfigGroup e : config.getParameterSets(ManualLinkCandidates.SET_NAME)) {
-			ManualLinkCandidates manualCandidates = (ManualLinkCandidates) e;
+		for(ConfigGroup e : config.getParameterSets(PublicTransitMappingConfigGroup.ManualLinkCandidates.SET_NAME)) {
+			PublicTransitMappingConfigGroup.ManualLinkCandidates manualCandidates = (PublicTransitMappingConfigGroup.ManualLinkCandidates) e;
 
 			Set<String> modes = manualCandidates.getModes();
 			if(modes.size() == 0) {
