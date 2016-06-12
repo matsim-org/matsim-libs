@@ -34,7 +34,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccess
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
@@ -75,13 +74,13 @@ public class RunCapeTownAccessibility {
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 
-			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
+			final NestedLogitAccessibilityCalculator<CapeTownModeNests> calculator =
 					InjectionUtils.createCalculator(
 							config,
-							new TypeLiteral<ModeNests>() {
+							new TypeLiteral<CapeTownModeNests>() {
 							},
 							InjectionUtils.override(
-									new BaseNestedAccessibilityComputationModule<ModeNests>(
+									new BaseNestedAccessibilityComputationModule<CapeTownModeNests>(
 											scenario ) {},
 									Arrays.asList(
 											new LazyScheduleBasedMatrixModule(),
