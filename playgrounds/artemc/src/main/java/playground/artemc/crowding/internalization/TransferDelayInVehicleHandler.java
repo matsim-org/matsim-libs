@@ -46,7 +46,11 @@ import java.util.List;
 import java.util.Map;
 
 
-/** Calculate time a bus vehicle spends at the stop and distributes this time among agents who aliighted and boarded the vehicle **/
+/** Calculate time a bus vehicle spends at the stop and distributes this time among agents who alighted and boarded the vehicle **/
+
+
+/*Delay events are now only thrown after vehicle leaves the facility. Thereby the dwell time cost is divided among all boarding and alighting passengers.
+ 'Sep 2015*/
 
 /**
  * Throws InVehicleDelayEvents to indicate that an agent entering or leaving a public vehicle delayed passengers being in that public vehicle.
@@ -134,7 +138,9 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			}
 			agentsTransferingAtThisStop.add(event.getPersonId());
 			this.vehId2agentsBoardingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
-													
+
+
+			/*Delay events are now only thrown after vehicle leaves the facility*/
 			//double delay = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 
 			//int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
@@ -170,7 +176,9 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			// update number of passengers in vehicle before throwing delay event
 			int passengersInVeh = this.vehId2passengers.get(event.getVehicleId());
 			this.vehId2passengers.put(event.getVehicleId(), passengersInVeh - 1);
-			
+
+
+			/*Delay events are now only thrown after vehicle leaves the facility*/
 			//double delay = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
 			//int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
 			
@@ -190,10 +198,10 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 
 		this.vehiclesAtStops.put(event.getVehicleId(), event.getTime());
 
-		log.info(event.getTime()+" Arrival: Vehicle "+event.getVehicleId().toString()+" at "+event.getFacilityId().toString()+" with " + this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) + " passengers");
+		//log.info(event.getTime()+" Arrival: Vehicle "+event.getVehicleId().toString()+" at "+event.getFacilityId().toString()+" with " + this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) + " passengers");
 	}
 	
-	/**
+
 	private int calcDelayedPassengersInVeh(Id<Vehicle> vehId) {
 		int delayedPassengersInVeh = 0;
 		if (this.vehId2passengers.containsKey(vehId)) {
@@ -201,7 +209,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 		}
 		return delayedPassengersInVeh;
 	}
-	 **/
+
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
@@ -234,7 +242,8 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 				
 				affectedAgents = 0;
 				if (!(this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) == null)){
-					affectedAgents = this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) - numberOfAgentsAlighting;
+					//affectedAgents = this.vehId2agentsInBusBeforeStop.get(event.getVehicleId()) - numberOfAgentsAlighting;
+					affectedAgents = calcDelayedPassengersInVeh(event.getVehicleId());
 				}
 				
 				for (Id<Person> personId : agentsBoardingAtThisStop){
@@ -261,7 +270,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			}
 		}
 
-		log.info(event.getTime()+" Departure: Vehicle "+event.getVehicleId().toString()+" from "+event.getFacilityId().toString()+" with " + this.vehId2passengers.get(event.getVehicleId()) + " passengers, after" + numberOfAgentsTransfering + " transfers and " + delayPerPerson + " delay pP to "+ affectedAgents + " agents.");
+		//log.info(event.getTime()+" Departure: Vehicle "+event.getVehicleId().toString()+" from "+event.getFacilityId().toString()+" with " + this.vehId2passengers.get(event.getVehicleId()) + " passengers, after" + numberOfAgentsTransfering + " transfers and " + delayPerPerson + " delay pP to "+ affectedAgents + " agents.");
 
 	}
 	

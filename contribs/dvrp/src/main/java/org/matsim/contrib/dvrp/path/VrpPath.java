@@ -34,6 +34,9 @@ public interface VrpPath
     double getLinkTravelTime(int idx);
 
 
+    void setLinkTravelTime(int idx, double linkTT);
+
+
     Link getFromLink();
 
 

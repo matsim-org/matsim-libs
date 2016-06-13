@@ -20,12 +20,10 @@
 package playground.vsp.congestion.routing;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
 
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -37,11 +35,11 @@ import playground.vsp.congestion.handlers.TollHandler;
 public final class CongestionTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private Builder timeDistanceTravelDisutilityFactory;
+	private RandomizingTimeDistanceTravelDisutilityFactory timeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public CongestionTollTimeDistanceTravelDisutilityFactory(Builder timeDistanceTravelDisutilityFactory, 
+	public CongestionTollTimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory timeDistanceTravelDisutilityFactory,
 			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.tollHandler = tollHandler;
 		this.timeDistanceTravelDisutilityFactory = timeDistanceTravelDisutilityFactory;

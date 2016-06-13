@@ -153,7 +153,7 @@ public class PassengerEngine
 
     //================ REQUESTS CREATION
 
-    private int nextId = 0;
+    private long nextId = 0;
 
 
     private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,

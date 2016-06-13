@@ -31,6 +31,11 @@ public class ScoreTracker {
 	public ScoreTracker() {
 		this.personScores = new HashMap<Id, PersonScore>();
 		this.vehicleExternalities = new HashMap<Id, VehicleScore>();
+		this.totalCrowdednessUtility = 0.0;
+		this.totalCrowdednessExternalityCharges = 0.0;
+		this.totalInVehicleTimeDelayExternalityCharges = 0.0;
+		this.totalCapacityConstraintsExternalityCharges = 0.0;
+		this.totalMoneyPaid = 0.0;
 	}
 	
 	public HashMap<Id, PersonScore> getPersonScores() {

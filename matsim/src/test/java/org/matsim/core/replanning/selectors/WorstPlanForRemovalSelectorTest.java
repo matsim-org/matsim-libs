@@ -29,7 +29,7 @@ import org.matsim.core.population.PopulationUtils;
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected GenericPlanSelector<Plan, Person> getPlanSelector() {
+	protected PlanSelector<Plan, Person> getPlanSelector() {
 		return new WorstPlanForRemovalSelector();
 	}
 
@@ -39,7 +39,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_nullType() {
-		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
+		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 
 		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
@@ -79,7 +79,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_withTypes() {
-		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
+		PlanSelector<Plan, Person> selector = getPlanSelector();
 		/* The used plans, ordered by score:
 		 * plan2: b, 22.0
 		 * plan6: b, 21.0

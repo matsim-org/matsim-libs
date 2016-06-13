@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
@@ -104,7 +104,7 @@ public class PricingRunner {
 				log.warn("The monetary distance rate is 0. The randomized router won't work properly...");
 			}
 			
-			final Builder factory = new Builder(TransportMode.car, config.planCalcScore());
+			final RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
 			factory.setSigma(3.0);
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -123,7 +123,7 @@ public class PricingRunner {
 				log.warn("The monetary distance rate is 0. The randomized router won't work properly...");
 			}
 			
-			final Builder factory = new Builder(TransportMode.car, config.planCalcScore());
+			final RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
 			factory.setSigma(3.0);
 			controler.addOverridingModule(new AbstractModule(){
 				@Override

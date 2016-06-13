@@ -20,8 +20,8 @@
 
 package playground.artemc.heterogeneity.scoring.functions;
 
-import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a

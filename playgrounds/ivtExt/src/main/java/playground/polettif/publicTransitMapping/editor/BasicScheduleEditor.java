@@ -30,6 +30,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -59,8 +60,8 @@ public class BasicScheduleEditor implements ScheduleEditor {
 
 	private final ParentStops parentStops;
 
-	private static final String SUFFIX_PATTERN = "[.]link:";
-	private static final String SUFFIX = ".link:";
+	private static final String SUFFIX_PATTERN = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
+	private static final String SUFFIX = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES;
 
 	// commands
 	public static final String RR_VIA_LINK = "rerouteViaLink";
@@ -105,7 +106,6 @@ public class BasicScheduleEditor implements ScheduleEditor {
 	/**
 	 * Parses a command file (csv) and runs the commands specified
 	 *
-	 * @param filePath
 	 * @throws IOException
 	 */
 	public void parseCommandCsv(String filePath) throws IOException {
@@ -229,10 +229,9 @@ public class BasicScheduleEditor implements ScheduleEditor {
 
 	/**
 	 * Reroutes the section between two stops that passes the oldlink via the new link
-	 *
-	 * @param transitRoute
-	 * @param oldLinkId
-	 * @param newLinkId
+	 * @param transitRoute the transit route
+	 * @param oldLinkId the section between two route stops where this link appears is rerouted
+	 * @param newLinkId the section is routed via this link
 	 */
 	public void rerouteViaLink(TransitRoute transitRoute, Id<Link> oldLinkId, Id<Link> newLinkId) {
 		List<TransitRouteStop> stopSequence = transitRoute.getStops();
@@ -393,10 +392,6 @@ public class BasicScheduleEditor implements ScheduleEditor {
 	/**
 	 * Adds a link to the network. Uses the attributes (freespeed, nr of lanes, transportModes)
 	 * of the attributeLink.
-	 * @param newLinkId
-	 * @param fromNodeId
-	 * @param toNodeId
-	 * @param attributeLinkId
 	 */
 	public void addLink(Id<Link> newLinkId, Id<Node> fromNodeId, Id<Node> toNodeId, Id<Link> attributeLinkId) {
 		Node fromNode = network.getNodes().get(fromNodeId);
@@ -465,7 +460,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		Set<TransitRoute> transitRoutesOnLink = new HashSet<>();
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				if(ScheduleTools.getLinkIds(transitRoute).contains(linkId)) {
+				if(ScheduleTools.getTransitRouteLinkIds(transitRoute).contains(linkId)) {
 					transitRoutesOnLink.add(transitRoute);
 				}
 			}

@@ -38,7 +38,7 @@ import java.util.Set;
  * @author meisterk
  *
  */
-public class CharyparNagelOpenTimesActivityScoringWithDiagnostics extends CharyparNagelActivityScoring {
+public class CharyparNagelOpenTimesActivityScoringWithDiagnostics extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	private final ActivityFacilities facilities;
 

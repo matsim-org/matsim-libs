@@ -21,14 +21,10 @@
 
 package playground.boescpa.analysis.populationAnalysis;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,23 +36,52 @@ import java.util.Map;
 public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 
 	private final Map<String, long[]> depTimes = new HashMap<>();
+	private final int statisticInterval = 60; // mins
+
+	public DepartureTimeAnalyzer(Population population) {
+		super(population);
+		getCharts = true;
+	}
+
+	public DepartureTimeAnalyzer(String pop2bAnalyzed) {
+		super(pop2bAnalyzed);
+		getCharts = true;
+	}
 
 	public static void main(final String[] args) {
 		final String pop2bAnalyzed = args[0];
 		final String resultsDest = args[1];
-		PopulationAnalyzer.analyzePopulation(new DepartureTimeAnalyzer(), pop2bAnalyzed, resultsDest);
+		final String actTypeToAnalyze = args.length > 2 ? args[2] : null;
+		new DepartureTimeAnalyzer(pop2bAnalyzed).analyzePopulation(resultsDest, actTypeToAnalyze);
+	}
+
+	@Override
+	final protected void reset() {
+		depTimes.clear();
 	}
 
 	@Override
 	final protected void analyzeAgent(Person person) {
 		double formerActDepTime = 0;
+		String mode = null;
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				formerActDepTime = activity.getEndTime();
+				if (!activity.getType().equals("pt interaction")) {
+					if (mode != null && (getActivityType() == null || activity.getType().equals(getActivityType()))) {
+						classifyDepTime(formerActDepTime, "total");
+						classifyDepTime(formerActDepTime, mode);
+
+					/*if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
+						double duration = activity.getEndTime() - activity.getStartTime();
+						if (getActivityType() == null) classifyDuration(duration, "total");
+						classifyDuration(duration, activity.getType());
+					}*/
+					}
+					formerActDepTime = activity.getEndTime();
+				}
 			} else if (planElement instanceof Leg){
-				classifyDepTime(formerActDepTime, "total");
-				classifyDepTime(formerActDepTime, ((Leg)planElement).getMode());
+				mode = ((Leg)planElement).getMode();
 			} else {
 				log.error("Unhandled implementation of PlanElement: " + planElement.toString());
 			}
@@ -65,36 +90,24 @@ public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 
 	private void classifyDepTime(double formerActDepTime, String mode) {
 		double corrDepTime = formerActDepTime > (30*60*60) ? (30*60*60) : formerActDepTime;
-		int depTime = (int)Math.floor(corrDepTime/(15*60));
+		int depTime = (int)Math.floor(corrDepTime/(statisticInterval*60));
 		synchronized (depTimes) {
 			if (!depTimes.keySet().contains(mode)) {
-				depTimes.put(mode, new long[(30*60/15) + 1]);
+				depTimes.put(mode, new long[(30*60/statisticInterval) + 1]);
+				modes.add(mode);
 			}
 			depTimes.get(mode)[depTime]++;
 		}
 	}
 
 	@Override
-	final protected void writeResults(String resultsDest) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(resultsDest);
-		try {
-			for (String mode : depTimes.keySet()) {
-				writer.write(getResultString(mode));
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private String getResultString(final String mode) {
+	final protected String getResultString(final String mode) {
 		String modeString = "************************" + "\n" + "departures " + mode + ": " + "\n" + "\n";
 		// times
 		modeString = modeString + "time  " + "\t";
 		for (int i = 0; i < depTimes.get(mode).length; i++) {
-			int hour = i*15/60;
-			int min = (i*15)-(hour*60);
+			int hour = i*statisticInterval/60;
+			int min = (i*statisticInterval)-(hour*60);
 			modeString = modeString + hour + ":" + min + "\t";
 		}
 		modeString = modeString + "\n";
@@ -105,5 +118,14 @@ public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 		}
 		modeString = modeString + "\n";
 		return modeString;
+	}
+
+	@Override
+	final protected Tuple<String, double[]> getSeries(String mode) {
+		double[] series = new double[depTimes.get(mode).length];
+		for (int i = 0; i < depTimes.get(mode).length; i++) {
+			series[i] = depTimes.get(mode)[i];
+		}
+		return new Tuple<>("departures " + mode, series);
 	}
 }

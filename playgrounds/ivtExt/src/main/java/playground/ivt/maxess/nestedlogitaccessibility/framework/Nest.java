@@ -50,6 +50,13 @@ public class Nest<N extends Enum<N>> {
 			return this;
 		}
 
+		public Builder<N> addAlternatives( final Iterable<Alternative<N>> as ) {
+			for ( Alternative<N> a : as ) {
+				alternatives.add( a );
+			}
+			return this;
+		}
+
 		public Nest<N> build() {
 			return new Nest<N>( name , mu_n , alternatives );
 		}

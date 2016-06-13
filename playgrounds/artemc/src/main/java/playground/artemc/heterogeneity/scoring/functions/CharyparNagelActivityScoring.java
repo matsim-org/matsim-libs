@@ -23,7 +23,7 @@ package playground.artemc.heterogeneity.scoring.functions;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 

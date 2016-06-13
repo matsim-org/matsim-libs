@@ -64,12 +64,12 @@ import playground.santiago.SantiagoScenarioConstants;
 public class SantiagoNetworkBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoNetworkBuilder.class);
 	
-//	final boolean prepareForModeChoice = false;
-	final boolean prepareForModeChoice = true;
+	final boolean prepareForModeChoice = false;
+//	final boolean prepareForModeChoice = true;
 	
-	private final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
+	private final String svnWorkingDir = "/Users/michaelzilske/svn/santiago/scenario/";
 	private final String workingDirInputFiles = svnWorkingDir + "inputFromElsewhere/";
-	private final String outputDir = svnWorkingDir + "inputForMATSim/network/";
+	private final String outputDir = svnWorkingDir + "inputFromElsewhere/network/";
 
 	private final String transitNetworkFile = svnWorkingDir + "inputForMATSim/transit/transitnetwork.xml.gz";
 	
@@ -106,7 +106,7 @@ public class SantiagoNetworkBuilder {
 		
 		if(prepareForModeChoice) mergeWithTransitNetwork(network);
 		
-		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
+		new NetworkWriter(network).write(outputDir + "network_tertiary.xml");
 		
 		convertNet2Shape(network, crs, outputDir + "networkShp/"); 
 		printBoundingBox(network);

@@ -38,27 +38,43 @@ import com.google.inject.name.Named;
 public class VrpTravelTimeEstimator
     implements TravelTime, MobsimBeforeCleanupListener
 {
+    public static class Params
+    {
+        private final TravelTime initialTT;
+        private final double alpha;
+
+
+        public Params(TravelTime initialTT, double alpha)
+        {
+            this.initialTT = initialTT;
+            this.alpha = alpha;
+        }
+    }
+
+
     private final TravelTime observedTT;
     private final Network network;
+
     private final int interval;
     private final int intervalCount;
     private final Map<Id<Link>, double[]> linkTTs;
+    private final double alpha;
 
 
     @Inject
-    public VrpTravelTimeEstimator(@Named(VrpTravelTimeModules.DVRP_INITIAL) TravelTime initialTT,
-            @Named(TransportMode.car) TravelTime observedTT, Network network,
-            TravelTimeCalculatorConfigGroup ttCalcConfig)
+    public VrpTravelTimeEstimator(Params params, @Named(TransportMode.car) TravelTime observedTT,
+            Network network, TravelTimeCalculatorConfigGroup ttCalcConfig)
     {
         this.observedTT = observedTT;
         this.network = network;
+        alpha = params.alpha;
 
         int maxTime = 30 * 3600;//TODO TTC default
-        this.interval = ttCalcConfig.getTraveltimeBinSize();
-        this.intervalCount = maxTime / interval + 1;
+        interval = ttCalcConfig.getTraveltimeBinSize();
+        intervalCount = maxTime / interval + 1;
 
         linkTTs = Maps.newHashMapWithExpectedSize(network.getLinks().size());
-        init(initialTT);
+        init(params.initialTT);
     }
 
 
@@ -87,12 +103,9 @@ public class VrpTravelTimeEstimator
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
         for (Link link : network.getLinks().values()) {
-            updateTTs(link, linkTTs.get(link.getId()), observedTT, ALPHA);
+            updateTTs(link, linkTTs.get(link.getId()), observedTT, alpha);
         }
     }
-
-
-    private static final double ALPHA = 0.05;//exponential moving average
 
 
     private void updateTTs(Link link, double[] tt, TravelTime travelTime, double alpha)

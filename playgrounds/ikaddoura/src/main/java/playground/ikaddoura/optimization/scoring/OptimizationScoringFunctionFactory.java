@@ -24,9 +24,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
@@ -50,8 +49,8 @@ public class OptimizationScoringFunctionFactory implements ScoringFunctionFactor
 			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.params.getScoringParameters( person ), network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.params.getScoringParameters( person )));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring(this.params.getScoringParameters( person ), network));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(this.params.getScoringParameters( person )));
 		scoringFunctionAccumulator.addScoringFunction(new OptimizationAgentStuckScoringFunction(this.params.getScoringParameters( person ), this.STUCKING_SCORE));
 		scoringFunctionAccumulator.addScoringFunction(new OptimizationActivityScoringFunction(this.params.getScoringParameters( person )));
 		

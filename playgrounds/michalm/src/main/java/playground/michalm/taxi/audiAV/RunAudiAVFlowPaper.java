@@ -24,9 +24,6 @@ import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.*;
-
-import com.google.inject.name.Names;
 
 
 public class RunAudiAVFlowPaper
@@ -46,8 +43,8 @@ public class RunAudiAVFlowPaper
 //                bind(VehicleType.class).annotatedWith(Names.named(TaxiModule.TAXI_MODE))
 //                        .toInstance(VehicleUtils.AUTONOMOUS_VEHICLE_TYPE);
 
-                bind(TravelTime.class).annotatedWith(Names.named(VrpTravelTimeModules.DVRP_INITIAL))
-                        .toInstance(initialTT);
+                bind(VrpTravelTimeEstimator.Params.class).toInstance(
+                        new VrpTravelTimeEstimator.Params(initialTT, 0.05));
             }
         });
 
