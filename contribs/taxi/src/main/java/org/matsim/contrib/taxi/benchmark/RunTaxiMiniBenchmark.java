@@ -19,16 +19,21 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
-import org.matsim.core.network.*;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.vehicles.*;
 
 
 /**
@@ -41,61 +46,54 @@ import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
  * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
  * each time interval (usually 15 minutes).
  */
-public class RunTaxiBenchmark
+public class RunTaxiMiniBenchmark
 {
-    public static void run(String configFile, int runs)
+    public interface MiniBenchmark
     {
-        final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-        Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
-        createControler(config, runs).run();
-
+        public void run(TaxiOptimizerFactory optimizerFactory);
     }
 
 
-    public static Controler createControler(Config config, int runs)
+    public static void run(String configFile, TaxiOptimizerFactory optimizerFactory, int runs)
+    {
+        final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+        Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
+
+        for (int r = 0; r < runs; r++) {
+            createMiniBenchmark(config).run(optimizerFactory);//TODO
+        }
+    }
+
+
+    public static MiniBenchmark createMiniBenchmark(Config config)
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
-        Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
+        final Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60,
+                30 * 3600);
         final TaxiData taxiData = new TaxiData();
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 
-        config.controler().setLastIteration(runs - 1);
-        Controler controler = new Controler(scenario);
-        controler.setModules(new TaxiBenchmarkControlerModule());
-        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+        final EventsManager events = EventsUtils.createEventsManager();
+        final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);
+        final TravelTime estimatedTravelTime = new FreeSpeedTravelTime();
+        final VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install()
+        return new MiniBenchmark() {
+            public void run(TaxiOptimizerFactory optimizerFactory)
             {
-                addControlerListenerBinding().to(TaxiBenchmarkStats.class);
-            };
-        });
-
-        return controler;
-    }
-
-
-    static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
-    {
-        Scenario scenario = new ScenarioBuilder(config).build();
-
-        if (config.network().isTimeVariantNetwork()) {
-            ((NetworkImpl)scenario.getNetwork()).getFactory()
-                    .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
-        }
-
-        ScenarioUtils.loadScenario(scenario);
-        return scenario;
+                new TaxiQSimProvider(events, plugins, scenario, taxiData, estimatedTravelTime,
+                        vehicleType, optimizerFactory).get().run();
+            }
+        };
     }
 
 
     public static void main(String[] args)
     {
-        run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml", 20);
+        run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml",
+                new DefaultTaxiOptimizerFactory(), 20);
     }
 }

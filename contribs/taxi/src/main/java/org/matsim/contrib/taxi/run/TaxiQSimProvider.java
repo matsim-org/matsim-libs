@@ -61,7 +61,7 @@ public class TaxiQSimProvider
     public TaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
             Scenario scenario, TaxiData taxiData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
-            TaxiConfigGroup taxiCfg, @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
+            @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
             TaxiOptimizerFactory optimizerFactory)
     {
         this.eventsManager = eventsManager;
@@ -69,7 +69,7 @@ public class TaxiQSimProvider
         this.scenario = scenario;
         this.taxiData = taxiData;
         this.travelTime = travelTime;
-        this.taxiCfg = taxiCfg;
+        this.taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         this.vehicleType = vehicleType;
         this.optimizerFactory = optimizerFactory;
     }
