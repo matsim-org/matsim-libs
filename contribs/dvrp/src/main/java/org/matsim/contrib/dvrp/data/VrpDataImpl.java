@@ -65,4 +65,15 @@ public class VrpDataImpl
     {
         requests.put(request.getId(), request);
     }
+
+
+    @Override
+    public void clearRequestsAndResetSchedules()
+    {
+        for (Vehicle v : vehicles.values()) {
+            v.resetSchedule();
+        }
+
+        requests.clear();
+    }
 }
