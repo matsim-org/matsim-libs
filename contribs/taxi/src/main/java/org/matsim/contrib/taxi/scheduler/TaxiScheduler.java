@@ -176,6 +176,7 @@ public class TaxiScheduler
         }
 
         TaxiTask currentTask = schedule.getCurrentTask();
+        //we can divert vehicle whose current task is an empty drive at the end of the schedule
         if (!Schedules.isLastTask(currentTask)
                 || currentTask.getTaxiTaskType() != TaxiTaskType.EMPTY_DRIVE) {
             return null;

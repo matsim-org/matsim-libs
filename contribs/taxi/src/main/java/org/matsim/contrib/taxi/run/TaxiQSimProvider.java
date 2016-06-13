@@ -78,7 +78,7 @@ public class TaxiQSimProvider
     @Override
     public Mobsim get()
     {
-        if (taxiCfg.isVehicleDiversion() && taxiCfg.isOnlineVehicleTracker()) {
+        if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
             throw new IllegalStateException("Diversion requires online tracking");
         }
 

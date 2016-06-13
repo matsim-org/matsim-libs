@@ -38,7 +38,13 @@ public class MielecTaxiPassengerPopulationCreator
     {
         String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
         String demandFile = dir + "taxi_demand_" + suffix + ".txt";
-        String planFile = dir + "plans_only_taxi_" + suffix + ".xml.gz";
+        String planFile = dir + "plans_only_taxi_mini_benchmark_" + suffix + ".xml.gz";
+        
+        //we have two travel demand waves:
+        //6:00:00-12:59:59
+        //13:00:00-19:59:59
+        final int maxDepartureTime = 13 * 3600;
+        final int departureTimeShift = 6 * 3600;
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
@@ -49,7 +55,13 @@ public class MielecTaxiPassengerPopulationCreator
         for (int i = 1; i < lines.size(); i++) {
             String[] line = lines.get(i);
             Id<Person> personId = Id.createPersonId(line[0]);
+
             double departureTime = Double.parseDouble(line[1]);
+            if (departureTime >= maxDepartureTime) {
+                continue;
+            }
+            departureTime -= departureTimeShift;
+            
             Id<Link> fromLinkId = Id.createLinkId(line[2]);
             Id<Link> toLinkId = Id.createLinkId(line[3]);
 
