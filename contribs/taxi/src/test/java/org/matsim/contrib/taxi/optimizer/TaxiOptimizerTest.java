@@ -102,12 +102,10 @@ public class TaxiOptimizerTest
         runBenchmark(variants, params, benchmark);
 
         params.put(AssignmentTaxiOptimizerParams.MODE, Mode.PICKUP_TIME.name());
+        params.put(AbstractTaxiOptimizerParams.REOPTIMIZATION_TIME_STEP, 30 + "");
         runBenchmark(variants, params, benchmark);
 
         params.put(AssignmentTaxiOptimizerParams.MODE, Mode.TOTAL_WAIT_TIME.name());
-        runBenchmark(variants, params, benchmark);
-
-        params.put(AssignmentTaxiOptimizerParams.MODE, Mode.DSE.name());
         params.put(AssignmentTaxiOptimizerParams.NULL_PATH_COST, 300 + "");
         runBenchmark(variants, params, benchmark);
     }
