@@ -55,8 +55,7 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	private boolean defaultAwaitDepartureTime = true;
 
-	LocalDate dateUsed = null;
-
+	private LocalDate dateUsed = null;
 
 	/**
 	 * Path to the folder where the gtfs files are located
@@ -611,14 +610,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	 */
 	private void getServiceIds(String param) {
 		switch (param) {
-			case MOST_USED_SINGLE_ID:
-				String mostUsed = getKeyOfMaxValue(serviceIdsCount);
-				this.serviceIds = Collections.singleton(mostUsed);
-				log.info("... Getting most used service ID: " + mostUsed + " (" + serviceIdsCount.get(mostUsed) + " occurences)");
-				break;
-
 			case ALL_SERVICE_IDS:
-				log.info("... Using all service IDs (probably way too much data)");
+				log.warn("    Using all trips is not recommended");
+				log.info("... Using all service IDs");
 				this.serviceIds = services.keySet();
 				break;
 
@@ -662,17 +656,10 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 					this.serviceIds = getServiceIdsOnDate(dateUsed);
 					log.info("        Using service IDs on " + param + ": " + this.serviceIds.size() + " services.");
 				} catch (NumberFormatException e) {
-					throw new IllegalArgumentException("Service id param not recognized! Allowed: " + DAY_WITH_MOST_SERVICES + ", day in format \"yyyymmdd\", " + DAY_WITH_MOST_TRIPS + ", " + MOST_USED_SINGLE_ID + ", " + ALL_SERVICE_IDS);
+					throw new IllegalArgumentException("Service id param not recognized! Allowed: day in format \"yyyymmdd\", " + DAY_WITH_MOST_SERVICES + ", "+ DAY_WITH_MOST_TRIPS + ", " + ALL_SERVICE_IDS);
 				}
 				break;
 		}
-	}
-
-	/**
-	 * Identifies the most used sevice ID of the validity period of the schedule and returns the ID.
-	 */
-	private static String getKeyOfMaxValue(Map<String, Integer> map) {
-		return map.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
 	}
 
 	public void setTransformation(CoordinateTransformation transformation) {

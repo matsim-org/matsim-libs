@@ -43,7 +43,7 @@ public class CompareMapping {
 		String ct = "EPSG:2056";
 		String unmappedMTS = "data/mts/fromGtfs/zvv_mostServices.xml.gz";
 		String networkFile = "data/network/mm/zurich.xml.gz";
-		String output = "../Users/Flavio/polybox/MA/analysis/compare/";
+		String output = args[0];
 
 
 		// gtfs 2 matsim
