@@ -39,12 +39,12 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TransitTravelDisutility costFunction;
+	private final TransitTravelDisutility costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and time step.
 	 */
-	final TravelTime timeFunction;
+	private final TravelTime timeFunction;
 	
 	public MultiNodeDijkstra(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
 		this.network = network;
@@ -58,7 +58,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 		return tree.getPath(swapNodes(toNodes));
 	}
 
-	private final Map<Node, TransitLeastCostPathTree.InitialNode> swapNodes(final Map<Node, InitialNode> original) {
+	private Map<Node, TransitLeastCostPathTree.InitialNode> swapNodes(final Map<Node, InitialNode> original) {
 		Map<Node, TransitLeastCostPathTree.InitialNode> result = new HashMap<>();
 		for (Map.Entry<Node, InitialNode> entry : original.entrySet()) {
 			result.put(entry.getKey(), new TransitLeastCostPathTree.InitialNode(entry.getValue().initialCost, entry.getValue().initialTime));
