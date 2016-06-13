@@ -29,6 +29,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
@@ -375,8 +376,12 @@ public class PTMapperUtils {
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if(link == null) {
-							log.warn("link " + manualCandidates.getStopFacilityId() + " not found in network.");
+							log.warn("link " + link.getId() + " not found in network.");
 						} else {
+							if(CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord()) > config.getLinkDistanceTolerance()*config.getMaxLinkCandidateDistance()) {
+								log.warn("Distance from manual link candidate " + link.getId() + " to stop facility " + manualCandidates.getStopFacilityIdStr() + " is more than " + config.getLinkDistanceTolerance()*config.getMaxLinkCandidateDistance());
+								log.info("Manual link candidate will still be used");
+							}
 							lcSet.add(new LinkCandidate(link, parentStopFacility));
 						}
 					}

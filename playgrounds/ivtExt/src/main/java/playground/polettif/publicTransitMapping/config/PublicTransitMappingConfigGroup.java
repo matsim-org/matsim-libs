@@ -642,6 +642,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		return null;
 	}
 
+	/**
+	 * Link candidates for complicated stops can be defined manually
+	 * with this parameterset
+	 */
 	public static class ManualLinkCandidates extends ReflectiveConfigGroup implements MatsimParameters {
 
 		public final static String SET_NAME = "manualLinkCandidates";

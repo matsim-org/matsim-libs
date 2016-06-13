@@ -64,7 +64,6 @@ public class Gtfs2TransitSchedule {
 	 *                  <li>date in the format yyyymmdd</li>
 	 *                  <li>dayWithMostTrips</li>
 	 *                  <li>all</li>
-	 *                  </li>
 	 *                  </ul>
 	 *              [2] the output coordinate system. Use WGS84 for no transformation.<br/>
 	 *              [3] output transit schedule file
