@@ -20,44 +20,29 @@
 /**
  * 
  */
-package playground.jbischoff.parking.choice;
+package playground.jbischoff.parking.sim;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import org.matsim.core.mobsim.qsim.QSim;
 
-import javax.inject.Inject;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.gbl.MatsimRandom;
+import com.google.inject.Provider;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
+/**
+ *
+ */
+public class ParkingQSimProvider implements Provider<QSim> {
 
-public class RandomParkingChoiceLogic implements ParkingChoiceLogic {
-
-	private final Network network;
-	private final Random random = MatsimRandom.getLocalInstance();
-
-	/**
-	 * {@link Network} the network
+	/* (non-Javadoc)
+	 * @see com.google.inject.Provider#get()
 	 */
-	public RandomParkingChoiceLogic(Network network) {
-
-		this.network = network;
-	}
-
 	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId) {
-		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
-		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
-		return randomKey;
-
+	public QSim get() {
+		// TODO Auto-generated method stub
+		
+		return null;
 	}
+
 }

@@ -20,44 +20,39 @@
 /**
  * 
  */
-package playground.jbischoff.parking.choice;
+package playground.jbischoff.parking.sim;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 
-import javax.inject.Inject;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.gbl.MatsimRandom;
+import playground.jbischoff.parking.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
+import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.WalkLegFactory;
+import playground.jbischoff.parking.routing.ParkingRouter;
+import playground.jbischoff.parking.routing.WithinDayParkingRouter;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
+/**
+ *
+ */
+public class SetupParking {
 
-public class RandomParkingChoiceLogic implements ParkingChoiceLogic {
-
-	private final Network network;
-	private final Random random = MatsimRandom.getLocalInstance();
-
-	/**
-	 * {@link Network} the network
-	 */
-	public RandomParkingChoiceLogic(Network network) {
-
-		this.network = network;
+	static public void installParkingModules(Controler controler){
+		controler.addOverridingModule(new AbstractModule() {
+			
+			
+			@Override
+			public void install() {
+			bind(WalkLegFactory.class).asEagerSingleton();
+			bind(ParkingManager.class).to(LinkLengthBasedParkingManagerWithRandomInitialUtilisation.class);
+			this.install(new ParkingSearchQSimModule());
+			bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
+			}
+		});
+		
 	}
-
-	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId) {
-		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
-		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
-		return randomKey;
-
-	}
+	
 }

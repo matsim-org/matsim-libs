@@ -23,10 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vehicles.Vehicle;
 
@@ -40,7 +43,12 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 	Map<Id<Link>,MutableInt> occupation = new HashMap<>();
 	Map<Id<Vehicle>,Id<Link>> parkingPosition = new HashMap<>();
 	Random rand = MatsimRandom.getLocalInstance();
-	public LinkLengthBasedParkingManagerWithRandomInitialUtilisation(Network network, double assumedParkedVehicleLength, double shareOfLinkLengthUsedForParking) {
+	
+	@Inject
+	public LinkLengthBasedParkingManagerWithRandomInitialUtilisation(Network network, Config config) {
+		 double assumedParkedVehicleLength = 4.0; 
+		 double shareOfLinkLengthUsedForParking = 0.7;
+		 //TODO: Make this configurable
 		for (Link link : network.getLinks().values()){
 			int maxCapacity = (int) (link.getLength()*shareOfLinkLengthUsedForParking / assumedParkedVehicleLength);
 			this.capacity.put(link.getId(), maxCapacity);

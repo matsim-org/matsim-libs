@@ -56,14 +56,18 @@ public class ParkingDynLeg implements DriverDynLeg {
 		this.logic = logic;
 		this.parkingManager = parkingManager;
 		this.vehicleId = vehicleId;
+		this.timer = timer;
+		this.events=events;
 	}
 
 	@Override
 	public void movedOverNode(Id<Link> newLinkId) {
 		currentLinkIdx++;
 		currentLinkId = newLinkId;
+		
 		if (currentLinkId.equals(this.getDestinationLinkId())) {
-					this.events.processEvent(
+			this.parkingMode = true;
+			this.events.processEvent(
 							new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 				}
 			
@@ -76,7 +80,6 @@ public class ParkingDynLeg implements DriverDynLeg {
 			List<Id<Link>> linkIds = route.getLinkIds();
 
 			if (currentLinkIdx == linkIds.size() - 1) {
-				this.parkingMode = true;
 				return route.getEndLinkId();
 			}
 

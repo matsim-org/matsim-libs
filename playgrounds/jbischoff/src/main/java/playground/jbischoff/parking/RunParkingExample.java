@@ -20,46 +20,31 @@
 /**
  * 
  */
-package playground.jbischoff.parking.sim;
+package playground.jbischoff.parking;
 
-import java.util.Collection;
-import java.util.HashMap;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import javax.inject.Inject;
-
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.vehicles.VehicleUtils;
+import playground.jbischoff.parking.sim.SetupParking;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 
-public class ParkingAgentSource implements AgentSource {
+public class RunParkingExample {
 
-	private Population population;
-	private AgentFactory agentFactory;
-	private QSim qsim;
-	private HashMap modeVehicleTypes;
-	private Collection<String> mainModes;
-	@Inject
-	public ParkingAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
-		this.population = population;
-		this.agentFactory = agentFactory;
-		this.qsim = qsim;  
-		this.modeVehicleTypes = new HashMap<>();
-		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
-		for (String mode : mainModes) {
-			// initialize each mode with default vehicle type:
-			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
-		}
-	}
-	@Override
-	public void insertAgentsIntoMobsim() {
-		// TODO Auto-generated method stub
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		SetupParking.installParkingModules(controler);
+		controler.run();
 
 	}
 

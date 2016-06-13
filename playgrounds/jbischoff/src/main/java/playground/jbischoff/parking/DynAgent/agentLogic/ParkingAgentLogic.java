@@ -21,6 +21,8 @@ package playground.jbischoff.parking.DynAgent.agentLogic;
 
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -32,14 +34,18 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.contrib.dynagent.StaticDriverDynLeg;
 import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.vehicles.Vehicle;
 
 import playground.jbischoff.parking.ParkingUtils;
+import playground.jbischoff.parking.DynAgent.ParkingDynLeg;
+import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.manager.ParkingManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.routing.ParkingRouter;
@@ -68,15 +74,23 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	private ParkingManager parkingManager;
 	private WalkLegFactory walkLegFactory;
 	private ParkingRouter parkingRouter;
+	private MobsimTimer timer;
+	private EventsManager events;
+	private ParkingChoiceLogic parkingLogic;
+	private boolean isinitialLocation = true;
 	/**
 	 * @param plan
 	 *            (always starts with Activity)
 	 */
-	public ParkingAgentLogic(Plan plan, ParkingManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter) {
+	public ParkingAgentLogic(Plan plan, ParkingManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer) {
 		planElemIter = plan.getPlanElements().iterator();
 		this.parkingManager = parkingManager;
 		this.walkLegFactory = walkLegFactory;
 		this.parkingRouter = parkingRouter;
+		this.timer = timer;
+		this.events = events;
+		this.parkingLogic = parkingLogic;
+		
 		
 	}
 
@@ -86,6 +100,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
 		this.currentPlanElement = planElemIter.next();
 		Activity act = (Activity) currentPlanElement;
+		//TODO: assume something different regarding initial parking location
+		
 		return new StaticDynActivity(act.getType(), act.getEndTime());
 	}
 
@@ -143,10 +159,11 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		NetworkRoute plannedRoute = (NetworkRoute) currentPlannedLeg.getRoute();
 		NetworkRoute actualRoute = this.parkingRouter.getRouteFromParkingToDestination(plannedRoute, now, agent.getCurrentLinkId());
 		Id<Vehicle> vehicleId = Id.create(this.agent.getId(), Vehicle.class);
-
-		if (this.parkingManager.unParkVehicleHere(vehicleId, agent.getCurrentLinkId(), now)){
+		
+		if ((this.parkingManager.unParkVehicleHere(vehicleId, agent.getCurrentLinkId(), now))||(isinitialLocation)){
 			this.lastParkActionState = LastParkActionState.CARTRIP;
-			return new StaticDriverDynLeg(TransportMode.car, actualRoute);
+			isinitialLocation = false;
+			return new ParkingDynLeg(TransportMode.car, actualRoute, parkingLogic, parkingManager, vehicleId, timer, events);
 		
 		}
 		else throw new RuntimeException("parking location mismatch");
@@ -178,7 +195,12 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
-		return new StaticDynActivity(nextPlannedActivity.getType(),nextPlannedActivity.getEndTime());
+		double endTime =nextPlannedActivity.getEndTime() ; 
+		if (endTime == Time.UNDEFINED_TIME){
+			endTime = Double.POSITIVE_INFINITY;
+		}
+			 
+		return new StaticDynActivity(nextPlannedActivity.getType(),endTime);
 		
 	}
 
