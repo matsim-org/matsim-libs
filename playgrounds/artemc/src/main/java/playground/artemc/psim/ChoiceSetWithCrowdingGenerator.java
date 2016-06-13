@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.LegImpl;
@@ -26,33 +26,44 @@ import java.util.HashMap;
  * Takes folder with simulation outputs and the desired output folder as parameters.
  * Created by artemc on 21/4/15.
  */
-public class ChoiceSetGenerator implements ShutdownListener {
+public class ChoiceSetWithCrowdingGenerator implements ShutdownListener {
 
 	static private String inputDirectory;
 	static private String outputDirectory;
 	static private String eventFilePath;
 
-	private static String simType = "10min";
-	private static String schema = "corridor_10min";
+	private static boolean internalizationOfCrowdingDelay = true;
+	private static boolean internalizationOfComfortDisutility = true;
 
-	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_homo/";
+	private static String simType = "5min";
+	private static String schema = "corridor_5min_fare3xpark_intComfort_0fare";
+
+	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_fare3xpark_intComfort_0fare1/";
 
 	//private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_5min_1000it_intCrowd_Comfort/";
 
 	private static String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
 
-	private static final Logger log = Logger.getLogger(ChoiceSetGenerator.class);
+	private static final Logger log = Logger.getLogger(ChoiceSetWithCrowdingGenerator.class);
 
-	private final ChoiceGenerationControler choiceGenerationControler;
+	private final ChoiceGenerationWithCrowdingControler choiceGenerationControler;
 
-	private MatsimServices controler;
+	private Controler controler;
 	private Population population;
 	private HashMap<Id<Person>, Plan> initialPlans = new HashMap<Id<Person>, Plan>();
 	static Integer departureTimeChoices = 3;
 
-	public ChoiceSetGenerator(Config config, String eventsFile) {
+	public ChoiceSetWithCrowdingGenerator(Config config, String eventsFile) {
 
-		choiceGenerationControler = new ChoiceGenerationControler(config, eventsFile);
+		if(internalizationOfCrowdingDelay)
+			log.info("Internalization of external PT Travel Delay cost is enabled.");
+		if(internalizationOfComfortDisutility)
+			log.info("Internalization of external Crowding cost is enabled.");
+
+		choiceGenerationControler = new ChoiceGenerationWithCrowdingControler(config, eventsFile);
+		choiceGenerationControler.setInternalizationOfComfortDisutility(internalizationOfComfortDisutility);
+		choiceGenerationControler.setInternalizationOfCrowdingDelay(internalizationOfCrowdingDelay);
+		choiceGenerationControler.load();
 
 		this.controler = choiceGenerationControler.getControler();
 		this.population = controler.getScenario().getPopulation();
@@ -68,7 +79,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			eventFilePath = args[2];
 
 			Config config = ScenarioInitializerFromOutput.initScenario(inputDirectory, outputDirectory);
-			ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
+			ChoiceSetWithCrowdingGenerator choiceSetGenerator = new ChoiceSetWithCrowdingGenerator(config, eventFilePath);
 			choiceSetGenerator.CreateChoiceSets();
 
 			choiceSetGenerator.choiceGenerationControler.run();
@@ -86,7 +97,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 					eventFilePath = file.getAbsolutePath() + "/it." + lastIteration+"/"+lastIteration+".events.xml.gz";
 
 					Config config = ScenarioInitializerFromOutput.initScenario(inputDirectory, outputDirectory);
-					ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
+					ChoiceSetWithCrowdingGenerator choiceSetGenerator = new ChoiceSetWithCrowdingGenerator(config, eventFilePath);
 					choiceSetGenerator.CreateChoiceSets();
 
 					choiceSetGenerator.choiceGenerationControler.run();
@@ -135,7 +146,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 			planMap.put(initialMode, population.getPersons().get(personId).getSelectedPlan());
 
-			//String[] modes = services.getScenario().getConfig().getModule("subtourModeChoice").getValue("modes").split(",");
+			//String[] modes = controler.getScenario().getConfig().getModule("subtourModeChoice").getValue("modes").split(",");
 			//String[] modes = {"car","walk"};
 
 			ArrayList<String> relevantModes = new ArrayList<String>();
@@ -276,6 +287,11 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			}
 
 			/*Clear all plans from initial person*/
+//			population.getPersons().get(personId).getPlans().clear();
+//			population.getPersons().get(personId).addPlan(initialPlans.get(personId));
+//			population.getPersons().get(personId).setSelectedPlan(initialPlans.get(personId));
+
+			/*Clear all plans from initial person*/
 			population.getPersons().get(personId).getPlans().clear();
 
 			Person tempPerson = population.getFactory().createPerson(Id.create(20000, Person.class));
@@ -308,6 +324,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population newPopulation = newScenario.getPopulation();
 		MoneyEventHandler moneyHandler = choiceGenerationControler.getMoneyEventHandler();
+		CrowdingPsimHandler crowdingPsimHandler = choiceGenerationControler.getCrowdingPsimHandler();
 
 		for (Id<Person> personId : population.getPersons().keySet()) {
 
@@ -322,8 +339,12 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			if (personId.toString().contains("_")) {
 				planToAdd = population.getPersons().get(personId).getSelectedPlan();
 				planToAdd.getCustomAttributes().put("toll", monetaryPayments.toString());
+				if(crowdingPsimHandler.getPerson2crowdingDisutility().containsKey(personId)) {
+					planToAdd.setScore(planToAdd.getScore() + crowdingPsimHandler.getPerson2crowdingDisutility().get(personId));
+				}
 			} else {
 				planToAdd = initialPlans.get(personId);
+				//planToAdd.getCustomAttributes().put("toll", monetaryPayments.toString());
 			}
 
 			if (newPopulation.getPersons().containsKey(orgPersonId)) {
