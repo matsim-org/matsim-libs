@@ -20,15 +20,23 @@
 
 package org.matsim.withinday.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -36,25 +44,47 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
-import javax.inject.Inject;
+/**
+ * Take the plans that the agents have after within-day replanning, and write them to file.
+ * <br/>
+ * Not the same as the {@link ExperiencedPlansService}, since that is based on the events.
+ * 
+ * @author (of documentation) nagel
+  */
+public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPlansService {
+	// I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an ExperiencedPlansService that
+	// reconstructs experienced plans from events. kai, jun'16
+	
+	private static final Logger log = Logger.getLogger( ExecutedPlansServiceImpl.class );
 
-public class ExperiencedPlansWriter implements AfterMobsimListener {
-	private static final Logger log = Logger.getLogger( ExperiencedPlansWriter.class );
+	public static String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
 
-	public static String EXPERIENCEDPLANSFILE = "experiencedPlans.xml.gz";
+	private Population experiencedPopulation ;
 
-	@Inject private Scenario scenario;
-	@Inject private MobsimDataProvider mobsimDataProvider;
-	@Inject private OutputDirectoryHierarchy controlerIO;
+	private Scenario scenario;
 
+	private MobsimDataProvider mobsimDataProvider;
+
+	private OutputDirectoryHierarchy controlerIO;
+	
+	@Inject
+	ExecutedPlansServiceImpl( Scenario scenario, MobsimDataProvider mobsimDataProvider, OutputDirectoryHierarchy controlerIO ) {
+		this.scenario = scenario;
+		this.mobsimDataProvider = mobsimDataProvider;
+		this.controlerIO = controlerIO;
+	}
+	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		Scenario experiencedScenario = ScenarioUtils.createScenario(scenario.getConfig());
-		Population experiencedPopulation = experiencedScenario.getPopulation(); 
+		Gbl.assertNotNull(scenario);
+		final Config config = scenario.getConfig();
+		Scenario experiencedScenario = ScenarioUtils.createScenario(config);
+		experiencedPopulation = experiencedScenario.getPopulation(); 
 				
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			
@@ -65,7 +95,9 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 				Person experiencedPerson = experiencedPopulation.getFactory().createPerson(person.getId());
 				
 				// add experienced plan
-				experiencedPerson.addPlan(WithinDayAgentUtils.getModifiablePlan(agent));
+				final Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+				experiencedPerson.addPlan(plan);
+				experiencedPerson.setSelectedPlan(plan);
 				
 				// copy attributes if possible
 				if (person instanceof PersonImpl && experiencedPerson instanceof PersonImpl) {
@@ -80,8 +112,13 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 			}
 		}
 
-		String outputFile = controlerIO.getIterationFilename(event.getIteration(), EXPERIENCEDPLANSFILE);
+		// yy write this in every iteration in order to be consistent with previous design.  I think this should be changed.  kai, jun'16
+		String outputFile = controlerIO.getIterationFilename(event.getIteration(), EXECUTEDPLANSFILE);
+		writePlans( outputFile ) ;
+	}
 
+	@Override
+	public void writePlans(String outputFile) {
 		final Config config = scenario.getConfig();
 		final String inputCRS = config.plans().getInputCRS();
 		final String internalCRS = config.global().getCoordinateSystem();
@@ -99,5 +136,14 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 
 			new PopulationWriter(transformation, experiencedPopulation, scenario.getNetwork()).write(outputFile);
 		}
+	}
+
+	@Override
+	public Map<Id<Person>, Plan> getAgentRecords() {
+		Map<Id<Person>,Plan> map = new HashMap<>() ;
+		for ( Person pp : this.experiencedPopulation.getPersons().values() ) {
+			map.put( pp.getId(), pp.getSelectedPlan() ) ;
+		}
+		return map ;
 	}
 }

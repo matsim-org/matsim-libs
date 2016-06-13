@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,33 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.population.algorithms;
 
-package org.matsim.core.replanning.strategies;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.PlanStrategyImpl.Builder;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.withinday.controller.ExecutedPlansService;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+/**
+ * @author nagel
+ *
+ */
+public final class LastExecutedPlanKeeper implements PlanAlgorithm {
 
-public class ReRoute implements Provider<PlanStrategy> {
+	private ExecutedPlansService executedPlans;
 
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private ActivityFacilities facilities;
-	@Inject private Provider<TripRouter> tripRouterProvider;
+	public LastExecutedPlanKeeper(ExecutedPlansService executedPlans) {
+		this.executedPlans = executedPlans;
+	}
 
 	@Override
-	public PlanStrategy get() {
-		Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan,Person>()) ;
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup));
-		return builder.build() ;
+	public void run(Plan plan) {
+		Plan newPlan = executedPlans.getAgentRecords().get( plan.getPerson().getId() ) ;
+		Gbl.assertNotNull( newPlan ) ;
+		((PlanImpl) plan).copyFrom(newPlan);
+		// yyyy would not be able to solve this by copy constructor!
 	}
 
 }

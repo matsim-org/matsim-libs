@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,33 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.replanning.modules;
 
-package org.matsim.core.replanning.strategies;
+import org.matsim.core.config.Config;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.withinday.controller.ExecutedPlansService;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.PlanStrategyImpl.Builder;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
+/**
+ * @author nagel
+ *
+ */
+public class KeepLastExecuted extends AbstractMultithreadedModule {
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+	private ExecutedPlansService executedPlans;
 
-public class ReRoute implements Provider<PlanStrategy> {
-
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private ActivityFacilities facilities;
-	@Inject private Provider<TripRouter> tripRouterProvider;
+	public KeepLastExecuted(Config config, ExecutedPlansService executedPlans) {
+		super(config.global());
+		this.executedPlans = executedPlans;
+	}
 
 	@Override
-	public PlanStrategy get() {
-		Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan,Person>()) ;
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup));
-		return builder.build() ;
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new org.matsim.population.algorithms.LastExecutedPlanKeeper(executedPlans) ;
 	}
 
 }

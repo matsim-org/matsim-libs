@@ -33,6 +33,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -53,6 +56,8 @@ import org.matsim.withinday.utils.EditRoutes;
 
 import com.google.inject.Inject;
 
+import playground.vsptelematics.bangbang.KNAccidentScenario.MyIterationCounter;
+
 /**
  * @author nagel
  *
@@ -63,21 +68,30 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 
 	private final Scenario scenario;
 	private EditRoutes editRoutes ;
+
+	private MyIterationCounter iterationCounter;
 	
 	@Inject
 	WithinDayBestRouteMobsimListener(Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory, TravelTime travelTime,
-			Map<String, TravelDisutilityFactory> travelDisutilityFactories ) {
+			Map<String, TravelDisutilityFactory> travelDisutilityFactories, MyIterationCounter ic ) {
 		this.scenario = scenario ;
 		{
 			TravelDisutility travelDisutility = travelDisutilityFactories.get(TransportMode.car).createTravelDisutility( travelTime ) ;
 			LeastCostPathCalculator pathAlgo = pathAlgoFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime) ;
 			RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory() ;
 			this.editRoutes = new EditRoutes( scenario.getNetwork(), pathAlgo, routeFactory ) ;
+			this.iterationCounter = ic ;
 		}
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
+		if ( this.iterationCounter.getIteration() >= 11 ) {
+//			log.warn("NOT replanning"); 
+			return ;
+		}
+		
+		
 		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
 		
 		for (MobsimAgent ma : agentsToReplan) {
@@ -100,7 +114,7 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 			for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				if ( KNAccidentScenario.replanningLinkIds.contains( agent.getCurrentLinkId() ) ) {
-					System.out.println("found agent");
+//					System.out.println("found agent");
 					set.add(agent);
 				}
 			}
