@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
@@ -55,7 +54,7 @@ public class RunTaxiBenchmark
 
     public static Controler createControler(Config config, int runs)
     {
-        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
@@ -66,7 +65,7 @@ public class RunTaxiBenchmark
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 
         Controler controler = new Controler(scenario);
-        controler.setModules(new TaxiBenchmarkControlerModule());        
+        controler.setModules(new TaxiBenchmarkControlerModule());
         controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 

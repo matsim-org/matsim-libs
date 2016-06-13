@@ -17,55 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.taxi.util.stats;
 
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.vehicles.*;
+import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import com.google.inject.name.Names;
+import com.google.inject.*;
 
 
-public class TaxiModule
-    extends AbstractModule
+public class TaxiStatusTimeProfileCollectorProvider
+    implements Provider<MobsimListener>
 {
-    public static final String TAXI_MODE = "taxi";
-
     private final TaxiData taxiData;
-    private final VehicleType vehicleType;
+    private final MatsimServices matsimServices;
 
 
-    public TaxiModule(TaxiData taxiData, TaxiConfigGroup taxiCfg)
-    {
-        this(taxiData, VehicleUtils.getDefaultVehicleType());
-    }
-
-
-    public TaxiModule(TaxiData taxiData, VehicleType vehicleType)
+    @Inject
+    public TaxiStatusTimeProfileCollectorProvider(TaxiData taxiData, MatsimServices matsimServices)
     {
         this.taxiData = taxiData;
-        this.vehicleType = vehicleType;
+        this.matsimServices = matsimServices;
     }
 
 
     @Override
-    public void install()
+    public MobsimListener get()
     {
-        addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
-        bind(TaxiData.class).toInstance(taxiData);
-        bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
-        bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
+        ProfileCalculator<String> dispatchStatsCalc = TimeProfiles.combineProfileCalculators(
+                TimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
+                TimeProfiles.createRequestsWithStatusCounter(taxiData,
+                        TaxiRequestStatus.UNPLANNED));
 
-        addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-        addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-        if (TaxiConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-            //add more time profiles if necessary, e.g. for eTaxis
-        }
+        return new TimeProfileCollector<>(dispatchStatsCalc, 300,
+                TimeProfiles.TAXI_TASK_TYPES_HEADER + TaxiRequestStatus.UNPLANNED, //
+                "taxi_status_time_profiles.txt", matsimServices);
     }
 }

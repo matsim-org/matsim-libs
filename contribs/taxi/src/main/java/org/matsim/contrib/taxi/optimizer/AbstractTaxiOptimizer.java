@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.*;
 
-import org.matsim.analysis.IterationStopWatch;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -43,9 +42,6 @@ public abstract class AbstractTaxiOptimizer
 
     protected boolean requiresReoptimization = false;
 
-    private static final String TAXI_OPTIMIZATION = "taxiOptim";
-    private final IterationStopWatch stopWatch;
-
 
     public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext,
             AbstractTaxiOptimizerParams params, Collection<TaxiRequest> unplannedRequests,
@@ -58,8 +54,6 @@ public abstract class AbstractTaxiOptimizer
         destinationKnown = optimContext.scheduler.getParams().destinationKnown;
         vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
         reoptimizationTimeStep = params.reoptimizationTimeStep;
-
-        stopWatch = optimContext.matsimServices.getStopwatch();
     }
 
 
@@ -67,8 +61,6 @@ public abstract class AbstractTaxiOptimizer
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (requiresReoptimization && (e.getSimulationTime() % reoptimizationTimeStep == 0)) {
-            stopWatch.beginOperation(TAXI_OPTIMIZATION);
-
             if (doUnscheduleAwaitingRequests) {
                 unscheduleAwaitingRequests();
             }
@@ -90,7 +82,6 @@ public abstract class AbstractTaxiOptimizer
             }
 
             requiresReoptimization = false;
-            stopWatch.endOperation(TAXI_OPTIMIZATION);
         }
     }
 
