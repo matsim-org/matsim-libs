@@ -101,9 +101,13 @@ public class TransitRouterImpl implements TransitRouter {
 		return travelDisutility.getTravelTime(person, coord, toCoord);
 	}
 
-	private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
-		return travelDisutility.getTravelDisutility(person, coord, toCoord);
-	}
+    private double getTransferTime(Person person, Coord coord, Coord toCoord) {
+    	return travelDisutility.getTravelTime(person, coord, toCoord) + this.config.getAdditionalTransferTime();
+    }
+
+    private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
+        return travelDisutility.getTravelDisutility(person, coord, toCoord);
+    }
 
 	@Override
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
@@ -159,7 +163,7 @@ public class TransitRouterImpl implements TransitRouter {
 		int transitLegCnt = 0;
 		for (Link ll : path.links) {
 			TransitRouterNetworkLink link = (TransitRouterNetworkLink) ll;
-			if (link.getLine() == null) {
+			if (link.line == null) {
 				// (it must be one of the "transfer" links.) finish the pt leg, if there was one before...
 				TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
 				if (route != null) {
@@ -183,7 +187,7 @@ public class TransitRouterImpl implements TransitRouter {
 			} else {
 				// (a real pt link)
 				currentDistance += link.getLength();
-				if (link.getRoute() != route) {
+				if (link.route != route) {
 					// the line changed
 					TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
 					if (route == null) {
@@ -192,13 +196,17 @@ public class TransitRouterImpl implements TransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
+//							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
+								double transferTime = getTransferTime(person, accessStop.getCoord(), egressStop.getCoord());
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
-								walkRoute.setTravelTime(walkTime);
+//							    walkRoute.setTravelTime(walkTime);
+								walkRoute.setTravelTime(transferTime);
 								walkRoute.setDistance( currentDistance );
 								leg.setRoute(walkRoute);
-								leg.setTravelTime(walkTime);
-								time += walkTime;
+//							    leg.setTravelTime(walkTime);
+								leg.setTravelTime(transferTime);
+//							    time += walkTime;
+								time += transferTime;
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
@@ -214,8 +222,8 @@ public class TransitRouterImpl implements TransitRouter {
 						}
 						currentDistance = 0;
 					}
-					line = link.getLine();
-					route = link.getRoute();
+					line = link.line;
+					route = link.route;
 					accessStop = egressStop;
 				}
 			}
