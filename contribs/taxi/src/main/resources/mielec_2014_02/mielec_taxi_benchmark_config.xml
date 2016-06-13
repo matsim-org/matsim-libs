@@ -41,7 +41,7 @@
 		<param name="snapshotStyle" value="queue" />
 		<param name="flowCapacityFactor" value="100.0" />
 	</module>
-	
+
 	<module name="controler">
 		<param name="outputDirectory" value="test/output/mielec_2014_02_benchmark" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
