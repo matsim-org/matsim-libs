@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 
-public class DynAgent
+public final class DynAgent
     implements MobsimDriverPassengerAgent
 {
     private DynAgentLogic agentLogic;
@@ -44,7 +44,7 @@ public class DynAgent
 
     private MobsimVehicle veh;
 
-    protected EventsManager events;
+    private EventsManager events;
 
     private MobsimAgent.State state;
 
@@ -55,8 +55,8 @@ public class DynAgent
 
     // =====
 
-    protected DynLeg dynLeg;
-    protected DynActivity dynActivity;
+    private DynLeg dynLeg;
+    private DynActivity dynActivity;
 
 
     // =====
