@@ -33,6 +33,7 @@ public class AssignmentTaxiOptimizerParams
     public static final String VEH_PLANNING_HORIZON_OVERSUPPLY = "vehPlanningHorizonOversupply";
     public static final String VEH_PLANNING_HORIZON_UNDERSUPPLY = "vehPlanningHorizonUndersupply";
 
+    //TODO should we adjust both the limits based on the current demand-supply relation?
     public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
     public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
 
