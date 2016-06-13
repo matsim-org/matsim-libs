@@ -23,6 +23,7 @@ package playground.boescpa.analysis.populationAnalysis;
 
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,11 +67,19 @@ public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (mode != null && (getActivityType() == null || activity.getType().equals(getActivityType()))) {
-					classifyDepTime(formerActDepTime, "total");
-					classifyDepTime(formerActDepTime, mode);
+				if (!activity.getType().equals("pt interaction")) {
+					if (mode != null && (getActivityType() == null || activity.getType().equals(getActivityType()))) {
+						classifyDepTime(formerActDepTime, "total");
+						classifyDepTime(formerActDepTime, mode);
+
+					/*if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
+						double duration = activity.getEndTime() - activity.getStartTime();
+						if (getActivityType() == null) classifyDuration(duration, "total");
+						classifyDuration(duration, activity.getType());
+					}*/
+					}
+					formerActDepTime = activity.getEndTime();
 				}
-				formerActDepTime = activity.getEndTime();
 			} else if (planElement instanceof Leg){
 				mode = ((Leg)planElement).getMode();
 			} else {

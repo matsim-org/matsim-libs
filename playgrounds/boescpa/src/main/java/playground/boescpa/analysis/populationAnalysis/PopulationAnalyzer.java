@@ -85,6 +85,7 @@ public abstract class PopulationAnalyzer {
 
 	private void analyzeAgents() {
 		this.population.getPersons().values().parallelStream().forEach(this::analyzeAgent);
+		//this.population.getPersons().values().stream().forEach(this::analyzeAgent);
 	}
 
 	protected abstract void analyzeAgent(Person person);

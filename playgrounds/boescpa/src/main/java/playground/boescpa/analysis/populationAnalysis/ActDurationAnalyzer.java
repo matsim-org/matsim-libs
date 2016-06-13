@@ -68,6 +68,7 @@ public class ActDurationAnalyzer extends PopulationAnalyzer{
 				if (getActivityType() == null || activity.getType().equals(getActivityType())) {
 					if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
 						double duration = activity.getEndTime() - activity.getStartTime();
+						duration = duration < 1 ? 1 : duration;
 						if (getActivityType() == null) classifyDuration(duration, "total");
 						classifyDuration(duration, activity.getType());
 					}
