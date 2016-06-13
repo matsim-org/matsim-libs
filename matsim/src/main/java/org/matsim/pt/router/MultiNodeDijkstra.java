@@ -20,17 +20,13 @@
 
 package org.matsim.pt.router;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitLeastCostPathTree.InitialNode;
-import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class MultiNodeDijkstra /*extends Dijkstra*/ {
@@ -50,17 +46,10 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 */
 	final TravelTime timeFunction;
 	
-	final HashMap<Id<Node>, DijkstraNodeData> nodeData;
-	private Person person = null;
-	private Vehicle vehicle = null;
-	private CustomDataManager customDataManager = new CustomDataManager();
-	
 	public MultiNodeDijkstra(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
 		this.network = network;
 		this.costFunction = costFunction;
 		this.timeFunction = timeFunction;
-		
-		this.nodeData = new HashMap<Id<Node>, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 	}
 
 	@SuppressWarnings("unchecked")
