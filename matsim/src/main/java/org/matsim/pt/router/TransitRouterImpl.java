@@ -34,7 +34,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.pt.router.TransitLeastCostPathTree.InitialNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
