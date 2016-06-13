@@ -162,14 +162,13 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
 
-		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory() ) ;
+		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() ) ;
 		
 		// new Route for current Leg.
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
 		final Person person = ((HasPerson) agent).getPerson();
 		final Integer linkIdx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
-//		EditRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now, scenario.getNetwork(), tripRouter);
 		editRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now) ;
 		
 		// the route _from_ the modified activity also needs to be replanned:

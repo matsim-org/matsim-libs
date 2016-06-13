@@ -3,16 +3,8 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import saleem.stockholmscenario.teleportation.ptoptimisation.utils.OptimisationUtils;
-import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class DepartureTimesManager {
 	public ArrayList<Departure> sortDepartures(ArrayList<Departure> deps){

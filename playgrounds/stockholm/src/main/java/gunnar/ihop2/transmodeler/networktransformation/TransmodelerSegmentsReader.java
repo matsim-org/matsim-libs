@@ -5,13 +5,14 @@ import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSi
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
-import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
-import floetteroed.utilities.tabularfileparser.TabularFileParser;
-import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
+import floetteroed.utilities.tabularfileparser.TabularFileParser;
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 /**
  * 

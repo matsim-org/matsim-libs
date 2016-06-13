@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -48,6 +49,7 @@ import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,9 +80,9 @@ public class KNAccidentScenario {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		
 		config.controler().setFirstIteration(10);
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(11);
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/telematics/output");
-		config.controler().setWriteEventsInterval(10);
+		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 		
 		config.qsim().setFlowCapFactor(0.04);
@@ -92,6 +94,11 @@ public class KNAccidentScenario {
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 		}
+		
+		StrategySettings stratSets = new StrategySettings() ;
+		stratSets.setStrategyName(DefaultSelector.KeepLastSelected.name());
+		stratSets.setWeight(1.);
+		config.strategy().addStrategySettings(stratSets);
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 		config.vspExperimental().setWritingOutputEvents(true);

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
@@ -130,13 +131,17 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 	public void writeModule(
 			final ConfigGroup module,
 			final BufferedWriter out) {
-		writeModule(
+		if ( ! (module instanceof ChangeLegModeConfigGroup) ) {
+			// yyyy special case to provide error message; may be removed eventually.  kai, may'16
+			
+			writeModule(
 				out,
 				"",
 				MODULE,
 				NAME,
 				module.getName(),
 				module );
+		}
 	}
 
 	@Override

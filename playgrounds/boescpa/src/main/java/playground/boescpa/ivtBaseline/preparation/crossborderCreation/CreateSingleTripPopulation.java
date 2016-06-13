@@ -56,6 +56,7 @@ public abstract class CreateSingleTripPopulation {
 	private final ActivityFacilities bcFacilities = FacilitiesUtils.createActivityFacilities();
 	private final double[] cummulativeDepartureProbability;
 	private final double samplePercentage;
+	protected final String mode;
 	protected final Random random;
 	private int index = 0;
 
@@ -74,6 +75,7 @@ public abstract class CreateSingleTripPopulation {
 		addHomeActivityIfNotInFacilityYet(this.origFacilities);
 		this.cummulativeDepartureProbability = readDepartures(this.configGroup.getPathToCumulativeDepartureProbabilities());
 		this.samplePercentage = this.configGroup.getSamplePercentage();
+		this.mode = this.configGroup.getMode();
 		this.random = new Random(this.configGroup.getRandomSeed());
 	}
 
@@ -115,7 +117,7 @@ public abstract class CreateSingleTripPopulation {
 		}
 		if (random.nextDouble() > samplePercentage) return;
 		// create and add new agent
-		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(this.configGroup.getTag() + "_" + subTag + "_" + index++, Person.class));
+		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(this.configGroup.getTag() + "_" + mode + "_" + subTag + "_" + index++, Person.class));
 		newCBPopulation.addPerson(p);
 		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", this.configGroup.getTag());
 		// store facilities (if not already stored)

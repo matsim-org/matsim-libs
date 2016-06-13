@@ -36,6 +36,7 @@ public class TagFilter {
 
 	public final static String MATCH_ALL = "*";
 	private final Map<String, Set<String>> keyValuePairs = new HashMap<>();
+	private final Map<String, Set<String>> keyValueExceptions = new HashMap<>();
 
 	public TagFilter() {
 	}
@@ -63,6 +64,18 @@ public class TagFilter {
 	 * @return <code>true</code> if at least one of the given tags matches any one of the specified filter-tags.
 	 */
 	public boolean matches(final Map<String, String> tags) {
+		// check for exceptions
+		for (Map.Entry<String, Set<String>> e : keyValueExceptions.entrySet()) {
+			if(tags.containsKey(e.getKey()) && e.getValue() == null) {
+				return false;
+			}
+			String value = tags.get(e.getKey());
+			if (value != null && (e.getValue().contains(value) || e.getValue().contains(MATCH_ALL))) {
+				return false;
+			}
+		}
+
+		// check for positive list
 		for (Map.Entry<String, Set<String>> e : keyValuePairs.entrySet()) {
 			if(tags.containsKey(e.getKey()) && e.getValue() == null) {
 				return true;
@@ -72,7 +85,24 @@ public class TagFilter {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
+	/**
+	 * Adds an exception to the filter, that is if this key and value appears,
+	 * the filter will return false
+	 */
+	public void addException(final String key, final String value) {
+		if(value == null) {
+			keyValueExceptions.put(key, null);
+		} else {
+			Set<String> values = MapUtils.getSet(key, keyValueExceptions);
+			values.add(value);
+		}
+	}
+
+	public void addException(final String key) {
+		addException(key, null);
+	}
 }

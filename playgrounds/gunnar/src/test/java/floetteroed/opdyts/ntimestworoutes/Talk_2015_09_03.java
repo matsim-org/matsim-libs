@@ -1,21 +1,11 @@
 package floetteroed.opdyts.ntimestworoutes;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.utilities.latex.PSTricksDiagramWriter;
-import floetteroed.utilities.math.Discretizer;
-import floetteroed.utilities.math.MathHelpers;
+import floetteroed.utilities.Discretizer;
 import floetteroed.utilities.math.Vector;
 
 /**

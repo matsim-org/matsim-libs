@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -32,19 +33,19 @@ class ThreadedMatrixCreator implements Runnable {
 	private Thread thread;
 	private Integer threadName;
 	private Scenario scenario;
-	private Map<Id<Coord>, Coord> locationFacilitiesFromMap;
-	private Map<Id<Coord>, Coord> locationFacilitiesToMap;
+	private Map<? extends Id<? extends Facility>, ? extends Facility> locationFacilitiesFromMap;
+	private Map<? extends Id<? extends Facility>, ? extends Facility> locationFacilitiesToMap;
 	private double departureTime;
 	private String outputRoot;
 	private String separator;
 	
 	
-	ThreadedMatrixCreator(Scenario scenario, Map<Id<Coord>, Coord> locationFacilitiesFromMap,
-			Map<Id<Coord>, Coord> locationFacilitiesToMap,
+	ThreadedMatrixCreator(Scenario scenario, Map<? extends Id<? extends Facility>, ? extends Facility> map,
+			Map<? extends Id<? extends Facility>, ? extends Facility> ptMatrixLocationsMap,
 			double departureTime, String outputRoot, String separator, int threadName){
 		this.scenario = scenario;
-		this.locationFacilitiesFromMap = locationFacilitiesFromMap;
-		this.locationFacilitiesToMap = locationFacilitiesToMap;
+		this.locationFacilitiesFromMap = map;
+		this.locationFacilitiesToMap = ptMatrixLocationsMap;
 		this.departureTime = departureTime;
 		this.outputRoot = outputRoot;
 		this.separator = separator;
@@ -90,15 +91,19 @@ class ThreadedMatrixCreator implements Runnable {
 
 		
 		// actual computation for each OD relation
-		for (Id<Coord> fromLocation : locationFacilitiesFromMap.keySet()) {
-			for (Id<Coord> toLocation : locationFacilitiesToMap.keySet()) {
+//		for (Id<Coord> fromLocation : locationFacilitiesFromMap.keySet()) {
+//			for (Id<Coord> toLocation : locationFacilitiesToMap.keySet()) {
+		for ( Facility fromFac : locationFacilitiesFromMap.values() ) {
+			for ( Facility toFac : locationFacilitiesToMap.values() ) {	
 				int counterTransitLegs = 0;				
 				
-				Coord fromCoord = locationFacilitiesFromMap.get(fromLocation);
-				Coord toCoord = locationFacilitiesToMap.get(toLocation);
+//				Coord fromCoord = locationFacilitiesFromMap.get(fromLocation);
+//				Coord toCoord = locationFacilitiesToMap.get(toLocation);
+				Coord fromCoord = fromFac.getCoord() ;
+				Coord toCoord = toFac.getCoord() ;
 				
 				// legList = list of legs sequentially travelled on a OD relation, e.g. transit_walk ...  pt ... transit_walk
-				List<Leg> legList = transitRouter.calcRoute(fromCoord, toCoord, departureTime, null);
+				List<Leg> legList = transitRouter.calcRoute(fromFac, toFac, departureTime, null);
 				
 				double travelTime = 0.;
 				double travelDistance = 0.;
@@ -108,7 +113,7 @@ class ThreadedMatrixCreator implements Runnable {
 					
 					// if origin == destination, there is one (transit) walk leg with zero travel time, which is
 					// correctly picked up below
-					log.warn("Leg list is null! Origin = " + fromLocation + " -- Destination = " + toLocation
+					log.warn("Leg list is null! Origin = " + fromFac.getId() + " -- Destination = " + toFac.getId()
 							+ " Setting time and distance to infinity.");
 					// TODO check if a very high value is better than positive infinity
 					travelTime = Float.MAX_VALUE;
@@ -214,13 +219,13 @@ class ThreadedMatrixCreator implements Runnable {
 					}
 				}
 				
-				travelTimeMatrixWriter.writeField(fromLocation);
-				travelTimeMatrixWriter.writeField(toLocation);
+				travelTimeMatrixWriter.writeField(fromFac.getId());
+				travelTimeMatrixWriter.writeField(toFac.getId());
 				travelTimeMatrixWriter.writeField(travelTime);
 				travelTimeMatrixWriter.writeNewLine();
 				
-				travelDistanceMatrixWriter.writeField(fromLocation);
-				travelDistanceMatrixWriter.writeField(toLocation);
+				travelDistanceMatrixWriter.writeField(fromFac.getId());
+				travelDistanceMatrixWriter.writeField(toFac.getId());
 				travelDistanceMatrixWriter.writeField(travelDistance);
 				travelDistanceMatrixWriter.writeNewLine();
 				

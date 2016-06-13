@@ -46,7 +46,7 @@ import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.TaxibusLine;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusVehicleRequestPath;
+import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**
  * @author jbischoff
@@ -56,7 +56,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 
 	private LeastCostPathCalculatorWithCache routerWithCache;
 	private LineDispatcher dispatcher;
-	private Map<Id<TaxibusLine>, Set<TaxibusVehicleRequestPath>> currentRequestPathsForLine = new HashMap<>();
+	private Map<Id<TaxibusLine>, Set<TaxibusDispatch>> currentRequestPathsForLine = new HashMap<>();
 	private static final Logger log = Logger.getLogger(MultipleFifoOptimizer.class);
 	private int twmaxdepartures = 0;
 	private int fullBusDepartures = 0;
@@ -86,7 +86,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 		routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router,
 		        TimeDiscretizer.OPEN_ENDED_15_MIN);
 		for (Id<TaxibusLine> line : this.dispatcher.getLines().keySet()) {
-			this.currentRequestPathsForLine.put(line, new LinkedHashSet<TaxibusVehicleRequestPath>());
+			this.currentRequestPathsForLine.put(line, new LinkedHashSet<TaxibusDispatch>());
 
 		}
 
@@ -101,7 +101,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 
 			{
 
-				Set<TaxibusVehicleRequestPath> setToDepart = new HashSet<>();
+				Set<TaxibusDispatch> setToDepart = new HashSet<>();
 				TaxibusLine line = dispatcher.findLineForRequest(req);
 				if (line == null) {
 					// log.error("rejecting reqeuest" + req.getId() + " f " +
@@ -111,14 +111,14 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 					continue;
 				}
 
-				Set<TaxibusVehicleRequestPath> requestPaths = this.currentRequestPathsForLine.get(line.getId());
-				TaxibusVehicleRequestPath best = null;
+				Set<TaxibusDispatch> requestPaths = this.currentRequestPathsForLine.get(line.getId());
+				TaxibusDispatch best = null;
 
 				VrpPathWithTravelData bestPath = null;
 				double bestCriteria = Double.MAX_VALUE;
 
 				// go through existing open paths
-				for (TaxibusVehicleRequestPath taxibusVehicleRequestPath : requestPaths) {
+				for (TaxibusDispatch taxibusVehicleRequestPath : requestPaths) {
 					if (taxibusVehicleRequestPath.getEarliestNextDeparture() >= taxibusVehicleRequestPath.getTwMax()) {
 						setToDepart.add(taxibusVehicleRequestPath);
 						continue;
@@ -151,7 +151,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 							this.optimContext.timer.getTimeOfDay(), routerWithCache, optimContext.travelTime);
 					if (getCriteriaFromPath(path) < bestCriteria) {
 						Vehicle veh = line.getNextEmptyVehicle();
-						best = new TaxibusVehicleRequestPath(veh, req, path);
+						best = new TaxibusDispatch(veh, req, path);
 						double twmax = Math.max(req.getT0(), path.getArrivalTime()) + line.getCurrentTwMax();
 						best.setTwMax(twmax);
 						handledRequests.add(req);
@@ -171,7 +171,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 						log.info(best.vehicle.getId() + " departs fully booked: " + fullBusDepartures);
 					}
 				}
-				for (TaxibusVehicleRequestPath ta : setToDepart) {
+				for (TaxibusDispatch ta : setToDepart) {
 					fillPathWithDropOffsAndSchedule(ta, line.getId());
 					requestPaths.remove(ta);
 					twmaxdepartures++;
@@ -194,7 +194,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 		return 0;
 	}
 
-	private void fillPathWithDropOffsAndSchedule(TaxibusVehicleRequestPath requestPath, Id<TaxibusLine> id) {
+	private void fillPathWithDropOffsAndSchedule(TaxibusDispatch requestPath, Id<TaxibusLine> id) {
 
 		Set<TaxibusRequest> allRequests = new LinkedHashSet<TaxibusRequest>();
 		allRequests.addAll(requestPath.requests);
@@ -223,10 +223,10 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 
 		// make sure to send taxis on their way once TwMax is exceeded
 		for (Id<TaxibusLine> lineId : this.currentRequestPathsForLine.keySet()) {
-			Set<TaxibusVehicleRequestPath> removedPaths = new HashSet<>();
-			Set<TaxibusVehicleRequestPath> currentPathsOnLine = this.currentRequestPathsForLine.get(lineId);
+			Set<TaxibusDispatch> removedPaths = new HashSet<>();
+			Set<TaxibusDispatch> currentPathsOnLine = this.currentRequestPathsForLine.get(lineId);
 			if (currentPathsOnLine != null) {
-				for (TaxibusVehicleRequestPath path : currentPathsOnLine) {
+				for (TaxibusDispatch path : currentPathsOnLine) {
 					if (path.getTwMax() < e.getSimulationTime()) {
 
 						log.info("bus " + path.vehicle.getId() + " has reached TwMax with " + path.requests.size()

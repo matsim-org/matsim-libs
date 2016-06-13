@@ -46,6 +46,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -107,79 +108,107 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 											locomotiveAttributes, 
 											sc.getPopulation().getPersonAttributes());
 		TransitRouterNetwork network = WagonSimRouterFactoryImpl.createRouterNetwork(sc.getTransitSchedule(), 0);
-		TransitRouter router = new TransitRouterImpl(routerConfig, prepSchedule, network, tt, tt);
+		TransitRouterImpl router = new TransitRouterImpl(routerConfig, prepSchedule, network, tt, tt);
 		Person p = sc.getPopulation().getPersons().get(Id.create("1", Person.class));
+		final Person person = p;
 		
 		// calc the first best route without any congestion
-		List<Leg> legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
+		List<Leg> legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 0, person );
 		Assert.equals(210., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
+		final Person person1 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 110, person1 );
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
+		final Person person2 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 111, person2 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
+		final Person person3 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 410, person3 );
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
+		final Person person4 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 411, person4 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
+		final Person person5 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 710, person5 );
 		Assert.equals(100., legs.get(1).getTravelTime());
+		final Person person6 = p;
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 711, person6 );
 		Assert.equals(85899., legs.get(1).getTravelTime());
 		
 		// only the first departure is overcrowded
 		vehLoad.entering(WagonSimVehicleLoadListener.getIdentifier("v1", "f1", 0), 50000, 990);
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
+		final Person person7 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 0, person7 );
 		Assert.equals(510., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
+		final Person person8 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 110, person8 );
 		Assert.equals(400., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
+		final Person person9 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 111, person9 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
+		final Person person10 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 410, person10 );
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
+		final Person person11 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 411, person11 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
+		final Person person12 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 710, person12 );
 		Assert.equals(100., legs.get(1).getTravelTime());
+		final Person person13 = p;
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 711, person13 );
 		Assert.equals(86199., legs.get(1).getTravelTime());
 		
 		// first and second departure is overcrowded
 		vehLoad.entering(WagonSimVehicleLoadListener.getIdentifier("v2", "f1", 0), 50000, 990);
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
+		final Person person14 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 0, person14 );
 		Assert.equals(810., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
+		final Person person15 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 110, person15 );
 		Assert.equals(700., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
+		final Person person16 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 111, person16 );
 		Assert.equals(699., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
+		final Person person17 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 410, person17 );
 		Assert.equals(400., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
+		final Person person18 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 411, person18 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
+		final Person person19 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 710, person19 );
 		Assert.equals(100., legs.get(1).getTravelTime());
+		final Person person20 = p;
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 711, person20 );
 		Assert.equals(86499., legs.get(1).getTravelTime());
 		
 		// all departures are overcrowded (disutility for all connections). Therefore,
 		// we get the same results as they are returned without any congestion.
 		vehLoad.entering(WagonSimVehicleLoadListener.getIdentifier("v3", "f1", 0), 50000, 990);
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 0, p);
+		final Person person21 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 0, person21 );
 		Assert.equals(210., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 110, p);
+		final Person person22 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 110, person22 );
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 111, p);
+		final Person person23 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 111, person23 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 410, p);
+		final Person person24 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 410, person24 );
 		Assert.equals(100., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 411, p);
+		final Person person25 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 411, person25 );
 		Assert.equals(399., legs.get(1).getTravelTime());
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 710, p);
+		final Person person26 = p;
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 710, person26 );
 		Assert.equals(100., legs.get(1).getTravelTime());
+		final Person person27 = p;
 		// we missed the last departure, thus, the (same) departure of the next day is chosen (independent from congestion)
-		legs = router.calcRoute(new Coord((double) 0, (double) 0), new Coord((double) 100, (double) 100), 711, p);
+		legs = router.calcRoute( new FakeFacility(new Coord((double) 0, (double) 0)), new FakeFacility(new Coord((double) 100, (double) 100)), (double) 711, person27 );
 		Assert.equals(85899., legs.get(1).getTravelTime());
 	}
 	

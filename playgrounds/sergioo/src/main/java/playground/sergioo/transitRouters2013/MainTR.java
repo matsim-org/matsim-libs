@@ -91,47 +91,47 @@ public class MainTR {
 		long time;
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouter.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouter.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" W");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWW.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWW.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WW");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckW.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckW.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckW");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWS.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWS.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WS");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWStuple.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWStuple.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WStuple");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckS.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckS.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckS");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckStuple.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckStuple.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckStuple");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWSV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWSV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WSV");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWStupleV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWStupleV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WStupleV");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckSV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckSV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckSV");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckStupleV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckStupleV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckStupleV");
 	}
 

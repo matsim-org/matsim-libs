@@ -21,7 +21,7 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -52,8 +52,8 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private int findSnapshotPeriod(Config config) {
 		if (config.qsim() != null) {
 			return (int) config.qsim().getSnapshotPeriod();
-		} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
-			return (int) ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod();
+//		} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
+//			return (int) ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod();
 		} else {
 			return 1;
 		}

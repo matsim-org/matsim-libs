@@ -20,8 +20,6 @@
 
 package org.matsim.core.scoring.functions;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;

@@ -73,7 +73,7 @@ public class TaxiStatsDumper
     }
 
 
-    private void appendToMultiDayStats(DailyTaxiStats s, AfterMobsimEvent event)
+    private void appendToMultiDayStats(TaxiStats s, AfterMobsimEvent event)
     {
         multiDayWriter.writeNext(new CSVLineBuilder().add(event.getIteration() + "") //
                 .addEmpty() //

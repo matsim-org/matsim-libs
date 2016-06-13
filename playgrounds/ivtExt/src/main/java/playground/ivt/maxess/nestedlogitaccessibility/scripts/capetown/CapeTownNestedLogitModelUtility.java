@@ -30,7 +30,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.capetown.PersonEnums;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,6 @@ import java.util.Map;
  * @author thibautd
  */
 public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
-	private final ObjectAttributes personAttributes;
 	private final CapeTownNestedLogitModelConfigGroup pars;
 
 	private final Households households;
@@ -50,16 +48,19 @@ public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
 	public CapeTownNestedLogitModelUtility(
 			final Scenario scenario ) {
 		this( (CapeTownNestedLogitModelConfigGroup) scenario.getConfig().getModule( CapeTownNestedLogitModelConfigGroup.GROUP_NAME ),
-				scenario.getPopulation().getPersonAttributes(),
 				scenario.getHouseholds() );
 	}
 
 	public CapeTownNestedLogitModelUtility(
 			final CapeTownNestedLogitModelConfigGroup configGroup,
-			final ObjectAttributes personAttributes, final Households households ) {
-		this.personAttributes = personAttributes;
+			final Households households ) {
 		this.pars = configGroup;
 		this.households = households;
+		for ( Household hh : households.getHouseholds().values() ) {
+			for ( Id<Person> personId : hh.getMemberIds() ) {
+				person2household.put( personId , hh.getId() );
+			}
+		}
 	}
 
 	@Override
@@ -95,35 +96,6 @@ public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
 		return (Integer) households.getHouseholdAttributes().getAttribute( hh.toString() , att );
 	}
 
-	private boolean hasMotoLicense( Person decisionMaker ) {
-		final String license = (String)
-				personAttributes.getAttribute(
-						decisionMaker.getId().toString(),
-						"license_motorcycle" );
-		switch( PersonEnums.LicenseMotorcycle.parseFromDescription( license ) ) {
-			case YES:
-				return true;
-			case UNKNOWN:
-			case NO:
-				return false;
-		}
-		throw new RuntimeException();
-	}
-
-	private boolean hasCarLicense( Person decisionMaker ) {
-		final String license = (String)
-				personAttributes.getAttribute(
-						decisionMaker.getId().toString(),
-						"license_car" );
-		switch ( PersonEnums.LicenseCar.parseFromDescription( license ) ) {
-			case YES:
-				return true;
-			case UNKNOWN:
-			case NO:
-				return false;
-		}
-		throw new RuntimeException();
-	}
 
 	private double getTravelTime( Alternative<ModeNests> a ) {
 		final List<? extends PlanElement> trip = a.getAlternative().getTrip();

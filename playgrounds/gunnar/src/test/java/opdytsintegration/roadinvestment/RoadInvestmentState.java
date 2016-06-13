@@ -1,11 +1,10 @@
 package opdytsintegration.roadinvestment;
 
-import opdytsintegration.MATSimState;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.MATSimState;
 
 /**
  * 

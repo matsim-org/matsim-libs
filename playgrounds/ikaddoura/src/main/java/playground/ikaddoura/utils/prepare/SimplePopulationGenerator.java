@@ -42,9 +42,9 @@ public class SimplePopulationGenerator {
 	
 	public static void main(String[] args) {
 		
-		final String networkFile = "../../../runs-svn/intervalBasedCongestionPricing/input/network.xml";
-		final String outputDirectory = "../../../runs-svn/intervalBasedCongestionPricing/input/";
-		final int totalDemand = 1000;
+		final String networkFile = "../../../runs-svn/vickreyPricing/input/network.xml";
+		final String outputDirectory = "../../../runs-svn/vickreyPricing/input/";
+		final int totalDemand = 7200;
 		
 		final File directory = new File(outputDirectory);
 		directory.mkdirs();
@@ -52,7 +52,7 @@ public class SimplePopulationGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		String populationFile = outputDirectory + "population_" + totalDemand + "agents.xml";
+		String populationFile = outputDirectory + "population_" + totalDemand + "trips.xml";
 		
 		SimplePopulationGenerator pG = new SimplePopulationGenerator(scenario);
 		pG.writePopulation(totalDemand, populationFile);
@@ -80,19 +80,19 @@ public class SimplePopulationGenerator {
 			Plan plan = this.population.getFactory().createPlan();
 	
 			Activity activity1 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-			activity1.setEndTime(8 * 3600.);
+			activity1.setEndTime(7 * 3600.);
 			plan.addActivity(activity1);
 				
 			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));
 
 			Activity activity2 = this.population.getFactory().createActivityFromCoord("work", workCoord);
-			activity2.setEndTime(16 * 3600.);
+//			activity2.setEndTime(activity1.getEndTime() + 8 * 3600.);
 			plan.addActivity(activity2);
 			
-			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));
-
-			Activity activity3 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-			plan.addActivity(activity3);
+//			plan.addLeg(this.population.getFactory().createLeg(TransportMode.pt));
+//
+//			Activity activity3 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
+//			plan.addActivity(activity3);
 			
 			person.addPlan(plan);
 			this.population.addPerson(person);

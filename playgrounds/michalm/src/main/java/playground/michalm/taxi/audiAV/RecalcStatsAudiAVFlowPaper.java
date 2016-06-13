@@ -41,9 +41,9 @@ public class RecalcStatsAudiAVFlowPaper
         ExecutorService service = Executors
                 .newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
 
-        for (String fleet : HourlyTaxiStatsExtractor.FLEETS) {
-            for (String av : HourlyTaxiStatsExtractor.AVS) {
-                String id = HourlyTaxiStatsExtractor.getId(fleet, av);
+        for (String fleet : TaxiStatsExtractor.FLEETS) {
+            for (String av : TaxiStatsExtractor.AVS) {
+                String id = TaxiStatsExtractor.getId(fleet, av);
 
                 service.execute(() -> {
                 TaxiData taxiData = ScheduleReconstructor.reconstructFromFile(network,

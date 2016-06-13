@@ -40,6 +40,8 @@ public class TransformNetworkFile {
 
 	private static final Logger log = Logger.getLogger(TransformNetworkFile.class);
 
+	private TransformNetworkFile() {}
+
 	/**
 	 * 	Transforms a network file.
 	 *

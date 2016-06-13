@@ -183,10 +183,11 @@ public class RunCapeTownTripChoiceSetConversion {
 			// "hierarchy" of modes
 			if ( containsAny( usedModes , "brt" , "bus" , "rail" ) ) return TransportMode.pt;
 			// TODO: handle differently than formal pt
-			if ( containsAny( usedModes , "taxi" ) ) return TransportMode.pt;
+			if ( containsAny( usedModes , "taxi" ) ) return "taxi";
 			// handle mode from the router (not strictly necessary)
 			if ( containsAny( usedModes , TransportMode.pt ) ) return TransportMode.pt;
-			if ( containsAny( usedModes , "car" , "ride" ) ) return TransportMode.car;
+			if ( containsAny( usedModes , "car" ) ) return TransportMode.car;
+			if ( containsAny( usedModes , "ride" ) ) return TransportMode.ride;
 			if ( containsAny( usedModes , "walk" ) ) return TransportMode.walk;
 			return "other";
 		}

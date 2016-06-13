@@ -19,35 +19,43 @@
 package playground.polettif.publicTransitMapping.plausibility;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
+import org.xml.sax.SAXException;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
-import playground.polettif.publicTransitMapping.tools.CsvTools;
-import playground.polettif.publicTransitMapping.tools.MiscUtils;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-import playground.polettif.publicTransitMapping.tools.shp.Schedule2ShapeFileWriter;
+import playground.polettif.publicTransitMapping.tools.*;
+import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuth;
+import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuthDiff;
 import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
 
 /**
@@ -63,7 +71,6 @@ public class PlausibilityCheck {
 	public static final String CsvSeparator = ";";
 
 	private static final double PI = Math.PI;
-	private static final double PI2 = 2 * Math.PI;
 
 	public static final String TRAVEL_TIME_WARNING = "TravelTimeWarning";
 	public static final String LOOP_WARNING = "LoopWarning";
@@ -76,40 +83,83 @@ public class PlausibilityCheck {
 
 	private Map<String, Double> thresholds;
 
-	private TransitSchedule schedule;
-	private Network network;
+	private final TransitSchedule schedule;
+	private final Network network;
+	private final String coordinateSystem;
 
-	public PlausibilityCheck(TransitSchedule schedule, Network network) {
+
+	public PlausibilityCheck(TransitSchedule schedule, Network network, String coordinateSystem) {
 		this.schedule = schedule;
 		this.network = network;
+		this.coordinateSystem = coordinateSystem;
 
 		this.thresholds = new HashMap<>();
-		this.thresholds.put("bus", 0.8 * PI);
-		this.thresholds.put("rail", 0.2 * PI);
+		this.thresholds.put("bus", 0.7 * PI);
+		this.thresholds.put("rail", 0.3 * PI);
 	}
 
 	/**
-	 * @param args schedule file, network file, output folder
+	 * Performs a plausibility check on the given schedule and network files
+	 * and writes the results to the output folder.
+	 * @param args schedule file, network file, coordinate system, output folder
 	 */
 	public static void main(final String[] args) {
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
-		Network network = NetworkTools.loadNetwork(args[1]);
+		run(args[0], args[1], args[2], args[3]);
+	}
 
-		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
-		check.run();
+	/**
+	 * Performs a plausibility check on the given schedule and network files
+	 * and writes the results to the output folder.
+	 * @param scheduleFile the schedule file
+	 * @param networkFile network file
+	 * @param coordinateSystem A name used by {@link MGC}. Use EPSG:* code to avoid problems.
+	 * @param outputFolder the output folder where all csv and shapefiles are written
+	 */
+	public static void run(String scheduleFile, String networkFile, String coordinateSystem, String outputFolder) {
+		setLogLevels();
 
-		check.writeCsv(args[2] + "allPlausibilityWarnings.csv");
-		check.writeResultShapeFiles(args[2]);
+		log.info("Reading schedule...");
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(scheduleFile);
+		log.info("Reading network...");
+		Network network = NetworkTools.readNetwork(networkFile);
 
-		Schedule2ShapeFileWriter schedule2shp = new Schedule2ShapeFileWriter(schedule, network);
-		schedule2shp.routes2Polylines(args[2]+"Schedule_TransitRoutes.shp");
-		schedule2shp.stopFacilities2Shapes(args[2]+"Schedule_StopFacilities.shp", args[2]+"Schedule_StopFacilities_refLinks.shp");
+		log.info("Run TransitScheduleValidator...");
+		TransitScheduleValidator.ValidationResult v = TransitScheduleValidator.validateAll(schedule, network);
+		TransitScheduleValidator.printResult(v);
+
+		log.info("Start plausibility check...");
+		PlausibilityCheck check = new PlausibilityCheck(schedule, network, coordinateSystem);
+		check.runCheck();
+
+		if(!outputFolder.endsWith("/")) {
+			outputFolder = outputFolder + "/";
+		}
+
+		new File(outputFolder).mkdir();
+		new File(outputFolder+"shp/").mkdir();
+		new File(outputFolder+"shp/schedule/").mkdir();
+		new File(outputFolder+"shp/warnings/").mkdir();
+		check.writeCsv(outputFolder + "allPlausibilityWarnings.csv");
+		check.writeResultShapeFiles(outputFolder+"shp/warnings/");
+
+		ScheduleShapeFileWriter schedule2shp = new ScheduleShapeFileWriter(schedule, network);
+		schedule2shp.routes2Polylines(outputFolder+"shp/schedule/TransitRoutes.shp");
+		schedule2shp.stopFacilities2Shapes(outputFolder+"shp/schedule/StopFacilities.shp", outputFolder+"shp/schedule/StopFacilities_refLinks.shp");
+
+		// stop facility histogram
+		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
+		try {
+			histogram.createCsv(outputFolder + "stopfacilities.csv");
+			histogram.createPng(outputFolder + "stopfacilities_histogram.png");
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			log.warn("Could not write stopfacilities.csv");
+		}
 	}
 
 	/**
 	 * Performs the plausibility check on the schedule
 	 */
-	public void run() {
+	public void runCheck() {
 		AbstractPlausibilityWarning.setNetwork(network);
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
@@ -144,7 +194,9 @@ public class PlausibilityCheck {
 						ttActual = 0;
 						previousStop = nextStop;
 						departTime = previousStop.getDepartureOffset();
-						nextStop = stopsIterator.next();
+						if(!nextStop.equals(transitRoute.getStops().get(transitRoute.getStops().size() - 1))) {
+							nextStop = stopsIterator.next();
+						}
 					}
 
 					// loopcheck
@@ -155,7 +207,7 @@ public class PlausibilityCheck {
 
 					// angle check (check if one link has length 0)
 					if(directionChangeThreshold != null) {
-						double angleDiff = getAzimuthDiff(linkFrom, linkTo);
+						double angleDiff = CoordTools.getAzimuthDiff(linkFrom, linkTo);
 						if(Math.abs(angleDiff) > directionChangeThreshold && linkFrom.getLength() > 0 && linkTo.getLength() > 0 && angleDiff != PI) {
 							PlausibilityWarning warning = new DirectionChangeWarning(transitLine, transitRoute, linkFrom, linkTo, directionChangeThreshold, angleDiff);
 							addWarningToContainers(warning);
@@ -206,18 +258,19 @@ public class PlausibilityCheck {
 
 		PolylineFeatureFactory travelTimeWarningsFF = new PolylineFeatureFactory.Builder()
 				.setName("TravelTimeWarnings")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS(coordinateSystem))
 				.addAttribute("warningIds", String.class)
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
-				.addAttribute("diff", Double.class)
+				.addAttribute("diff [s]", Double.class)
+				.addAttribute("diff [%]", Double.class)
 				.addAttribute("expected", Double.class)
 				.addAttribute("actual", Double.class)
 				.create();
 
 		PolylineFeatureFactory loopWarningsFF = new PolylineFeatureFactory.Builder()
 				.setName("LoopWarnings")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS(coordinateSystem))
 				.addAttribute("warningIds", String.class)
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
@@ -225,7 +278,7 @@ public class PlausibilityCheck {
 
 		PolylineFeatureFactory directionChangeWarnings = new PolylineFeatureFactory.Builder()
 				.setName("DirectionChangeWarnings")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS(coordinateSystem))
 				.addAttribute("warningIds", String.class)
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
@@ -239,7 +292,7 @@ public class PlausibilityCheck {
 			boolean createTravelTimeFeature = false;
 			boolean createDirectionChangeFeature = false;
 
-			double diff = -1, ttExpected = -1, ttActual = -1, azDiff = 0.0;
+			double diff = -1, diffPerc = -1, ttExpected = -1, ttActual = -1, azDiff = 0.0;
 
 			Set<Id<PlausibilityWarning>> warningIds = new HashSet<>();
 			Set<String> routeIds = new HashSet<>();
@@ -248,14 +301,11 @@ public class PlausibilityCheck {
 				// Travel Time Warnings
 				if(w instanceof TravelTimeWarning) {
 					createTravelTimeFeature = true;
-					if(w.getDifference() > diff) {
+					if(w.getExpected()/w.getActual() > diff) {
 						diff = w.getDifference();
-					}
-					if(w.getExpected() > ttExpected) {
-						ttExpected = w.getExpected();
-					}
-					if(w.getActual() > ttActual) {
 						ttActual = w.getActual();
+						ttExpected = w.getExpected();
+						diffPerc = ttActual / ttExpected - 1;
 					}
 					warningIds.add(w.getId());
 					routeIds.add(w.getTransitLine().getId() + ":" + w.getTransitRoute().getId());
@@ -283,7 +333,8 @@ public class PlausibilityCheck {
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
-				f.setAttribute("diff", diff);
+				f.setAttribute("diff [s]", diff);
+				f.setAttribute("diff [%]", diffPerc);
 				f.setAttribute("expected", ttExpected);
 				f.setAttribute("actual", ttActual);
 				traveltTimeWarningsFeatures.add(f);
@@ -330,8 +381,6 @@ public class PlausibilityCheck {
 
 	/**
 	 * Transforms a list of link ids to an array of coordinates for shp features
-	 *
-	 * @return
 	 */
 	public Coordinate[] linkIdList2Coordinates(List<Id<Link>> linkIdList) {
 		List<Coordinate> coordList = new ArrayList<>();
@@ -344,120 +393,13 @@ public class PlausibilityCheck {
 		return coordinates;
 	}
 
-	/**
-	 * calculates the azimuth difference of two links
-	 *
-	 * @param link1
-	 * @param link2
-	 * @return the difference in [rad]
-	 */
-	private static double getAzimuthDiff(Link link1, Link link2) {
-		Coord c1 = link1.getFromNode().getCoord();
-		Coord c2 = link2.getToNode().getCoord();
-
-		if(c1.equals(c2)) {
-			return PI;
-		}
-
-		double az1 = getAzimuth(c1, link1.getToNode().getCoord());
-		double az2 = getAzimuth(link2.getFromNode().getCoord(), c2);
-		double diff = Math.abs(az2 - az1);
-
-		return (diff > PI ? PI2 - diff : diff);
-	}
-
-
-	private void p(Object s) {
-		System.out.println(s);
-	}
-
-
-
-	@Deprecated
-	public void writeCsvResultsBySchedule(String outputFile) {
-		List<String> csvLines = new ArrayList<>();
-		csvLines.add("WarningType" + PlausibilityCheck.CsvSeparator +
-				"TransitLine" + PlausibilityCheck.CsvSeparator +
-				"TransitRoute" + PlausibilityCheck.CsvSeparator +
-				"fromId" + PlausibilityCheck.CsvSeparator +
-				"toId" + PlausibilityCheck.CsvSeparator +
-				"diff" + PlausibilityCheck.CsvSeparator +
-				"expected" + PlausibilityCheck.CsvSeparator +
-				"actual");
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				for(PlausibilityWarning warning : e2.getValue()) {
-					csvLines.add(warning.getCsvLine());
-				}
-			}
-		}
-		try {
-			CsvTools.writeToFile(csvLines, outputFile);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Deprecated
-	public void writeCsvResultsByLinkId(String outputFile) {
-		List<String> csvLines = new ArrayList<>();
-		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
-			for(PlausibilityWarning warning : e.getValue()) {
-				csvLines.addAll(warning.getCsvLineForEachLink());
-			}
-		}
-
-		try {
-			CsvTools.writeToFile(csvLines, outputFile);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	public void printSummary() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				System.out.println(transitRoute.getId());
-				System.out.println("    tt:   " + TravelTimeWarning.routeStat.get(transitRoute));
-				System.out.println("    loop: " + LoopWarning.routeStat.get(transitRoute));
-				System.out.println("    dir:  " + DirectionChangeWarning.routeStat.get(transitRoute));
-			}
-		}
-	}
-
-	public void printLineSummary() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			System.out.println(transitLine.getId());
-			System.out.println("    tt:   " + TravelTimeWarning.lineStat.get(transitLine));
-			System.out.println("    loop: " + LoopWarning.lineStat.get(transitLine));
-			System.out.println("    dir:  " + DirectionChangeWarning.lineStat.get(transitLine));
-		}
-	}
-
-	@Deprecated
-	public void printResultByTransitRoute() {
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			p("\n#################################\n" + e.getKey().getId());
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				p("\t" + e2.getKey().getId());
-				for(PlausibilityWarning l : e2.getValue()) {
-					System.out.println("\t" + l);
-				}
-			}
-		}
-	}
-
-	@Deprecated
-	public void printResultByLink() {
-		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
-			System.out.println("Link " + e.getKey().toString());
-			Set<Tuple<Object, Object>> stopPairs = new HashSet<>();
-			for(PlausibilityWarning warning : e.getValue()) {
-				if(stopPairs.add(warning.getPair())) {
-					System.out.println(warning);
-				}
-			}
-		}
+	private static void setLogLevels() {
+		Logger.getLogger(MGC.class).setLevel(Level.ERROR);
+		Logger.getLogger(MatsimFileTypeGuesser.class).setLevel(Level.ERROR);
+		Logger.getLogger(MatsimNetworkReader.class).setLevel(Level.ERROR);
+		Logger.getLogger(NetworkImpl.class).setLevel(Level.ERROR);
+		Logger.getLogger(NodeImpl.class).setLevel(Level.ERROR);
+		Logger.getLogger(LinkImpl.class).setLevel(Level.ERROR);
+		Logger.getLogger(MatsimXmlParser.class).setLevel(Level.ERROR);
 	}
 }

@@ -9,15 +9,6 @@
   <artifactId>gunnar</artifactId>
   <name>gunnar</name>
   <dependencies>
-	<!--
-     <dependency>
-  		<groupId>gunnarutilities</groupId>
-  		<artifactId>gunnarutilities</artifactId>
-  		<version>0.0</version>
-  		<scope>system</scope>
-  		<systemPath>${basedir}/libs/utilities.jar</systemPath>	
-  	</dependency>
-  	-->
   	  	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>roadpricing</artifactId>
@@ -30,6 +21,29 @@
      	<version>3.4.1</version>
      </dependency>
 
+    <dependency>
+    	<groupId>floetteroed.utilities</groupId>
+    	<artifactId>floetteroed-utilities</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>floetteroed.opdyts</groupId>
+    	<artifactId>opdyts</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
   </dependencies>  
   
+   <build>
+    <plugins>
+  <plugin>
+   <artifactId>maven-compiler-plugin</artifactId>
+   <version>3.3</version>
+   <configuration>
+       <source>1.7</source>
+       <target>1.7</target>
+   </configuration>
+	</plugin>
+	</plugins>  
+  </build>
+  	
 </project>

@@ -73,14 +73,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="simulation">
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
-		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 

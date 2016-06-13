@@ -3,7 +3,6 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.jfree.chart.plot.XYPlot;
 import org.matsim.core.utils.charts.XYLineChart;
 
 public class PlotInfo {

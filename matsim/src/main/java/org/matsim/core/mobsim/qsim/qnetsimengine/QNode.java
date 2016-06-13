@@ -214,47 +214,39 @@ public class QNode implements NetsimNode {
 	}
 
 	private void moveLink(final QLinkI link, final double now){
-//		if ( link instanceof QLinkLanesImpl ) {
-			// This cannot be moved to QLinkLanesImpl since we want to be able to serve other lanes if one lane is blocked.
-			// kai, feb'12
-			// yyyy but somehow I think this should be solved "under the hood" in QLinkLanesImpl.  kai, sep'13
-			// zzzz the above yyyy solution would get really ugly with the current interface and the code in the
-			// else {} branch: link.isNotOfferingVehicle():boolean would return sequentially the state of the single
-			//lanes. Each call would have side effects on a state machine within QLinkLanesImpl. Proposal: think
-			//about a better interface first, then solve under the hood. dg, mar'14
-			for (QLaneI lane : link.getOfferingQLanes()) {
-				while (! lane.isNotOfferingVehicle()) {
-					QVehicle veh = lane.getFirstVehicle();
-					Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
-					if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
-						break;
-					}
+		for (QLaneI lane : link.getOfferingQLanes()) {
+			while (! lane.isNotOfferingVehicle()) {
+				QVehicle veh = lane.getFirstVehicle();
+				Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
+				if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
+					break;
 				}
 			}
-//		} 
-//		else {
-//			while (!link.isNotOfferingVehicle()) {
-//				QVehicle veh = link.getFirstVehicle();
-//				if (!moveVehicleOverNode(veh, link, now)) {
-//					break;
-//				}
-//			}
-//		}
+		}
 	}
 
 
 	private static boolean checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh){
+		// we need nextLinkId and nextQLink, because the link lookup may have failed and then nextQLink is null
 		if (nextQLink == null){
-			//throw new IllegalStateException
 			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + 
 					" plans to travel on that link from link " + veh.getCurrentLink().getId());
 			return false ;
 		}
 		if (currentLink.getToNode() != nextQLink.getLink().getFromNode()) {
-			//throw new RuntimeException
 			log.warn("Cannot move vehicle " + veh.getId() + " from link " + currentLink.getId() + " to link " + nextQLink.getLink().getId());
 			return false ;
 		}
+//		if ( !nextQLink.getLink().getAllowedModes().contains( veh.getDriver().getMode() ) ) {
+//			final String message = "The link with id " + nextLinkId + " does not allow the current mode, which is " + veh.getDriver().getMode();
+//			throw new RuntimeException( message ) ;
+////			log.warn(message );
+////			return false ;
+//			// yyyy is rather nonsensical to get the mode from the driver, not from the vehicle.  However, this seems to be 
+//			// how it currently works: network links are defined for modes, not for vehicle types.  kai, may'16
+//		}
+		// currently does not work, see MATSIM-533 
+		
 		return true ;
 	}
 
@@ -284,8 +276,7 @@ public class QNode implements NetsimNode {
 			return true;
 		}
 		
-		QNetwork network = (QNetwork) this.netsimEngine.getNetsimNetwork() ;
-		QLinkI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
+		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
 		if ( !checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
 			return true ;

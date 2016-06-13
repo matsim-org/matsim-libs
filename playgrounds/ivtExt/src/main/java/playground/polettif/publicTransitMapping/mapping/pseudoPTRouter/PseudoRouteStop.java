@@ -19,12 +19,17 @@
 package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A RouteStop used in the pseudoGraph.
- *
+ * <p/>
  * Link Candidates are made for each stop facility. Since one
  * stop facility might be accessed twice in the same transitRoute,
  * unique Link Candidates for each TransitRouteStop are needed. This
@@ -32,11 +37,19 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
  *
  * @author polettif
  */
-public class PseudoRouteStop {
+public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
 
 	private static PublicTransitMappingConfigGroup config;
 
-	public final String id;
+	// dijkstra
+	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
+	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
+	public PseudoRouteStop previous = null;
+
+	private final double linkWeight;
+
+	// schedule values
+	public final Id<PseudoRouteStop> id;
 	private final String name;
 
 	private final String linkId;
@@ -51,7 +64,6 @@ public class PseudoRouteStop {
 	private final String stopPostAreaId;
 	private final String parentStopFacilityId;
 	private final String linkCandidateId;
-	private final double linkWeight;
 	private final double stopFacilityDistance;
 
 	public static void setConfig(PublicTransitMappingConfigGroup configGroup) {
@@ -59,14 +71,12 @@ public class PseudoRouteStop {
 	}
 
 	/**
-	 * Constructor. All values are stored here as well to make access easier during
+	 * Constructor. All primitive values are stored
+	 * as well to make access easier during
 	 * stop facility replacement.
-	 * @param order
-	 * @param routeStop
-	 * @param linkCandidate
 	 */
-	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
-		this.id = Integer.toString(order) + linkCandidate.getId();
+	/*package*/ PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
 		this.linkId = linkCandidate.getLinkIdStr();
@@ -86,17 +96,25 @@ public class PseudoRouteStop {
 
 		// link value
 		this.linkWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
-//		this.linkWeight = linkCandidate.getLinkLength();
 	}
 
+	/**
+	 * This constructor is only used to set dummy stops
+	 *
+	 * @param id
+	 */
 	public PseudoRouteStop(String id) {
-		if(id.equals("SOURCE")) {
-			this.id = "SOURCE";
+		if(id.equals(PseudoGraph.SOURCE)) {
+			this.id = Id.create(PseudoGraph.SOURCE, PseudoRouteStop.class);
+			this.distToSource = 0;
 		} else {
-			this.id = "DESTINATION";
+			this.id = Id.create(PseudoGraph.DESTINATION, PseudoRouteStop.class);
 		}
 		this.name = id;
 		this.linkCandidateId = null;
+
+		previous = null;
+
 		this.linkId = null;
 		this.stopFacilityDistance = 0.0;
 
@@ -116,6 +134,22 @@ public class PseudoRouteStop {
 		this.linkWeight = 0.0;
 	}
 
+	@Override
+	public Id<PseudoRouteStop> getId() {
+		return id;
+	}
+
+	@Override
+	public int compareTo(PseudoRouteStop other) {
+		if(other.getId().equals(this.id)) {
+			return 0;
+		}
+		return Double.compare(distToSource, other.distToSource);
+	}
+
+	public double getLinkWeight() {
+		return linkWeight;
+	}
 
 	public double getDepartureOffset() {
 		return departureOffset;
@@ -132,10 +166,6 @@ public class PseudoRouteStop {
 	@Deprecated
 	public String getChildStopFacilityId() {
 		return linkCandidateId;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public Coord getCoord() {
@@ -164,32 +194,29 @@ public class PseudoRouteStop {
 
 	@Override
 	public String toString() {
-		return name;
+		return facilityName + " " + id;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if(this == obj)
 			return true;
-		if (obj == null)
+		if(obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if(getClass() != obj.getClass())
 			return false;
 
 		PseudoRouteStop other = (PseudoRouteStop) obj;
-		if (id == null) {
-			if (other.id != null)
+		if(id == null) {
+			if(other.id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if(!id.toString().equals(other.id.toString()))
 			return false;
 		return true;
-	}
-
-	public double getLinkWeight() {
-		return linkWeight;
 	}
 
 	public double getStopFacilityDistance() {
 		return stopFacilityDistance;
 	}
+
 }

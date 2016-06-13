@@ -23,12 +23,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.publicTransitMapping.config.ManualLinkCandidates;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
@@ -59,7 +61,7 @@ public class PTMapperUtils {
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
 	 * no link can be found within nodeSearchRadius an artificial node and loop
-	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink(TransitStopFacility, Network, String)}.
+	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink(TransitStopFacility, Network, String, double)}.
 	 * For each link candiate a child stop facility is generated and referenced to
 	 * the link. Link candidates for different modes with the same link use the same
 	 * child stop facility. Child stop facilities are not created and added to the schedule!
@@ -99,7 +101,7 @@ public class PTMapperUtils {
 
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
-								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial());
+								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), config.getFreespeedArtificial());
 								closestLinks.add(loopLink);
 							}
 
@@ -127,7 +129,6 @@ public class PTMapperUtils {
 	 * @param childStopFacilitySuffix what suffix the child facility should get in the id
 	 */
 	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule, String childStopFacilitySuffix) {
-		log.info("Replacing parent StopFacilities with child StopFacilities...");
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
 
@@ -224,12 +225,9 @@ public class PTMapperUtils {
 	 * to the facility coordinates.<p/>
 	 * <p/>
 	 * Since all links are part of the route, no rerouting has to be done.
-	 *
-	 * @param schedule
-	 * @param network
 	 */
-	public static void tightenChildStopFacilities(TransitSchedule schedule, Network network) {
-		log.info("Concentrating child stop facilities...");
+	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
+		log.info("Pulling child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				if(transitRoute.getRoute() != null) {
@@ -249,11 +247,6 @@ public class PTMapperUtils {
 					for(int i = 1; i < linkList.size()-1; i++) {
 
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
-
-							if(linkList.get(i).getId().toString().equals("937")) {
-								log.debug("");
-							}
-
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
 							testSet.add(linkList.get(i-1));
@@ -279,12 +272,6 @@ public class PTMapperUtils {
 	/**
 	 * If a link of <tt>comparingLinks</tt> is closer to the stop facility than
 	 * its currently referenced link, the closest link is used.
-	 * @param schedule
-	 * @param network
-	 * @param transitRoute
-	 * @param stopFacility
-	 * @param comparingLinks
-	 * @return
 	 */
 	private static Id<Link> useCloserRefLinkForChildStopFacility(TransitSchedule schedule, Network network, TransitRoute transitRoute, TransitStopFacility stopFacility, Collection<? extends Link> comparingLinks) {
 		// check if previous link is closer to stop facility
@@ -348,5 +335,37 @@ public class PTMapperUtils {
 				config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(), config.getModeRoutingAssignment().get(scheduleTransportMode),
 				config.getMaxLinkCandidateDistance()
 		);
+	}
+
+	/**
+	 * adds manually defined link candidates from config (if available)
+	 */
+	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
+		for(ConfigGroup e : config.getParameterSets(ManualLinkCandidates.SET_NAME)) {
+			ManualLinkCandidates manualCandidates = (ManualLinkCandidates) e;
+
+			Set<String> modes = manualCandidates.getModes();
+			if(modes.size() == 0) {
+				modes = linkCandidates.keySet();
+			}
+
+			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
+			if(parentStopFacility == null) {
+				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
+			} else {
+				for(String mode : modes) {
+					Set<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
+					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
+						Link link = network.getLinks().get(linkId);
+						if(link == null) {
+							log.warn("link " + manualCandidates.getStopFacilityId() + " not found in network.");
+						} else {
+							lcSet.add(new LinkCandidate(link, parentStopFacility));
+						}
+					}
+					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);
+				}
+			}
+		}
 	}
 }

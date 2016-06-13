@@ -19,7 +19,7 @@
 
 package playground.jbischoff.taxibus.algorithm.scheduler;
 
-import java.util.TreeSet;
+import java.util.HashSet;
 
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
@@ -62,8 +62,8 @@ public class TaxibusPickupTask
 
 
 	@Override
-	public TreeSet<TaxibusRequest> getRequests() {
-		TreeSet<TaxibusRequest> t = new TreeSet<>();
+	public HashSet<TaxibusRequest> getRequests() {
+		HashSet<TaxibusRequest> t = new HashSet<>();
 		t.add(request);
 		return t;
 	}

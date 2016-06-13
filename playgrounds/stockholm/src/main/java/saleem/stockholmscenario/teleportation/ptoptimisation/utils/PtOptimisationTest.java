@@ -1,11 +1,6 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation.utils;
 
-import java.util.ArrayList;
-
 import junit.framework.TestCase;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 //Each time represents a departure time
 public class PtOptimisationTest extends TestCase {

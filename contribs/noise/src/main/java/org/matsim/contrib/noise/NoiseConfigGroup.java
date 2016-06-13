@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -62,7 +61,6 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(NoiseConfigGroup.class);
 	
 	private double receiverPointGap = 250.;
-	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
 	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
 	private String[] consideredActivitiesForDamageCalculation = {"home", "work"};
@@ -328,16 +326,6 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
 		log.info("setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
 		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
-	}
-
-	@StringGetter( "transformationFactory" )
-	public String getTransformationFactory() {
-		return transformationFactory;
-	}
-
-	@StringSetter( "transformationFactory" )
-	public void setTransformationFactory(String transformationFactory) {
-		this.transformationFactory = transformationFactory;
 	}
 
 	public String[] getConsideredActivitiesForReceiverPointGridArray() {

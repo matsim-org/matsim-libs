@@ -49,8 +49,19 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class NetworkChangeEventsAnalysis {
+	
+	private final String nceDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/berlin_2016-02-11_2016-05-18/networkChangeEventFiles_weekends_holidays/";
+	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	
+	private final int TIMESTEP = 3600 * 3;
+	private final int morningTimeInterval_from = TIMESTEP * 2;
+	private final int nightTimeInterval_from = TIMESTEP * 0;
+	
+	private final boolean writeDetailedOutput = true;
+	private final boolean analyzeFreespeed = false;
+	private final boolean analyzeCapacity = true;
+	private final boolean analyzeLanes = false;
 
-	Logger log = Logger.getLogger(getClass());
 	private Map<Id<Link>, double[]> capacities = new HashMap<>();
 	private Map<Id<Link>, double[]> averageCapacity = new HashMap<>();
 	private Map<Id<Link>, double[]> standardDeviationCapacity = new HashMap<>();
@@ -62,19 +73,12 @@ public class NetworkChangeEventsAnalysis {
 	private Map<Id<Link>, double[]> lanes = new HashMap<>();
 	private Map<Id<Link>, double[]> averageLanes = new HashMap<>();
 	private Map<Id<Link>, double[]> standardDeviationLanes = new HashMap<>();
-
-	private final int TIMESTEP = 3600 * 3;
-	private final boolean writeDetailedOutput = true;
-	private final boolean analyzeFreespeed = true;
-	private final boolean analyzeCapacity = false;
-	private final boolean analyzeLanes = false;
-
+	
 	private int days;
 	private int timebins;
 	private int binsPerDay;
 	
-	private final String nceDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/berlin_2016-02-11-2016-04-26/workingDays/";
-	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	Logger log = Logger.getLogger(getClass());
 
 	public static void main(String[] args) {
 		NetworkChangeEventsAnalysis cmtt = new NetworkChangeEventsAnalysis();
@@ -165,25 +169,35 @@ public class NetworkChangeEventsAnalysis {
 		}
 		
 		calculateStatistics(scenario0);
-				
-		int morningTime = TIMESTEP * 2;
-		int nightTime = TIMESTEP * 0;
 		
 		if (writeDetailedOutput) {
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + morningTime, morningTime);
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + nightTime, nightTime);
 			
-			if (analyzeFreespeed) writeFreeSpeedActualSpeedRatio(scenario0, this.freespeeds, "freespeedActSpeedRatio_" + morningTime, morningTime);
-			if (analyzeFreespeed) writeFreeSpeedActualSpeedRatio(scenario0, this.freespeeds, "freespeedActSpeedRatio_" + nightTime, nightTime);
+			if (analyzeFreespeed) {
+				writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
+				writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + morningTimeInterval_from, morningTimeInterval_from);
+				writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + nightTimeInterval_from, nightTimeInterval_from);
+				
+				writeFreeSpeedActualSpeedRatio(scenario0, this.freespeeds, "freespeedActSpeedRatio_" + morningTimeInterval_from, morningTimeInterval_from, "freespeed");
+				writeFreeSpeedActualSpeedRatio(scenario0, this.freespeeds, "freespeedActSpeedRatio_" + nightTimeInterval_from, nightTimeInterval_from, "freespeed");
+			}
 
-			if (analyzeCapacity) writeDetailedInformation(scenario0, this.capacities, "capacity_all");
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "capacity_" + morningTime, morningTime);
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "capacity_" + nightTime, nightTime);
+			if (analyzeCapacity) {
+				writeDetailedInformation(scenario0, this.capacities, "capacity_all");
+				writeDetailedInformation(scenario0, this.capacities, "capacity_" + morningTimeInterval_from, morningTimeInterval_from);
+				writeDetailedInformation(scenario0, this.capacities, "capacity_" + nightTimeInterval_from, nightTimeInterval_from);
+				
+				writeFreeSpeedActualSpeedRatio(scenario0, this.capacities, "capacityRatio_" + morningTimeInterval_from, morningTimeInterval_from, "capacity");
+				writeFreeSpeedActualSpeedRatio(scenario0, this.capacities, "capacityRatio_" + nightTimeInterval_from, nightTimeInterval_from, "capacity");
+			}
 			
-			if (analyzeLanes) writeDetailedInformation(scenario0, this.lanes, "lanes_all");
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "lanes_" + morningTime, morningTime);
-			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "lanes_" + nightTime, nightTime);
+			if (analyzeLanes) {
+				writeDetailedInformation(scenario0, this.lanes, "lanes_all");
+				writeDetailedInformation(scenario0, this.lanes, "lanes_" + morningTimeInterval_from, morningTimeInterval_from);
+				writeDetailedInformation(scenario0, this.lanes, "lanes_" + nightTimeInterval_from, nightTimeInterval_from);
+				
+				writeFreeSpeedActualSpeedRatio(scenario0, this.lanes, "laneRatio_" + morningTimeInterval_from, morningTimeInterval_from, "lanes");
+				writeFreeSpeedActualSpeedRatio(scenario0, this.lanes, "laneRatio_" + nightTimeInterval_from, nightTimeInterval_from, "lanes");
+			}
 		}
 		
 		if (analyzeFreespeed) { 
@@ -268,7 +282,7 @@ public class NetworkChangeEventsAnalysis {
 		}
 	}
 	
-	private void writeFreeSpeedActualSpeedRatio(Scenario scenario, Map<Id<Link>, double[]> values, String filename, int analysisTime) {
+	private void writeFreeSpeedActualSpeedRatio(Scenario scenario, Map<Id<Link>, double[]> values, String filename, int analysisTime, String analysisParameter) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(nceDirectory + filename + ".csv");
 		BufferedWriter bwt = IOUtils.getBufferedWriter(nceDirectory + filename + ".csvt");
 		Locale.setDefault(Locale.US);
@@ -310,7 +324,18 @@ public class NetworkChangeEventsAnalysis {
 					} else {
 						
 						if (time == analysisTime) {
-							bw.append(";" + df.format(e.getValue()[i] / freespeed));
+							if (analysisParameter.equals("freespeed")) {
+								bw.append(";" + df.format(e.getValue()[i] / freespeed));
+							
+							} else if (analysisParameter.equals("capacity")) {
+								bw.append(";" + df.format(e.getValue()[i] / capacity));
+								
+							} else if (analysisParameter.equals("lanes")) {
+								bw.append(";" + df.format(e.getValue()[i] / lanes));
+							
+							} else {
+								throw new RuntimeException("Unknown analysis parameter. Aborting...");
+							}
 						}
 						
 						time = time + TIMESTEP;

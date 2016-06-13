@@ -40,6 +40,8 @@ public class TransformTransitScheduleFile {
 
 	private static final Logger log = Logger.getLogger(TransformTransitScheduleFile.class);
 
+	private TransformTransitScheduleFile() {}
+
 	/**
 	 * Transforms a MATSim Transit Schedule file.
 	 *
