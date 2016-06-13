@@ -24,7 +24,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 

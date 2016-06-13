@@ -71,14 +71,14 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	}
 
 	@Override
-	protected PlanSelector getPlanSelector() {
+	protected PlanSelector<Plan,Person> getPlanSelector() {
 		return new PathSizeLogitSelector(config.planCalcScore(), createNetwork());
 	}
 
 	@Override
 	public void testNegativeScore() {
 		this.network = createNetwork();
-		PlanSelector selector = getPlanSelector();
+		PlanSelector<Plan,Person> selector = getPlanSelector();
 
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
 		Link l2 = network.getLinks().get(Id.create("2", Link.class));
@@ -186,7 +186,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 	@Override
 	public void testZeroScore() {
 		this.network = createNetwork();
-		PlanSelector selector = getPlanSelector();
+		PlanSelector<Plan,Person> selector = getPlanSelector();
 		Link l1 = network.getLinks().get(Id.create("1", Link.class));
 		Link l6 = network.getLinks().get(Id.create("6", Link.class));
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));

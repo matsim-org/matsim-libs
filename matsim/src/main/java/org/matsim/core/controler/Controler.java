@@ -253,11 +253,8 @@ public final class Controler implements ControlerI, MatsimServices {
 		}
     }
 
-	/**
-	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-	 */
+	
 	@Override
-	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
 	public final EventsManager getEvents() {
 		if (this.injector != null) {
 			return this.injector.getInstance(EventsManager.class);

@@ -48,26 +48,27 @@ public abstract class Hafas2TransitSchedule {
 	 *
 	 * @param args <br/>
 	 *             [0] hafasFolder<br/>
-	 *             [1] outputFolder<br/>
-	 *             [2] outputCoordinateSystem<br/>
+	 *             [1] outputCoordinateSystem<br/>
+	 *             [2] outputScheduleFile<br/>
+	 *             [3] outputVehicleFile<br/>
 	 */
 	public static void main(String[] args) {
-		run(args[0], args[1], args[2]);
+		run(args[0], args[1], args[2], args[3]);
 	}
 
 	/**
 	 * Converts all files in <tt>hafasFolder</tt> and writes the output schedule and vehicle file to
 	 * <tt>outputFolder</tt>. Stop Facility coordinates are transformed to <tt>outputCoordinateSystem</tt>.
 	 */
-	public static void run(String hafasFolder, String outputFolder, String outputCoordinateSystem) {
+	public static void run(String hafasFolder, String outputCoordinateSystem, String outputScheduleFile, String outputVehicleFile) {
 		TransitSchedule schedule = ScheduleTools.createSchedule();
 		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
 
-		new HafasConverter(schedule, vehicles, transformation).createSchedule(hafasFolder);
+		new HafasConverterLines(schedule, vehicles, transformation).createSchedule(hafasFolder);
 
-		ScheduleTools.writeTransitSchedule(schedule, outputFolder+"schedule.xml");
-		ScheduleTools.writeVehicles(vehicles, outputFolder+"vehicles.xml");
+		ScheduleTools.writeTransitSchedule(schedule, outputScheduleFile);
+		ScheduleTools.writeVehicles(vehicles, outputVehicleFile);
 	}
 
 	/**

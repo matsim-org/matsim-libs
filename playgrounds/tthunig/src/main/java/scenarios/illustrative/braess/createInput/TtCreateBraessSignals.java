@@ -68,18 +68,19 @@ public final class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V
+		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_X_SECOND_Z, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V
 	}
 	
 	private static final int CYCLE_TIME = 60;
 	private static final int INTERGREEN_TIME = 0;
-
+	
 	private Scenario scenario;
 	
 	private boolean middleLinkExists = true;
 	private LaneType laneType;
 	private SignalControlType signalType;
-	
+	private int secondsZGreen;
+
 	// travel time for the middle link
 	private int linkTTMid;
 	// travel time for the middle route links
@@ -145,8 +146,7 @@ public final class TtCreateBraessSignals {
 	 */
 	private void createSignalSystems() {
 
-		if (signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_SO) || 
-				signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_Z) || 
+		if (signalType.equals(SignalControlType.SIGNAL4_X_SECOND_Z) || 
 				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_V2Z) ||
 				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_Z2V)) {
 			// create only one signal system at node 4
@@ -272,11 +272,8 @@ public final class TtCreateBraessSignals {
 					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
-				case SIGNAL4_ONE_SECOND_SO:
-					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 59);
-					break;
-				case SIGNAL4_ONE_SECOND_Z:
-					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 1);
+				case SIGNAL4_X_SECOND_Z:
+					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), secondsZGreen);
 					break;
 				case SIGNAL4_SYLVIA_V2Z:
 					// create a basis signal plan
@@ -568,6 +565,10 @@ public final class TtCreateBraessSignals {
 
 	public void setSignalType(SignalControlType signalType) {
 		this.signalType = signalType;
+	}
+	
+	public void setSecondsZGreen(int secondsZGreen){
+		this.secondsZGreen = secondsZGreen;
 	}
 
 	public void writeSignalFiles(String directory) {

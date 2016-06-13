@@ -22,7 +22,6 @@ package org.matsim.contrib.dynagent.run;
 import java.util.*;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
@@ -30,7 +29,6 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
-import org.matsim.pt.config.TransitConfigGroup;
 
 import com.google.inject.Provides;
 
@@ -50,22 +48,27 @@ public class DynQSimModule<T extends Mobsim>
     @Override
     public void install()
     {
-        bind(Mobsim.class).toProvider(providerClass);
+        bindMobsim().toProvider(providerClass);
     }
 
 
     @Provides
-    Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup,
-            NetworkConfigGroup networkConfigGroup, Config config)
+    private Collection<AbstractQSimPlugin> provideQSimPlugins(Config config)
+    {
+        return createQSimPlugins(config);
+    }
+
+    
+    public static Collection<AbstractQSimPlugin> createQSimPlugins(Config config)
     {
         final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
         plugins.add(new MessageQueuePlugin(config));
         plugins.add(new DynActivityEnginePlugin(config));
         plugins.add(new QNetsimEnginePlugin(config));
-        if (networkConfigGroup.isTimeVariantNetwork()) {
+        if (config.network().isTimeVariantNetwork()) {
             plugins.add(new NetworkChangeEventsPlugin(config));
         }
-        if (transitConfigGroup.isUseTransit()) {
+        if (config.transit().isUseTransit()) {
             plugins.add(new TransitEnginePlugin(config));
         }
         plugins.add(new TeleportationPlugin(config));

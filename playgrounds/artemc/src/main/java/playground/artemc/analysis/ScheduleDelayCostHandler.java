@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -43,9 +44,7 @@ import playground.artemc.heterogeneity.scoring.PersonalScoringFunctionFactory;
 import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters;
 import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters.Mode;
 
-
-
-public class ScheduleDelayCostHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler{
+public class ScheduleDelayCostHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, ScheduleDelayCostHandlerFactory{
 
 	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
 	
@@ -464,6 +463,11 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 
 	public HashSet<String> getUsedModes() {
 		return usedModes;
+	}
+
+	@Override
+	public void setControler(Controler controler) {
+
 	}
 
 	public ArrayList<Id<Person>> getStuckedAgents() {

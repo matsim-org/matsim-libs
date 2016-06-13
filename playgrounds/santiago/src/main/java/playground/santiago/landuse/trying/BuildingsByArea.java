@@ -21,7 +21,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class BuildingsByArea {
 
 	final String OUTPUT_PATH = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/";	
-	final String CSV_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/OrderedShapeManzanasWithInfo-Modified2.csv";
+	final String CSV_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/2_modifiedShapeSantiagoWithInfo/OrderedBuildingsByBlock.csv";
 	private final static Logger log = Logger.getLogger(BuildingsByArea.class);
 	
 	private BuildingsByArea() {
@@ -71,16 +71,16 @@ public class BuildingsByArea {
 	
 				
 				
-				C.put(entries[22],Integer.parseInt(entries[7]));	D.put(entries[22],Integer.parseInt(entries[9]));
-				E.put(entries[22],Integer.parseInt(entries[10]));	G.put(entries[22],Integer.parseInt(entries[12]));
-				H.put(entries[22],Integer.parseInt(entries[5]));	I.put(entries[22],Integer.parseInt(entries[13]));
-				L.put(entries[22],Integer.parseInt(entries[6]));	M.put(entries[22],Integer.parseInt(entries[14]));
-				O.put(entries[22],Integer.parseInt(entries[15]));	P.put(entries[22],Integer.parseInt(entries[4]));
-				Q.put(entries[22],Integer.parseInt(entries[8]));	S.put(entries[22],Integer.parseInt(entries[17]));
-				T.put(entries[22],Integer.parseInt(entries[19]));	V.put(entries[22],Integer.parseInt(entries[16]));
-				W.put(entries[22],Integer.parseInt(entries[18]));	Z.put(entries[22],Integer.parseInt(entries[11]));
+				C.put(entries[21],Integer.parseInt(entries[6]));	D.put(entries[21],Integer.parseInt(entries[8]));
+				E.put(entries[21],Integer.parseInt(entries[9]));	G.put(entries[21],Integer.parseInt(entries[12]));
+				H.put(entries[21],Integer.parseInt(entries[11]));	I.put(entries[21],Integer.parseInt(entries[13]));
+				L.put(entries[21],Integer.parseInt(entries[5]));	M.put(entries[21],Integer.parseInt(entries[14]));
+				O.put(entries[21],Integer.parseInt(entries[15]));	P.put(entries[21],Integer.parseInt(entries[4]));
+				Q.put(entries[21],Integer.parseInt(entries[7]));	S.put(entries[21],Integer.parseInt(entries[17]));
+				T.put(entries[21],Integer.parseInt(entries[19]));	V.put(entries[21],Integer.parseInt(entries[16]));
+				W.put(entries[21],Integer.parseInt(entries[18]));	Z.put(entries[21],Integer.parseInt(entries[10]));
 				
-				newKeys.add(entries[22]);
+				newKeys.add(entries[21]);
 			}
 
 			br.close();

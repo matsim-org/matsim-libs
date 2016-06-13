@@ -10,8 +10,8 @@
 
 		<param name="taxisFile" value="../dvrp/src/main/resources/one_taxi/one_taxi_vehicles.xml" />
 
-		<param name="timeProfiles" value="true" />
-		<param name="detailedStats" value="true" />
+		<param name="timeProfiles" value="false" />
+		<param name="detailedStats" value="false" />
 
 		<parameterset type="optimizer">
 			<param name="type" value="RULE_BASED" />
@@ -43,6 +43,11 @@
 	<module name="controler">
 		<param name="outputDirectory" value="test/output/one_taxi_benchmark" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="writeEventsInterval" value="0" />
+		<param name="writePlansInterval" value="0" />
+		<param name="writeSnapshotsInterval" value="0" />
+		<param name="createGraphs" value="false" />
+		<param name="dumpDataAtEnd" value="false" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
@@ -53,8 +58,8 @@
 	</module>
 
 	<module name="strategy">
-		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background, i.e. not 
-			to change their behavior -->
+		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background,
+		i.e. not to change their behavior -->
 		<param name="maxAgentPlanMemorySize" value="1" />
 		<param name="ModuleProbability_1" value="1.0" />
 		<param name="Module_1" value="BestScore" />

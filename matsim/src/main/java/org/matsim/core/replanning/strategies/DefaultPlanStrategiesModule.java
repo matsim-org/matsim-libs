@@ -73,44 +73,44 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
         // strategy packages that only select:
         if (usedStrategyNames.contains(DefaultSelector.KeepLastSelected.toString())) {
-            addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelected.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.BestScore.toString())) {
-            addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBestPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBest.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectExpBeta.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBetaPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBeta.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.ChangeExpBeta.toString())) {
-            addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBetaPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBeta.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectRandom.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandomPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandom.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectPathSizeLogit.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogitPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogit.class);
         }
 
         // strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
         // at least once).
 
         if (usedStrategyNames.contains(DefaultStrategy.ReRoute.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoutePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoute.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutatorPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutator.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator_ReRoute.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoute.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.SubtourModeChoice.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoicePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoice.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeTripMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripModePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripMode.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleTripMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripMode.class);
         }
 
         // td, 15 feb 16: removed the "Leg" versions of strategies. Notify the users that they should switch to the

@@ -37,7 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -131,7 +131,7 @@ public class CNTest {
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 
 		final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new Builder( TransportMode.car, controler.getConfig().planCalcScore() ),
+				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, controler.getConfig().planCalcScore() ),
 				tollHandler, controler.getConfig().planCalcScore()
 			) ;
 		factory.setSigma(3.);

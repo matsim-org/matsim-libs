@@ -28,7 +28,6 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -41,7 +40,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import java.util.*;
 
 // needs to be re-designed with delegation instead of inheritance. kai, oct'14
-public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
+public class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private DestinationScoring destinationChoiceScoring;	
 	private final ActivityFacilities facilities;

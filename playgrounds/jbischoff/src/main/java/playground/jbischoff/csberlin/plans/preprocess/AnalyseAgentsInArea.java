@@ -49,19 +49,26 @@ public class AnalyseAgentsInArea {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
-		new MatsimPopulationReader(scenario).readFile("D:/runs-svn/berlin-bvg09/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.plans.selected.xml.gz");
-		Geometry geo = JbUtils.readShapeFileAndExtractGeometry("../../../shared-svn/projects/bmw_carsharing/data/gis/mierendorffkiez.shp","id").get("1");
+		new MatsimPopulationReader(scenario).readFile("D:/runs-svn/bvg.run192.100pct.100.plans.selected.xml.gz");
+		Geometry geo = JbUtils.readShapeFileAndExtractGeometry("../../../shared-svn/projects/bmw_carsharing/data/gis/untersuchungsraum.shp","id").get("0");
 		int i = 0;
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			i++;
 			if (i%200000==0) System.out.println(i);
 			Plan plan = p.getSelectedPlan();
-			Activity act = (Activity) plan.getPlanElements().get(0);
-			if (act.getType().contains("home")){
-				Coord coord = act.getCoord();
-				if (geo.contains(MGC.coord2Point(coord))){
-					scenario2.getPopulation().addPerson(p);
+			for (PlanElement pe : plan.getPlanElements()){
+				if (pe instanceof Activity){
+					Activity act = (Activity) pe;
+					if (!act.getType().contains("pt interaction")){
+						Coord coord = act.getCoord();
+						if (geo.contains(MGC.coord2Point(coord))){
+							scenario2.getPopulation().addPerson(p);
+							break;
+						}
+					
 				}
+			}
+			
 			}
 			
 		}
@@ -78,7 +85,7 @@ public class AnalyseAgentsInArea {
 			}
 		}
 		
-		new PopulationWriter(scenario2.getPopulation()).writeFileV4("../../../shared-svn/projects/bmw_carsharing/data/scenario/mierendorff-plans.xml.gz");
+		new PopulationWriter(scenario2.getPopulation()).writeFileV4("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans.xml.gz");
 	}
 
 }

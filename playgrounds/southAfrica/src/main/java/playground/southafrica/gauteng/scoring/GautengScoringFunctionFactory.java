@@ -33,6 +33,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -110,7 +111,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
 }
 
-class MoneyScoringImpl implements org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
+class MoneyScoringImpl implements ScoringFunctionAccumulator.MoneyScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
 	final static private Logger log = Logger.getLogger(MoneyScoringImpl.class);
 
 	private double score = 0.0;

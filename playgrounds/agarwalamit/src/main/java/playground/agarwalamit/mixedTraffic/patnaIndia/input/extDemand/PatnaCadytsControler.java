@@ -40,7 +40,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -98,7 +98,7 @@ public class PatnaCadytsControler {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		final RandomizingTimeDistanceTravelDisutility.Builder builder_bike =  new RandomizingTimeDistanceTravelDisutility.Builder("bike", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -99,7 +99,7 @@ public class PrtQSimProvider
         if (prtConfig.getVehicleCapacity() > 1) {
             PrtScheduler scheduler = new PrtScheduler(matsimServices.getScenario(), taxiData, qSim.getSimTimer(),
                     schedulerParams, travelTime, travelDisutility);
-            TaxiOptimizerContext optimContext = new PrtOptimizerContext(taxiData, matsimServices,
+            TaxiOptimizerContext optimContext = new PrtOptimizerContext(taxiData, matsimServices.getScenario(),
                     qSim.getSimTimer(), travelTime, travelDisutility, scheduler, prtConfig);
             
             return optimizerFactory.createTaxiOptimizer(optimContext,
@@ -109,7 +109,7 @@ public class PrtQSimProvider
             TaxiScheduler scheduler = new TaxiScheduler(matsimServices.getScenario(), taxiData, qSim.getSimTimer(),
                     schedulerParams, travelTime, travelDisutility);
 
-            TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices,
+            TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices.getScenario(),
                     qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
             return optimizerFactory.createTaxiOptimizer(optimContext,
                     taxiCfg.getOptimizerConfigGroup());

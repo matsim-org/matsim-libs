@@ -44,7 +44,7 @@ public class RunTaxiScenario
 
     public static Controler createControler(Config config, boolean otfvis)
     {
-        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
         config.checkConsistency();
 
@@ -54,7 +54,9 @@ public class RunTaxiScenario
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+        double expAveragingAlpha = 0.05;//from the AV flow paper 
+        controler.addOverridingModule(
+                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         if (otfvis) {

@@ -18,18 +18,7 @@
 
 package playground.polettif.publicTransitMapping.workbench.santiago;
 
-import GTFS2PTSchedule.GTFS2MATSimTransitSchedule;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import playground.polettif.boescpa.lib.tools.PopulationUtils;
-import playground.polettif.publicTransitMapping.gtfs.Gtfs2TransitSchedule;
 import playground.polettif.publicTransitMapping.mapping.PTMapperPseudoRouting;
-import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkConverter;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-
-import java.util.Collections;
 
 public class Preparation {
 

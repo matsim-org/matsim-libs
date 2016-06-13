@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 /**
  * @author thibautd
  */
-class NestedLogitModel<N extends Enum<N>> {
+public class NestedLogitModel<N extends Enum<N>> {
 	private final double mu;
 	private final Utility<N> utility;
 	private final ChoiceSetIdentifier<N> choiceSetIdentifier;

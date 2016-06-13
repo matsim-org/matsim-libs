@@ -118,7 +118,7 @@ public final class StrategyManagerPopsConfigLoader {
 			if ( name != null ) {
 				// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 				// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
-				GenericPlanSelector<Plan, Person> planSelector = null ;
+				PlanSelector<Plan, Person> planSelector = null ;
 				if ( name.equals("WorstPlanSelector") ) { 
 					planSelector = new WorstPlanForRemovalSelector() ; 
 				} else if ( name.equals("SelectRandom") ) {

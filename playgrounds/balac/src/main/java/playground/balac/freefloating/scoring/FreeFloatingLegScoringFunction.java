@@ -11,7 +11,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
+public class FreeFloatingLegScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring {
 
 	private PlanImpl plan;
 	

@@ -32,22 +32,17 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	{
 		super(params, network);
 		this.config = config;
-	}
-	@Override
-	public void reset() {
-		super.reset();
 		freefloatingRentals = new ArrayList<Stats>();
-		
+
 		owcsRentals = new ArrayList<Stats>();
-		
+
 		twcsRentals = new ArrayList<Stats>();
-		
+
 		twMap = new HashMap<Id<Link>, Stats>();
-		
-		distancetw = 0.0;		
-		
+
+		distancetw = 0.0;
 	}
-	
+
 	@Override
 	public void finish() {		
 		super.finish();

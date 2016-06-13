@@ -62,7 +62,7 @@ import org.matsim.facilities.OpeningTimeImpl;
  * @author meisterk
  * 
  */
-public class ActivityScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
+public class ActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	// TODO should be in person.desires
 	public static final int DEFAULT_PRIORITY = 1;

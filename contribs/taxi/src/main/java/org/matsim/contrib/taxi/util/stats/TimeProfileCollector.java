@@ -41,15 +41,17 @@ public class TimeProfileCollector<T>
     private final List<T> timeProfile = new ArrayList<>();
     private final int interval;
     private final String header;
+    private final String outputFile;
     private final MatsimServices matsimServices;
 
 
     public TimeProfileCollector(ProfileCalculator<T> calculator, int interval, String header,
-            MatsimServices matsimServices)
+            String outputFile, MatsimServices matsimServices)
     {
         this.calculator = calculator;
         this.interval = interval;
         this.header = header;
+        this.outputFile = outputFile;
         this.matsimServices = matsimServices;
     }
 
@@ -67,7 +69,7 @@ public class TimeProfileCollector<T>
     public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e)
     {
         PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(matsimServices.getControlerIO()
-                .getIterationFilename(matsimServices.getIterationNumber(), "taxi_time_profiles.txt")));
+                .getIterationFilename(matsimServices.getIterationNumber(), outputFile)));
 
         pw.println("time\t" + header);
 

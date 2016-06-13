@@ -26,10 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +36,7 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
+public class CapeTownNestedLogitModelUtility implements Utility<CapeTownModeNests> {
 	private final CapeTownNestedLogitModelConfigGroup pars;
 
 	private final Households households;
@@ -64,7 +62,7 @@ public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
 	}
 
 	@Override
-	public double calcUtility( final Person p, final Alternative<ModeNests> a ) {
+	public double calcUtility( final Person p, final Alternative<CapeTownModeNests> a ) {
 		final double logTT = Math.log( 1 + getTravelTime( a ) );
 		switch ( a.getNestId() ) {
 			case car:
@@ -77,6 +75,12 @@ public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
 			case walk:
 				return pars.getAscWalk() +
 						pars.getBetaTtWalk() * logTT;
+			case ride:
+				return pars.getAscRide() +
+						pars.getBetaTtRide() * logTT;
+			case taxi:
+				return pars.getAscTaxi() +
+						pars.getBetaTtTaxi() * logTT;
 			default:
 				throw new RuntimeException( "unknown nest "+a.getNestId() );
 		}
@@ -97,7 +101,7 @@ public class CapeTownNestedLogitModelUtility implements Utility<ModeNests> {
 	}
 
 
-	private double getTravelTime( Alternative<ModeNests> a ) {
+	private double getTravelTime( Alternative<CapeTownModeNests> a ) {
 		final List<? extends PlanElement> trip = a.getAlternative().getTrip();
 
 		double tt = 0;

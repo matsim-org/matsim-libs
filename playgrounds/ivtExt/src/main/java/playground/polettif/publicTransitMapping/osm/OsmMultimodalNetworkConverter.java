@@ -521,11 +521,14 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Runs the network cleaner on the street network.
 	 */
 	private void cleanNetwork() {
-		Network streetNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car));
-		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, Collections.singleton(TransportMode.car));
-		new NetworkCleaner().run(streetNetwork);
-		NetworkTools.integrateNetwork(streetNetwork, restNetwork);
-		this.network = streetNetwork;
+		Set<String> roadModes = new HashSet<>();
+		roadModes.add("car");
+		roadModes.add("bus");
+		Network roadNetwork = NetworkTools.filterNetworkByLinkMode(network, roadModes);
+		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, roadModes);
+		new NetworkCleaner().run(roadNetwork);
+		NetworkTools.integrateNetwork(roadNetwork, restNetwork);
+		this.network = roadNetwork;
 	}
 
 	private void writeNetwork() {

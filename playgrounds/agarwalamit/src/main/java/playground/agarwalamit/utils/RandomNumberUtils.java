@@ -152,29 +152,37 @@ public class RandomNumberUtils {
 		
 		//Checks
 		double sum = MapUtils.doubleValueSum(discreteDistribution);
-		SortedMap<String, Double> probs = new TreeMap<>();
 		if (sum <= 0. ) throw new IllegalArgumentException("Sum of the values for given distribution is "+sum+". Aborting ...");
-		else if (sum != 1 ) {
-			LOG.warn("Sum of the values for given distribution is not equal to one. Converting them ...");
-			probs.putAll( MapUtils.getDoublePercentShare( discreteDistribution ) );
-		} else probs.putAll( discreteDistribution );
 
 		// process
 		int idx = 0;
-		for(String str : probs.keySet()) { // fill the array
-			double requiredNrs = Math.round( probs.get(str) * requiredRandomNumbers );
-			for(int i = 0; i < requiredNrs ; i++) {
+		for(String str : discreteDistribution.keySet()) { // fill the array
+			double requiredNrs = Math.round( ( discreteDistribution.get(str)/sum) * requiredRandomNumbers ); 
+ 			for(int i = 0; i <  requiredNrs && idx < requiredRandomNumbers ; i++) {
 				strs[idx] = str;
 				idx++;
 			}
 		}
+		//fixing null elements due to rounding errors
+		while ( idx < requiredRandomNumbers  ) {
+			List<String > strings = new ArrayList<>(discreteDistribution.keySet());
+			strs[idx] = strings.get( rnd.nextInt( strings.size() ));
+			idx++;
+		}
+		
 		//shuffle uniformly 
 		List<String> outArray = Arrays.asList( RandomNumberUtils.shuffleUniformly(strs) ); 
 
 		//cross check and print
-		for (String s : probs.keySet()){
-			LOG.info("Share of "+s+" in input and output -- "+ probs.get(s)+" and "+ Collections.frequency(outArray, s)/sum);
+		for (String s : discreteDistribution.keySet()){
+			LOG.info("Share of "+s+" in input and output -- "+ discreteDistribution.get(s)/sum+" and "+ (double) Collections.frequency(outArray, s)/outArray.size());
 		}
+		
+		//Check if due to rounding any element is null
+		while(outArray.contains(null)) {
+			throw new RuntimeException("Some element in the list is null. Aborting ...");
+		}
+		
 		return outArray;
 	}
 	
