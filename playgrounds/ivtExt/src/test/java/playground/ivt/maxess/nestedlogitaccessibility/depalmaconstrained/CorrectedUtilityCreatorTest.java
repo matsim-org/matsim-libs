@@ -119,7 +119,7 @@ public class CorrectedUtilityCreatorTest {
 		final List<ActivityFacility> facilitiesWithWork =
 				scenario.getActivityFacilities().getFacilities().values().stream()
 					.filter( f -> f.getActivityOptions().containsKey( "work" ) )
-					.collect( Collectors.toList() );
+					.collect( Collectors.<ActivityFacility>toList() );
 
 		facilitiesWithWork.stream()
 				.forEach( f -> f.getActivityOptions().get( "work" ).setCapacity( CAPACITY ) );

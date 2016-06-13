@@ -2,11 +2,10 @@ package playground.andreas.bvgScoringFunction;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
 
-public class BvgActivityScoringFunction extends CharyparNagelActivityScoring {
+public class BvgActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	private CharyparNagelScoringParameters params;
 

@@ -60,7 +60,7 @@ public class CsvTools {
 				String value = (cols.get(i) == null ? "" : cols.get(i));
 				line += value+";";
 			}
-			csvLines.put(entry.getKey(), line);
+			csvLines.put(entry.getKey(), line.substring(0, line.length() - 1));
 		}
 
 		return new LinkedList<>(csvLines.values());

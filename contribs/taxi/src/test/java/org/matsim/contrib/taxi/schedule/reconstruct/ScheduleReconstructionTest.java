@@ -47,7 +47,7 @@ public class ScheduleReconstructionTest
     @Test
     public void testMielecReconstruction()
     {
-        runReconstruction("./src/main/resources/mielec_2014_02/config.xml");
+        runReconstruction("./src/main/resources/mielec_2014_02/mielec_taxi_config.xml");
     }
 
 

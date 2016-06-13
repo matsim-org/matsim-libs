@@ -33,8 +33,7 @@ public class NPersonsVehicleRequestPathFinder
         this.vehicleCapacity = vehicleCapacity;
         this.scheduler = optimContext.scheduler;
 
-        router = new Dijkstra(optimContext.getNetwork(),
-                optimContext.travelDisutility, optimContext.travelTime);
+        router = new Dijkstra(optimContext.network, optimContext.travelDisutility, optimContext.travelTime);
 
     }
 

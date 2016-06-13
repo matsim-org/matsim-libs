@@ -22,6 +22,7 @@ package playground.polettif.publicTransitMapping.tools;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -45,7 +46,7 @@ import playground.polettif.publicTransitMapping.mapping.router.Router;
 
 import java.util.*;
 
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Provides Tools for analysing and manipulating networks.
@@ -58,14 +59,14 @@ public class NetworkTools {
 
 	private NetworkTools() {}
 
-	public static Network readNetwork(String filePath) {
+	public static Network readNetwork(String fileName) {
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(filePath);
+		new MatsimNetworkReader(network).readFile(fileName);
 		return network;
 	}
 
-	public static void writeNetwork(Network network, String filePath) {
-		new NetworkWriter(network).write(filePath);
+	public static void writeNetwork(Network network, String fileName) {
+		new NetworkWriter(network).write(fileName);
 	}
 
 	public static Network createNetwork() {
@@ -568,7 +569,7 @@ public class NetworkTools {
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				Set<String> usedNetworkModes = MapUtils.getSet(transitRoute.getTransportMode(), modeAssignments);
-				List<Link> links = getLinksFromIds(network, getLinkIds(transitRoute));
+				List<Link> links = getLinksFromIds(network, getTransitRouteLinkIds(transitRoute));
 				for(Link link : links) {
 					usedNetworkModes.addAll(link.getAllowedModes());
 				}
@@ -588,6 +589,33 @@ public class NetworkTools {
 			routers.put(e.getKey(), modeDependentRouters.get(e.getValue()));
 		}
 		return routers;
+	}
+
+	/**
+	 * Replaces all non-car link modes with "pt"
+	 */
+	public static void replaceNonCarModesWithPT(Network network) {
+		log.info("... Replacing all non-car link modes with \"pt\"");
+
+		Set<String> modesCar = Collections.singleton(TransportMode.car);
+
+		Set<String> modesCarPt = new HashSet<>();
+		modesCarPt.add(TransportMode.car);
+		modesCarPt.add(TransportMode.pt);
+
+		Set<String> modesPt = new HashSet<>();
+		modesPt.add(TransportMode.pt);
+
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().size() == 0 && link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesCar);
+			}
+			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesCarPt);
+			} else if(!link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesPt);
+			}
+		}
 	}
 
 	/**

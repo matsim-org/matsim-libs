@@ -21,8 +21,8 @@
 package playground.benjamin.scoring.income;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**

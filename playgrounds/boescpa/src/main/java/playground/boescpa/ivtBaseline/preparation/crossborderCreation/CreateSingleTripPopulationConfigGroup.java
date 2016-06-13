@@ -41,6 +41,8 @@ public class CreateSingleTripPopulationConfigGroup extends ReflectiveConfigGroup
 	private String pathToFacilities;
 	// cumulative departure probabilities: hourly probabilities used to determine the departures of the single trip agents
 	private String pathToCumulativeDepartureProbabilities;
+	// cumulative duration probabilities: half-hourly probabilities used to determine the durations of the single trip agents
+	private String pathToCumulativeDurationProbabilities;
 	// subpopulation origin: the facilities which will be used as home locations (file can also be used otherwise)
 	private String pathToSubpopulation_Origin;
 	// subpopulation destination: the facilities which will be used for the activity locations (file can also be used otherwise)
@@ -121,6 +123,16 @@ public class CreateSingleTripPopulationConfigGroup extends ReflectiveConfigGroup
 	@StringSetter("inputFile_CumulativeDepartureProbabilities")
 	public void setPathToCumulativeDepartureProbabilities(String pathToCumulativeDepartureProbabilities) {
 		this.pathToCumulativeDepartureProbabilities = pathToCumulativeDepartureProbabilities;
+	}
+
+	@StringGetter("inputFile_CumulativeDurationProbabilities")
+	public String getPathToCumulativeDurationProbabilities() {
+		return pathToCumulativeDurationProbabilities;
+	}
+
+	@StringSetter("inputFile_CumulativeDurationProbabilities")
+	public void setPathToCumulativeDurationProbabilities(String pathToCumulativeDurationProbabilities) {
+		this.pathToCumulativeDurationProbabilities = pathToCumulativeDurationProbabilities;
 	}
 
 	@StringGetter("outputFile_Population")

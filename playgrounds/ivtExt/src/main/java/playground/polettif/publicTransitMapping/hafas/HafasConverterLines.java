@@ -22,7 +22,6 @@
 package playground.polettif.publicTransitMapping.hafas;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
@@ -106,11 +105,10 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 
 		for(FPLANRoute fplanRoute : routes) {
 			Id<VehicleType> vehicleTypeId = fplanRoute.getVehicleTypeId();
-			String transportMode = TransportMode.pt;
 
 			// get wheter the route using this vehicle type should be added & set transport mode
 			if(HafasDefinitions.Vehicles.valueOf(vehicleTypeId.toString()).addToSchedule) {
-				transportMode = HafasDefinitions.Vehicles.valueOf(vehicleTypeId.toString()).transportMode.modeName;
+				String transportMode = HafasDefinitions.Vehicles.valueOf(vehicleTypeId.toString()).transportMode.modeName;
 
 				Id<TransitLine> lineId = createLineId(fplanRoute);
 
@@ -172,7 +170,23 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 	}
 
 	private Id<TransitLine> createLineId(FPLANRoute route) {
-		if(route.getRouteDescription() == null) {
+		if(route.getOperator().equals("SBB")) {
+			long firstStopId;
+			long lastStopId ;
+			try {
+				firstStopId = Long.parseLong(route.getFirstStopId());
+				lastStopId = Long.parseLong(route.getLastStopId());
+			} catch (NumberFormatException e) {
+				firstStopId = 0;
+				lastStopId = 1;
+			}
+			if(firstStopId < lastStopId) {
+				return Id.create("SBB_" + route.getVehicleTypeId() + "_" + route.getFirstStopId() + "-" + route.getLastStopId(), TransitLine.class);
+			} else {
+				return Id.create("SBB_" + route.getVehicleTypeId() + "_" + route.getLastStopId() + "-" + route.getFirstStopId(), TransitLine.class);
+			}
+		}
+		else if(route.getRouteDescription() == null) {
 			return Id.create(route.getOperator(), TransitLine.class);
 		} else {
 			return Id.create(route.getOperator() + "_" + route.getRouteDescription(), TransitLine.class);
@@ -181,6 +195,5 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 
 	private Id<TransitRoute> createRouteId(FPLANRoute route, int routeNr) {
 		return Id.create(route.getFahrtNummer() + "_" + String.format("%03d", routeNr), TransitRoute.class);
-//		return Id.create(route.getFahrtNummer(), TransitRoute.class);
 	}
 }

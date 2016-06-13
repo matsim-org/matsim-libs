@@ -19,12 +19,14 @@
 package playground.polettif.publicTransitMapping.tools;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -99,17 +101,18 @@ public class ScheduleCleaner {
 
 		int removed = 0;
 
-		for(TransitLine line : schedule.getTransitLines().values()) {
-			Set<TransitRoute> toRemove = new HashSet<>();
-			for(TransitRoute transitRoute : line.getRoutes().values()) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : new HashSet<>(transitLine.getRoutes().values())) {
 				boolean removeRoute = false;
 				NetworkRoute networkRoute = transitRoute.getRoute();
 				if(networkRoute == null) {
 					removeRoute = true;
-				} else if(networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
+				}
+				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
+				if(linkIds.size() == 0) {
 					removeRoute = true;
-
-					for(Id<Link> linkId : ScheduleTools.getLinkIds(transitRoute)) {
+				} else {
+					for(Id<Link> linkId : linkIds) {
 						if(linkId == null) {
 							removeRoute = true;
 						}
@@ -117,19 +120,11 @@ public class ScheduleCleaner {
 				}
 
 				if(removeRoute) {
-					toRemove.add(transitRoute);
-				}
-			}
-
-			removed += toRemove.size();
-
-			if(!toRemove.isEmpty()) {
-				for(TransitRoute transitRoute : toRemove) {
-					line.removeRoute(transitRoute);
+					transitLine.removeRoute(transitRoute);
+					removed++;
 				}
 			}
 		}
-
 		log.info("... " + removed + " transit routes removed");
 
 		return removed;
@@ -137,9 +132,10 @@ public class ScheduleCleaner {
 
 	/**
 	 * Removes links that are not used by public transit. Links which have a mode defined
-	 * in modesToKeep are kept regardless of public transit usage.
+	 * in modesToKeep are kept regardless of public transit usage. Opposite links of used
+	 * links are kept if keepOppositeLinks is true.
 	 */
-	public static void removeNotUsedTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToKeep) {
+	public static void removeNotUsedTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToKeep, boolean keepOppositeLinks) {
 		log.info("... Removing links that are not used by public transit");
 
 		Set<Id<Link>> usedTransitLinkIds = new HashSet<>();
@@ -147,15 +143,24 @@ public class ScheduleCleaner {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null)
-					usedTransitLinkIds.addAll(ScheduleTools.getLinkIds(route));
+					usedTransitLinkIds.addAll(ScheduleTools.getTransitRouteLinkIds(route));
 			}
 		}
 
-		Set<Id<Link>> linksToRemove = new HashSet<>();
-		for(Link link : network.getLinks().values()) {
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		if(keepOppositeLinks) {
+			for(Id<Link> linkId : new HashSet<>(usedTransitLinkIds)) {
+				Link oppositeLink = NetworkTools.getOppositeLink(links.get(linkId));
+				if(oppositeLink != null) usedTransitLinkIds.add(oppositeLink.getId());
+			}
+		}
+
+		int linksRemoved = 0;
+		for(Link link : new HashSet<>(network.getLinks().values())) {
 			// only remove link if there are only modes to remove on it
 			if(!MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
-				linksToRemove.add(link.getId());
+				network.removeLink(link.getId());
+				linksRemoved++;
 			}
 			// only retain modes that are actually used
 			else if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
@@ -163,29 +168,19 @@ public class ScheduleCleaner {
 			}
 		}
 
-		for(Id<Link> linkId : linksToRemove) {
-			network.removeLink(linkId);
-		}
-
 		// removing nodes
-		Set<Id<Node>> nodesToRemove = new HashSet<>();
-		for(Node n : network.getNodes().values()) {
+		for(Node n : new HashSet<>(network.getNodes().values())) {
 			if(n.getOutLinks().size() == 0 && n.getInLinks().size() == 0) {
-				nodesToRemove.add(n.getId());
+				network.removeNode(n.getId());
 			}
 		}
-		for(Id<Node> nodeId : nodesToRemove) {
-			network.removeNode(nodeId);
-		}
 
-		log.info("    " + linksToRemove.size() + " links removed");
+		log.info("    " + linksRemoved + " links removed");
 	}
 
 	/**
 	 * Changes the schedule to an unmapped schedule by removes all link sequences
 	 * from a transit schedule and removing referenced links from stop facilities.
-	 *
-	 * @param schedule
 	 */
 	public static void removeMapping(TransitSchedule schedule) {
 		log.info("... Removing reference links and link sequences from schedule");
@@ -201,12 +196,16 @@ public class ScheduleCleaner {
 		}
 	}
 
+	/**
+	 * Removes duplicate departures (with the same departure time)
+	 * from a transit route.
+	 */
 	public static void cleanDepartures(TransitSchedule schedule) {
-		for(TransitLine line : schedule.getTransitLines().values()) {
-			for(TransitRoute route : line.getRoutes().values()) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				final Set<Double> departureTimes = new HashSet<>();
 				final List<Departure> departuresToRemove = new ArrayList<>();
-				for(Departure departure : route.getDepartures().values()) {
+				for(Departure departure : transitRoute.getDepartures().values()) {
 					double dt = departure.getDepartureTime();
 					if(departureTimes.contains(dt)) {
 						departuresToRemove.add(departure);
@@ -215,7 +214,7 @@ public class ScheduleCleaner {
 					}
 				}
 				for(Departure departure2Remove : departuresToRemove) {
-					route.removeDeparture(departure2Remove);
+					transitRoute.removeDeparture(departure2Remove);
 				}
 			}
 		}
@@ -240,7 +239,7 @@ public class ScheduleCleaner {
 			for(List<TransitRoute> routeList : profiles.values()) {
 				if(routeList.size() > 1) {
 					TransitRoute finalRoute = routeList.get(0);
-					for(int i=1; i < routeList.size(); i++) {
+					for(int i = 1; i < routeList.size(); i++) {
 
 						combined++;
 						transitLine.removeRoute(routeList.get(i));
@@ -333,19 +332,114 @@ public class ScheduleCleaner {
 		log.info("Removing not used vehicles...");
 		int removed = 0;
 		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
-		for (TransitLine line : schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				for(Departure departure : transitRoute.getDepartures().values()) {
 					usedVehicles.add(departure.getVehicleId());
 				}
 			}
 		}
-		for (Id<Vehicle> vehicleId : new HashSet<>(vehicles.getVehicles().keySet())) {
-			if (!usedVehicles.contains(vehicleId)) {
+		for(Id<Vehicle> vehicleId : new HashSet<>(vehicles.getVehicles().keySet())) {
+			if(!usedVehicles.contains(vehicleId)) {
 				vehicles.removeVehicle(vehicleId);
 				removed++;
 			}
 		}
 		log.info(removed + " vehicles removed");
+	}
+
+
+	/**
+	 * Replaces all schedule transport modes (i.e. bus or rail)
+	 * with <tt>mode</tt> (normally pt).
+	 */
+	public static void replaceScheduleModes(TransitSchedule schedule, String mode) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				transitRoute.setTransportMode(mode);
+			}
+		}
+	}
+
+	/**
+	 * Removes the given route from the schedule
+	 * @return true if the route could be removed
+	 */
+	public static boolean removeRoute(TransitSchedule schedule, Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
+		TransitLine transitLine = schedule.getTransitLines().get(transitLineId);
+		return transitLine != null && transitLine.removeRoute(transitLine.getRoutes().get(transitRouteId));
+	}
+
+	/**
+	 * cuts the schedule
+	 */
+	public static void cutSchedule(TransitSchedule schedule, Coord center, double radius) {
+		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
+		for (TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			if(CoordUtils.calcEuclideanDistance(center, stopFacility.getCoord()) <= radius) {
+				stopsInArea.add(stopFacility.getId());
+			}
+		}
+		cutSchedule(schedule, stopsInArea);
+	}
+
+	public static void cutSchedule(TransitSchedule schedule, Coord SWcorner, Coord NEcorner) {
+		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
+		for (TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			if(CoordTools.isInArea(stopFacility.getCoord(), SWcorner, NEcorner)) {
+				stopsInArea.add(stopFacility.getId());
+			}
+		}
+		cutSchedule(schedule, stopsInArea);
+	}
+
+	/**
+	 * cuts the schedule, retains routes that pass stops defined in stopsInArea
+	 */
+	public static void cutSchedule(TransitSchedule schedule, Set<Id<TransitStopFacility>> stopsInArea) {
+		log.info("Cutting schedule...");
+		log.info("   area contains " + stopsInArea.size() + " stops.");
+
+		// Identify all routes not crossing area and therefore to remove:
+		int routesRemoved = 0;
+		Set<TransitLine> linesToRemove = new HashSet<>();
+		for (TransitLine transitLine : schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : new HashSet<>(transitLine.getRoutes().values())) {
+				boolean toKeep = false;
+				for (TransitRouteStop stop : transitRoute.getStops()) {
+					if (stopsInArea.contains(stop.getStopFacility().getId())) {
+						toKeep = true;
+					}
+				}
+				if (!toKeep) {
+					transitLine.removeRoute(transitRoute);
+					routesRemoved++;
+				}
+			}
+			if (transitLine.getRoutes().isEmpty()) {
+				linesToRemove.add(transitLine);
+			}
+		}
+		log.info("   routes removed: " + routesRemoved);
+
+		for (TransitLine lineToRemove : linesToRemove) {
+			schedule.removeTransitLine(lineToRemove);
+		}
+		log.info("   lines removed: " + linesToRemove.size());
+
+		removeNotUsedStopFacilities(schedule);
+	}
+
+	/**
+	 * Removes all transit routes using the given mode from the schedule
+	 */
+	public static void removeTransitRouteByMode(TransitSchedule schedule, Set<String> modesToRemove) {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : new HashSet<>(transitLine.getRoutes().values())) {
+				if(modesToRemove.contains(transitRoute.getTransportMode())) {
+					transitLine.removeRoute(transitRoute);
+				}
+			}
+		}
 	}
 }

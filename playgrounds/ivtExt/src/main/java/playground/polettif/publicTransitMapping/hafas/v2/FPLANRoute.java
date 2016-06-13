@@ -147,6 +147,20 @@ public class FPLANRoute {
 	}
 
 	/**
+	 * @return the id of the first stop
+	 */
+	public String getFirstStopId() {
+		return (String) tmpStops.get(0)[0];
+	}
+
+	/**
+	 * @return the id of the last stop
+	 */
+	public String getLastStopId() {
+		return (String) tmpStops.get(tmpStops.size()-1)[0];
+	}
+
+	/**
 	 * @return the transit route stops of this route. Static schedule needs to be set.
 	 */
 	public List<TransitRouteStop> getTransitRouteStops() {

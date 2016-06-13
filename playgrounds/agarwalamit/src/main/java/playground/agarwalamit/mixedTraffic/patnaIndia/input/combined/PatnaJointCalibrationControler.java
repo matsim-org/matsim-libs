@@ -60,11 +60,11 @@ public class PatnaJointCalibrationControler {
 	private final static double SAMPLE_SIZE = 0.10;
 	private final static String subPopAttributeName = "userGroup";
 
-	private static final String NET_FILE = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/network_diff_linkSpeed.xml.gz"; //
-	private static final String JOINT_PLANS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_counts.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
+	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz"; //
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_counts.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_vehicles_10pct.xml.gz";
 
 	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c3/";
 
@@ -179,9 +179,6 @@ public class PatnaJointCalibrationControler {
 		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 
-		config.setParam(DefaultStrategy.TimeAllocationMutator.name(), "mutationAffectsDuration", "false");
-		config.setParam(DefaultStrategy.TimeAllocationMutator.name(), "mutationRange", "7200.0");
-
 		{//urban
 			StrategySettings expChangeBeta = new StrategySettings();
 			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
@@ -200,9 +197,12 @@ public class PatnaJointCalibrationControler {
 			timeAllocationMutator.setSubpopulation(PatnaUserGroup.urban.name());
 			timeAllocationMutator.setWeight(0.05);
 			config.strategy().addStrategySettings(timeAllocationMutator);
+			
+			config.timeAllocationMutator().setAffectingDuration(false);
+			config.timeAllocationMutator().setMutationRange(7200.);
 
 			StrategySettings modeChoice = new StrategySettings();
-			modeChoice.setStrategyName(DefaultStrategy.ChangeLegMode.name());
+			modeChoice.setStrategyName(DefaultStrategy.ChangeTripMode.name());
 			modeChoice.setSubpopulation(PatnaUserGroup.urban.name());
 			modeChoice.setWeight(0.1);
 			config.strategy().addStrategySettings(modeChoice);

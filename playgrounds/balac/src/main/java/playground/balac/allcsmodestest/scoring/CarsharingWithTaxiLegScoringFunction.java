@@ -14,7 +14,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
-public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
+public class CarsharingWithTaxiLegScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring {
 
 	private PlanImpl plan;
 	

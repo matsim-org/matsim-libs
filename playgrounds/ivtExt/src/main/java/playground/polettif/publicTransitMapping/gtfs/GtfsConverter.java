@@ -53,16 +53,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	private static final Logger log = Logger.getLogger(GtfsConverter.class);
 
-	// todo await departure time?
 	private boolean defaultAwaitDepartureTime = true;
 
-	public static final String ALL_SERVICE_IDS = "all";
-	public static final String MOST_USED_SINGLE_ID = "mostUsedSingleId";
-	public static final String DAY_WITH_MOST_TRIPS = "dayWithMostTrips";
-	public static final String DAY_WITH_MOST_SERVICES = "dayWithMostServices";
-
-	LocalDate dateUsed = null;
-
+	private LocalDate dateUsed = null;
 
 	/**
 	 * Path to the folder where the gtfs files are located
@@ -225,7 +218,7 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 						 */
 
 						/* if stop sequence is already used by the same transitLine: just add new departure for the
-						 * 	transitRoute that uses that stop sequence
+						 * transitRoute that uses that stop sequence
 						 */
 						boolean routeExistsInTransitLine = false;
 						for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
@@ -617,14 +610,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	 */
 	private void getServiceIds(String param) {
 		switch (param) {
-			case MOST_USED_SINGLE_ID:
-				String mostUsed = getKeyOfMaxValue(serviceIdsCount);
-				this.serviceIds = Collections.singleton(mostUsed);
-				log.info("... Getting most used service ID: " + mostUsed + " (" + serviceIdsCount.get(mostUsed) + " occurences)");
-				break;
-
 			case ALL_SERVICE_IDS:
-				log.info("... Using all service IDs (probably way too much data)");
+				log.warn("    Using all trips is not recommended");
+				log.info("... Using all service IDs");
 				this.serviceIds = services.keySet();
 				break;
 
@@ -663,19 +651,15 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 			}
 
 			default:
-				dateUsed = LocalDate.of(Integer.parseInt(param.substring(0, 4)), Integer.parseInt(param.substring(4, 6)), Integer.parseInt(param.substring(6, 8)));
-
-				this.serviceIds = getServiceIdsOnDate(dateUsed);
-				log.info("        Using service IDs on " + param + ": " + this.serviceIds.size() + " services.");
+				try {
+					dateUsed = LocalDate.of(Integer.parseInt(param.substring(0, 4)), Integer.parseInt(param.substring(4, 6)), Integer.parseInt(param.substring(6, 8)));
+					this.serviceIds = getServiceIdsOnDate(dateUsed);
+					log.info("        Using service IDs on " + param + ": " + this.serviceIds.size() + " services.");
+				} catch (NumberFormatException e) {
+					throw new IllegalArgumentException("Service id param not recognized! Allowed: day in format \"yyyymmdd\", " + DAY_WITH_MOST_SERVICES + ", "+ DAY_WITH_MOST_TRIPS + ", " + ALL_SERVICE_IDS);
+				}
 				break;
 		}
-	}
-
-	/**
-	 * Identifies the most used sevice ID of the validity period of the schedule and returns the ID.
-	 */
-	private static String getKeyOfMaxValue(Map<String, Integer> map) {
-		return map.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
 	}
 
 	public void setTransformation(CoordinateTransformation transformation) {

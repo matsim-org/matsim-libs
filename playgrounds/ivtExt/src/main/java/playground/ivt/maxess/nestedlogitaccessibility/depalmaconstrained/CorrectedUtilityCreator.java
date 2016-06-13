@@ -27,14 +27,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * @author thibautd
@@ -79,8 +81,8 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		int iteration = 0;
 		for ( int lastSize = -1,
 			  	newSize = iterationInformation.constrainedExPost.size();
-			  // TODO: less restrictive criterion?
-			  lastSize != newSize; ) {
+				// TODO: less restrictive criterion?
+				lastSize != newSize; ) {
 			log.info( "Iteration "+(iteration++)+": constrained set has size "+newSize );
 			//counter.incCounter();
 			// update omegas based on the constrained set
@@ -105,9 +107,10 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 	private class IterationInformation {
 		private final TObjectDoubleMap<Id<Person>> individualOmegas = new TObjectDoubleHashMap<>();
-		private final Set<Id<ActivityFacility>> constrainedExPost = new HashSet<>();
+		private final Set<Id<ActivityFacility>> constrainedExPost = ConcurrentHashMap.newKeySet();
 
 		IterationInformation( Demand<?> demand ) {
+			log.info( "initialize iteration information");
 			for ( Id<Person> personId : scenario.getPopulation().getPersons().keySet() ) {
 				individualOmegas.put( personId , 1 );
 			}
@@ -115,31 +118,41 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 		}
 
 		void updateConstrained( final Demand<?> demand ) {
+			log.debug( "update constrained set" );
 			final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = demand.getDemandPerFacility();
 
-			for ( Map.Entry<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> entry : demandPerFacility.entrySet() ) {
-				// constrained set can only grow --- do not bother if constrained in previous iteration
-				if ( constrainedExPost.contains( entry.getKey() ) ) continue;
+			// Trick to be able to set the number of desired threads. see http://stackoverflow.com/q/21163108
+			final ForkJoinPool fjp = new ForkJoinPool( scenario.getConfig().global().getNumberOfThreads() );
 
-				final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
-				final double supply = getSupply( f, activityType, configGroup );
+			fjp.submit( () -> {
+				demandPerFacility.entrySet().parallelStream().forEach( entry -> {
+					// constrained set can only grow --- do not bother if constrained in previous iteration
+					if ( constrainedExPost.contains( entry.getKey() ) ) return;
 
-				double correctedDemand = 0;
-				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
-						iterator.hasNext();
-						) {
-					iterator.advance();
-					final double omega = individualOmegas.get( iterator.key() );
-					final double proba = iterator.value();
-					correctedDemand += omega * proba;
-				}
-				if ( supply <= correctedDemand ) constrainedExPost.add( entry.getKey() );
-			}
+					final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( entry.getKey() );
+					final double supply = getSupply( f, activityType, configGroup );
+
+					double correctedDemand = 0;
+					for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
+						  iterator.hasNext();
+							) {
+						iterator.advance();
+						final double omega = individualOmegas.get( iterator.key() );
+						final double proba = iterator.value();
+						correctedDemand += omega * proba;
+					}
+					if ( supply <= correctedDemand ) constrainedExPost.add( entry.getKey() );
+				} );
+			}).join();
+			fjp.shutdown();
 		}
 
 		void updateIndividualOmegas(
 				final Demand<?> demand ) {
+			log.debug( "update individual omegas" );
+			final Counter counter = new Counter( "look at person # " , " / "+scenario.getPopulation().getPersons().size() );
 			for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
+				counter.incCounter();
 				final TObjectDoubleMap<Id<ActivityFacility>> probabilities =
 						demand.getProbabilitiesForIndividual( p );
 
@@ -162,6 +175,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}
+			counter.printCounter();
 		}
 	}
 

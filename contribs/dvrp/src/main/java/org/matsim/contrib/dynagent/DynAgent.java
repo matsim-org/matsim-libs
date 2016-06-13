@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 
-public class DynAgent
+public final class DynAgent
     implements MobsimDriverPassengerAgent
 {
     private DynAgentLogic agentLogic;
@@ -50,12 +50,12 @@ public class DynAgent
 
     // =====
 
-    private DynLeg dynLeg;
 
     private Id<Link> currentLinkId;
 
     // =====
 
+    private DynLeg dynLeg;
     private DynActivity dynActivity;
 
 
@@ -67,7 +67,7 @@ public class DynAgent
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
         this.events = events;
-
+        
         // initial activity
         dynActivity = this.agentLogic.computeInitialActivity(this);
         state = dynActivity.getEndTime() != Time.UNDEFINED_TIME ? //
@@ -112,7 +112,7 @@ public class DynAgent
     @Override
     public void endLegAndComputeNextState(double now)
     {
-        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, TransportMode.car));
+        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));
 
         computeNextAction(dynLeg, now);
     }

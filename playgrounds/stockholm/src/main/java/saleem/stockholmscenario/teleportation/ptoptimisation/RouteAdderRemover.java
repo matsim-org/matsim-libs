@@ -22,6 +22,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.Vehicles;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
@@ -38,10 +39,10 @@ public class RouteAdderRemover {
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
 			if(vehicleinstances.get(tline.getRoutes().values().iterator().next().getDepartures().values().iterator().next().getVehicleId()).getType().getId().toString().equals("BUS")){//If a bus line
-				if(Math.random()<=0.1){//With 10% probability
-					ArrayList<TransitRoute> routes = cutilforroutes.toArrayList(tline.getRoutes().values().iterator());
-					int sizer = routes.size();
-					for(int j=0;j<sizer;j++) {
+				ArrayList<TransitRoute> routes = cutilforroutes.toArrayList(tline.getRoutes().values().iterator());
+				int sizer = routes.size();
+				for(int j=1;j<sizer;j++) {
+					if(Math.random()<=0.1){//With 10% probability
 						TransitRoute troute = routes.get(j);
 						if(Math.random()<=0.1){
 							ArrayList<Departure> departures = cutilfordepartures.toArrayList(troute.getDepartures().values().iterator());
@@ -55,10 +56,11 @@ public class RouteAdderRemover {
 								troute.removeDeparture(departure);
 								vehicles.removeVehicle(departure.getVehicleId());//To remove the vehicles used in the route
 							}
-							double time = 115200;//Morning Peak
+							double time = 115200;//Hypothetical departure after end time;delete all other departures; effectively a route that doesn't exist.
 							Departure hypodeparture = tschedulefact.createDeparture(Id.create("DepHypo"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 							hypodeparture.setVehicleId(vehid);
 							troute.addDeparture(hypodeparture);
+							tline.removeRoute(troute);
 						}
 					}
 				}
@@ -75,7 +77,10 @@ public class RouteAdderRemover {
 		int size = lines.size();
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
-			if(vehicleinstances.get(tline.getRoutes().values().iterator().next().getDepartures().values().iterator().next().getVehicleId()).getType().getId().toString().equals("BUS")){//If a bus line
+			Vehicle vehicle = vehicleinstances.get(tline.getRoutes().values().iterator().next().getDepartures().values().
+							  iterator().next().getVehicleId());
+			if(vehicle.getType().getId().toString().equals("BUS")){//If a bus line
+				VehicleType type = vehicle.getType();
 				if(Math.random()<=0.1){//With 10% probability
 					ArrayList<TransitRoute> routes = cutilforroutes.toArrayList(tline.getRoutes().values().iterator());
 					int sizer = routes.size();
@@ -84,7 +89,7 @@ public class RouteAdderRemover {
 						if(Math.random()<=0.1){
 							TransitRoute route = createTransiteRoute(scenario, tschedulefact, troute, links2stops);//Create a new Transit Route, with same origin as troute
 							if(route==null)return;
-							addDeparturestoRoute(tschedulefact, route, vehicles);
+							addDeparturestoRoute(tschedulefact, route, vehicles, type);
 							tline.addRoute(route);
 						}
 					}
@@ -109,7 +114,8 @@ public class RouteAdderRemover {
 		}
 		return link2stop;
 	}
-	public void addDeparturestoRoute(TransitScheduleFactory tschedulefact, TransitRoute route, Vehicles vehicles){//Creates and adds random departures to the newly created route
+	public void addDeparturestoRoute(TransitScheduleFactory tschedulefact, TransitRoute route, Vehicles vehicles, VehicleType vtype ){//Creates and adds 
+																																	 //random departures to the newly created route
 		
 		int numpeakmorning = (int)(Math.ceil(4*Math.random()));//Peakhour departures
 		int numpeakevening = (int)(Math.ceil(4*Math.random()));
@@ -121,6 +127,8 @@ public class RouteAdderRemover {
 				double time = 25200 + 7200*Math.random();//Morning Peak
 				Departure departure = tschedulefact.createDeparture(Id.create("DepAdded"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 				departure.setVehicleId(vehid);
+				Vehicle veh = new VehicleImpl(vehid, vtype);
+				vehicles.addVehicle(veh);
 				if(!route.getDepartures().containsKey(departure.getId())){//If not already added a departure with the same id
 					route.addDeparture(departure);
 				}
@@ -132,6 +140,8 @@ public class RouteAdderRemover {
 				double time = 59400 + 7200*Math.random();//Evening Peak
 				Departure departure = tschedulefact.createDeparture(Id.create("DepAdded"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 				departure.setVehicleId(vehid);
+				Vehicle veh = new VehicleImpl(vehid, vtype);
+				vehicles.addVehicle(veh);
 				if(!route.getDepartures().containsKey(departure.getId())){//If not already added a departure with the same id
 					route.addDeparture(departure);
 				}
@@ -143,6 +153,8 @@ public class RouteAdderRemover {
 				double time = 86400*Math.random();//Anytime within day
 				Departure departure = tschedulefact.createDeparture(Id.create("DepAdded"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 				departure.setVehicleId(vehid);
+				Vehicle veh = new VehicleImpl(vehid, vtype);
+				vehicles.addVehicle(veh);
 				if(!route.getDepartures().containsKey(departure.getId())){//If not already added a departure with the same id
 					route.addDeparture(departure);
 				}
@@ -153,47 +165,64 @@ public class RouteAdderRemover {
 		Map<Id<Link>, ? extends Link> links = scenario.getNetwork().getLinks();
 		TransitRouteStop origin = troute.getStops().get(0);
 		List<TransitRouteStop> transitstopsfornewroute = new ArrayList<TransitRouteStop>();
-		Link destinationlink = createDestination(links2stops, transitstopsfornewroute, links, origin);//Changes transitstopsfornewroute within the function
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(origin.getStopFacility().getLinkId(), destinationlink.getId());
+		List<Id<Link>> linksfornewroute = new ArrayList<Id<Link>>();
+		Link destinationlink = createDestination(links2stops, transitstopsfornewroute,linksfornewroute, links, origin);//Changes transitstopsfornewroute 
+																											//and networkroutelinks within the function
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(origin.getStopFacility().getLinkId(),linksfornewroute, destinationlink.getId());
 		if(transitstopsfornewroute.size()==1){
 			return null;
 		}
-		Id<TransitRoute> id = Id.create(origin.getStopFacility().getId().toString()+"to"+transitstopsfornewroute.get(transitstopsfornewroute.size()-1).getStopFacility().getId()+"added", TransitRoute.class);
+		Id<TransitRoute> id = Id.create(origin.getStopFacility().getId().toString()+"to"+transitstopsfornewroute.get(transitstopsfornewroute.size()-1).getStopFacility().getId()+"added"+(100000*Math.random()), TransitRoute.class);
 		TransitRoute route = tschedulefact.createTransitRoute(id, networkRoute, transitstopsfornewroute, "pt");
 		return route;
 		
 	}
+	public Node getNextNode(Node node, Map<Id<Link>, ? extends Link> links){
+		Set<Id<Link>> keyset = node.getOutLinks().keySet();//Outgoing links from node
+		if(keyset.size()==0){
+			return null;
+		}
+		boolean found = false;
+		while(!found){//Some times same node leads to the same node due to changes made by Pseudo Simulator
+			Iterator<Id<Link>> iterator = keyset.iterator();
+			int randval = (int)Math.ceil(keyset.size()*Math.random());//To select one outlink randomly
+			int j=1;
+			Id<Link> linkid = iterator.next();;
+			while(j++<randval){
+				if(iterator.hasNext())
+					linkid = iterator.next();
+			}
+			Link link = links.get(linkid);//Select one outlink randomly
+			if(!node.equals(link.getToNode())){
+				node = link.getToNode();
+				found = true;
+			}
+		}
+		return node;
+	}
 	//Create Destination Link, and creates list of stops until the destination link, returns the link, changes stopsfornewroute by reference
-	public Link createDestination(Map<Id<Link>, TransitRouteStop> links2stops, List<TransitRouteStop> stopsfornewroute, Map<Id<Link>, ? extends Link> links, TransitRouteStop origin){
-		int numofstops = (int)(4+11*Math.random());
+	public Link createDestination(Map<Id<Link>, TransitRouteStop> links2stops, List<TransitRouteStop> stopsfornewroute,
+								List<Id<Link>> linksfornewroute, Map<Id<Link>, ? extends Link> links, TransitRouteStop origin){
+		int numofstops = (int)Math.ceil((25*Math.random()));
 		Link link = links.get(origin.getStopFacility().getLinkId());
 		TransitRouteStop stop = links2stops.get(link.getId());
 		stopsfornewroute.add(stop);//Sequence of stops according to selected links
 		Node node = link.getToNode();
+		if(node==null){
+			return link;
+		}
 		int i=0;
-		while(i++<numofstops){
-			Set<Id<Link>> keyset = node.getOutLinks().keySet();//Outgoing links from node
-			if(keyset.size()==0){
-				return link;
-			}
-			Iterator<Id<Link>> iterator = keyset.iterator();
-			int randval = (int)Math.floor(keyset.size()*Math.random());//To select one outlink randomly
-			int j=0;
-			while(j++<randval){
-				iterator.next();
-			}
-			Id<Link> linkid = iterator.next();
-			link = links.get(linkid);//Select one outlink randomly
-			node = link.getToNode();
+		int pos=0;
+		while(i++<1){
+			node = getNextNode(node, links);
 			if(links2stops.get(link.getId())!=null){
 				TransitRouteStop tstop = links2stops.get(link.getId());
-				stopsfornewroute.add(tstop);//Sequence of stops according to selected links
-
-			}
-			else{
-				System.out.println("Strange");
+				stopsfornewroute.add(pos, tstop);//Sequence of stops according to selected links
+				linksfornewroute.add(pos, link.getId());
+				pos++;
 			}
 		}
+		linksfornewroute.remove(link.getId());//Remove last link as it is the destination link and will be accounted for.
 		return link;
 
 	}	
