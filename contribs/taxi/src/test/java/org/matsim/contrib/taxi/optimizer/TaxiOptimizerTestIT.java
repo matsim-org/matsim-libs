@@ -45,7 +45,7 @@ public class TaxiOptimizerTestIT
         params.put(RuleBasedTaxiOptimizerParams.GOAL, Goal.MIN_PICKUP_TIME.name());
         params.put(RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 1 + "");
         params.put(RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 1 + "");
-        params.put(RuleBasedTaxiOptimizerParams.CELL_SIZE, 10 + "");
+        params.put(RuleBasedTaxiOptimizerParams.CELL_SIZE, 100 + "");
         runBenchmark(variants, params, benchmark);
     }
 
