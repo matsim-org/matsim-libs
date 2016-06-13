@@ -106,8 +106,8 @@ public class TaxiQSimProvider
         TaxiScheduler scheduler = new TaxiScheduler(scenario, taxiData, qSim.getSimTimer(),
                 schedulerParams, travelTime, travelDisutility);
 
-        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, scenario,
-                qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData,
+                scenario.getNetwork(), qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
         return optimizerFactory.createTaxiOptimizer(optimContext,
                 taxiCfg.getOptimizerConfigGroup());
     }

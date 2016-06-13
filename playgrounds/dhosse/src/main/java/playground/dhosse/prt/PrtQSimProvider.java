@@ -2,7 +2,6 @@ package playground.dhosse.prt;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -14,7 +13,6 @@ import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
@@ -99,7 +97,7 @@ public class PrtQSimProvider
         if (prtConfig.getVehicleCapacity() > 1) {
             PrtScheduler scheduler = new PrtScheduler(matsimServices.getScenario(), taxiData, qSim.getSimTimer(),
                     schedulerParams, travelTime, travelDisutility);
-            TaxiOptimizerContext optimContext = new PrtOptimizerContext(taxiData, matsimServices.getScenario(),
+            TaxiOptimizerContext optimContext = new PrtOptimizerContext(taxiData, matsimServices.getScenario().getNetwork(),
                     qSim.getSimTimer(), travelTime, travelDisutility, scheduler, prtConfig);
             
             return optimizerFactory.createTaxiOptimizer(optimContext,
@@ -109,7 +107,7 @@ public class PrtQSimProvider
             TaxiScheduler scheduler = new TaxiScheduler(matsimServices.getScenario(), taxiData, qSim.getSimTimer(),
                     schedulerParams, travelTime, travelDisutility);
 
-            TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices.getScenario(),
+            TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices.getScenario().getNetwork(),
                     qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
             return optimizerFactory.createTaxiOptimizer(optimContext,
                     taxiCfg.getOptimizerConfigGroup());

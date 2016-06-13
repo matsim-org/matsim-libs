@@ -1,6 +1,6 @@
 package playground.dhosse.prt.optimizer;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
@@ -16,11 +16,11 @@ public class PrtOptimizerContext
     public final PrtConfig prtConfigGroup;
 
 
-    public PrtOptimizerContext(TaxiData taxiData, Scenario scenario, MobsimTimer timer,
+    public PrtOptimizerContext(TaxiData taxiData, Network network, MobsimTimer timer,
             TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
             PrtConfig prtConfigGroup)
     {
-        super(taxiData, scenario, timer, travelTime, travelDisutility, scheduler);
+        super(taxiData, network, timer, travelTime, travelDisutility, scheduler);
         this.prtConfigGroup = prtConfigGroup;
     }
 }
