@@ -38,7 +38,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -52,7 +51,10 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.matsim.contrib.accessibility.FacilityTypes.HOME;
 import static org.matsim.contrib.accessibility.FacilityTypes.WORK;
@@ -80,6 +82,25 @@ public class Prepare {
 		String inputVehicles = "../data/vehicles/ch_hafas_vehicles.xml.gz";
 		String inputPopulation;
 		String scenName;
+
+		// Switzerland 10%
+		scenName = "ch_ten";
+		inputPopulation = "population/ch_10prct.xml.gz";
+		final Config configCH = createConfig(scenName);
+		configCH.qsim().setFlowCapFactor(0.1);
+
+		Prepare prepareCH = new Prepare(configCH, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		prepareCH.removeInvalidLines();
+//		prepareCH.cutSchedule();
+		prepareCH.population();
+		prepareCH.vehicles(0.1);
+		prepareCH.writeFiles(scenName);
+
+		try {
+			TransitScheduleValidator.main(new String[]{scenName+"/"+configCH.transit().getTransitScheduleFile(), scenName+"/"+configCH.network().getInputFile()});
+		} catch (IOException | SAXException | ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 
 		// Zurich 1%
 		// no delay
@@ -129,29 +150,25 @@ public class Prepare {
 		prepareZH10Tel.writeFiles(scenName);
 
 
-		// Switzerland 10%
-		scenName = "ch_ten";
-		inputPopulation = "population/ch_10prct.xml.gz";
-		final Config configCH = createConfig(scenName);
-		configCH.qsim().setFlowCapFactor(0.1);
 
-		Prepare prepareCH = new Prepare(configCH, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
-		prepareCH.removeInvalidLines();
-//		prepareCH.cutSchedule();
-		prepareCH.population();
-		prepareCH.vehicles(0.1);
-		prepareCH.writeFiles(scenName);
-
-		try {
-			TransitScheduleValidator.main(new String[]{scenName+"/"+configCH.transit().getTransitScheduleFile(), scenName+"/"+configCH.network().getInputFile()});
-		} catch (IOException | SAXException | ParserConfigurationException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public Prepare(Config config, String inputNetwork, String inputSchedule, String inputVehicles, String inputPopulation) {
 		this.config = config;
 		this.network = NetworkTools.readNetwork(inputNetwork);
+		this.schedule = ScheduleTools.readTransitSchedule(inputSchedule);
+		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
+
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		reader.readFile(inputPopulation);
+		this.population = sc.getPopulation();
+	}
+
+
+	public Prepare(Config config, Network network, String inputSchedule, String inputVehicles, String inputPopulation) {
+		this.config = config;
+		this.network = network;
 		this.schedule = ScheduleTools.readTransitSchedule(inputSchedule);
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
@@ -296,12 +313,12 @@ public class Prepare {
 		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.2);
-		StrategyConfigGroup.StrategySettings changeLegMode = new StrategyConfigGroup.StrategySettings();
-		changeLegMode.setStrategyName("ChangeLegMode");
-		changeLegMode.setWeight(0.2);
+		StrategyConfigGroup.StrategySettings changeMode = new StrategyConfigGroup.StrategySettings();
+		changeMode.setStrategyName("changeMode");
+		changeMode.setWeight(0.2);
 		config.strategy().addStrategySettings(changeExpBeta);
 		config.strategy().addStrategySettings(reRoute);
-		config.strategy().addStrategySettings(changeLegMode);
+		config.strategy().addStrategySettings(changeMode);
 
 		return config;
 	}
