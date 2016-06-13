@@ -72,19 +72,16 @@ public class TaxiOptimizerTests
 
         // onlineVehicleTracker == false ==> vehicleDiversion == false
         variants.add(new TaxiConfigVariant(false, false, 120, 60, 1., false));
-        variants.add(new TaxiConfigVariant(false, false, 0, 0, 1., false));
-        variants.add(new TaxiConfigVariant(true, false, 120, 60, 1., false));
+        variants.add(new TaxiConfigVariant(true, false, 0, 0, 1., false));
 
         // onlineVehicleTracker == true, vehicleDiversion == false
         variants.add(new TaxiConfigVariant(false, false, 120, 60, 1., true));
-        variants.add(new TaxiConfigVariant(false, false, 0, 0, 1., true));
         variants.add(new TaxiConfigVariant(true, false, 120, 60, 1., true));
 
         if (diversionSupported) {
             // onlineVehicleTracker == true, vehicleDiversion == true
-            variants.add(new TaxiConfigVariant(false, true, 120, 60, 1., true));
+            variants.add(new TaxiConfigVariant(false, true, 0, 0, 1., true));
             variants.add(new TaxiConfigVariant(true, true, 120, 60, 1., true));
-            variants.add(new TaxiConfigVariant(true, true, 0, 0, 1., true));
         }
 
         return variants;
