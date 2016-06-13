@@ -67,7 +67,7 @@ public final class DynAgent
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
         this.events = events;
-
+        
         // initial activity
         dynActivity = this.agentLogic.computeInitialActivity(this);
         state = dynActivity.getEndTime() != Time.UNDEFINED_TIME ? //
@@ -112,7 +112,7 @@ public final class DynAgent
     @Override
     public void endLegAndComputeNextState(double now)
     {
-        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, TransportMode.car));
+        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));
 
         computeNextAction(dynLeg, now);
     }
