@@ -63,7 +63,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	}
 
 	@Override
-	public void writePlans(String iterationFilename) {
+	public void writeExperiencedPlans(String iterationFilename) {
 		Population tmpPop = PopulationUtils.createPopulation(config);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.createPerson(entry.getKey());
@@ -84,7 +84,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	}
 
 	@Override
-	public Map<Id<Person>, Plan> getAgentRecords() {
+	public Map<Id<Person>, Plan> getExperiencedPlans() {
 		return this.agentRecords;
 	}
 

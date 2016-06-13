@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -114,11 +113,11 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 
 		// yy write this in every iteration in order to be consistent with previous design.  I think this should be changed.  kai, jun'16
 		String outputFile = controlerIO.getIterationFilename(event.getIteration(), EXECUTEDPLANSFILE);
-		writePlans( outputFile ) ;
+		writeExecutedPlans( outputFile ) ;
 	}
 
 	@Override
-	public void writePlans(String outputFile) {
+	public void writeExecutedPlans(String outputFile) {
 		final Config config = scenario.getConfig();
 		final String inputCRS = config.plans().getInputCRS();
 		final String internalCRS = config.global().getCoordinateSystem();
@@ -139,7 +138,7 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 	}
 
 	@Override
-	public Map<Id<Person>, Plan> getAgentRecords() {
+	public Map<Id<Person>, Plan> getExecutedPlans() {
 		Map<Id<Person>,Plan> map = new HashMap<>() ;
 		for ( Person pp : this.experiencedPopulation.getPersons().values() ) {
 			map.put( pp.getId(), pp.getSelectedPlan() ) ;

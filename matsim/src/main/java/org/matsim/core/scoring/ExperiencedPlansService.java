@@ -1,8 +1,16 @@
 package org.matsim.core.scoring;
 
 
-import org.matsim.core.population.PlansService;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
-public interface ExperiencedPlansService extends PlansService {
+import java.util.Map;
+
+public interface ExperiencedPlansService {
+
+	void writeExperiencedPlans(String filename);
+
+	Map<Id<Person>, Plan> getExperiencedPlans();
 
 }
