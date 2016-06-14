@@ -24,9 +24,9 @@ public class SamplingAgentsFromPop {
 	
 	///Fields///
 	
-	final static String NET_FILENAME = "../../../runs-svn/santiago/casoBase10_NP/input/network_merged_cl.xml.gz";
+	final static String NET_FILENAME = "../../../runs-svn/santiago/cluster_1/input/network_merged_cl.xml.gz";
 	
-	final static String PATH_FOR_SAMPLED_INPUT = "../../../runs-svn/santiago/casoBase10_NP/input/new-input/";
+	final static String PATH_FOR_SAMPLED_INPUT = "../../../runs-svn/santiago/cluster_1/input/new-input/";
 	final static String INPUT_POP_FILENAME = PATH_FOR_SAMPLED_INPUT + "expanded_plans_final_1.xml.gz";	
 	final static String INPUT_CONFIG_FILENAME = PATH_FOR_SAMPLED_INPUT + "expanded_config_final.xml";
 	final static String OUTPUT_POP_FILENAME = PATH_FOR_SAMPLED_INPUT + "sampled_plans_final_1.xml.gz";
