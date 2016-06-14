@@ -8,4 +8,11 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>gtfs2matsimtransitschedule</artifactId>
   <name>gtfs2matsimtransitschedule</name>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

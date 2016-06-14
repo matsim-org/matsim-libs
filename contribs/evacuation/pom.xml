@@ -16,6 +16,13 @@
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
 	</repositories>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.swinglabs</groupId>

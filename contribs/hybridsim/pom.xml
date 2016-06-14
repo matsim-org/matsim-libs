@@ -155,6 +155,9 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>

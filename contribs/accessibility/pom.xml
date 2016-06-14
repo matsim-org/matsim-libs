@@ -24,6 +24,11 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+	  <plugins>
+		  <plugin>
+			  <artifactId>maven-assembly-plugin</artifactId>
+		  </plugin>
+	  </plugins>
   </build>
   <dependencies>
   	<dependency>
