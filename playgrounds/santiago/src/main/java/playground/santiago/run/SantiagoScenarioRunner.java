@@ -62,7 +62,8 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
-	private static String inputPath = "../../../runs-svn/santiago/cluster_1/input/";
+//	private static String inputPath = "../../../runs-svn/santiago/cluster_1/input/";
+	private static String inputPath = "net/ils4/lcamus/runs-svn/santiago/cluster_1/input/";
 	private static boolean doModeChoice = true;
 //	private static boolean mapActs2Links = true;
 	private static boolean mapActs2Links = false;
@@ -72,7 +73,7 @@ public class SantiagoScenarioRunner {
 	public static void main(String args[]){
 
 		if(args.length==0){
-			configFile = inputPath + "new-input/randomized_config_final.xml";
+			configFile = inputPath + "new-input/cluster_randomized_config_final.xml";
 //			configFile = inputPath + "config_triangleCordon.xml";
 		} else {
 			configFile = args[0];
