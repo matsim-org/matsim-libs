@@ -62,7 +62,7 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
-	private static String inputPath = "../../../runs-svn/santiago/casoBase5_NP/input/";
+	private static String inputPath = "../../../runs-svn/santiago/cluster_1/input/";
 	private static boolean doModeChoice = true;
 //	private static boolean mapActs2Links = true;
 	private static boolean mapActs2Links = false;
@@ -72,7 +72,7 @@ public class SantiagoScenarioRunner {
 	public static void main(String args[]){
 
 		if(args.length==0){
-			configFile = inputPath + "new_input/expanded_config_final.xml";
+			configFile = inputPath + "new-input/randomized_config_final.xml";
 //			configFile = inputPath + "config_triangleCordon.xml";
 		} else {
 			configFile = args[0];
@@ -80,6 +80,7 @@ public class SantiagoScenarioRunner {
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile);
+//		config.controler().setOutputDirectory(outputDirectory);
 //		config.qsim().setNumberOfThreads(1);
 //		config.parallelEventHandling().setNumberOfThreads(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
