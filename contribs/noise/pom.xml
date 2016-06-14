@@ -8,6 +8,13 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>noise</artifactId>
   <name>noise</name>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
   <dependencies>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>

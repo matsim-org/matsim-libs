@@ -8,6 +8,13 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>cadytsIntegration</artifactId>
   <name>cadytsIntegration</name>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
   <dependencies>
   	<dependency>
   		<groupId>cadyts</groupId>

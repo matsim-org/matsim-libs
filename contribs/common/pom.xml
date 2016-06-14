@@ -9,6 +9,13 @@
     <groupId>org.matsim.contrib</groupId>
     <artifactId>common</artifactId>
     <name>common</name>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>

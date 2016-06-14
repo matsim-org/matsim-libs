@@ -8,4 +8,11 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>networkEditor</artifactId>
   <name>networkEditor</name>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

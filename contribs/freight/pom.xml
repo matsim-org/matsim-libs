@@ -37,7 +37,10 @@
                 </execution>
             </executions>
         </plugin>
-    </plugins>
+		<plugin>
+			<artifactId>maven-assembly-plugin</artifactId>
+		</plugin>
+	</plugins>
 </build>
 
 
