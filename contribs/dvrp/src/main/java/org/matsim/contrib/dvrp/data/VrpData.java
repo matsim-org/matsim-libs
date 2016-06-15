@@ -36,4 +36,7 @@ public interface VrpData
 
 
     void addRequest(Request request);
+
+
+    void clearRequestsAndResetSchedules();
 }

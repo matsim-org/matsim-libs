@@ -32,11 +32,8 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.ActivityFacility;
@@ -105,8 +102,8 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			this.initialized = true;
 		}
 		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();		
-		CharyparNagelActivityScoring activityScoringFunction = new DCActivityScoringFunction(
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		DCActivityScoringFunction activityScoringFunction = new DCActivityScoringFunction(
 
 //					(PlanImpl) person,
 					person.getSelectedPlan(),
@@ -118,9 +115,9 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 					this.facilityToZoneIndexMap,
 					this.dcCalculator);
 		scoringFunctionAccumulator.addScoringFunction(activityScoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(params));
 		return scoringFunctionAccumulator;
 		
 //		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();

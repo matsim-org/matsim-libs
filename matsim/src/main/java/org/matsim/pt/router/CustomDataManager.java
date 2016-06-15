@@ -51,19 +51,19 @@ public class CustomDataManager {
 		return this.data.get(this.fromNode);
 	}
 
-	/*package*/ void initForLink(final Link link) {
+	public void initForLink(final Link link) {
 		this.fromNode = link.getFromNode();
 		this.toNode = link.getToNode();
 		this.tmpToNodeData = null;
 	}
 	
-	/*package*/ void storeTmpData() {
+	public void storeTmpData() {
 		if (this.tmpToNodeData != null) {
 			this.data.put(this.toNode, this.tmpToNodeData);
 		}
 	}
 	
-	/*package*/ void reset() {
+	public void reset() {
 		this.data.clear();
 		this.fromNode = null;
 		this.toNode = null;

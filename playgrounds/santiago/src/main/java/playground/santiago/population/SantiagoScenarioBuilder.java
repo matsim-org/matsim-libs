@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/casoBase10_NP/";
+	final String pathForMatsim = "../../../runs-svn/santiago/cluster_1/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
@@ -488,75 +488,75 @@ public class SantiagoScenarioBuilder {
 		return populationOut;
 	}
 	
-	private void randomizeEndTimes(Population population){
-		log.info("Randomizing activity end times...");
-		Random random = MatsimRandom.getRandom();
-		for(Person person : population.getPersons().values()){
-			double timeShift = 0.;
-			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-				if(pe instanceof Activity){
-					Activity act = (Activity) pe;
-					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getEndTime() - act.getStartTime() == 0){
-							timeShift += 1800.;
-						}
-					}
-				}
-			}
-			
-			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			Activity lastAct = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
-			
-			double delta = 0;
-			while(delta == 0){
-				delta = createRandomEndTime(random);
-				if(firstAct.getEndTime() + delta < 0){
-					delta = 0;
-				}
-				if(lastAct.getStartTime() + delta + timeShift > 24 * 3600){
-					delta = 0;
-				}
-				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
-					// if an activity end time for last activity exists, it should be 24:00:00
-					// in order to avoid zero activity durations, this check is done
-					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
-						delta = 0;
-					}
-				}
-			}
-			
-			for(int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++){
-				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
-				if(pe instanceof Activity){
-					Activity act = (Activity)pe;
-					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
-							act.setStartTime(act.getStartTime() + delta);
-						}
-						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
-							act.setEndTime(act.getEndTime() + delta);
-						}
-					}
-//					else {
-//						log.warn("This should not happen! ");
+//	private void randomizeEndTimes(Population population){
+//		log.info("Randomizing activity end times...");
+//		Random random = MatsimRandom.getRandom();
+//		for(Person person : population.getPersons().values()){
+//			double timeShift = 0.;
+//			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+//				if(pe instanceof Activity){
+//					Activity act = (Activity) pe;
+//					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+//						if(act.getEndTime() - act.getStartTime() == 0){
+//							timeShift += 1800.;
+//						}
 //					}
-				}
-			}
-		}
-		log.info("...Done.");
-	}
+//				}
+//			}
+//			
+//			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+//			Activity lastAct = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
+//			
+//			double delta = 0;
+//			while(delta == 0){
+//				delta = createRandomEndTime(random);
+//				if(firstAct.getEndTime() + delta < 0){
+//					delta = 0;
+//				}
+//				if(lastAct.getStartTime() + delta + timeShift > 24 * 3600){
+//					delta = 0;
+//				}
+//				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
+//					// if an activity end time for last activity exists, it should be 24:00:00
+//					// in order to avoid zero activity durations, this check is done
+//					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
+//						delta = 0;
+//					}
+//				}
+//			}
+//			
+//			for(int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++){
+//				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+//				if(pe instanceof Activity){
+//					Activity act = (Activity)pe;
+//					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+//						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
+//							act.setStartTime(act.getStartTime() + delta);
+//						}
+//						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
+//							act.setEndTime(act.getEndTime() + delta);
+//						}
+//					}
+////					else {
+////						log.warn("This should not happen! ");
+////					}
+//				}
+//			}
+//		}
+//		log.info("...Done.");
+//	}
 	
-	private double createRandomEndTime(Random random){
-		//draw two random numbers [0;1] from uniform distribution
-		double r1 = random.nextDouble();
-		double r2 = random.nextDouble();
-		
-		//Box-Muller-Method in order to get a normally distributed variable
-		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		double endTime = 20*60 * normal;
-		
-		return endTime;
-	}
+//	private double createRandomEndTime(Random random){
+//		//draw two random numbers [0;1] from uniform distribution
+//		double r1 = random.nextDouble();
+//		double r2 = random.nextDouble();
+//		
+//		//Box-Muller-Method in order to get a normally distributed variable
+//		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
+//		double endTime = 20*60 * normal;
+//		
+//		return endTime;
+//	}
 	
 	/**
 	 * 

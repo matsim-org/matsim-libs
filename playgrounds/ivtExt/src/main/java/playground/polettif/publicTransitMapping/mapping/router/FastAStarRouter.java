@@ -45,18 +45,21 @@ public class FastAStarRouter implements Router {
 		pseudoRouteWeightType = type;
 	}
 
-	public  FastAStarRouter(Network network) {
+	public FastAStarRouter(Network network) {
 		this.paths = new HashMap<>();
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
 	}
 
+	/**
+	 * Synchronized since {@link org.matsim.core.router.Dijkstra} is not thread safe.
+	 */
 	@Override
 	public synchronized LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
-		if (fromNode != null && toNode != null) {
+		if(fromNode != null && toNode != null) {
 			Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
-			if (!paths.containsKey(nodes)) {
+			if(!paths.containsKey(nodes)) {
 				paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
 			}
 			return paths.get(nodes);
@@ -82,6 +85,6 @@ public class FastAStarRouter implements Router {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		return link.getLength()/link.getFreespeed();
+		return link.getLength() / link.getFreespeed();
 	}
 }

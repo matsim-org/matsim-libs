@@ -32,7 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
  * @author nagel
  *
  */
-public abstract class AbstractPlanSelector implements PlanSelector {
+public abstract class AbstractPlanSelector implements PlanSelector<Plan, Person> {
 
 	@Override
 	public final Plan selectPlan(HasPlansAndId<Plan, Person> person) {

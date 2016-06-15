@@ -125,11 +125,13 @@ import java.util.concurrent.ConcurrentHashMap;
 				new ConstantSpeedAccessibilityContributionCalculator(
 						TransportMode.bike,
 						scenario));
-		calculators.put(
-				Modes4Accessibility.pt,
-				new MatrixBasedPtAccessibilityContributionCalculator(
-						ptMatrix,
-						scenario.getConfig()));
+		if (ptMatrix != null) {
+			calculators.put(
+					Modes4Accessibility.pt,
+					PtMatrixAccessibilityContributionCalculator.create(
+							ptMatrix,
+							scenario.getConfig()));
+		}
 	}
 	
 	/**

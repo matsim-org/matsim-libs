@@ -11,7 +11,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import playground.singapore.typesPopulation.population.PersonImplPops;
@@ -27,7 +27,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 	private final Map<Id, ArrayList<Double>> weights = new HashMap<Id, ArrayList<Double>>();
 	private Map<Id, Double> totalWeights = new HashMap<Id, Double>();
 	private Map<Id, Integer> maxPlansPerAgent = new HashMap<Id, Integer>();
-	private Map<Id, GenericPlanSelector<Plan, Person>> removalPlanSelector = new HashMap<Id, GenericPlanSelector<Plan, Person>>();
+	private Map<Id, PlanSelector<Plan, Person>> removalPlanSelector = new HashMap<Id, PlanSelector<Plan, Person>>();
 	private final TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>> changeRequests = new TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>>();
 	/**
 	 * chooses a (weight-influenced) random strategy
@@ -175,7 +175,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector, Id populationId) {
+	public final void setPlanSelectorForRemoval(final PlanSelector<Plan, Person> planSelector, Id populationId) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector.put(populationId, planSelector);
 	}
@@ -195,7 +195,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 
 	private void removePlans(PersonImplPops person, int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
-			GenericPlanSelector<Plan, Person> selector = removalPlanSelector.get(person.getPopulationId());
+			PlanSelector<Plan, Person> selector = removalPlanSelector.get(person.getPopulationId());
 			if(selector == null) {
 				selector = new WorstPlanForRemovalSelector();
 				removalPlanSelector.put(person.getPopulationId(), selector);

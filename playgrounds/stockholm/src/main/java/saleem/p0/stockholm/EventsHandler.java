@@ -53,7 +53,7 @@ public class EventsHandler implements LinkLeaveEventHandler, LinkEnterEventHandl
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		if(event.getTime()-time>=3590) {
+		if(event.getTime()-time>=3190) {
 			if(numveh==0)numveh=1;
 			delays.add(delay/numveh);
 			times.add(event.getTime()/3600);

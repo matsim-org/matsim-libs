@@ -30,11 +30,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -42,19 +39,13 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScoring, org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
+public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 
 	protected double score;
-	private double lastTime;
-
-	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
-	private Leg currentLeg;
 	protected Network network;
-	private TransitSchedule transitSchedule;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
@@ -63,37 +54,9 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
-		this.reset();
-	}
-	
-	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network, TransitSchedule transitSchedule) {
-		this(params, network);
-		this.transitSchedule = transitSchedule;
-	}
-
-
-	@Override
-	public void reset() {
-		this.lastTime = INITIAL_LAST_TIME;
-		this.score = INITIAL_SCORE;
 		this.nextEnterVehicleIsFirstOfTrip = true ;
 		this.nextStartPtLegIsFirstOfTrip = true ;
 		this.currentLegIsPtLeg = false;
-	}
-
-	@Override
-	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
-	public void startLeg(final double time, final Leg leg) {
-		assert leg != null;
-		this.lastTime = time;
-		this.currentLeg = leg;
-	}
-
-	@Override
-	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
-	public void endLeg(final double time) {
-		this.score += calcLegScore(this.lastTime, time, this.currentLeg);
-		this.lastTime = time;
 	}
 
 	@Override

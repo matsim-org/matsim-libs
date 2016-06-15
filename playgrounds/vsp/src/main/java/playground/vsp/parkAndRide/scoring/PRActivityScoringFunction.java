@@ -16,7 +16,7 @@ import playground.vsp.parkAndRide.replanning.EllipseSearch;
  * @author ikaddoura
  *
  */
-public class PRActivityScoringFunction extends CharyparNagelActivityScoring {
+public class PRActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 	private static final Logger log = Logger.getLogger(EllipseSearch.class);
 
 	private CharyparNagelScoringParameters params;

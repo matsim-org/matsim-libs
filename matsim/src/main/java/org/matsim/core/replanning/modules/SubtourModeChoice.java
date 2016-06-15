@@ -50,7 +50,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author michaz
  * 
  */
-@Deprecated // use TripSubtourModeChoice
 public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	private final Provider<TripRouter> tripRouterProvider;
@@ -60,7 +59,6 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	
-	@Deprecated // use TripSubtourModeChoice
 	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
 		this(globalConfigGroup.getNumberOfThreads(),
 				subtourModeChoiceConfigGroup.getModes(),
@@ -68,7 +66,6 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
 	}
 
-	@Deprecated // use TripSubtourModeChoice
 	public SubtourModeChoice(
 			final int numberOfThreads,
 			final String[] modes,

@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.locationchoice.router.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -45,12 +44,12 @@ public class AssignmentTaxiOptimizer
 
         this.params = params;
 
-        router = new MultiNodeDijkstra(optimContext.getNetwork(), optimContext.travelDisutility,
+        router = new MultiNodeDijkstra(optimContext.network, optimContext.travelDisutility,
                 optimContext.travelTime, true);
 
         FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
         RoutingNetwork routingNetwork = new InverseArrayRoutingNetworkFactory(null)
-                .createRoutingNetwork(optimContext.getNetwork());
+                .createRoutingNetwork(optimContext.network);
         backwardRouter = new BackwardFastMultiNodeDijkstra(routingNetwork,
                 optimContext.travelDisutility, optimContext.travelTime, null, fastRouterFactory,
                 true);

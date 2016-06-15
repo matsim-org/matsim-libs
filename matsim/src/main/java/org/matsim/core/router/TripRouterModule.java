@@ -38,6 +38,7 @@ public class TripRouterModule extends AbstractModule {
 
     @Override
     public void install() {
+        bind(TripRouter.class); // not thread-safe, not a singleton
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
@@ -64,15 +65,6 @@ public class TripRouterModule extends AbstractModule {
             addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
 
-    }
-
-    @Provides TripRouter create(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
-        TripRouter tripRouter = new TripRouter();
-        for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
-            tripRouter.setRoutingModule(entry.getKey(), entry.getValue().get());
-        }
-        tripRouter.setMainModeIdentifier(mainModeIdentifier);
-        return tripRouter;
     }
 
 }

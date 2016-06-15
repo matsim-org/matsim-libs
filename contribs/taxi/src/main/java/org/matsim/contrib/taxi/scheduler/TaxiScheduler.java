@@ -67,10 +67,11 @@ public class TaxiScheduler
         router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility,
                 travelTime, params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
+        taxiData.clearRequestsAndResetSchedules();
+
         for (Vehicle veh : taxiData.getVehicles().values()) {
-            veh.resetSchedule();
-            Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
-            schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+            TaxiSchedules.asTaxiSchedule(veh.getSchedule())
+                    .addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
     }
 
@@ -175,6 +176,7 @@ public class TaxiScheduler
         }
 
         TaxiTask currentTask = schedule.getCurrentTask();
+        //we can divert vehicle whose current task is an empty drive at the end of the schedule
         if (!Schedules.isLastTask(currentTask)
                 || currentTask.getTaxiTaskType() != TaxiTaskType.EMPTY_DRIVE) {
             return null;

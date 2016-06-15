@@ -32,7 +32,11 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.*;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
 import playground.ivt.maxess.gisutils.GlobCoverTypeIdentifier;
 
 import java.util.Set;

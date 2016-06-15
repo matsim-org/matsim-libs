@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -59,7 +59,7 @@ public class RouterManager {
 		private final Scenario scenario;
 		
 		public Router(Scenario scenario, TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
-			final TravelDisutility disutility = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() ).createTravelDisutility(travelTime);
+			final TravelDisutility disutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() ).createTravelDisutility(travelTime);
 			transitRouter = new TransitRouterWSImplFactory(scenario, waitTime, stopStopTime).get();
 			router = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), disutility, travelTime);
 			this.scenario = scenario;

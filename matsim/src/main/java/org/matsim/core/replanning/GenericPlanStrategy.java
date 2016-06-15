@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * and then modify that new copy.  Otherwise, the evolutionary functionality of MATSim will probably be destroyed. kai, jan'15
  * </ul>
  * 
- * @author (of "Generic"PlanStrategy) Kai Nagel
+ * @author (of the generic version) Kai Nagel
  *
  */
 public interface GenericPlanStrategy<T extends BasicPlan, I> {

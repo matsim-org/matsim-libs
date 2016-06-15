@@ -3,23 +3,22 @@
  */
 package org.matsim.contrib.cadyts.general;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cadyts.utilities.math.Vector;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
-import cadyts.utilities.math.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nagel
  *
  */
 @Deprecated // please test before using.  If it works, remove deprecated tag.  Optimally, write test case. kai, dec'13
-public final class PlanSelectionByCadyts<T> implements PlanSelector {
+public final class PlanSelectionByCadyts<T> implements PlanSelector<Plan, Person> {
 
 	private final CadytsContextI<T> cContext;
 	private double beta;

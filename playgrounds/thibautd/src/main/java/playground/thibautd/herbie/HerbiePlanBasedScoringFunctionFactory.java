@@ -26,11 +26,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.facilities.ActivityFacilities;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointActivityScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
@@ -93,7 +92,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 				new CharyparNagelMoneyScoring( params ) );
 
 		scoringFunctionAccumulator.addScoringFunction(
-				new CharyparNagelAgentStuckScoring( params ));
+				new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring( params ));
 		
 		return scoringFunctionAccumulator;
 	}

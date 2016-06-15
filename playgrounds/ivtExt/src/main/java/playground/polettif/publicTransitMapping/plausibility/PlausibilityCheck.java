@@ -18,7 +18,6 @@
 
 package playground.polettif.publicTransitMapping.plausibility;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,20 +42,17 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
-import org.xml.sax.SAXException;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.*;
 import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuthDiff;
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Performs a plausibility check on the given schedule
@@ -142,7 +138,7 @@ public class PlausibilityCheck {
 		check.writeCsv(outputFolder + "allPlausibilityWarnings.csv");
 		check.writeResultShapeFiles(outputFolder+"shp/warnings/");
 
-		ScheduleShapeFileWriter schedule2shp = new ScheduleShapeFileWriter(schedule, network);
+		ScheduleShapeFileWriter schedule2shp = new ScheduleShapeFileWriter(schedule, network, coordinateSystem);
 		schedule2shp.routes2Polylines(outputFolder+"shp/schedule/TransitRoutes.shp");
 		schedule2shp.stopFacilities2Shapes(outputFolder+"shp/schedule/StopFacilities.shp", outputFolder+"shp/schedule/StopFacilities_refLinks.shp");
 
@@ -169,7 +165,7 @@ public class PlausibilityCheck {
 
 				Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
 
-				List<Link> links = NetworkTools.getLinksFromIds(network, getLinkIds(transitRoute));
+				List<Link> links = NetworkTools.getLinksFromIds(network, getTransitRouteLinkIds(transitRoute));
 				Map<Node, Tuple<Link, Link>> nodesInRoute = new HashMap<>();
 				Set<List<Id<Link>>> loops = new HashSet<>();
 
@@ -263,7 +259,7 @@ public class PlausibilityCheck {
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
 				.addAttribute("diff [s]", Double.class)
-				.addAttribute("diff [%]", Double.class)
+				.addAttribute("diff [ratio]", Double.class)
 				.addAttribute("expected", Double.class)
 				.addAttribute("actual", Double.class)
 				.create();
@@ -329,7 +325,7 @@ public class PlausibilityCheck {
 
 			// Travel Time Warnings
 			if(createTravelTimeFeature) {
-				SimpleFeature f = travelTimeWarningsFF.createPolyline(linkIdList2Coordinates(e.getKey()));
+				SimpleFeature f = travelTimeWarningsFF.createPolyline(ShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -342,7 +338,7 @@ public class PlausibilityCheck {
 
 			// Direction Change Warning
 			if(createDirectionChangeFeature) {
-				SimpleFeature f = directionChangeWarnings.createPolyline(linkIdList2Coordinates(e.getKey()));
+				SimpleFeature f = directionChangeWarnings.createPolyline(ShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -353,7 +349,7 @@ public class PlausibilityCheck {
 
 			// Loop Warnings
 			if(createLoopFeature) {
-				SimpleFeature f = loopWarningsFF.createPolyline(linkIdList2Coordinates(e.getKey()));
+				SimpleFeature f = loopWarningsFF.createPolyline(ShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -377,20 +373,6 @@ public class PlausibilityCheck {
 		for(Id<Link> linkId : warning.getLinkIds()) {
 			MapUtils.getSet(linkId, warningsLinks).add(warning);
 		}
-	}
-
-	/**
-	 * Transforms a list of link ids to an array of coordinates for shp features
-	 */
-	public Coordinate[] linkIdList2Coordinates(List<Id<Link>> linkIdList) {
-		List<Coordinate> coordList = new ArrayList<>();
-		for(Id<Link> linkId : linkIdList) {
-			coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
-		}
-		coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkIdList.get(linkIdList.size() - 1)).getToNode().getCoord()));
-		Coordinate[] coordinates = new Coordinate[coordList.size()];
-		coordList.toArray(coordinates);
-		return coordinates;
 	}
 
 	private static void setLogLevels() {

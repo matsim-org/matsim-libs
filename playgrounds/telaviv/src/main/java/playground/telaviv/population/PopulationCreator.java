@@ -33,16 +33,11 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -53,7 +48,6 @@ import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.Emme2ZonesFileParser;
 
-import javax.inject.Provider;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -212,7 +206,7 @@ public class PopulationCreator {
 		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(config, null, timeMutationRange, true);
 		
 		final TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car, config.planCalcScore() );
+		TravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 		ReplanningContext context = new ReplanningContext() {
 			@Override

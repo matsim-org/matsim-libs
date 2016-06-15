@@ -37,8 +37,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.ivt.lib.tools.fileCreation.F2LConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
-import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 
 import java.io.File;
 

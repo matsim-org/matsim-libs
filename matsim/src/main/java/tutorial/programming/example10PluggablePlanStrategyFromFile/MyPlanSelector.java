@@ -20,8 +20,6 @@
 package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,7 +28,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 /**
  * @author nagel
  */
-class MyPlanSelector implements PlanSelector 
+class MyPlanSelector implements PlanSelector<Plan, Person>
 {
 	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
 

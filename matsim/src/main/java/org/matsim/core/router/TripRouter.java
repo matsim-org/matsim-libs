@@ -37,6 +37,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 /**
  * Class acting as an intermediate between clients needing to
  * compute routes and all registered {@link RoutingModule}s.
@@ -57,6 +60,16 @@ public final class TripRouter implements MatsimExtensionPoint {
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+
+	public TripRouter() {}
+
+	@Inject
+	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+			setRoutingModule(entry.getKey(), entry.getValue().get());
+		}
+		setMainModeIdentifier(mainModeIdentifier);
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors

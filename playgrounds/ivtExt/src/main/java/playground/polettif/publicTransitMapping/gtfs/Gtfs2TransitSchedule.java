@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-import playground.polettif.publicTransitMapping.tools.GtfsShapeFileTools;
+import playground.polettif.publicTransitMapping.tools.ShapeFileTools;
 
 /**
  * Contract class to read GTFS files and convert them to an unmapped MATSim Transit Schedule
@@ -39,9 +39,16 @@ public class Gtfs2TransitSchedule {
 
 	protected static Logger log = Logger.getLogger(Gtfs2TransitSchedule.class);
 
+	public static final String ALL_SERVICE_IDS = "all";
+	public static final String DAY_WITH_MOST_TRIPS = "dayWithMostTrips";
+	public static final String DAY_WITH_MOST_SERVICES = "dayWithMostServices";
+
+	public enum ServiceParam{dayWithMostTrips, dayWithMostServices, all}
+
 	protected TransitSchedule schedule;
 	protected Vehicles vehicles;
 	protected CoordinateTransformation transformation;
+
 
 	/**
 	 * Reads gtfs files in and converts them to an unmapped
@@ -56,9 +63,7 @@ public class Gtfs2TransitSchedule {
 	 *                  <li>dayWithMostServices</li>
 	 *                  <li>date in the format yyyymmdd</li>
 	 *                  <li>dayWithMostTrips</li>
-	 *                  <li>mostUsedSingleId</li>
 	 *                  <li>all</li>
-	 *                  </li>
 	 *                  </ul>
 	 *              [2] the output coordinate system. Use WGS84 for no transformation.<br/>
 	 *              [3] output transit schedule file
@@ -92,7 +97,6 @@ public class Gtfs2TransitSchedule {
 	 *     				             	<li>dayWithMostServices (default)</li>
 	 *     				             	<li>dayWithMostTrips</li>
 	 *     				             	<li>date in the format yyyymmdd</li>
-	 *     				             	<li>mostUsedSingleId</li>
 	 *     				             	<li>all</li>
 	 *     				             	</ul>
 	 * @param outputCoordinateSystem 	the output coordinate system. Use WGS84 for no transformation.
@@ -110,11 +114,10 @@ public class Gtfs2TransitSchedule {
 		CoordinateTransformation transformation = outputCoordinateSystem != null ? TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem) : new IdentityTransformation();
 
 		GtfsConverter gtfsConverter = new GtfsConverter(schedule, vehicles, transformation);
-		String param = serviceIdsParam == null ? GtfsConverter.DAY_WITH_MOST_SERVICES : serviceIdsParam;
+		String param = serviceIdsParam == null ? DAY_WITH_MOST_SERVICES : serviceIdsParam;
 		gtfsConverter.run(gtfsFolder, param);
 
 		boolean authExists = true;
-
 		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), scheduleFile);
 		if(vehicleFile != null) {
 			ScheduleTools.writeVehicles(gtfsConverter.getVehicles(), vehicleFile);
@@ -127,7 +130,7 @@ public class Gtfs2TransitSchedule {
 				log.warn("Code " + outputCoordinateSystem + " not recognized by geotools. Shapefile not written.");
 			}
 			if(authExists)
-				GtfsShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeFile);
+				ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeFile);
 		}
 	}
 
