@@ -35,6 +35,10 @@ import java.util.Map;
  */
 public class ActDurationAnalyzer extends PopulationAnalyzer{
 
+	// Flag to record the durations of the beginning of the first activity of a type until
+	// the end of the last activity of the same type (<-> all of the same type as one).
+	private final static boolean ALL_SAME_TYPE_ACTS_AS_ONE = false;
+
 	private final Map<String, long[]> durations = new HashMap<>();
 	private final int statisticInterval = 30; // mins
 
@@ -62,15 +66,22 @@ public class ActDurationAnalyzer extends PopulationAnalyzer{
 
 	@Override
 	final protected void analyzeAgent(Person person) {
+		Map<String, Tuple<Double, Double>> sameTypeStartEnd = new HashMap<>();
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
 				if (getActivityType() == null || activity.getType().equals(getActivityType())) {
 					if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
-						double duration = activity.getEndTime() - activity.getStartTime();
-						duration = duration < 1 ? 1 : duration;
-						if (getActivityType() == null) classifyDuration(duration, "total");
-						classifyDuration(duration, activity.getType());
+						if (!ALL_SAME_TYPE_ACTS_AS_ONE) {
+							evaluateActivity(activity.getType(), activity.getStartTime(), activity.getEndTime());
+						} else {
+							if (!sameTypeStartEnd.keySet().contains(activity.getType())) {
+								sameTypeStartEnd.put(activity.getType(), new Tuple<>(activity.getStartTime(), activity.getEndTime()));
+							} else {
+								double firstStartTime = sameTypeStartEnd.get(activity.getType()).getFirst();
+								sameTypeStartEnd.put(activity.getType(), new Tuple<>(firstStartTime, activity.getEndTime()));
+							}
+						}
 					}
 				}
 			} else if (planElement instanceof Leg){
@@ -78,6 +89,18 @@ public class ActDurationAnalyzer extends PopulationAnalyzer{
 				log.error("Unhandled implementation of PlanElement: " + planElement.toString());
 			}
 		}
+		if (ALL_SAME_TYPE_ACTS_AS_ONE) {
+			for (String actType : sameTypeStartEnd.keySet()) {
+				evaluateActivity(actType, sameTypeStartEnd.get(actType).getFirst(), sameTypeStartEnd.get(actType).getSecond());
+			}
+		}
+	}
+
+	private void evaluateActivity(String actType, double startTime, double endTime) {
+		double duration = endTime - startTime;
+		duration = duration < 1 ? 1 : duration;
+		if (getActivityType() == null) classifyDuration(duration, "total");
+		classifyDuration(duration, actType);
 	}
 
 	private void classifyDuration(double duration, String activity) {
