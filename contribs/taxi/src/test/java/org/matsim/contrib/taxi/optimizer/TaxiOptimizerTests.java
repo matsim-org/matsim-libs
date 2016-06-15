@@ -31,7 +31,7 @@ import org.matsim.core.config.*;
 
 public class TaxiOptimizerTests
 {
-    static class TaxiConfigVariant
+    public static class TaxiConfigVariant
     {
         final boolean destinationKnown;
         final boolean vehicleDiversion;
@@ -66,7 +66,8 @@ public class TaxiOptimizerTests
     }
 
 
-    static List<TaxiConfigVariant> createDefaultTaxiConfigVariants(boolean diversionSupported)
+    public static List<TaxiConfigVariant> createDefaultTaxiConfigVariants(
+            boolean diversionSupported)
     {
         List<TaxiConfigVariant> variants = new ArrayList<>();
 
@@ -88,7 +89,7 @@ public class TaxiOptimizerTests
     }
 
 
-    static Map<String, String> createAbstractOptimParams(OptimizerType type)
+    public static Map<String, String> createAbstractOptimParams(OptimizerType type)
     {
         Map<String, String> params = new HashMap<>();
         params.put(AbstractTaxiOptimizerParams.ID, type.name());
@@ -97,13 +98,13 @@ public class TaxiOptimizerTests
     }
 
 
-    static class BenchmarkWithConfig
+    public static class BenchmarkWithConfig
     {
         private final Config config;
         private final MiniBenchmark miniBenchmark;
 
 
-        BenchmarkWithConfig(String plansSuffix, String taxisSuffix)
+        public BenchmarkWithConfig(String plansSuffix, String taxisSuffix)
         {
             String dir = "./src/main/resources/mielec_2014_02/";
             String configFile = dir + "mielec_taxi_benchmark_config.xml";
@@ -111,7 +112,8 @@ public class TaxiOptimizerTests
             TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
             config = ConfigUtils.loadConfig(configFile, taxiCfg);
 
-            config.plans().setInputFile(dir + "plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
+            config.plans().setInputFile(
+                    dir + "plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
             taxiCfg.setTaxisFile(dir + "taxis_mini_benchmark-" + taxisSuffix + ".xml");
 
             miniBenchmark = RunTaxiMiniBenchmark.createMiniBenchmark(config);
@@ -119,7 +121,7 @@ public class TaxiOptimizerTests
     }
 
 
-    static void runBenchmark(List<TaxiConfigVariant> variants, Map<String, String> params,
+    public static void runBenchmark(List<TaxiConfigVariant> variants, Map<String, String> params,
             BenchmarkWithConfig benchmark)
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
@@ -135,5 +137,4 @@ public class TaxiOptimizerTests
             benchmark.miniBenchmark.run(new DefaultTaxiOptimizerFactory());
         }
     }
-
 }

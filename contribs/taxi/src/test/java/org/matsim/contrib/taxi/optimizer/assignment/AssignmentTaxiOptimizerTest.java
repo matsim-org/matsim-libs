@@ -17,57 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer;
+package org.matsim.contrib.taxi.optimizer.assignment;
+
+import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
 import java.util.*;
 
 import org.junit.Test;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentProblem.Mode;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
 
-public class TaxiOptimizerTest
+public class AssignmentTaxiOptimizerTest
 {
-    @Test
-    public void testRuleBased()
-    {
-        BenchmarkWithConfig benchmark = new BenchmarkWithConfig("3.0", "25");
-
-        List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
-        Map<String, String> params = createAbstractOptimParams(OptimizerType.RULE_BASED);
-
-        params.put(RuleBasedTaxiOptimizerParams.GOAL, Goal.DEMAND_SUPPLY_EQUIL.name());
-        params.put(RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 99999 + "");
-        params.put(RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 99999 + "");
-        params.put(RuleBasedTaxiOptimizerParams.CELL_SIZE, 99999 + "");
-        runBenchmark(variants, params, benchmark);
-
-        params.put(RuleBasedTaxiOptimizerParams.GOAL, Goal.MIN_WAIT_TIME.name());
-        params.put(RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 10 + "");
-        params.put(RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 10 + "");
-        params.put(RuleBasedTaxiOptimizerParams.CELL_SIZE, 1000 + "");
-        runBenchmark(variants, params, benchmark);
-    }
-
-
-    @Test
-    public void testFifo()
-    {
-        BenchmarkWithConfig benchmark = new BenchmarkWithConfig("3.0", "25");
-
-        List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
-        Map<String, String> params = createAbstractOptimParams(OptimizerType.FIFO);
-
-        runBenchmark(variants, params, benchmark);
-    }
-
-
     @Test
     public void testAssignment()
     {
