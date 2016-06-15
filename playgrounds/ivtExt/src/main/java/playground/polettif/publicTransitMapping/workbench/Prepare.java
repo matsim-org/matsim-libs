@@ -174,45 +174,6 @@ public class Prepare {
 		this.population = sc.getPopulation();
 	}
 
-	private void removeInvalidLines() {
-		Set<String> set = new HashSet<>();
-
-		// copy/paste
-		/*
-		set.add("AB-_line21");
-		set.add("AB-_line21");
-		set.add("PAG_line581");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("SBG_line7312");
-		set.add("SBG_line7312");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("FAR_line2");
-		set.add("PAG_line581");
-
-
-		for(String e : set) {
-			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
-			if(tl != null) schedule.removeTransitLine(tl);
-		}
-*/
-
-		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04121_042", TransitRoute.class));
-		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04051_003", TransitRoute.class));
-		ScheduleCleaner.removeRoute(schedule, Id.create("PAG_line581", TransitLine.class), Id.create("00012_012", TransitRoute.class));
-		ScheduleCleaner.removeRoute(schedule, Id.create("TL_line16", TransitLine.class), Id.create("06154_001", TransitRoute.class));
-	}
-
 	private void writeFiles(String folder) {
 		new ConfigWriter(config).write(folder+"/config.xml");
 		ScheduleTools.writeVehicles(vehicles, folder + "/" + config.transit().getVehiclesFile());
@@ -329,6 +290,48 @@ public class Prepare {
 		config.strategy().addStrategySettings(changeTripMode);
 
 		return config;
+	}
+
+	private void removeInvalidLines() {
+		ScheduleCleaner.removeInvalidTransitRoutes(TransitScheduleValidator.validateAll(schedule, network), schedule);
+
+/*
+		Set<String> set = new HashSet<>();
+
+		// copy/paste
+
+		set.add("AB-_line21");
+		set.add("AB-_line21");
+		set.add("PAG_line581");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("SBG_line7312");
+		set.add("SBG_line7312");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("FAR_line2");
+		set.add("PAG_line581");
+
+
+		for(String e : set) {
+			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
+			if(tl != null) schedule.removeTransitLine(tl);
+		}
+*/
+
+//		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04121_042", TransitRoute.class));
+//		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04051_003", TransitRoute.class));
+//		ScheduleCleaner.removeRoute(schedule, Id.create("PAG_line581", TransitLine.class), Id.create("00012_012", TransitRoute.class));
+//		ScheduleCleaner.removeRoute(schedule, Id.create("TL_line16", TransitLine.class), Id.create("06154_001", TransitRoute.class));
 	}
 
 
