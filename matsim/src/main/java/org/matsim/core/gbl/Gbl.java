@@ -200,7 +200,7 @@ public abstract class Gbl {
 	}
 	public static void assertNotNull( Object obj ) {
 		if ( obj==null ) {
-			throw new RuntimeException( "object is null; follow stack trace" ) ;
+			throw new RuntimeException( "Object is null; follow stack trace" ) ;
 		}
 	}
 

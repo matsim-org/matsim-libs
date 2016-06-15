@@ -43,6 +43,8 @@ public class TestInductiveChargingController extends MatsimTestCase {
 	public void testBasic(){
 		Config config= loadConfig(getClassInputDirectory()+"config.xml");
 		
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		
 		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
 		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<>();
 		int batteryCapacityInJoules = 10*1000*3600;

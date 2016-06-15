@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,8 +39,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -109,6 +109,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
 
 		Link accessActLink = null ;
 		if ( fromFacility.getLinkId()!=null ) {
@@ -161,7 +164,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				result.add( accessLeg ) ;
 				Logger.getLogger(this.getClass()).warn( accessLeg );
 
-				final ActivityImpl interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId() );
+				final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId() );
 				result.add( interactionActivity ) ;
 				Logger.getLogger(this.getClass()).warn( interactionActivity );
 			}
@@ -171,7 +174,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		{
 			Leg newLeg = populationFactory.createLeg( mode );
 			newLeg.setDepartureTime( now );
-			now += routeLeg( person, newLeg, accessActLink.getId(), egressActLink.getId(), now );
+			now += routeLeg( person, newLeg, accessActLink, egressActLink, now );
 
 			result.add( newLeg ) ;
 			Logger.getLogger(this.getClass()).warn( newLeg );
@@ -248,17 +251,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 
-	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, double depTime) {
+	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
 		double travTime = 0;
-		Link fromLink = this.network.getLinks().get(fromLinkId);
-		Link toLink = this.network.getLinks().get(toLinkId);
-
-		/* Remove this and next three lines once debugged. */
-		if(fromLink == null || toLink == null){
-			Logger.getLogger(NetworkRoutingInclAccessEgressModule.class).error("  ==>  null from/to link for person " + person.getId().toString());
-		}
-		if (fromLink == null) throw new RuntimeException("fromLink "+fromLinkId+" missing.");
-		if (toLink == null) throw new RuntimeException("toLink "+toLinkId+" missing.");
 
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link

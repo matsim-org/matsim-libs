@@ -24,6 +24,10 @@ public class ScoringTest extends MatsimTestCase {
 		};
 		
 		PSSControler pssControler=new PSSControler("test/input/playground/wrashid/PSF/singleAgent/config9.xml", paramMutator);
+
+		pssControler.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
 		pssControler.runMATSimIterations();
 		
 		ChargingTimes chargingTimesOfAgentOne = AfterSimulationListener.getChargingTimes().get(Id.create("1", Person.class));
