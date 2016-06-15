@@ -171,7 +171,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("Calculating pseudoTransitRoutes... ("+nTransitRoutes+" transit routes)");
 
 		// initiate
-		int numThreads = config.getThreads() > 0 ? config.getThreads() : 1;
+		int numThreads = config.getNumOfThreads() > 0 ? config.getNumOfThreads() : 1;
 		PseudoRouting[] pseudoRoutingThreads = new PseudoRouting[numThreads];
 		for(int i = 0; i < numThreads; i++) {
 			pseudoRoutingThreads[i] = new PseudoRouting();
@@ -282,14 +282,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("=============================");
 		log.info("Clean schedule and network...");
 
-		// change the network transport modes
-		ScheduleTools.assignScheduleModesToLinks(schedule, network);
-		if(config.getCombinePtModes()) {
-			NetworkTools.replaceNonCarModesWithPT(network);
-		} else if(config.getAddPtMode()) {
-			ScheduleTools.addPTModeToNetwork(schedule, network);
-		}
-
 		// changing the freespeed of the artificial links (value is used in simulations)
 		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
 		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
@@ -297,8 +289,15 @@ public class PTMapperPseudoRouting extends PTMapper {
 		// Remove unnecessary parts of schedule
 		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
-		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+		if(config.getRemoveNotUsedStopFacilities()) ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
+		// change the network transport modes
+		ScheduleTools.assignScheduleModesToLinks(schedule, network);
+		if(config.getCombinePtModes()) {
+			NetworkTools.replaceNonCarModesWithPT(network);
+		} else if(config.getAddPtMode()) {
+			ScheduleTools.addPTModeToNetwork(schedule, network);
+		}
 
 		/**
 		 * Validate the schedule
@@ -456,11 +455,11 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 	/**
 	 * Generates and calculates the pseudoTransitRoutes for all the queued
-	 * transit routes. If no route on the network can be found (or the
+	 * transit lines. If no route on the network can be found (or the
 	 * scheduleTransportMode should not be mapped to the network), artificial
 	 * links between link candidates are stored to be created later.
 	 */
-	public class PseudoRouting extends Thread {
+	private class PseudoRouting extends Thread {
 
 		private List<TransitLine> queue = new ArrayList<>();
 		private Set<Tuple<LinkCandidate, LinkCandidate>> artificialLinksToBeCreated = new HashSet<>();

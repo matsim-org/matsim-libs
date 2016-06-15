@@ -58,7 +58,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_NCLOSEST_LINKS = "maxNClosestLinks";
 	private static final String MAX_LINK_CANDIDATE_DISTANCE = "maxLinkCandidateDistance";
 	private static final String PREFIX_ARTIFICIAL = "prefixArtificial";
-	private static final String BEELINE_DISTANCE_MAX_FACTOR = "beelineDistanceMaxFactor";
+	private static final String MAX_TRAVEL_COST_FACTOR = "maxTravelCostFactor";
 	private static final String NETWORK_FILE = "networkFile";
 	private static final String SCHEDULE_FILE = "scheduleFile";
 	private static final String OUTPUT_NETWORK_FILE = "outputNetworkFile";
@@ -69,10 +69,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String SCHEDULE_FREESPEED_MODES = "scheduleFreespeedModes";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
 	private static final String ADD_PT_MODE = "addPtMode";
-	private static final String MULTI_THREAD = "threads";
+	private static final String NUM_OF_THREADS = "numOfThreads";
 	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 	private static final String MANUAL_LINK_CANDIDATE_CSV_FILE = "manualLinkCandidateCsvFile";
 	private static final String SUFFIX_CHILD_STOP_FACILITIES_TAG = "suffixChildStopFacilities";
+	private static final String REMOVE_NOT_USED_STOP_FACILITIES = "removeNotUsedStopFacilities";
 
 	public PublicTransitMappingConfigGroup() {
 		super(GROUP_NAME);
@@ -117,8 +118,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 						"\t\tMust be >= 1.");
 		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
 				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
-						"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
-						"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
+				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
+				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
 		map.put(MAX_NCLOSEST_LINKS,
 				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 						"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
@@ -138,18 +139,21 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all" +
 				"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional" +
 				"\t\tmodes (rail is recommended) can be added, separated by commas.");
-		map.put(BEELINE_DISTANCE_MAX_FACTOR,
-				"If all paths between two stops have a [length] > [beelineDistanceMaxFactor] * [beelineDistance], \n" +
+		map.put(MAX_TRAVEL_COST_FACTOR,
+				"If all paths between two stops have a [travelCost] > ["+MAX_TRAVEL_COST_FACTOR+"] * [minTravelCost], \n" +
 				"\t\tan artificial link is created. If "+PSEUDO_ROUTE_WEIGHT_TYPE+" is " + PseudoRouteWeightType.travelTime +
-				"\t\tthe check is [travelTime] > [beelineDistanceMaxFactor] * [travelTime between stops from schedule]");
-		map.put(MULTI_THREAD,
-				"Defines the number of threads that should be used for pseudoRouting. Default: 2.");
+				"\t\tminTravelCost is the travelTime between stops from schedule. If "+PSEUDO_ROUTE_WEIGHT_TYPE+" is \n" +
+				"\t\t"+PseudoRouteWeightType.linkLength + " minTravel cost is the beeline distance.");
+		map.put(NUM_OF_THREADS,
+				"Defines the number of numOfThreads that should be used for pseudoRouting. Default: 2.");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
 		map.put(OUTPUT_STREET_NETWORK_FILE, "Path to the output car only network file. The input multimodal map is filtered. \n" +
 				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
+		map.put(REMOVE_NOT_USED_STOP_FACILITIES,
+				"If true, stop facilities that are not used by any transit route are removed from the schedule. Default: true");
 //		map.put(SUFFIX_CHILD_STOP_FACILITIES_TAG,
 //				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
 //						"\t\t(i.e. stop0123.link:LINKID20123).");
@@ -318,6 +322,21 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 
 	/**
+ 	 *
+ 	 */
+	private boolean removeNotUsedStopFacilities = true;
+
+	@StringGetter(REMOVE_NOT_USED_STOP_FACILITIES)
+	public boolean getRemoveNotUsedStopFacilities() {
+		return removeNotUsedStopFacilities;
+	}
+
+	@StringSetter(REMOVE_NOT_USED_STOP_FACILITIES)
+	public void setRemoveNotUsedStopFacilities(boolean v) {
+		this.removeNotUsedStopFacilities = v;
+	}
+
+	/**
 	 * Defines the radius [meter] from a stop facility within nodes are searched.
 	 * Mainly a maximum value for performance.
 	 */
@@ -353,16 +372,16 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * Defines whehter multiple threads should be used (one for each
 	 * schedule transport mode).
 	 */
-	private int threads = 2;
+	private int numOfThreads = 2;
 
-	@StringGetter(MULTI_THREAD)
-	public int getThreads() {
-		return threads;
+	@StringGetter(NUM_OF_THREADS)
+	public int getNumOfThreads() {
+		return numOfThreads;
 	}
 
-	@StringSetter(MULTI_THREAD)
-	public void setThreads(int threads) {
-		this.threads = threads;
+	@StringSetter(NUM_OF_THREADS)
+	public void setNumOfThreads(int numOfThreads) {
+		this.numOfThreads = numOfThreads;
 	}
 
 
@@ -462,12 +481,12 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 */
 	private double beelineDistanceMaxFactor = 5.0;
 
-	@StringGetter(BEELINE_DISTANCE_MAX_FACTOR)
+	@StringGetter(MAX_TRAVEL_COST_FACTOR)
 	public double getBeelineDistanceMaxFactor() {
 		return beelineDistanceMaxFactor;
 	}
 
-	@StringSetter(BEELINE_DISTANCE_MAX_FACTOR)
+	@StringSetter(MAX_TRAVEL_COST_FACTOR)
 	public void setBeelineDistanceMaxFactor(double beelineDistanceMaxFactor) {
 		if(beelineDistanceMaxFactor < 1) {
 			throw new RuntimeException("beelineDistanceMaxFactor cannnot be less than 1!");

@@ -77,12 +77,12 @@ public class Prepare {
 
 	public static void main(final String[] args) {
 
-		String inputNetwork = "../output/2016-06-10/ch_ll_network.xml.gz";
-		String inputSchedule = "../output/2016-06-10/ch_ll_schedule.xml.gz";
+		String inputNetwork = "../output/2016-06-14/ch_network.xml.gz";
+		String inputSchedule = "../output/2016-06-14/ch_schedule.xml.gz";
 		String inputVehicles = "../data/vehicles/ch_hafas_vehicles.xml.gz";
 		String inputPopulation;
 		String scenName;
-
+/*
 		// Switzerland 10%
 		scenName = "ch_ten";
 		inputPopulation = "population/ch_10prct.xml.gz";
@@ -101,7 +101,7 @@ public class Prepare {
 		} catch (IOException | SAXException | ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-
+*/
 		// Zurich 1%
 		// no delay
 		scenName = "zurich_one";
@@ -148,9 +148,6 @@ public class Prepare {
 		prepareZH10Tel.population();
 		prepareZH10Tel.vehicles(0.1);
 		prepareZH10Tel.writeFiles(scenName);
-
-
-
 	}
 
 	public Prepare(Config config, String inputNetwork, String inputSchedule, String inputVehicles, String inputPopulation) {
@@ -182,9 +179,10 @@ public class Prepare {
 		Set<String> set = new HashSet<>();
 
 		// copy/paste
+		/*
 		set.add("AB-_line21");
 		set.add("AB-_line21");
-		set.add("RVB_line2");
+		set.add("PAG_line581");
 		set.add("RVB_line2");
 		set.add("RVB_line2");
 		set.add("RVB_line2");
@@ -208,9 +206,12 @@ public class Prepare {
 			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
 			if(tl != null) schedule.removeTransitLine(tl);
 		}
+*/
 
-		ScheduleCleaner.removeRoute(schedule, Id.create("VBZ_line31", TransitLine.class), Id.create("05060_155", TransitRoute.class));
-		ScheduleCleaner.removeRoute(schedule, Id.create("AAG_line401", TransitLine.class), Id.create("00001_001", TransitRoute.class));
+		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04121_042", TransitRoute.class));
+		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04051_003", TransitRoute.class));
+		ScheduleCleaner.removeRoute(schedule, Id.create("PAG_line581", TransitLine.class), Id.create("00012_012", TransitRoute.class));
+		ScheduleCleaner.removeRoute(schedule, Id.create("TL_line16", TransitLine.class), Id.create("06154_001", TransitRoute.class));
 	}
 
 	private void writeFiles(String folder) {
@@ -260,9 +261,10 @@ public class Prepare {
 
 	private void cutSchedule() {
 		Coord effretikon = new Coord(2693780.0, 1253409.0);
+		Coord zurichHB = new Coord(2682830.0, 1248125.0);
 		double radius = 20000;
 
-		ScheduleCleaner.cutSchedule(schedule, effretikon, radius);
+		ScheduleCleaner.cutSchedule(schedule, zurichHB, radius);
 		Set<String> modesToKeep = new HashSet<>();
 		modesToKeep.add("car");
 		modesToKeep.add("rail");
@@ -275,10 +277,10 @@ public class Prepare {
 	private static Config createConfig(String folder) {
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setLastIteration(400);
+		config.controler().setLastIteration(200);
 		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("../output/"+folder);
+		config.controler().setOutputDirectory("/cluster/scratch/polettif/scenario_output/"+folder);
 
 		config.global().setNumberOfThreads(8);
 		config.global().setRandomSeed(6129);
@@ -313,12 +315,12 @@ public class Prepare {
 		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.2);
-		StrategyConfigGroup.StrategySettings changeMode = new StrategyConfigGroup.StrategySettings();
-		changeMode.setStrategyName("changeMode");
-		changeMode.setWeight(0.2);
+		StrategyConfigGroup.StrategySettings changeTripMode = new StrategyConfigGroup.StrategySettings();
+		changeTripMode.setStrategyName("ChangeTripMode");
+		changeTripMode.setWeight(0.2);
 		config.strategy().addStrategySettings(changeExpBeta);
 		config.strategy().addStrategySettings(reRoute);
-		config.strategy().addStrategySettings(changeMode);
+		config.strategy().addStrategySettings(changeTripMode);
 
 		return config;
 	}
