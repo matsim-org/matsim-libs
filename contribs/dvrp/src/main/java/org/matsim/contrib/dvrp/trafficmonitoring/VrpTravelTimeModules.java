@@ -19,10 +19,11 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeEstimator.Params;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.*;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 
 public class VrpTravelTimeModules
@@ -50,6 +51,27 @@ public class VrpTravelTimeModules
                 bind(VrpTravelTimeEstimator.class).asEagerSingleton();
                 addTravelTimeBinding(DVRP_ESTIMATED).to(VrpTravelTimeEstimator.class);
                 addMobsimListenerBinding().to(VrpTravelTimeEstimator.class);
+            }
+        };
+    }
+
+
+    public static AbstractModule createFreeSpeedTravelTimeForBenchmarkingModule()
+    {
+        return createTravelTimeForBenchmarkingModule(new FreeSpeedTravelTime());
+    }
+
+
+    /**
+     * Instead of TravelTimeCalculatorModule
+     */
+    public static AbstractModule createTravelTimeForBenchmarkingModule(final TravelTime travelTime)
+    {
+        return new AbstractModule() {
+            public void install()
+            {
+                addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
+                addTravelTimeBinding(DVRP_ESTIMATED).toInstance(travelTime);
             }
         };
     }
