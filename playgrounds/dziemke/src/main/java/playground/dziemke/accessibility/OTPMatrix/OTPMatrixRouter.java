@@ -73,10 +73,12 @@ public class OTPMatrixRouter {
         reader.readLine();
         String[] line = reader.readLine();
         while (line != null) {
-            if (line.length == 9) {
-                individuals.add(new Individual(line[0], Double.parseDouble(line[5]), Double.parseDouble(line[4]), 0));
+        	if (line.length == 9) {
+//                individuals.add(new Individual(line[0], Double.parseDouble(line[5]), Double.parseDouble(line[4]), 0));
+                individuals.add(new Individual(line[0], Double.parseDouble(line[4]), Double.parseDouble(line[3]), 0));
             } else if (line.length == 10) {
-                individuals.add(new Individual(line[0], Double.parseDouble(line[6]), Double.parseDouble(line[5]), 0));
+                individuals.add(new Individual(line[0], Double.parseDouble(line[5]), Double.parseDouble(line[4]), 0));
+//                individuals.add(new Individual(line[0], Double.parseDouble(line[6]), Double.parseDouble(line[5]), 0));
             } else {
                 break;
             }
