@@ -10,25 +10,30 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilities;
 
-class AccessibilityComputationTestModule extends AbstractModule {
+class AccessibilityComputationTestModuleCustomBoundary extends AbstractModule {
 	private final List<String> activityTypes;
 	private final ActivityFacilities networkDensityFacilities;
 	private final String crs;
 	private final String name;
 	private Double cellSize;
+	private BoundingBox boundingBox;
 
-	public AccessibilityComputationTestModule(List<String> activityTypes, ActivityFacilities networkDensityFacilities, String crs, String name, Double cellSize) {
+	public AccessibilityComputationTestModuleCustomBoundary(List<String> activityTypes,
+			ActivityFacilities networkDensityFacilities, String crs, String name, Double cellSize,
+			BoundingBox boundingBox) {
 		this.activityTypes = activityTypes;
 		this.networkDensityFacilities = networkDensityFacilities;
 		this.crs = crs;
 		this.name = name;
 		this.cellSize = cellSize;
+		this.boundingBox = boundingBox;
 	}
 
 
@@ -45,7 +50,9 @@ class AccessibilityComputationTestModule extends AbstractModule {
 					GridBasedAccessibilityControlerListenerV3 listener =
 							new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType), ptMatrix, getConfig(), scenario, travelTimes, travelDisutilityFactories);
 					listener.addAdditionalFacilityData(networkDensityFacilities);
-					listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+//					listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+					listener.generateGridsAndMeasuringPointsByCustomBoundary(boundingBox.getXMin(), boundingBox.getYMin(),
+							boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
 					listener.writeToSubdirectoryWithName(activityType);
 					// for push to geoserver
 //					listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));

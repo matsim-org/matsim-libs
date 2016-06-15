@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,7 +49,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
 
-	private static final Double cellSize = 10000.;
+	private static final Double cellSize = 200.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -60,18 +79,19 @@ public class AccessibilityComputationNairobiTest {
 		
 
 		// Parameters
-		boolean createQGisOutput = false;
-		boolean includeDensityLayer = true;
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
+		BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
 		
+		// QGis Parameters
+		boolean createQGisOutput = true;
+		boolean includeDensityLayer = false;
 		Double lowerBound = 2.;
-		Double upperBound = 5.5;
+		Double upperBound = 7.25;
 		Integer range = 9; // in the current implementation, this need always be 9
-		int symbolSize = 1010;
+		int symbolSize = 210;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
-		
 		// config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
@@ -89,7 +109,7 @@ public class AccessibilityComputationNairobiTest {
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings stratSets = new StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
@@ -99,25 +119,20 @@ public class AccessibilityComputationNairobiTest {
 		// yy For a test, "abort" may be too strict.  kai, may'16
 				
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		
-		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		double xMin = boundingBox.getXMin();
-		double xMax = boundingBox.getXMax();
-		double yMin = boundingBox.getYMin();
-		double yMax = boundingBox.getYMax();
-		double[] mapViewExtent = {xMin, yMin, xMax, yMax};
-		
+//		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+
 		
 		// no pt block
-
+		
 		
 		assertNotNull(config);
 
 		
 		// collect activity types
-		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
-		log.warn( "found activity types: " + activityTypes );
+//		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+//		log.warn( "found activity types: " + activityTypes );
+		final List<String> activityTypes = new ArrayList<>();
+		activityTypes.add(FacilityTypes.WORK);
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
@@ -135,22 +150,22 @@ public class AccessibilityComputationNairobiTest {
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
 
 		final Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
+		controler.addOverridingModule(new AccessibilityComputationTestModuleCustomBoundary(
+				activityTypes, networkDensityFacilities, crs, name, cellSize, boundingBox));
 		controler.run();
 
+		
+		// QGis
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
+			double[] mapViewExtent = {boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax()};
+
 
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//					if (!actType.equals("w")) {
-					if (!actType.equals(FacilityTypes.WORK)) {
-						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-						continue ;
-					}
 					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
@@ -158,5 +173,4 @@ public class AccessibilityComputationNairobiTest {
 			}  
 		}
 	}
-
 }

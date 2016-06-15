@@ -92,6 +92,7 @@ public class AccessibilityRunUtils {
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
 			Coord coord = measuringPoint.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
+			// TODO check if this is good or if orthogonal projection etc. is more suitable
 			double distance = ((LinkImpl) link).calcDistance(coord);
 			if (distance <= maximumAllowedDistance) {
 				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
