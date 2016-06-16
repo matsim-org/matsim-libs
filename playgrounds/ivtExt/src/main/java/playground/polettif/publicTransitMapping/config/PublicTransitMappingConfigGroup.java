@@ -35,15 +35,14 @@ import java.util.*;
 
 
 /**
+ * Config Group that is used by {@link playground.polettif.publicTransitMapping.mapping.PTMapper}
+ * Defines parameters for mapping public transit to a network.
  *
+ * @author polettif
  */
 public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "PublicTransitMapping";
-
-	public static final String ARTIFICIAL_LINK_MODE = "artificial";
-	public static final String STOP_FACILITY_LOOP_LINK = "stopFacilityLink";
-	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
 
 	/**
 	 * Suffix used for child stop facilities. The id of the referenced link is appended (i.e. stop0123.link:7852).
@@ -51,10 +50,14 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public static final String SUFFIX_CHILD_STOP_FACILITIES = ".link:";
 	public static final String SUFFIX_CHILD_STOP_FACILITIES_REGEX = "[.]link:";
 
+	public static final String ARTIFICIAL_LINK_MODE = "artificial";
+	public static final String STOP_FACILITY_LOOP_LINK = "stopFacilityLink";
+	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
+
 	private static final String MODE_ROUTING_ASSIGNMENT ="modeRoutingAssignment";
 	private static final String MODES_TO_KEEP_ON_CLEAN_UP = "modesToKeepOnCleanUp";
 	private static final String NODE_SEARCH_RADIUS = "nodeSearchRadius";
-	private static final String PSEUDO_ROUTE_WEIGHT_TYPE = "pseudoRouteWeightType";
+	private static final String TRAVEL_COST_TYPE = "travelCostType";
 	private static final String MAX_NCLOSEST_LINKS = "maxNClosestLinks";
 	private static final String MAX_LINK_CANDIDATE_DISTANCE = "maxLinkCandidateDistance";
 	private static final String PREFIX_ARTIFICIAL = "prefixArtificial";
@@ -96,34 +99,33 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> map = super.getComments();
 		map.put(MODE_ROUTING_ASSIGNMENT,
 				"References transportModes from the schedule (key) and the allowed transportModes of a link from \n" +
-						"\t\the network (values). Schedule transport modes not defined here are not mapped at all and routes \n" +
-						"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
-						"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
-						"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
-						"\t\tExample: \"bus:bus,car | rail:rail,light_rail\"");
+				"\t\the network (values). Schedule transport modes not defined here are not mapped at all and routes \n" +
+				"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
+				"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
+				"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
+				"\t\tExample: \"bus:bus,car | rail:rail,light_rail\"");
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
-						"\t\tlisted in this set (typically only car). Separated by comma.");
+				"\t\tlisted in this set (typically only car). Separated by comma.");
 		map.put(COMBINE_PT_MODES,
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
-						"\t\tshould be replaced with pt (true) or not. Default: false");
+				"\t\tshould be replaced with pt (true) or not. Default: false");
 		map.put(ADD_PT_MODE,
 				"The mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
-						"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: true");
+				"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: true");
 		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
 				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: true");
 		map.put(LINK_DISTANCE_TOLERANCE,
 				"(concerns Link Candidates) After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
-						"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
-						"\t\tMust be >= 1.");
-		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
-				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
-				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
-				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
+				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
+				"\t\tMust be >= 1.");
+		map.put(TRAVEL_COST_TYPE,
+				"Defines which link attribute should be used for routing. Possible values \""+ TravelCostType.linkLength+"\" (default) " +
+				"\t\tand \""+ TravelCostType.travelTime+"\".");
 		map.put(MAX_NCLOSEST_LINKS,
 				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
-						"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
-						"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
+				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
+				"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
 		map.put(NODE_SEARCH_RADIUS,
 				"(concerns Link Candidates) Defines the radius [meter] from a stop facility within nodes are searched. Values up to 2000 do" +
 				"\t\tdon't have a significant impact on performance.");
@@ -131,9 +133,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"(concerns Link Candidates) The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
-//		map.put(FREESPEED_ARTIFICIAL,
-//				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes. Is ignored if" +
-//				"\t\t"+SCHEDULE_FREESPEED_MODES + "is set.");
 		map.put(SCHEDULE_FREESPEED_MODES,
 				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel" +
 				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all" +
@@ -141,9 +140,9 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\tmodes (rail is recommended) can be added, separated by commas.");
 		map.put(MAX_TRAVEL_COST_FACTOR,
 				"If all paths between two stops have a [travelCost] > ["+MAX_TRAVEL_COST_FACTOR+"] * [minTravelCost], \n" +
-				"\t\tan artificial link is created. If "+PSEUDO_ROUTE_WEIGHT_TYPE+" is " + PseudoRouteWeightType.travelTime +
-				"\t\tminTravelCost is the travelTime between stops from schedule. If "+PSEUDO_ROUTE_WEIGHT_TYPE+" is \n" +
-				"\t\t"+PseudoRouteWeightType.linkLength + " minTravel cost is the beeline distance.");
+				"\t\tan artificial link is created. If "+ TRAVEL_COST_TYPE +" is " + TravelCostType.travelTime +
+				"\t\tminTravelCost is the travelTime between stops from schedule. If "+ TRAVEL_COST_TYPE +" is \n" +
+				"\t\t"+ TravelCostType.linkLength + " minTravel cost is the beeline distance.");
 		map.put(NUM_OF_THREADS,
 				"Defines the number of numOfThreads that should be used for pseudoRouting. Default: 2.");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
@@ -154,9 +153,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 		map.put(REMOVE_NOT_USED_STOP_FACILITIES,
 				"If true, stop facilities that are not used by any transit route are removed from the schedule. Default: true");
-//		map.put(SUFFIX_CHILD_STOP_FACILITIES_TAG,
-//				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
-//						"\t\t(i.e. stop0123.link:LINKID20123).");
 		return map;
 	}
 
@@ -391,19 +387,19 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * information on link travel times is available, travelTime
 	 * can be used.
 	 */
-	public enum PseudoRouteWeightType {
+	public enum TravelCostType {
 		travelTime, linkLength
 	}
-	private PseudoRouteWeightType pseudoRouteWeightType = PseudoRouteWeightType.linkLength;
+	private TravelCostType travelCostType = TravelCostType.linkLength;
 
-	@StringGetter(PSEUDO_ROUTE_WEIGHT_TYPE)
-	public PseudoRouteWeightType getPseudoRouteWeightType() {
-		return pseudoRouteWeightType;
+	@StringGetter(TRAVEL_COST_TYPE)
+	public TravelCostType getTravelCostType() {
+		return travelCostType;
 	}
 
-	@StringSetter(PSEUDO_ROUTE_WEIGHT_TYPE)
-	public void setPseudoRouteWeightType(PseudoRouteWeightType type) {
-		this.pseudoRouteWeightType = type;
+	@StringSetter(TRAVEL_COST_TYPE)
+	public void setTravelCostType(TravelCostType type) {
+		this.travelCostType = type;
 	}
 
 
@@ -457,25 +453,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * Suffix used for child stop facilities. A number for each child of a
-	 * parent stop facility is appended (i.e. stop0123.fac:2).
-	 */
-//	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES_TAG)
-	public String getSuffixChildStopFacilities() {
-		return SUFFIX_CHILD_STOP_FACILITIES;
-	}
-
-//	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES_TAG)
-//	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
-//		this.suffixChildStopFacilities = suffixChildStopFacilities;
-//		this.suffixRegexEscaped = Pattern.quote(suffixChildStopFacilities);
-//	}
-
-	public String getSuffixRegexEscaped() {
-		return SUFFIX_CHILD_STOP_FACILITIES_REGEX;
-	}
-
-	/**
 	 * If all paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance,
 	 * an artificial link is created.
 	 */
@@ -494,21 +471,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
 	}
 
+
 	/**
-	 * The freespeed of artificially created links.
+	 *
 	 */
-//	private double freespeedArtificialLinks = 40;
-
-//	@StringGetter(FREESPEED_ARTIFICIAL)
-//	public double getFreespeedArtificial() {
-//		return freespeedArtificialLinks;
-//	}
-
-//	@StringSetter(FREESPEED_ARTIFICIAL)
-//	public void setFreespeedArtificial(double freespeedArtificialLinks) {
-//		this.freespeedArtificialLinks = freespeedArtificialLinks;
-//	}
-
 	public Set<String> scheduleFreespeedModes = new HashSet<>(ARTIFICIAL_LINK_MODE_AS_SET);
 
 	@StringGetter(SCHEDULE_FREESPEED_MODES)
@@ -650,15 +616,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		final String old = this.outputScheduleFile;
 		this.outputScheduleFile = outputSchedule;
 		return old;
-	}
-
-	/**
-	 * Number of link candidates considered for all stops, different for scheduleModes.
-	 * Depends on accuracy of stops and desired performance. Somewhere between 4 and 10 seems reasonable,
-	 * depending on the accuracy of the stop facility coordinates. Default: 8
-	 */
-	public Map<String, Integer> getMaxNClosestLinksByMode() {
-		return null;
 	}
 
 	/**

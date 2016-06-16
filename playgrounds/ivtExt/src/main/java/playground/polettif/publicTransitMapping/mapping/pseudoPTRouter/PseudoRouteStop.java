@@ -95,7 +95,7 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 		this.awaitDepartureTime = routeStop.isAwaitDepartureTime();
 
 		// link value
-		this.linkWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
+		this.linkWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
 	}
 
 	/**

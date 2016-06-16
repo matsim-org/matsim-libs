@@ -61,7 +61,7 @@ public class CompareMapping {
 
 		// ptm
 		PublicTransitMappingConfigGroup ptmConfig = PublicTransitMappingConfigGroup.createDefaultConfig();
-		ptmConfig.setPseudoRouteWeightType(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime);
+		ptmConfig.setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType.travelTime);
 		ptmConfig.setMaxNClosestLinks(6);
 		ptmConfig.setLinkDistanceTolerance(1.2);
 		ptmConfig.setMaxLinkCandidateDistance(60);
