@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -38,112 +38,92 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
 
-
 /**
  * @author dziemke
  */
 public class CreateFacilitiiesFileFromCSVFile {
-	static String csvFileName = "../../../shared-svn/projects/maxess/data/nairobi/kodi/Public_Primary_School_listed_by_2007.csv";
-	static String attributeCaption = "LANDUSE";
-	static String facilitiesOutputFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/facilities.xml";
-	static final String SEPARATOR = ",";
-	
-	static final String originalCRS = "EPSG:4326";
-	static final String workingCRS = "EPSG:21037";
-	
-	static final String LOCATION = "Geolocation";
-	static final String NAME = "Name of School";
-	
-	
-	// Globally used objects
-	static ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities("Homes"); // TODO adapt name
-	static ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
-	static Map<String,Integer> columnHeads;
-	
-	static CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(originalCRS, workingCRS);
-
+	private final static Logger LOG = Logger.getLogger(CreateFacilitiiesFileFromCSVFile.class);
 
 	public static void main(String[] args) {
-//		Collection<SimpleFeature> blocks = collectFeatures();	
-		readFile();
-//		ActivityFacilities activityFacilities = createFacilities(blocks);
-		writeFacilitiesFile(activityFacilities);
+		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/public_primary_school_2007/Public_Primary_School_listed_by_2007.csv";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/public_primary_school_2007/facilities_2.xml";
+		
+		String facilitiesFileDescription = "Facilities in Nairobi based on Land-Use Shapefile";
+		String inputCRS = "EPSG:4326";
+		String outputCRS = "EPSG:21037";
+		String headOfCoordColumn = "Geolocation";
+		String separator = ",";
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
+
+		ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(csvFile, facilitiesFileDescription,
+				headOfCoordColumn, ct, separator);
+		writeFacilitiesFile(activityFacilities, facilitiesFile);
 	}
-	
 
 
-	public static void readFile() {
+	public static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName, String facilitiesFileDescription,
+			String headOfCoordColumn, CoordinateTransformation ct, String separator) {
+		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(facilitiesFileDescription);
 		int lineCount = 0;
-
 		try {
 			BufferedReader bufferedReader = IOUtils.getBufferedReader(csvFileName);
 
 			// Header
 			String currentLine = bufferedReader.readLine();
-			String[] header = currentLine.split(SEPARATOR, -1);
-			columnHeads = new LinkedHashMap<>(header.length);
-			for (int i=0; i<header.length; i++) {
-				columnHeads.put(header[i],i);
-			}
+			Map<String,Integer> columnHeads = createColumnHeadsMap(currentLine, separator);
 			lineCount++;
 
 			// Lines with data
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				
 				// This quite complicated expression does the following:
 				// Split on the comma only if that comma has zero, or an even number of quotes ahead of it.
 				// See: http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
-				String[] entries = currentLine.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
-
+				String[] lineEntries = currentLine.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 				lineCount++;
 
-
-				if (lineCount % 100000 == 0) {
-//					log.info(lineCount+ " lines read in so far.");
-					Gbl.printMemoryUsage();
-				}
-
-				//			System.out.println(entries[13]);
-				
-				// household id / person id
-				System.out.println("name = " + entries[columnHeads.get(NAME)]);
-				System.out.println("loc = " + entries[columnHeads.get(LOCATION)]);
-//				Id<Person> pid = Id.create(hid+"_"+id, Person.class);
-				ActivityFacility activityFacility = createFacility(lineCount, entries);
+				ActivityFacility activityFacility = createFacility(lineCount, lineEntries, columnHeads, headOfCoordColumn, ct, separator);
 				activityFacilities.addActivityFacility(activityFacility);
 			}
 		} catch (IOException e) {
-//			log.error(new Exception(e));
+			throw new RuntimeException(e);
 		}
+		LOG.info("All activity facilities created.");
+		return activityFacilities;
 	}
 
 
-	private static ActivityFacility createFacility(int lineCount, String[] entries) {
-//		private static void createFacility(String[] entries) {
+	private static Map<String,Integer> createColumnHeadsMap(String headLine, String separator) {
+		String[] header = headLine.split(separator);
+		Map<String,Integer> columnHeads = new LinkedHashMap<>(header.length);
+		for (int i=0; i<header.length; i++) {
+			columnHeads.put(header[i],i);
+		}
+		LOG.info("Map that relates all column head to their position created.");
+		return columnHeads;
+	}
 
-//			Id<ActivityFacility> id = Id.create(entries[columnHeads.get(NAME)] , ActivityFacility.class);
-			Id<ActivityFacility> id = Id.create(lineCount , ActivityFacility.class);
 
-			
-			String location = entries[columnHeads.get(LOCATION)].replaceAll("[()\"]","");
-			String[] coordinates = location.split(SEPARATOR, -1);
-			Coord wgs84Coord = CoordUtils.createCoord(Double.parseDouble(coordinates[1]), Double.parseDouble(coordinates[0]));
-			Coord coord = ct.transform(wgs84Coord);
-			System.out.println("wgs84 = " + wgs84Coord + " -- coord = " + coord);
+	private static ActivityFacility createFacility(int lineCount, String[] lineEntries, Map<String,Integer> columnHeads,
+			String headOfCoordColumn, CoordinateTransformation ct, String separator) {
+		Id<ActivityFacility> id = Id.create(lineCount , ActivityFacility.class);
 
-			ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, coord);
-//			String landUseType = (String) feature.getAttribute("LANDUSE");
-			ActivityOption activityOption = activityFacilitiesFactory.createActivityOption("Educational");
-			activityFacility.addActivityOption(activityOption);
-//			activityFacilities.addActivityFacility(activityFacility);
-//			i++;
-//		}
+		String location = lineEntries[columnHeads.get(headOfCoordColumn)].replaceAll("[()\"]","");
+		String[] coordinates = location.split(separator, -1);
+		Coord coord = CoordUtils.createCoord(Double.parseDouble(coordinates[1]), Double.parseDouble(coordinates[0]));
+		Coord transformedCoord = ct.transform(coord);
+
+		ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
+		ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, transformedCoord);
+		ActivityOption activityOption = activityFacilitiesFactory.createActivityOption("Educational");
+		activityFacility.addActivityOption(activityOption);
 		return activityFacility;
 	}
 
 
-	private static void writeFacilitiesFile(ActivityFacilities activityFacilities) {
+	private static void writeFacilitiesFile(ActivityFacilities activityFacilities, String facilitiesOutputFile) {
 		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(activityFacilities);
 		facilitiesWriter.write(facilitiesOutputFile);
+		LOG.info("Facility file written.");
 	}
 }

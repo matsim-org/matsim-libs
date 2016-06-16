@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -42,22 +44,27 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class CreateFacilitiiesFileFromShapeFile {
 	private final static Logger LOG = Logger.getLogger(CreateFacilitiiesFileFromShapeFile.class);
-
-	static String shapeFileName = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/nairobi_LU.shp";
-	static String captionOfIdentifierAttribute = "OBJECTID";
-	static String captionOfValueAttribute = "LANDUSE";
-	static String facilitiesOutputFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
-	static String facilitiesFileDescription = "Facilities in Nairobi based on Land-Use Shapefile";
-	// TODO A coordinate transformation might be necessary
 	
 	public static void main(String[] args) {
-		Collection<SimpleFeature> blocks = collectFeatures();		
-		ActivityFacilities activityFacilities = createFacilities(blocks);
-		writeFacilitiesFile(activityFacilities);
+		String shapeFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/nairobi_LU.shp";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
+
+		String facilitiesFileDescription = "Facilities in Nairobi based on Land-Use Shapefile";
+		String inputCRS = "EPSG:21037";
+		String outputCRS = "EPSG:21037";
+		String captionOfIdentifierAttribute = "OBJECTID";
+		String captionOfValueAttribute = "LANDUSE";
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
+		
+		Collection<SimpleFeature> features = collectFeatures(shapeFile);		
+		ActivityFacilities activityFacilities = createFacilities(features, facilitiesFileDescription, ct,
+				captionOfIdentifierAttribute, captionOfValueAttribute);
+		writeFacilitiesFile(activityFacilities, facilitiesFile);
 	}
 
 	
-	private static Collection<SimpleFeature> collectFeatures() {
+	private static Collection<SimpleFeature> collectFeatures(String shapeFileName) {
 		ShapeFileReader reader = new ShapeFileReader();
 		Collection<SimpleFeature> features = reader.readFileAndInitialize(shapeFileName);
 		LOG.info("All features collected.");
@@ -65,16 +72,22 @@ public class CreateFacilitiiesFileFromShapeFile {
 	}
 	
 	
-	private static ActivityFacilities createFacilities(Collection<SimpleFeature> blocks) {
+	private static ActivityFacilities createFacilities(Collection<SimpleFeature> features, String facilitiesFileDescription,
+			CoordinateTransformation ct, String captionOfIdentifierAttribute, String captionOfValueAttribute) {
+		
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(facilitiesFileDescription);
 		ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
-		for (SimpleFeature feature : blocks) {
+		
+		
+		for (SimpleFeature feature : features) {
 			String objectId = String.valueOf(feature.getAttribute(captionOfIdentifierAttribute));
 			Id<ActivityFacility> id = Id.create(objectId , ActivityFacility.class);
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 			Point point = geometry.getCentroid();
 			Coord coord = CoordUtils.createCoord(point.getX(), point.getY());
-			ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, coord);
+			Coord transformedCoord = ct.transform(coord);
+
+			ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, transformedCoord);
 			String landUseType = (String) feature.getAttribute(captionOfValueAttribute);
 			ActivityOption activityOption = activityFacilitiesFactory.createActivityOption(landUseType);
 			activityFacility.addActivityOption(activityOption);
@@ -85,9 +98,9 @@ public class CreateFacilitiiesFileFromShapeFile {
 	}
 	
 	
-	private static void writeFacilitiesFile(ActivityFacilities activityFacilities) {
+	private static void writeFacilitiesFile(ActivityFacilities activityFacilities, String facilitiesOutputFile) {
 		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(activityFacilities);
 		facilitiesWriter.write(facilitiesOutputFile);
-		LOG.info("Faciltiy file written.");
+		LOG.info("Facility file written.");
 	}
 }
