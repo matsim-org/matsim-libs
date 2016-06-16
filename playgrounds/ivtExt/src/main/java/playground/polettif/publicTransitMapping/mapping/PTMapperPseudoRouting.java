@@ -129,7 +129,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("===========================================");
 		log.info("Creating mode separated network and routers");
 		Map<String, Set<String>> modeRoutingAssignment = config.getModeRoutingAssignment();
-		FastAStarRouter.setPseudoRouteWeightType(config.getPseudoRouteWeightType());
+		FastAStarRouter.setTravelCostType(config.getTravelCostType());
 		for(Map.Entry<String, Set<String>> modeAssignment : modeRoutingAssignment.entrySet()) {
 			if(!modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
 				log.info("Initiating network and router for " + modeAssignment.getValue());
@@ -508,7 +508,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 						final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
 
 						double maxAllowedPathCost;
-						if(config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime)) {
+						if(config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 							maxAllowedPathCost = (routeStops.get(i+1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getBeelineDistanceMaxFactor();
 						} else {
 							maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
@@ -570,7 +570,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 										artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
 										double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getBeelineDistanceMaxFactor();
-										double artificialPathCost = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
+										double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
 										PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 										PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
@@ -595,7 +595,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 									artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
-									double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
+									double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
 									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);

@@ -39,10 +39,10 @@ public class FastAStarRouter implements Router {
 	
 	private final LeastCostPathCalculator pathCalculator;
 	private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
-	private static PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType = PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength;
+	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
 
-	public static void setPseudoRouteWeightType(PublicTransitMappingConfigGroup.PseudoRouteWeightType type) {
-		pseudoRouteWeightType = type;
+	public static void setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType type) {
+		travelCostType = type;
 	}
 
 	public FastAStarRouter(Network network) {
@@ -80,7 +80,7 @@ public class FastAStarRouter implements Router {
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return (pseudoRouteWeightType.equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? link.getLength() / link.getFreespeed() : link.getLength());
+		return (travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? link.getLength() / link.getFreespeed() : link.getLength());
 	}
 
 	@Override

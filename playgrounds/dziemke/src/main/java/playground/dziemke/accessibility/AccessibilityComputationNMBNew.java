@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dziemke.accessibility;
 
 import java.util.ArrayList;
@@ -33,7 +51,9 @@ import org.matsim.facilities.ActivityFacilities;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
-
+/**
+ * @author dziemke
+ */
 public class AccessibilityComputationNMBNew {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
 	
@@ -67,14 +87,14 @@ public class AccessibilityComputationNMBNew {
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		String crs = TransformationFactory.WGS84_SA_Albers;
+		final String crs = TransformationFactory.WGS84_SA_Albers;
 
 		// QGis
 		boolean createQGisOutput = true;
 		boolean includeDensityLayer = true;
 		Double lowerBound = -3.5;
 		Double upperBound = 3.5;
-		Integer range = 9;
+		Integer range = 9; // in the current implementation, this must always be 9
 		int symbolSize = 525;
 		int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
 
@@ -138,7 +158,6 @@ public class AccessibilityComputationNMBNew {
 		activityTypes.add("w");
 		activityTypes.add("l");
 		activityTypes.add("e");
-		log.error("Only using s as activity type to speed up for testing");
 
 		// collect homes
 		String activityFacilityType = "h";
@@ -181,10 +200,9 @@ public class AccessibilityComputationNMBNew {
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
-
+			// TODO create map extend directly from bounding box?
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);

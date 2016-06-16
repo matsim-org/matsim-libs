@@ -189,7 +189,6 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		}
 		
 		UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
-		log.warn("here-1") ;
 		if (urbanSimMode) {
 			if ( outputSubdirectory != null ) {
 				throw new RuntimeException("output subdirectory not null stems from separate accessibility computation per activity type.  "
