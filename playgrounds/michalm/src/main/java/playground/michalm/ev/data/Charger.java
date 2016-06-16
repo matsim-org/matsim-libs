@@ -47,4 +47,7 @@ public interface Charger
      * @return capacity == number of plugs
      */
     int getCapacity();
+
+
+    void resetLogic();
 }

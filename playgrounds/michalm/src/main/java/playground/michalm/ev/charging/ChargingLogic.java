@@ -22,4 +22,7 @@ package playground.michalm.ev.charging;
 public interface ChargingLogic
 {
     void chargeVehicles(double chargeTime);
+
+
+    void reset();
 }

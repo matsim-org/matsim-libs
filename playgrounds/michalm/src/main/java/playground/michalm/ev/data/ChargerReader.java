@@ -27,20 +27,22 @@ import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.michalm.ev.UnitConversionRatios;
 
-public class TaxiChargerReader
+
+public class ChargerReader
     extends MatsimXmlParser
 {
     private final static String CHARGER = "charger";
 
     private final static int DEFAULT_CHARGER_CAPACITY = 1;
-    private final static int DEFAULT_CHARGER_POWER = 50;//50kW
+    private final static int DEFAULT_CHARGER_POWER = 50;//[kW]
 
     private final EvData data;
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public TaxiChargerReader(Scenario scenario, EvData data)
+    public ChargerReader(Scenario scenario, EvData data)
     {
         this.data = data;
         links = scenario.getNetwork().getLinks();
@@ -65,7 +67,8 @@ public class TaxiChargerReader
     {
         Id<Charger> id = Id.create(atts.getValue("id"), Charger.class);
         Link link = links.get(Id.createLinkId(atts.getValue("link")));
-        double power = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER) * 1000;//kW --> W
+        double power = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER)
+                * UnitConversionRatios.W_PER_kW;
         int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_CHARGER_CAPACITY);
         return new ChargerImpl(id, power, capacity, link);
     }

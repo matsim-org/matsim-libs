@@ -103,4 +103,11 @@ public class PartialFastChargingWithQueueingLogic
 
         return energyToCharge / charger.getPower() / charger.getCapacity();
     }
+    
+    
+    @Override
+    public void reset()
+    {
+        vehicles.clear();
+    }
 }

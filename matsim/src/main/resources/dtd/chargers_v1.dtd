@@ -7,10 +7,12 @@
 
 <!-- ============================================================ -->
 
-<!ELEMENT ranks (rank)*>
+<!ELEMENT chargers (charger)*>
 
-<!ATTLIST rank
+<!ELEMENT charger EMPTY>
+
+<!ATTLIST charger
 	id       CDATA   #REQUIRED
-	name     CDATA   #IMPLIED
-	capacity CDATA   #IMPLIED
-	link     CDATA   #REQUIRED>
+	link     CDATA   #REQUIRED
+	power    CDATA   #IMPLIED
+    capacity CDATA   #IMPLIED>

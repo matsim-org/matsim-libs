@@ -17,33 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.ev;
+package playground.michalm.ev;
 
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 
-import playground.michalm.ev.discharging.AuxEnergyConsumption;
-import playground.michalm.taxi.data.ETaxi;
+import playground.michalm.ev.data.*;
 
 
-public class ETaxiAuxEnergyConsumption
-    implements AuxEnergyConsumption
+public class EvTimeProfiles
 {
-    private final ETaxi taxi;
-    private final double auxPower;
-
-
-    public ETaxiAuxEnergyConsumption(ETaxi taxi, double auxPower)
+    public static ProfileCalculator<Integer> createDischargedVehiclesCounter(final EvData evData)
     {
-        this.taxi = taxi;
-        this.auxPower = auxPower;
+        return new ProfileCalculator<Integer>() {
+            @Override
+            public Integer calcCurrentPoint()
+            {
+                int count = 0;
+                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+                    if (ev.getBattery().getSoc() < 0) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        };
     }
 
 
-    @Override
-    public void useEnergy(double period)
+    public static ProfileCalculator<Double> createMeanSocCalculator(final EvData evData)
     {
-        if (taxi.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-            taxi.getBattery().discharge(auxPower * period);
-        }
+        return new ProfileCalculator<Double>() {
+            @Override
+            public Double calcCurrentPoint()
+            {
+                Mean mean = new Mean();
+                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+                    mean.increment(ev.getBattery().getSoc());
+                }
+                return mean.getResult() / UnitConversionRatios.J_PER_kWh;//print out in [kWh]
+            }
+        };
     }
 }

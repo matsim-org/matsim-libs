@@ -26,26 +26,14 @@ import playground.michalm.ev.data.ElectricVehicle;
 
 public class EnergyConsumptions
 {
-    public static DriveEnergyConsumption createFixedDriveEnergyConsumption(final ElectricVehicle ev,
-            final double rate)
+    public static void consumeFixedDriveEnergy(ElectricVehicle ev, double rate, Link link)
     {
-        return new DriveEnergyConsumption() {
-            public void useEnergy(Link link, double travelTime)
-            {
-                ev.getBattery().discharge(rate * link.getLength());
-            }
-        };
+        ev.getBattery().discharge(rate * link.getLength());
     }
 
 
-    public static AuxEnergyConsumption createFixedAuxEnergyConsumption(final ElectricVehicle ev,
-            final double auxPower)
+    public static void consumeFixedAuxEnergy(ElectricVehicle ev, double auxPower, double period)
     {
-        return new AuxEnergyConsumption() {
-            public void useEnergy(double period)
-            {
-                ev.getBattery().discharge(auxPower * period);
-            }
-        };
+        ev.getBattery().discharge(auxPower * period);
     }
 }

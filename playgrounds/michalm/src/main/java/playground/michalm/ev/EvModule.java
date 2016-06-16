@@ -20,6 +20,8 @@
 package playground.michalm.ev;
 
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.michalm.ev.charging.ChargingHandler;
 import playground.michalm.ev.data.EvData;
@@ -53,5 +55,12 @@ public class EvModule
             addMobsimListenerBinding().toProvider(EvTimeProfileCollectorProvider.class);
             //add more time profiles if necessary
         }
+
+        addControlerListenerBinding().toInstance(new IterationEndsListener() {
+            public void notifyIterationEnds(IterationEndsEvent event)
+            {
+                evData.clearQueuesAndResetBatteries();
+            }
+        });
     }
 }

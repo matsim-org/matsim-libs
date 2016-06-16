@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.data;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.*;
-import org.xml.sax.Attributes;
+import java.util.*;
 
-import playground.michalm.ev.*;
-import playground.michalm.ev.data.BatteryImpl;
-import playground.michalm.taxi.data.ETaxi;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.taxi.data.TaxiData;
 
 
-public class ETaxiReader
-    extends VehicleReader
+public class TaxiDataWithRanks
+    extends TaxiData
 {
-    public ETaxiReader(Network network, VrpData data)
+    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
+
+    private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
+            .unmodifiableMap(taxiRanks);
+
+
+    public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
     {
-        super(network, data);
+        return unmodifiableTaxiRanks;
     }
 
 
-    @Override
-    protected Vehicle createVehicle(Attributes atts)
+    public void addTaxiRank(TaxiRank taxiRank)
     {
-        Vehicle v = super.createVehicle(atts);
-        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
-                * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * 20)
-                * UnitConversionRatios.J_PER_kWh;
-        return new ETaxi(v, new BatteryImpl(batteryCapacity, initialSoc));
+        taxiRanks.put(taxiRank.getId(), taxiRank);
     }
 }

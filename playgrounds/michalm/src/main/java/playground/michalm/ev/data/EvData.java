@@ -37,4 +37,7 @@ public interface EvData
 
 
     public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev);
+
+
+    public void clearQueuesAndResetBatteries();
 }

@@ -92,4 +92,11 @@ public class ChargerImpl
     {
         return link.getCoord();
     }
+    
+    
+    @Override
+    public void resetLogic()
+    {
+        logic.reset();
+    }
 }

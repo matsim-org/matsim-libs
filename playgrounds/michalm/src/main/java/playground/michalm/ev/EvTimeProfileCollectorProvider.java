@@ -27,7 +27,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import com.google.inject.*;
 
 import playground.michalm.ev.data.EvData;
-import playground.michalm.taxi.ev.EvTimeProfiles;
 
 
 public class EvTimeProfileCollectorProvider

@@ -37,12 +37,17 @@ public class EvConfigGroup
     public static final String CHARGE_TIME_STEP = "chargeTimeStep";
     public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
 
+    //input
+    public static final String CHARGERS_FILE = "chargersFile";
+
     //output
     public static final String TIME_PROFILES = "timeProfiles";
 
     //no need to simulate with 1-second time step
     private int chargeTimeStep = 5; //5 s ==> 0.35% SOC (fast charging, 50 kW)
     private int auxDischargeTimeStep = 60; //1 min ==> 0.25% SOC (3 kW aux power)
+
+    private String chargersFile = null;
 
     private boolean timeProfiles = false;
 
@@ -78,6 +83,20 @@ public class EvConfigGroup
     public void setAuxDischargeTimeStep(int auxDischargeTimeStep)
     {
         this.auxDischargeTimeStep = auxDischargeTimeStep;
+    }
+
+
+    @StringGetter(CHARGERS_FILE)
+    public String getChargerFile()
+    {
+        return chargersFile;
+    }
+
+
+    @StringSetter(CHARGERS_FILE)
+    public void setChargerFile(String chargersFile)
+    {
+        this.chargersFile = chargersFile;
     }
 
 

@@ -17,63 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.run;
 
-import java.util.*;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.Controler;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
+import playground.michalm.ev.*;
+import playground.michalm.ev.data.*;
 
 
-public class EvDataImpl
-    implements EvData
+public class RunETaxiScenario
 {
-    private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
-    private final Map<Id<Vehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
-
-    private final Map<Id<Charger>, Charger> unmodifiableChargers = Collections
-            .unmodifiableMap(chargers);
-    private final Map<Id<Vehicle>, ElectricVehicle> unmodifiableEVehicles = Collections
-            .unmodifiableMap(eVehicles);
-
-
-    @Override
-    public Map<Id<Charger>, Charger> getChargers()
+    public static void run(String configFile, boolean otfvis)
     {
-        return unmodifiableChargers;
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+                new OTFVisConfigGroup(), new EvConfigGroup());
+        createControler(config, otfvis).run();
     }
 
 
-    @Override
-    public void addCharger(Charger charger)
+    public static Controler createControler(Config config, boolean otfvis)
     {
-        chargers.put(charger.getId(), charger);
+        Controler controler = RunTaxiScenario.createControler(config, otfvis);
+        EvConfigGroup evCfg = EvConfigGroup.get(config);
+
+        EvData evData = new EvDataImpl();
+        new ChargerReader(controler.getScenario(), evData).parse(evCfg.getChargerFile());// create xml and DTD
+        
+        //TODO unfinished
+        
+        controler.addOverridingModule(new EvModule(evData));
+        
+        
+
+        return controler;
     }
 
 
-    @Override
-    public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles()
+    public static void main(String[] args)
     {
-        return unmodifiableEVehicles;
-    }
-
-
-    @Override
-    public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev)
-    {
-        eVehicles.put(vehicleId, ev);
-    }
-
-
-    @Override
-    public void clearQueuesAndResetBatteries()
-    {
-        for (ElectricVehicle ev : eVehicles.values()) {
-            ev.getBattery().resetSoc();
-        }
-
-        for (Charger c : chargers.values()) {
-            c.resetLogic();
-        }
+        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
+        RunETaxiScenario.run(configFile, true);
     }
 }

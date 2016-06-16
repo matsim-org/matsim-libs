@@ -8,7 +8,7 @@ import org.matsim.core.router.util.*;
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
-import playground.michalm.taxi.data.ETaxiData;
+import playground.michalm.taxi.data.TaxiDataWithRanks;
 
 public class PrtModule {
 	
@@ -22,7 +22,7 @@ public class PrtModule {
 		pars.setTeleportedModeSpeed(1.);
 		controler.getConfig().plansCalcRoute().getModeRoutingParams().put(PrtRequestCreator.MODE, pars);
 		
-		PrtData prtData = new PrtData(controler.getScenario().getNetwork(), (ETaxiData)vrpData);
+		PrtData prtData = new PrtData(controler.getScenario().getNetwork(), (TaxiDataWithRanks)vrpData);
 		
 		PrtTripRouterFactoryImpl factory = new PrtTripRouterFactoryImpl(vrpData, controler.getScenario(), ttime, tdis, prtData);
 		controler.setTripRouterFactory(factory);
