@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data;
+package playground.michalm.ev.data;
 
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.network.Link;
 
-import playground.michalm.ev.AuxEnergyConsumption;
+import playground.michalm.ev.charging.ChargingLogic;
 
 
-public class ETaxiAuxEnergyConsumption
-    implements AuxEnergyConsumption
+public interface Charger
+    extends BasicLocation<Charger>
 {
-    private final ETaxi taxi;
-    private final double auxPower;
+    ChargingLogic getLogic();
 
 
-    public ETaxiAuxEnergyConsumption(ETaxi taxi, double auxPower)
-    {
-        this.taxi = taxi;
-        this.auxPower = auxPower;
-    }
+    void setLogic(ChargingLogic logic);
 
 
-    @Override
-    public void useEnergy(double period)
-    {
-        if (taxi.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-            taxi.getBattery().discharge(auxPower * period);
-        }
-    }
+    Link getLink();
+
+
+    /**
+     * @return max power at a single plug, in [W]
+     */
+    double getPower();
+
+
+    /**
+     * @return capacity == number of plugs
+     */
+    int getCapacity();
 }

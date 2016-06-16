@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.data;
 
-import org.matsim.api.core.v01.network.Link;
+import playground.michalm.ev.discharging.*;
 
 
-/**
- * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus
- * effectively regenerated (returned back to the battery).
- */
-public interface DriveEnergyConsumption
+public interface ElectricVehicle
 {
-    void useEnergy(Link link, double travelTime);
+    DriveEnergyConsumption getDriveEnergyConsumption();
+
+
+    AuxEnergyConsumption getAuxEnergyConsumption();
+
+
+    Battery getBattery();
+
+
+    //used for swapping
+    void setBattery(Battery battery);
 }

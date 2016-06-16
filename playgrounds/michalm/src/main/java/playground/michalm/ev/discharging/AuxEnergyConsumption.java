@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package playground.michalm.ev.discharging;
 
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
-
-
-public class TimeProfiles
+public interface AuxEnergyConsumption
 {
-    public static ProfileCalculator<String> combineProfileCalculators(
-            final ProfileCalculator<?>... calculators)
-    {
-        return new ProfileCalculator<String>() {
-            @Override
-            public String calcCurrentPoint()
-            {
-                String s = "";
-                for (ProfileCalculator<?> pc : calculators) {
-                    s += pc.calcCurrentPoint() + "\t";
-                }
-                return s;
-            }
-        };
-    }
-
-
-    public static String combineValues(Object... values)
-    {
-        String s = "";
-        for (Object v : values) {
-            s += v.toString() + "\t";
-        }
-        return s;
-    }
+    void useEnergy(double period);
 }

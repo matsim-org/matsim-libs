@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.file.*;
 import org.xml.sax.Attributes;
 
 import playground.michalm.ev.*;
+import playground.michalm.ev.data.BatteryImpl;
 import playground.michalm.taxi.data.ETaxi;
 
 

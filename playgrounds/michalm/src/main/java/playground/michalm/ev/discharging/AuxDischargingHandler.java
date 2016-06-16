@@ -17,52 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.discharging;
 
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
+import com.google.inject.Inject;
 
-public class ChargingAuxDischargingHandler
+import playground.michalm.ev.EvConfigGroup;
+import playground.michalm.ev.data.*;
+
+
+public class AuxDischargingHandler
     implements MobsimAfterSimStepListener
 {
-    private final Iterable<? extends Charger> chargers;
-    private final int chargePeriod;
-
     private final Iterable<? extends ElectricVehicle> vehicles;
-    private final int auxDischargePeriod;
+    private final int auxDischargeTimeStep;
 
 
-    public ChargingAuxDischargingHandler(Iterable<? extends Charger> chargers, int chargePeriod,
-            Iterable<? extends ElectricVehicle> vehicles, int auxDischargePeriod)
+    @Inject
+    public AuxDischargingHandler(EvData evData, EvConfigGroup evConfig)
     {
-        this.chargers = chargers;
-        this.chargePeriod = chargePeriod;
-
-        this.vehicles = vehicles;
-        this.auxDischargePeriod = auxDischargePeriod;
+        this.vehicles = evData.getElectricVehicles().values();
+        this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
     }
 
 
     @Override
     public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e)
     {
-        if (lastSimStepInPeriod(e.getSimulationTime(), auxDischargePeriod)) {
+        if ( (e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
             for (ElectricVehicle v : vehicles) {
-                v.getAuxEnergyConsumption().useEnergy(auxDischargePeriod);
+                v.getAuxEnergyConsumption().useEnergy(auxDischargeTimeStep);
             }
         }
-
-        if (lastSimStepInPeriod(e.getSimulationTime(), chargePeriod)) {
-            for (Charger c : chargers) {
-                c.getLogic().chargeVehicles(chargePeriod);
-            }
-        }
-    }
-
-
-    private boolean lastSimStepInPeriod(double simTime, double period)
-    {
-        return (simTime + 1) % period == 0;
     }
 }

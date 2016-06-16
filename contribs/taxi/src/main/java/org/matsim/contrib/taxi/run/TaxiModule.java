@@ -65,7 +65,7 @@ public class TaxiModule
 
         if (TaxiConfigGroup.get(getConfig()).getTimeProfiles()) {
             addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-            //add more time profiles if necessary, e.g. for eTaxis
+            //add more time profiles if necessary
         }
     }
 }

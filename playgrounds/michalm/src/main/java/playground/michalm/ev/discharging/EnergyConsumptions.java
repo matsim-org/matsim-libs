@@ -17,21 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.discharging;
 
-public interface Battery
+import org.matsim.api.core.v01.network.Link;
+
+import playground.michalm.ev.data.ElectricVehicle;
+
+
+public class EnergyConsumptions
 {
-    double getCapacity();
+    public static DriveEnergyConsumption createFixedDriveEnergyConsumption(final ElectricVehicle ev,
+            final double rate)
+    {
+        return new DriveEnergyConsumption() {
+            public void useEnergy(Link link, double travelTime)
+            {
+                ev.getBattery().discharge(rate * link.getLength());
+            }
+        };
+    }
 
 
-    double getSoc();
-
-
-    void charge(double energy);
-
-
-    void discharge(double energy);
-
-
-    void resetSoc();
+    public static AuxEnergyConsumption createFixedAuxEnergyConsumption(final ElectricVehicle ev,
+            final double auxPower)
+    {
+        return new AuxEnergyConsumption() {
+            public void useEnergy(double period)
+            {
+                ev.getBattery().discharge(auxPower * period);
+            }
+        };
+    }
 }

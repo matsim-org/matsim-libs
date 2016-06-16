@@ -21,64 +21,25 @@ package playground.michalm.taxi.data;
 
 import org.matsim.contrib.dvrp.data.*;
 
-import playground.michalm.ev.*;
+import playground.michalm.ev.data.Battery;
 
 
 public class ETaxi
     extends VehicleImpl
-    implements ElectricVehicle
 {
-    private Battery battery;//not final -- can be swapped
-
-    private DriveEnergyConsumption driveEnergyConsumption;
-    private AuxEnergyConsumption auxEnergyConsumption;
+    private final Battery battery;//at start
 
 
     public ETaxi(Vehicle vehicle, Battery battery)
     {
         super(vehicle.getId(), vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(),
                 vehicle.getT1());
-
         this.battery = battery;
     }
 
 
-    @Override
     public Battery getBattery()
     {
         return battery;
-    }
-
-
-    @Override
-    public DriveEnergyConsumption getDriveEnergyConsumption()
-    {
-        return driveEnergyConsumption;
-    }
-
-
-    @Override
-    public AuxEnergyConsumption getAuxEnergyConsumption()
-    {
-        return auxEnergyConsumption;
-    }
-
-
-    @Override
-    public void setBattery(Battery battery)
-    {
-        this.battery = battery;
-    }
-
-
-    public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption)
-    {
-        this.driveEnergyConsumption = driveEnergyConsumption;
-    }
-
-
-    public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption)
-    {
-        this.auxEnergyConsumption = auxEnergyConsumption;
     }
 }

@@ -17,63 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.taxi.ev;
 
-public class BatteryImpl
-    implements Battery
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+
+import playground.michalm.ev.discharging.AuxEnergyConsumption;
+import playground.michalm.taxi.data.ETaxi;
+
+
+public class ETaxiAuxEnergyConsumption
+    implements AuxEnergyConsumption
 {
-    private final double capacity;
-    private final double initialSoc;
-    private double soc;
+    private final ETaxi taxi;
+    private final double auxPower;
 
 
-    public BatteryImpl(double capacity, double initialSoc)
+    public ETaxiAuxEnergyConsumption(ETaxi taxi, double auxPower)
     {
-        this.capacity = capacity;
-        this.initialSoc = initialSoc;
-        this.soc = initialSoc;
+        this.taxi = taxi;
+        this.auxPower = auxPower;
     }
 
 
     @Override
-    public double getCapacity()
+    public void useEnergy(double period)
     {
-        return capacity;
-    }
-
-
-    @Override
-    public double getSoc()
-    {
-        return soc;
-    }
-
-
-    @Override
-    public void charge(double energy)
-    {
-        if (energy > capacity - soc) {
-            throw new IllegalArgumentException();
+        if (taxi.getSchedule().getStatus() == ScheduleStatus.STARTED) {
+            taxi.getBattery().discharge(auxPower * period);
         }
-
-        soc += energy;
-    }
-
-
-    @Override
-    public void discharge(double energy)
-    {
-        if (energy > soc) {
-            throw new IllegalStateException();
-        }
-
-        soc -= energy;
-    }
-
-
-    @Override
-    public void resetSoc()
-    {
-        soc = initialSoc;
     }
 }

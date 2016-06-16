@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,77 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.data;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 
-public class ChargerImpl
-    implements Charger
+public interface EvData
 {
-    private final Id<Charger> id;
-    private final double power;
-    private final int capacity;
-    private final Link link;
-
-    private ChargingLogic logic;
+    public Map<Id<Charger>, Charger> getChargers();
 
 
-    public ChargerImpl(Id<Charger> id, double power, int capacity, Link link)
-    {
-        this.id = id;
-        this.power = power;
-        this.capacity = capacity;
-        this.link = link;
-    }
+    public void addCharger(Charger charger);
 
 
-    @Override
-    public ChargingLogic getLogic()
-    {
-        return logic;
-    }
+    public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
 
 
-    @Override
-    public void setLogic(ChargingLogic logic)
-    {
-        this.logic = logic;
-    }
-
-
-    @Override
-    public Id<Charger> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public double getPower()
-    {
-        return power;
-    }
-
-
-    @Override
-    public int getCapacity()
-    {
-        return capacity;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return link;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return link.getCoord();
-    }
+    public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev);
 }

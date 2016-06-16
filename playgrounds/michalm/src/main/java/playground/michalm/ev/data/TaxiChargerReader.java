@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.ev.data;
 
 import java.util.*;
 
@@ -27,21 +27,20 @@ import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.michalm.taxi.data.*;
 
-
-public class TaxiRankReader
+public class TaxiChargerReader
     extends MatsimXmlParser
 {
-    private final static String RANK = "rank";
+    private final static String CHARGER = "charger";
 
-    private final static int DEFAULT_RANK_CAPACITY = Integer.MAX_VALUE;
+    private final static int DEFAULT_CHARGER_CAPACITY = 1;
+    private final static int DEFAULT_CHARGER_POWER = 50;//50kW
 
-    private final ETaxiData data;
+    private final EvData data;
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public TaxiRankReader(Scenario scenario, ETaxiData data)
+    public TaxiChargerReader(Scenario scenario, EvData data)
     {
         this.data = data;
         links = scenario.getNetwork().getLinks();
@@ -51,8 +50,8 @@ public class TaxiRankReader
     @Override
     public void startTag(String name, Attributes atts, Stack<String> context)
     {
-        if (RANK.equals(name)) {
-            data.addTaxiRank(createRank(atts));
+        if (CHARGER.equals(name)) {
+            data.addCharger(createCharger(atts));
         }
     }
 
@@ -62,12 +61,12 @@ public class TaxiRankReader
     {}
 
 
-    private TaxiRank createRank(Attributes atts)
+    private Charger createCharger(Attributes atts)
     {
-        Id<TaxiRank> id = Id.create(atts.getValue("id"), TaxiRank.class);
-        String name = ReaderUtils.getString(atts, "name", id + "");
+        Id<Charger> id = Id.create(atts.getValue("id"), Charger.class);
         Link link = links.get(Id.createLinkId(atts.getValue("link")));
-        int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_RANK_CAPACITY);
-        return new TaxiRank(id, name, link, capacity);
+        double power = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER) * 1000;//kW --> W
+        int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_CHARGER_CAPACITY);
+        return new ChargerImpl(id, power, capacity, link);
     }
 }

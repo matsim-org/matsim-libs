@@ -17,36 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package playground.michalm.ev;
 
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.controler.AbstractModule;
+
+import playground.michalm.ev.charging.ChargingHandler;
+import playground.michalm.ev.data.EvData;
+import playground.michalm.ev.discharging.*;
 
 
-public class TimeProfiles
+public class EvModule
+    extends AbstractModule
 {
-    public static ProfileCalculator<String> combineProfileCalculators(
-            final ProfileCalculator<?>... calculators)
+    private final EvData evData;
+
+
+    public EvModule(EvData evData)
     {
-        return new ProfileCalculator<String>() {
-            @Override
-            public String calcCurrentPoint()
-            {
-                String s = "";
-                for (ProfileCalculator<?> pc : calculators) {
-                    s += pc.calcCurrentPoint() + "\t";
-                }
-                return s;
-            }
-        };
+        this.evData = evData;
     }
 
 
-    public static String combineValues(Object... values)
+    @Override
+    public void install()
     {
-        String s = "";
-        for (Object v : values) {
-            s += v.toString() + "\t";
+        bind(EvData.class).toInstance(evData);
+        bind(DriveDischargingHandler.class).asEagerSingleton();
+        addEventHandlerBinding().to(DriveDischargingHandler.class);
+        bind(AuxDischargingHandler.class).asEagerSingleton();
+        addMobsimListenerBinding().to(AuxDischargingHandler.class);
+        bind(ChargingHandler.class).asEagerSingleton();
+        addMobsimListenerBinding().to(ChargingHandler.class);
+
+        if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
+            addMobsimListenerBinding().toProvider(EvTimeProfileCollectorProvider.class);
+            //add more time profiles if necessary
         }
-        return s;
     }
 }

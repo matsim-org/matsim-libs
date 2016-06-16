@@ -17,47 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.util.stats;
+package playground.michalm.ev.charging;
 
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
-import playground.michalm.ev.UnitConversionRatios;
-import playground.michalm.taxi.data.*;
+import com.google.inject.Inject;
+
+import playground.michalm.ev.EvConfigGroup;
+import playground.michalm.ev.data.*;
 
 
-public class EStatsCalculators
+public class ChargingHandler
+    implements MobsimAfterSimStepListener
 {
-    public static ProfileCalculator<Integer> createDischargedVehiclesCounter(final ETaxiData taxiData)
+    private final Iterable<? extends Charger> chargers;
+    private final int chargeTimeStep;
+
+
+    @Inject
+    public ChargingHandler(EvData evData, EvConfigGroup evConfig)
     {
-        return new ProfileCalculator<Integer>() {
-            @Override
-            public Integer calcCurrentPoint()
-            {
-                int count = 0;
-                for (ETaxi t : taxiData.getETaxis().values()) {
-                    if (t.getBattery().getSoc() < 0) {
-                        count++;
-                    }
-                }
-                return count;
-            }
-        };
+        this.chargers = evData.getChargers().values();
+        this.chargeTimeStep = evConfig.getChargeTimeStep();
     }
 
 
-    public static ProfileCalculator<Double> createMeanSocCalculator(final ETaxiData taxiData)
+    @Override
+    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e)
     {
-        return new ProfileCalculator<Double>() {
-            @Override
-            public Double calcCurrentPoint()
-            {
-                Mean mean = new Mean();
-                for (ETaxi t : taxiData.getETaxis().values()) {
-                    mean.increment(t.getBattery().getSoc());
-                }
-                return mean.getResult() / UnitConversionRatios.J_PER_kWh;//print out in [kWh]
+        if ( (e.getSimulationTime() + 1) % chargeTimeStep == 0) {
+            for (Charger c : chargers) {
+                c.getLogic().chargeVehicles(chargeTimeStep);
             }
-        };
+        }
     }
 }

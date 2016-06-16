@@ -21,7 +21,7 @@ package playground.michalm.ev;
 
 public class UnitConversionRatios
 {
-    public static final double J_PER_kWh = 3600_000;// J per kWh
+    public static final double J_PER_kWh = 3_600_000;// J per kWh
     public static final double J_m_PER_Wh_km = 3.6;// J/m per Wh/km 
     public static final double J_m_PER_kWh_100km = 36;// J/m per kWh/100km
 }

@@ -17,11 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.charging;
 
 import java.util.*;
 
 import com.google.common.collect.Iterables;
+
+import playground.michalm.ev.data.*;
 
 
 /**

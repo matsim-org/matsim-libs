@@ -17,9 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.data;
 
-public interface AuxEnergyConsumption
+public interface Battery
 {
-    void useEnergy(double period);
+    double getCapacity();
+
+
+    double getSoc();
+
+
+    void charge(double energy);
+
+
+    void discharge(double energy);
+
+
+    void resetSoc();
 }

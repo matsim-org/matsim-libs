@@ -46,13 +46,13 @@ public class TaxiStatusTimeProfileCollectorProvider
     @Override
     public MobsimListener get()
     {
-        ProfileCalculator<String> dispatchStatsCalc = TimeProfiles.combineProfileCalculators(
-                TimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
-                TimeProfiles.createRequestsWithStatusCounter(taxiData,
+        ProfileCalculator<String> calc = TimeProfiles.combineProfileCalculators(
+                TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
+                TaxiTimeProfiles.createRequestsWithStatusCounter(taxiData,
                         TaxiRequestStatus.UNPLANNED));
 
-        return new TimeProfileCollector<>(dispatchStatsCalc, 300,
-                TimeProfiles.TAXI_TASK_TYPES_HEADER + TaxiRequestStatus.UNPLANNED, //
+        return new TimeProfileCollector<>(calc, 300,
+                TaxiTimeProfiles.TAXI_TASK_TYPES_HEADER + TaxiRequestStatus.UNPLANNED, //
                 "taxi_status_time_profiles.txt", matsimServices);
     }
 }

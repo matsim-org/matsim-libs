@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,79 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.ev;
+package playground.michalm.ev.data;
 
-import org.apache.commons.configuration.Configuration;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
+
+import playground.michalm.ev.charging.ChargingLogic;
 
 
-public class ETaxiParams
+public class ChargerImpl
+    implements Charger
 {
-    public static String CHARGE_TIME_STEP = "chargeTimeStep";
-    public static String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
+    private final Id<Charger> id;
+    private final double power;
+    private final int capacity;
+    private final Link link;
 
-    public final int chargeTimeStep;
-    public final int auxDischargeTimeStep;
+    private ChargingLogic logic;
 
-    public ETaxiParams(Configuration config)
+
+    public ChargerImpl(Id<Charger> id, double power, int capacity, Link link)
     {
-        chargeTimeStep = config.getInt(CHARGE_TIME_STEP);
-        auxDischargeTimeStep = config.getInt(AUX_DISCHARGE_TIME_STEP);
+        this.id = id;
+        this.power = power;
+        this.capacity = capacity;
+        this.link = link;
     }
 
 
-    //just an example
-    public ETaxiParams()
+    @Override
+    public ChargingLogic getLogic()
     {
-        //no need to simulate with 1-second time step
-        chargeTimeStep = 5; //5 s ==> 0.35% SOC (fast charging, 50 kW)
-        auxDischargeTimeStep = 60; //1 min ==> 0.25% SOC (3 kW aux power)
+        return logic;
+    }
+
+
+    @Override
+    public void setLogic(ChargingLogic logic)
+    {
+        this.logic = logic;
+    }
+
+
+    @Override
+    public Id<Charger> getId()
+    {
+        return id;
+    }
+
+
+    @Override
+    public double getPower()
+    {
+        return power;
+    }
+
+
+    @Override
+    public int getCapacity()
+    {
+        return capacity;
+    }
+
+
+    @Override
+    public Link getLink()
+    {
+        return link;
+    }
+
+
+    @Override
+    public Coord getCoord()
+    {
+        return link.getCoord();
     }
 }

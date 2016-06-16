@@ -22,45 +22,22 @@ package playground.michalm.taxi.data;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.taxi.data.*;
-
-import playground.michalm.ev.Charger;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.taxi.data.TaxiData;
 
 
 public class ETaxiData
     extends TaxiData
 {
     private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
-    private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
 
     private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
             .unmodifiableMap(taxiRanks);
-    private final Map<Id<Charger>, Charger> unmodifiableChargers = Collections
-            .unmodifiableMap(chargers);
 
 
     public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
     {
         return unmodifiableTaxiRanks;
-    }
-
-
-    public Map<Id<Charger>, Charger> getChargers()
-    {
-        return unmodifiableChargers;
-    }
-
-
-    public Map<Id<Vehicle>, ETaxi> getETaxis()
-    {
-        return convertMap(getVehicles());
-    }
-
-
-    public Map<Id<Request>, TaxiRequest> getTaxiRequests()
-    {
-        return convertMap(getRequests());
     }
 
 
@@ -70,16 +47,8 @@ public class ETaxiData
     }
 
 
-    public void addCharger(Charger charger)
+    public Map<Id<Vehicle>, ETaxi> getETaxis()
     {
-        chargers.put(charger.getId(), charger);
-    }
-
-
-    //casts Collection of supertype S to Collection of type T
-    @SuppressWarnings("unchecked")
-    private static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
-    {
-        return (Map<I, T>)collection;
+        return convertMap(getVehicles());
     }
 }

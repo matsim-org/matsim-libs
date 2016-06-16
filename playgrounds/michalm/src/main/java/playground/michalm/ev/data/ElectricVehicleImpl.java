@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,9 +17,62 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.data;
 
-public interface ChargingLogic
+import playground.michalm.ev.discharging.*;
+
+
+public class ElectricVehicleImpl
+    implements ElectricVehicle
 {
-    void chargeVehicles(double chargeTime);
+    private Battery battery;//not final -- can be swapped
+
+    private DriveEnergyConsumption driveEnergyConsumption;
+    private AuxEnergyConsumption auxEnergyConsumption;
+
+
+    public ElectricVehicleImpl(Battery battery)
+    {
+        this.battery = battery;
+    }
+
+
+    @Override
+    public Battery getBattery()
+    {
+        return battery;
+    }
+
+
+    @Override
+    public DriveEnergyConsumption getDriveEnergyConsumption()
+    {
+        return driveEnergyConsumption;
+    }
+
+
+    @Override
+    public AuxEnergyConsumption getAuxEnergyConsumption()
+    {
+        return auxEnergyConsumption;
+    }
+
+
+    @Override
+    public void setBattery(Battery battery)
+    {
+        this.battery = battery;
+    }
+
+
+    public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption)
+    {
+        this.driveEnergyConsumption = driveEnergyConsumption;
+    }
+
+
+    public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption)
+    {
+        this.auxEnergyConsumption = auxEnergyConsumption;
+    }
 }

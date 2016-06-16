@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,63 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.ev.data;
 
-public interface ElectricVehicle
+public class BatteryImpl
+    implements Battery
 {
-    DriveEnergyConsumption getDriveEnergyConsumption();
+    private final double capacity;
+    private final double initialSoc;
+    private double soc;
 
 
-    AuxEnergyConsumption getAuxEnergyConsumption();
+    public BatteryImpl(double capacity, double initialSoc)
+    {
+        this.capacity = capacity;
+        this.initialSoc = initialSoc;
+        this.soc = initialSoc;
+    }
 
 
-    Battery getBattery();
+    @Override
+    public double getCapacity()
+    {
+        return capacity;
+    }
 
 
-    //used for swapping
-    void setBattery(Battery battery);
+    @Override
+    public double getSoc()
+    {
+        return soc;
+    }
+
+
+    @Override
+    public void charge(double energy)
+    {
+        if (energy > capacity - soc) {
+            throw new IllegalArgumentException();
+        }
+
+        soc += energy;
+    }
+
+
+    @Override
+    public void discharge(double energy)
+    {
+        if (energy > soc) {
+            throw new IllegalStateException();
+        }
+
+        soc -= energy;
+    }
+
+
+    @Override
+    public void resetSoc()
+    {
+        soc = initialSoc;
+    }
 }

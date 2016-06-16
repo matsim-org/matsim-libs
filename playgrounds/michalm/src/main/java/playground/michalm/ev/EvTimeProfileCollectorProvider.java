@@ -17,36 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package playground.michalm.ev;
 
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+
+import com.google.inject.*;
+
+import playground.michalm.ev.data.EvData;
+import playground.michalm.taxi.ev.EvTimeProfiles;
 
 
-public class TimeProfiles
+public class EvTimeProfileCollectorProvider
+    implements Provider<MobsimListener>
 {
-    public static ProfileCalculator<String> combineProfileCalculators(
-            final ProfileCalculator<?>... calculators)
+    private final EvData evData;
+    private final MatsimServices matsimServices;
+
+
+    @Inject
+    public EvTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
     {
-        return new ProfileCalculator<String>() {
-            @Override
-            public String calcCurrentPoint()
-            {
-                String s = "";
-                for (ProfileCalculator<?> pc : calculators) {
-                    s += pc.calcCurrentPoint() + "\t";
-                }
-                return s;
-            }
-        };
+        this.evData = evData;
+        this.matsimServices = matsimServices;
     }
 
 
-    public static String combineValues(Object... values)
+    @Override
+    public MobsimListener get()
     {
-        String s = "";
-        for (Object v : values) {
-            s += v.toString() + "\t";
-        }
-        return s;
+        ProfileCalculator<String> calc = TimeProfiles.combineProfileCalculators(
+                EvTimeProfiles.createMeanSocCalculator(evData),
+                EvTimeProfiles.createDischargedVehiclesCounter(evData));
+
+        return new TimeProfileCollector<>(calc, 300,
+                TimeProfiles.combineValues("meanSOC", "discharged"), //
+                "ev_time_profiles.txt", matsimServices);
     }
 }

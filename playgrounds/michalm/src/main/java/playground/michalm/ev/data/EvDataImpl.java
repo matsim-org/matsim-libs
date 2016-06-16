@@ -17,36 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package playground.michalm.ev.data;
 
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 
-public class TimeProfiles
+public class EvDataImpl
+    implements EvData
 {
-    public static ProfileCalculator<String> combineProfileCalculators(
-            final ProfileCalculator<?>... calculators)
+    private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
+    private final Map<Id<Vehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
+
+    private final Map<Id<Charger>, Charger> unmodifiableChargers = Collections
+            .unmodifiableMap(chargers);
+    private final Map<Id<Vehicle>, ElectricVehicle> unmodifiableEVehicles = Collections
+            .unmodifiableMap(eVehicles);
+
+
+    @Override
+    public Map<Id<Charger>, Charger> getChargers()
     {
-        return new ProfileCalculator<String>() {
-            @Override
-            public String calcCurrentPoint()
-            {
-                String s = "";
-                for (ProfileCalculator<?> pc : calculators) {
-                    s += pc.calcCurrentPoint() + "\t";
-                }
-                return s;
-            }
-        };
+        return unmodifiableChargers;
     }
 
 
-    public static String combineValues(Object... values)
+    @Override
+    public void addCharger(Charger charger)
     {
-        String s = "";
-        for (Object v : values) {
-            s += v.toString() + "\t";
-        }
-        return s;
+        chargers.put(charger.getId(), charger);
+    }
+
+
+    @Override
+    public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles()
+    {
+        return unmodifiableEVehicles;
+    }
+
+
+    @Override
+    public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev)
+    {
+        eVehicles.put(vehicleId, ev);
     }
 }
