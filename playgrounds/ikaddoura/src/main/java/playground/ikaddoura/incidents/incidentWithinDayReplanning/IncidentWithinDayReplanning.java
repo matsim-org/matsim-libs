@@ -42,7 +42,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import playground.ikaddoura.incidents.NetworkChangeEventsUtils;
 
 /**
-* @author nagel, ikaddoura
+* @author ikaddoura
 * 
 */
 public class IncidentWithinDayReplanning {
