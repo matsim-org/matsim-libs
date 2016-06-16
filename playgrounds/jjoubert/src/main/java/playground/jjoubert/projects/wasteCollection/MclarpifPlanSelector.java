@@ -34,7 +34,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  * 
  * @author jwjoubert
  */
-public class MclarpifPlanSelector implements PlanSelector {
+public class MclarpifPlanSelector implements PlanSelector<Plan, Person> {
 	final private Logger log = Logger.getLogger(MclarpifPlanSelector.class);
 
 	/* (non-Javadoc)

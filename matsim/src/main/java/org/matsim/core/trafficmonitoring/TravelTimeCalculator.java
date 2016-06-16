@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -39,6 +40,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -142,9 +144,15 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		return calculator;
 	}
 
+	@Inject
+	TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network) {
+		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes()));
+		eventsManager.addHandler(this);
+		configure(this, ttconfigGroup, network);
+	}
+
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
-		// yyyy the hard-coded 30 hours seems a bit dangerous ... assume someone wants to run matsim for a week?? kai, jan'16
+		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup);
 	}
 
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
@@ -158,7 +166,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		this.filterAnalyzedModes = filterModes;
 		this.analyzedModes = strings;
 		this.timeSlice = timeslice;
-		this.numSlots = (maxTime / this.timeSlice) + 1;
+		this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeslice);
 		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeSlice);
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		if (this.calculateLinkTravelTimes){

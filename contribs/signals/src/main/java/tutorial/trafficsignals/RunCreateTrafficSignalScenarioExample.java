@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package tutorial.trafficsignals;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
@@ -52,7 +51,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -181,18 +179,17 @@ public class RunCreateTrafficSignalScenarioExample {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
 		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+		SignalSystemsConfigGroup signalSystemsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalSystemsConfigGroup.setUseSignalSystems(true);
 		config.qsim().setNodeOffset(20.0);
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalSystemsConfigGroup).loadSignalsData());
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);
 		
-		Path p = Paths.get(OUTPUT_DIR);
-		Path absp = p.toAbsolutePath();
 		Files.createDirectories(Paths.get(OUTPUT_DIR));
 		
 		//write to file
@@ -208,14 +205,14 @@ public class RunCreateTrafficSignalScenarioExample {
 		signalsWriter.setSignalControlOutputFilename(signalControlFile);
 		signalsWriter.writeSignalsData(scenario);
 
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
+		signalSystemsConfigGroup.setSignalSystemFile(signalSystemsFile);
+		signalSystemsConfigGroup.setSignalGroupsFile(signalGroupsFile);
+		signalSystemsConfigGroup.setSignalControlFile(signalControlFile);
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);
 		
 		log.info("Config of simple traffic light scenario is written to " + configFile);
-		log.info("Visualize scenario by calling VisSimpleTrafficSignalScenario.main() of contrib.otfvis project.");
+		log.info("Visualize scenario by calling VisSimpleTrafficSignalScenario in the same package.");
 		return configFile;
 	}
 	

@@ -172,6 +172,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	/**
 	 * Starts the iterations.
 	 */
+	@Override
 	public final void run() {
 		this.injectorCreated = true;
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
@@ -253,11 +254,8 @@ public final class Controler implements ControlerI, MatsimServices {
 		}
     }
 
-	/**
-	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-	 */
+	
 	@Override
-	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
 	public final EventsManager getEvents() {
 		if (this.injector != null) {
 			return this.injector.getInstance(EventsManager.class);

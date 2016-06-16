@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -102,7 +103,7 @@ class PtSubModeRouterSet implements TransitRouter{
 	 *  This Method is not supported, as this ''Router`` just provides SubModeRouter
 	 */
 	@Override
-	public List<Leg> calcRoute(Coord fromCoord, Coord toCoord, double departureTime, Person person) {
+	public List<Leg> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime, Person person) {
 		throw new UnsupportedOperationException("use class own's calcRoute(Leg)! This class probably only works with PlansCalcSubModeDependendTransitRoute...");
 	}
 

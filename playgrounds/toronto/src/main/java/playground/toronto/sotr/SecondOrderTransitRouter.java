@@ -6,14 +6,16 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 
 import playground.toronto.sotr.SOTRMultiNodeDijkstra.Path;
 import playground.toronto.sotr.calculators.SOTRDisutilityCalculator;
 import playground.toronto.sotr.calculators.SOTRTimeCalculator;
 import playground.toronto.sotr.routernetwork2.AbstractRoutingLink;
-import playground.toronto.sotr.routernetwork2.RoutingNetwork.RoutingNetworkDelegate;
 import playground.toronto.sotr.routernetwork2.AbstractRoutingNode;
+import playground.toronto.sotr.routernetwork2.RoutingNetwork.RoutingNetworkDelegate;
 
 public class SecondOrderTransitRouter implements TransitRouter {
 
@@ -38,13 +40,13 @@ public class SecondOrderTransitRouter implements TransitRouter {
 	}
 	
 	@Override
-	public List<Leg> calcRoute(Coord fromCoord, Coord toCoord,
+	public List<Leg> calcRoute(Facility<?> fromFacility, Facility<?> toFacility,
 			double departureTime, Person person) {
-		
+			
 		//Prepare the network delegate for routing.
-		Collection<AbstractRoutingNode> accessNodes = getNearestNodes(fromCoord);
-		Collection<AbstractRoutingNode> egressNodes = getNearestNodes(toCoord);
-		this.network.prepareForRouting(fromCoord, accessNodes, toCoord, egressNodes);
+		Collection<AbstractRoutingNode> accessNodes = getNearestNodes(fromFacility.getCoord());
+		Collection<AbstractRoutingNode> egressNodes = getNearestNodes(toFacility.getCoord());
+		this.network.prepareForRouting(fromFacility.getCoord(), accessNodes, toFacility.getCoord(), egressNodes);
 		
 		//Execute the routing algorithm
 		Path path = this.pathingAlgorithm.calculateLeastCostPath(person, departureTime);

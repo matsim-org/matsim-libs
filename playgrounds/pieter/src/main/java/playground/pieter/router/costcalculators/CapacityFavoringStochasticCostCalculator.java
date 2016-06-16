@@ -5,8 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -20,7 +19,7 @@ class CapacityFavoringStochasticCostCalculator implements TravelDisutility {
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator ;
 		
-		Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, cnScoringGroup );
+		RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup );
 		this.delegate = builder.createTravelDisutility(timeCalculator) ; 
 		
 	}

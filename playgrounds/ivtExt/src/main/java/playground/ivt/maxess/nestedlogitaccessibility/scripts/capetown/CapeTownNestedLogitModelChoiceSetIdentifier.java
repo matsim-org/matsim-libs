@@ -32,27 +32,26 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.capetown.PersonEnums;
 import playground.ivt.utils.ConcurrentStopWatch;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author thibautd
  */
-public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<ModeNests> {
+public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<CapeTownModeNests> {
+	private final Map<Id<Person>,Id<Household>> person2household = new HashMap<>();
+	private final Households households;
+
 	public enum Measurement { carTravelTime, ptTravelTime, walkTravelTime, prismSampling; }
 
 	private final Random random = MatsimRandom.getLocalInstance();
@@ -76,6 +75,7 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 			final TripRouter router,
 			final ActivityFacilities allFacilities,
 			final ObjectAttributes personAttributes,
+			final Households households,
 			final int budget_m ) {
 		this.configGroup = configGroup;
 		this.stopWatch = stopWatch;
@@ -92,14 +92,20 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 			}
 		}
 		relevantFacilities = builder.getQuadTree();
+
+		this.households = households;
+		for ( Household hh : households.getHouseholds().values() ) {
+			for ( Id<Person> personId : hh.getMemberIds() ) {
+				person2household.put( personId , hh.getId() );
+			}
+		}
 	}
 
 	@Override
-	public Map<String, NestedChoiceSet<ModeNests>> identifyChoiceSet( final Person person ) {
+	public Map<String, NestedChoiceSet<CapeTownModeNests>> identifyChoiceSet( final Person person ) {
 		final ChoiceSetBuilder baseBuilder = new ChoiceSetBuilder( configGroup );
 		final ChoiceSetBuilder nocarBuilder = new ChoiceSetBuilder( configGroup );
 		final ChoiceSetBuilder noptBuilder = new ChoiceSetBuilder( configGroup );
-		final ChoiceSetBuilder nobikeBuilder = new ChoiceSetBuilder( configGroup );
 		final ChoiceSetBuilder nowalkBuilder = new ChoiceSetBuilder( configGroup );
 		final ChoiceSetBuilder allBuilder = new ChoiceSetBuilder( configGroup );
 
@@ -126,7 +132,6 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 							baseBuilder.carNestBuilder :
 							null,
 					noptBuilder.carNestBuilder,
-					nobikeBuilder.carNestBuilder,
 					nowalkBuilder.carNestBuilder );
 			stopWatch.endMeasurement( Measurement.carTravelTime );
 			//-------------------------------------------------------------
@@ -141,7 +146,6 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 					allBuilder.ptNestBuilder,
 					baseBuilder.ptNestBuilder,
 					nocarBuilder.ptNestBuilder,
-					nobikeBuilder.ptNestBuilder,
 					nowalkBuilder.ptNestBuilder );
 			stopWatch.endMeasurement( Measurement.ptTravelTime );
 			//-------------------------------------------------------------
@@ -156,40 +160,86 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 					allBuilder.walkNestBuilder,
 					baseBuilder.walkNestBuilder,
 					nocarBuilder.walkNestBuilder,
-					nobikeBuilder.walkNestBuilder,
 					noptBuilder.walkNestBuilder );
 			stopWatch.endMeasurement( Measurement.walkTravelTime );
 			//-------------------------------------------------------------
+			add(
+					calcAlternative(
+							i,
+							TransportMode.ride,
+							origin,
+							f,
+							person ),
+					allBuilder.rideNestBuilder,
+					baseBuilder.rideNestBuilder,
+					nocarBuilder.rideNestBuilder,
+					noptBuilder.rideNestBuilder );
+			add(
+					calcAlternative(
+							i,
+							"taxi",
+							origin,
+							f,
+							person ),
+					allBuilder.taxiNestBuilder,
+					baseBuilder.taxiNestBuilder,
+					nocarBuilder.taxiNestBuilder,
+					noptBuilder.taxiNestBuilder );
 		}
 
-		final Map<String, NestedChoiceSet<ModeNests>> result = new LinkedHashMap<>();
+		final Map<String, NestedChoiceSet<CapeTownModeNests>> result = new LinkedHashMap<>();
 		result.put( "all" , allBuilder.build() );
 		result.put( "base" , baseBuilder.build() );
 		result.put( "nocar" , nocarBuilder.build() );
-		result.put( "nobike" , nobikeBuilder.build() );
 		result.put( "nopt" , noptBuilder.build() );
 		result.put( "nowalk" , nowalkBuilder.build() );
 
 		return result;
 	}
 
-	private boolean isBikeAvailable( Person person ) {
-		final String avail = (String)
-				personAttributes.getAttribute(
-					person.getId().toString(),
-					"availability: bicycle" );
-		return avail.equals( "always" );
-	}
-
 	private boolean isCarAvailable( Person person ) {
-		final String avail = (String)
-				personAttributes.getAttribute(
-					person.getId().toString(),
-					"availability: car" );
-		return avail.equals( "always" );
+		return (hasCarLicense( person ) || hasMotoLicense( person ) ) &&
+				(getHouseholdInteger( person , "numberOfHouseholdCarsOwned" ) > 0 ||
+					getHouseholdInteger( person , "numberOfHouseholdMotorcyclesOwned" ) > 0 );
 	}
 
-	private Alternative<ModeNests> calcAlternative(
+	private Integer getHouseholdInteger( Person decisionMaker , String att ) {
+		final Id<Household> hh = person2household.get( decisionMaker.getId() );
+		if ( hh == null ) throw new IllegalStateException( "no household ID for person "+decisionMaker.getId() );
+		return (Integer) households.getHouseholdAttributes().getAttribute( hh.toString() , att );
+	}
+
+	private boolean hasMotoLicense( Person decisionMaker ) {
+		final String license = (String)
+				personAttributes.getAttribute(
+						decisionMaker.getId().toString(),
+						"license_motorcycle" );
+		switch( PersonEnums.LicenseMotorcycle.parseFromDescription( license ) ) {
+			case YES:
+				return true;
+			case UNKNOWN:
+			case NO:
+				return false;
+		}
+		throw new RuntimeException();
+	}
+
+	private boolean hasCarLicense( Person decisionMaker ) {
+		final String license = (String)
+				personAttributes.getAttribute(
+						decisionMaker.getId().toString(),
+						"license_car" );
+		switch ( PersonEnums.LicenseCar.parseFromDescription( license ) ) {
+			case YES:
+				return true;
+			case UNKNOWN:
+			case NO:
+				return false;
+		}
+		throw new RuntimeException();
+	}
+
+	private Alternative<CapeTownModeNests> calcAlternative(
 			final int i,
 			final String mode,
 			final ActivityFacility origin,
@@ -207,7 +257,7 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 						destination );
 
 		return new Alternative<>(
-				ModeNests.valueOf( mode ),
+				CapeTownModeNests.valueOf( mode ),
 				Id.create( i+"_"+mode , Alternative.class ),
 				trip );
 	}
@@ -268,39 +318,51 @@ public class CapeTownNestedLogitModelChoiceSetIdentifier implements ChoiceSetIde
 		return prism instanceof List ? (List<ActivityFacility>) prism : new ArrayList<>( prism );
 	}
 
-	private void add( Alternative<ModeNests> alternative , Nest.Builder<ModeNests>... sets ) {
-		for ( Nest.Builder<ModeNests> set : sets ) {
+	private void add( Alternative<CapeTownModeNests> alternative , Nest.Builder<CapeTownModeNests>... sets ) {
+		for ( Nest.Builder<CapeTownModeNests> set : sets ) {
 			if ( set == null ) continue;
 			set.addAlternative( alternative );
 		}
 	}
 
 	private static class ChoiceSetBuilder {
-		final Nest.Builder<ModeNests> carNestBuilder;
-		final Nest.Builder<ModeNests> ptNestBuilder ;
-		final Nest.Builder<ModeNests> walkNestBuilder ;
+		final Nest.Builder<CapeTownModeNests> carNestBuilder;
+		final Nest.Builder<CapeTownModeNests> ptNestBuilder ;
+		final Nest.Builder<CapeTownModeNests> walkNestBuilder ;
+		final Nest.Builder<CapeTownModeNests> rideNestBuilder ;
+		final Nest.Builder<CapeTownModeNests> taxiNestBuilder ;
 
 		public ChoiceSetBuilder( final CapeTownNestedLogitModelConfigGroup c ) {
 			carNestBuilder =
-					new Nest.Builder<ModeNests>()
+					new Nest.Builder<CapeTownModeNests>()
 							.setMu( c.getMuCar() )
-							.setName( ModeNests.car );
+							.setName( CapeTownModeNests.car );
 			ptNestBuilder =
-					new Nest.Builder<ModeNests>()
+					new Nest.Builder<CapeTownModeNests>()
 							.setMu( c.getMuPt() )
-							.setName( ModeNests.pt );
+							.setName( CapeTownModeNests.pt );
 			walkNestBuilder =
-					new Nest.Builder<ModeNests>()
+					new Nest.Builder<CapeTownModeNests>()
 							.setMu( c.getMuWalk() )
-							.setName( ModeNests.walk );
+							.setName( CapeTownModeNests.walk );
+			rideNestBuilder =
+					new Nest.Builder<CapeTownModeNests>()
+							.setMu( c.getMuRide() )
+							.setName( CapeTownModeNests.ride );
+			taxiNestBuilder =
+					new Nest.Builder<CapeTownModeNests>()
+							.setMu( c.getMuTaxi() )
+							.setName( CapeTownModeNests.taxi );
 
 		}
 
-		public NestedChoiceSet<ModeNests> build() {
+		public NestedChoiceSet<CapeTownModeNests> build() {
 			return new NestedChoiceSet<>(
 					carNestBuilder.build(),
 					ptNestBuilder.build(),
-					walkNestBuilder.build() );
+					walkNestBuilder.build(),
+					rideNestBuilder.build(),
+					taxiNestBuilder.build());
 		}
 	}
 }

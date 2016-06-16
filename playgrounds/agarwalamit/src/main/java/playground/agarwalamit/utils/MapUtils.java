@@ -27,8 +27,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.utils.BkNumberUtils;
-
 /**
  * @author amit
  */
@@ -85,12 +83,23 @@ public final class MapUtils {
 		return outMap;
 	}
 
-	public static SortedMap<String, Double> getPercentShare(final SortedMap<String, Integer> inMap){
+	public static SortedMap<String, Double> getIntPercentShare(final SortedMap<String, Integer> inMap){
 		SortedMap<String, Double> outMap = new TreeMap<>();
 		double valueSum = (double) MapUtils.intValueSum(inMap);
 		for(String str : inMap.keySet()) {
 			double legs = (double) inMap.get(str);
-			double pctShare = BkNumberUtils.roundDouble( legs*100 / valueSum, 3); 
+			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
+			outMap.put(str, pctShare);
+		}
+		return outMap;
+	}
+	
+	public static SortedMap<String, Double> getDoublePercentShare(final SortedMap<String, Double> inMap){
+		SortedMap<String, Double> outMap = new TreeMap<>();
+		double valueSum = MapUtils.doubleValueSum(inMap);
+		for(String str : inMap.keySet()) {
+			double legs = (double) inMap.get(str);
+			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
 			outMap.put(str, pctShare);
 		}
 		return outMap;

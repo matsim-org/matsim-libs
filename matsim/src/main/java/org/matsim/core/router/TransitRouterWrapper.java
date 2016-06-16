@@ -68,19 +68,19 @@ public class TransitRouterWrapper implements RoutingModule {
     }
 
     /**
-     * Just links to {@link TransitRouter#calcRoute(Coord, Coord, double, Person)}.
+     * Just links to {@link TransitRouter#calcRoute(Facility, Facility, double, Person)}.
      *
      * @return the list of legs returned by the transit router.
      */
     @Override
     public List<? extends PlanElement> calcRoute(
-            final Facility fromFacility,
-            final Facility toFacility,
+            final Facility<?> fromFacility,
+            final Facility<?> toFacility,
             final double departureTime,
             final Person person) {
         List<Leg> baseTrip = router.calcRoute(
-                fromFacility.getCoord(),
-                toFacility.getCoord(),
+                fromFacility,
+                toFacility,
                 departureTime,
                 person);
 

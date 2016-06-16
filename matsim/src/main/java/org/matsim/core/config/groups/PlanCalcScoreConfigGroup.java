@@ -594,8 +594,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@Override
 		public Map<String, String> getComments() {
 			final Map<String, String> map = super.getComments();
-			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  "method to compute score at typical duration.  Use "
-					+ TypicalDurationScoreComputation.uniform + " for backwards compatibility (all activities same score; higher proba to drop long acts).") ;
+			// ---
+			StringBuilder str = new StringBuilder() ;
+			str.append("method to compute score at typical duration.  Options: | ") ;
+			for ( TypicalDurationScoreComputation value : TypicalDurationScoreComputation.values() ) {
+				str.append( value.name() + " | " ) ;
+			}
+			str.append( "Use " + TypicalDurationScoreComputation.uniform.name() + " for backwards compatibility (all activities same score; higher proba to drop long acts)." ) ;
+			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  str.toString() ) ;
+			// ---
 			return map ;
 		}
 

@@ -27,6 +27,13 @@ public class TaxiConfigGroup
 {
     public static final String GROUP_NAME = "taxi";
 
+
+    public static TaxiConfigGroup get(Config config)
+    {
+        return (TaxiConfigGroup)config.getModule(GROUP_NAME);
+    }
+
+
     public static final String DESTINATION_KNOWN = "destinationKnown";
     public static final String VEHICLE_DIVERSION = "vehicleDiversion";
     public static final String PICKUP_DURATION = "pickupDuration";
@@ -191,5 +198,12 @@ public class TaxiConfigGroup
     public ConfigGroup getOptimizerConfigGroup()
     {
         return getParameterSets(OPTIMIZER_PARAMETER_SET).iterator().next();
+    }
+
+
+    public void setOptimizerConfigGroup(ConfigGroup optimizerCfg)
+    {
+        clearParameterSetsForType(OPTIMIZER_PARAMETER_SET);
+        addParameterSet(optimizerCfg);
     }
 }

@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
@@ -48,18 +47,25 @@ public class RunTaxiBenchmark
     {
         final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
         Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
+        createControler(config, runs).run();
+
+    }
+
+
+    public static Controler createControler(Config config, int runs)
+    {
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
-
-        config.controler().setLastIteration(runs - 1);
 
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 
+        config.controler().setLastIteration(runs - 1);
         Controler controler = new Controler(scenario);
+        controler.setModules(new TaxiBenchmarkControlerModule());
         controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(VrpTravelTimeModules.createFreespeedTravelTimeModule(true));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         controler.addOverridingModule(new AbstractModule() {
@@ -70,11 +76,11 @@ public class RunTaxiBenchmark
             };
         });
 
-        controler.run();
+        return controler;
     }
 
 
-    private static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
+    static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
     {
         Scenario scenario = new ScenarioBuilder(config).build();
 

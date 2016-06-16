@@ -71,28 +71,58 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		boolean problem = false ; // ini
 		
-		// added feb'16
-		if ( !config.qsim().isUsingTravelTimeCheckInTeleportation() ) {
-			log.log( lvl, "found `qsim.usingTravelTimeCheckInTeleporation==false'; vsp should try out `true' and report." ) ;
+		// sort the config groups alphabetically
+		
+		// === controler:
+		
+		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
+		if ( !formats.contains(EventsFileFormat.xml) ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
+		}
+
+		// === location choice:
+		
+		boolean usingLocationChoice = false ;
+		if ( config.getModule("locationchoice")!=null ) {
+			usingLocationChoice = true ;
 		}
 		
-		// added feb'16
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
+		if ( usingLocationChoice ) {
+			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent");
+			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
+				problem = true ;
+				System.out.flush() ;
+				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
+						"DestinationSampler is resolved.  kai, jan'13") ;
+			}
+//			if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
+//				//			problem = true ;
+//				log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
+//				"ChoiceSet is resolved.  kai, jan'13") ;
+//			}
+			if ( !config.vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
+				problem = true ;
+				System.out.flush() ;
+				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
+			}
 		}
 		
-		// added apr'15
-		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
-			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
+		// === planCalcScore:
+		
+		// use beta_brain=1 // added as of nov'12
+		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
+					"problems during paper writing.) This means you have to add the following lines to your config file: ") ;
+			log.log( lvl, "<module name=\"planCalcScore\">");
+			log.log( lvl, "	<param name=\"BrainExpBeta\" value=\"1.0\" />");
+			log.log( lvl, "</module>");
 		}
-		switch( config.qsim().getTrafficDynamics() ) {
-		case withHoles:
-			break;
-		default:
-			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
-					+ TrafficDynamics.withHoles + "'." ) ;
-			break;
-		}
+		
+		// === planCalcScore:
 		
 		// added apr'15:
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
@@ -111,7 +141,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
 			}
 		}
-
+		
 		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
@@ -135,12 +165,76 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush() ;
 			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
+
+		// === plans:
+		
+		// added before nov'12
+		if ( !config.plans().isRemovingUnneccessaryPlanAttributes() ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "You are not removing unnecessary plan attributes; vsp default is to do that.") ;
+		}
+		
+		PlansConfigGroup.ActivityDurationInterpretation actDurInterpr =  config.plans().getActivityDurationInterpretation()  ;
+		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
+			// added jan'13
+			log.log( lvl, PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
+			problem = true;
+			// added before nov'12
+			if( config.transit().isUseTransit()) {
+				problem = true;
+				System.out.flush() ;
+				log.error("You are using " + config.plans().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
+						"conjunction with the matsim transit module. This is not working at all as pt interaction activities never have an end time and " +
+						"thus will never end!");
+			}
+		}
+		
+		// added jan'13
+		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +
+					PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + 
+					"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
+			log.log( lvl,  "   <param name=\"activityDurationInterpretation\" value=\"" + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
+			log.log( lvl, "Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
+		}
+
+		// === plansCalcRoute:
+		
+		// added feb'16
+		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
+		}
+		
+		// qsim:
+		
+		// added feb'16
+		if ( !config.qsim().isUsingTravelTimeCheckInTeleportation() ) {
+			log.log( lvl, "found `qsim.usingTravelTimeCheckInTeleporation==false'; vsp should try out `true' and report." ) ;
+		}
+		
+		// added apr'15
+		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
+			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
+		}
+		switch( config.qsim().getTrafficDynamics() ) {
+		case withHoles:
+			break;
+		default:
+			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
+					+ TrafficDynamics.withHoles + "'." ) ;
+			break;
+		}
 		
 		if ( config.qsim()!=null && config.qsim().isRemoveStuckVehicles() ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "found that the qsim is removing stuck vehicles.  vsp default is setting this to false.");
 		}
+		
+		// === strategy:
 		
 		boolean found = false ;
 		Collection<StrategySettings> settingsColl = config.strategy().getStrategySettings();
@@ -155,11 +249,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "You have no strategy configured that uses ChangeExpBeta. vsp default is to use ChangeExpBeta at least in one strategy.");
 		}
 		
-		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
-		if ( !formats.contains(EventsFileFormat.xml) ) {
+		// added may'16
+		if ( config.strategy().getFractionOfIterationsToDisableInnovation()==Double.POSITIVE_INFINITY ) {
 			problem = true ;
 			System.out.flush() ;
-			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
+			log.log( lvl, "You have not set fractionOfIterationsToDisableInnovation; vsp default is to set this to 0.8 or similar.  Add the following config lines:" ) ;
+			log.log( lvl, "<module name=\"strategy\">");
+			log.log( lvl, "	<param name=\"fractionOfIterationsToDisableInnovation\" value=\"0.8\" />");
+			log.log( lvl, "</module>");
 		}
 		
 		// added nov'15
@@ -191,78 +288,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				log.log( lvl, "</module>");
 			}
 		}
-		
-		// added before nov'12
-		if ( !config.plans().isRemovingUnneccessaryPlanAttributes() ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "You are not removing unnecessary plan attributes; vsp default is to do that.") ;
-		}
-		
-		PlansConfigGroup.ActivityDurationInterpretation actDurInterpr =  config.plans().getActivityDurationInterpretation()  ;
-		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
-			// added jan'13
-			log.log( lvl, PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
-			problem = true;
-			// added before nov'12
-			if( config.transit().isUseTransit()) {
-				problem = true;
-				System.out.flush() ;
-				log.error("You are using " + config.plans().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
-						"conjunction with the matsim transit module. This is not working at all as pt interaction activities never have an end time and " +
-				"thus will never end!");
-			}
-		}
-		
-		// added jan'13
-		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +
-					PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + 
-							"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
-			log.log( lvl,  "   <param name=\"activityDurationInterpretation\" value=\"" + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
-			log.log( lvl, "Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
-		}
-		
-		// pseudo-pt über Distanz, nicht ptSpeedFactor
-		// todo
-		
-		// use beta_brain=1 // added as of nov'12
-		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
-					"problems during paper writing.) This means you have to add the following lines to your config file: ") ;
-			log.log( lvl, "<module name=\"planCalcScore\">");
-			log.log( lvl, "	<param name=\"BrainExpBeta\" value=\"1.0\" />");
-			log.log( lvl, "</module>");
-		}
-		
-		boolean usingLocationChoice = false ;
-		if ( config.getModule("locationchoice")!=null ) {
-			usingLocationChoice = true ;
-		}
-		
-		if ( usingLocationChoice ) {
-			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent");
-			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
-				problem = true ;
-				System.out.flush() ;
-				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
-				"DestinationSampler is resolved.  kai, jan'13") ;
-			}
-//			if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
-//				//			problem = true ;
-//				log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
-//				"ChoiceSet is resolved.  kai, jan'13") ;
-//			}
-			if ( !config.vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
-				problem = true ;
-				System.out.flush() ;
-				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
-			}
-		}
+
+		// === zzz:
 		
 		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel() == VspDefaultsCheckingLevel.abort ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 

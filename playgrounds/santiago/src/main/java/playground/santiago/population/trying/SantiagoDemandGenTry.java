@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -18,17 +19,22 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+import playground.santiago.population.ActivityClassifier;
 
 
 /**
@@ -39,16 +45,29 @@ public class SantiagoDemandGenTry {
 	
 	private final static Logger log = Logger.getLogger(SantiagoDemandGenTry.class);
 	
-	final String INPUT_FOR_SIMULATION = "../../../runs-svn/santiago/casoBase5_NP/input/";
-	final String OUTPUT_FOR_NEW_INPUT = "../../../runs-svn/santiago/casoBase5_NP/input/new-input/";
+	final String INPUT_FOR_SIMULATION = "../../../runs-svn/santiago/cluster_1/input/";
+	final String OUTPUT_FOR_NEW_INPUT = "../../../runs-svn/santiago/cluster_1/input/new-input/";
 	final String PLANS_FROM_BUILDER = INPUT_FOR_SIMULATION + "plans_final.xml.gz";
 	final String CONFIG_FROM_BUILDER = INPUT_FOR_SIMULATION + "config_final.xml";
 	final String PEOPLE_FILE_FROM_ODS = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/exportedFilesFromDatabase/Normal/Persona.csv";
-	final double PERCENTAGE = 0.5;
+	final double PERCENTAGE = 0.1;
+
 	
 	public SantiagoDemandGenTry(){
 	}
 
+	private void run(){
+		
+		clonePersons(PERCENTAGE, CONFIG_FROM_BUILDER, PEOPLE_FILE_FROM_ODS, OUTPUT_FOR_NEW_INPUT);
+		changeAndWriteNewConfigFile ( CONFIG_FROM_BUILDER, PERCENTAGE, OUTPUT_FOR_NEW_INPUT );
+
+	}
+	
+	public static void main(String args[]){
+		SantiagoDemandGenTry sdg = new SantiagoDemandGenTry();
+		sdg.run();
+	}
+		
 	private Map<String,Double> getIdsAndFactorsSantiago(String people_file){
 
 		Map<String, Double> IdFactors = new TreeMap<String,Double>();
@@ -121,6 +140,116 @@ public class SantiagoDemandGenTry {
 		double pF = (percentage*totalPopulation)/sumFactors;
 		return pF;
 		}
+
+	private void clonePersons(double percentage, String config_file, String people_file, String output_for_new_input){
+		
+
+		Map<String,Double> IdsAndFactorsFromMatsimPop = getIdsAndFactorsMatsimPop(config_file, people_file);
+		double pF = getProportionalFactor(percentage, config_file, people_file);
+		
+		Config config = ConfigUtils.loadConfig(config_file);		
+		Scenario scenarioFromBuilder = ScenarioUtils.loadScenario(config);
+		Population populationFromPlansFinal = scenarioFromBuilder.getPopulation();
+		List<Person> persons = new ArrayList<>(populationFromPlansFinal.getPersons().values());
+
+		///////Can be omitted, just for having an observable list of factors//////
+//		ArrayList<Integer> clonateFactorsList = new ArrayList<>();
+//		for (Map.Entry<String,Double> entry : IdsAndFactorsFromMatsimPop.entrySet()){		
+//			clonateFactorsList.add((int)Math.round(entry.getValue()*pF));			
+//		}
+		//////////////////////////////////////////////////////////////////////////
+	
+		for (Person p : persons) {
+			String keyId = p.getId().toString();
+			int clonateFactor = (int)Math.round(pF*IdsAndFactorsFromMatsimPop.get(keyId));
+			
+			for(int cf = 1; cf < clonateFactor ; cf++) {
+				Id<Person> pOutId = Id.createPersonId( p.getId().toString().concat("_").concat(String.valueOf(cf)) );
+				Person pOut = populationFromPlansFinal.getFactory().createPerson( pOutId  );
+				populationFromPlansFinal.addPerson(pOut);
+				
+				for (Plan plan : p.getPlans()){
+					Plan planOut = populationFromPlansFinal.getFactory().createPlan();
+					List<PlanElement> pes = plan.getPlanElements();
+					for ( PlanElement pe : pes){
+						if(pe instanceof Leg) {
+							Leg leg = (Leg) pe;
+							Leg legOut = populationFromPlansFinal.getFactory().createLeg(leg.getMode());
+							planOut.addLeg(legOut);
+						} else { 
+							Activity actIn = (Activity)pe;
+							Activity actOut = populationFromPlansFinal.getFactory().createActivityFromCoord(actIn.getType(), actIn.getCoord());
+							planOut.addActivity(actOut);
+							actOut.setEndTime(actIn.getEndTime());
+							actOut.setStartTime(actIn.getStartTime());
+					}
+				}
+					pOut.addPlan(planOut);
+			}
+		}
+		}
+		
+		randomizeEndTimes(populationFromPlansFinal);
+
+	
+		File output = new File(output_for_new_input);
+		if(!output.exists()) createDir(new File(output_for_new_input));
+		new PopulationWriter(populationFromPlansFinal).write(output_for_new_input + "expanded_plans_final_0.xml.gz");
+		log.info("expanded_plans_final_0 has the entire population w/ randomized activity end times but WITHOUT the classification of the activities");
+		
+		// Re-classify the activities using the new end_times from the randomizedEndTimes method //		
+		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(scenarioTmp).readFile(output_for_new_input + "expanded_plans_final_0.xml.gz");
+		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+		aap.run();
+		new PopulationWriter(aap.getOutPop()).write(output_for_new_input + "expanded_plans_final_1.xml.gz");
+		log.info("expanded_plans_final_1 has the entire population w/ randomized activity end times INCLUDING the classification of the activities");
+		///////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+	}
+
+	private void changeAndWriteNewConfigFile (String config_file, double percentage, String output_for_new_input){
+		
+		Config oldConfig = ConfigUtils.loadConfig(config_file);
+		
+		/*QSim stuffs*/		
+		QSimConfigGroup qsim = oldConfig.qsim();
+		//The capacity factor is equal to the percentage used in the clonePersons method.
+		qsim.setFlowCapFactor(percentage);
+		//storageCapFactor obtained by expression proposed by Nicolai and Nagel, 2013.
+		double storageCapFactor = Math.ceil(((0.1 / (Math.pow(percentage, 0.25))))*100)/100;
+		qsim.setStorageCapFactor(storageCapFactor);
+		////////////////////////////////////////////////////////////////////////
+		
+		/*Path to new plans file*/		
+		PlansConfigGroup plans = oldConfig.plans();
+		plans.setInputFile(output_for_new_input + "expanded_plans_final_1.xml.gz");
+		////////////////////////////////////////////////////////////////////////
+		
+		
+		/*New group of parameters considering the new classification of the activities*/
+		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(scenarioTmp).readFile(output_for_new_input + "expanded_plans_final_0.xml.gz");
+		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+		aap.run();		
+		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
+		setActivityParams(acts, oldConfig);
+		////////////////////////////////////////////////////////////////////////
+
+		
+		/*Counts stuffs*/
+		CountsConfigGroup counts = oldConfig.counts();
+		counts.setCountsScaleFactor(Math.pow(percentage,-1));
+		////////////////////////////////////////////////////////////////////////
+		
+		
+		/*Write the new config_file*/
+		File output = new File(output_for_new_input);
+		if(!output.exists()) createDir(new File(output_for_new_input));		
+		new ConfigWriter(oldConfig).write(output_for_new_input + "expanded_config_final.xml");
+		////////////////////////////////////////////////////////////////////////
+	}
 	
 	private void randomizeEndTimes(Population population){
 		log.info("Randomizing activity end times...");
@@ -179,7 +308,7 @@ public class SantiagoDemandGenTry {
 		}
 		log.info("...Done.");
 	}
-	
+		
 	private double createRandomEndTime(Random random){
 		//draw two random numbers [0;1] from uniform distribution
 		double r1 = random.nextDouble();
@@ -195,91 +324,26 @@ public class SantiagoDemandGenTry {
 	private void createDir(File file) {
 		log.info("Directory " + file + " created: "+ file.mkdirs());	
 	}
-	
-	private void clonePersons(double percentage, String config_file, String people_file, String output_for_new_input){
-		
 
-		Map<String,Double> IdsAndFactorsFromMatsimPop = getIdsAndFactorsMatsimPop(config_file, people_file);
-		double pF = getProportionalFactor(percentage, config_file, people_file);
-		
-		Config config = ConfigUtils.loadConfig(config_file);		
-		Scenario scenarioFromBuilder = ScenarioUtils.loadScenario(config);
-		Population populationFromPlansFinal = scenarioFromBuilder.getPopulation();
-		List<Person> persons = new ArrayList<>(populationFromPlansFinal.getPersons().values());
-
-		///////Can be omitted, just for having an observable list of factors//////
-//		ArrayList<Integer> clonateFactorsList = new ArrayList<>();
-//		for (Map.Entry<String,Double> entry : IdsAndFactorsFromMatsimPop.entrySet()){		
-//			clonateFactorsList.add((int)Math.round(entry.getValue()*pF));			
-//		}
-		//////////////////////////////////////////////////////////////////////////
-	
-		for (Person p : persons) {
-			String keyId = p.getId().toString();
-			int clonateFactor = (int)Math.round(pF*IdsAndFactorsFromMatsimPop.get(keyId));
-			
-			for(int cf = 1; cf < clonateFactor ; cf++) {
-				Id<Person> pOutId = Id.createPersonId( p.getId().toString().concat("_").concat(String.valueOf(cf)) );
-				Person pOut = populationFromPlansFinal.getFactory().createPerson( pOutId  );
-				populationFromPlansFinal.addPerson(pOut);
-				
-				for (Plan plan : p.getPlans()){
-					Plan planOut = populationFromPlansFinal.getFactory().createPlan();
-					List<PlanElement> pes = plan.getPlanElements();
-					for ( PlanElement pe : pes){
-						if(pe instanceof Leg) {
-							Leg leg = (Leg) pe;
-							Leg legOut = populationFromPlansFinal.getFactory().createLeg(leg.getMode());
-							planOut.addLeg(legOut);
-						} else { 
-							Activity actIn = (Activity)pe;
-							Activity actOut = populationFromPlansFinal.getFactory().createActivityFromCoord(actIn.getType(), actIn.getCoord());
-							planOut.addActivity(actOut);
-							actOut.setEndTime(actIn.getEndTime());
-							actOut.setStartTime(actIn.getStartTime());
-					}
-				}
-					pOut.addPlan(planOut);
+	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
+		for(String act :acts.keySet()){
+			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+				//do nothing
+			} else {
+				ActivityParams params = new ActivityParams();
+				params.setActivityType(act);
+				params.setTypicalDuration(acts.get(act));
+				// Minimum duration is now specified by typical duration.
+//				params.setMinimalDuration(acts.get(act).getSecond());
+				params.setClosingTime(Time.UNDEFINED_TIME);
+				params.setEarliestEndTime(Time.UNDEFINED_TIME);
+				params.setLatestStartTime(Time.UNDEFINED_TIME);
+				params.setOpeningTime(Time.UNDEFINED_TIME);
+				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+				config.planCalcScore().addActivityParams(params);
 			}
 		}
-		}
-		
-		randomizeEndTimes(populationFromPlansFinal);
-		File output = new File(output_for_new_input);
-		if(!output.exists()) createDir(new File(output_for_new_input));
-		new PopulationWriter(populationFromPlansFinal).write(output_for_new_input + "expanded_plans_final.xml.gz");
-		
-		
 	}
+	
 
-	private void changeAndWriteNewConfigFile (String config_file, double percentage, String output_for_new_input){
-		
-		Config oldConfig = ConfigUtils.loadConfig(config_file);
-		QSimConfigGroup qsim = oldConfig.qsim();
-		PlansConfigGroup plans = oldConfig.plans();
-		//The capacity factor is equal to the percentage used in the clonePersons method.
-		qsim.setFlowCapFactor(percentage);
-		//storageCapFactor obtained by expression proposed by Nicolai and Nagel, 2013.
-		double storageCapFactor = Math.ceil(((0.1 / (Math.pow(percentage, 0.25))))*100)/100;
-		qsim.setStorageCapFactor(storageCapFactor);
-		
-		plans.setInputFile(output_for_new_input + "expanded_plans_final.xml.gz");
-		
-		File output = new File(output_for_new_input);
-		if(!output.exists()) createDir(new File(output_for_new_input));
-		
-		new ConfigWriter(oldConfig).write(output_for_new_input + "expanded_config_final.xml");
-	}
-	
-	private void run(){
-		clonePersons(PERCENTAGE, CONFIG_FROM_BUILDER, PEOPLE_FILE_FROM_ODS, OUTPUT_FOR_NEW_INPUT);
-		changeAndWriteNewConfigFile ( CONFIG_FROM_BUILDER, PERCENTAGE, OUTPUT_FOR_NEW_INPUT );
-
-	}
-	
-	public static void main(String args[]){
-		SantiagoDemandGenTry sdg = new SantiagoDemandGenTry();
-		sdg.run();
-	}
-	
 }

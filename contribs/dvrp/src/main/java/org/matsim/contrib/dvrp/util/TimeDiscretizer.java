@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.util;
 
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+
 public class TimeDiscretizer
 {
     public enum Type
@@ -55,6 +57,12 @@ public class TimeDiscretizer
     private final int timeInterval;
     private final Type type;
 
+    
+    public TimeDiscretizer(TravelTimeCalculatorConfigGroup ttcConfig)
+    {
+        this(ttcConfig.getMaxTime(), ttcConfig.getTraveltimeBinSize(), Type.OPEN_ENDED);
+    }
+    
 
     public TimeDiscretizer(int maxTime, int timeInterval, Type type)
     {

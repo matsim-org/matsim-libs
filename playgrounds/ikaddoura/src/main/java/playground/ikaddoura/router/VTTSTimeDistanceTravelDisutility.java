@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -42,7 +42,7 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
 public final class VTTSTimeDistanceTravelDisutility implements TravelDisutility {
 	private final static Logger log = Logger.getLogger(VTTSTimeDistanceTravelDisutility.class);
 	
-	private final RandomizingTimeDistanceTravelDisutility delegate;
+	private final TravelDisutility delegate;
 	private final TravelTime timeCalculator;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private final VTTSHandler vttsHandler;
@@ -57,7 +57,7 @@ public final class VTTSTimeDistanceTravelDisutility implements TravelDisutility 
 		this.cnScoringGroup = cnScoringGroup;
 		this.sigma = sigma;
 		
-		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, cnScoringGroup );
+		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup );
 		builder.setSigma(sigma);
 		this.delegate = builder.createTravelDisutility(timeCalculator);
 	}

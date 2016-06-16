@@ -48,17 +48,22 @@ public final class PatnaUtils {
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
 	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";
 
+	public static final String INCOME_ATTRIBUTE = "monthlyIncome";
+	public static final String TRANSPORT_COST_ATTRIBUTE = "dailyTransportCost";
+	public final static String SUBPOP_ATTRIBUTE = "userGroup";
+	
 	public enum PatnaUrbanActivityTypes {
 		home, work, educational, social, other, unknown;
 	}
-	
+
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
-	
+
 	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
-	
+
 	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck_ext","car_ext","motorbike_ext","bike_ext");
 	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
+	
 
 	private PatnaUtils(){} 
 
@@ -89,5 +94,47 @@ public final class PatnaUtils {
 			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
 			scenario.getVehicles().addVehicle(vehicle);
 		}
+	}
+
+	public static int getAverageIncome(final String incomeCode){
+		switch (incomeCode) {
+		case "1": return 500;
+		case "2": return 750;
+		case "3": return 2000;
+		case "4": return 4000;
+		case "5": return 6250;
+		case "6": return 8750;
+		case "7": return 20000;
+		default : throw new IllegalArgumentException("Unknown income code "+ incomeCode);
+		}
+	}
+	
+	public static double getAverageDailyTranportCost(final String dailyTranportCostCode){
+		switch (dailyTranportCostCode) {
+		case "1": return 10.00;
+		case "2": return 17.50;
+		case "3": return 37.5;
+		case "4": return 75.0;
+		case "5": return 200.0;
+		default : throw new IllegalArgumentException("Unknown daily transport cost code "+ dailyTranportCostCode);
+		}
+	}
+
+	public static int getIncomeIntervalCode(final double income){
+		if (income < 500 ) return 1;
+		else if(income < 1000) return 2;
+		else if(income < 3000) return 3;
+		else if(income < 5000) return 4;
+		else if(income < 7500) return 5;
+		else if(income < 10000) return 6;
+		else return 7;
+	}
+
+	public static int getDailyTransportCost(final double dailyTransportCost){
+		if (dailyTransportCost < 10 ) return 1;
+		else if(dailyTransportCost < 25) return 2;
+		else if(dailyTransportCost < 50) return 3;
+		else if(dailyTransportCost < 100) return 4;
+		else return 5;
 	}
 }

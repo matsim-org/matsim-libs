@@ -110,22 +110,22 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		}
 	}
 
-	private List<Tuple<Integer, ActivityFacility>> getFacilityCandidates(ActivityFacility facility, String seondaryActivityType) {
-		List<Tuple<Integer, ActivityFacility>> shopFacilitiesForBC = new ArrayList<>();
-		for (ActivityFacility facilityCandidate : getOrigFacilities().getFacilitiesForActivityType(seondaryActivityType).values()) {
+	private List<Tuple<Integer, ActivityFacility>> getFacilityCandidates(ActivityFacility facility, String secondaryActivityType) {
+		List<Tuple<Integer, ActivityFacility>> facilitiesForBC = new ArrayList<>();
+		for (ActivityFacility facilityCandidate : getOrigFacilities().getFacilitiesForActivityType(secondaryActivityType).values()) {
 			if (!facilityCandidate.getId().toString().contains(BC_TAG) && // we don't want the BC-facilities themselves to be candidates here.
 					CoordUtils.calcEuclideanDistance(facility.getCoord(), facilityCandidate.getCoord()) < MAX_BEELINE_DISTANCE) {
-				if (shopFacilitiesForBC.isEmpty()) {
-					shopFacilitiesForBC.add(new Tuple<>(0, facilityCandidate));
+				if (facilitiesForBC.isEmpty()) {
+					facilitiesForBC.add(new Tuple<>(0, facilityCandidate));
 				} else {
-					int cummulativeProbFacility = shopFacilitiesForBC.get(shopFacilitiesForBC.size()-1).getFirst()
-							+ (int) Math.round(shopFacilitiesForBC.get(shopFacilitiesForBC.size() - 1).getSecond()
-							.getActivityOptions().get(seondaryActivityType).getCapacity());
-					shopFacilitiesForBC.add(new Tuple<>(cummulativeProbFacility, facilityCandidate));
+					int cummulativeProbFacility = facilitiesForBC.get(facilitiesForBC.size()-1).getFirst()
+							+ (int) Math.round(facilitiesForBC.get(facilitiesForBC.size() - 1).getSecond()
+							.getActivityOptions().get(secondaryActivityType).getCapacity());
+					facilitiesForBC.add(new Tuple<>(cummulativeProbFacility, facilityCandidate));
 				}
 			}
 		}
-		return shopFacilitiesForBC;
+		return facilitiesForBC;
 	}
 
 	private ActivityFacility getSAFacility(List<Tuple<Integer, ActivityFacility>> candidates, String saType) {
@@ -145,16 +145,15 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		Plan plan = new PlanImpl();
 
 		double departureTime = getDepartureTime();
-		double actDuration = (4 + random.nextInt(24) + random.nextDouble())
-				* PrefsCreator.actCharacteristics.valueOf(this.actTag.substring(2).toUpperCase()).getMinDur();
-		if (this.actTag.substring(2).equals(SHOP)) {
-			actDuration *= 1.5; // shop has a very small min-time (representing kiosk-shopping)
+		double actDuration = getSADuration();
+		if (this.actTag.substring(2).toLowerCase().equals(SHOP)) {
+			actDuration = actDuration / 3; // shop has a histogram of roughly a third of leisure
 		}
 		double returnTime = departureTime + actDuration;
-		if (returnTime > 24.0 * 3600.0) {
+		/*if (returnTime > 24.0 * 3600.0) {
 			returnTime = 24.0 * 3600.0;
 			departureTime = returnTime - actDuration;
-		}
+		}*/
 
 		ActivityImpl actStart = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
@@ -163,7 +162,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(new LegImpl(mode));
 
 		ActivityImpl actSA = new ActivityImpl(this.actTag, destFacility.getCoord(), destFacility.getLinkId());
 		actSA.setFacilityId(destFacility.getId());
@@ -172,7 +171,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		actSA.setEndTime(returnTime);
 		plan.addActivity(actSA);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(new LegImpl(mode));
 
 		ActivityImpl actEnd = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());
@@ -180,5 +179,18 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
 		plan.addActivity(actEnd);
 		return plan;
+	}
+
+	private double getSADuration() {
+		double randDur = random.nextDouble();
+		// identify selected hour of day
+		int durInterval = 0;
+		while (durInterval < 48 && cummulativeDurationProbability[durInterval + 1] < randDur) {
+			durInterval++;
+		}
+		double duration = durInterval*60*30;
+		// random assignment within that hour of the day
+		duration += random.nextInt(1800);
+		return duration;
 	}
 }

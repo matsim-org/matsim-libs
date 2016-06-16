@@ -92,7 +92,7 @@
 		<param name="transitModes" value="pt" />
 	</module>
 	
-	<module name="changeLegModes">
+	<module name="changeMode">
 		<param name="modes" value="car,pt" />
 	</module>
 

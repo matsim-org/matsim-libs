@@ -60,7 +60,7 @@ public class TaxiData
 
     //casts Collection of supertype S to Collection of type T
     @SuppressWarnings("unchecked")
-    private static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
+    protected static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
     {
         return (Map<I, T>)collection;
     }

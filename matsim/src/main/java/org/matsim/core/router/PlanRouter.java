@@ -142,10 +142,13 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
-		if ((act.getLinkId() == null || act.getCoord() == null)
+		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
 				&& facilities != null
 				&& !facilities.getFacilities().isEmpty()) {
-			// use facilities only if the activity does not provides the required fields.
+			// use facilities only if the activity does not provide the required fields.
+			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
+			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AERoutingModule, so we 
+			// need to conceptually sort this out!!  kai, jun'16
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
 		return new ActivityWrapperFacility( act );

@@ -29,6 +29,8 @@ public class CapeTownNestedLogitModelConfigGroup extends ReflectiveConfigGroup {
 	private double muCar = 1;
 	private double muPt = 1;
 	private double muWalk = 1;
+	private double muRide = 1;
+	private double muTaxi = 1;
 
 	private double ascCar = 0;
 	private double betaTtCar = 0;
@@ -40,6 +42,11 @@ public class CapeTownNestedLogitModelConfigGroup extends ReflectiveConfigGroup {
 	private double ascWalk = 0;
 	private double betaTtWalk = -0;
 
+	private double ascRide = 0;
+	private double betaTtRide = -0;
+
+	private double ascTaxi = 0;
+	private double betaTtTaxi = -0;
 
 	public CapeTownNestedLogitModelConfigGroup() {
 		super( GROUP_NAME );
@@ -143,5 +150,65 @@ public class CapeTownNestedLogitModelConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("betaNCarsPerPerson")
 	public void setBetaNCarsPerPerson( final double betaNCarsPerPerson ) {
 		this.betaNCarsPerPerson = betaNCarsPerPerson;
+	}
+
+	@StringGetter("muRide")
+	public double getMuRide() {
+		return muRide;
+	}
+
+	@StringSetter("muRide")
+	public void setMuRide(double muRide) {
+		this.muRide = muRide;
+	}
+
+	@StringGetter("muTaxi")
+	public double getMuTaxi() {
+		return muTaxi;
+	}
+
+	@StringSetter("muTaxi")
+	public void setMuTaxi(double muTaxi) {
+		this.muTaxi = muTaxi;
+	}
+
+	@StringGetter("ascRide")
+	public double getAscRide() {
+		return ascRide;
+	}
+
+	@StringSetter("ascRide")
+	public void setAscRide(double ascRide) {
+		this.ascRide = ascRide;
+	}
+
+	@StringGetter("betaTtRide")
+	public double getBetaTtRide() {
+		return betaTtRide;
+	}
+
+	@StringSetter("betaTtRide")
+	public void setBetaTtRide(double betaTtRide) {
+		this.betaTtRide = betaTtRide;
+	}
+
+	@StringGetter("ascTaxi")
+	public double getAscTaxi() {
+		return ascTaxi;
+	}
+
+	@StringSetter("ascTaxi")
+	public void setAscTaxi(double ascTaxi) {
+		this.ascTaxi = ascTaxi;
+	}
+
+	@StringGetter("betaTtTaxi")
+	public double getBetaTtTaxi() {
+		return betaTtTaxi;
+	}
+
+	@StringSetter("betaTtTaxi")
+	public void setBetaTtTaxi(double betaTtTaxi) {
+		this.betaTtTaxi = betaTtTaxi;
 	}
 }

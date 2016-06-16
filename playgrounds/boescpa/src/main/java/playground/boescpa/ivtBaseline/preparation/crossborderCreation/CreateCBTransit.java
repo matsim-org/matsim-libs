@@ -149,7 +149,7 @@ public class CreateCBTransit extends CreateSingleTripPopulation {
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(new LegImpl(mode));
 
 		ActivityImpl actEnd = new ActivityImpl(this.configGroup.getTag() + "Home", destFacility.getCoord(), destFacility.getLinkId());
 		actEnd.setFacilityId(destFacility.getId());

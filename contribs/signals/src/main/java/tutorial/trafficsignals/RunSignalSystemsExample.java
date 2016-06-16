@@ -22,15 +22,21 @@ package tutorial.trafficsignals;
 import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 
 /**
@@ -50,38 +56,51 @@ public class RunSignalSystemsExample {
 		
 		File f = new File("t");
 		System.out.println(f.getAbsolutePath());
-		Config config = ConfigUtils.loadConfig(inputDir + "config.xml") ;
+		Config config = ConfigUtils.loadConfig(inputDir + "config.xml", new SignalSystemsConfigGroup(), new OTFVisConfigGroup() ) ;
 		
 		config.controler().setLastIteration(0); // use higher values if you want to iterate
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		config.network().setInputFile(inputDir + "network.xml");
 		
-		config.plans().setInputFile(inputDir + "plans100.xml");
+		config.plans().setInputFile(inputDir + "plans2000.xml.gz");
+		
+		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
+		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
+		
+		SignalSystemsConfigGroup signalConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
 		
 		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
 		// (this switch will eventually go away)
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+		signalConfig.setUseSignalSystems(true);
 
 		// these are the paths to the signal systems definition files:
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(inputDir + "signalControl_v2.0.xml");
+		signalConfig.setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
+		signalConfig.setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
+		signalConfig.setSignalControlFile(inputDir + "signalControl_v2.0.xml");
 		
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
+		
+		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+		otfvisConfig.setScaleQuadTreeRect(true); // make links visible beyond screen edge
+		otfvisConfig.setColoringScheme(ColoringScheme.byId);
+		otfvisConfig.setAgentSize(120);
+		
+		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalConfig).loadSignalsData());
+		
 		// ---
 
 		// add the signals module to the simulation:
 		Controler c = new Controler( scenario );
+
 		c.addOverridingModule(new SignalsModule());
+		c.addOverridingModule( new OTFVisWithSignalsLiveModule() );
 		
 		//do it, do it, do it, now
-		c.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		c.run();
 	}
 

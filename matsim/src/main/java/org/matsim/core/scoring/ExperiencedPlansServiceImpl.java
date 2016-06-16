@@ -38,7 +38,11 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		eventsToLegs.addLegHandler(this);
 	}
 
+	@Override
 	synchronized public void handleLeg(PersonExperiencedLeg o) {
+		// yy This has to be synchronized because ... ???
+		// (I seem to recall that with the multi-threaded events handler, in the end multiple threads could call this method 
+		// simultaneously--??? kai, jun'16)
 		Id<Person> agentId = o.getAgentId();
 		Leg leg = o.getLeg();
 		Plan plan = agentRecords.get(agentId);
@@ -47,7 +51,11 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		}
 	}
 
+	@Override
 	synchronized public void handleActivity(PersonExperiencedActivity o) {
+		// yy This has to be synchronized because ... ???
+		// (I seem to recall that with the multi-threaded events handler, in the end multiple threads could call this method 
+		// simultaneously--??? kai, jun'16)
 		Id<Person> agentId = o.getAgentId();
 		Activity activity = o.getActivity();
 		Plan plan = agentRecords.get(agentId);
@@ -57,7 +65,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	}
 
 	@Override
-	public void writeExperiencedPlans(String iterationFilename) {
+	public void writePlans(String iterationFilename) {
 		Population tmpPop = PopulationUtils.createPopulation(config);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.createPerson(entry.getKey());

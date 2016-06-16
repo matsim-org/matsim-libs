@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -54,9 +55,6 @@ public class CreateTestExternalMATSimConfig {
 	 final String ptTravelTimes;
 	 final String ptTravelDistances;
 	 final String useTravelTimesAndDistances;
-	 final String changeLegModeModuleName 	= "changeLegMode";
-	 final String changeLegModeParamName		= "modes";
-	 final String changeLegModeValue			= "car,pt";
 	 final String strategyModuleName 			= "strategy";
 	 final String startegyModule4ProbabilityPramName= "ModuleProbability_4";
 	 final double startegyModuleProbabilityValue= 0.1;
@@ -151,8 +149,9 @@ public class CreateTestExternalMATSimConfig {
 		acm.addParam(AccessibilityConfigGroup.TIME_OF_DAY, this.timeOfDay + "");
 		
 		// changeLegMode module
-		ConfigGroup changeLegModeModule = config.createModule(changeLegModeModuleName);
-		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
+		ChangeModeConfigGroup changeModeConfig = ConfigUtils.addOrGetModule(config, ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.class ) ;
+		String[] str = {"car","pt"} ;
+		changeModeConfig.setModes( str );
 		
 		// strategy module
 		ConfigGroup strategyModule = config.createModule(strategyModuleName);
@@ -218,8 +217,9 @@ public class CreateTestExternalMATSimConfig {
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 
 		// changeLegMode module
-		ConfigGroup changeLegModeModule = config.createModule(changeLegModeModuleName);
-		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
+		ChangeModeConfigGroup changeModeConfig = ConfigUtils.addOrGetModule(config, ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.class ) ;
+		String[] str = {"car","pt"} ;
+		changeModeConfig.setModes( str );
 		
 		return writeConfigFile(config);
 	}

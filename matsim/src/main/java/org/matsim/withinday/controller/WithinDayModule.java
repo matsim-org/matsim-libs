@@ -58,6 +58,7 @@ public class WithinDayModule extends AbstractModule {
         bind(EarliestLinkExitTimeProvider.class).asEagerSingleton();
     }
 
+    @SuppressWarnings("static-method")
     @Provides @Named("lowerBound") Map<String, TravelTime> provideEarliestLinkExitTravelTimes(Map<String, TravelTime> travelTimes) {
         Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<String, TravelTime>();
         earliestLinkExitTravelTimes.putAll(travelTimes);

@@ -33,6 +33,7 @@ public class PSSControler {
 	private static int iterationNumber = 0;
 	private static final int numberOfTimeBins = 96;
 	private double[][] minimumPriceSignal;
+	private final Config config;
 
 	public static int getIterationNumber() {
 		return iterationNumber;
@@ -41,6 +42,8 @@ public class PSSControler {
 	public PSSControler(String configFilePath, ParametersPSFMutator parameterPSFMutator) {
 		this.configFilePath = configFilePath;
 		this.parameterPSFMutator = parameterPSFMutator;
+		
+		config = ConfigUtils.loadConfig(configFilePath, new ParametersPSF());
 	}
 
 	public static void main(String[] args) {
@@ -172,9 +175,9 @@ public class PSSControler {
 	}
 
 	public void runMATSimIterations() {
-
-		// use the right Controler (read parameter
-		Config config = ConfigUtils.loadConfig(configFilePath, new ParametersPSF());
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			throw new RuntimeException("does not seem to work with access/egress walk switched on") ;
+		}
 
 		String tempStringValue = config.findParam(ParametersPSF.PSF_MODULE, "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
@@ -268,6 +271,10 @@ public class PSSControler {
 
 	private String getIterationResultDirectory() {
 		return resultDirectory + "iteration" + iterationNumber;
+	}
+	
+	public final Config getConfig() {
+		return this.config ;
 	}
 
 }

@@ -18,7 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
-import com.google.inject.*;
+import com.google.inject.Binding;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.google.inject.spi.DefaultElementVisitor;
@@ -26,7 +30,6 @@ import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import com.google.inject.util.Modules;
 import com.google.inject.util.Types;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.RoutingModule;
@@ -99,14 +102,13 @@ public class InjectionUtils {
 			final Module... modules ) {
 		// Otherwise MATSim AbstractModules cannot be used...
 		// And the MATSim Injector limits the injector methods one has access to
-		final Injector bootstrapInjector = Guice.createInjector(
-				(Module) binder -> {
-					binder.bind( Config.class ).toInstance( config );
-				} );
+		//final Injector bootstrapInjector = Guice.createInjector(
+		//		new ExplodedConfigModule( config ) );
 
-		for ( Module m : modules ) bootstrapInjector.injectMembers( m );
+		//for ( Module m : modules ) bootstrapInjector.injectMembers( m );
 
-		Injector injector = bootstrapInjector.createChildInjector( insertMapBindings( modules ) );
+		//Injector injector = bootstrapInjector.createChildInjector( insertMapBindings( modules ) );
+		final Injector injector = org.matsim.core.controler.Injector.createInjector(config , modules);
 
 		final ParameterizedType newType =
 				Types.newParameterizedType(

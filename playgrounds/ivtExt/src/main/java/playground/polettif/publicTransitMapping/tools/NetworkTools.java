@@ -22,6 +22,7 @@ package playground.polettif.publicTransitMapping.tools;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -36,10 +37,16 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
+import playground.polettif.publicTransitMapping.mapping.router.Router;
 
 import java.util.*;
+
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Provides Tools for analysing and manipulating networks.
@@ -50,14 +57,16 @@ public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
 
-	public static Network loadNetwork(String filePath) {
+	private NetworkTools() {}
+
+	public static Network readNetwork(String fileName) {
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(filePath);
+		new MatsimNetworkReader(network).readFile(fileName);
 		return network;
 	}
 
-	public static void writeNetwork(Network network, String filePath) {
-		new NetworkWriter(network).write(filePath);
+	public static void writeNetwork(Network network, String fileName) {
+		new NetworkWriter(network).write(fileName);
 	}
 
 	public static Network createNetwork() {
@@ -70,16 +79,17 @@ public class NetworkTools {
 
 	public static void transformNetworkFile(String networkFile, String fromCoordinateSystem, String toCoordinateSystem) {
 		log.info("... Transformig network from " + fromCoordinateSystem + " to " + toCoordinateSystem);
-		Network network = loadNetwork(networkFile);
+		Network network = readNetwork(networkFile);
 		transformNetwork(network, fromCoordinateSystem, toCoordinateSystem);
 		writeNetwork(network, networkFile);
 	}
 
 	/**
-	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
+	 * Returns the nearest link for the given coordinate.
+	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes},
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
-	 * the coordinate on the right side is returned.<p/>
+	 * the coordinate on its right side is returned.<p/>
 	 *
 	 * @param network (instance of NetworkImpl)
 	 * @param coord   the coordinate
@@ -89,7 +99,6 @@ public class NetworkTools {
 			NetworkImpl networkImpl = (NetworkImpl) network;
 			double nodeSearchRadius = 200.0;
 
-			Set<Link> visitedLinks = new HashSet<>();
 			Link closestLink = null;
 			double minDistance = Double.MAX_VALUE;
 
@@ -210,7 +219,7 @@ public class NetworkTools {
 	 *
 	 * @return the new Link.
 	 */
-	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix) {
+	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix, double freespeed, Set<String> transportModes) {
 		NetworkFactory networkFactory = network.getFactory();
 
 		Coord coord = stopFacility.getCoord();
@@ -218,8 +227,10 @@ public class NetworkTools {
 		Node dummyNode = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node"), coord);
 		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix + stopFacility.getId() + "_link"), dummyNode, dummyNode);
 
-		dummyLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-		dummyLink.setLength(1.0);
+		dummyLink.setAllowedModes(transportModes);
+		dummyLink.setLength(5);
+		dummyLink.setFreespeed(freespeed);
+		dummyLink.setCapacity(9999); // todo param default values in config
 
 		if(!network.getNodes().containsKey(dummyNode.getId())) {
 			network.addNode(dummyNode);
@@ -290,12 +301,10 @@ public class NetworkTools {
 
 	/**
 	 * Checks if a link sequence has loops (i.e. the same link is passed twice).
-	 *
-	 * @param links
 	 */
-	public static boolean linkSequenceHasLoops(List<Link> links) {
-		Set tmpSet = new HashSet<>(links);
-		return tmpSet.size() < links.size();
+	public static boolean linkSequenceHasLoops(List<Link> linkSequence) {
+		Set tmpSet = new HashSet<>(linkSequence);
+		return tmpSet.size() < linkSequence.size();
 	}
 
 
@@ -358,12 +367,9 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Integrates network B into network A. Network
+	 * Integrates <tt>network B</tt> into <tt>network A</tt>. Network
 	 * A contains all links and nodes of both networks
 	 * after integration.
-	 *
-	 * @param networkA
-	 * @param networkB
 	 */
 	public static void integrateNetwork(final Network networkA, final Network networkB) {
 		final NetworkFactory factory = networkA.getFactory();
@@ -536,6 +542,78 @@ public class NetworkTools {
 		for(Link link : network.getLinks().values()) {
 			if(link.getAllowedModes().contains(networkMode)) {
 				link.setFreespeed(freespeedValue);
+			}
+		}
+	}
+
+	/**
+	 * Resets the link length of all links with the given link Mode
+	 */
+	public static void resetLinkLength(Network network, String networkMode) {
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().contains(networkMode)) {
+				double l = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+				link.setLength(l > 0 ? l : 1);
+			}
+		}
+	}
+
+	/**
+	 * Creates mode dependent routers based on the actual network modes used.
+	 * @param schedule
+	 * @param network
+	 * @return
+	 */
+	public static Map<String, Router> guessRouters(TransitSchedule schedule, Network network) {
+		Map<String, Set<String>> modeAssignments = new HashMap<>();
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				Set<String> usedNetworkModes = MapUtils.getSet(transitRoute.getTransportMode(), modeAssignments);
+				List<Link> links = getLinksFromIds(network, getTransitRouteLinkIds(transitRoute));
+				for(Link link : links) {
+					usedNetworkModes.addAll(link.getAllowedModes());
+				}
+			}
+		}
+
+		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
+		for(Set<String> networkModes : modeAssignments.values()) {
+			if(!modeDependentRouters.containsKey(networkModes)) {
+				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
+			}
+		}
+
+		Map<String, Router> routers = new HashMap<>();
+
+		for(Map.Entry<String, Set<String>> e : modeAssignments.entrySet()) {
+			routers.put(e.getKey(), modeDependentRouters.get(e.getValue()));
+		}
+		return routers;
+	}
+
+	/**
+	 * Replaces all non-car link modes with "pt"
+	 */
+	public static void replaceNonCarModesWithPT(Network network) {
+		log.info("... Replacing all non-car link modes with \"pt\"");
+
+		Set<String> modesCar = Collections.singleton(TransportMode.car);
+
+		Set<String> modesCarPt = new HashSet<>();
+		modesCarPt.add(TransportMode.car);
+		modesCarPt.add(TransportMode.pt);
+
+		Set<String> modesPt = new HashSet<>();
+		modesPt.add(TransportMode.pt);
+
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().size() == 0 && link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesCar);
+			}
+			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesCarPt);
+			} else if(!link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesPt);
 			}
 		}
 	}

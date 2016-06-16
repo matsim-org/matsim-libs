@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.misc.Counter;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
@@ -34,21 +33,23 @@ import java.util.*;
  * components algorithm on a rail network.
  *
  * https://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm
+ *
+ * Note: does not really work
  */
 public class TarjanNetworkCleaner {
 
 	protected static Logger log = Logger.getLogger(TarjanNetworkCleaner.class);
 
 	public static void main(String[] args) {
-		Network network = NetworkTools.loadNetwork("C:/Users/polettif/Desktop/data/network/multimodal/zurich-plus-mm.xml");
+		Network network = NetworkTools.readNetwork("C:/Users/Flavio/Desktop/data/network/multimodal/zurich-plus-mm.xml.gz");
 
 		network = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("rail"));
-
-		new NetworkCleaner().run(network);
+//		new NetworkCleaner().run(network);
+//		NetworkTools.writeNetwork(network, "C:/Users/Flavio/Desktop/data/tarjan/rail_cleaned.xml.gz");
 
 		new TarjanNetworkCleaner(network).run();
 
-		NetworkTools.writeNetwork(network, "C:/Users/polettif/Desktop/data/tarjan/final.xml.gz");
+		NetworkTools.writeNetwork(network, "C:/Users/Flavio/Desktop/data/tarjan/final.xml.gz");
 	}
 
 	private final Network network;
@@ -72,13 +73,19 @@ public class TarjanNetworkCleaner {
 		for(Vertex v : vertices.values()) {
 			counter.incCounter();
 			if(v.index == null) {
-				strongconnect(v, 0);
+				strongconnect(v);
 			}
 		}
 
 		int removed = 0;
 		log.info("creating Network...");
+		double visIndex = 0;
 		for(List<Vertex> c : components) {
+			for(Vertex vv : c) {
+				this.network.getLinks().get(vv.link.getId()).setNumberOfLanes(visIndex);
+			}
+			visIndex++;
+			/*
 			Set<Node> nodesCompletelyInsideComponent = getNodesCompletelyInsideComponent(c);
 			for(Vertex v : c) {
 				if(nodesCompletelyInsideComponent.contains(v.link.getFromNode()) &&
@@ -86,22 +93,23 @@ public class TarjanNetworkCleaner {
 					network.removeLink(v.link.getId());
 					removed++;
 				}
-			}
+			} */
 		}
 		log.info(removed + " links removed.");
 	}
 
-	public void strongconnect(Vertex v, int lvl) {
-		v.index = index++;
+	public void strongconnect(Vertex v) {
+		v.index = index;
 		v.lowlink = index;
+		index++;
 		stack.push(v);
 		v.onStack = true;
 
 		// Consider successors of v
 		for(Id<Link> wId : v.getSuccessors()) {
 			Vertex w = vertices.get(wId);
-			if(w.index == null && lvl < maxLvl) {
-				strongconnect(w, lvl+1);
+			if(w.index == null) {
+				strongconnect(w);
 				v.lowlink = Integer.min(v.lowlink, w.lowlink);
 			} else if(w.onStack) {
 				v.lowlink = Integer.min(v.lowlink, w.index);
@@ -110,11 +118,12 @@ public class TarjanNetworkCleaner {
 
 		// If v is a root node, pop the stack and generate an SCC
 		if(v.lowlink.equals(v.index)) {
+			// start a new strongly connected component
 			List<Vertex> newComponent = new ArrayList<>();
 			while(true) {
 				Vertex x = stack.pop();
 				newComponent.add(x);
-				x.lowlink = Integer.MAX_VALUE;
+				x.onStack = false;
 				if(x == v)
 					break;
 			}
@@ -172,7 +181,9 @@ public class TarjanNetworkCleaner {
 			this.link = link;
 
 			for(Link outlink : link.getToNode().getOutLinks().values()) {
-				successors.add(outlink.getId());
+				if(!outlink.getToNode().equals(link.getFromNode())) {
+					successors.add(outlink.getId());
+				}
 			}
 		}
 

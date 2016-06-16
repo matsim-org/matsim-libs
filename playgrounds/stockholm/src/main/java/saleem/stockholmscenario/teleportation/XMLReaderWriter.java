@@ -19,10 +19,10 @@ import org.jdom.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import saleem.stockholmscenario.utils.CoordinateSystemConverter;
 import saleem.stockholmscenario.utils.DistanceCalculation;
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
-import au.com.bytecode.opencsv.CSVWriter;
 
 public class XMLReaderWriter {
 	Map<String, Element> nodesmap = new HashMap<String, Element>();

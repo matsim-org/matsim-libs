@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -77,6 +78,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final Person person) {
 		Leg newLeg = populationFactory.createLeg( mode );
 		newLeg.setDepartureTime( departureTime );
+		
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
@@ -127,7 +131,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
+			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime; // yyyy why int?  kai, dec'15
 		} else {

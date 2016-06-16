@@ -18,30 +18,25 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.PrismSampler;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.utils.ConcurrentStopWatch;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -49,14 +44,10 @@ import java.util.*;
 public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<ModeNests> {
 	public enum Measurement { carTravelTime, ptTravelTime, bikeTravelTime, walkTravelTime, prismSampling; }
 
-	private final Random random = MatsimRandom.getLocalInstance();
-	private final int nSamples;
 	private final TripRouter router;
 
-	private final ActivityFacilities allFacilities;
 	private final ObjectAttributes personAttributes;
-	private final QuadTree<ActivityFacility> relevantFacilities;
-	private final int budget_m;
+	private final PrismSampler prismSampler;
 
 	private final SimpleNestedLogitUtilityConfigGroup configGroup;
 
@@ -73,19 +64,10 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 			final int budget_m ) {
 		this.configGroup = configGroup;
 		this.stopWatch = stopWatch;
-		this.nSamples = nSamples;
 		this.router = router;
-		this.allFacilities = allFacilities;
 		this.personAttributes = personAttributes;
-		this.budget_m = budget_m;
 
-		final QuadTreeRebuilder<ActivityFacility> builder = new QuadTreeRebuilder<>();
-		for ( ActivityFacility f : allFacilities.getFacilities().values() ) {
-			if ( f.getActivityOptions().containsKey( type ) ) {
-				builder.put( f.getCoord() , f );
-			}
-		}
-		relevantFacilities = builder.getQuadTree();
+		this.prismSampler = new PrismSampler( type , nSamples , allFacilities , budget_m );
 	}
 
 	@Override
@@ -99,13 +81,13 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 
 		// Sample and route alternatives
 		stopWatch.startMeasurement( Measurement.prismSampling );
-		final ActivityFacility origin = getOrigin( person );
-		final List<ActivityFacility> prism = calcPrism( origin );
+		final ActivityFacility origin = prismSampler.getOrigin( person );
+		final List<ActivityFacility> prism = prismSampler.calcSampledPrism( origin );
 		stopWatch.endMeasurement( Measurement.prismSampling );
 
-		for ( int i= 0; i < nSamples; i++ ) {
-			final ActivityFacility f = prism.remove( random.nextInt( prism.size() ) );
-
+		int i = 0;
+		for ( ActivityFacility f : prism ) {
+			i++;
 			//-------------------------------------------------------------
 			stopWatch.startMeasurement( Measurement.carTravelTime );
 			add(
@@ -221,62 +203,6 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 				ModeNests.valueOf( mode ),
 				Id.create( i+"_"+mode , Alternative.class ),
 				trip );
-	}
-
-	private ActivityFacility getOrigin( Person p ) {
-		final Activity act = (Activity) p.getSelectedPlan().getPlanElements().get( 0 );
-		final Id<ActivityFacility> facilityId = act.getFacilityId();
-		return facilityId != null ?
-				allFacilities.getFacilities().get( act.getFacilityId() ) :
-				new ActivityFacility() {
-					@Override
-					public Map<String, ActivityOption> getActivityOptions() {
-						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
-					}
-
-					@Override
-					public void addActivityOption( ActivityOption option ) {
-						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
-
-					}
-
-					@Override
-					public Id<Link> getLinkId() {
-						return act.getLinkId();
-					}
-
-					@Override
-					public Coord getCoord() {
-						return act.getCoord();
-					}
-
-					@Override
-					public Map<String, Object> getCustomAttributes() {
-						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
-					}
-
-					@Override
-					public Id<ActivityFacility> getId() {
-						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
-					}
-				};
-	}
-
-	private List<ActivityFacility> calcPrism( ActivityFacility p ) {
-		// somehow silly to hard-code f1 and f2 to be the same,
-		// but it should allow latter to extend it easier to a really "plan aware" measure,
-		// using real prisms... or not.
-		final Coord f1 = p.getCoord();
-		final Coord f2 = p.getCoord();
-
-		Collection<ActivityFacility> prism = Collections.emptyList();
-
-		final double radius = Math.max( budget_m, 1.1 * CoordUtils.calcEuclideanDistance( f1, f2 ) );
-		for ( int i=1; prism.size() < nSamples; i++ ) {
-			prism = relevantFacilities.getElliptical(f1.getX(), f1.getY(), f2.getX(), f2.getY(), i * radius);
-		}
-
-		return prism instanceof List ? (List<ActivityFacility>) prism : new ArrayList<>( prism );
 	}
 
 	private void add( Alternative<ModeNests> alternative , Nest.Builder<ModeNests>... sets ) {

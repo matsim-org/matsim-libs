@@ -42,9 +42,7 @@ public abstract class AbstractTravelTimeAggregator {
 	}
 
 	protected int getTimeSlotIndex(final double time) {
-		int slice = ((int) time)/this.travelTimeBinSize;
-		if (slice >= this.numSlots) slice = this.numSlots - 1;
-		return slice;
+	    return TimeBinUtils.getTimeBinIndex(time, travelTimeBinSize, numSlots);
 	}
 
 	protected abstract void addTravelTime(TravelTimeData travelTimeRole, double enterTime,

@@ -27,7 +27,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
- * Generates {@link CharyparNagelOpenTimesActivityScoring}s.
+ * Generates {@link FacilityOpeningIntervalCalculator}s.
  * 
  * @author meisterk
  */
@@ -54,7 +54,7 @@ public final class CharyparNagelOpenTimesScoringFunctionFactory implements Scori
 		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(parameters, scenario.getActivityFacilities()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities())));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters, scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));

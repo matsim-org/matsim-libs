@@ -46,18 +46,18 @@ import static playground.boescpa.ivtBaseline.counts.CountsIVTBaseline.COUNTS_DEL
  */
 public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 
-	private final Config config;
+	//private final Config config;
 
 	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
 	private final Set<String> linksToMonitorCache = new HashSet<>();
 
 	private final HashMap<String, Integer> linkCounts = new HashMap<>();
 
-	@Inject
+	/*@Inject
 	private StreetLinkDailyCountsEventHandler(@Named("pathToStreetLinksDailyToMonitor") final String pathToLinksList, Config config) {
 		setLinksToMonitor(pathToLinksList);
 		this.config = config;
-	}
+	}*/
 
 	private void setLinksToMonitor(final String pathToLinksList) {
 		this.linksToMonitor.clear();
@@ -99,7 +99,7 @@ public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 	}
 
 	public void write(String filename) {
-		try {
+		/*try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			// write file head
 			writer.write("linkId"+ COUNTS_DELIMITER + "countStationDescr" + COUNTS_DELIMITER + "countVolume" + COUNTS_DELIMITER + "matsimVolume" + COUNTS_DELIMITER + "relativeVolume");
@@ -119,6 +119,6 @@ public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 }

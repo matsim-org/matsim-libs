@@ -25,9 +25,9 @@ import com.google.inject.util.Types;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ExplodedConfigModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.lang.reflect.ParameterizedType;
@@ -73,13 +73,14 @@ public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>
 		//bind( TransitSchedule.class ).toInstance( scenario.getTransitSchedule() );
 
 		install( new ScenarioByInstanceModule( scenario ) );
-		install( new ExplodedConfigModule( scenario.getConfig()  ) );
 		install( new TripRouterModule() );
 
 		install( new AbstractModule() {
 			@Override
 			public void install() {
 				addTravelTimeBinding( "car" ).to( FreespeedTravelTimeAndDisutility.class );
+				addTravelDisutilityFactoryBinding( "car" ).toInstance(
+						tt -> (TravelDisutility) tt);
 			}
 		} );
 

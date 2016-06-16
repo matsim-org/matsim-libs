@@ -27,14 +27,14 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
+import org.matsim.core.scoring.functions.FacilityOpeningIntervalCalculator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Generates {@link CharyparNagelOpenTimesActivityScoring}s.
+ * Generates {@link FacilityOpeningIntervalCalculator}s.
  *
  * An extension of CharyparNagelOpenTimesScoringFunctionFactory that get an
  * agent's typical activity durations from its desires and not from the config file.

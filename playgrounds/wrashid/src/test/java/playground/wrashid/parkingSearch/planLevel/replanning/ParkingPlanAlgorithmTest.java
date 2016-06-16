@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -24,7 +25,12 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 	public void testReplaceParking() {
 		Controler controler;
 		String configFilePath = "test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
-		controler = new Controler(this.loadConfig(configFilePath));
+		final Config config = this.loadConfig(configFilePath);
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
+		controler = new Controler(config);
 
 		parkingBookKeeper = ParkingUtils.initializeParking(controler) ;
 

@@ -1,15 +1,15 @@
 package sergio;
 
-import floetteroed.utilities.Tuple;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
+
+import floetteroed.utilities.Tuple;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
 
 /**
  * 

@@ -1,7 +1,5 @@
 package gunnar.tryout;
 
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +12,7 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 
+import gunnar.ihop2.regent.demandreading.Zone;
 import patryk.popgen2.PopulationParser;
 import patryk.popgen2.SelectZones;
 

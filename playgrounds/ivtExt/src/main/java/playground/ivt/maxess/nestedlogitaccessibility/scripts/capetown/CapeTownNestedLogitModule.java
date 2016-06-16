@@ -24,7 +24,6 @@ import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.RunMzTripChoiceSetConversion;
 import playground.ivt.router.TripSoftCache;
@@ -45,9 +44,9 @@ public class CapeTownNestedLogitModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind( new TypeLiteral<Utility<ModeNests>>() {} )
+		bind( new TypeLiteral<Utility<CapeTownModeNests>>() {} )
 				.to( CapeTownNestedLogitModelUtility.class );
-		bind( new TypeLiteral<ChoiceSetIdentifier<ModeNests>>() {} )
+		bind( new TypeLiteral<ChoiceSetIdentifier<CapeTownModeNests>>() {} )
 				.to( CapeTownNestedLogitModelChoiceSetIdentifier.class );
 	}
 
@@ -65,6 +64,7 @@ public class CapeTownNestedLogitModule extends AbstractModule {
 						cache ),
 				scenario.getActivityFacilities(),
 				scenario.getPopulation().getPersonAttributes(),
+				scenario.getHouseholds(),
 				group.getDistanceBudget() );
 	}
 }

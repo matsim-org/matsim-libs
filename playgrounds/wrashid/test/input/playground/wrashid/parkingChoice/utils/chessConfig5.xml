@@ -73,7 +73,7 @@
 		<param name="activityMinimalDuration_4" value="08:00:00" />
 	</module>
 	
-	<module name="changeLegMode" >
+	<module name="changeMode" >
 		<param name="modes" value="car,pt,bike,walk" />
 	</module>
 	

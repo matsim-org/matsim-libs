@@ -40,10 +40,7 @@ import java.util.Set;
  *
  * @author mrieser
  */
-public final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility {
-	private static final Logger log = Logger.getLogger( RandomizingTimeDistanceTravelDisutility.class ) ;
-
-	private static int normalisationWrnCnt = 0; 
+final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility {
 
 	private final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
@@ -57,81 +54,8 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 	// "cache" of the random value
 	private double logNormalRnd;
 	private Person prevPerson;
-	
-	private static int wrnCnt = 0 ;
 
-	// === start Builder ===
-	public static class Builder implements TravelDisutilityFactory{
-		private final String mode;
-		private double sigma = 0. ;
-		private final PlanCalcScoreConfigGroup cnScoringGroup;
-
-		public Builder( final String mode, PlanCalcScoreConfigGroup cnScoringGroup ) {
-			this.mode = mode;
-			this.cnScoringGroup = cnScoringGroup;
-		}
-
-		@Override
-		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(
-				final TravelTime timeCalculator) {
-			logWarningsIfNecessary( cnScoringGroup );
-
-			/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
-			final ModeParams params = cnScoringGroup.getModes().get( mode ) ;
-			if ( params == null ) {
-				throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getModes().keySet() );
-			}
-			final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-
-			final double marginalCostOfDistance_m = -params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
-
-			if ( params.getMarginalUtilityOfDistance() !=  0.0 ) {
-				throw new RuntimeException( "marginal utility of distance not honored for travel disutility; aborting ... (should be easy to implement)") ;
-			}
-
-
-			double normalization = 1;
-			if ( sigma != 0. ) {
-				normalization = 1. / Math.exp(this.sigma * this.sigma / 2);
-				if (normalisationWrnCnt < 10) {
-					normalisationWrnCnt++;
-					log.info(" sigma: " + this.sigma + "; resulting normalization: " + normalization);
-				}
-			}
-
-			return new RandomizingTimeDistanceTravelDisutility(
-					timeCalculator,
-					marginalCostOfTime_s,
-					marginalCostOfDistance_m,
-					normalization,
-					sigma);
-		}
-
-		private void logWarningsIfNecessary(final PlanCalcScoreConfigGroup cnScoringGroup) {
-			if ( wrnCnt < 1 ) {
-				wrnCnt++ ;
-				if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
-					log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
-							"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
-				}
-
-				final Set<String> monoSubpopKeyset = Collections.singleton( null );
-				if ( !cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
-					log.warn( "Scoring parameters are defined for different subpopulations." +
-							" The routing disutility will only consider the ones of the default subpopulation.");
-					log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
-				}
-			}
-		}
-
-		public Builder setSigma( double val ) {
-			this.sigma = val ;
-			return this;
-		}
-	}  
-	// === end Builder ===
-
-	private RandomizingTimeDistanceTravelDisutility(
+	RandomizingTimeDistanceTravelDisutility(
 			final TravelTime timeCalculator,
 			final double marginalCostOfTime_s,
 			final double marginalCostOfDistance_m,

@@ -56,7 +56,7 @@ public class DivertedVrpPath
     @Override
     public Link getLink(int idx)
     {
-        if (idx <= diversionLinkIdx) {//equivalent to: idx < diversionLinkIdx
+        if (isInOriginalPath(idx)) {
             return originalPath.getLink(idx);
         }
         else {
@@ -68,14 +68,32 @@ public class DivertedVrpPath
     @Override
     public double getLinkTravelTime(int idx)
     {
-        //TT for diversionLinkIdx must be taken from originalPath since TT for the first link
-        //in newSubPath is 1 second (a vehicle enters the link at its end)  
-
-        if (idx <= diversionLinkIdx) {//incorrect: idx < diversionLinkIdx
+        if (isInOriginalPath(idx)) {
             return originalPath.getLinkTravelTime(idx);
         }
         else {
             return newSubPath.getLinkTravelTime(idx - diversionLinkIdx);
+        }
+    }
+
+
+    private boolean isInOriginalPath(int idx)
+    {
+        //for getLink() both idx < diversionLinkIdx and idx <= diversionLinkIdx are OK
+        //for getLinkTT() diversionLinkIdx must be taken from originalPath since TT for the first link
+        //in newSubPath is 1 second (a vehicle enters the link at its end) 
+        return idx <= diversionLinkIdx;
+    }
+
+
+    @Override
+    public void setLinkTravelTime(int idx, double linkTT)
+    {
+        if (isInOriginalPath(idx)) {
+            originalPath.setLinkTravelTime(idx, linkTT);
+        }
+        else {
+            newSubPath.setLinkTravelTime(idx - diversionLinkIdx, linkTT);
         }
     }
 

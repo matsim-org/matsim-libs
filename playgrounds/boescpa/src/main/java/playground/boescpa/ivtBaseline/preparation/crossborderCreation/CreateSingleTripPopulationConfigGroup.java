@@ -41,6 +41,8 @@ public class CreateSingleTripPopulationConfigGroup extends ReflectiveConfigGroup
 	private String pathToFacilities;
 	// cumulative departure probabilities: hourly probabilities used to determine the departures of the single trip agents
 	private String pathToCumulativeDepartureProbabilities;
+	// cumulative duration probabilities: half-hourly probabilities used to determine the durations of the single trip agents
+	private String pathToCumulativeDurationProbabilities;
 	// subpopulation origin: the facilities which will be used as home locations (file can also be used otherwise)
 	private String pathToSubpopulation_Origin;
 	// subpopulation destination: the facilities which will be used for the activity locations (file can also be used otherwise)
@@ -49,6 +51,8 @@ public class CreateSingleTripPopulationConfigGroup extends ReflectiveConfigGroup
 	private String pathToOutput;
 	// sample percentage: the share of the input sub-population which will be used for the output. E.g. for a 1%-sub-population: '0.01'
 	private double samplePercentage;
+	// mode: the mode the cb-population is supposed to use
+	private String mode = "car";
 	// random seed: the random seed used for the random aspects of the population generation
 	private long randomSeed;
 
@@ -121,6 +125,16 @@ public class CreateSingleTripPopulationConfigGroup extends ReflectiveConfigGroup
 		this.pathToCumulativeDepartureProbabilities = pathToCumulativeDepartureProbabilities;
 	}
 
+	@StringGetter("inputFile_CumulativeDurationProbabilities")
+	public String getPathToCumulativeDurationProbabilities() {
+		return pathToCumulativeDurationProbabilities;
+	}
+
+	@StringSetter("inputFile_CumulativeDurationProbabilities")
+	public void setPathToCumulativeDurationProbabilities(String pathToCumulativeDurationProbabilities) {
+		this.pathToCumulativeDurationProbabilities = pathToCumulativeDurationProbabilities;
+	}
+
 	@StringGetter("outputFile_Population")
 	public String getPathToOutput() {
 		return pathToOutput;
@@ -149,6 +163,16 @@ public class CreateSingleTripPopulationConfigGroup extends ReflectiveConfigGroup
 	@StringSetter("samplePercentage")
 	public void setSamplePercentage(double samplePercentage) {
 		this.samplePercentage = samplePercentage;
+	}
+
+	@StringGetter("mode")
+	public String getMode() {
+		return mode;
+	}
+
+	@StringSetter("mode")
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 
 	public CreateSingleTripPopulationConfigGroup copy() {

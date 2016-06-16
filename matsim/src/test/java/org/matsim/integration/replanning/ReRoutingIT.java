@@ -23,6 +23,7 @@ package org.matsim.integration.replanning;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
@@ -106,15 +107,19 @@ public class ReRoutingIT extends MatsimTestCase {
 		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
 		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
 		
-		Scenario expectedPopulation = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(config.network().getInputFile());
-		new MatsimPopulationReader(expectedPopulation).readFile(originalFileName);
-		Scenario actualPopulation = ScenarioUtils.createScenario(config);
-	
-		new MatsimPopulationReader(actualPopulation).readFile(revisedFileName);
+		Scenario referenceScenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
+		new MatsimPopulationReader(referenceScenario).readFile(originalFileName);
 
-		Assert.assertTrue("different plans files", 
-				PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));		
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimPopulationReader(scenario).readFile(revisedFileName);
+
+		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
+		if ( !isEqual ) {
+			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write( getOutputDirectory() + "/reference_population.xml.gz");
+			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write( getOutputDirectory() + "/output_population.xml.gz");
+		}
+		Assert.assertTrue("different plans files.", isEqual);
 	}
 
 }

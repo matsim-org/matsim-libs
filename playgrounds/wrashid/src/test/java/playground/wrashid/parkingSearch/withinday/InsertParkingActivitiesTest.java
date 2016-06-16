@@ -54,8 +54,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -79,6 +78,10 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 	public void testInsertParkingActivities() {
 		Config config = super.loadConfig(null);
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with "true".  kai, jun'16
+		
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		createFacilities(sc);
@@ -135,7 +138,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime ) ;
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime ) ;
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults() ;
 		builder.setLeastCostPathCalculatorFactory( new DijkstraFactory() );

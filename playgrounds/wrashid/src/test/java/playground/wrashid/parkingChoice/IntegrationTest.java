@@ -25,6 +25,9 @@ public class IntegrationTest  extends TestCase {
 		ParkingChoiceLib.isTestCaseRun=true;
 		Controler controler=new Controler("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
 		
+		controler.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+		
 		LinkedList<PParking> parkingCollection= new LinkedList<PParking>();
 		
 		for (int i = 0; i < 10; i++) {

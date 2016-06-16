@@ -56,8 +56,7 @@ public class ZonalTaxiOptimizer
         zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
         System.err.println("No conversion of SRS is done");
 
-        this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(
-                optimContext.getNetwork(),
+        this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(optimContext.network,
                 new ZoneFinderImpl(zones, params.expansionDistance));
 
         //FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to

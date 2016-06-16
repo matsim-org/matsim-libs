@@ -19,7 +19,6 @@
 
 package playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines;
 
-import java.util.Collection;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.router.DynRoutingModule;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.*;
 
@@ -62,5 +62,10 @@ public class TaxiModule
 
         addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
         addControlerListenerBinding().to(TaxiStatsDumper.class);
+
+        if (TaxiConfigGroup.get(getConfig()).getTimeProfiles()) {
+            addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
+            //add more time profiles if necessary
+        }
     }
 }

@@ -82,7 +82,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 		// activities
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(blackList,
-						new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities())));
+						new CharyparNagelActivityScoring(params, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities()))));
 		//		CharyparNagelActivityScoring warns if first activity of the day and last activity of the day are not equal.
 		//		As we have home and remote_home activities, this case occurs on intention very often in our scenarios.
 		//		Ergo we have to suppress this output or we will get GBs of logs...

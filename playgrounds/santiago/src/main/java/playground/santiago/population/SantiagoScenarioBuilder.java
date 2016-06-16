@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/casoBase5_NP/";
+	final String pathForMatsim = "../../../runs-svn/santiago/cluster_1/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
@@ -165,49 +165,49 @@ public class SantiagoScenarioBuilder {
 		double sampleSizeEOD = populationMap.get(popA0eAX).getPersons().size() + populationMap.get(popA0neAX).getPersons().size(); 
 		
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population populationTmp = scenarioTmp.getPopulation();
+
 		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
 		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
-		
+		Population populationTmp = scenarioTmp.getPopulation();
 		//randomizeEndTimes(populationTmp);
 		
 		//finish population
-		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
-		aap.run();
+//		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+//		aap.run();
 
 		//add here so the end times will not be randomized
-		addFreightPop(aap.getOutPop());
+		addFreightPop(/*aap.getOutPop()*/populationTmp);
 		
-		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
+		new PopulationWriter(/*aap.getOutPop()*/populationTmp).write(outputDir + "plans/plans_final.xml.gz");
 				
 		//finish config
-		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
-		setActivityParams(acts, config);
+//		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
+//		setActivityParams(acts, config);
 
 		setCountsParameters(config.counts(), sampleSizeEOD);
 		setQSimParameters(config.qsim(), sampleSizeEOD);
 		new ConfigWriter(config).write(outputDir + "config_final.xml");
 	}
 
-	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
-		for(String act :acts.keySet()){
-			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-				//do nothing
-			} else {
-				ActivityParams params = new ActivityParams();
-				params.setActivityType(act);
-				params.setTypicalDuration(acts.get(act));
-				// Minimum duration is now specified by typical duration.
-//				params.setMinimalDuration(acts.get(act).getSecond());
-				params.setClosingTime(Time.UNDEFINED_TIME);
-				params.setEarliestEndTime(Time.UNDEFINED_TIME);
-				params.setLatestStartTime(Time.UNDEFINED_TIME);
-				params.setOpeningTime(Time.UNDEFINED_TIME);
-				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-				config.planCalcScore().addActivityParams(params);
-			}
-		}
-	}
+//	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
+//		for(String act :acts.keySet()){
+//			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+//				//do nothing
+//			} else {
+//				ActivityParams params = new ActivityParams();
+//				params.setActivityType(act);
+//				params.setTypicalDuration(acts.get(act));
+//				// Minimum duration is now specified by typical duration.
+////				params.setMinimalDuration(acts.get(act).getSecond());
+//				params.setClosingTime(Time.UNDEFINED_TIME);
+//				params.setEarliestEndTime(Time.UNDEFINED_TIME);
+//				params.setLatestStartTime(Time.UNDEFINED_TIME);
+//				params.setOpeningTime(Time.UNDEFINED_TIME);
+//				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+//				config.planCalcScore().addActivityParams(params);
+//			}
+//		}
+//	}
 
 	/**
 	 * Freight traffic will only be added to population if file exists. Otherwise do nothing.
@@ -488,75 +488,75 @@ public class SantiagoScenarioBuilder {
 		return populationOut;
 	}
 	
-	private void randomizeEndTimes(Population population){
-		log.info("Randomizing activity end times...");
-		Random random = MatsimRandom.getRandom();
-		for(Person person : population.getPersons().values()){
-			double timeShift = 0.;
-			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-				if(pe instanceof Activity){
-					Activity act = (Activity) pe;
-					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
-						if(act.getEndTime() - act.getStartTime() == 0){
-							timeShift += 1800.;
-						}
-					}
-				}
-			}
-			
-			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			Activity lastAct = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
-			
-			double delta = 0;
-			while(delta == 0){
-				delta = createRandomEndTime(random);
-				if(firstAct.getEndTime() + delta < 0){
-					delta = 0;
-				}
-				if(lastAct.getStartTime() + delta + timeShift > 24 * 3600){
-					delta = 0;
-				}
-				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
-					// if an activity end time for last activity exists, it should be 24:00:00
-					// in order to avoid zero activity durations, this check is done
-					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
-						delta = 0;
-					}
-				}
-			}
-			
-			for(int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++){
-				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
-				if(pe instanceof Activity){
-					Activity act = (Activity)pe;
-					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
-							act.setStartTime(act.getStartTime() + delta);
-						}
-						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
-							act.setEndTime(act.getEndTime() + delta);
-						}
-					}
-//					else {
-//						log.warn("This should not happen! ");
+//	private void randomizeEndTimes(Population population){
+//		log.info("Randomizing activity end times...");
+//		Random random = MatsimRandom.getRandom();
+//		for(Person person : population.getPersons().values()){
+//			double timeShift = 0.;
+//			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+//				if(pe instanceof Activity){
+//					Activity act = (Activity) pe;
+//					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+//						if(act.getEndTime() - act.getStartTime() == 0){
+//							timeShift += 1800.;
+//						}
 //					}
-				}
-			}
-		}
-		log.info("...Done.");
-	}
+//				}
+//			}
+//			
+//			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+//			Activity lastAct = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
+//			
+//			double delta = 0;
+//			while(delta == 0){
+//				delta = createRandomEndTime(random);
+//				if(firstAct.getEndTime() + delta < 0){
+//					delta = 0;
+//				}
+//				if(lastAct.getStartTime() + delta + timeShift > 24 * 3600){
+//					delta = 0;
+//				}
+//				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
+//					// if an activity end time for last activity exists, it should be 24:00:00
+//					// in order to avoid zero activity durations, this check is done
+//					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
+//						delta = 0;
+//					}
+//				}
+//			}
+//			
+//			for(int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++){
+//				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+//				if(pe instanceof Activity){
+//					Activity act = (Activity)pe;
+//					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+//						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
+//							act.setStartTime(act.getStartTime() + delta);
+//						}
+//						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
+//							act.setEndTime(act.getEndTime() + delta);
+//						}
+//					}
+////					else {
+////						log.warn("This should not happen! ");
+////					}
+//				}
+//			}
+//		}
+//		log.info("...Done.");
+//	}
 	
-	private double createRandomEndTime(Random random){
-		//draw two random numbers [0;1] from uniform distribution
-		double r1 = random.nextDouble();
-		double r2 = random.nextDouble();
-		
-		//Box-Muller-Method in order to get a normally distributed variable
-		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		double endTime = 20*60 * normal;
-		
-		return endTime;
-	}
+//	private double createRandomEndTime(Random random){
+//		//draw two random numbers [0;1] from uniform distribution
+//		double r1 = random.nextDouble();
+//		double r2 = random.nextDouble();
+//		
+//		//Box-Muller-Method in order to get a normally distributed variable
+//		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
+//		double endTime = 20*60 * normal;
+//		
+//		return endTime;
+//	}
 	
 	/**
 	 * 

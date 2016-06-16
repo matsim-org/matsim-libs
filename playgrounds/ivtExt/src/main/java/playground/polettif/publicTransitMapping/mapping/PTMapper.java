@@ -23,14 +23,19 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
- * Provides the contract for an implementation of ptLines routing.
+ * Provides the contract for an multithread
+ * implementation of public transit mapping.
+ *
+ * Currently redirects to the only implementation
+ * {@link PTMapperPseudoRouting}.
  *
  * @author polettif
  */
@@ -38,54 +43,116 @@ public abstract class PTMapper {
 
 	protected static Logger log = Logger.getLogger(PTMapper.class);
 
-	protected final TransitSchedule schedule;
 	protected final PublicTransitMappingConfigGroup config;
-	protected NetworkFactory networkFactory;
+	protected Network network;
+	protected TransitSchedule schedule;
 
 	/**
-	 * The provided schedule is expected to already contain for each transit route
-	 * 	- the stops in the sequence they will be served.
-	 * 	- the scheduled times.
+	 * Routes the unmapped MATSim Transit Schedule to the network using the file
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
 	 *
-	 * The routes will be newly routed. Any former routes will be overwritten.
-	 * Changes are done on the schedule provided here.
+	 * @see playground.polettif.publicTransitMapping.workbench.CreateDefaultConfig
 	 *
-	 * @param schedule which will be newly routed.
-	 * @param config a PublicTransitMapping config that defines all parameters used
-	 *               for mapping.
+	 * @param args <br/>[0] PublicTransitMapping config file<br/>
 	 */
-	protected PTMapper(TransitSchedule schedule, PublicTransitMappingConfigGroup config) {
-		this.schedule = schedule;
-		this.config = config;
+	public static void main(String[] args) {
+		if(args.length == 1) {
+			run(args[0]);
+		} else {
+			throw new IllegalArgumentException("Incorrect number of arguments: [0] config file");
+		}
 	}
 
 	/**
-	 * Loads the PublicTransitMapping config file. If pahts to input files
+	 * Routes the unmapped MATSim Transit Schedule to the network using the file
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
+	 *
+	 * @see playground.polettif.publicTransitMapping.workbench.CreateDefaultConfig
+	 *
+	 * @param configFile the PublicTransitMapping config file
+	 */
+	public static void run(String configFile) {
+		new PTMapperPseudoRouting(configFile).run();
+	}
+
+	public static void run(PublicTransitMappingConfigGroup ptmConfig, TransitSchedule schedule, Network network) {
+		new PTMapperPseudoRouting(ptmConfig, schedule, network).run();
+	}
+
+	/**
+	 * If the config has schedule and network files defined, they are loaded.
+	 * <p/>
+	 *
+	 * @param config the config
+	 */
+	public PTMapper(PublicTransitMappingConfigGroup config) {
+		this.config = config;
+		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
+		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
+	}
+
+	/**
+	 * Use this constructor if you just want to use the config for mapping parameters.
+	 * The provided schedule is expected to contain the stops sequence and
+	 * the stop facilities each transit route. The routes will be newly routed,
+	 * any former routes will be overwritten. Changes are done on the schedule
+	 * network provided here.
+	 * <p/>
+	 *
+	 * @param config a PublicTransitMapping config that defines all parameters used
+	 *               for mapping.
+	 * @param schedule which will be newly routed.
+	 * @param network schedule is mapped to this network, is modified
+	 */
+	public PTMapper(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
+		this.config = config;
+		this.schedule = schedule;
+		this.network = network;
+	}
+
+	/**
+	 * Constructor:<p/>
+	 *
+	 * Loads the PublicTransitMapping config file. If paths to input files
 	 * (schedule and network) are provided in the config, mapping can be run
-	 * via {@link #mapFilesFromConfig()}
+	 * via {@link #run()}
 	 *
 	 * @param configPath the config file
 	 */
 	public PTMapper(String configPath) {
 		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup() ) ;
 		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
-		this.schedule = null;
+		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
+		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
 	}
-
-	/**
-	 * Reads the schedule and network file specified in the config and
-	 * maps the schedule to the network. Writes the output files as well
-	 * if defined in config.
-	 */
-	public abstract void mapFilesFromConfig();
 
 	/**
 	 * Based on the stop facilities and transit routes in this.schedule
 	 * the schedule will be mapped to the given network. Both schedule and
-	 * network are modified.
+	 * network are modified.<p/>
 	 *
-	 * @param network is a multimodal network
+	 * Reads the schedule and network file specified in the PublicTransitMapping
+	 * config and maps the schedule to the network. Writes the output files as
+	 * well if defined in config. The mapping parameters defined in the config
+	 * are used.
 	 */
-	public abstract void mapScheduleToNetwork(Network network);
+	public abstract void run();
 
+
+	// Setters and Getters
+	public void setSchedule(TransitSchedule schedule) {
+		this.schedule = schedule;
+	}
+
+	public void setNetwork(Network network) {
+		this.network = network;
+	}
+
+	public TransitSchedule getSchedule() {
+		return schedule;
+	}
+
+	public Network getNetwork() {
+		return network;
+	}
 }

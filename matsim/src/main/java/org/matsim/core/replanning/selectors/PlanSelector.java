@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * PlanSelector.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +16,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 
 /**
- * select a plan of a person
+ * @author nagel
  *
- * @author mrieser
  */
-public interface PlanSelector extends GenericPlanSelector<Plan, Person> {}
+public interface PlanSelector<T extends BasicPlan, I> {
+	
+	T selectPlan( HasPlansAndId<T, I> member ) ; 
+
+}

@@ -28,13 +28,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 
-import playground.artemc.crowding.BusFacilityInteractionEvent;
 import playground.artemc.crowding.events.CrowdedPenaltyEvent;
 import playground.artemc.crowding.events.PersonCrowdednessEvent;
 
@@ -51,9 +49,11 @@ import playground.artemc.crowding.events.PersonCrowdednessEvent;
  */
 public class LoadFactor60ScoringFunction implements ScoringFunction {
 	
-	private final static double loadFactorPenalty = 0.006 / 60d; //beta_lf_b, Tirachini, p.44
+//	private final static double loadFactorBeta = 0.006 / 60d; //beta_lf_b, Tirachini, p.44
 //	private final static double standingPenalty = 16 / 3600d; // documentation ???
-	
+
+	private final static double loadFactorBeta = ((0.66 + 0.48) * 6.0 / 11.0) / 3600.0; //beta_lf_b, Tirachini, p.44, ratio of travel time and crowded travel time: 6/11
+
 	private ScoringFunction delegate ;
 	private double score;
 	private ScoreTracker scoreTracker;
@@ -115,12 +115,12 @@ public class LoadFactor60ScoringFunction implements ScoringFunction {
 			double externality = 0;
 			double monetaryExternality = 0;
 			
-			// Use of the Tirachini's formula (guillaumer)
+			// Use of the Tirachini's formula
 			
 			// The crowding disutilities arise when the load factor reach 60%
-			seatingPenalty += (travelTime + dwellTime) * loadFactorPenalty * Math.max(loadFactor - 0.6, 0); 
+			seatingPenalty += (travelTime + dwellTime) * loadFactorBeta * Math.max(loadFactor - 0.6, 0);
 		
-			standingPenalty += (travelTime + dwellTime) * loadFactorPenalty * Math.max(loadFactor - 0.6, 0); 
+			standingPenalty += (travelTime + dwellTime) * loadFactorBeta * Math.max(loadFactor - 0.6, 0);
 			
 			if (isSitting)
 			{
@@ -142,7 +142,7 @@ public class LoadFactor60ScoringFunction implements ScoringFunction {
 			if (events != null)
 			{
 				// If we have an EventManager, report the penalty calculated to it
-				// "getTime", "getVehicleId" and "externality" have beed added at the initial class (guillaumer)
+				// "getTime", "getVehicleId" and "externality" have beed added at the initial class
 				events.processEvent(new CrowdedPenaltyEvent(pce.getTime(), personId, vehicleId, penalty, externality));
 			
 				//Paying for externality

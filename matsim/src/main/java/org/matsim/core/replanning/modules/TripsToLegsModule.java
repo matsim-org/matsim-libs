@@ -50,7 +50,6 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	/**
 	 * Initializes an instance, allowing to specify additional activity types to
 	 * consider as stage activities.
-	 * @param controler
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
 	 * @param tripRouterProvider
 	 * @param globalConfigGroup

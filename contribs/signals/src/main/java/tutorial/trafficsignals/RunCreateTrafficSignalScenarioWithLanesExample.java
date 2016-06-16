@@ -60,6 +60,10 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 
 	private static final Logger log = Logger
 			.getLogger(RunCreateTrafficSignalScenarioWithLanesExample.class);
+	
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/";
+
+	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 
 	private int onset1 = 0;
 	private int dropping1 = 55;
@@ -212,74 +216,55 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 
 	public String run() {
 		
-		String inputDir = "../../matsim/examples/tutorial/unsupported/example90TrafficLights/";
-		String outputDir = "../../matsim/output/example90TrafficLights/";
-		
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(inputDir + "network.xml.gz");
-		config.plans().setInputFile(inputDir + "population.xml.gz");
+		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
+		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
 		config.qsim().setUseLanes(true);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+		SignalSystemsConfigGroup signalSystemsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalSystemsConfigGroup.setUseSignalSystems(true);
 		config.controler().setMobsim("qsim");
 		config.qsim().setNodeOffset(20.0);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
-						.loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalSystemsConfigGroup).loadSignalsData());
 
 		this.createLanes((MutableScenario) scenario);
 
-		SignalsData signalsData = (SignalsData) scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 
-		this.createGroupsAndSystem2(scenario,
-				signalsData.getSignalSystemsData(),
-				signalsData.getSignalGroupsData());
-		this.createGroupsAndSystem5(scenario,
-				signalsData.getSignalSystemsData(),
-				signalsData.getSignalGroupsData());
+		this.createGroupsAndSystem2(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
+		this.createGroupsAndSystem5(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
 		this.createSystem2Control(scenario, signalsData.getSignalControlData());
 		this.createSystem5Control(scenario, signalsData.getSignalControlData());
 
-		File outputDirectory = new File(outputDir);
+		File outputDirectory = new File(OUTPUT_DIR);
 		if (!outputDirectory.exists()) {
 			outputDirectory.mkdir();
 		}
 
-		config.network().setLaneDefinitionsFile(
-				outputDir + "lane_definitions_v2.0.xml");
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(
-				outputDir + "signal_systems.xml");
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(
-				outputDir + "signal_groups.xml");
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
-				outputDir + "signal_control.xml");
+		config.network().setLaneDefinitionsFile(OUTPUT_DIR + "lane_definitions_v2.0.xml");
+		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(OUTPUT_DIR + "signal_control.xml");
 
 		// write to file
-		String configFile = outputDir + "config.xml";
+		String configFile = OUTPUT_DIR + "config.xml";
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);
 		
-		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(
-				scenario.getLanes());
+		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(scenario.getLanes());
 		writerDelegate.write(config.network().getLaneDefinitionsFile());
 
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
-				.getSignalSystemFile());
-		signalsWriter.setSignalGroupsOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
-				.getSignalGroupsFile());
-		signalsWriter.setSignalControlOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
-				.getSignalControlFile());
+		signalsWriter.setSignalSystemsOutputFilename(signalSystemsConfigGroup.getSignalSystemFile());
+		signalsWriter.setSignalGroupsOutputFilename(signalSystemsConfigGroup.getSignalGroupsFile());
+		signalsWriter.setSignalControlOutputFilename(signalSystemsConfigGroup.getSignalControlFile());
 		signalsWriter.writeSignalsData(scenario);
 
-		log.info("Config of traffic light scenario with lanes is written to "
-				+ configFile);
-		log.info("Visualize scenario by calling "
-				+ "VisTrafficSignalScenarioWithLanes.main() of contrib.otfvis project.");
+		log.info("Config of traffic light scenario with lanes is written to " + configFile);
+		log.info("Visualize scenario by calling VisTrafficSignalScenarioWithLanes in the same package.");
 		return configFile;
 
 	}
