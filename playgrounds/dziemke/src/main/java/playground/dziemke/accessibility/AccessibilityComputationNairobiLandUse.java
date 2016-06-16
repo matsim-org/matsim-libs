@@ -60,8 +60,9 @@ public class AccessibilityComputationNairobiLandUse {
 	public static void main(String[] args) {
 		// Input and output
 		String networkFile = "../../../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network.xml";
-		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
-		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/09/";
+//		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/facilities.xml";
+		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/11/";
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
@@ -71,9 +72,9 @@ public class AccessibilityComputationNairobiLandUse {
 		// QGis
 		boolean createQGisOutput = true;
 		boolean includeDensityLayer = false;
-		Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
+		Double lowerBound = -3.5; // (upperBound - lowerBound) is ideally easily divisible by 7
 		Double upperBound = 3.5;
-		Integer range = 10; // in the current implementation, this must always be 9
+		Integer range = 9; // in the current implementation, this must always be 9
 		int symbolSize = 2010;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
@@ -115,6 +116,10 @@ public class AccessibilityComputationNairobiLandUse {
 //		log.warn( "found activity types: " + activityTypes );
 		final List<String> activityTypes = new ArrayList<>();
 		activityTypes.add("Educational");
+//		activityTypes.add("Commercial");
+//		activityTypes.add("Industrial");
+//		activityTypes.add("Public Purpose");
+//		activityTypes.add("Recreational");
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
@@ -156,7 +161,9 @@ public class AccessibilityComputationNairobiLandUse {
 //							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 
 //							listener.addAdditionalFacilityData(homes) ;
-							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+//							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+							listener.generateGridsAndMeasuringPointsByCustomBoundary(boundingBox.getXMin(), boundingBox.getYMin(),
+									boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
 							listener.writeToSubdirectoryWithName(actType);
 							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;

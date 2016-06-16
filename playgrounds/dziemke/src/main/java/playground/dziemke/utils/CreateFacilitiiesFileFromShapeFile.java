@@ -1,7 +1,26 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dziemke.utils;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -18,14 +37,18 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-
 /**
  * @author dziemke
  */
 public class CreateFacilitiiesFileFromShapeFile {
-	static String shapeFileName = "../../../shared-svn/projects/maxess/data/nairobi/nairobi_LU_2010/nairobi_LU.shp";
-	static String attributeCaption = "LANDUSE";
-	static String facilitiesOutputFile = "../../../shared-svn/projects/maxess/data/nairobi/nairobi_LU_2010/facilites.xml";
+	private final static Logger LOG = Logger.getLogger(CreateFacilitiiesFileFromShapeFile.class);
+
+	static String shapeFileName = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/nairobi_LU.shp";
+	static String captionOfIdentifierAttribute = "OBJECTID";
+	static String captionOfValueAttribute = "LANDUSE";
+	static String facilitiesOutputFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
+	static String facilitiesFileDescription = "Facilities in Nairobi based on Land-Use Shapefile";
+	// TODO A coordinate transformation might be necessary
 	
 	public static void main(String[] args) {
 		Collection<SimpleFeature> blocks = collectFeatures();		
@@ -37,31 +60,27 @@ public class CreateFacilitiiesFileFromShapeFile {
 	private static Collection<SimpleFeature> collectFeatures() {
 		ShapeFileReader reader = new ShapeFileReader();
 		Collection<SimpleFeature> features = reader.readFileAndInitialize(shapeFileName);
-//		Map <String, SimpleFeature> blocks = new HashMap<>();
-//		for (SimpleFeature feature : features) {
-//			blocks.put((String) feature.getAttribute(attributeCaption), feature);
-//		}
+		LOG.info("All features collected.");
 		return features;
 	}
 	
 	
 	private static ActivityFacilities createFacilities(Collection<SimpleFeature> blocks) {
-		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities("Homes"); // adapt name
+		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(facilitiesFileDescription);
 		ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
-		int i = 1;
-		for (SimpleFeature feature : blocks) {		
-//			Id<ActivityFacility> id = Id.create((String) feature.getAttribute("OBJECTID"), ActivityFacility.class);
-			Id<ActivityFacility> id = Id.create(i , ActivityFacility.class);
+		for (SimpleFeature feature : blocks) {
+			String objectId = String.valueOf(feature.getAttribute(captionOfIdentifierAttribute));
+			Id<ActivityFacility> id = Id.create(objectId , ActivityFacility.class);
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 			Point point = geometry.getCentroid();
 			Coord coord = CoordUtils.createCoord(point.getX(), point.getY());
 			ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, coord);
-			String landUseType = (String) feature.getAttribute("LANDUSE");
+			String landUseType = (String) feature.getAttribute(captionOfValueAttribute);
 			ActivityOption activityOption = activityFacilitiesFactory.createActivityOption(landUseType);
 			activityFacility.addActivityOption(activityOption);
 			activityFacilities.addActivityFacility(activityFacility);
-			i++;
 		}
+		LOG.info("All activity facilities created.");
 		return activityFacilities;
 	}
 	
@@ -69,5 +88,6 @@ public class CreateFacilitiiesFileFromShapeFile {
 	private static void writeFacilitiesFile(ActivityFacilities activityFacilities) {
 		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(activityFacilities);
 		facilitiesWriter.write(facilitiesOutputFile);
+		LOG.info("Faciltiy file written.");
 	}
 }
