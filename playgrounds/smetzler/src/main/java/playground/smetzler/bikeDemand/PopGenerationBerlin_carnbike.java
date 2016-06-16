@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Point;
 public class PopGenerationBerlin_carnbike implements Runnable {
 	
 
-	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/Berlin_carnbike.xml";
+	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/Berlin_carnbike_2000_kleiner.xml";
 	//String DHDN = "EPSG:3068";
 
 
@@ -53,15 +53,22 @@ public class PopGenerationBerlin_carnbike implements Runnable {
 		populationWriter.write(outputPop);
 	}
 	
-	private Random rnd = new Random(1234); //1234 = seed
+	private Random rnd = new Random(1111); //1234 = seed
 	// Create a GeometryFactory if you don't have one already
 	GeometryFactory geometryFactory = new GeometryFactory();
 
-//	//berlin quadrat
-	double minX = 4578619;
-	double maxX = 4608229;
-	double minY = 5810205;
-	double maxY = 5830048;
+////	//berlin rechteck
+//	double minX = 4578619;
+//	double maxX = 4608229;
+//	double minY = 5810205;
+//	double maxY = 5830048;
+	
+//	//berlin rechteck etwas kleiner
+	double minX = 4587000;
+	double maxX = 4600000;
+	double minY = 5816000;
+	double maxY = 5824500;
+	
 //	Envelope e = new Envelope(minX, maxX, minY, maxY);
 	// Simply pass an array of Coordinate or a CoordinateSequence to its method
 	Coordinate sw = new Coordinate(minX, minY);
@@ -91,8 +98,8 @@ public class PopGenerationBerlin_carnbike implements Runnable {
 	
 
 	private void generatePopulation() {
-		generateHomeWorkHomeTrips("home1", "work1", 3000, TransportMode.bike);
-		generateHomeWorkHomeTrips("home1", "work1", 3000, TransportMode.car);// create 1000 trips from zone 'home1' to 'work1'
+		generateHomeWorkHomeTrips("home1", "work1", 2000, TransportMode.bike);
+		generateHomeWorkHomeTrips("home1", "work1", 2000, TransportMode.car);// create 1000 trips from zone 'home1' to 'work1'
 		//... generate more trips here
 	}
 
@@ -142,7 +149,8 @@ public class PopGenerationBerlin_carnbike implements Runnable {
 	}
 
 	private Id<Person> createId(String source, String sink, int i, String transportMode) {
-		return Id.create(transportMode + "_" + source + "_" + sink + "_" + i, Person.class);
+//		return Id.create(transportMode + "_" + source + "_" + sink + "_" + i, Person.class);
+		return Id.create(transportMode + i, Person.class);
 	}
 
 }
