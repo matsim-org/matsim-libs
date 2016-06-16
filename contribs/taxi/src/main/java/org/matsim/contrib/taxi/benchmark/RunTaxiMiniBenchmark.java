@@ -60,7 +60,7 @@ public class RunTaxiMiniBenchmark
         Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
 
         for (int r = 0; r < runs; r++) {
-            createMiniBenchmark(config).run(optimizerFactory);//TODO
+            createMiniBenchmark(config).run(optimizerFactory);
         }
     }
 

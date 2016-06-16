@@ -21,9 +21,8 @@ package org.matsim.core.network;
 
 import java.util.*;
 
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.*;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -47,7 +46,7 @@ public class FixedIntervalTimeVariantAttribute
     public FixedIntervalTimeVariantAttribute(int timeSlice, int maxTime)
     {
         this.timeSlice = timeSlice;
-        this.numSlots = (maxTime / timeSlice) + 1;
+        this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeSlice);
     }
 
 
@@ -115,11 +114,7 @@ public class FixedIntervalTimeVariantAttribute
             return baseValue;
         }
 
-        int bin = ((int)time) / timeSlice;
-        if (bin >= numSlots) {
-            bin = numSlots - 1;
-        }
-
+        int bin = TimeBinUtils.getTimeBinIndex(time, timeSlice, numSlots);
         return values[bin];
     }
 
