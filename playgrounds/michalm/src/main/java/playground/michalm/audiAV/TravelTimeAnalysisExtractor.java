@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.audiAV;
+package playground.michalm.audiAV;
 
 import java.util.*;
 
