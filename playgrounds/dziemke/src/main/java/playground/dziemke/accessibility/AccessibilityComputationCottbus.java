@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dziemke.accessibility;
 
 import java.util.ArrayList;
@@ -29,7 +47,7 @@ import org.matsim.facilities.ActivityFacilities;
 import playground.dziemke.utils.LogToOutputSaver;
 
 public class AccessibilityComputationCottbus {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
+	public static final Logger log = Logger.getLogger(AccessibilityComputationCottbus.class);
 	
 	private static final double cellSize = 200.;
 	
