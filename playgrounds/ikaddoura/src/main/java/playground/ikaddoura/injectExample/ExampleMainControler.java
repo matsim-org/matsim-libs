@@ -50,13 +50,23 @@ public class ExampleMainControler {
 			
 			@Override public void install() {
 
+				// Use case I
+				
 				this.bind(IKWriter.class); // bind a class which provides some functionality
 				
 				this.bind(IKEventHandler.class).asEagerSingleton(); // bind the implemented event handler which needs to be filled during the simulation
 				this.addEventHandlerBinding().to(IKEventHandler.class); // add the implemented event handler
 				
-//				this.bind(IKControlerListener.class);
+//				this.bind(IKControlerListener.class); // not necessary
 				this.addControlerListenerBinding().to(IKControlerListener.class); // add the implemented controler listener
+				
+				
+				// Use case II
+				
+				// a combined event handler and controler listener has to be added twice and bound as singleton.
+				this.bind(IKControlerListenerAndEventHandler.class).asEagerSingleton();
+				this.addControlerListenerBinding().to(IKControlerListenerAndEventHandler.class);
+				this.addEventHandlerBinding().to(IKControlerListenerAndEventHandler.class);
 				
 			}
 
