@@ -30,6 +30,7 @@ import playground.polettif.publicTransitMapping.hafas.lib.StopReader;
 import playground.polettif.publicTransitMapping.hafas.v1.FPLANReaderV1;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class HafasConverterOperatorAsLine extends Hafas2TransitSchedule {
 	}
 
 	@Override
-	public void createSchedule(String pathToInputFiles) {
+	public void createSchedule(String pathToInputFiles) throws IOException {
 		log.info("Creating the schedule based on HAFAS...");
 
 		// 1. Read and create stop facilities

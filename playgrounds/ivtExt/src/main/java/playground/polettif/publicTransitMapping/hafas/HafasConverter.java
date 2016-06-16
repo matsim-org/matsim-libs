@@ -37,6 +37,7 @@ import playground.polettif.publicTransitMapping.hafas.v2.FPLANReader;
 import playground.polettif.publicTransitMapping.hafas.v2.FPLANRoute;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,19 +48,19 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class HafasConverterLines extends Hafas2TransitSchedule {
+public class HafasConverter extends Hafas2TransitSchedule {
 
 	private TransitScheduleFactory scheduleFactory;
 	private VehiclesFactory vehicleFactory;
 
-	public HafasConverterLines(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public HafasConverter(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		super(schedule, vehicles, transformation);
 		this.scheduleFactory = schedule.getFactory();
 		this.vehicleFactory = vehicles.getFactory();
 	}
 
 	@Override
-	public void createSchedule(String pathToInputFiles) {
+	public void createSchedule(String pathToInputFiles) throws IOException {
 		log.info("Creating the schedule based on HAFAS...");
 
 		// 1. Read and create stop facilities
@@ -172,7 +173,11 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 	private Id<TransitLine> createLineId(FPLANRoute route) {
 		if(route.getOperator().equals("SBB")) {
 			long firstStopId;
-			long lastStopId ;
+			long lastStopId;
+
+			// possible S-Bahn number
+			String sBahnNr = (route.getVehicleTypeId().toString().equals("S") && route.getRouteDescription() != null) ? route.getRouteDescription() : "";
+
 			try {
 				firstStopId = Long.parseLong(route.getFirstStopId());
 				lastStopId = Long.parseLong(route.getLastStopId());
@@ -180,16 +185,17 @@ public class HafasConverterLines extends Hafas2TransitSchedule {
 				firstStopId = 0;
 				lastStopId = 1;
 			}
+
 			if(firstStopId < lastStopId) {
-				return Id.create("SBB_" + route.getVehicleTypeId() + "_" + route.getFirstStopId() + "-" + route.getLastStopId(), TransitLine.class);
+				return Id.create("SBB_" + route.getVehicleTypeId() + sBahnNr + "_" + route.getFirstStopId() + "-" + route.getLastStopId(), TransitLine.class);
 			} else {
-				return Id.create("SBB_" + route.getVehicleTypeId() + "_" + route.getLastStopId() + "-" + route.getFirstStopId(), TransitLine.class);
+				return Id.create("SBB_" + route.getVehicleTypeId() + sBahnNr + "_" + route.getLastStopId() + "-" + route.getFirstStopId(), TransitLine.class);
 			}
 		}
 		else if(route.getRouteDescription() == null) {
 			return Id.create(route.getOperator(), TransitLine.class);
 		} else {
-			return Id.create(route.getOperator() + "_" + route.getRouteDescription(), TransitLine.class);
+			return Id.create(route.getOperator() + "_line" + route.getRouteDescription(), TransitLine.class);
 		}
 	}
 

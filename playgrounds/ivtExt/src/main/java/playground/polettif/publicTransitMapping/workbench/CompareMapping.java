@@ -52,7 +52,7 @@ public class CompareMapping {
 		// cleanup
 		Set<String> modesToRemove = new HashSet<>();
 		modesToRemove.add("rail");
-//		modesToRemove.add("tram");
+		modesToRemove.add("tram");
 		modesToRemove.add("gondola");
 		modesToRemove.add("funicular");
 		modesToRemove.add("ferry");
@@ -62,9 +62,9 @@ public class CompareMapping {
 		// ptm
 		PublicTransitMappingConfigGroup ptmConfig = PublicTransitMappingConfigGroup.createDefaultConfig();
 		ptmConfig.setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType.travelTime);
-		ptmConfig.setMaxNClosestLinks(6);
-		ptmConfig.setLinkDistanceTolerance(1.2);
-		ptmConfig.setMaxLinkCandidateDistance(60);
+		ptmConfig.setMaxNClosestLinks(10);
+		ptmConfig.setLinkDistanceTolerance(1.1);
+		ptmConfig.setMaxLinkCandidateDistance(80);
 		ptmConfig.setNumOfThreads(4);
 		ptmConfig.setModeRoutingAssignmentStr("bus:bus,car|tram:tram");
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
