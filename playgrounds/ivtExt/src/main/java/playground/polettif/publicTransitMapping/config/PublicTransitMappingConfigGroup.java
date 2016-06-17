@@ -120,23 +120,23 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
 				"\t\tMust be >= 1.");
 		map.put(TRAVEL_COST_TYPE,
-				"Defines which link attribute should be used for routing. Possible values \""+ TravelCostType.linkLength+"\" (default) " +
+				"Defines which link attribute should be used for routing. Possible values \""+ TravelCostType.linkLength+"\" (default) \n" +
 				"\t\tand \""+ TravelCostType.travelTime+"\".");
 		map.put(MAX_NCLOSEST_LINKS,
 				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
 				"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
 		map.put(NODE_SEARCH_RADIUS,
-				"(concerns Link Candidates) Defines the radius [meter] from a stop facility within nodes are searched. Values up to 2000 do" +
+				"(concerns Link Candidates) Defines the radius [meter] from a stop facility within nodes are searched. Values up to 2000 do \n" +
 				"\t\tdon't have a significant impact on performance.");
 		map.put(MAX_LINK_CANDIDATE_DISTANCE,
 				"(concerns Link Candidates) The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(SCHEDULE_FREESPEED_MODES,
-				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel" +
-				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all" +
-				"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional" +
+				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel \n" +
+				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all \n" +
+				"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional \n" +
 				"\t\tmodes (rail is recommended) can be added, separated by commas.");
 		map.put(MAX_TRAVEL_COST_FACTOR,
 				"If all paths between two stops have a [travelCost] > ["+MAX_TRAVEL_COST_FACTOR+"] * [minTravelCost], \n" +
@@ -523,7 +523,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(MANUAL_LINK_CANDIDATE_CSV_FILE)
 	public void setManualLinkCandidateCsvFile(String file) {
-		this.manualLinkCandidateCsvFile = file;
+		this.manualLinkCandidateCsvFile = file.equals("") ? null :file;
 	}
 
 	public void loadManualLinkCandidatesCsv() {
@@ -554,10 +554,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(NETWORK_FILE)
-	public String setNetworkFile(String networkFile) {
-		final String old = this.networkFile;
-		this.networkFile = networkFile;
-		return old;
+	public void setNetworkFile(String networkFile) {
+		this.networkFile = networkFile.equals("") ? null : networkFile;
 	}
 
 	@StringGetter(SCHEDULE_FILE)
@@ -569,10 +567,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(SCHEDULE_FILE)
-	public String setScheduleFile(String scheduleFile) {
-		final String old = this.scheduleFile;
-		this.scheduleFile = scheduleFile;
-		return old;
+	public void setScheduleFile(String scheduleFile) {
+		this.scheduleFile = scheduleFile.equals("") ? null : scheduleFile;
 	}
 
 	@StringGetter(OUTPUT_NETWORK_FILE)
@@ -596,10 +592,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(OUTPUT_STREET_NETWORK_FILE)
-	public String setOutputStreetNetworkFile(String outputStreetNetwork) {
-		final String old = this.outputStreetNetworkFile;
-		this.outputStreetNetworkFile = outputStreetNetwork;
-		return old;
+	public void setOutputStreetNetworkFile(String outputStreetNetworkFile) {
+		this.outputStreetNetworkFile = outputStreetNetworkFile.equals("") ? null : outputStreetNetworkFile;
 	}
 
 	public String getOutputScheduleFile() {
@@ -616,6 +610,14 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		final String old = this.outputScheduleFile;
 		this.outputScheduleFile = outputSchedule;
 		return old;
+	}
+
+	public Set<ManualLinkCandidates> getManualLinkCandidates() {
+		Set<ManualLinkCandidates> manualCandidates = new HashSet<>();
+		for(ConfigGroup e : this.getParameterSets(PublicTransitMappingConfigGroup.ManualLinkCandidates.SET_NAME)) {
+			manualCandidates.add((PublicTransitMappingConfigGroup.ManualLinkCandidates) e);
+		}
+		return manualCandidates;
 	}
 
 	/**
