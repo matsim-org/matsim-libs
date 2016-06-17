@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
+import java.util.HashSet;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -49,6 +51,8 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
 	protected Id<Vehicle> vehicleId;
 	private boolean isBEV = true; //TODO set this based on vehicle type
+	private Double maxDischargingPowerInKW, maxLevel2ChargingPowerInKW, maxLevel3ChargingPowerInKW;
+	private HashSet<ChargingPlugType> compatiblePlugTypes;
 
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
@@ -123,7 +127,35 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
 	}
 
-	public Double isBEV() {
-		return this.isBEV ? 1.0 : 0.0;
+	public boolean isBEV() {
+		return this.isBEV;
 	}
+
+	public void setChargingFields(String vehicleTypeName, Double maxDischargingPowerInKW,
+			Double maxLevel2ChargingPowerInKW, Double maxLevel3ChargingPowerInKW, HashSet<ChargingPlugType> compatiblePlugTypes) {
+		this.maxDischargingPowerInKW = maxDischargingPowerInKW;
+		this.maxLevel2ChargingPowerInKW = maxLevel2ChargingPowerInKW;
+		this.maxLevel3ChargingPowerInKW = maxLevel3ChargingPowerInKW;
+		this.compatiblePlugTypes = compatiblePlugTypes;
+	}
+
+	public Double getMaxDischargingPowerInKW() {
+		return maxDischargingPowerInKW;
+	}
+
+	public void setMaxDischargingPowerInKW(Double maxDischargingPowerInKW) {
+	}
+
+	public Double getMaxLevel2ChargingPowerInKW() {
+		return maxLevel2ChargingPowerInKW;
+	}
+
+	public Double getMaxLevel3CharginPowerInKW() {
+		return maxLevel3ChargingPowerInKW;
+	}
+
+	public HashSet<ChargingPlugType> getCompatiblePlugTypes() {
+		return compatiblePlugTypes;
+	}
+
 }
