@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/chargers_v1.dtd">
+<!DOCTYPE chargers SYSTEM "http://matsim.org/files/dtd/chargers_v1.dtd">
 
 <chargers>
 	<charger id="charger_one" link="215" />

@@ -17,6 +17,6 @@
 	capacity    CDATA   #IMPLIED
 	t_0         CDATA   #IMPLIED
 	t_1         CDATA   #IMPLIED
-	battery_charge    CDATA   #IMPLIED
+	initial_soc    CDATA   #IMPLIED
 	battery_capacity  CDATA   #IMPLIED>
 	

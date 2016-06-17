@@ -28,6 +28,7 @@ import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.ev.charging.PartialFastChargingWithQueueingLogic;
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.EnergyConsumptions;
+import playground.michalm.taxi.data.ETaxi;
 
 
 public class ETaxiUtils
@@ -41,26 +42,21 @@ public class ETaxiUtils
 
         // TODO variable AUX -- depends on weather etc...
         // TODO add the Leaf's consumption model for driving 
-        double driveRate = 150. * 3.6; //15 kWh / 100 km == 150 Wh/km; converted into J/m
-        double auxPower = 500; //0.5 kW
-
-        double batteryCapacity = 20 * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = 0.8 * 20 * UnitConversionRatios.J_PER_kWh;
+        double driveRate = 15. * UnitConversionRatios.J_m_PER_kWh_100km; //15 kWh/100km == 150 Wh/km
+        double auxPower = 0.5 * UnitConversionRatios.W_PER_kW; //0.5 kW
 
         for (Vehicle v : taxiData.getVehicles().values()) {
-            ElectricVehicleImpl ev = new ElectricVehicleImpl(
-                    new BatteryImpl(batteryCapacity, initialSoc));
+            ElectricVehicleImpl ev = (ElectricVehicleImpl) ((ETaxi)v).getEv();
             ev.setDriveEnergyConsumption((link, travelTime) -> EnergyConsumptions
                     .consumeFixedDriveEnergy(ev, driveRate, link));
             ev.setAuxEnergyConsumption(
-                    (period) -> consumeFixedAuxEnergyWhenStarted(ev, v, auxPower, period));
-
+                    (period) -> consumeFixedAuxEnergyWhenScheduleStarted(ev, v, auxPower, period));
             evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
         }
     }
 
 
-    public static void consumeFixedAuxEnergyWhenStarted(ElectricVehicle ev, Vehicle taxi,
+    public static void consumeFixedAuxEnergyWhenScheduleStarted(ElectricVehicle ev, Vehicle taxi,
             double auxPower, double period)
     {
         if (taxi.getSchedule().getStatus() == ScheduleStatus.STARTED) {

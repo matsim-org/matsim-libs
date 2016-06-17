@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,64 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.data;
 
-import playground.michalm.ev.discharging.*;
+import org.matsim.contrib.dvrp.data.*;
+
+import playground.michalm.ev.data.*;
 
 
-public class ElectricVehicleImpl
-    implements ElectricVehicle
+public class ETaxi
+    extends VehicleImpl
 {
-    private Battery battery;//not final -- can be swapped
-
-    private DriveEnergyConsumption driveEnergyConsumption;
-    private AuxEnergyConsumption auxEnergyConsumption;
+    private final ElectricVehicle ev;
 
 
-    public ElectricVehicleImpl(Battery battery)
+    public ETaxi(Vehicle vehicle, double batteryCapacity, double initialSoc)
     {
-        this.battery = battery;
+        super(vehicle.getId(), vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(),
+                vehicle.getT1());
+        ev = new ElectricVehicleImpl(new BatteryImpl(batteryCapacity, initialSoc));
     }
 
 
-    @Override
-    public Battery getBattery()
+    public ElectricVehicle getEv()
     {
-        return battery;
-    }
-
-
-    @Override
-    public DriveEnergyConsumption getDriveEnergyConsumption()
-    {
-        return driveEnergyConsumption;
-    }
-
-
-    @Override
-    public AuxEnergyConsumption getAuxEnergyConsumption()
-    {
-        return auxEnergyConsumption;
-    }
-
-
-    @Override
-    public Battery swapBattery(Battery battery)
-    {
-        Battery old = this.battery;
-        this.battery = battery;
-        return old;
-    }
-
-
-    public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption)
-    {
-        this.driveEnergyConsumption = driveEnergyConsumption;
-    }
-
-
-    public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption)
-    {
-        this.auxEnergyConsumption = auxEnergyConsumption;
+        return ev;
     }
 }
