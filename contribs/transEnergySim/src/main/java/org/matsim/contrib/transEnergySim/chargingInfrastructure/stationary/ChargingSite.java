@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.management.ChargingNetworkOperator;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.management.ChargingSitePolicy;
 
@@ -40,6 +41,9 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract Collection<ChargingPlugType> getAllAvailableChargingPlugTypes();
 
 	abstract double estimateChargingSessionDuration(ChargingPlug plug);
+
+	abstract void addNearbyLink(Link link);
+	abstract Collection<Link> getNearbyLinks();
 
 	
 }
