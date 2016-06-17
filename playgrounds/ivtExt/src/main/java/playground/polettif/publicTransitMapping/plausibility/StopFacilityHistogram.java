@@ -28,6 +28,7 @@ import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -38,7 +39,7 @@ import java.util.*;
  * @author polettif
  */
 public class StopFacilityHistogram {
-	
+
 	private TransitSchedule schedule;
 	private Map<String, Integer> histMap = new TreeMap<>();
 	private double[] hist;
@@ -46,16 +47,26 @@ public class StopFacilityHistogram {
 	private static final String SUFFIX_PATTERN = "[.]link:";
 	private static final String SUFFIX = ".link:";
 
+	/**
+	 * @param args [0] schedule file, [1] output file (csv or png), [2] output file (csv or png, optional)
+	 */
 	public static void main(final String[] args) {
-		run(args[0], args[1]);
+		String csvFile = args[1].contains(".csv") ? args[1] : null;
+		String pngFile = args[1].contains(".png") ? args[1] : null;
+
+		if(args.length == 3 && csvFile == null) {
+			csvFile = args[2];
+		} else if(args.length == 3 && pngFile == null){
+			pngFile = args[2];
+		}
+
+		run(ScheduleTools.readTransitSchedule(args[0]), pngFile, csvFile);
 	}
 
-	public static void run(String scheduleFile, String outputPngFile) {
-		new StopFacilityHistogram(ScheduleTools.readTransitSchedule(scheduleFile)).createPng(outputPngFile);
-	}
-
-	public static void run(TransitSchedule schedule, String outputPngFile) {
-		new StopFacilityHistogram(schedule).createPng(outputPngFile);
+	public static void run(TransitSchedule schedule, String outputPngFile, String outputCsvFile) {
+		StopFacilityHistogram h = new StopFacilityHistogram(schedule);
+		if(outputPngFile != null) h.createPng(outputPngFile);
+		if(outputCsvFile != null) h.createCsv(outputCsvFile);
 	}
 
 	public StopFacilityHistogram(TransitSchedule schedule) {
@@ -99,7 +110,7 @@ public class StopFacilityHistogram {
 		return hist[hist.length - 1];
 	}
 
-	public void createCsv(String outputFile) throws FileNotFoundException, UnsupportedEncodingException {
+	public void createCsv(String outputFile) {
 		Map<Tuple<Integer, Integer>, String> stopStatCsv = new HashMap<>();
 		stopStatCsv.put(new Tuple<>(1, 1), "parent stop id");
 		stopStatCsv.put(new Tuple<>(1, 2), "nr of child stop facilities");
@@ -110,7 +121,11 @@ public class StopFacilityHistogram {
 			i++;
 		}
 
-		CsvTools.writeToFile(CsvTools.convertToCsvLines(stopStatCsv), outputFile);
+		try {
+			CsvTools.writeToFile(CsvTools.convertToCsvLines(stopStatCsv), outputFile);
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

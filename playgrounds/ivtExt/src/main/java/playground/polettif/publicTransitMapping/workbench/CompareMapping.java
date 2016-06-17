@@ -39,6 +39,7 @@ public class CompareMapping {
 		String inputGtfs = "data/gtfs/zvv/";
 		String ct = "EPSG:2056";
 		String unmappedMTS = "data/mts/fromGtfs/zvv_mostServices.xml.gz";
+		String filteredUnmappedMTS = "data/mts/fromGtfs/zvv_mostServices_bus.xml.gz";
 		String networkFile = "data/network/mm/zurich_detail.xml.gz";
 		String output = args[0];
 
@@ -58,6 +59,7 @@ public class CompareMapping {
 		modesToRemove.add("ferry");
 		ScheduleCleaner.removeTransitRouteByMode(schedule, modesToRemove);
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+		ScheduleTools.writeTransitSchedule(schedule, filteredUnmappedMTS);
 
 		// ptm
 		PublicTransitMappingConfigGroup ptmConfig = PublicTransitMappingConfigGroup.createDefaultConfig();
@@ -77,7 +79,7 @@ public class CompareMapping {
 
 		// stop facilities histogram
 		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
-		histogram.createCsv(output+"stopFacilities.csv");
+		histogram.createCsv(output+"gtfs_stopFacilities.csv");
 
 		// check and shapefile
 //		PlausibilityCheck check = new PlausibilityCheck(schedule, network, ct);
