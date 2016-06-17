@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Point;
 public class RandomizeCoordinatesWithFacilitiesInfo {
 	
 	/*******/
-	final String NEW_INPUT = "../../../runs-svn/santiago/cluster_1/input/new-input/";	
+	final String NEW_INPUT = "../../../runs-svn/santiago/basecase1/input/new-input/";	
 	/*******/
 	
 	
@@ -51,7 +51,7 @@ public class RandomizeCoordinatesWithFacilitiesInfo {
 	final String EXPANDED_CONFIG_FINAL = NEW_INPUT + "expanded_config_final.xml";
 //	final String FINAL_SAMPLED_RANDOM_PLANS = NEW_INPUT + "randomized_sampled_plans_final.xml.gz";
 	final String FINAL_EXPANDED_RANDOM_PLANS = NEW_INPUT + "randomized_expanded_plans_final.xml.gz";
-	final String FINAL_CONFIG_FILE = NEW_INPUT + "randomized_config_final.xml";
+	final String FINAL_CONFIG_FILE = NEW_INPUT + "randomized_expanded_config_final.xml";
 
 	/*******/
 	
