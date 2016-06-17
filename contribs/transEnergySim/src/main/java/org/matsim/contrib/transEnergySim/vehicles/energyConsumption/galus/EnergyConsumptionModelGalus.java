@@ -43,6 +43,8 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  */
 public class EnergyConsumptionModelGalus extends AbstractInterpolatedEnergyConsumptionModel {
 
+	//TODO discuss how to return a simplified consumption for range estimation purposes
+	private double averageEnergyConsumptionPerMeterTraveled = 4.14E+02;
 	
 
 	public EnergyConsumptionModelGalus() {
@@ -67,6 +69,10 @@ public class EnergyConsumptionModelGalus extends AbstractInterpolatedEnergyConsu
 	}
 
 	
+	@Override
+	public double getEnergyConsumptionRateInJoulesPerMeter() {
+		return averageEnergyConsumptionPerMeterTraveled;
+	}
 
 	
 

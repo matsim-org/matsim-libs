@@ -8,5 +8,6 @@ public interface ChargingPlugType {
 	boolean isV1GCapable();
 	boolean isV2GCapable();
 	String getPlugTypeName();
+	int getNominalLevel();
 	
 }
