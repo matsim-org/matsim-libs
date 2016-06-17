@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.RouteUtils;
@@ -35,8 +34,6 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
-import playground.polettif.publicTransitMapping.plausibility.log.PlausibilityWarning;
-import playground.polettif.publicTransitMapping.plausibility.log.TravelTimeWarning;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -44,8 +41,6 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Provides some static tools for PTMapper.
@@ -238,28 +233,29 @@ public class PTMapperUtils {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				boolean hasStopLoop = ScheduleTools.routeHasStopSequenceLoop(transitRoute);
 				if(transitRoute.getRoute() != null) {
+					TransitRouteStop currentStop;
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
+
 					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
+//					stopsIterator.next(); // first stop is ignored
 
 					List<Id<Link>> linkIdList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
-					TransitRouteStop currentStop = stopsIterator.next();
-
+					currentStop = stopsIterator.next();
 					// look for a closer link before the route's start
-					// removed because it messes up more than it solves...
-					/*
 					if(!hasStopLoop) {
-						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
+						Set<Link> inlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(0).getFromNode().getInLinks().values(), linkList.get(0).getAllowedModes());
+						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), inlinksWithSameMode);
 						if(closerLinkBefore != null) {
 							linkIdList.add(0, closerLinkBefore);
 						}
 						currentStop = stopsIterator.next();
 					}
-					*/
 
 					// optimize referenced links between start and end
 					for(int i = 1; i < linkList.size()-1; i++) {
+
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
@@ -274,16 +270,14 @@ public class PTMapperUtils {
 					}
 
 					// look for a closer link after the route's end
-					// removed because it messes up more than it solves...
-					/*
 					if(!hasStopLoop) {
 						currentStop = routeStops.get(routeStops.size() - 1);
-						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
+						Set<Link> outlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(linkList.size() - 1).getToNode().getOutLinks().values(), linkList.get(linkList.size() - 1).getAllowedModes());
+						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), outlinksWithSameMode);
 						if(closerLinkAfter != null) {
 							linkIdList.add(closerLinkAfter);
 						}
 					}
-					*/
 
 					// set the new link list
 					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdList, network));

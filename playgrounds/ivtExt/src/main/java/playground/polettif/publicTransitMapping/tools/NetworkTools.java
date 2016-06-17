@@ -560,9 +560,6 @@ public class NetworkTools {
 
 	/**
 	 * Creates mode dependent routers based on the actual network modes used.
-	 * @param schedule
-	 * @param network
-	 * @return
 	 */
 	public static Map<String, Router> guessRouters(TransitSchedule schedule, Network network) {
 		Map<String, Set<String>> modeAssignments = new HashMap<>();
@@ -616,6 +613,19 @@ public class NetworkTools {
 				link.setAllowedModes(modesPt);
 			}
 		}
+	}
+
+	/**
+	 * @return only links that have the same allowed modes set
+	 */
+	public static Set<Link> filterLinkSetExactlyByModes(Collection<? extends Link> links, Set<String> transportModes) {
+		Set<Link> returnSet = new HashSet<>();
+		for(Link l : links) {
+			if(l.getAllowedModes().equals(transportModes)) {
+				returnSet.add(l);
+			}
+		}
+		return returnSet;
 	}
 
 	/**
