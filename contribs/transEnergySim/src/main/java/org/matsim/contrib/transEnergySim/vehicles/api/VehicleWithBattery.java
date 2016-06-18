@@ -158,4 +158,8 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return compatiblePlugTypes;
 	}
 
+	public boolean hasEnoughEnergyToDriveDistance(double nextLegTravelDistanceInMeters) {
+		return getRemainingRangeInMeters() >= nextLegTravelDistanceInMeters;
+	}
+
 }
