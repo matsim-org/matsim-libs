@@ -8,7 +8,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				for (Person person : population.getPersons().values()) {
-					agentRecords.put(person.getId(), new PlanImpl());
+					agentRecords.put(person.getId(), PopulationUtils.createPlan());
 				}
 			}
 		});

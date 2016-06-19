@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -59,7 +59,7 @@ public class SviReplanner implements PersonAlgorithm {
 		}
 		
 		// 2nd plan, set everything to pt-mode
-		Plan p2 = new PlanImpl();
+		Plan p2 = PopulationUtils.createPlan();
 		person.addPlan(p2);
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
@@ -75,7 +75,7 @@ public class SviReplanner implements PersonAlgorithm {
 		} 
 
 		// 3rd plan, set everything to car-mode and modify times
-		Plan p3 = new PlanImpl();
+		Plan p3 = PopulationUtils.createPlan();
 		person.addPlan(p3);
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
@@ -99,7 +99,7 @@ public class SviReplanner implements PersonAlgorithm {
 		} 
 		
 		// 4th plan, set everything to pt-mode and modify times
-		Plan p4 = new PlanImpl();
+		Plan p4 = PopulationUtils.createPlan();
 		person.addPlan(p4);
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {

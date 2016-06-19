@@ -32,6 +32,7 @@ import org.matsim.contrib.locationchoice.population.LCPlan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
 public class PlanUtils {
@@ -146,7 +147,7 @@ public class PlanUtils {
 	
 	public static Plan createCopy(Plan plan) {
 		if (plan instanceof PlanImpl) {
-			PlanImpl planTmp = new PlanImpl();
+			PlanImpl planTmp = PopulationUtils.createPlan();
 			planTmp.copyFrom(plan);
 			return planTmp;			
 		} else if (plan instanceof LCPlan) {

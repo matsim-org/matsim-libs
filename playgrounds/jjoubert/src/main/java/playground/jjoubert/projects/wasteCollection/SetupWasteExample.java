@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -106,7 +106,7 @@ public class SetupWasteExample {
 		first.setEndTime(0.0);
 		Activity last = pf.createActivityFromLinkId("depot", Id.createLinkId("ba"));
 				
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		plan.addActivity(first);
 		plan.addLeg(leg);
 		plan.addActivity(last);

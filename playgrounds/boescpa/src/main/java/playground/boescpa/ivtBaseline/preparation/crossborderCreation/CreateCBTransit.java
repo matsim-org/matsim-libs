@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -139,7 +139,7 @@ public class CreateCBTransit extends CreateSingleTripPopulation {
 
 	@Override
 	final Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		double departureTime = getDepartureTime();
 
 		ActivityImpl actStart = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());

@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -132,7 +133,7 @@ public class BasePlanImpl implements BasePlan {
 		newPerson.setBasePlan(copyPlan);
 	}
 	public static void convertToBasePlan(BasePersonImpl newPerson, Plan plan) {
-		PlanImpl newPlan = new PlanImpl(newPerson);
+		PlanImpl newPlan = PopulationUtils.createPlan(newPerson);
 		EmptyTime time = null;
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Activity) {

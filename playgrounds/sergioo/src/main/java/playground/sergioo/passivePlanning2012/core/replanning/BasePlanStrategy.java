@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
@@ -43,7 +43,7 @@ public class BasePlanStrategy implements PlanStrategy {
 		@Override
 		public void run() {
 			for(BasePerson person:persons) {
-				Plan plan = new PlanImpl(person);
+				Plan plan = PopulationUtils.createPlan(person);
 				for(int i=0; i<person.getBasePlan().getPlanElements().size(); i++) {
 					PlanElement planElement = person.getBasePlan().getPlanElements().get(i);
 					if(planElement instanceof Activity)

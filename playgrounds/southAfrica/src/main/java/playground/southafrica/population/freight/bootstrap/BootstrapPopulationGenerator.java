@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -245,7 +244,7 @@ public class BootstrapPopulationGenerator {
 	
 	
 	public Plan convertDigicoreChainToPlan(PopulationFactory pf, DigicoreChain chain){
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		
 		/* Create the first major activity. */
 		DigicoreActivity firstMajor = chain.getFirstMajorActivity();

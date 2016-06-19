@@ -39,6 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -234,7 +235,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 	 * Is this really the most efficient way of adding an activiyt at a certain plan loc?
 	 */
 	private void newPlanWithTaxiStages(Plan plan, Leg leg) {
-		Plan tmpPlan = new PlanImpl();
+		Plan tmpPlan = PopulationUtils.createPlan();
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {

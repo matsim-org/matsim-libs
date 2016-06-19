@@ -105,7 +105,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
 			Person person = PopulationUtils.getFactory().createPerson(id);
-			PlanImpl plan = new PlanImpl( person );
+			PlanImpl plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
@@ -114,7 +114,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
 			person = PopulationUtils.getFactory().createPerson(id1);
-			plan = new PlanImpl( person );
+			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );
@@ -134,7 +134,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
 			Person person = PopulationUtils.getFactory().createPerson(id);
-			PlanImpl plan = new PlanImpl( person );
+			PlanImpl plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
@@ -147,7 +147,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
 			person = PopulationUtils.getFactory().createPerson(id1);
-			plan = new PlanImpl( person );
+			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );

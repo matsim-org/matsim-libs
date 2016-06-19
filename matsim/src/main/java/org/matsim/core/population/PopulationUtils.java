@@ -649,5 +649,16 @@ public final class PopulationUtils {
 		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
 		return scenario.getPopulation().getFactory() ;
 	}
+
+	public static PlanImpl createPlan(Person person) {
+		Plan plan = getFactory().createPlan() ;
+		plan.setPerson(person);
+		return (PlanImpl) plan ;
+	}
+
+	public static PlanImpl createPlan() {
+		Plan plan = getFactory().createPlan() ;
+		return (PlanImpl) plan ;
+	}
 	
 }

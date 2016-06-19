@@ -37,6 +37,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
@@ -118,7 +119,7 @@ public class EditPartialRoute {
 			}
 
 			if (getRouteSize(oldRoute) == 0) {
-				PlanImpl newPlan = new PlanImpl(plan.getPerson());
+				PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
 				newPlan.addActivity(fromActivity);
 				newPlan.addLeg(leg);
 				newPlan.addActivity(toActivity);
@@ -137,7 +138,7 @@ public class EditPartialRoute {
 			}
 
 			if (getRouteSize(oldRoute) == 0) {
-				PlanImpl newPlan = new PlanImpl(plan.getPerson());
+				PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
 				newPlan.addActivity(fromActivity);
 				newPlan.addLeg(leg);
 				newPlan.addActivity(toActivity);
@@ -155,7 +156,7 @@ public class EditPartialRoute {
 			}
 
 		} else {
-			PlanImpl newPlan = new PlanImpl(plan.getPerson());
+			PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
 			newPlan.addActivity(fromActivity);
 			newPlan.addLeg(leg);
 			newPlan.addActivity(toActivity);
@@ -273,7 +274,7 @@ public class EditPartialRoute {
 
 	// TODO: perhaps reuse same dummy leg, etc. to make things more efficient?
 	private NetworkRoute getRoute(Link fromLink, Link toLink) {
-		PlanImpl newPlan = new PlanImpl();
+		PlanImpl newPlan = PopulationUtils.createPlan();
 		ActivityImpl fromActivity = new ActivityImpl("", fromLink.getId());
 		ActivityImpl toActivity = new ActivityImpl("", toLink.getId());
 		LegImpl leg = new LegImpl(TransportMode.car);

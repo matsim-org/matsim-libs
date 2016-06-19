@@ -74,7 +74,7 @@ public final class PersonImpl implements Person {
 		if (oldPlan == null) {
 			return null;
 		}
-		PlanImpl newPlan = new PlanImpl(oldPlan.getPerson());
+		PlanImpl newPlan = PopulationUtils.createPlan(oldPlan.getPerson());
 		newPlan.copyFrom(oldPlan);
 		this.getPlans().add(newPlan);
 		this.setSelectedPlan(newPlan);

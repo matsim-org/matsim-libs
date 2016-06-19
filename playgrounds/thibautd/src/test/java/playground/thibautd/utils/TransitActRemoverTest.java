@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,7 +44,7 @@ public class TransitActRemoverTest {
 
 	@Before
 	public void createPlanWithTransit() {
-		plan = new PlanImpl();
+		plan = PopulationUtils.createPlan();
 
 		double now = 0;
 		transitTravelTime = 0;

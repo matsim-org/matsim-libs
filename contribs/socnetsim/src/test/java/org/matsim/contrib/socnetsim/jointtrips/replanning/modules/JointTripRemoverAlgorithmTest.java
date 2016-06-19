@@ -96,7 +96,7 @@ public class JointTripRemoverAlgorithmTest {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		PlanImpl driverPlan = new PlanImpl( driver );
+		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		// the fantaisist modes are not (only) for fun: they allow to check from
@@ -111,7 +111,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "unicycle" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan = new PlanImpl( passenger );
+		PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
 		Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );
@@ -162,7 +162,7 @@ public class JointTripRemoverAlgorithmTest {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		PlanImpl driverPlan = new PlanImpl( driver );
+		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
@@ -173,7 +173,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "elevator" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
 		Activity p1Act1 = passengerPlan1.createAndAddActivity( "home" , link1 );
@@ -184,7 +184,7 @@ public class JointTripRemoverAlgorithmTest {
 		passengerPlan1.createAndAddLeg( "paraglider" );
 		Activity p1Act2 = passengerPlan1.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
 		passengerPlan2.createAndAddActivity( "home" , link1 );
@@ -249,7 +249,7 @@ public class JointTripRemoverAlgorithmTest {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		PlanImpl driverPlan = new PlanImpl( driver );
+		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
@@ -264,7 +264,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "iceskate" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
 		Activity p1Act1 = passengerPlan1.createAndAddActivity( "home" , link1 );
@@ -275,7 +275,7 @@ public class JointTripRemoverAlgorithmTest {
 		passengerPlan1.createAndAddLeg( "submarine" );
 		Activity p1Act2 = passengerPlan1.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
 		passengerPlan2.createAndAddActivity( "home" , link1 );
@@ -349,7 +349,7 @@ public class JointTripRemoverAlgorithmTest {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		PlanImpl driverPlan = new PlanImpl( driver );
+		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
@@ -364,7 +364,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "donkey" );
 		Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
 		Activity p1Act1 = passengerPlan1.createAndAddActivity( "home" , link1 );
@@ -375,7 +375,7 @@ public class JointTripRemoverAlgorithmTest {
 		passengerPlan1.createAndAddLeg( "ski" );
 		Activity p1Act2 = passengerPlan1.createAndAddActivity( "home" , link1 );
 
-		PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
 		passengerPlan2.createAndAddActivity( "home" , link1 );
@@ -447,7 +447,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		final PlanImpl driverPlan = new PlanImpl( driver );
+		final PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		// the fantaisist modes are not (only) for fun: they allow to check from
@@ -467,7 +467,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "unicycle" );
 		final Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan = new PlanImpl( passenger );
+		final PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
 		final Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );
@@ -518,7 +518,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		final PlanImpl driverPlan = new PlanImpl( driver );
+		final PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		// the fantaisist modes are not (only) for fun: they allow to check from
@@ -533,7 +533,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "unicycle" );
 		final Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan = new PlanImpl( passenger );
+		final PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
 		final Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );
@@ -589,7 +589,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		final PlanImpl driverPlan = new PlanImpl( driver );
+		final PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		final Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
@@ -606,7 +606,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Leg dEgress2 = driverPlan.createAndAddLeg( "elevator" );
 		final Activity dAct3 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		final PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
 		final Activity p1Act1 = passengerPlan1.createAndAddActivity( "home" , link1 );
@@ -617,7 +617,7 @@ public class JointTripRemoverAlgorithmTest {
 		passengerPlan1.createAndAddLeg( "paraglider" );
 		final Activity p1Act2 = passengerPlan1.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		final PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
 		passengerPlan2.createAndAddActivity( "home" , link1 );
@@ -678,7 +678,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		final PlanImpl driverPlan = new PlanImpl( driver );
+		final PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
 		final Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
@@ -695,7 +695,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan.createAndAddLeg( "elevator" );
 		final Activity dAct3 = driverPlan.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		final PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
 		passengerPlan1.createAndAddActivity( "home" , link1 );
@@ -706,7 +706,7 @@ public class JointTripRemoverAlgorithmTest {
 		passengerPlan1.createAndAddLeg( "paraglider" );
 		passengerPlan1.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		final PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
 		final Activity p2Act1 = passengerPlan2.createAndAddActivity( "home" , link1 );
@@ -768,7 +768,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
-		final PlanImpl driverPlan1 = new PlanImpl( driver1 );
+		final PlanImpl driverPlan1 = PopulationUtils.createPlan(driver1);
 		plans.put( driver1.getId() , driverPlan1 );
 
 		final Activity d1Act1 = driverPlan1.createAndAddActivity( "home" , link1 );
@@ -781,7 +781,7 @@ public class JointTripRemoverAlgorithmTest {
 		final Leg d1Leg = driverPlan1.createAndAddLeg( "skateboard" );
 		final Activity d1Act3 = driverPlan1.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl driverPlan2 = new PlanImpl( driver2 );
+		final PlanImpl driverPlan2 = PopulationUtils.createPlan(driver2);
 		plans.put( driver2.getId() , driverPlan2 );
 
 		final Activity d2Act1 = driverPlan2.createAndAddActivity( "home" , link1 );
@@ -794,7 +794,7 @@ public class JointTripRemoverAlgorithmTest {
 		driverPlan2.createAndAddLeg( "elevator" );
 		final Activity d2Act3 = driverPlan2.createAndAddActivity( "home" , link1 );
 
-		final PlanImpl passengerPlan = new PlanImpl( passenger );
+		final PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
 		final Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );

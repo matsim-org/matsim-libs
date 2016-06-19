@@ -40,6 +40,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -109,7 +110,7 @@ public class ChainChopper {
 
 		double cumTime = 0.0;
 		Coord lastLocation = null;
-		PlanImpl currentPlan = new PlanImpl();
+		PlanImpl currentPlan = PopulationUtils.createPlan();
 		for(int i=0; i<plan.getPlanElements().size(); i+=2){
 			Activity act = (Activity)plan.getPlanElements().get(i);
 			double startTime;
@@ -151,13 +152,13 @@ public class ChainChopper {
 					currentPlan.addLeg(leg);
 					Activity cutActivityEnd = new ActivityImpl("chopEnd", cCut);
 					currentPlan.addActivity(cutActivityEnd);
-					PlanImpl segment = new PlanImpl();
+					PlanImpl segment = PopulationUtils.createPlan();
 					segment.copyFrom(currentPlan);
 					segments.add(segment);
 
 					/* Add the remaining portion to the start of the new
 					 * plan. */
-					currentPlan = new PlanImpl();
+					currentPlan = PopulationUtils.createPlan();
 					Activity cutActivityStart = new ActivityImpl("chopStart", cCut);
 					cutActivityStart.setEndTime(Time.parseTime("00:01:00"));
 					currentPlan.addActivity(cutActivityStart);
@@ -173,11 +174,11 @@ public class ChainChopper {
 					currentPlan.addActivity(act);
 					
 					/* Add the final segment to the list. */
-					PlanImpl segment = new PlanImpl();
+					PlanImpl segment = PopulationUtils.createPlan();
 					segment.copyFrom(currentPlan);
 					segments.add(segment);
 					
-					currentPlan = new PlanImpl();
+					currentPlan = PopulationUtils.createPlan();
 				}
 			} else{
 				if(endTime > Time.MIDNIGHT){
@@ -192,12 +193,12 @@ public class ChainChopper {
 					endPortion.setStartTime(startTime);
 					currentPlan.addActivity(endPortion);
 					endPortion.setMaximumDuration(Time.UNDEFINED_TIME);
-					PlanImpl segment = new PlanImpl();
+					PlanImpl segment = PopulationUtils.createPlan();
 					segment.copyFrom(currentPlan);
 					segments.add(segment);
 
 					/* Add the remainder to the start of the new plan. */
-					currentPlan = new PlanImpl();
+					currentPlan = PopulationUtils.createPlan();
 					Activity startPortion = new ActivityImpl(act.getType(), act.getCoord());
 					startPortion.setEndTime(endTime - Time.MIDNIGHT);
 					currentPlan.addActivity(startPortion);
@@ -222,7 +223,7 @@ public class ChainChopper {
 			/* Add the remainder of the current plan to the list of segments. */
 			if(i == plan.getPlanElements().size()-1){
 				if(currentPlan.getPlanElements().size() >= 3){
-					PlanImpl segment = new PlanImpl();
+					PlanImpl segment = PopulationUtils.createPlan();
 					segment.copyFrom(currentPlan);
 					segments.add(segment);
 				}

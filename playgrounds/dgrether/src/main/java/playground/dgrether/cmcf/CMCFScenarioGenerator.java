@@ -170,7 +170,7 @@ public class CMCFScenarioGenerator {
 
 		for (int i = 1; i <= 3600; i++) {
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+			PlanImpl plan = PopulationUtils.createPlan(p);
 			p.addPlan(plan);
 			//home
 //			homeEndTime = homeEndTime +  ((i - 1) % 3);

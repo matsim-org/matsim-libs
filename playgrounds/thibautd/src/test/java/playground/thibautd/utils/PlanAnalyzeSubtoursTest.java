@@ -227,7 +227,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
@@ -243,7 +243,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	static PlanImpl createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));

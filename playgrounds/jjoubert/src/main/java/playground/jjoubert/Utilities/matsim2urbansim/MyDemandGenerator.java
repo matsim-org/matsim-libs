@@ -118,7 +118,7 @@ public class MyDemandGenerator {
 					Person agent = PopulationUtils.getFactory().createPerson(Id.create(agentId, Person.class));
 					PersonUtils.setEmployed(agent, true);
 
-					Plan plan = new PlanImpl(agent);
+					Plan plan = PopulationUtils.createPlan(agent);
 					
 					/*
 					 * Generate the start-of-day home activity. Some criteria:

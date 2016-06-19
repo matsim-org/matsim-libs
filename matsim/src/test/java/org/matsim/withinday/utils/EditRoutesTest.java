@@ -398,7 +398,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createSamplePlan() {
-		plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
 		Activity activityH1 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
 		((PlanImpl) plan).createAndAddLeg(TransportMode.car);

@@ -52,7 +52,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	@Override
 	public Plan createPlan(){
-		return new PlanImpl();
+		return PopulationUtils.createPlan();
 	}
 
 	@Override

@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 /**
@@ -234,7 +233,7 @@ public class JointPlansTest {
 
 	private static Plan createPlan( final Person person , final boolean withCache ) {
 		if ( withCache ) return new PlanWithCachedJointPlan( person );
-		else return new PlanImpl( person );
+		else return PopulationUtils.createPlan(person);
 	}
 }
 

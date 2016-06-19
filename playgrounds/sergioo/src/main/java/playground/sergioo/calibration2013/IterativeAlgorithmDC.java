@@ -204,7 +204,7 @@ public class IterativeAlgorithmDC {
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 					for(Person person:typePopulations.get(type)) {
 						Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
-						PlanImpl copyPlan = new PlanImpl(copyPerson);
+						PlanImpl copyPlan = PopulationUtils.createPlan(copyPerson);
 						copyPlan.copyFrom(person.getSelectedPlan());
 						copyPerson.addPlan(copyPlan);
 						transitActsRemover.run(copyPlan);

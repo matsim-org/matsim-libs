@@ -181,7 +181,7 @@ public class CMCFScenarioGeneratorNoReroute {
 
 		for (int i = 1; i <= 7200; i++) {
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+			PlanImpl plan = PopulationUtils.createPlan(p);
 			p.addPlan(plan);
 			// home % 2
 			homeEndTime = homeEndTime + firstHomeEndTime + ((i - 1) % 2);

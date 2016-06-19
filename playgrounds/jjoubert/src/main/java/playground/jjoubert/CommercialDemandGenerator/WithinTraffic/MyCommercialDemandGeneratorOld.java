@@ -41,6 +41,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -136,7 +137,7 @@ public class MyCommercialDemandGeneratorOld {
 			int populationLimit = 1;
 			int agentId  = firstIndex;
 			for(int i = 0; i < populationSize; i++ ){
-				PlanImpl plan = new PlanImpl(null);
+				PlanImpl plan = PopulationUtils.createPlan(null);
 
 				// Sample start time
 				int startTimeBin = (int) cdfStartTime.sampleFromCDF();

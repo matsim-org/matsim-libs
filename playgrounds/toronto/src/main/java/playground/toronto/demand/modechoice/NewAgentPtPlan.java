@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
@@ -55,7 +56,7 @@ public class NewAgentPtPlan extends NewPopulation {
 			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
 				((PlanImpl) pl).setType(TransportMode.car);
-				PlanImpl ptPlan = new org.matsim.core.population.PlanImpl(person);
+				PlanImpl ptPlan = PopulationUtils.createPlan(person);
 				ptPlan.setType(TransportMode.pt);
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);

@@ -41,7 +41,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord(0, 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -70,14 +70,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testHandleEmptyPlan() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
@@ -88,7 +88,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 */
 	public void testMultipleLegs() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -107,7 +107,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -124,7 +124,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -137,7 +137,7 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "always");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));

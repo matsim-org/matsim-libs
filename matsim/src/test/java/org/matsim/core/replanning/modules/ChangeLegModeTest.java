@@ -83,7 +83,7 @@ public class ChangeLegModeTest {
 		module.prepareReplanning(null);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -104,7 +104,7 @@ public class ChangeLegModeTest {
 	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
 		module.prepareReplanning(null);
 
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(null);
+		PlanImpl plan = PopulationUtils.createPlan(null);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));

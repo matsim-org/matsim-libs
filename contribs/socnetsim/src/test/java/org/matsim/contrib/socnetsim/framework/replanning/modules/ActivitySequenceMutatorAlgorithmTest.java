@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -42,7 +41,7 @@ import java.util.Random;
 public class ActivitySequenceMutatorAlgorithmTest {
 	@Test
 	public void testTwoActivities() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );
@@ -74,7 +73,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testOneActivities() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );
@@ -100,7 +99,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testZeroActivities() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );
@@ -120,7 +119,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testStage() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
 		plan.addLeg( new LegImpl( "mode" ) );

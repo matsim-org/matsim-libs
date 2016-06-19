@@ -142,7 +142,7 @@ public class Fcd {
 				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 				continue;
 			}
@@ -157,7 +157,7 @@ public class Fcd {
 				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 			}
 		
@@ -210,7 +210,7 @@ public class Fcd {
 				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 				continue;
@@ -227,7 +227,7 @@ public class Fcd {
 				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 			}

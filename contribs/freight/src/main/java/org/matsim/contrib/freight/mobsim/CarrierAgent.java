@@ -38,7 +38,6 @@ import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -254,7 +253,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour);
-			Plan plan = new PlanImpl();
+			Plan plan = PopulationUtils.createPlan();
 			Activity startActivity = new ActivityImpl(FreightConstants.START,scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);

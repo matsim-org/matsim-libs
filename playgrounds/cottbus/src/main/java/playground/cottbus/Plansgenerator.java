@@ -337,7 +337,7 @@ public class Plansgenerator {
 			homeEndtime = START_TIME;
 
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+			PlanImpl plan = PopulationUtils.createPlan(p);
 			p.addPlan(plan);
 			//home
 			homeEndtime += Math.floor(Math.random() * DURATION); //0.05 * 60;

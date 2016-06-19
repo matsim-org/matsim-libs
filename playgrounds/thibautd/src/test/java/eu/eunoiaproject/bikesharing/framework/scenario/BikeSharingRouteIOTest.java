@@ -36,7 +36,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -160,7 +159,7 @@ public class BikeSharingRouteIOTest {
 	private Person wrapInPlan( final BikeSharingRoute outRoute ) {
 		final Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p"));
 
-		final Plan plan = new PlanImpl( person );
+		final Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );
 
 		plan.addActivity( new ActivityImpl( "stuff" ,  outRoute.getStartLinkId() ) );

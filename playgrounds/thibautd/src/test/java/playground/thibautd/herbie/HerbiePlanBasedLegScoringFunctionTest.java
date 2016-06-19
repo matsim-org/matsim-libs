@@ -102,7 +102,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = new PlanImpl( person );
+		PlanImpl plan = PopulationUtils.createPlan(person);
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 10 );
@@ -139,7 +139,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = new PlanImpl( person );
+		PlanImpl plan = PopulationUtils.createPlan(person);
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 10 );
@@ -174,7 +174,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 //		desires.putActivityDuration( "h" , 12 * 3600 );
 //		desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = new PlanImpl( person );
+		PlanImpl plan = PopulationUtils.createPlan(person);
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 100 );
@@ -224,7 +224,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = new PlanImpl( person );
+		PlanImpl plan = PopulationUtils.createPlan(person);
 
 		for (double tt=60; tt <= 2*3600; tt *= 1.5) {
 			Activity act = plan.createAndAddActivity( "w" );

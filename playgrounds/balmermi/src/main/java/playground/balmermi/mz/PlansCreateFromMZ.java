@@ -364,7 +364,7 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
-			PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
+			PlanImpl plan2 = PopulationUtils.createPlan(p);
 			plan2.setScore(plan.getScore());
 			plan2.addActivity((ActivityImpl)plan.getPlanElements().get(0));
 

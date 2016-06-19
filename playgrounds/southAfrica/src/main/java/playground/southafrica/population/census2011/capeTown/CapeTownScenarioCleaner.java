@@ -49,6 +49,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -246,7 +247,7 @@ public class CapeTownScenarioCleaner {
 		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).parse(folder + "personAttributes.xml.gz");
 		for(Id<Person> id : scPersons.getPopulation().getPersons().keySet()){
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
-			PlanImpl plan = new PlanImpl();
+			PlanImpl plan = PopulationUtils.createPlan();
 			plan.copyFrom(scPersons.getPopulation().getPersons().get(id).getSelectedPlan());
 			for(PlanElement pe : plan.getPlanElements()){
 				/* Check and add modes. */
@@ -283,7 +284,7 @@ public class CapeTownScenarioCleaner {
 		for(Id<Person> id : scCom.getPopulation().getPersons().keySet()){
 			String[] sa = id.toString().split("_");
 			Person person = pf.createPerson(Id.createPersonId("coct_c_" + sa[1]));
-			PlanImpl plan = new PlanImpl();
+			PlanImpl plan = PopulationUtils.createPlan();
 			plan.copyFrom(scCom.getPopulation().getPersons().get(id).getSelectedPlan());
 			for(PlanElement pe : plan.getPlanElements()){
 				if(pe instanceof Leg){

@@ -217,7 +217,7 @@ public class SurveyPlanPicker {
 
 				/* Randomly pick any of the closest plans, and make a COPY of it. */
 				Tuple<Plan, Double> randomTuple = closestPlans.get( RandomPermutation.getRandomPermutation(closestPlans.size())[0]-1 );
-				PlanImpl plan = new PlanImpl();
+				PlanImpl plan = PopulationUtils.createPlan();
 				plan.copyFrom(randomTuple.getFirst());
 			
 				distanceList.add(randomTuple.getSecond());

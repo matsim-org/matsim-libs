@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -75,7 +74,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 			final Id<Person> id = Id.create( currentId++ , Person.class );
 			final Person person = PopulationUtils.getFactory().createPerson(id);
 
-			final Plan plan = new PlanImpl( person );
+			final Plan plan = PopulationUtils.createPlan(person);
 			fillPlan( plan , random );
 			person.addPlan( plan );
 

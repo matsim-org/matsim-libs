@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -167,7 +168,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						
-						PlanImpl newPlan = new PlanImpl(plan.getPerson());
+						PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
 						newPlan.addActivity(previousActivity);
 						newPlan.addLeg(leg);
 						newPlan.addActivity(nextActivity);

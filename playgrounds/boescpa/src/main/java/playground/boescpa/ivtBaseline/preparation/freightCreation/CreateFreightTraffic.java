@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -168,7 +167,7 @@ public class CreateFreightTraffic {
 	}
 
 	private Plan createSingleTripPlan(ActivityFacility startFacility, ActivityFacility endFacility) {
-		Plan plan = new PlanImpl();
+		Plan plan = org.matsim.core.population.PopulationUtils.createPlan();
 		int departureTime = getDepartureTime();
 
 		ActivityImpl actStart = new ActivityImpl(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());

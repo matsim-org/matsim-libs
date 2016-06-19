@@ -18,7 +18,7 @@ public class PersonUtils {
 
 	@Deprecated // use methods of interface Person
 	public static PlanImpl createAndAddPlan(Person person, final boolean selected) {
-		PlanImpl p = new PlanImpl(person);
+		PlanImpl p = PopulationUtils.createPlan(person);
 		person.addPlan(p);
 		if (selected) {
 			person.setSelectedPlan(p);

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 /**
@@ -67,7 +66,7 @@ public class PermissibleModesCalculatorImplTest {
 	public void fixtureWithNothing() {
 		String name = "no information";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = new PlanImpl( person );
+		Plan plan = PopulationUtils.createPlan(person);
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
 
@@ -75,7 +74,7 @@ public class PermissibleModesCalculatorImplTest {
 	public void fixtureWithNoLicense() {
 		String name = "no License";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = new PlanImpl( person );
+		Plan plan = PopulationUtils.createPlan(person);
 		PersonUtils.setLicence(person, "no");
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
@@ -84,7 +83,7 @@ public class PermissibleModesCalculatorImplTest {
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = new PlanImpl( person );
+		Plan plan = PopulationUtils.createPlan(person);
 		PersonUtils.setCarAvail(person, "never");
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
@@ -93,7 +92,7 @@ public class PermissibleModesCalculatorImplTest {
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = new PlanImpl( person );
+		Plan plan = PopulationUtils.createPlan(person);
 		PersonUtils.setCarAvail(person, "sometimes");
 		fixtures.add( new Fixture( name , plan , true ) );
 	}

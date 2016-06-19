@@ -306,7 +306,7 @@ public class CreateFreightTraffic {
 		ActivityFacility homeFacility = this.getRandomFacilityFromZone(origin);
 		ActivityFacility freightFacility = this.getRandomFacilityFromZone(destination);
 						
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		ActivityImpl actH = new ActivityImpl("freight", homeFacility.getLinkId());
 		actH.setFacilityId(homeFacility.getId());
 		actH.setCoord(homeFacility.getCoord());

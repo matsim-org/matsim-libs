@@ -46,29 +46,6 @@ public final class PlanImpl implements Plan {
 
 	private Customizable customizableDelegate;
 
-	/*
-	 * Creates a new Plan for the specified Person (without adding this Plan to the Person).
-	 * This is for special uses only, like if you need a Plan as a value object without adding it
-	 * to a scenario.
-	 * 
-	 * For initial demand generation, please use scenario.getPopulation().getFactory().createPlan(...) instead.
-	 * 
-	 */
-	public PlanImpl(final Person person) {
-		this.person = person;
-	}
-
-	/*
-	 * Creates a new Plan without an associated Person.
-	 * This is for special uses only, like if you need a Plan as a value object without adding it
-	 * to a scenario.
-	 * 
-	 * For initial demand generation, please use scenario.getPopulation().getFactory().createPlan(...) instead.
-	 */
-	public PlanImpl() {
-	
-	}
-
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type1, final Coord coord) {
 		ActivityImpl a = new ActivityImpl(type1, coord);

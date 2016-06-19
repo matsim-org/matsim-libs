@@ -110,7 +110,7 @@ public final class QLinkTest extends MatsimTestCase {
 		QVehicle v = new QVehicle(f.basicVehicle);
 
 		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
-		p.addPlan(new PlanImpl());
+		p.addPlan(PopulationUtils.createPlan());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		
 		double now = 0. ;
@@ -141,7 +141,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(23, Person.class));
-		PlanImpl plan = new PlanImpl();
+		PlanImpl plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
@@ -204,7 +204,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
-		p.addPlan(new PlanImpl());
+		p.addPlan(PopulationUtils.createPlan());
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
@@ -240,7 +240,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		Person pers = PopulationUtils.getFactory().createPerson(Id.create(80, Person.class));
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		pers.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
@@ -474,7 +474,7 @@ public final class QLinkTest extends MatsimTestCase {
 	private Person createPerson2(Id<Person> personId, Fixture f) {
 		final Id<Person> id = personId;
 		Person p = PopulationUtils.getFactory().createPerson(id);
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
 		Leg leg = new LegImpl(TransportMode.car);
@@ -503,7 +503,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		for (int i = 0; i < 5; i++) {
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			PlanImpl plan = new PlanImpl();
+			PlanImpl plan = PopulationUtils.createPlan();
 			Activity act = new ActivityImpl("h", link1.getId());
 			act.setEndTime(7*3600);
 			plan.addActivity(act);

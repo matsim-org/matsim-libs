@@ -119,7 +119,7 @@ public class MyControler1 {
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i + 1, Person.class));
 
 			try {
-				PlanImpl plan1 = new PlanImpl(p);
+				PlanImpl plan1 = PopulationUtils.createPlan(p);
 				ActivityImpl act1a = plan1.createAndAddActivity("h", new Coord(100., 100.));
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
@@ -132,7 +132,7 @@ public class MyControler1 {
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
-				PlanImpl plan2 = new PlanImpl(p);
+				PlanImpl plan2 = PopulationUtils.createPlan(p);
 				ActivityImpl act2a = plan1.createAndAddActivity("h", new Coord(100., 100.));
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
@@ -315,7 +315,7 @@ public class MyControler1 {
 
 	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Population population){
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(ii, Person.class));
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+		PlanImpl plan = PopulationUtils.createPlan(p);
 		try {
 			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
 			act1.setLinkId(sourceLink.getId());

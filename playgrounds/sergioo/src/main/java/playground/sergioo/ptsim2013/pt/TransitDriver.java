@@ -55,7 +55,7 @@ public class TransitDriver extends AbstractTransitDriver {
 		super(internalInterface, agentTracker);
 		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		Leg leg = new LegImpl(TransportMode.car);
 		leg.setRoute(getWrappedCarRoute(getCarRoute()));
 		Activity startActivity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getStartLinkId());

@@ -197,7 +197,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 		if (firstTimeToGetModifiablePlan) {
 			firstTimeToGetModifiablePlan = false ;
-			PlanImpl newPlan = new PlanImpl(this.getCurrentPlan().getPerson());
+			PlanImpl newPlan = PopulationUtils.createPlan(this.getCurrentPlan().getPerson());
 			newPlan.copyFrom(this.getCurrentPlan());
 			this.plan = newPlan;
 		}

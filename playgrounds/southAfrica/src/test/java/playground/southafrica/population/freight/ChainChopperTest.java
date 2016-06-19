@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -120,7 +121,7 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan1(){
-		PlanImpl plan = new PlanImpl();
+		PlanImpl plan = PopulationUtils.createPlan();
 		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
@@ -149,7 +150,7 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan2(){
-		PlanImpl plan = new PlanImpl();
+		PlanImpl plan = PopulationUtils.createPlan();
 		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
@@ -183,7 +184,7 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan3(){
-		PlanImpl plan = new PlanImpl();
+		PlanImpl plan = PopulationUtils.createPlan();
 		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);

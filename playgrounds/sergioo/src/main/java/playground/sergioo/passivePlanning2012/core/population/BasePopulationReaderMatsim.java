@@ -37,6 +37,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -189,7 +190,7 @@ public class BasePopulationReaderMatsim extends MatsimXmlParser implements Popul
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = new PlanImpl(currperson); 
+		this.currplan = PopulationUtils.createPlan(currperson); 
 		if(selected)
 			currperson.setSelectedPlan(currplan);
 		String scoreString = atts.getValue(ATTR_PLAN_SCORE);

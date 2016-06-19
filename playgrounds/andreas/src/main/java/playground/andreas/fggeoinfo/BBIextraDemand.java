@@ -87,7 +87,7 @@ public class BBIextraDemand {
 
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = new PlanImpl();
+					PlanImpl plan = PopulationUtils.createPlan();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
@@ -113,7 +113,7 @@ public class BBIextraDemand {
 
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = new PlanImpl();
+					PlanImpl plan = PopulationUtils.createPlan();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
@@ -132,7 +132,7 @@ public class BBIextraDemand {
 
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = new PlanImpl();
+					PlanImpl plan = PopulationUtils.createPlan();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);

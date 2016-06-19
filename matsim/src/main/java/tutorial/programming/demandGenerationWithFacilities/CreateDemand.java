@@ -9,6 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -220,7 +221,7 @@ class CreateDemand {
 	}
 	
 	private Plan adaptAndCopyPlan(Person person, Plan plan, boolean worker) {		
-		PlanImpl newPlan = new PlanImpl();
+		PlanImpl newPlan = PopulationUtils.createPlan();
 		newPlan.copyFrom(plan);
 		/*
 		 * Go through plan and adapt locations and times

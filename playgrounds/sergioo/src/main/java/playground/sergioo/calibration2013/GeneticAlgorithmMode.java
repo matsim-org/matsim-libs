@@ -103,7 +103,7 @@ public class GeneticAlgorithmMode {
 			for(Person person:scenario.getPopulation().getPersons().values()) {
 				Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
 				PersonUtils.setCarAvail(copyPerson, PersonUtils.getCarAvail(person));
-				PlanImpl copyPlan = new PlanImpl(copyPerson);
+				PlanImpl copyPlan = PopulationUtils.createPlan(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);
 				transitActsRemover.run(copyPlan);

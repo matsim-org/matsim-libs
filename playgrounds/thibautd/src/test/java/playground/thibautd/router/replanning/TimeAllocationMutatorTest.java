@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -93,11 +94,11 @@ public class TimeAllocationMutatorTest {
 		Counter counter = new Counter( getClass().getSimpleName()+": testing plan # " );
 		for (PlanImpl plan : plans) {
 			counter.incCounter();
-			PlanImpl planTransit = new PlanImpl();
+			PlanImpl planTransit = PopulationUtils.createPlan();
 			planTransit.copyFrom( plan );
 			transit.run( planTransit );
 
-			PlanImpl planTrips2Legs = new PlanImpl();
+			PlanImpl planTrips2Legs = PopulationUtils.createPlan();
 			planTrips2Legs.copyFrom( plan );
 			trips2legs.run( planTrips2Legs );
 			regular.run( planTrips2Legs );

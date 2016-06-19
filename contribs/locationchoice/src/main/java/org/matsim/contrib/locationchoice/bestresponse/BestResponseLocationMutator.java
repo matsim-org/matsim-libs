@@ -44,6 +44,7 @@ import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -118,7 +119,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
 			// (this may be done by now. kai, jan'13)
 			
-			Plan bestPlan = new PlanImpl(person);
+			Plan bestPlan = PopulationUtils.createPlan(person);
 			
 			// bestPlan is initialized as a copy from the old/input plan:
 			((PlanImpl) bestPlan).copyFrom(plan);
@@ -290,7 +291,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 		Plan planTmp = null;
 		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
-			planTmp = new PlanImpl(plan.getPerson());
+			planTmp = PopulationUtils.createPlan(plan.getPerson());
 			PlanUtils.copyFrom(plan, planTmp);
 		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);

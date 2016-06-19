@@ -571,7 +571,7 @@ public class CreatePlansFromTrips {
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
 			sortTrips(pTrips);
 			
-			PlanImpl p = new PlanImpl();
+			PlanImpl p = PopulationUtils.createPlan();
 			Trip T = null;
 			
 			HashMap<String, Coord> workplaceZoneMap = new HashMap<String, Coord>();

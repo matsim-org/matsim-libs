@@ -51,7 +51,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testCreateAndAddActAndLeg() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		try {
 			plan.createAndAddLeg(TransportMode.car);
 			fail("expected IllegalStateException when creating a leg in an empty plan.");
@@ -70,7 +70,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testInsertActLeg_Between() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		ActivityImpl homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
 		ActivityImpl workAct = plan.createAndAddActivity("w", new Coord(100, 200));
@@ -97,7 +97,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testInsertActLeg_AtEnd() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		ActivityImpl homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
 		ActivityImpl workAct = plan.createAndAddActivity("w", new Coord(100, 200));
@@ -124,7 +124,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testInsertActLeg_AtWrongPosition() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("h", new Coord(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new Coord(100, 200));
@@ -148,7 +148,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testInsertActLeg_AtStart() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("h", new Coord(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new Coord(100, 200));
@@ -173,7 +173,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testInsertActLeg_BehindEnd() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("h", new Coord(0, 0));
 		plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new Coord(100, 200));
@@ -209,7 +209,7 @@ public class PlanImplTest {
 		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("h", new Coord(0, 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new Coord(100, 200));
@@ -217,7 +217,7 @@ public class PlanImplTest {
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
-		PlanImpl plan2 = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
+		PlanImpl plan2 = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
 		plan2.copyFrom(plan);
 
 		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
@@ -236,7 +236,7 @@ public class PlanImplTest {
 		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 
-		PlanImpl plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("h", new Coord(0, 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("w", new Coord(100, 200));
@@ -244,7 +244,7 @@ public class PlanImplTest {
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
-		PlanImpl plan2 = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
+		PlanImpl plan2 = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
 		plan2.copyFrom(plan);
 
 		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
@@ -260,7 +260,7 @@ public class PlanImplTest {
 	@Test
 	public void testRemoveActivity() {
 
-		PlanImpl testee = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		testee.createAndAddActivity("h", new Coord(0, 0));
 		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("w", new Coord(100, 200));
@@ -279,7 +279,7 @@ public class PlanImplTest {
 	 */
 	@Test
 	public void testRemoveLeg() {
-		PlanImpl testee = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		testee.createAndAddActivity("h", new Coord(0, 0));
 		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("w", new Coord(100, 200));
@@ -295,7 +295,7 @@ public class PlanImplTest {
 
 	@Test
 	public void addMultipleLegs() {
-		Plan p = new PlanImpl();
+		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
 		p.addLeg(new LegImpl(TransportMode.walk));
 		p.addLeg(new LegImpl(TransportMode.pt));
@@ -312,7 +312,7 @@ public class PlanImplTest {
 
 	@Test
 	public void addMultipleActs() {
-		Plan p = new PlanImpl();
+		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
 		p.addLeg(new LegImpl(TransportMode.walk));
 		p.addActivity(new ActivityImpl("w"));
@@ -327,7 +327,7 @@ public class PlanImplTest {
 
 	@Test
 	public void createAndAddMultipleLegs() {
-		PlanImpl p = new PlanImpl();
+		PlanImpl p = PopulationUtils.createPlan();
 		p.createAndAddActivity("h");
 		p.createAndAddLeg(TransportMode.walk);
 		p.createAndAddLeg(TransportMode.pt);
@@ -344,7 +344,7 @@ public class PlanImplTest {
 
 	@Test
 	public void createAndAddMultipleActs() {
-		PlanImpl p = new PlanImpl();
+		PlanImpl p = PopulationUtils.createPlan();
 		p.createAndAddActivity("h");
 		p.createAndAddLeg(TransportMode.walk);
 		p.createAndAddActivity("w");

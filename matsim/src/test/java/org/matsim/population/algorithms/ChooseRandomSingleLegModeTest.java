@@ -46,7 +46,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testRandomChoice() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -74,7 +74,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testHandleEmptyPlan() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
@@ -82,7 +82,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
@@ -91,7 +91,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testHandlePlan_DifferentThanLastMode() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -107,7 +107,7 @@ public class ChooseRandomSingleLegModeTest {
 	@Test
 	public void testHandlePlan_OnlySingleLegChanged() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		plan.createAndAddActivity("home", new Coord(0, 0));
 		LegImpl leg1 = plan.createAndAddLeg(TransportMode.car);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -138,7 +138,7 @@ public class ChooseRandomSingleLegModeTest {
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -158,7 +158,7 @@ public class ChooseRandomSingleLegModeTest {
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
@@ -172,7 +172,7 @@ public class ChooseRandomSingleLegModeTest {
 		algo.setIgnoreCarAvailability(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "always");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
 		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));

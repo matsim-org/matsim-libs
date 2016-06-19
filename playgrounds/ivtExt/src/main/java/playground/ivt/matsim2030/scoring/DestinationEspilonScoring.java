@@ -26,6 +26,7 @@ import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
@@ -49,7 +50,7 @@ public class DestinationEspilonScoring implements ActivityScoring, LegScoring,
 			final DestinationChoiceBestResponseContext context ) {
 		this.context = context;
 		this.scoring = new DestinationScoring( context );
-		this.currentPlan = new PlanImpl( person );
+		this.currentPlan = PopulationUtils.createPlan(person);
 	}
 
 	@Override

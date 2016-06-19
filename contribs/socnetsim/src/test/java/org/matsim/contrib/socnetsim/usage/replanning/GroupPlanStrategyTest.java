@@ -207,7 +207,7 @@ public class GroupPlanStrategyTest {
 		Id<Person> id = Id.createPersonId( count );
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
-		PlanImpl plan = new PlanImpl( person );
+		PlanImpl plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );
 		if ( !PersonUtils.isSelected(plan) ) throw new RuntimeException();
