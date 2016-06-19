@@ -104,6 +104,7 @@ public final class PopulationUtils {
 	}
 
 	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
 		RouteFactoryImpl routeFactory = new RouteFactoryImpl();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
 		RouteFactory factory;
@@ -677,6 +678,7 @@ public final class PopulationUtils {
 
 	public static ActivityImpl createActivity(Activity act) {
 		// yyyy somehow combine this with copyFromTo method.
+		// Or maybe a clone method??
 		
 		
 		// Act coord could be null according to first c'tor!
