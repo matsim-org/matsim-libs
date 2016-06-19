@@ -261,7 +261,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";
 		}
-		this.currleg = new LegImpl(mode.intern());
+		this.currleg = PopulationUtils.createLeg(mode.intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
 		this.currleg.setArrivalTime(Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)));

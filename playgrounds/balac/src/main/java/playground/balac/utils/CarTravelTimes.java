@@ -140,14 +140,14 @@ public class CarTravelTimes {
 			act.setEndTime(60.0 * Double.parseDouble(arr[3]));
 			plan.addActivity(act);
 			
-			LegImpl leg = new LegImpl("car");
+			LegImpl leg = PopulationUtils.createLeg("car");
 			plan.addLeg(leg);
 			
 			act = PopulationUtils.createActivityFromLinkId("leisure", lEnd.getId());
 			act.setCoord(coordEnd);
 			act.setEndTime(48800);
 			plan.addActivity(act);
-			leg = new LegImpl("car");
+			leg = PopulationUtils.createLeg("car");
 			plan.addLeg(leg);
 			act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 			act.setCoord(coordStart);

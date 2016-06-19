@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -287,14 +286,14 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		/* scope of driver-specific variables */ {
 			// insert in driver plan
 			final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
-			driverTrip.add( new LegImpl( TransportMode.car ) );
+			driverTrip.add( PopulationUtils.createLeg(TransportMode.car) );
 			/* scope of firstAct */ {
 				final Activity firstAct = PopulationUtils.createActivityFromCoordAndLinkId(JointActingTypes.INTERACTION, match.tripPassenger.departure.getCoord(), match.tripPassenger.departure.getLinkId());
 				firstAct.setMaximumDuration( 0 );
 				driverTrip.add( firstAct );
 			}
 			/* scope of leg */ {
-				final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
+				final Leg leg =  PopulationUtils.createLeg(JointActingTypes.DRIVER);
 				final DriverRoute dRoute = new DriverRoute(
 						match.tripPassenger.departure.getLinkId(),
 						match.tripPassenger.arrival.getLinkId());
@@ -307,7 +306,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				secondAct.setMaximumDuration( 0 );
 				driverTrip.add( secondAct );
 			}
-			driverTrip.add( new LegImpl( TransportMode.car ) );
+			driverTrip.add( PopulationUtils.createLeg(TransportMode.car) );
 
 			TripRouter.insertTrip(
 					driverPlan,
@@ -318,7 +317,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 
 		/* scope of passenger-specific variables */ {
 			// insert in passenger plan
-			final Leg pLeg =  new LegImpl( JointActingTypes.PASSENGER );
+			final Leg pLeg =  PopulationUtils.createLeg(JointActingTypes.PASSENGER);
 			final PassengerRoute pRoute = new PassengerRoute(
 					match.tripPassenger.departure.getLinkId(),
 					match.tripPassenger.arrival.getLinkId());

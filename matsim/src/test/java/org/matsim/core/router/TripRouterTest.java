@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -56,9 +55,9 @@ public class TripRouterTest {
 		plan.createAndAddActivity( "9" );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
+		trip.add( PopulationUtils.createLeg("2") );
 		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
-		trip.add( new LegImpl( "4" ) );
+		trip.add( PopulationUtils.createLeg("4") );
 
 		TripRouter.insertTrip( plan , o , trip , d );
 
@@ -102,9 +101,9 @@ public class TripRouterTest {
 		plan.addActivity( new EqualsActivity( "9" , Id.create( 1, Link.class ) ) );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
+		trip.add( PopulationUtils.createLeg("2") );
 		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
-		trip.add( new LegImpl( "4" ) );
+		trip.add( PopulationUtils.createLeg("4") );
 
 		TripRouter.insertTrip( plan , o , trip , d );
 
@@ -153,9 +152,9 @@ public class TripRouterTest {
 		plan.createAndAddActivity( "9" );
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
+		trip.add( PopulationUtils.createLeg("2") );
 		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
-		trip.add( new LegImpl( "4" ) );
+		trip.add( PopulationUtils.createLeg("4") );
 
 		assertEquals(
 				"wrong old trip",

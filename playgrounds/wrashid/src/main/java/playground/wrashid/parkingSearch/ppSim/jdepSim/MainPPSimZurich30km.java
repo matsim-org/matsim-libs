@@ -538,7 +538,7 @@ public class MainPPSimZurich30km {
 							double walkSpeed = 3.0 / 3.6;
 							double walkDuration = walkDistance / walkSpeed;
 
-							LegImpl walkLeg = new LegImpl(TransportMode.walk);
+							LegImpl walkLeg = PopulationUtils.createLeg(TransportMode.walk);
 							walkLeg.setTravelTime(walkDuration);
 							planElements.remove(i);
 							planElements.add(i, walkLeg);
@@ -573,7 +573,7 @@ public class MainPPSimZurich30km {
 																		// parking!
 						planElements.add(i + 1, parkingAct);
 
-						LegImpl walkLeg = new LegImpl(TransportMode.walk);
+						LegImpl walkLeg = PopulationUtils.createLeg(TransportMode.walk);
 						// just initializing for testing (should be overwritten
 						// at end of parking search)
 						walkLeg.setTravelTime(3600);
@@ -588,7 +588,7 @@ public class MainPPSimZurich30km {
 																		// parking!
 						planElements.add(i, parkingAct);
 
-						LegImpl walkLeg = new LegImpl(TransportMode.walk);
+						LegImpl walkLeg = PopulationUtils.createLeg(TransportMode.walk);
 						// just initializing for testing (should be overwritten
 						// at end of parking search)
 						walkLeg.setTravelTime(3600);

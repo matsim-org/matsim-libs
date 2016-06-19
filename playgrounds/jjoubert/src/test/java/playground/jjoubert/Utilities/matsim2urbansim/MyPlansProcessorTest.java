@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -149,7 +148,7 @@ public class MyPlansProcessorTest{
 		Activity a1 = PopulationUtils.createActivityFromCoord("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
-		Leg l1 = new LegImpl(TransportMode.car);
+		Leg l1 = PopulationUtils.createLeg(TransportMode.car);
 		Link homeLink = n.getLinks().get(Id.create("12", Link.class));
 		Link workLink = n.getLinks().get(Id.create("43", Link.class));
 		List<Id<Link>> hwLinks = new ArrayList<Id<Link>>();
@@ -166,7 +165,7 @@ public class MyPlansProcessorTest{
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
 		// Work -> home.
-		Leg l2 = new LegImpl(TransportMode.car);
+		Leg l2 = PopulationUtils.createLeg(TransportMode.car);
 		NetworkRoute nr2 = new LinkNetworkRouteImpl(workLink.getId(), homeLink.getId());
 		l2.setRoute(nr2);
 		l2.setTravelTime(10.0*60.0);
@@ -188,7 +187,7 @@ public class MyPlansProcessorTest{
 		a1 = PopulationUtils.createActivityFromCoord("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
-		l1 = new LegImpl(TransportMode.car);
+		l1 = PopulationUtils.createLeg(TransportMode.car);
 		homeLink = n.getLinks().get(Id.create("12", Link.class));
 		workLink = n.getLinks().get(Id.create("43", Link.class));
 		hwLinks = new ArrayList<Id<Link>>();
@@ -205,7 +204,7 @@ public class MyPlansProcessorTest{
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
 		// Work -> home.
-		l2 = new LegImpl(TransportMode.car);
+		l2 = PopulationUtils.createLeg(TransportMode.car);
 		nr2 = new LinkNetworkRouteImpl(workLink.getId(), homeLink.getId());
 		l2.setRoute(nr2);
 		l2.setTravelTime(20.0*60.0);

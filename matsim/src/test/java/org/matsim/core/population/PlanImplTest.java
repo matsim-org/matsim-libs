@@ -80,7 +80,7 @@ public class PlanImplTest {
 
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
-		Leg l = new LegImpl(TransportMode.car);
+		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		plan.insertLegAct(1, l, a);
 
 		// test
@@ -107,7 +107,7 @@ public class PlanImplTest {
 
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
-		Leg l = new LegImpl(TransportMode.car);
+		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		plan.insertLegAct(3, l, a);
 
 		// test
@@ -134,7 +134,7 @@ public class PlanImplTest {
 
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
-		Leg l = new LegImpl(TransportMode.car);
+		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
 			plan.insertLegAct(2, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -158,7 +158,7 @@ public class PlanImplTest {
 
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
-		Leg l = new LegImpl(TransportMode.car);
+		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
 			plan.insertLegAct(0, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -183,7 +183,7 @@ public class PlanImplTest {
 
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
-		Leg l = new LegImpl(TransportMode.car);
+		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
 			plan.insertLegAct(4, l, a);
 			fail("expected Exception because of wrong act/leg-index.");
@@ -297,9 +297,9 @@ public class PlanImplTest {
 	public void addMultipleLegs() {
 		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
-		p.addLeg(new LegImpl(TransportMode.walk));
-		p.addLeg(new LegImpl(TransportMode.pt));
-		p.addLeg(new LegImpl(TransportMode.walk));
+		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
+		p.addLeg(PopulationUtils.createLeg(TransportMode.pt));
+		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
 		p.addActivity(new ActivityImpl("w"));
 
 		Assert.assertEquals(5, p.getPlanElements().size());
@@ -314,7 +314,7 @@ public class PlanImplTest {
 	public void addMultipleActs() {
 		Plan p = PopulationUtils.createPlan();
 		p.addActivity(new ActivityImpl("h"));
-		p.addLeg(new LegImpl(TransportMode.walk));
+		p.addLeg(PopulationUtils.createLeg(TransportMode.walk));
 		p.addActivity(new ActivityImpl("w"));
 		p.addActivity(new ActivityImpl("l"));
 

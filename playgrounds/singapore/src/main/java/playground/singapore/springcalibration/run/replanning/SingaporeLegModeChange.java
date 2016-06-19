@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -248,7 +247,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 					double taxiWaitTime = this.taxiUtils.getWaitingTime(coord, hour);
 					double taxiWaitEndTime = currentActivity.getEndTime() + taxiWaitTime;
 					
-					Leg taxiWalkLeg = new LegImpl(TaxiUtils.taxi_walk);
+					Leg taxiWalkLeg = PopulationUtils.createLeg(TaxiUtils.taxi_walk);
 					taxiWalkLeg.setDepartureTime(currentActivity.getEndTime());
 					taxiWalkLeg.setTravelTime(0.0);
 					tmpPlan.addLeg(taxiWalkLeg);

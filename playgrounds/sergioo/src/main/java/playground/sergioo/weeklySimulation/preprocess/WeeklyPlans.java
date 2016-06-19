@@ -93,9 +93,9 @@ public class WeeklyPlans {
 					if(((Activity)planElement).getType().equals(((Activity)last).getType()) && ((Activity)planElement).getFacilityId().equals(((Activity)last).getFacilityId()))
 						plan.getPlanElements().remove(last);
 					else if(((Activity)planElement).getFacilityId().equals(((Activity)last).getFacilityId()))
-						plan.addLeg(new LegImpl(TransportMode.transit_walk));
+						plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 					else
-						plan.addLeg(new LegImpl(carAvailable?TransportMode.car:TransportMode.pt));
+						plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			}
 			else
 				planElementCopy = new LegImpl((LegImpl)planElement);
@@ -126,7 +126,7 @@ public class WeeklyPlans {
 		while(totalDurations<Time.MIDNIGHT-2*3600) {
 			String prevActivityType = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType();
 			Coord prevActivityCoord = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getCoord();
-			plan.addLeg(new LegImpl(carAvailable?TransportMode.car:TransportMode.pt));
+			plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			String type = !prevActivityType.equals("home") && Math.random()<PROB_HOME?"home":getRandomActivityType(config.findParam("locationchoice", "flexible_types").split(","));
 			double duration;
 			try {
@@ -153,7 +153,7 @@ public class WeeklyPlans {
 				totalDurations = Time.MIDNIGHT;
 				((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations-1);
 			}
-			plan.addLeg(new LegImpl(carAvailable?TransportMode.car:TransportMode.pt));
+			plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			totalDurations = Time.MIDNIGHT;
 			activity = PopulationUtils.createActivityFromCoord(typeLast, lastCoord);
 			((ActivityImpl)activity).setFacilityId(lastFacilityId);

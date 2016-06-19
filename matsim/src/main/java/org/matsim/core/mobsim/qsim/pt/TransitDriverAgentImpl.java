@@ -66,7 +66,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 				lastActivity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getStartLinkId());
 				plan.addActivity(lastActivity);
 			}
-			Leg leg = new LegImpl(transportMode);
+			Leg leg = PopulationUtils.createLeg(transportMode);
 			leg.setRoute(networkRoute);
 			plan.addLeg(leg);
 			Activity activity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getEndLinkId());

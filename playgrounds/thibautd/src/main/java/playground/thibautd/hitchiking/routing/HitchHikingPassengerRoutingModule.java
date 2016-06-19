@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -93,7 +93,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 					departureTime,
 					person ) );
 
-		Leg leg = new LegImpl( HitchHikingConstants.PASSENGER_MODE );
+		Leg leg = PopulationUtils.createLeg(HitchHikingConstants.PASSENGER_MODE);
 		Route route = routeFactory.createRoute(
 					Route.class, // HitchHikingConstants.PASSENGER_MODE,
 					puSpot.getId(),

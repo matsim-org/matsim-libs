@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -132,11 +131,11 @@ public class JointTripRemoverAlgorithmTest {
 
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ));
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dAct2 ));
 
 		expectedAfterRemoval.put(
 				passenger.getId(),
-				Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ));
+				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
 
 		return new Fixture(
 				"one passenger",
@@ -205,19 +204,19 @@ public class JointTripRemoverAlgorithmTest {
 		jointPassengerLeg1.setRoute( pRoute );
 		jointPassengerLeg2.setRoute( pRoute.clone()	);
 
-		Leg expectedDriverLeg = new LegImpl( JointActingTypes.DRIVER );
+		Leg expectedDriverLeg = PopulationUtils.createLeg(JointActingTypes.DRIVER);
 		DriverRoute expDRoute = dRoute.clone();
 		expDRoute.removePassenger( passenger1.getId() );
 		expectedDriverLeg.setRoute( expDRoute );
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dPu ,
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dPu ,
 					expectedDriverLeg,
-					dDo , new LegImpl( TransportMode.car ) , dAct2 ));
+					dDo , PopulationUtils.createLeg(TransportMode.car) , dAct2 ));
 
 		expectedAfterRemoval.put(
 				passenger1.getId(),
-				Arrays.asList( p1Act1 , new LegImpl( TransportMode.pt ) , p1Act2 ));
+				Arrays.asList( p1Act1 , PopulationUtils.createLeg(TransportMode.pt) , p1Act2 ));
 
 		expectedAfterRemoval.put(
 				passenger2.getId(),
@@ -305,19 +304,19 @@ public class JointTripRemoverAlgorithmTest {
 		pRoute.setDriverId( driver.getId() );
 		jointPassengerLeg2.setRoute( pRoute	);
 
-		Leg expectedDriverLeg = new LegImpl( JointActingTypes.DRIVER );
+		Leg expectedDriverLeg = PopulationUtils.createLeg(JointActingTypes.DRIVER);
 		DriverRoute expDRoute = new DriverRoute( link2 , link5 );
 		expDRoute.addPassenger( passenger2.getId() );
 		expectedDriverLeg.setRoute( expDRoute );
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dPu1 ,
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dPu1 ,
 					expectedDriverLeg,
-					dDo2 , new LegImpl( TransportMode.car ) , dAct2 ));
+					dDo2 , PopulationUtils.createLeg(TransportMode.car) , dAct2 ));
 
 		expectedAfterRemoval.put(
 				passenger1.getId(),
-				Arrays.asList( p1Act1 , new LegImpl( TransportMode.pt ) , p1Act2 ));
+				Arrays.asList( p1Act1 , PopulationUtils.createLeg(TransportMode.pt) , p1Act2 ));
 
 		expectedAfterRemoval.put(
 				passenger2.getId(),
@@ -405,19 +404,19 @@ public class JointTripRemoverAlgorithmTest {
 		pRoute.setDriverId( driver.getId() );
 		jointPassengerLeg2.setRoute( pRoute	);
 
-		Leg expectedDriverLeg = new LegImpl( JointActingTypes.DRIVER );
+		Leg expectedDriverLeg = PopulationUtils.createLeg(JointActingTypes.DRIVER);
 		DriverRoute expDRoute = new DriverRoute( link4 , link5 );
 		expDRoute.addPassenger( passenger2.getId() );
 		expectedDriverLeg.setRoute( expDRoute );
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dPu2 ,
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dPu2 ,
 					expectedDriverLeg,
-					dDo1 , new LegImpl( TransportMode.car ) , dAct2 ));
+					dDo1 , PopulationUtils.createLeg(TransportMode.car) , dAct2 ));
 
 		expectedAfterRemoval.put(
 				passenger1.getId(),
-				Arrays.asList( p1Act1 , new LegImpl( TransportMode.pt ) , p1Act2 ));
+				Arrays.asList( p1Act1 , PopulationUtils.createLeg(TransportMode.pt) , p1Act2 ));
 
 		expectedAfterRemoval.put(
 				passenger2.getId(),
@@ -488,11 +487,11 @@ public class JointTripRemoverAlgorithmTest {
 
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ));
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dAct2 ));
 
 		expectedAfterRemoval.put(
 				passenger.getId(),
-				Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ));
+				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
 
 		return new Fixture(
 				"complex access trip driver",
@@ -559,11 +558,11 @@ public class JointTripRemoverAlgorithmTest {
 
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ));
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dAct2 ));
 
 		expectedAfterRemoval.put(
 				passenger.getId(),
-				Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ));
+				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
 
 		return new Fixture(
 				"complex access trip passenger",
@@ -643,12 +642,12 @@ public class JointTripRemoverAlgorithmTest {
 
 		expectedAfterRemoval.put(
 				driver.getId(),
-				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ,
+				Arrays.asList( dAct1 , PopulationUtils.createLeg(TransportMode.car) , dAct2 ,
 					dAccess2 , dPu2 , jointDriverLeg2 , dDo2 , dEgress2 , dAct3 ));
 
 		expectedAfterRemoval.put(
 				passenger1.getId(),
-				Arrays.asList( p1Act1 , new LegImpl( TransportMode.pt ) , p1Act2 ));
+				Arrays.asList( p1Act1 , PopulationUtils.createLeg(TransportMode.pt) , p1Act2 ));
 
 		expectedAfterRemoval.put(
 				passenger2.getId(),
@@ -734,7 +733,7 @@ public class JointTripRemoverAlgorithmTest {
 				driver.getId(),
 				Arrays.asList( dAct1 ,
 					dAccess , dPu , jointDriverLeg , dDo , dEgress , dAct2 ,
-					new LegImpl( TransportMode.car ) , dAct3 ));
+					PopulationUtils.createLeg(TransportMode.car) , dAct3 ));
 
 		expectedAfterRemoval.put(
 				passenger1.getId(),
@@ -742,7 +741,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		expectedAfterRemoval.put(
 				passenger2.getId(),
-				Arrays.asList( p2Act1 , new LegImpl( TransportMode.pt ) , p2Act2 ));
+				Arrays.asList( p2Act1 , PopulationUtils.createLeg(TransportMode.pt) , p2Act2 ));
 
 		return new Fixture(
 				"two passengers different trips remove second",
@@ -830,7 +829,7 @@ public class JointTripRemoverAlgorithmTest {
 		if ( removeFirst ) {
 			expectedAfterRemoval.put(
 					driver1.getId(),
-					Arrays.asList( d1Act1 , new LegImpl( TransportMode.car ) , d1Act2 ,
+					Arrays.asList( d1Act1 , PopulationUtils.createLeg(TransportMode.car) , d1Act2 ,
 						d1Leg , d1Act3 ));
 
 			expectedAfterRemoval.put(
@@ -839,7 +838,7 @@ public class JointTripRemoverAlgorithmTest {
 
 			expectedAfterRemoval.put(
 					passenger.getId(),
-					Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ,
+					Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ,
 						pAccess2 , pPu2 , jointPassengerLeg2 , pDo2 , pEgress2 , pAct3 ));
 
 			return new Fixture(
@@ -862,12 +861,12 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				driver2.getId(),
 				Arrays.asList( d2Act1 , d2Leg , d2Act2 ,
-					new LegImpl( TransportMode.car ) , d2Act3 ));
+					PopulationUtils.createLeg(TransportMode.car) , d2Act3 ));
 
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , pAccess1 , pPu1 , jointPassengerLeg1 , pDo1 , pEgress1 ,
-					pAct2 , new LegImpl( TransportMode.pt ) , pAct3 ));
+					pAct2 , PopulationUtils.createLeg(TransportMode.pt) , pAct3 ));
 
 		return new Fixture(
 				"two drivers remove second",

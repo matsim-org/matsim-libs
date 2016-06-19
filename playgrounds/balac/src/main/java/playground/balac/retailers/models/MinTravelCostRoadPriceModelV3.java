@@ -21,6 +21,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -161,7 +162,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
 
         					LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
-        					LegImpl li = new LegImpl(TransportMode.car);
+        					LegImpl li = PopulationUtils.createLeg(TransportMode.car);
         					li.setDepartureTime(0.0D);
                             handleCarLeg(li, link, this.controler.getScenario().getNetwork().getLinks().get(linklpa.getId()), network, routeAlgo);
 
@@ -191,7 +192,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
 
         					LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
-        					LegImpl li = new LegImpl(TransportMode.car);
+        					LegImpl li = PopulationUtils.createLeg(TransportMode.car);
         					li.setDepartureTime(0.0D);
                             handleCarLeg(li, link, this.controler.getScenario().getNetwork().getLinks().get(linknpa.getId()), network, routeAlgo);
 

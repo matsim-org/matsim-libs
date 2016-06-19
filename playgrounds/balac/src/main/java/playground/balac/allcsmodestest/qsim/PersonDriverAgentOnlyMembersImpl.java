@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -455,7 +456,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 	//added methods
 	
 	private void initializeCSWalkLeg(String mode, double now, Link startLink, Link destinationLink) {
-		LegImpl walkLeg = new LegImpl(mode);
+		LegImpl walkLeg = PopulationUtils.createLeg(mode);
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
 		final double dist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord());
@@ -498,7 +499,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 			}
 		}
 		
-		LegImpl carLeg = new LegImpl(mode);
+		LegImpl carLeg = PopulationUtils.createLeg(mode);
 		
 		carLeg.setTravelTime( travelTime );
 		

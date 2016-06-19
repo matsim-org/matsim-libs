@@ -48,7 +48,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -172,7 +171,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		person.addPlan(plan);
 		Id<Link> linkId = Id.create(1, Link.class);
 		Activity home1 = PopulationUtils.createActivityFromLinkId("home", linkId);
-		Leg leg = new LegImpl("car");
+		Leg leg = PopulationUtils.createLeg("car");
 		Activity home2 = PopulationUtils.createActivityFromLinkId("home", linkId);
 		plan.addActivity(home1);
 		plan.addLeg(leg);

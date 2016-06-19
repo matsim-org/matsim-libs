@@ -127,7 +127,7 @@ public class PTTravelTimes {
 				act.setEndTime(m * 60);
 				plan.addActivity(act);
 				
-				LegImpl leg = new LegImpl("pt");
+				LegImpl leg = PopulationUtils.createLeg("pt");
 				
 				TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStart.getId());
 						
@@ -215,7 +215,7 @@ public class PTTravelTimes {
 				act.setCoord(coordEnd);
 				act.setEndTime(48800);
 				plan.addActivity(act);
-				leg = new LegImpl("pt");
+				leg = PopulationUtils.createLeg("pt");
 				plan.addLeg(leg);
 				act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 				act.setCoord(coordStart);

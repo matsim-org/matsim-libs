@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.RouteUtils;
@@ -99,7 +98,7 @@ public class SetupWasteExample {
 		Route route = RouteUtils.createNetworkRoute(routeLinkIds, sc.getNetwork());
 		route.setDistance(routeLinkIds.size()*1000.0);
 		
-		Leg leg = new LegImpl("waste");
+		Leg leg = PopulationUtils.createLeg("waste");
 		leg.setRoute(route);
 		
 		Activity first = pf.createActivityFromLinkId("depot", Id.createLinkId("ab"));

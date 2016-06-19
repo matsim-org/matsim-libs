@@ -68,7 +68,7 @@ public class PrtRouterWrapper implements RoutingModule {
 		time += act.getMaximumDuration();
         
         //prtLeg
-		leg = new LegImpl(PrtRequestCreator.MODE);
+		leg = PopulationUtils.createLeg(PrtRequestCreator.MODE);
 		Route route = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 		leg.setRoute(route);
 		leg.setDepartureTime(time);

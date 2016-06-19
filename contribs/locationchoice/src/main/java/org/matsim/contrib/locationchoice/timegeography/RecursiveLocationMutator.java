@@ -39,6 +39,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -184,7 +185,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 	}
 
 	protected double computeTravelTime(Person person, Activity fromAct, Activity toAct) {
-		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
+		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -129,7 +128,7 @@ public class TestScoringFunctionState {
 		act.setEndTime( now );
 		scoringFunction.handleActivity( act );
 
-		Leg leg = new LegImpl( TransportMode.car );
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime( now );
 		leg.setTravelTime( step );
 		now += step;

@@ -463,7 +463,7 @@ public class BlnPlansGenerator {
 
 		if(BlnPlansGenerator.setAllLegsToCar == true){
 
-			leg = new LegImpl(TransportMode.car);
+			leg = PopulationUtils.createLeg(TransportMode.car);
 			this.modalSplit[3]++;
 
 		} else {
@@ -471,7 +471,7 @@ public class BlnPlansGenerator {
 			switch (Integer.parseInt(tripData[48])) {
 			case 0:
 				// "keine Angabe"
-				leg = new LegImpl("undefined");
+				leg = PopulationUtils.createLeg("undefined");
 				this.modalSplit[0]++;
 				break;
 			case 1:
@@ -479,42 +479,42 @@ public class BlnPlansGenerator {
 //				leg = new LegImpl(TransportMode.pt);
 //				this.modalSplit[4]++;
 //				break;
-				leg = new LegImpl(TransportMode.walk);
+				leg = PopulationUtils.createLeg(TransportMode.walk);
 				this.modalSplit[1]++;
 				break;
 			case 2:
 				// "Rad"
-				leg = new LegImpl(TransportMode.bike);
+				leg = PopulationUtils.createLeg(TransportMode.bike);
 				this.modalSplit[2]++;
 				break;
 			case 3:
 				// "MIV" TODO [an] BasicLeg.Mode.miv cannot be handled by PersonPrepareForSim.1
-				leg = new LegImpl(TransportMode.car);
+				leg = PopulationUtils.createLeg(TransportMode.car);
 				this.modalSplit[3]++;
 				break;
 			case 4:
 				// "OEV"
-				leg = new LegImpl(TransportMode.pt);
+				leg = PopulationUtils.createLeg(TransportMode.pt);
 				this.modalSplit[4]++;
 				break;
 			case 5:
 				// "Rad/OEV"
-				leg = new LegImpl(TransportMode.pt);
+				leg = PopulationUtils.createLeg(TransportMode.pt);
 				this.modalSplit[5]++;
 				break;
 			case 6:
 				// "IV/OEV"
-				leg = new LegImpl(TransportMode.pt);
+				leg = PopulationUtils.createLeg(TransportMode.pt);
 				this.modalSplit[6]++;
 				break;
 			case 7:
 				// "sonstiges"
-				leg = new LegImpl("undefined");
+				leg = PopulationUtils.createLeg("undefined");
 				this.modalSplit[7]++;
 				break;
 			default:
 				log.error("transport mode not defined");
-			leg = new LegImpl(TransportMode.walk);
+			leg = PopulationUtils.createLeg(TransportMode.walk);
 			this.modalSplit[8]++;
 			}
 

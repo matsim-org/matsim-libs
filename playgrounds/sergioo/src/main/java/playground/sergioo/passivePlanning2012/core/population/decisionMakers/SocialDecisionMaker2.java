@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -230,7 +230,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		mode.add(bestMode);
 		leastCostPathCalculator.setModeRestriction(mode);
 		NetworkRoute networkRoute = getFullNetworkRoute(bestPath, start.getLinkId(), end.getLinkId(), time);
-		Leg leg = new LegImpl(bestMode);
+		Leg leg = PopulationUtils.createLeg(bestMode);
 		leg.setRoute(networkRoute);
 		return Arrays.asList(leg);
 	}

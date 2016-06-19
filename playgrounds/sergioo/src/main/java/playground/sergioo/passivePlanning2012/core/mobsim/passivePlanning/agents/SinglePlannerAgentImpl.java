@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
@@ -92,7 +92,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 				if(firstLeg && planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 					firstLeg = false;
 					if(!((Activity)planElement).getType().equals(previous.getType()) && !(plan.getPlanElements().get(index-1) instanceof Leg)) {
-						Leg leg = new LegImpl(TransportMode.transit_walk);
+						Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 						leg.setTravelTime(0);
 						leg.setRoute(new GenericRouteImpl(previous.getLinkId(), ((Activity)planElement).getLinkId()));
 						plan.getPlanElements().add(index++, leg);
@@ -122,7 +122,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 					agent.initializeLastActivity((Activity)nextElement, startTime);
 				}
 				else if(((Activity)nextElement).getCoord().equals(((Activity)prevElement).getCoord())) {
-					Leg leg = new LegImpl(TransportMode.transit_walk);
+					Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 					leg.setTravelTime(0);
 					leg.setRoute(new GenericRouteImpl(previous.getLinkId(), previous.getLinkId()));
 					plan.getPlanElements().add(currentElementIndex.get()+1, leg);

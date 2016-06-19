@@ -20,6 +20,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -91,7 +92,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
         //PlansCalcRoute pcr = new PlansCalcRoute(this.services.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.services.getLeastCostPathCalculatorFactory(), routeFactory);
 
-        LegImpl li = new LegImpl(TransportMode.car);
+        LegImpl li = PopulationUtils.createLeg(TransportMode.car);
         li.setDepartureTime(0.0D);
         //log.info("fromLink " + link);
         //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));

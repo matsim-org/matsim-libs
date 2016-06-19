@@ -34,7 +34,7 @@ public final class LegImpl implements Leg {
 
 	private double arrTime = Time.UNDEFINED_TIME;
 
-	public LegImpl(final String transportMode) {
+	private LegImpl(final String transportMode) {
 		this.mode = transportMode;
 	}
 

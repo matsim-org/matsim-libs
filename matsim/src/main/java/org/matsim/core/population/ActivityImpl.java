@@ -62,18 +62,6 @@ public final class ActivityImpl implements Activity {
 		this.type = type.intern();
 	}
 
-	private ActivityImpl(final Activity act) {
-		this(act.getType());
-		// Act coord could be null according to first c'tor!
-		Coord c = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
-		this.coord = c ;
-		this.linkId = act.getLinkId();
-		this.setStartTime(act.getStartTime());
-		this.setEndTime(act.getEndTime());
-		this.setMaximumDuration(act.getMaximumDuration());
-		this.setFacilityId(act.getFacilityId());
-	}
-
 	@Override
 	public final double getEndTime() {
 		return this.endTime;

@@ -26,7 +26,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
@@ -89,7 +88,7 @@ public class PlanGeneratorWithParkingActivities {
 	}
 
 	private void addWalkLeg(List<PlanElement> planElements, int index) {
-		Leg leg = new LegImpl("walk");
+		Leg leg = PopulationUtils.createLeg("walk");
 		planElements.add(index, leg);
 	}
 

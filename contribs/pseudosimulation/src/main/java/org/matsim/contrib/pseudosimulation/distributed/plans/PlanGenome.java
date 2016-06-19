@@ -101,7 +101,7 @@ public class PlanGenome implements Plan {
     @Deprecated // use scenario.getPopulation().getFactory().createLeg(...) instead, and add it yourself
     public LegImpl createAndAddLeg(final String mode) {
         verifyCreateLeg();
-        LegImpl leg = new LegImpl(mode);
+        LegImpl leg = PopulationUtils.createLeg(mode);
         // Override leg number with an appropriate value
         getPlanElements().add(leg);
         return leg;

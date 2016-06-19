@@ -67,7 +67,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	@Override
 	public Leg createLeg(final String legMode) {
-		return new LegImpl(legMode);
+		return PopulationUtils.createLeg(legMode);
 	}
 
 	/**

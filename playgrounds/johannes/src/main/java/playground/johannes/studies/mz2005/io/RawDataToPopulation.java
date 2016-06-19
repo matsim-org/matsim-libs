@@ -139,7 +139,7 @@ public class RawDataToPopulation {
 			/*
 			 * create leg
 			 */
-			LegImpl leg = new LegImpl(trip.aggrMode.name());
+			LegImpl leg = PopulationUtils.createLeg(trip.aggrMode.name());
 			plan.addLeg(leg);
 			/*
 			 * create route
@@ -178,7 +178,7 @@ public class RawDataToPopulation {
 		ActivityImpl previous = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 		if(!previous.getType().equalsIgnoreCase(ActivityType.home.name())) {
 			previous.setEndTime(86399);
-			LegImpl leg = new LegImpl("undefined");
+			LegImpl leg = PopulationUtils.createLeg("undefined");
 			plan.addLeg(leg);
 			
 			act = PopulationUtils.createActivityFromCoord(ActivityType.home.name(), ((Activity)plan.getPlanElements().get(0)).getCoord());

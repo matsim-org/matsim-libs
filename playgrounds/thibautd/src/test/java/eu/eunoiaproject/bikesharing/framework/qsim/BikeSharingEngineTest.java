@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 
 /**
@@ -107,7 +107,7 @@ public class BikeSharingEngineTest {
 					manager, EventsUtils.createEventsManager());
 
 		// create agent
-		final Leg leg = new LegImpl( BikeSharingConstants.MODE );
+		final Leg leg = PopulationUtils.createLeg(BikeSharingConstants.MODE);
 		final BikeSharingRoute route =
 			new BikeSharingRoute(
 					departureFacility,

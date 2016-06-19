@@ -106,7 +106,7 @@ public class TemplatePopulationConverter {
 							plan.addActivity(act);
 						} else {
 							String transportMode = lineArgs[i++];
-							Leg leg = new LegImpl(transportMode);
+							Leg leg = PopulationUtils.createLeg(transportMode);
 							plan.addLeg(leg);
 						}
 					}

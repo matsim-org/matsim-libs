@@ -34,7 +34,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -83,7 +82,7 @@ public class Main {
 
 		
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Leg leg = new LegImpl(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		Coord fromCoord = new Coord(xFromAct, yFromAct);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", fromCoord);
 		((ActivityImpl) fromAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), fromCoord).getId());

@@ -143,7 +143,7 @@ public final class QLinkTest extends MatsimTestCase {
 		PlanImpl plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", f.link2.getId()));
@@ -242,7 +242,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Plan plan = PopulationUtils.createPlan();
 		pers.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
 		route.setVehicleId(f.basicVehicle.getId());
 		leg.setRoute(route);
@@ -476,7 +476,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
 		route.setVehicleId(f.basicVehicle.getId());
 		leg.setRoute(route);
@@ -506,7 +506,7 @@ public final class QLinkTest extends MatsimTestCase {
 			Activity act = PopulationUtils.createActivityFromLinkId("h", link1.getId());
 			act.setEndTime(7*3600);
 			plan.addActivity(act);
-			Leg leg = new LegImpl("car");
+			Leg leg = PopulationUtils.createLeg("car");
 			NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 			List<Id<Link>> links = new ArrayList<Id<Link>>();
 			links.add(link3.getId()); // let the person(s) drive around in circles to generate a traffic jam

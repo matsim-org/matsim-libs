@@ -62,7 +62,7 @@ public class ActivityChainRepairer {
                     lastAct.setEndTime(lastAct.getStartTime() + durationLastAct);
                     // create leg to return home...
                     LegImpl lastLeg = (LegImpl) plan.get(plan.size()-2);
-                    LegImpl newLeg = new LegImpl(lastLeg.getMode());
+                    LegImpl newLeg = PopulationUtils.createLeg(lastLeg.getMode());
                     // create final home activity (assumption that first activity was home or remote_home)...
                     ActivityImpl firstAct = (ActivityImpl) plan.get(0);
                     ActivityImpl newAct = PopulationUtils.createActivityFromCoord(firstAct.getType(), firstAct.getCoord());

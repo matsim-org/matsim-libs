@@ -29,7 +29,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -125,7 +124,7 @@ public class ChainChopperTest {
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		/* Create the point far enough away that it will only reach it by 
 		 * 08:00 the next morning. */
@@ -154,7 +153,7 @@ public class ChainChopperTest {
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		/* Create the point far enough away that it will reach it by 23:00:00 
 		 * the evening. */
@@ -165,7 +164,7 @@ public class ChainChopperTest {
 		b.setMaximumDuration(Time.parseTime("02:00:00"));
 		plan.addActivity(b);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		Activity c = PopulationUtils.createActivityFromCoord("c", CoordUtils.createCoord(2*distance, 2.0));
 		plan.addActivity(c);
@@ -188,7 +187,7 @@ public class ChainChopperTest {
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		/* Create the point far enough away that it will reach it by 20:00 the 
 		 * same day. */

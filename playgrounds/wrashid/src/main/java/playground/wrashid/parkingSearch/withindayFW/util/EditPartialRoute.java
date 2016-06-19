@@ -277,7 +277,7 @@ public class EditPartialRoute {
 		PlanImpl newPlan = PopulationUtils.createPlan();
 		ActivityImpl fromActivity = PopulationUtils.createActivityFromLinkId("", fromLink.getId());
 		ActivityImpl toActivity = PopulationUtils.createActivityFromLinkId("", toLink.getId());
-		LegImpl leg = new LegImpl(TransportMode.car);
+		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		fromActivity.setEndTime(0);
 		toActivity.setEndTime(0);
 

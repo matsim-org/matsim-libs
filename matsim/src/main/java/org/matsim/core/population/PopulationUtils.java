@@ -691,5 +691,9 @@ public final class PopulationUtils {
 		
 		return (ActivityImpl) newAct ;
 	}
+
+	public static LegImpl createLeg(String transportMode) {
+		return (LegImpl) getFactory().createLeg(transportMode) ;
+	}
 	
 }

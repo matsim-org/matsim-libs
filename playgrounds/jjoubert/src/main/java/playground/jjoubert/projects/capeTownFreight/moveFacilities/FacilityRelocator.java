@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -149,7 +148,7 @@ public class FacilityRelocator {
 		}
 		
 		/* Build a complete plan from the list of activities. */
-		Leg commercialLeg = new LegImpl("commercial");
+		Leg commercialLeg = PopulationUtils.createLeg("commercial");
 		for(int i = 0; i < bestInsertionList.size()-1; i++){
 			newPlan.addActivity(bestInsertionList.get(i));
 			newPlan.addLeg(commercialLeg);

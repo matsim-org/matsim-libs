@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.modules;
 import java.util.Collections;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -70,7 +70,7 @@ public class TourModeUnifierAlgorithm implements PlanAlgorithm {
 				TripRouter.insertTrip(
 						plan,
 						trip.getOriginActivity(),
-						Collections.singletonList( new LegImpl( mode ) ),
+						Collections.singletonList( PopulationUtils.createLeg(mode) ),
 						trip.getDestinationActivity() );
 			}
 		}

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import playground.ivt.utils.SoftCache;
@@ -82,7 +81,7 @@ public class TripSoftCache {
 	}
 
 	private static Leg clone( final Leg leg) {
-		final Leg clone = new LegImpl( leg.getMode() );
+		final Leg clone = PopulationUtils.createLeg(leg.getMode());
 		clone.setRoute( leg.getRoute().clone() );
 		clone.setDepartureTime( leg.getDepartureTime() );
 		clone.setTravelTime( leg.getTravelTime() );

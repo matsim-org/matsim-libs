@@ -24,7 +24,6 @@ package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -87,7 +86,7 @@ public class CreateCBTransitPT extends CreateSingleTripPopulation {
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl(mode));
+		plan.addLeg(PopulationUtils.createLeg(mode));
 
 		ActivityImpl actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", destFacility.getCoord(), destFacility.getLinkId());
 		actEnd.setFacilityId(destFacility.getId());

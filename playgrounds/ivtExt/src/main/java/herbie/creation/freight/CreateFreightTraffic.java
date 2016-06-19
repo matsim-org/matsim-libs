@@ -315,7 +315,7 @@ public class CreateFreightTraffic {
 		actH.setMaximumDuration(departureTime);
 		actH.setEndTime(departureTime);
 		plan.addActivity(actH);		
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(PopulationUtils.createLeg("car"));
 				
 		ActivityImpl actFreight = PopulationUtils.createActivityFromLinkId("freight", freightFacility.getLinkId());
 		

@@ -113,7 +113,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(PersonDepartureEvent event) {
-			LegImpl leg = new LegImpl(event.getLegMode());
+			LegImpl leg = PopulationUtils.createLeg(event.getLegMode());
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
 			currentRoute = new ArrayList<Id<Link>>();
@@ -262,7 +262,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
 					Route route = tourLeg.getRoute();
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
-					LegImpl leg = new LegImpl(TransportMode.car);
+					LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());

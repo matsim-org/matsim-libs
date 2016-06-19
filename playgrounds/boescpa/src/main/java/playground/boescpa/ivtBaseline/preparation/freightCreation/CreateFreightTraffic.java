@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -177,7 +176,7 @@ public class CreateFreightTraffic {
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(org.matsim.core.population.PopulationUtils.createLeg("car"));
 
 		ActivityImpl actEnd = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
 		actEnd.setFacilityId(endFacility.getId());

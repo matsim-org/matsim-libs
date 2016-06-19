@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -163,7 +162,7 @@ public class BikeSharingRouteIOTest {
 
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("stuff", outRoute.getStartLinkId()) );
 
-		final Leg leg = new LegImpl( BikeSharingConstants.MODE );
+		final Leg leg = PopulationUtils.createLeg(BikeSharingConstants.MODE);
 		leg.setRoute( outRoute );
 		plan.addLeg( leg );
 

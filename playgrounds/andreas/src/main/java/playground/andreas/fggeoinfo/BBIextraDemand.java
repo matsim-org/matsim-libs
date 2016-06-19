@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -92,7 +91,7 @@ public class BBIextraDemand {
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
-					plan.addLeg(new LegImpl(TransportMode.car));
+					plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
 					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordBBI));
 
@@ -118,7 +117,7 @@ public class BBIextraDemand {
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
-					plan.addLeg(new LegImpl(TransportMode.car));
+					plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
 					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordTXL));
 
@@ -137,7 +136,7 @@ public class BBIextraDemand {
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
-					plan.addLeg(new LegImpl(TransportMode.car));
+					plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
 					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordSXF));
 

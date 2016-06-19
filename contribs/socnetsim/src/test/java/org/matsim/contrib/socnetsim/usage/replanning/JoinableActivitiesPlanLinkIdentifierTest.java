@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -375,7 +375,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 			plan.addActivity( act );
 		}
 
-		plan.addLeg( new LegImpl( "car" ) );
+		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
@@ -384,7 +384,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 			plan.addActivity( act );
 		}
 
-		plan.addLeg( new LegImpl( "car" ) );
+		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
@@ -394,7 +394,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		}
 
 
-		plan.addLeg( new LegImpl( "car" ) );
+		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
@@ -422,7 +422,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 			plan.addActivity( act );
 		}
 
-		plan.addLeg( new LegImpl( "car" ) );
+		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
@@ -431,7 +431,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 			plan.addActivity( act );
 		}
 
-		plan.addLeg( new LegImpl( "car" ) );
+		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );

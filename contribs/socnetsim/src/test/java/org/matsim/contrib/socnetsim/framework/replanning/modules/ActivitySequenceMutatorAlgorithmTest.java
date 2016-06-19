@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -43,11 +42,11 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("l", Id.create( "l" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
@@ -75,9 +74,9 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
@@ -101,7 +100,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
@@ -121,13 +120,13 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("stage", Id.create( "s" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("l", Id.create( "l" , Link.class )) );
-		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =

@@ -15,7 +15,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -74,7 +73,7 @@ public class CreateDummyPopulation {
 		homeAct0.setEndTime(6.0 * 3600.0);
 		homeAct0.setCoord(this.scenario.getNetwork().getLinks().get(Id.create("21016-21015", Link.class)).getCoord());
 		
-		Leg leg = new LegImpl(TransportMode.walk);
+		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
 		plan.addLeg(leg);
 		
 		ActivityImpl workAct = PopulationUtils.createActivityFromLinkId("work", Id.create("21010-24021", Link.class));

@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -127,9 +126,9 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			
 			plan.getPlanElements().add(actIndex, newActivity);
 			if (actIndex == 0)
-				plan.getPlanElements().add(actIndex + 1, new LegImpl( ( (Leg) plan.getPlanElements().get(actIndex + 2) ).getMode() ));			
+				plan.getPlanElements().add(actIndex + 1, PopulationUtils.createLeg(( (Leg) plan.getPlanElements().get(actIndex + 2) ).getMode()));			
 			else
-				plan.getPlanElements().add(actIndex + 1, new LegImpl( ( (Leg) plan.getPlanElements().get(actIndex - 1) ).getMode() ));			
+				plan.getPlanElements().add(actIndex + 1, PopulationUtils.createLeg(( (Leg) plan.getPlanElements().get(actIndex - 1) ).getMode()));			
 		}		
 	}
 

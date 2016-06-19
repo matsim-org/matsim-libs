@@ -149,7 +149,7 @@ public class Fcd {
 			
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, add activities
-				currentPerson.getSelectedPlan().addLeg(new LegImpl(TransportMode.car));
+				currentPerson.getSelectedPlan().addLeg(PopulationUtils.createLeg(TransportMode.car));
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 				
 			} else {
@@ -218,7 +218,7 @@ public class Fcd {
 			
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, add activities
-				currentPerson.getSelectedPlan().addLeg(new LegImpl(TransportMode.car));
+				currentPerson.getSelectedPlan().addLeg(PopulationUtils.createLeg(TransportMode.car));
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 				

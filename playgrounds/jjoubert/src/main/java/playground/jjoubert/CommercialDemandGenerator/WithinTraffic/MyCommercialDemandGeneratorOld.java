@@ -148,7 +148,7 @@ public class MyCommercialDemandGeneratorOld {
 				majorActivityStart.setEndTime(startTime);
 				plan.getPlanElements().add(majorActivityStart);
 
-				LegImpl leg = new LegImpl(TransportMode.car);
+				LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 				plan.addLeg(leg);
 
 				// Sample number of activities, given start time

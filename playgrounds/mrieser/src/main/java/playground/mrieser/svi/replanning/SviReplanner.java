@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -67,7 +66,7 @@ public class SviReplanner implements PersonAlgorithm {
 			}
 			if (pe instanceof Leg) {
 				// copy leg
-				Leg leg = new LegImpl(TransportMode.pt);
+				Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 				leg.setDepartureTime(leg.getDepartureTime());
 				p2.addLeg(leg);
 			}
@@ -91,7 +90,7 @@ public class SviReplanner implements PersonAlgorithm {
 			}
 			if (pe instanceof Leg) {
 				// copy leg
-				Leg leg = new LegImpl(TransportMode.car);
+				Leg leg = PopulationUtils.createLeg(TransportMode.car);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				p3.addLeg(leg);
 			}
@@ -115,7 +114,7 @@ public class SviReplanner implements PersonAlgorithm {
 			}
 			if (pe instanceof Leg) {
 				// copy leg
-				Leg leg = new LegImpl(TransportMode.pt);
+				Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 				leg.setDepartureTime(Time.UNDEFINED_TIME);
 				p4.addLeg(leg);
 			}

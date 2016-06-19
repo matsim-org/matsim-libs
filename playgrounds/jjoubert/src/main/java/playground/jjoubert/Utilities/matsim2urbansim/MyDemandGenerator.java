@@ -150,11 +150,11 @@ public class MyDemandGenerator {
 					Leg toHome = null;
 					int carOwner = Integer.parseInt(entry[3]);
 					if(carOwner == 1){
-						fromHome = new LegImpl(TransportMode.car);
-						toHome = new LegImpl(TransportMode.car);
+						fromHome = PopulationUtils.createLeg(TransportMode.car);
+						toHome = PopulationUtils.createLeg(TransportMode.car);
 					} else{
-						fromHome = new LegImpl(TransportMode.pt);
-						toHome = new LegImpl(TransportMode.pt);
+						fromHome = PopulationUtils.createLeg(TransportMode.pt);
+						toHome = PopulationUtils.createLeg(TransportMode.pt);
 					}
 					
 					

@@ -624,11 +624,11 @@ public class CreatePlansFromTrips {
 				}
 				if(type == 0){
 					//pure-auto trips
-					leg = new LegImpl(TransportMode.car);
+					leg = PopulationUtils.createLeg(TransportMode.car);
 					
 				}else if (type == 1){
 					//pure-transit trips
-					leg = new LegImpl(TransportMode.pt);
+					leg = PopulationUtils.createLeg(TransportMode.pt);
 					
 				}else if (type == 2){
 					//auto-access/auto-egress transit (ie, to GO/subway)

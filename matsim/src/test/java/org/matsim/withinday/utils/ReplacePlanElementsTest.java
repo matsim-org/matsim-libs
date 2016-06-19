@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -64,7 +63,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	public void testReplaceLeg() {
 		Plan plan = createSamplePlan();
 		Leg oldLeg = (Leg)plan.getPlanElements().get(1);
-		Leg newLeg = new LegImpl(TransportMode.walk);
+		Leg newLeg = PopulationUtils.createLeg(TransportMode.walk);
 		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the legs is null
