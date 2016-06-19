@@ -34,6 +34,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoSchedule;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoScheduleImpl;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;

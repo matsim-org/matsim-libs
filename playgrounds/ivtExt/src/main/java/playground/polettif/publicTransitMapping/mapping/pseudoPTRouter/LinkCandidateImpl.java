@@ -32,7 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  * @author polettif
  */
-public class LinkCandidate  {
+public class LinkCandidateImpl {
 
 	private final String id;
 	private final String parentStopFacilityId;
@@ -48,7 +48,7 @@ public class LinkCandidate  {
 	private final Coord fromNodeCoord;
 	private final Coord toNodeCoord;
 
-	public LinkCandidate(Link link, TransitStopFacility parentStopFacility) {
+	public LinkCandidateImpl(Link link, TransitStopFacility parentStopFacility) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
 		this.parentStopFacilityId = parentStopFacility.getId().toString();
 
@@ -116,7 +116,7 @@ public class LinkCandidate  {
 		if(getClass() != obj.getClass())
 			return false;
 
-		LinkCandidate other = (LinkCandidate) obj;
+		LinkCandidateImpl other = (LinkCandidateImpl) obj;
 		if(id == null) {
 			if(other.id != null)
 				return false;

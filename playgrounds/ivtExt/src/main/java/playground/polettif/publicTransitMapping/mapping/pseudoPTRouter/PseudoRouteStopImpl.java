@@ -37,19 +37,19 @@ import java.util.Map;
  *
  * @author polettif
  */
-public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
+public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, Comparable<PseudoRouteStopImpl> {
 
 	private static PublicTransitMappingConfigGroup config;
 
 	// dijkstra
-	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
+	public final Map<PseudoRouteStopImpl, Double> neighbours = new HashMap<>();
 	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
-	public PseudoRouteStop previous = null;
+	public PseudoRouteStopImpl previous = null;
 
 	private final double linkWeight;
 
 	// schedule values
-	public final Id<PseudoRouteStop> id;
+	public final Id<PseudoRouteStopImpl> id;
 	private final String name;
 
 	private final String linkId;
@@ -75,8 +75,8 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 	 * as well to make access easier during
 	 * stop facility replacement.
 	 */
-	/*package*/ PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
-		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
+	/*package*/ PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidateImpl linkCandidate) {
+		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStopImpl.class);
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
 		this.linkId = linkCandidate.getLinkIdStr();
@@ -103,12 +103,12 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 	 *
 	 * @param id
 	 */
-	public PseudoRouteStop(String id) {
-		if(id.equals(PseudoGraph.SOURCE)) {
-			this.id = Id.create(PseudoGraph.SOURCE, PseudoRouteStop.class);
+	public PseudoRouteStopImpl(String id) {
+		if(id.equals(PseudoGraphImpl.SOURCE)) {
+			this.id = Id.create(PseudoGraphImpl.SOURCE, PseudoRouteStopImpl.class);
 			this.distToSource = 0;
 		} else {
-			this.id = Id.create(PseudoGraph.DESTINATION, PseudoRouteStop.class);
+			this.id = Id.create(PseudoGraphImpl.DESTINATION, PseudoRouteStopImpl.class);
 		}
 		this.name = id;
 		this.linkCandidateId = null;
@@ -135,12 +135,12 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 	}
 
 	@Override
-	public Id<PseudoRouteStop> getId() {
+	public Id<PseudoRouteStopImpl> getId() {
 		return id;
 	}
 
 	@Override
-	public int compareTo(PseudoRouteStop other) {
+	public int compareTo(PseudoRouteStopImpl other) {
 		if(other.getId().equals(this.id)) {
 			return 0;
 		}
@@ -206,7 +206,7 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 		if(getClass() != obj.getClass())
 			return false;
 
-		PseudoRouteStop other = (PseudoRouteStop) obj;
+		PseudoRouteStopImpl other = (PseudoRouteStopImpl) obj;
 		if(id == null) {
 			if(other.id != null)
 				return false;

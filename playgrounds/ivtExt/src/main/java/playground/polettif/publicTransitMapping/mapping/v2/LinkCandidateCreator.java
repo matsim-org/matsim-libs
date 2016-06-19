@@ -20,7 +20,7 @@ package playground.polettif.publicTransitMapping.mapping.v2;
 
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
 
 import java.util.Set;
 
@@ -28,7 +28,7 @@ public interface LinkCandidateCreator {
 	
 	void createLinkCandidates();
 
-	Set<LinkCandidate> getLinkCandidates(String scheduleTransportMode, TransitStopFacility transitStopFacility);
+	Set<LinkCandidateImpl> getLinkCandidates(String scheduleTransportMode, TransitStopFacility transitStopFacility);
 
 	void addManualLinkCandidates(Set<PublicTransitMappingConfigGroup.ManualLinkCandidates> manualLinkCandidates);
 

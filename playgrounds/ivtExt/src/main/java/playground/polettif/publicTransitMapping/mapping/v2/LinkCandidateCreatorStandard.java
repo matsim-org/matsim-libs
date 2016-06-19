@@ -28,7 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.*;
@@ -43,7 +43,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	private Network network;
 	private PublicTransitMappingConfigGroup config;
 
-	private Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = new HashMap<>();
+	private Map<String, Map<TransitStopFacility, Set<LinkCandidateImpl>>> linkCandidates = new HashMap<>();
 	private Set<Tuple<TransitStopFacility, String>> loopLinks = new HashSet<>();
 
 	public LinkCandidateCreatorStandard(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config) {
@@ -62,14 +62,14 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 					String scheduleTransportMode = transitRoute.getTransportMode();
 					TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
 
-					Set<LinkCandidate> modeLinkCandidates = MapUtils.getSet(stopFacility, MapUtils.getMap(scheduleTransportMode, linkCandidates));
+					Set<LinkCandidateImpl> modeLinkCandidates = MapUtils.getSet(stopFacility, MapUtils.getMap(scheduleTransportMode, linkCandidates));
 
 					// if no link candidates for the current stop and mode have been generated
 					if(modeLinkCandidates.size() == 0) {
 
 						// if stop facilty already has a referenced link
 						if(stopFacility.getLinkId() != null) {
-							modeLinkCandidates.add(new LinkCandidate(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
+							modeLinkCandidates.add(new LinkCandidateImpl(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
 						} else {
 							// limits number of links, for all links within search radius
 							List<Link> closestLinks = NetworkTools.findClosestLinks(network,
@@ -88,7 +88,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 							 * generate a LinkCandidate for each close link
 							 */
 							for(Link link : closestLinks) {
-								modeLinkCandidates.add(new LinkCandidate(link, stopFacility));
+								modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility));
 							}
 						}
 					}
@@ -98,7 +98,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	}
 
 	@Override
-	public Set<LinkCandidate> getLinkCandidates(String scheduleTransportMode, TransitStopFacility transitStopFacility) {
+	public Set<LinkCandidateImpl> getLinkCandidates(String scheduleTransportMode, TransitStopFacility transitStopFacility) {
 		return linkCandidates.get(scheduleTransportMode).get(transitStopFacility);
 	}
 
@@ -116,7 +116,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
 			} else {
 				for(String mode : modes) {
-					Set<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
+					Set<LinkCandidateImpl> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if(link == null) {
@@ -128,7 +128,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 										"("+CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord())+")");
 								log.info("Manual link candidate will still be used");
 							}
-							lcSet.add(new LinkCandidate(link, parentStopFacility));
+							lcSet.add(new LinkCandidateImpl(link, parentStopFacility));
 						}
 					}
 					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);

@@ -16,14 +16,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRoute;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,15 +33,15 @@ import java.util.Set;
  */
 public class PseudoScheduleImpl implements PseudoSchedule {
 
-	private Set<PseudoRoute> pseudoSchedule = new HashSet<>();
+	private Set<PseudoRouteImpl> pseudoSchedule = new HashSet<>();
 
 	@Override
-	public void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence) {
-		pseudoSchedule.add(new PseudoRoute(transitLine, transitRoute, pseudoStopSequence));
+	public void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStopImpl> pseudoStopSequence) {
+		pseudoSchedule.add(new PseudoRouteImpl(transitLine, transitRoute, pseudoStopSequence));
 	}
 
 	@Override
-	public Set<PseudoRoute> getPseudoRoutes() {
+	public Set<PseudoRouteImpl> getPseudoRoutes() {
 		return pseudoSchedule;
 	}
 
@@ -57,11 +55,11 @@ public class PseudoScheduleImpl implements PseudoSchedule {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<Id<TransitLine>, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(PseudoRoute pseudoRoute : pseudoSchedule) {
-			List<PseudoRouteStop> pseudoStopSequence = pseudoRoute.getPseudoStops();
+		for(PseudoRouteImpl pseudoRoute : pseudoSchedule) {
+			List<PseudoRouteStopImpl> pseudoStopSequence = pseudoRoute.getPseudoStops();
 			List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
-			for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
+			for(PseudoRouteStopImpl pseudoStop : pseudoStopSequence) {
 				String idStr = pseudoStop.getParentStopFacilityId() + PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES + pseudoStop.getLinkIdStr();
 				Id<TransitStopFacility> childStopFacilityId = Id.create(idStr, TransitStopFacility.class);
 

@@ -22,9 +22,7 @@ package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
 import java.util.*;
@@ -38,35 +36,35 @@ import java.util.*;
  *
  * @author polettif
  */
-public class PseudoGraph {
+public class PseudoGraphImpl {
 
-	protected static Logger log = Logger.getLogger(PseudoGraph.class);
+	protected static Logger log = Logger.getLogger(PseudoGraphImpl.class);
 
 	/*package*/ static final String SOURCE = "SOURCE";
 	/*package*/ static final String DESTINATION = "DESTINATION";
-	private final Id<PseudoRouteStop> SOURCE_ID = Id.create(SOURCE, PseudoRouteStop.class);
-	private final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
-	private final Id<PseudoRouteStop> DESTINATION_ID = Id.create(DESTINATION, PseudoRouteStop.class);
-	private final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
+	private final Id<PseudoRouteStopImpl> SOURCE_ID = Id.create(SOURCE, PseudoRouteStopImpl.class);
+	private final PseudoRouteStopImpl SOURCE_PSEUDO_STOP = new PseudoRouteStopImpl(SOURCE);
+	private final Id<PseudoRouteStopImpl> DESTINATION_ID = Id.create(DESTINATION, PseudoRouteStopImpl.class);
+	private final PseudoRouteStopImpl DESTINATION_PSEUDO_STOP = new PseudoRouteStopImpl(DESTINATION);
 
 	private final PublicTransitMappingConfigGroup config;
 
-	private final Map<Id<PseudoRouteStop>, PseudoRouteStop> graph;
+	private final Map<Id<PseudoRouteStopImpl>, PseudoRouteStopImpl> graph;
 
-	public PseudoGraph(PublicTransitMappingConfigGroup configGroup) {
+	public PseudoGraphImpl(PublicTransitMappingConfigGroup configGroup) {
 		this.config = configGroup;
-		PseudoRouteStop.setConfig(configGroup);
+		PseudoRouteStopImpl.setConfig(configGroup);
 		this.graph = new HashMap<>();
 	}
 
-	public static PseudoRouteStop createPseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
-		return new PseudoRouteStop(order, routeStop, linkCandidate);
+	public static PseudoRouteStopImpl createPseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidateImpl linkCandidate) {
+		return new PseudoRouteStopImpl(order, routeStop, linkCandidate);
 	}
 
 	/**
 	 * Add a path between two pseudoStops
 	 */
-	public void addPath(PseudoRouteStop fromPseudoStop, PseudoRouteStop toPseudoStop, double pathWeight) {
+	public void addPath(PseudoRouteStopImpl fromPseudoStop, PseudoRouteStopImpl toPseudoStop, double pathWeight) {
 		if(!graph.containsKey(fromPseudoStop.getId())) {
 			graph.put(fromPseudoStop.getId(), fromPseudoStop);
 		}
@@ -90,16 +88,16 @@ public class PseudoGraph {
 
 		double incr = 0.001;
 
-		NavigableSet<PseudoRouteStop> queue = new TreeSet<>();
+		NavigableSet<PseudoRouteStopImpl> queue = new TreeSet<>();
 
 		queue.add(graph.get(SOURCE_ID));
 
-		PseudoRouteStop currentStop, neighbour;
+		PseudoRouteStopImpl currentStop, neighbour;
 		while(!queue.isEmpty()) {
 			currentStop = queue.pollFirst(); // vertex with shortest distance (first iteration will return source)
 
 			//look at distances to each neighbour
-			for(Map.Entry<PseudoRouteStop, Double> n : currentStop.neighbours.entrySet()) {
+			for(Map.Entry<PseudoRouteStopImpl, Double> n : currentStop.neighbours.entrySet()) {
 				neighbour = n.getKey(); //the neighbour in this iteration
 
 				final double alternateDist = currentStop.distToSource + n.getValue();
@@ -118,14 +116,14 @@ public class PseudoGraph {
 	/**
 	 * Prints a path from the source to the specified vertex
 	 */
-	public LinkedList<PseudoRouteStop> getShortestPseudoPath() {
+	public LinkedList<PseudoRouteStopImpl> getShortestPseudoPath() {
 		if(!graph.containsKey(DESTINATION_ID)) {
 			System.err.printf("Graph doesn't contain end PseudoRouteStop \"%s\"\n", DESTINATION_ID);
 			return null;
 		}
 
-		PseudoRouteStop step = graph.get(DESTINATION_ID);
-		LinkedList<PseudoRouteStop> path = new LinkedList<>();
+		PseudoRouteStopImpl step = graph.get(DESTINATION_ID);
+		LinkedList<PseudoRouteStopImpl> path = new LinkedList<>();
 
 		// check if a path exists
 		if(step.previous == null) {
@@ -147,15 +145,15 @@ public class PseudoGraph {
 		return path;
 	}
 
-	public void addSourceDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
-		for(LinkCandidate lc : linkCandidates) {
-			addPath(SOURCE_PSEUDO_STOP, new PseudoRouteStop(order, routeStop, lc), 1.0);
+	public void addSourceDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidateImpl> linkCandidates) {
+		for(LinkCandidateImpl lc : linkCandidates) {
+			addPath(SOURCE_PSEUDO_STOP, new PseudoRouteStopImpl(order, routeStop, lc), 1.0);
 		}
 	}
 
-	public void addDestinationDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
-		for(LinkCandidate lc : linkCandidates) {
-			addPath(new PseudoRouteStop(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0);
+	public void addDestinationDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidateImpl> linkCandidates) {
+		for(LinkCandidateImpl lc : linkCandidates) {
+			addPath(new PseudoRouteStopImpl(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0);
 		}
 	}
 }

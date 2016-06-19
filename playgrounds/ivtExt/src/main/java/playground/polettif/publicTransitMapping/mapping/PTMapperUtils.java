@@ -32,8 +32,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStopImpl;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -71,8 +71,8 @@ public class PTMapperUtils {
 	 * @return a map with all link candidates for a stop facilitiy and
 	 * the scheduleTransportMode as top level key.
 	 */
-	public static Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> generateModeLinkCandidates(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config) {
-		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> tree = new HashMap<>();
+	public static Map<String, Map<TransitStopFacility, Set<LinkCandidateImpl>>> generateModeLinkCandidates(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config) {
+		Map<String, Map<TransitStopFacility, Set<LinkCandidateImpl>>> tree = new HashMap<>();
 
 		if(loopLinkModes == null) {
 			loopLinkModes = new HashSet<>();
@@ -89,14 +89,14 @@ public class PTMapperUtils {
 					String scheduleTransportMode = transitRoute.getTransportMode();
 					TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
 
-					Set<LinkCandidate> modeLinkCandidates = MapUtils.getSet(stopFacility, MapUtils.getMap(scheduleTransportMode, tree));
+					Set<LinkCandidateImpl> modeLinkCandidates = MapUtils.getSet(stopFacility, MapUtils.getMap(scheduleTransportMode, tree));
 
 					// if no link candidates for the current stop and mode have been generated
 					if(modeLinkCandidates.size() == 0) {
 
 						// if stop facilty already has a referenced link
 						if(stopFacility.getLinkId() != null) {
-							modeLinkCandidates.add(new LinkCandidate(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
+							modeLinkCandidates.add(new LinkCandidateImpl(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
 						} else {
 
 							// limits number of links, for all links within search radius
@@ -112,7 +112,7 @@ public class PTMapperUtils {
 							 * generate a LinkCandidate for each close link
 							 */
 							for(Link link : closestLinks) {
-								modeLinkCandidates.add(new LinkCandidate(link, stopFacility));
+								modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility));
 							}
 						}
 					}
@@ -130,17 +130,17 @@ public class PTMapperUtils {
 	 * @param schedule                where the facilities should be replaced
 	 * @param pseudoSchedule          defines the actual sequence of pseudoRouteStops
 	 */
-	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule) {
+	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStopImpl>>> pseudoSchedule) {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<Id<TransitLine>, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(Map.Entry<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
-			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
+		for(Map.Entry<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStopImpl>>> lineEntry : pseudoSchedule.entrySet()) {
+			for(Map.Entry<TransitRoute, List<PseudoRouteStopImpl>> routeEntry : lineEntry.getValue().entrySet()) {
 
-				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
+				List<PseudoRouteStopImpl> pseudoStopSequence = routeEntry.getValue();
 				List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
-				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
+				for(PseudoRouteStopImpl pseudoStop : pseudoStopSequence) {
 					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + suffixChildStopFacilities + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
 
 					// if child stop facility for this link has not yet been generated
@@ -202,12 +202,12 @@ public class PTMapperUtils {
 	 * If link candidates have the same link for boths stop facilities, the link candidate is
 	 * assigned to the stop facility that is closer (i.e. removed from the other set).
 	 */
-	public static void separateLinkCandidates(Set<LinkCandidate> linkCandidatesCurrent, Set<LinkCandidate> linkCandidatesNext) {
-		Set<LinkCandidate> removeFromCurrent = new HashSet<>();
-		Set<LinkCandidate> removeFromNext = new HashSet<>();
+	public static void separateLinkCandidates(Set<LinkCandidateImpl> linkCandidatesCurrent, Set<LinkCandidateImpl> linkCandidatesNext) {
+		Set<LinkCandidateImpl> removeFromCurrent = new HashSet<>();
+		Set<LinkCandidateImpl> removeFromNext = new HashSet<>();
 
-		for(LinkCandidate lcCurrent : linkCandidatesCurrent) {
-			for(LinkCandidate lcNext : linkCandidatesNext) {
+		for(LinkCandidateImpl lcCurrent : linkCandidatesCurrent) {
+			for(LinkCandidateImpl lcNext : linkCandidatesNext) {
 				if(lcCurrent.getLinkIdStr().equals(lcNext.getLinkIdStr())) {
 					if(lcCurrent.getStopFacilityDistance() > lcNext.getStopFacilityDistance()) {
 						removeFromCurrent.add(lcCurrent);
@@ -357,7 +357,7 @@ public class PTMapperUtils {
 	/**
 	 * adds manually defined link candidates from config (if available)
 	 */
-	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
+	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidateImpl>>> linkCandidates, PublicTransitMappingConfigGroup config) {
 		for(ConfigGroup e : config.getParameterSets(PublicTransitMappingConfigGroup.ManualLinkCandidates.SET_NAME)) {
 			PublicTransitMappingConfigGroup.ManualLinkCandidates manualCandidates = (PublicTransitMappingConfigGroup.ManualLinkCandidates) e;
 
@@ -371,7 +371,7 @@ public class PTMapperUtils {
 				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
 			} else {
 				for(String mode : modes) {
-					Set<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
+					Set<LinkCandidateImpl> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if(link == null) {
@@ -383,7 +383,7 @@ public class PTMapperUtils {
 										"("+CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord())+")");
 								log.info("Manual link candidate will still be used");
 							}
-							lcSet.add(new LinkCandidate(link, parentStopFacility));
+							lcSet.add(new LinkCandidateImpl(link, parentStopFacility));
 						}
 					}
 					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);
