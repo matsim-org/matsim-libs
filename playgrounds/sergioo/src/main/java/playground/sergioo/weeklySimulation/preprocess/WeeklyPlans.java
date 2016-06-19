@@ -98,7 +98,7 @@ public class WeeklyPlans {
 						plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			}
 			else
-				planElementCopy = new LegImpl((LegImpl)planElement);
+				planElementCopy = PopulationUtils.createLeg((LegImpl)planElement);
 			plan.getPlanElements().add(planElementCopy);
 		}
 	}

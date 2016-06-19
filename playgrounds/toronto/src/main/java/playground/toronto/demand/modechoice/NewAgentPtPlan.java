@@ -69,7 +69,7 @@ public class NewAgentPtPlan extends NewPopulation {
 //						walkPlan.addAct((Act) o);
 					} else if (o instanceof Leg) {
 						Leg leg = (Leg) o;
-						LegImpl ptLeg = new org.matsim.core.population.LegImpl((LegImpl) leg);
+						LegImpl ptLeg = PopulationUtils.createLeg((LegImpl) leg);
 						ptLeg.setMode(TransportMode.pt);
 						ptLeg.setRoute(null);
 						// -----------------------------------------------
@@ -78,7 +78,7 @@ public class NewAgentPtPlan extends NewPopulation {
 						// automaticly!!
 						// -----------------------------------------------
 						ptPlan.addLeg(ptLeg);
-						LegImpl walkLeg = new org.matsim.core.population.LegImpl((LegImpl) leg);
+						LegImpl walkLeg = PopulationUtils.createLeg((LegImpl) leg);
 						walkLeg.setMode(TransportMode.walk);
 						walkLeg.setRoute(null);
 //						walkPlan.addLeg(walkLeg);

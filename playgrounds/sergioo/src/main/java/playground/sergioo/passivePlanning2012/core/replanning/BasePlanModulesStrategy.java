@@ -64,7 +64,7 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 					if(planElement instanceof EmptyTime)
 						plan.addLeg(new EmptyTimeImpl((EmptyTime) planElement));
 					else
-						plan.addLeg(new LegImpl((LegImpl)planElement));
+						plan.addLeg(PopulationUtils.createLeg((LegImpl)planElement));
 			if(person.addPlan(plan))
 				person.setSelectedPlan(plan);
 			plans.add(plan);

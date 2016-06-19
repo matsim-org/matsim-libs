@@ -695,5 +695,21 @@ public final class PopulationUtils {
 	public static LegImpl createLeg(String transportMode) {
 		return (LegImpl) getFactory().createLeg(transportMode) ;
 	}
+
+	/**
+	 * Makes a deep copy of this leg, however only when the Leg has a route which is
+	 * instance of Route or BasicRoute. Other route instances are not considered.
+	 * @param leg
+	 */
+	public static LegImpl createLeg(LegImpl leg) {
+		Leg newLeg = createLeg( leg.getMode() ) ;
+		newLeg.setDepartureTime(leg.getDepartureTime());
+		newLeg.setTravelTime(leg.getTravelTime());
+		((LegImpl)newLeg).setArrivalTime(leg.getArrivalTime());
+		if (leg.getRoute() != null) {
+			leg.setRoute(leg.getRoute().clone());
+		}
+		return leg ;
+	}
 	
 }

@@ -38,21 +38,6 @@ public final class LegImpl implements Leg {
 		this.mode = transportMode;
 	}
 
-	/**
-	 * Makes a deep copy of this leg, however only when the Leg has a route which is
-	 * instance of Route or BasicRoute. Other route instances are not considered.
-	 * @param leg
-	 */
-	public LegImpl(final LegImpl leg) {
-		this(leg.getMode());
-		this.setDepartureTime(leg.getDepartureTime());
-		this.setTravelTime(leg.getTravelTime());
-		this.setArrivalTime(leg.getArrivalTime());
-		if (leg.getRoute() != null) {
-			this.setRoute(leg.getRoute().clone());
-		}
-	}
-
 	@Override
 	public final String getMode() {
 		return this.mode;

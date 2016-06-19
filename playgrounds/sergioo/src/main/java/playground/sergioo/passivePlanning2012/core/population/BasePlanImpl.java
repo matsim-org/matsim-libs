@@ -75,7 +75,7 @@ public class BasePlanImpl implements BasePlan {
 					throw new RuntimeException("Activity without time information");
 			}
 			else {
-				toBeAdded = new LegImpl((LegImpl)planElement);
+				toBeAdded = PopulationUtils.createLeg((LegImpl)planElement);
 				prevTime = time;
 				if(((Leg)planElement).getTravelTime()!=Time.UNDEFINED_TIME)
 					time += ((Leg)planElement).getTravelTime();
@@ -233,7 +233,7 @@ public class BasePlanImpl implements BasePlan {
 					addLeg(emptyTime);
 				}
 				else
-					addLeg(new LegImpl((LegImpl)pe));
+					addLeg(PopulationUtils.createLeg((LegImpl)pe));
 			else
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
 		}
