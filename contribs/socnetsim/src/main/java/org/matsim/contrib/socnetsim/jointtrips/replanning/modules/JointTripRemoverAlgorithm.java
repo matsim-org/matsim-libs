@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
@@ -178,11 +178,9 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			// note that no check of the mode is done...
 			if ( !newPassengers.equals( currentPassengers ) ) {
 				newTrip.add(
-						new ActivityImpl(
-							JointActingTypes.INTERACTION,
-							route != null ?
-								route.getStartLinkId() :
-									subtrip.getOriginActivity().getLinkId() ) );
+						PopulationUtils.createActivityImpl(JointActingTypes.INTERACTION, route != null ?
+							route.getStartLinkId() :
+								subtrip.getOriginActivity().getLinkId()) );
 
 				// as the spatial structure of the trip is modified, it is possible
 				// that some pre-existing subtours are removed. Thus, a driver that may

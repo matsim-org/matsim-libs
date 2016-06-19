@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -70,8 +69,8 @@ public class InvertertedNetworkLegRouterTest {
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
-		Activity fromAct = new ActivityImpl("h", Id.create("12", Link.class));
-		Activity toAct = new ActivityImpl("h", Id.create("78", Link.class));
+		Activity fromAct = PopulationUtils.createActivityImpl("h", Id.create("12", Link.class));
+		Activity toAct = PopulationUtils.createActivityImpl("h", Id.create("78", Link.class));
 
 		InvertedNetworkRoutingModule router =
 				new InvertedNetworkRoutingModule(

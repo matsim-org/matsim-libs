@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -58,7 +57,7 @@ public class TripRouterTest {
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
+		trip.add( PopulationUtils.createActivityImpl("3", Id.create( "coucou", Link.class )) );
 		trip.add( new LegImpl( "4" ) );
 
 		TripRouter.insertTrip( plan , o , trip , d );
@@ -104,7 +103,7 @@ public class TripRouterTest {
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
+		trip.add( PopulationUtils.createActivityImpl("3", Id.create( "coucou", Link.class )) );
 		trip.add( new LegImpl( "4" ) );
 
 		TripRouter.insertTrip( plan , o , trip , d );
@@ -155,7 +154,7 @@ public class TripRouterTest {
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
+		trip.add( PopulationUtils.createActivityImpl("3", Id.create( "coucou", Link.class )) );
 		trip.add( new LegImpl( "4" ) );
 
 		assertEquals(
@@ -211,7 +210,7 @@ public class TripRouterTest {
 			return this.delegate.getFacilityId();
 		}
 		public EqualsActivity(final String type, final Id<Link> link) {
-			delegate = new ActivityImpl( type, link ) ;
+			delegate = PopulationUtils.createActivityImpl(type, link) ;
 		}
 		@Override
 		public int hashCode() {

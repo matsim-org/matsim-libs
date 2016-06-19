@@ -36,6 +36,7 @@ import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 
 import javax.inject.Inject;
 
@@ -80,7 +81,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
     public void handleEvent(ActivityEndEvent event) {
         ActivityImpl activity = activities.get(event.getPersonId());
         if (activity == null) {
-            ActivityImpl firstActivity = new ActivityImpl(event.getActType(), event.getLinkId());
+            ActivityImpl firstActivity = PopulationUtils.createActivityImpl(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
             activity = firstActivity;
         }
@@ -93,7 +94,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
+        ActivityImpl activity = PopulationUtils.createActivityImpl(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
         activities.put(event.getPersonId(), activity);

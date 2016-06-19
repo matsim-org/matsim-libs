@@ -62,7 +62,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
-        return new ActivityImpl(actType, linkId);
+        return PopulationUtils.createActivityImpl(actType, linkId);
 	}
 
 	@Override

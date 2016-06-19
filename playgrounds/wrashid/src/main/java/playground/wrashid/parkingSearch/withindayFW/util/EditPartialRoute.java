@@ -275,8 +275,8 @@ public class EditPartialRoute {
 	// TODO: perhaps reuse same dummy leg, etc. to make things more efficient?
 	private NetworkRoute getRoute(Link fromLink, Link toLink) {
 		PlanImpl newPlan = PopulationUtils.createPlan();
-		ActivityImpl fromActivity = new ActivityImpl("", fromLink.getId());
-		ActivityImpl toActivity = new ActivityImpl("", toLink.getId());
+		ActivityImpl fromActivity = PopulationUtils.createActivityImpl("", fromLink.getId());
+		ActivityImpl toActivity = PopulationUtils.createActivityImpl("", toLink.getId());
 		LegImpl leg = new LegImpl(TransportMode.car);
 		fromActivity.setEndTime(0);
 		toActivity.setEndTime(0);

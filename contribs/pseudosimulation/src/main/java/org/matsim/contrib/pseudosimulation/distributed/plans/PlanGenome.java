@@ -10,6 +10,7 @@ import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponen
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -92,7 +93,7 @@ public class PlanGenome implements Plan {
 
     @Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
     public final ActivityImpl createAndAddActivity(final String type, final Id<Link> linkId) {
-        ActivityImpl a = new ActivityImpl(type, linkId);
+        ActivityImpl a = PopulationUtils.createActivityImpl(type, linkId);
         getPlanElements().add(a);
         return a;
     }

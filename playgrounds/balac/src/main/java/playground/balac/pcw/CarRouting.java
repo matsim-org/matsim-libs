@@ -22,6 +22,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -148,7 +149,7 @@ public void run(final String[] args) throws IOException {
 			Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 			
 			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
-			ActivityImpl act = new ActivityImpl("home", lStart.getId());
+			ActivityImpl act = PopulationUtils.createActivityImpl("home", lStart.getId());
 			act.setCoord(coordStart);
 			//String[] arr2 = arr[4].split(":");
 			//double h = Double.parseDouble(arr2[0]);
@@ -163,13 +164,13 @@ public void run(final String[] args) throws IOException {
 			LegImpl leg = new LegImpl("car");
 			plan.addLeg(leg);
 			
-			act = new ActivityImpl("leisure", lEnd.getId());
+			act = PopulationUtils.createActivityImpl("leisure", lEnd.getId());
 			act.setCoord(coordEnd);
 			act.setEndTime(48800);
 			plan.addActivity(act);
 			leg = new LegImpl("car");
 			plan.addLeg(leg);
-			act = new ActivityImpl("home", lStart.getId());
+			act = PopulationUtils.createActivityImpl("home", lStart.getId());
 			act.setCoord(coordStart);
 			plan.addActivity(act);
 			person.addPlan(plan);

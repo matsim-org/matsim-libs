@@ -63,7 +63,7 @@ public final class PlanImpl implements Plan {
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type1, final Id<Link> linkId) {
-		ActivityImpl a = new ActivityImpl(type1, linkId);
+		ActivityImpl a = PopulationUtils.createActivityImpl(type1, linkId);
 		getPlanElements().add(a);
 		return a;
 	}

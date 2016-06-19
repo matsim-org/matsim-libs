@@ -16,6 +16,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -118,7 +119,7 @@ public class PTTravelTimes {
 				//PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
 			//	i++;
 				PlanImpl plan = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
-				ActivityImpl act = new ActivityImpl("home", lStart.getId());
+				ActivityImpl act = PopulationUtils.createActivityImpl("home", lStart.getId());
 				act.setCoord(coordStart);
 				//String[] arr2 = arr[6].split(":");
 				//double h = Double.parseDouble(arr2[0]);
@@ -210,13 +211,13 @@ public class PTTravelTimes {
 				
 				outLink.write(Double.toString(distance));
 				outLink.newLine();
-				act = new ActivityImpl("leisure", lEnd.getId());
+				act = PopulationUtils.createActivityImpl("leisure", lEnd.getId());
 				act.setCoord(coordEnd);
 				act.setEndTime(48800);
 				plan.addActivity(act);
 				leg = new LegImpl("pt");
 				plan.addLeg(leg);
-				act = new ActivityImpl("home", lStart.getId());
+				act = PopulationUtils.createActivityImpl("home", lStart.getId());
 				act.setCoord(coordStart);
 				plan.addActivity(act);
 				person.addPlan(plan);

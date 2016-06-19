@@ -660,5 +660,9 @@ public final class PopulationUtils {
 		Plan plan = getFactory().createPlan() ;
 		return (PlanImpl) plan ;
 	}
+
+	public static ActivityImpl createActivityImpl(String type, Id<Link> linkId) {
+		return (ActivityImpl) getFactory().createActivityFromLinkId(type, linkId) ;
+	}
 	
 }

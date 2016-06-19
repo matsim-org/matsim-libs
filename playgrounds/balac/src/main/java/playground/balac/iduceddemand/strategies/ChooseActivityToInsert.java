@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -68,8 +69,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonHomeLocation(t);					
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
+				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -81,8 +81,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonWorkLocation(t);
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
+				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -95,8 +94,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				actFacility = findActivityLocation(allActTypes[index], 
 						((Activity)plan.getPlanElements().get(actIndex)).getCoord());
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(actFacility.getCoord() ).getId());
+				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(actFacility.getCoord() ).getId());
 				
 				newActivity.setFacilityId(actFacility.getId());
 				newActivity.setCoord(actFacility.getCoord());

@@ -307,7 +307,7 @@ public class CreateFreightTraffic {
 		ActivityFacility freightFacility = this.getRandomFacilityFromZone(destination);
 						
 		Plan plan = PopulationUtils.createPlan();
-		ActivityImpl actH = new ActivityImpl("freight", homeFacility.getLinkId());
+		ActivityImpl actH = PopulationUtils.createActivityImpl("freight", homeFacility.getLinkId());
 		actH.setFacilityId(homeFacility.getId());
 		actH.setCoord(homeFacility.getCoord());
 		
@@ -317,7 +317,7 @@ public class CreateFreightTraffic {
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
 				
-		ActivityImpl actFreight = new ActivityImpl("freight", freightFacility.getLinkId());
+		ActivityImpl actFreight = PopulationUtils.createActivityImpl("freight", freightFacility.getLinkId());
 		
 		actFreight.setStartTime(departureTime);
 		actFreight.setMaximumDuration(24.0 * 3600.0 - departureTime);

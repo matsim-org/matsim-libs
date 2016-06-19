@@ -62,7 +62,7 @@ public class PrtRouterWrapper implements RoutingModule {
 		time += leg.getTravelTime();
         
         //pt interaction
-        Activity act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, accessStop.getLink().getId());
+        Activity act = PopulationUtils.createActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, accessStop.getLink().getId());
 		act.setMaximumDuration(60);
 		trip.add(act);
 		time += act.getMaximumDuration();
@@ -76,7 +76,7 @@ public class PrtRouterWrapper implements RoutingModule {
         time += leg.getTravelTime();
 		
 		//interaction
-		act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, egressStop.getLink().getId());
+		act = PopulationUtils.createActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, egressStop.getLink().getId());
 		act.setMaximumDuration(0);
 		trip.add(act);
 		

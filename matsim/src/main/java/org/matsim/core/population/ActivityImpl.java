@@ -62,7 +62,7 @@ public final class ActivityImpl implements Activity {
 		this.type = type.intern();
 	}
 
-	public ActivityImpl(final String type, final Id<Link> linkId) {
+	private ActivityImpl(final String type, final Id<Link> linkId) {
 		this(type);
 		this.linkId = linkId ;
 	}
