@@ -142,18 +142,22 @@ public class PatnaNetworkGenerator {
 				double linkLength = 1000 * Double.parseDouble(lengthInKm);
 				double capacity = getCapacityOfLink(widthOfRoad);
 
+				Set<String> allowedModes ;
+				if (capacity <= 500.0) allowedModes = new HashSet<>(Arrays.asList("car","bike","motorbike","car_ext","motorbike_ext","bike_ext")); 
+				else allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
+				
 				link1.setFreespeed(freeSpeedInMPS);
 				link1.setCapacity(capacity);
 				link1.setNumberOfLanes(numberoflanes);
 				link1.setLength(linkLength);
-				link1.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
+				link1.setAllowedModes(new HashSet<>(allowedModes));
 				network.addLink(link1);
 
 				link2.setFreespeed(freeSpeedInMPS);
 				link2.setCapacity(capacity);
 				link2.setNumberOfLanes(numberoflanes);
 				link2.setLength(linkLength);
-				link2.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
+				link2.setAllowedModes(new HashSet<>(allowedModes));
 				network.addLink(link2);
 			}
 		};
