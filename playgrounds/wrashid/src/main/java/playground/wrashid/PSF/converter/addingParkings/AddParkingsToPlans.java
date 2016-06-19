@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
@@ -121,7 +122,7 @@ public class AddParkingsToPlans {
 		double parkingActivityDuration = 10; // in seconds
 
 		// copy the activity
-		ActivityImpl parkingActivity = new ActivityImpl(activity);
+		ActivityImpl parkingActivity = PopulationUtils.createActivity(activity);
 
 		parkingActivity.setType(activityType);
 		parkingActivity.setMaximumDuration(parkingActivityDuration);

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
@@ -244,10 +245,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 	private static PlanElement createDeparture(final Facility fromFacility) {
 		final ActivityImpl dep = 
-			new ActivityImpl(
-					DEPARTURE_ACTIVITY_TYPE,
-					fromFacility.getCoord(),
-					fromFacility.getLinkId() );
+			PopulationUtils.createActivityFromCoordAndLinkId(DEPARTURE_ACTIVITY_TYPE, fromFacility.getCoord(), fromFacility.getLinkId());
 		dep.setMaximumDuration( 0d );
 		return dep;
 	}
@@ -268,20 +266,14 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 							data.scenario.getTransitSchedule(),
 							data.scenario.getNetwork()));
 				final ActivityImpl act =
-					new ActivityImpl(
-							PtConstants.TRANSIT_ACTIVITY_TYPE, 
-							data.scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
-							tRoute.getStartLinkId());
+					PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, data.scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
 				act.setMaximumDuration(0.0);
 				trip.add(act);
 				nextCoord = data.scenario.getTransitSchedule().getFacilities().get(tRoute.getEgressStopId()).getCoord();
 			}
 			else { // walk legs don't have a coord, use the coord from the last egress point
 				final ActivityImpl act =
-					new ActivityImpl(
-							PtConstants.TRANSIT_ACTIVITY_TYPE,
-							nextCoord, 
-							leg.getRoute().getStartLinkId());
+					PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg.getRoute().getStartLinkId());
 				act.setMaximumDuration(0.0);
 				trip.add(act);	
 			}
@@ -291,10 +283,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 		// put an interaction before the egress
 		final ActivityImpl act =
-			new ActivityImpl(
-					PtConstants.TRANSIT_ACTIVITY_TYPE,
-					nextCoord, 
-					nextLinkId );
+			PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, nextLinkId);
 		act.setMaximumDuration(0.0);
 		trip.add(act);
 		return trip;

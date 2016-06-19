@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -96,7 +95,7 @@ public class PlanWrapper {
 						 * activity type, though. */
 						if(act.getType().contains("minor")){
 							/* Split it up proportionally. */
-							Activity end = new ActivityImpl(act);
+							Activity end = PopulationUtils.createActivity(act);
 							end.setStartTime(end.getStartTime() - Time.MIDNIGHT*(dayCount-1));
 							end.setEndTime(Time.MIDNIGHT);
 							segment.addActivity(end);
@@ -106,7 +105,7 @@ public class PlanWrapper {
 							list.add(p);
 												
 							/* Start a new segment. */
-							Activity start = new ActivityImpl(act);
+							Activity start = PopulationUtils.createActivity(act);
 							start.setStartTime(Time.parseTime("00:00:00"));
 							start.setEndTime(start.getEndTime() - Time.MIDNIGHT*(dayCount));
 							segment = PopulationUtils.createPlan();
@@ -127,7 +126,7 @@ public class PlanWrapper {
 							list.add(p);	
 							
 							/* Start a new segment. */
-							Activity start = new ActivityImpl(act);
+							Activity start = PopulationUtils.createActivity(act);
 							start.setStartTime(Time.parseTime("00:00:00"));
 							start.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount));
 							segment = PopulationUtils.createPlan();
@@ -163,7 +162,7 @@ public class PlanWrapper {
 					segment = PopulationUtils.createPlan();
 					segment.addActivity(chopStart);
 					segment.addLeg(tmpPlan.getPreviousLeg(act));
-					Activity firstRealActivity = new ActivityImpl(act);
+					Activity firstRealActivity = PopulationUtils.createActivity(act);
 					firstRealActivity.setStartTime(act.getStartTime() - Time.MIDNIGHT*dayCount);
 					firstRealActivity.setEndTime(act.getEndTime() - Time.MIDNIGHT*dayCount);
 					segment.addActivity(act);

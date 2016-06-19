@@ -19,6 +19,7 @@ import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -121,7 +122,7 @@ class PlanSerializable implements Serializable {
         }
 
         public Activity getActivity() {
-            ActivityImpl activity = new ActivityImpl(type, coord.getCoord(), linkIdString == null ? null : Id.createLinkId(linkIdString));
+            ActivityImpl activity = PopulationUtils.createActivityFromCoordAndLinkId(type, coord.getCoord(), linkIdString == null ? null : Id.createLinkId(linkIdString));
             activity.setEndTime(endTime);
             activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, ActivityFacility.class));
             activity.setMaximumDuration(maximumDuration);

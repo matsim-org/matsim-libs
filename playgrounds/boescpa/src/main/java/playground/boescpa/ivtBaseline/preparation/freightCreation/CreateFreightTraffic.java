@@ -170,7 +170,7 @@ public class CreateFreightTraffic {
 		Plan plan = org.matsim.core.population.PopulationUtils.createPlan();
 		int departureTime = getDepartureTime();
 
-		ActivityImpl actStart = new ActivityImpl(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());
+		ActivityImpl actStart = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());
 		actStart.setFacilityId(startFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -179,7 +179,7 @@ public class CreateFreightTraffic {
 
 		plan.addLeg(new LegImpl("car"));
 
-		ActivityImpl actEnd = new ActivityImpl(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
+		ActivityImpl actEnd = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
 		actEnd.setFacilityId(endFacility.getId());
 		actEnd.setStartTime(departureTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);

@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import playground.ivt.utils.SoftCache;
 
@@ -90,7 +90,7 @@ public class TripSoftCache {
 	}
 
 	private static Activity clone( final Activity act) {
-		return new ActivityImpl( act );
+		return PopulationUtils.createActivity(act);
 	}
 
 	public Departure createDeparture(

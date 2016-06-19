@@ -668,5 +668,28 @@ public final class PopulationUtils {
 	public static ActivityImpl createActivityFromCoord(String type, Coord coord) {
 		return (ActivityImpl) getFactory().createActivityFromCoord(type, coord) ;
 	}
+
+	public static ActivityImpl createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
+		Activity act = getFactory().createActivityFromCoord(type, coord) ;
+		act.setLinkId(linkId);
+		return (ActivityImpl) act ;
+	}
+
+	public static ActivityImpl createActivity(Activity act) {
+		// yyyy somehow combine this with copyFromTo method.
+		
+		
+		// Act coord could be null according to first c'tor!
+		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
+
+		Activity newAct = createActivityFromCoordAndLinkId(act.getType(),coord,act.getLinkId()) ;
+		
+		newAct.setStartTime(act.getStartTime());
+		newAct.setEndTime(act.getEndTime());
+		newAct.setMaximumDuration(act.getMaximumDuration());
+		newAct.setFacilityId(act.getFacilityId());
+		
+		return (ActivityImpl) newAct ;
+	}
 	
 }

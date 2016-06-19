@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -60,7 +59,7 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 			Plan plan = PopulationUtils.createPlan(person);
 			for(PlanElement planElement:person.getBasePlan().getPlanElements())
 				if(planElement instanceof Activity)
-					plan.addActivity(new ActivityImpl((Activity) planElement));
+					plan.addActivity(PopulationUtils.createActivity((Activity) planElement));
 				else if(planElement instanceof Leg)
 					if(planElement instanceof EmptyTime)
 						plan.addLeg(new EmptyTimeImpl((EmptyTime) planElement));

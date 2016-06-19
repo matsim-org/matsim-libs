@@ -16,6 +16,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -100,7 +101,7 @@ public class AddZoneInformationToPlan {
 						
 						Point activityCoordAsPoint = geometryFactory.createPoint(new Coordinate(x,y));
 						
-						ActivityImpl modifiedActivity = new ActivityImpl(activity);
+						ActivityImpl modifiedActivity = PopulationUtils.createActivity(activity);
 						
 						for(Id<ActivityFacility> id : combinedFeatures.keySet()) {
 							SimpleFeature feature = combinedFeatures.get(id);

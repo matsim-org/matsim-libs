@@ -133,7 +133,7 @@ public class MyDemandGenerator {
 					Point pHome = homeZone.getInteriorPoint();
 					Coord cHome = new Coord(pHome.getX(), pHome.getY());
 					Link lHome = NetworkUtils.getNearestRightEntryLink(ni, cHome);
-					Activity homeStart = new ActivityImpl("home", cHome, lHome.getId());
+					Activity homeStart = PopulationUtils.createActivityFromCoordAndLinkId("home", cHome, lHome.getId());
 					homeStart.setStartTime(0);
 					homeStart.setEndTime(21595 + Math.random()*10.0);
 					
@@ -168,7 +168,7 @@ public class MyDemandGenerator {
 					Point pWork = workZone.getInteriorPoint();
 					Coord cWork = new Coord(pWork.getX(), pWork.getY());
 					Link lWork = NetworkUtils.getNearestRightEntryLink(ni, cWork);
-					Activity work = new ActivityImpl("work", cWork, lWork.getId());
+					Activity work = PopulationUtils.createActivityFromCoordAndLinkId("work", cWork, lWork.getId());
 					work.setStartTime(25200);
 					work.setEndTime(work.getStartTime() + 32400);
 					
@@ -176,7 +176,7 @@ public class MyDemandGenerator {
 					/*
 					 * Generate the end-of-day home activity.
 					 */
-					Activity homeEnd = new ActivityImpl("home", cHome, lHome.getId());
+					Activity homeEnd = PopulationUtils.createActivityFromCoordAndLinkId("home", cHome, lHome.getId());
 					homeEnd.setStartTime(work.getEndTime()+1800);
 					homeEnd.setEndTime(86399);
 					

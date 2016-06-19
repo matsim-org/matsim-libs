@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.XY2Links;
@@ -126,9 +127,8 @@ public class Plans2Trips {
 							.getFactory().createPlan();
 					clone.addPlan(clonePlan);
 
-					final ActivityImpl newStartAct = new ActivityImpl(
-							(Activity) selectedPlan.getPlanElements().get(
-									tripPlanElementIndex - 1));
+					final ActivityImpl newStartAct = PopulationUtils.createActivity((Activity) selectedPlan.getPlanElements().get(
+							tripPlanElementIndex - 1));
 					clonePlan.addActivity(newStartAct);
 					this.resampleLocation(person, newStartAct);
 
@@ -137,9 +137,8 @@ public class Plans2Trips {
 					clonePlan.addLeg(newLeg);
 					newLeg.setRoute(null);
 
-					final ActivityImpl newEndAct = new ActivityImpl(
-							(Activity) selectedPlan.getPlanElements().get(
-									tripPlanElementIndex + 1));
+					final ActivityImpl newEndAct = PopulationUtils.createActivity((Activity) selectedPlan.getPlanElements().get(
+							tripPlanElementIndex + 1));
 					clonePlan.addActivity(newEndAct);
 					this.resampleLocation(person, newEndAct);
 					newEndAct.setEndTime(Time.UNDEFINED_TIME);

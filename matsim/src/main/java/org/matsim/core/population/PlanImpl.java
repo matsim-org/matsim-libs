@@ -239,7 +239,7 @@ public final class PlanImpl implements Plan {
 			if (pe instanceof Activity) {
 				//no need to cast to ActivityImpl here
 				Activity a = (Activity) pe;
-				getPlanElements().add(new ActivityImpl(a));
+				getPlanElements().add(PopulationUtils.createActivity(a));
 			} else if (pe instanceof Leg) {
 				Leg l = (Leg) pe;
 				LegImpl l2 = createAndAddLeg(l.getMode());

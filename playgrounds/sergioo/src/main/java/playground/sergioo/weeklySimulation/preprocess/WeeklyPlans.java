@@ -86,7 +86,7 @@ public class WeeklyPlans {
 		for(PlanElement planElement:dailyPlanElements) {
 			PlanElement planElementCopy;
 			if(planElement instanceof Activity) {
-				planElementCopy = new ActivityImpl((Activity)planElement);
+				planElementCopy = PopulationUtils.createActivity((Activity)planElement);
 				((ActivityImpl)planElementCopy).setEndTime(dayPos*Time.MIDNIGHT+((Activity)planElement).getEndTime());
 				PlanElement last = plan.getPlanElements().get(plan.getPlanElements().size()-1);
 				if(last instanceof Activity)

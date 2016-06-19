@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -227,7 +226,7 @@ public class BasePlanImpl implements BasePlan {
 	public void copyFrom(final Plan in) {
 		for(PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity)
-				addActivity(new ActivityImpl((Activity) pe));
+				addActivity(PopulationUtils.createActivity((Activity) pe));
 			else if (pe instanceof Leg)
 				if (pe instanceof EmptyTime || ((Leg)pe).getMode().equals(EMPTY)) {
 					EmptyTime emptyTime = new EmptyTimeImpl(((Leg)pe).getRoute().getStartLinkId(), ((EmptyTime)pe).getTravelTime());

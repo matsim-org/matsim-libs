@@ -19,7 +19,7 @@
 package playground.vsp.congestion.handlers;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -57,7 +57,7 @@ public class MarginalSumScoringFunction {
 		double scoreA0 = sumScoringA.getScore();
 		double scoreB0 = sumScoringB.getScore();
 
-		Activity activityWithoutDelay = new ActivityImpl(activity);
+		Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
 		activityWithoutDelay.setStartTime(activity.getStartTime() - delay);
 		
 //		log.info("activity: " + activity.toString());
@@ -105,7 +105,7 @@ public class MarginalSumScoringFunction {
 		delegateA.handleActivity(activityMorning);
 		delegateB.handleActivity(activityMorning);
 		
-		Activity activityEveningWithoutDelay = new ActivityImpl(activityEvening);
+		Activity activityEveningWithoutDelay = PopulationUtils.createActivity(activityEvening);
 		activityEveningWithoutDelay.setStartTime(activityEvening.getStartTime() - delay);
 		
 //		log.info("activityMorning: " + activityMorning.toString());

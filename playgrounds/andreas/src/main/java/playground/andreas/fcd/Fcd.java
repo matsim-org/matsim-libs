@@ -315,7 +315,7 @@ public class Fcd {
 	}
 
 	private Activity createActivityWithLinkFromFcdEvent(FcdEvent fcdEvent, Link link) {
-		Activity act = new ActivityImpl("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()), link.getId());
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()), link.getId());
 		act.setEndTime(fcdEvent.getTime());
 		return act;
 	}

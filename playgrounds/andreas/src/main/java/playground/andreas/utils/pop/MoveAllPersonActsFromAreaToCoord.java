@@ -36,6 +36,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -90,7 +91,7 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 						this.actSourceArea.put(act.getType(), new Integer(this.actSourceArea.get(act.getType()).intValue() + 1 ));
 					}
 					if(this.kmlOutputEnabled){
-						this.kmlWriter.addActivity(new ActivityImpl(act));
+						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
 					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
                     ((PersonImpl) person).setId(Id.create(person.getId().toString() + "_source-target", Person.class));

@@ -80,7 +80,7 @@ public class CreateCBTransitPT extends CreateSingleTripPopulation {
 		Plan plan = PopulationUtils.createPlan();
 		double departureTime = getDepartureTime();
 
-		ActivityImpl actStart = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
+		ActivityImpl actStart = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -89,7 +89,7 @@ public class CreateCBTransitPT extends CreateSingleTripPopulation {
 
 		plan.addLeg(new LegImpl(mode));
 
-		ActivityImpl actEnd = new ActivityImpl(this.configGroup.getTag() + "Home", destFacility.getCoord(), destFacility.getLinkId());
+		ActivityImpl actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", destFacility.getCoord(), destFacility.getLinkId());
 		actEnd.setFacilityId(destFacility.getId());
 		actEnd.setStartTime(departureTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);

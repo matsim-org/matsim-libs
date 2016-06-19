@@ -62,17 +62,7 @@ public final class ActivityImpl implements Activity {
 		this.type = type.intern();
 	}
 
-	private ActivityImpl(final String type, final Id<Link> linkId) {
-		this(type);
-		this.linkId = linkId ;
-	}
-
-	public ActivityImpl(final String type, final Coord coord, final Id<Link> linkId) {
-		this(type, linkId);
-		this.coord = coord ;
-	}
-
-	public ActivityImpl(final Activity act) {
+	private ActivityImpl(final Activity act) {
 		this(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());

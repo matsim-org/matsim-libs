@@ -110,7 +110,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 			if(followingActivities.size()==0) {
 				EmptyTime emptyTime = (EmptyTime) plan.getPlanElements().get(emptyTimeIndex);
 				Activity nextActivity = (Activity) plan.getPlanElements().get(emptyTimeIndex+1);
-				Activity newActivity = new ActivityImpl(nextActivity);
+				Activity newActivity = PopulationUtils.createActivity(nextActivity);
 				futureActivityStartTime-=emptyTime.getTravelTime()/2;
 				newActivity.setStartTime(futureActivityStartTime);
 				newActivity.setEndTime(futureActivityStartTime+PLAN_STEP);

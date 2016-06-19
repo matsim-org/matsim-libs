@@ -39,6 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.RouteUtils;
@@ -204,7 +205,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	private ActivityImpl createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
-		ActivityImpl act = new ActivityImpl( stageActivityType, interactionCoord, interactionLink);
+		ActivityImpl act = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, interactionCoord, interactionLink);
 		act.setMaximumDuration(0.0);
 		return act;
 	}

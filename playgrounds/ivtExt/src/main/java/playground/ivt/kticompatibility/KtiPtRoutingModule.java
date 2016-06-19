@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -169,7 +169,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 	private static Activity createInteraction(
 			final Coord coord,
 			final Id link) {
-		final Activity act = new ActivityImpl( PtConstants.TRANSIT_ACTIVITY_TYPE , coord , link );
+		final Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, coord, link);
 		act.setMaximumDuration( 0 );
 		return act;
 	}
