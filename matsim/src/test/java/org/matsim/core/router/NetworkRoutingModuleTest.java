@@ -60,9 +60,9 @@ public class NetworkRoutingModuleTest {
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord((double) 0, (double) 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord((double) 0, (double) 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
 		final NetworkRoutingModule routingModule = new NetworkRoutingModule(
@@ -85,9 +85,9 @@ public class NetworkRoutingModuleTest {
 		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord((double) 0, (double) 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord((double) 0, (double) 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 		
 		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();

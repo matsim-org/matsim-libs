@@ -57,12 +57,12 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	@Override
 	public Activity createActivityFromCoord(final String actType, final Coord coord) {
-        return new ActivityImpl(actType, coord);
+        return PopulationUtils.createActivityFromCoord(actType, coord);
 	}
 
 	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
-        return PopulationUtils.createActivityImpl(actType, linkId);
+        return PopulationUtils.createActivityFromLinkId(actType, linkId);
 	}
 
 	@Override

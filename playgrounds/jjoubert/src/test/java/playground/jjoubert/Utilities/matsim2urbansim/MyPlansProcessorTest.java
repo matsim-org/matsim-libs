@@ -44,8 +44,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -146,7 +146,7 @@ public class MyPlansProcessorTest{
 		Person p1 = pf.createPerson(Id.create("0", Person.class));
 		Plan plan = pf.createPlan();
 		// Home.
-		Activity a1 = new ActivityImpl("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
+		Activity a1 = PopulationUtils.createActivityFromCoord("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
 		Leg l1 = new LegImpl(TransportMode.car);
@@ -161,7 +161,7 @@ public class MyPlansProcessorTest{
 		plan.addLeg(l1);
 		// TODO Try dijkstra here.
 		// Work.
-		Activity a2 = new ActivityImpl("work", new Coord(9.0, 9.0));
+		Activity a2 = PopulationUtils.createActivityFromCoord("work", new Coord(9.0, 9.0));
 		a2.setStartTime(7*3600);
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
@@ -172,7 +172,7 @@ public class MyPlansProcessorTest{
 		l2.setTravelTime(10.0*60.0);
 		plan.addLeg(l2);
 		// Home.
-		Activity a3 = new ActivityImpl("home", new Coord(1.0, 1.0));
+		Activity a3 = PopulationUtils.createActivityFromCoord("home", new Coord(1.0, 1.0));
 		a3.setStartTime(17*3600);
 		plan.addActivity(a3);
 		//---------------------------------------------------------------------
@@ -185,7 +185,7 @@ public class MyPlansProcessorTest{
 		Person p2 = pf.createPerson(Id.create("1", Person.class));
 		plan = pf.createPlan();
 		// Home.
-		a1 = new ActivityImpl("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
+		a1 = PopulationUtils.createActivityFromCoord("home", new Coord(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
 		l1 = new LegImpl(TransportMode.car);
@@ -200,7 +200,7 @@ public class MyPlansProcessorTest{
 		plan.addLeg(l1);
 		// TODO Try dijkstra here.
 		// Work.
-		a2 = new ActivityImpl("work", new Coord(9.0, 9.0));
+		a2 = PopulationUtils.createActivityFromCoord("work", new Coord(9.0, 9.0));
 		a2.setStartTime(7*3600);
 		a2.setEndTime(16*3600);
 		plan.addActivity(a2);
@@ -211,7 +211,7 @@ public class MyPlansProcessorTest{
 		l2.setTravelTime(20.0*60.0);
 		plan.addLeg(l2);
 		// Home.
-		a3 = new ActivityImpl("home", new Coord(1.0, 1.0));
+		a3 = PopulationUtils.createActivityFromCoord("home", new Coord(1.0, 1.0));
 		a3.setStartTime(17*3600);
 		plan.addActivity(a3);
 		//---------------------------------------------------------------------

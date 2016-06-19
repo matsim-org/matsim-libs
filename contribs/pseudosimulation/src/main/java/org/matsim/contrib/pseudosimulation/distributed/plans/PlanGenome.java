@@ -86,14 +86,14 @@ public class PlanGenome implements Plan {
 
     @Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
     public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
-        ActivityImpl a = new ActivityImpl(type, coord);
+        ActivityImpl a = PopulationUtils.createActivityFromCoord(type, coord);
         getPlanElements().add(a);
         return a;
     }
 
     @Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
     public final ActivityImpl createAndAddActivity(final String type, final Id<Link> linkId) {
-        ActivityImpl a = PopulationUtils.createActivityImpl(type, linkId);
+        ActivityImpl a = PopulationUtils.createActivityFromLinkId(type, linkId);
         getPlanElements().add(a);
         return a;
     }

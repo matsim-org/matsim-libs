@@ -29,7 +29,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -122,7 +121,7 @@ public class ChainChopperTest {
 	 */
 	private Plan buildPlan1(){
 		PlanImpl plan = PopulationUtils.createPlan();
-		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
+		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
@@ -133,7 +132,7 @@ public class ChainChopperTest {
 		double travelTime = Time.parseTime("16:00:00");
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
-		Activity b = new ActivityImpl("b", CoordUtils.createCoord(distance, 2.0));
+		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 2.0));
 		plan.addActivity(b);
 		return plan;
 	}
@@ -151,7 +150,7 @@ public class ChainChopperTest {
 	 */
 	private Plan buildPlan2(){
 		PlanImpl plan = PopulationUtils.createPlan();
-		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
+		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
@@ -162,13 +161,13 @@ public class ChainChopperTest {
 		double travelTime = Time.parseTime("07:00:00");
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
-		Activity b = new ActivityImpl("b", CoordUtils.createCoord(distance, 1.0));
+		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 1.0));
 		b.setMaximumDuration(Time.parseTime("02:00:00"));
 		plan.addActivity(b);
 		
 		plan.addLeg(new LegImpl("truck"));
 		
-		Activity c = new ActivityImpl("c", CoordUtils.createCoord(2*distance, 2.0));
+		Activity c = PopulationUtils.createActivityFromCoord("c", CoordUtils.createCoord(2*distance, 2.0));
 		plan.addActivity(c);
 		return plan;
 	}
@@ -185,7 +184,7 @@ public class ChainChopperTest {
 	 */
 	private Plan buildPlan3(){
 		PlanImpl plan = PopulationUtils.createPlan();
-		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
+		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
@@ -196,7 +195,7 @@ public class ChainChopperTest {
 		double travelTime = Time.parseTime("06:00:00");
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
-		Activity b = new ActivityImpl("b", CoordUtils.createCoord(distance, 2.0));
+		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 2.0));
 		plan.addActivity(b);
 		return plan;
 	}

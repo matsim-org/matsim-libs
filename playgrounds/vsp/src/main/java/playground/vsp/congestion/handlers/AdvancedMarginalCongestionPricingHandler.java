@@ -193,10 +193,10 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 												
 					// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
 						
-					ActivityImpl activityMorning = PopulationUtils.createActivityImpl(this.personId2firstActivityType.get(personId), linkId);
+					ActivityImpl activityMorning = PopulationUtils.createActivityFromLinkId(this.personId2firstActivityType.get(personId), linkId);
 					activityMorning.setEndTime(this.personId2firstActivityEndTime.get(personId));
 					
-					ActivityImpl activityEvening = PopulationUtils.createActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+					ActivityImpl activityEvening = PopulationUtils.createActivityFromLinkId(this.personId2currentActivityType.get(personId), linkId);
 					activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
 						
 					activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, totalDelayThisPerson);
@@ -206,7 +206,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				} else {
 					// The activity has an end time indicating a 'normal' activity.
 					
-					ActivityImpl activity = PopulationUtils.createActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+					ActivityImpl activity = PopulationUtils.createActivityFromLinkId(this.personId2currentActivityType.get(personId), linkId);
 					activity.setStartTime(this.personId2currentActivityStartTime.get(personId));
 					activity.setEndTime(activityEndTime);	
 					activityDelayDisutility = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, totalDelayThisPerson);

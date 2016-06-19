@@ -27,6 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -223,7 +224,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 	private static ActivityImpl createNewParkingActivity(ActivityFacilityImpl newParking, NetworkImpl network,
 			double parkingActivityDuration) {
-		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
+		ActivityImpl newParkingActivity = PopulationUtils.createActivityFromCoord("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
 		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, newParking.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);

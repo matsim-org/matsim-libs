@@ -98,18 +98,18 @@ public class Person2ActivityPerformingWriter {
 			String lastActType = actStartTimes.get(lastActIndex).getFirst();
 
 			if(firstActType.equals(lastActType)){ // first act == last act
-				Activity act = PopulationUtils.createActivityImpl(firstActType, Id.createLinkId("NONE"));
+				Activity act = PopulationUtils.createActivityFromLinkId(firstActType, Id.createLinkId("NONE"));
 				act.setStartTime(actStartTimes.get(lastActIndex).getSecond());
 				act.setEndTime(actEndTimes.get(0).getSecond()+24*3600);
 				storeUtilOfPerforming(sc, p, act);
 			} else {	// first act != last act
 
-				Activity act = PopulationUtils.createActivityImpl(firstActType, Id.createLinkId("NONE"));
+				Activity act = PopulationUtils.createActivityFromLinkId(firstActType, Id.createLinkId("NONE"));
 				act.setStartTime(actStartTimes.get(0).getSecond());
 				act.setEndTime(actEndTimes.get(0).getSecond());
 				storeUtilOfPerforming(sc, p, act);
 
-				act = PopulationUtils.createActivityImpl(lastActType, Id.createLinkId("NONE"));
+				act = PopulationUtils.createActivityFromLinkId(lastActType, Id.createLinkId("NONE"));
 				act.setStartTime(actStartTimes.get(lastActIndex).getSecond());
 				act.setEndTime(actEndTimes.get(lastActIndex).getSecond());
 				storeUtilOfPerforming(sc, p, act);
@@ -121,7 +121,7 @@ public class Person2ActivityPerformingWriter {
 			// remaining act
 			for (int index = 1; index < actEndTimes.size()-1;index++){
 				if(!actStartTimes.get(index).getFirst().equals(actEndTimes.get(index).getFirst())) throw new RuntimeException("Activities are not same. Aborting...");//just for double check
-				Activity act = PopulationUtils.createActivityImpl(actEndTimes.get(index).getFirst(), Id.createLinkId("NONE"));
+				Activity act = PopulationUtils.createActivityFromLinkId(actEndTimes.get(index).getFirst(), Id.createLinkId("NONE"));
 				act.setStartTime(actStartTimes.get(index).getSecond());
 				act.setEndTime(actEndTimes.get(index).getSecond());
 				storeUtilOfPerforming(sc, p, act);

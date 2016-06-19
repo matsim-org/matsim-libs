@@ -48,7 +48,7 @@ public final class PlanImpl implements Plan {
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type1, final Coord coord) {
-		ActivityImpl a = new ActivityImpl(type1, coord);
+		ActivityImpl a = PopulationUtils.createActivityFromCoord(type1, coord);
 		getPlanElements().add(a);
 		return a;
 	}
@@ -63,7 +63,7 @@ public final class PlanImpl implements Plan {
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type1, final Id<Link> linkId) {
-		ActivityImpl a = PopulationUtils.createActivityImpl(type1, linkId);
+		ActivityImpl a = PopulationUtils.createActivityFromLinkId(type1, linkId);
 		getPlanElements().add(a);
 		return a;
 	}

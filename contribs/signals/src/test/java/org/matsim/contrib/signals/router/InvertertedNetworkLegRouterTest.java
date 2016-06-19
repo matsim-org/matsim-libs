@@ -69,8 +69,8 @@ public class InvertertedNetworkLegRouterTest {
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
-		Activity fromAct = PopulationUtils.createActivityImpl("h", Id.create("12", Link.class));
-		Activity toAct = PopulationUtils.createActivityImpl("h", Id.create("78", Link.class));
+		Activity fromAct = PopulationUtils.createActivityFromLinkId("h", Id.create("12", Link.class));
+		Activity toAct = PopulationUtils.createActivityFromLinkId("h", Id.create("78", Link.class));
 
 		InvertedNetworkRoutingModule router =
 				new InvertedNetworkRoutingModule(

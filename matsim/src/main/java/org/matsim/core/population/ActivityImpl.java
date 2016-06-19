@@ -67,11 +67,6 @@ public final class ActivityImpl implements Activity {
 		this.linkId = linkId ;
 	}
 
-	public ActivityImpl(final String type, final Coord coord) {
-		this(type);
-		this.coord = coord ;
-	}
-
 	public ActivityImpl(final String type, final Coord coord, final Id<Link> linkId) {
 		this(type, linkId);
 		this.coord = coord ;

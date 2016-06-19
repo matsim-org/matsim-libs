@@ -661,8 +661,12 @@ public final class PopulationUtils {
 		return (PlanImpl) plan ;
 	}
 
-	public static ActivityImpl createActivityImpl(String type, Id<Link> linkId) {
+	public static ActivityImpl createActivityFromLinkId(String type, Id<Link> linkId) {
 		return (ActivityImpl) getFactory().createActivityFromLinkId(type, linkId) ;
+	}
+
+	public static ActivityImpl createActivityFromCoord(String type, Coord coord) {
+		return (ActivityImpl) getFactory().createActivityFromCoord(type, coord) ;
 	}
 	
 }

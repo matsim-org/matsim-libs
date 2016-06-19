@@ -129,7 +129,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		public void handleEvent(ActivityEndEvent event) {
 			if (currentActivity == null) {
-				ActivityImpl firstActivity = PopulationUtils.createActivityImpl(event.getActType(), event.getLinkId());
+				ActivityImpl firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
 				currentActivity = firstActivity;
 			}
@@ -143,7 +143,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(ActivityStartEvent event) {
-			ActivityImpl activity = PopulationUtils.createActivityImpl(event.getActType(), event.getLinkId()); 
+			ActivityImpl activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			if(event.getActType().equals(FreightConstants.END)){
@@ -254,7 +254,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour);
 			Plan plan = PopulationUtils.createPlan();
-			Activity startActivity = PopulationUtils.createActivityImpl(FreightConstants.START, scheduledTour.getVehicle().getLocation());
+			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
@@ -270,13 +270,13 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					plan.addLeg(leg);
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
-					Activity tourElementActivity = PopulationUtils.createActivityImpl(act.getActivityType(), act.getLocation());					
+					Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());					
 					double duration = act.getDuration() ;
 					tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
 					plan.addActivity(tourElementActivity);
 				}
 			}
-			Activity endActivity = PopulationUtils.createActivityImpl(FreightConstants.END, scheduledTour.getVehicle().getLocation());
+			Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLocation());
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);

@@ -85,10 +85,10 @@ public class Main {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Coord fromCoord = new Coord(xFromAct, yFromAct);
-		Activity fromAct = new ActivityImpl("h", fromCoord);
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", fromCoord);
 		((ActivityImpl) fromAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), fromCoord).getId());
 		Coord toCoord = new Coord(xToAct, yToAct);
-		Activity toAct = new ActivityImpl("h", toCoord);
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", toCoord);
 		((ActivityImpl) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
 
 		for (int i = 0; i < 1000; i++) {

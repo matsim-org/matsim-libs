@@ -38,7 +38,7 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 		if(typeOfActivityFacility==null)
 			return null;
 		ActivityFacility facility = socialDecisionMaker.getScenario().getActivityFacilities().getFacilities().get(typeOfActivityFacility.getSecond());
-		Activity activity = PopulationUtils.createActivityImpl(typeOfActivityFacility.getFirst(), facility.getLinkId());
+		Activity activity = PopulationUtils.createActivityFromLinkId(typeOfActivityFacility.getFirst(), facility.getLinkId());
 		((ActivityImpl)activity).setFacilityId(typeOfActivityFacility.getSecond());
 		List<? extends PlanElement> trip = socialDecisionMaker.decideModeRoute(startTime, startFacilityId, facility.getId(), tripRouter);
 		if(trip==null)

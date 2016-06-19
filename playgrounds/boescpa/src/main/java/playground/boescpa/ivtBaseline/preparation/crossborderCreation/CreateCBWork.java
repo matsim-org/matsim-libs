@@ -187,7 +187,7 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 
 		plan.addLeg(new LegImpl(mode));
 
-		ActivityImpl actSA = new ActivityImpl(this.actTag, destFacility.getCoord());
+		ActivityImpl actSA = PopulationUtils.createActivityFromCoord(this.actTag, destFacility.getCoord());
 		//destFacility.getActivityOptions().get(this.actTag).setCapacity(
 		//		destFacility.getActivityOptions().get(this.actTag).getCapacity() + 1);
 		actSA.setFacilityId(destFacility.getId());

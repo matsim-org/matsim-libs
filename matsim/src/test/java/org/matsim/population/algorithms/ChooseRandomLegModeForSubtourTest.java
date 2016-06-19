@@ -171,9 +171,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		Plan plan = PopulationUtils.createPlan();
 		person.addPlan(plan);
 		Id<Link> linkId = Id.create(1, Link.class);
-		Activity home1 = PopulationUtils.createActivityImpl("home", linkId);
+		Activity home1 = PopulationUtils.createActivityFromLinkId("home", linkId);
 		Leg leg = new LegImpl("car");
-		Activity home2 = PopulationUtils.createActivityImpl("home", linkId);
+		Activity home2 = PopulationUtils.createActivityFromLinkId("home", linkId);
 		plan.addActivity(home1);
 		plan.addLeg(leg);
 		plan.addActivity(home2);

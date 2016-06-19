@@ -56,13 +56,13 @@ public class UmlaufDriver extends AbstractTransitDriver {
 				lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
 				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());
 			} else {
-				lastActivity = PopulationUtils.createActivityImpl(activityType, networkRoute.getStartLinkId());
+				lastActivity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getStartLinkId());
 				plan.addActivity(lastActivity);
 			}
 			Leg leg = new LegImpl(transportMode);
 			leg.setRoute(networkRoute);
 			plan.addLeg(leg);
-			Activity activity = PopulationUtils.createActivityImpl(activityType, networkRoute.getEndLinkId());
+			Activity activity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getEndLinkId());
 			plan.addActivity(activity);
 		}
 

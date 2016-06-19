@@ -69,7 +69,7 @@ public class CreateDummyPopulation {
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
 		
-		ActivityImpl homeAct0 = PopulationUtils.createActivityImpl("home", Id.create("21016-21015", Link.class));
+		ActivityImpl homeAct0 = PopulationUtils.createActivityFromLinkId("home", Id.create("21016-21015", Link.class));
 		plan.addActivity(homeAct0);
 		homeAct0.setEndTime(6.0 * 3600.0);
 		homeAct0.setCoord(this.scenario.getNetwork().getLinks().get(Id.create("21016-21015", Link.class)).getCoord());
@@ -77,7 +77,7 @@ public class CreateDummyPopulation {
 		Leg leg = new LegImpl(TransportMode.walk);
 		plan.addLeg(leg);
 		
-		ActivityImpl workAct = PopulationUtils.createActivityImpl("work", Id.create("21010-24021", Link.class));
+		ActivityImpl workAct = PopulationUtils.createActivityFromLinkId("work", Id.create("21010-24021", Link.class));
 		plan.addActivity(workAct);
 		workAct.setEndTime(18.0 * 3600.0);
 		workAct.setCoord(this.scenario.getNetwork().getLinks().get(Id.create("21010-24021", Link.class)).getCoord());

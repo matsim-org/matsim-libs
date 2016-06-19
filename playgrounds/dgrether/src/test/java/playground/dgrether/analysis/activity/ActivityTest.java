@@ -21,6 +21,7 @@ package playground.dgrether.analysis.activity;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -32,7 +33,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class ActivityTest extends MatsimTestCase {
 
 	public void testCalculateDuration() {
-		ActivityImpl testee = new ActivityImpl("h", new Coord((double) 0, (double) 0));
+		ActivityImpl testee = PopulationUtils.createActivityFromCoord("h", new Coord((double) 0, (double) 0));
 		testee.setStartTime(0.0);
 		testee.setMaximumDuration(0.0);
 		testee.setEndTime(0.0);

@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
@@ -134,7 +135,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 			for(SchedulingLink link:path)
 				if(link instanceof ActivitySchedulingLink) {
 					ActivitySchedulingLink activityLink = (ActivitySchedulingLink)link;
-					ActivityImpl activity = new ActivityImpl(activityLink.getActivityType(), activityLink.getCoord());
+					ActivityImpl activity = PopulationUtils.createActivityFromCoord(activityLink.getActivityType(), activityLink.getCoord());
 					activity.setEndTime(((SchedulingNode)link.getToNode()).getTime());
 					activity.setLinkId(facilities.getFacilities().get(activityLink.getFacilityId()).getLinkId());
 					activity.setFacilityId(activityLink.getFacilityId());

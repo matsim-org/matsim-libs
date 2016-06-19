@@ -215,7 +215,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 			this.currplan.addActivity(curract);
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
-			this.curract = new ActivityImpl(atts.getValue(ATTR_ACT_TYPE), coord);
+			this.curract = PopulationUtils.createActivityFromCoord(atts.getValue(ATTR_ACT_TYPE), coord);
 			this.currplan.addActivity(curract);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");

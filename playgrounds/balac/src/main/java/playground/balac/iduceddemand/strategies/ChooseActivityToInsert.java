@@ -69,7 +69,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonHomeLocation(t);					
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -81,7 +81,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonWorkLocation(t);
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -94,7 +94,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				actFacility = findActivityLocation(allActTypes[index], 
 						((Activity)plan.getPlanElements().get(actIndex)).getCoord());
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(actFacility.getCoord() ).getId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], ((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(actFacility.getCoord() ).getId());
 				
 				newActivity.setFacilityId(actFacility.getId());
 				newActivity.setCoord(actFacility.getCoord());

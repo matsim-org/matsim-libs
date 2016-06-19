@@ -29,6 +29,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -105,7 +106,7 @@ public class PlanGeneratorWithParkingActivities {
 
 		ActivityFacilityImpl parkingFacility = closestParkingMatrix.getClosestParkings(relatedActivity.getCoord(), 1, 1).get(0);
 
-		ActivityImpl newParkingActivity = new ActivityImpl("parking", parkingFacility.getCoord());
+		ActivityImpl newParkingActivity = PopulationUtils.createActivityFromCoord("parking", parkingFacility.getCoord());
 		newParkingActivity.setFacilityId(parkingFacility.getId());
 		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, parkingFacility.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);

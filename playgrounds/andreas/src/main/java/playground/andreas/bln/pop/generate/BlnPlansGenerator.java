@@ -299,7 +299,7 @@ public class BlnPlansGenerator {
 				String[] tripEntry = iterator.next();
 
 				// Read Activity from survey
-				ActivityImpl newAct = new ActivityImpl(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
+				ActivityImpl newAct = PopulationUtils.createActivityFromCoord(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
 
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 

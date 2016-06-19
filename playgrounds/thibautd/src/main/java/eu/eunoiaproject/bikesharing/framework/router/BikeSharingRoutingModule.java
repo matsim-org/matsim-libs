@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -190,7 +191,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 	}
 
 	private static PlanElement createInteraction( final Facility facility ) {
-		final Activity act = new ActivityImpl( BikeSharingConstants.INTERACTION_TYPE , facility.getCoord() );
+		final Activity act = PopulationUtils.createActivityFromCoord(BikeSharingConstants.INTERACTION_TYPE, facility.getCoord());
 		act.setMaximumDuration( 0 );
 		((ActivityImpl) act).setLinkId( facility.getLinkId() );
 		// XXX This may cause problems if IDs of ActivityFacilities and BikeSharingFacilities overlap...

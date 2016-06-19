@@ -57,7 +57,7 @@ public class TripRouterTest {
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( PopulationUtils.createActivityImpl("3", Id.create( "coucou", Link.class )) );
+		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
 		trip.add( new LegImpl( "4" ) );
 
 		TripRouter.insertTrip( plan , o , trip , d );
@@ -103,7 +103,7 @@ public class TripRouterTest {
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( PopulationUtils.createActivityImpl("3", Id.create( "coucou", Link.class )) );
+		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
 		trip.add( new LegImpl( "4" ) );
 
 		TripRouter.insertTrip( plan , o , trip , d );
@@ -154,7 +154,7 @@ public class TripRouterTest {
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( PopulationUtils.createActivityImpl("3", Id.create( "coucou", Link.class )) );
+		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
 		trip.add( new LegImpl( "4" ) );
 
 		assertEquals(
@@ -210,7 +210,7 @@ public class TripRouterTest {
 			return this.delegate.getFacilityId();
 		}
 		public EqualsActivity(final String type, final Id<Link> link) {
-			delegate = PopulationUtils.createActivityImpl(type, link) ;
+			delegate = PopulationUtils.createActivityFromLinkId(type, link) ;
 		}
 		@Override
 		public int hashCode() {

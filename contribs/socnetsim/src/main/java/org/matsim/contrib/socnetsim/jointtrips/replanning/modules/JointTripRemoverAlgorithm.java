@@ -178,7 +178,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			// note that no check of the mode is done...
 			if ( !newPassengers.equals( currentPassengers ) ) {
 				newTrip.add(
-						PopulationUtils.createActivityImpl(JointActingTypes.INTERACTION, route != null ?
+						PopulationUtils.createActivityFromLinkId(JointActingTypes.INTERACTION, route != null ?
 							route.getStartLinkId() :
 								subtrip.getOriginActivity().getLinkId()) );
 

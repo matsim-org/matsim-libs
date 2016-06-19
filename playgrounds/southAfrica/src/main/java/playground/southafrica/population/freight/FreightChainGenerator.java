@@ -44,6 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -246,7 +247,7 @@ public class FreightChainGenerator {
 			 * first 'major' activity. */
 			Id<Node> firstId = Id.createNodeId(chainList.get(0).split(",")[1]);
 			Coord coord = network.getPathDependentNode(firstId).getCoord();
-			ActivityImpl firstActivity = new ActivityImpl("major", coord);
+			ActivityImpl firstActivity = PopulationUtils.createActivityFromCoord("major", coord);
 			firstActivity.setFacilityId(Id.create(firstId.toString(), ActivityFacility.class));
 
 			int startHour = chainAttributes[0];
@@ -263,7 +264,7 @@ public class FreightChainGenerator {
 				Id<Node> thisId = Id.createNodeId(chainList.get(i).split(",")[1]);
 
 				Coord thisCoord = network.getPathDependentNode(thisId).getCoord();
-				ActivityImpl activity = new ActivityImpl("minor", thisCoord);
+				ActivityImpl activity = PopulationUtils.createActivityFromCoord("minor", thisCoord);
 				activity.setFacilityId(Id.create(thisId.toString(), ActivityFacility.class));
 				
 				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
@@ -278,7 +279,7 @@ public class FreightChainGenerator {
 			/* Add the final 'major' activity. */
 			Id<Node> finalId = Id.createNodeId(chainList.get(chainList.size()-1).split(",")[1]);
 			Coord finalCoord = network.getPathDependentNode(finalId).getCoord();
-			ActivityImpl finalActivity = new ActivityImpl("major", finalCoord);
+			ActivityImpl finalActivity = PopulationUtils.createActivityFromCoord("major", finalCoord);
 			finalActivity.setFacilityId(Id.create(finalId, ActivityFacility.class));
 			plan.addActivity(finalActivity);
 			

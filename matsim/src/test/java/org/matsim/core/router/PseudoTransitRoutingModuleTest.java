@@ -54,9 +54,9 @@ public class PseudoTransitRoutingModuleTest {
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.pt);
-		Activity fromAct = new ActivityImpl("h", new Coord(0, 0));
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord(0, 3000));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
 		double tt = new PseudoTransitRoutingModule(

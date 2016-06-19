@@ -71,7 +71,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonHomeLocation(t);					
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], primaryActivity.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -85,7 +85,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonWorkLocation(t);
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], primaryActivity.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -99,7 +99,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonEducationLocation(t);
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], primaryActivity.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -113,7 +113,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				actFacility = findActivityLocation(allActTypes[index], 
 						((Activity)plan.getPlanElements().get(actIndex)).getCoord());
 				
-				newActivity = PopulationUtils.createActivityImpl(allActTypes[index], actFacility.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], actFacility.getLinkId());
 				
 				newActivity.setFacilityId(actFacility.getId());
 				newActivity.setCoord(actFacility.getCoord());

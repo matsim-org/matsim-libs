@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -41,7 +40,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	public void testReplaceActivity() {
 		Plan plan = createSamplePlan();
 		Activity oldActivity = (Activity)plan.getPlanElements().get(0);
-		Activity newActivity = new ActivityImpl("s", new Coord((double) 200, (double) 200));
+		Activity newActivity = PopulationUtils.createActivityFromCoord("s", new Coord((double) 200, (double) 200));
 		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the activities is null

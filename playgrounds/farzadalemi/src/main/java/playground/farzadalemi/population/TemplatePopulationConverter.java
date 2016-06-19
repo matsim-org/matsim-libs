@@ -100,7 +100,7 @@ public class TemplatePopulationConverter {
 							double yCoord = Double.parseDouble(lineArgs[i++]);
 							double startTime = Double.parseDouble(lineArgs[i++]); // in seconds from midnight
 							double endTime = Double.parseDouble(lineArgs[i++]); // in seconds from midnight
-							Activity act = new ActivityImpl(activityType, new Coord(xCoord, yCoord));
+							Activity act = PopulationUtils.createActivityFromCoord(activityType, new Coord(xCoord, yCoord));
 							act.setStartTime(startTime);
 							act.setEndTime(endTime);
 							plan.addActivity(act);

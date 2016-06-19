@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import playground.thibautd.parknride.ParkAndRideConstants;
@@ -125,7 +125,7 @@ public class TestScoringFunctionState {
 	private void test( final boolean testPark , final boolean testMode ) {
 		double step = 10;
 		double now = step;
-		Activity act = new ActivityImpl( "home" , uniqueLink.getCoord() );
+		Activity act = PopulationUtils.createActivityFromCoord("home", uniqueLink.getCoord());
 		act.setEndTime( now );
 		scoringFunction.handleActivity( act );
 
@@ -141,7 +141,7 @@ public class TestScoringFunctionState {
 					scoringFunction.lastLegWasCar());
 		}
 
-		act = new ActivityImpl( "work" , uniqueLink.getCoord() );
+		act = PopulationUtils.createActivityFromCoord("work", uniqueLink.getCoord());
 		now += step;
 		act.setEndTime( now );
 		scoringFunction.handleActivity( act );
@@ -157,7 +157,7 @@ public class TestScoringFunctionState {
 		now += step;
 		scoringFunction.handleLeg( leg );
 
-		act = new ActivityImpl( "work" , uniqueLink.getCoord() );
+		act = PopulationUtils.createActivityFromCoord("work", uniqueLink.getCoord());
 		now += step;
 		act.setEndTime( now );
 		scoringFunction.handleActivity( act );
@@ -173,7 +173,7 @@ public class TestScoringFunctionState {
 		now += step;
 		scoringFunction.handleLeg( leg );
 
-		act = new ActivityImpl( ParkAndRideConstants.PARKING_ACT , uniqueLink.getCoord() );
+		act = PopulationUtils.createActivityFromCoord(ParkAndRideConstants.PARKING_ACT, uniqueLink.getCoord());
 		act.setEndTime( now );
 		scoringFunction.handleActivity( act );
 

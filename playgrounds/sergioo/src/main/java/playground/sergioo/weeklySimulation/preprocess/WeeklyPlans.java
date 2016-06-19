@@ -137,12 +137,12 @@ public class WeeklyPlans {
 			}
 			totalDurations += duration;
 			if(type.equals("home")) {
-				activity = new ActivityImpl(type, homeCoord);
+				activity = PopulationUtils.createActivityFromCoord(type, homeCoord);
 				((ActivityImpl)activity).setFacilityId(homeFacilityId);
 			}
 			else {
 				ActivityFacility facility = getRandomFacilityAndLinkId(type, prevActivityCoord);
-				activity = new ActivityImpl(type, facility.getCoord());
+				activity = PopulationUtils.createActivityFromCoord(type, facility.getCoord());
 				((ActivityImpl)activity).setFacilityId(facility.getId());
 			}
 			((ActivityImpl)activity).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
@@ -155,7 +155,7 @@ public class WeeklyPlans {
 			}
 			plan.addLeg(new LegImpl(carAvailable?TransportMode.car:TransportMode.pt));
 			totalDurations = Time.MIDNIGHT;
-			activity = new ActivityImpl(typeLast, lastCoord);
+			activity = PopulationUtils.createActivityFromCoord(typeLast, lastCoord);
 			((ActivityImpl)activity).setFacilityId(lastFacilityId);
 			((ActivityImpl)activity).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
 			plan.addActivity(activity);

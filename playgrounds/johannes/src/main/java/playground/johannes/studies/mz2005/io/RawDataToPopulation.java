@@ -121,7 +121,7 @@ public class RawDataToPopulation {
 		/*
 		 * create the first home activity
 		 */
-		ActivityImpl act = new ActivityImpl(ActivityType.home.name(), new Coord((double) 0, (double) 0));
+		ActivityImpl act = PopulationUtils.createActivityFromCoord(ActivityType.home.name(), new Coord((double) 0, (double) 0));
 		act.setStartTime(0);
 		act.setCoord(null);
 		plan.addActivity(act);
@@ -159,7 +159,7 @@ public class RawDataToPopulation {
 			/*
 			 * create next activity
 			 */
-			ActivityImpl next = new ActivityImpl(activityType(trip.type, trip.leisureType), new Coord((double) 0, (double) 0));
+			ActivityImpl next = PopulationUtils.createActivityFromCoord(activityType(trip.type, trip.leisureType), new Coord((double) 0, (double) 0));
 			next.setStartTime(trip.endTime * 60);
 			next.setCoord(null);
 			if(trip.destCoord !=  null) {
@@ -181,7 +181,7 @@ public class RawDataToPopulation {
 			LegImpl leg = new LegImpl("undefined");
 			plan.addLeg(leg);
 			
-			act = new ActivityImpl(ActivityType.home.name(), ((Activity)plan.getPlanElements().get(0)).getCoord());
+			act = PopulationUtils.createActivityFromCoord(ActivityType.home.name(), ((Activity)plan.getPlanElements().get(0)).getCoord());
 			act.setStartTime(86399);
 			act.setEndTime(86400);
 		}

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -150,7 +149,7 @@ public class ChainChopper {
 					 * current plan. */
 					Leg leg = (Leg)plan.getPlanElements().get(i-1);
 					currentPlan.addLeg(leg);
-					Activity cutActivityEnd = new ActivityImpl("chopEnd", cCut);
+					Activity cutActivityEnd = PopulationUtils.createActivityFromCoord("chopEnd", cCut);
 					currentPlan.addActivity(cutActivityEnd);
 					PlanImpl segment = PopulationUtils.createPlan();
 					segment.copyFrom(currentPlan);
@@ -159,7 +158,7 @@ public class ChainChopper {
 					/* Add the remaining portion to the start of the new
 					 * plan. */
 					currentPlan = PopulationUtils.createPlan();
-					Activity cutActivityStart = new ActivityImpl("chopStart", cCut);
+					Activity cutActivityStart = PopulationUtils.createActivityFromCoord("chopStart", cCut);
 					cutActivityStart.setEndTime(Time.parseTime("00:01:00"));
 					currentPlan.addActivity(cutActivityStart);
 					lastLocation = cCut;
@@ -189,7 +188,7 @@ public class ChainChopper {
 
 					/* Split the activity. Add one portion to the end of 
 					 * the current plan. */
-					Activity endPortion = new ActivityImpl(act.getType(), act.getCoord());
+					Activity endPortion = PopulationUtils.createActivityFromCoord(act.getType(), act.getCoord());
 					endPortion.setStartTime(startTime);
 					currentPlan.addActivity(endPortion);
 					endPortion.setMaximumDuration(Time.UNDEFINED_TIME);
@@ -199,7 +198,7 @@ public class ChainChopper {
 
 					/* Add the remainder to the start of the new plan. */
 					currentPlan = PopulationUtils.createPlan();
-					Activity startPortion = new ActivityImpl(act.getType(), act.getCoord());
+					Activity startPortion = PopulationUtils.createActivityFromCoord(act.getType(), act.getCoord());
 					startPortion.setEndTime(endTime - Time.MIDNIGHT);
 					currentPlan.addActivity(startPortion);
 

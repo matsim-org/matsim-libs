@@ -88,13 +88,13 @@ public class BBIextraDemand {
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = PopulationUtils.createPlan();
-					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					ActivityImpl act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
 					plan.addLeg(new LegImpl(TransportMode.car));
 
-					plan.addActivity(new ActivityImpl("leisure", this.coordBBI));
+					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordBBI));
 
 					person.addPlan(plan);
 
@@ -114,13 +114,13 @@ public class BBIextraDemand {
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = PopulationUtils.createPlan();
-					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					ActivityImpl act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
 					plan.addLeg(new LegImpl(TransportMode.car));
 
-					plan.addActivity(new ActivityImpl("leisure", this.coordTXL));
+					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordTXL));
 
 					person.addPlan(plan);
 
@@ -133,13 +133,13 @@ public class BBIextraDemand {
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = PopulationUtils.createPlan();
-					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					ActivityImpl act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
 					plan.addLeg(new LegImpl(TransportMode.car));
 
-					plan.addActivity(new ActivityImpl("leisure", this.coordSXF));
+					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordSXF));
 
 					person.addPlan(plan);
 

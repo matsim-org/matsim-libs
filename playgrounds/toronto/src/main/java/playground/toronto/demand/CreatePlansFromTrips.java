@@ -673,7 +673,7 @@ public class CreatePlansFromTrips {
 				c = getRandomCoordInZone(Id.create(T.zone_d, Zone.class));
 			}
 			
-			p.addActivity(new ActivityImpl(act_d, c));
+			p.addActivity(PopulationUtils.createActivityFromCoord(act_d, c));
 			
 			if (!skipPerson) {
 				Person q = P;

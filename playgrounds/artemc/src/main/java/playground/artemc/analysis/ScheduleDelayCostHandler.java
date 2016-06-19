@@ -206,7 +206,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		Id<Person> perosnId = event.getPersonId();
 		Journey thisJourney = journeys.get(perosnId);
 		if(event.getActType().equals("work")){
-			ActivityImpl activity = PopulationUtils.createActivityImpl(event.getActType(), event.getLinkId());
+			ActivityImpl activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			activities.put(perosnId, activity);

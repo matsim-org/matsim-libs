@@ -72,19 +72,19 @@ public class TripsToLegsAlgorithmTest {
 		final Id<Link> id1 = Id.create( 1, Link.class );
 		final Id<Link> id2 = Id.create( 2, Link.class );
 
-		Activity act = PopulationUtils.createActivityImpl("act_1", id1);
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 		Leg leg = new LegImpl( "mode_1" );
 		plan.addLeg( leg );
 		structure.add( leg );
-		act = PopulationUtils.createActivityImpl("act_2", id2);
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 		leg = new LegImpl( "mode_2" );
 		plan.addLeg( leg );
 		structure.add( leg );
-		act = PopulationUtils.createActivityImpl("act_3", id1);
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -103,7 +103,7 @@ public class TripsToLegsAlgorithmTest {
 		final Id<Link> id1 = Id.create( 1, Link.class );
 		final Id<Link> id2 = Id.create( 2, Link.class );
 
-		Activity act = PopulationUtils.createActivityImpl("act_1", id1);
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -114,7 +114,7 @@ public class TripsToLegsAlgorithmTest {
 		leg = new LegImpl( "mode_1bis" );
 		plan.addLeg( leg );
 
-		act = PopulationUtils.createActivityImpl("act_2", id2);
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -125,7 +125,7 @@ public class TripsToLegsAlgorithmTest {
 		leg = new LegImpl( "mode_2bis" );
 		plan.addLeg( leg );
 
-		act = PopulationUtils.createActivityImpl("act_3", id1);
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -145,7 +145,7 @@ public class TripsToLegsAlgorithmTest {
 		final Id<Link> id2 = Id.create( 2, Link.class );
 		final Id<Link> id3 = Id.create( 3, Link.class );
 
-		Activity act = PopulationUtils.createActivityImpl("act_1", id1);
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -153,13 +153,13 @@ public class TripsToLegsAlgorithmTest {
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		act = PopulationUtils.createActivityImpl(DUMMY_1, id3);
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_1, id3);
 		plan.addActivity( act );
 
 		leg = new LegImpl( "mode_1bis" );
 		plan.addLeg( leg );
 
-		act = PopulationUtils.createActivityImpl("act_2", id2);
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -167,13 +167,13 @@ public class TripsToLegsAlgorithmTest {
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		act = PopulationUtils.createActivityImpl(DUMMY_2, id3);
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_2, id3);
 		plan.addActivity( act );
 
 		leg = new LegImpl( "mode_2bis" );
 		plan.addLeg( leg );
 
-		act = PopulationUtils.createActivityImpl("act_3", id1);
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -193,25 +193,25 @@ public class TripsToLegsAlgorithmTest {
 		final Id<Link> id2 = Id.create( 2, Link.class );
 		final Id<Link> id3 = Id.create( 3, Link.class );
 
-		Activity act = PopulationUtils.createActivityImpl("act_1", id1);
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
 		Leg leg = new LegImpl( TransportMode.transit_walk );
 		plan.addLeg( leg );
 
-		act = PopulationUtils.createActivityImpl(DUMMY_1, id3);
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_1, id3);
 		plan.addActivity( act );
 
 		leg = new LegImpl( TransportMode.pt );
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		act = PopulationUtils.createActivityImpl("act_2", id2);
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
-		act = PopulationUtils.createActivityImpl("act_2bis", id2);
+		act = PopulationUtils.createActivityFromLinkId("act_2bis", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -219,13 +219,13 @@ public class TripsToLegsAlgorithmTest {
 		plan.addLeg( leg );
 		structure.add( new LegImpl( TransportMode.pt ) );
 
-		act = PopulationUtils.createActivityImpl(DUMMY_2, id3);
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_2, id3);
 		plan.addActivity( act );
 
 		leg = new LegImpl( "mode_2bis" );
 		plan.addLeg( leg );
 
-		act = PopulationUtils.createActivityImpl("act_3", id1);
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 

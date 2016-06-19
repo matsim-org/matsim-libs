@@ -148,9 +148,9 @@ public class PlanWrapper {
 					double angle = Math.atan(dy / dx);
 					Coord coord = new Coord(distance * Math.cos(angle), distance * Math.sin(angle));
 					
-					Activity chopEnd = new ActivityImpl("chopEnd", coord);
+					Activity chopEnd = PopulationUtils.createActivityFromCoord("chopEnd", coord);
 					chopEnd.setEndTime(Time.MIDNIGHT);
-					Activity chopStart = new ActivityImpl("chopStart", coord);
+					Activity chopStart = PopulationUtils.createActivityFromCoord("chopStart", coord);
 					chopStart.setEndTime(Time.parseTime("00:00:00"));
 					
 					/* Finish off the current segment. */

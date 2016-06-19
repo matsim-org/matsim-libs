@@ -161,13 +161,13 @@ public class BikeSharingRouteIOTest {
 		final Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );
 
-		plan.addActivity( PopulationUtils.createActivityImpl("stuff", outRoute.getStartLinkId()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("stuff", outRoute.getStartLinkId()) );
 
 		final Leg leg = new LegImpl( BikeSharingConstants.MODE );
 		leg.setRoute( outRoute );
 		plan.addLeg( leg );
 
-		plan.addActivity( PopulationUtils.createActivityImpl("stuff", outRoute.getEndLinkId()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("stuff", outRoute.getEndLinkId()) );
 
 		return person;
 	}

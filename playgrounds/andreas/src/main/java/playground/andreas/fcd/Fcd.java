@@ -309,7 +309,7 @@ public class Fcd {
 	// HELPER
 	
 	private Activity createActivityFromFcdEvent(FcdEvent fcdEvent){
-		Activity act = new ActivityImpl("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
+		Activity act = PopulationUtils.createActivityFromCoord("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
 		act.setEndTime(fcdEvent.getTime());
 		return act;
 	}

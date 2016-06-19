@@ -63,8 +63,8 @@ public class ActivityFitnessLandscape {
 			new CharyparNagelActivityScoring(
 					new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), new ScenarioConfigGroup()).build());
 
-		final Activity shortAct = PopulationUtils.createActivityImpl(SHORT_TYPE, Id.create( 1 , Link.class ));
-		final Activity longAct = PopulationUtils.createActivityImpl(LONG_TYPE, Id.create( 1 , Link.class ));
+		final Activity shortAct = PopulationUtils.createActivityFromLinkId(SHORT_TYPE, Id.create( 1 , Link.class ));
+		final Activity longAct = PopulationUtils.createActivityFromLinkId(LONG_TYPE, Id.create( 1 , Link.class ));
 
 		double now = 0;
 		now += SHORT_DUR;
