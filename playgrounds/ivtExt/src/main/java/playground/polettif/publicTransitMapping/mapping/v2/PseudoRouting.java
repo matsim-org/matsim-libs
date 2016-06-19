@@ -63,7 +63,7 @@ public class PseudoRouting extends Thread {
 	private final LinkCandidateCreator linkCandidates;
 
 	private List<TransitLine> queue = new ArrayList<>();
-	private Set<Tuple<LinkCandidateImpl, LinkCandidateImpl>> artificialLinksToBeCreated = new HashSet<>();
+	private Set<Tuple<LinkCandidate, LinkCandidate>> artificialLinksToBeCreated = new HashSet<>();
 	private PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
 
 	private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
@@ -101,7 +101,7 @@ public class PseudoRouting extends Thread {
 				 * sequence can be calculated (using Dijkstra). From this sequence, the actual
 				 * path on the network can be routed later on.
 				 */
-				PseudoGraphImpl pseudoGraph = new PseudoGraphImpl(config);
+				PseudoGraph pseudoGraph = new PseudoGraphImpl(config);
 
 				/** [4.2]
 				 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
@@ -109,8 +109,8 @@ public class PseudoRouting extends Thread {
 				for(int i = 0; i < routeStops.size() - 1; i++) {
 					TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
 					TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
-					Set<LinkCandidateImpl> linkCandidatesCurrent = linkCandidates.getLinkCandidates(scheduleTransportMode, routeStops.get(i).getStopFacility());
-					Set<LinkCandidateImpl> linkCandidatesNext = linkCandidates.getLinkCandidates(scheduleTransportMode, routeStops.get(i + 1).getStopFacility());
+					SortedSet<LinkCandidate> linkCandidatesCurrent = linkCandidates.getLinkCandidates(routeStops.get(i).getStopFacility(), scheduleTransportMode);
+					SortedSet<LinkCandidate> linkCandidatesNext = linkCandidates.getLinkCandidates(routeStops.get(i + 1).getStopFacility(), scheduleTransportMode);
 
 					final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
 
@@ -129,8 +129,8 @@ public class PseudoRouting extends Thread {
 						/**
 						 * Calculate the shortest path between all link candidates.
 						 */
-						for(LinkCandidateImpl linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidateImpl linkCandidateNext : linkCandidatesNext) {
+						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 
 								double pathCost;
 								LeastCostPathCalculator.Path leastCostPath = null;
@@ -163,9 +163,10 @@ public class PseudoRouting extends Thread {
 								 * if the path between two link candidates is viable, add it to the pseudoGraph
 								 */
 								if(pathCost < maxAllowedPathCost) {
-									PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStopImpl pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost);
+//									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+//									PseudoRouteStop pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+//									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost);
+									pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
 								}
 								/**
 								 * Use artificial path between two linkCandidates
@@ -180,9 +181,9 @@ public class PseudoRouting extends Thread {
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getBeelineDistanceMaxFactor();
 									double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
-									PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStopImpl pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, artificialPathCost);
+//									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+//									PseudoRouteStop pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+									pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, artificialPathCost);
 								}
 							}
 						}
@@ -198,16 +199,17 @@ public class PseudoRouting extends Thread {
 					 * facility and the other linkCandidates).
 					 */
 					else {
-						for(LinkCandidateImpl linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidateImpl linkCandidateNext : linkCandidatesNext) {
+						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 								artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
 								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
 								double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
-								PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStopImpl pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-								pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight);
+//								PseudoRouteStop pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+//								PseudoRouteStop pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+//								pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight);
+								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, newPathWeight);
 							}
 						}
 					}
@@ -216,21 +218,18 @@ public class PseudoRouting extends Thread {
 				/** [4.3]
 				 * Build pseudo network and find shortest path using dijkstra
 				 */
-				// add dummy path to pseudoGraph
-				pseudoGraph.addSourceDummyPaths(0, routeStops.get(0), linkCandidates.getLinkCandidates(scheduleTransportMode, routeStops.get(0).getStopFacility()));
-				int e = routeStops.size() - 1;
-				pseudoGraph.addDestinationDummyPaths(e, routeStops.get(e), linkCandidates.getLinkCandidates(scheduleTransportMode, routeStops.get(e).getStopFacility()));
+				pseudoGraph.addDummyEdges(routeStops,
+						linkCandidates.getLinkCandidates(routeStops.get(0).getStopFacility(), scheduleTransportMode),
+						linkCandidates.getLinkCandidates(routeStops.get(routeStops.size() - 1).getStopFacility(), scheduleTransportMode));
 
 				// run Dijkstra
-				pseudoGraph.runDijkstra();
-				LinkedList<PseudoRouteStopImpl> pseudoPath = pseudoGraph.getShortestPseudoPath();
+				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostPath();
 
 				if(pseudoPath == null) {
-					log.warn("PseudoGraph has no path from SOURCE to DESTIONATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
+					log.warn("PseudoGraph has no path from SOURCE to DESTINATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
 				} else {
 					threadPseudoSchedule.addPseudoRoute(transitLine, transitRoute, pseudoPath);
 				}
-
 				increaseCounter();
 			}
 		}
@@ -252,9 +251,9 @@ public class PseudoRouting extends Thread {
 			connections.add(new Tuple<>(l.getFromNode().getId().toString(), l.getToNode().getId().toString()));
 		}
 
-		for(Tuple<LinkCandidateImpl, LinkCandidateImpl> c : artificialLinksToBeCreated) {
-			LinkCandidateImpl fromLinkCandidate = c.getFirst();
-			LinkCandidateImpl toLinkCandidate = c.getSecond();
+		for(Tuple<LinkCandidate, LinkCandidate> c : artificialLinksToBeCreated) {
+			LinkCandidate fromLinkCandidate = c.getFirst();
+			LinkCandidate toLinkCandidate = c.getSecond();
 
 			Tuple<String, String> key = new Tuple<>(fromLinkCandidate.getToNodeIdStr(), toLinkCandidate.getFromNodeIdStr());
 

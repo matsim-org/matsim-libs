@@ -18,22 +18,38 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Identifiable;
 
-import java.util.List;
-import java.util.Set;
+/**
+ * TODO doc
+ */
+public interface LinkCandidate extends Comparable<LinkCandidate> {
 
-public interface PseudoSchedule {
+	Coord getToNodeCoord();
 
-	void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence);
+	Coord getFromNodeCoord();
 
-	Set<PseudoRoute> getPseudoRoutes();
+	String getToNodeIdStr();
 
-	void mergePseudoSchedule(PseudoSchedule otherPseudoSchedule);
+	String getFromNodeIdStr();
 
-	void createAndReplaceFacilities(TransitSchedule schedule);
+	String getLinkIdStr();
 
+	String getId();
+
+	double getStopFacilityDistance();
+
+	double getLinkTravelCost();
+
+	/**
+	 * @return the link candidates priority compared to all other
+	 * link candidates for the same stop and transport mode. The priority
+	 * is scaled 0..1 (1 being high priority).
+	 */
+	double getPriority();
+
+	void setPriority(double priority);
+
+	int compareTo(LinkCandidate other);
 }
-

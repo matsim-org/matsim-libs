@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
 /**
  * A possible link for a stop facility. A LinkCandidate contains
@@ -32,13 +33,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  * @author polettif
  */
-public class LinkCandidateImpl {
+public class LinkCandidateImpl implements LinkCandidate {
+
+	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
 
 	private final String id;
 	private final String parentStopFacilityId;
+	private double priority;
 	private final double stopFacilityDistance;
-	private final double linkLength;
-	private final double linkTravelTime;
+	private final double linkTravelCost;
 
 	private final String linkId;
 	private final String fromNodeId;
@@ -53,8 +56,12 @@ public class LinkCandidateImpl {
 		this.parentStopFacilityId = parentStopFacility.getId().toString();
 
 		this.linkId = link.getId().toString();
-		this.linkLength = link.getLength();
-		this.linkTravelTime = linkLength / link.getFreespeed();
+
+		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
+			this.linkTravelCost = link.getLength() / link.getFreespeed();
+		} else {
+			this.linkTravelCost = link.getLength();
+		}
 
 		this.fromNodeId = link.getFromNode().getId().toString();
 		this.toNodeId = link.getToNode().getId().toString();
@@ -64,22 +71,36 @@ public class LinkCandidateImpl {
 		this.toNodeCoord = link.getToNode().getCoord();
 
 		this.stopFacilityDistance = CoordUtils.distancePointLinesegment(fromNodeCoord, toNodeCoord, stopFacilityCoord);
+		this.priority = 1/stopFacilityDistance;
 	}
 
-	public double getLinkLength() {
-		return linkLength;
+	public static void setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType travelCostType) {
+		LinkCandidateImpl.travelCostType = travelCostType;
 	}
 
-	public double getLinkTravelTime() {
-		return linkTravelTime;
-	}
-
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public double getStopFacilityDistance() {
 		return stopFacilityDistance;
+	}
+
+	@Override
+	public double getLinkTravelCost() {
+		return linkTravelCost;
+	}
+
+	@Override
+	public double getPriority() {
+		return priority;
+	}
+
+	@Override
+	public void setPriority(double priority) {
+		this.priority = priority;
 	}
 
 	public String getToNodeIdStr() {
@@ -108,6 +129,14 @@ public class LinkCandidateImpl {
 	}
 
 	@Override
+	public int compareTo(LinkCandidate other) {
+		if(other.getId().equals(this.id)) {
+			return 0;
+		}
+		return Double.compare(stopFacilityDistance, other.getStopFacilityDistance());
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(this == obj)
 			return true;
@@ -123,15 +152,5 @@ public class LinkCandidateImpl {
 		} else if(!id.equals(other.id))
 			return false;
 		return true;
-	}
-
-
-	/**
-	 * @deprecated Should not be used since we work with different networks
-	 * during pseudoRouting
-	 */
-	@Deprecated
-	public Link getLink() {
-		return null;
 	}
 }

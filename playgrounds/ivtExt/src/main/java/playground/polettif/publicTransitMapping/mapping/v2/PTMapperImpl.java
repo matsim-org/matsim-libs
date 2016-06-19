@@ -89,20 +89,8 @@ public class PTMapperImpl extends PTMapper {
 		 */
 		log.info("=============================");
 		log.info("Searching for link candidates");
-		log.info("   search radius: " + config.getNodeSearchRadius());
-		log.info("   max N closest links: " + config.getMaxNClosestLinks());
-		log.info("   max link candidate distance: " + config.getMaxLinkCandidateDistance());
-		log.info("   link distance tolerance: " + config.getLinkDistanceTolerance());
-		log.info("   Note: loop links for stop facilities are created if no link candidate can be found.");
 		LinkCandidateCreator linkCandidates = new LinkCandidateCreatorStandard(this.schedule, this.network, this.config);
 		linkCandidates.createLinkCandidates();
-
-		// Add manually set link candidates from config
-		if(config.getManualLinkCandidateCsvFile() != null) {
-			config.loadManualLinkCandidatesCsv();
-		}
-		linkCandidates.addManualLinkCandidates(config.getManualLinkCandidates());
-
 
 		/** [2]
 		 * Create a separate network for all schedule modes and
@@ -122,7 +110,6 @@ public class PTMapperImpl extends PTMapper {
 				modeSeparatedRouters.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork));
 			}
 		}
-
 
 		/** [3]
 		 * PseudoRouting

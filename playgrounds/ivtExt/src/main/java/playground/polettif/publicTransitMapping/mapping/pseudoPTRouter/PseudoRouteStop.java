@@ -18,22 +18,42 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Identifiable;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-public interface PseudoSchedule {
+/**
+ * TODO doc
+ */
+public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
+	String getParentStopFacilityId();
 
-	void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence);
+	Coord getCoord();
 
-	Set<PseudoRoute> getPseudoRoutes();
+	boolean isBlockingLane();
 
-	void mergePseudoSchedule(PseudoSchedule otherPseudoSchedule);
+	boolean awaitsDepartureTime();
 
-	void createAndReplaceFacilities(TransitSchedule schedule);
+	String getLinkIdStr();
 
+	String getFacilityName();
+
+	String getStopPostAreaId();
+
+	double getArrivalOffset();
+
+	double getDepartureOffset();
+
+	double getLinkTravelCost();
+
+	Map<PseudoRouteStop, Double> getNeighbours();
+
+	double getTravelCostToSource();
+	void setTravelCostToSource(double alternateDist);
+
+	PseudoRouteStop getClosestPrecedingRouteStop();
+	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
+
+	int compareTo(PseudoRouteStop other);
 }
-

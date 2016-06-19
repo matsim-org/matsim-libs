@@ -41,6 +41,7 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoGraphImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStopImpl;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
@@ -218,12 +219,12 @@ public class PTMapperPseudoRouting extends PTMapper {
 		/**
 		 * Collect pseudoSchedules from threads
 		 */
-		final Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStopImpl>>> pseudoSchedule = new HashMap<>();
+		final Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule = new HashMap<>();
 		for(PseudoRouting thread : pseudoRoutingThreads) {
-			Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStopImpl>> threadPseudoSchedule = thread.getPseudoSchedule();
-			for(Map.Entry<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStopImpl>> e : threadPseudoSchedule.entrySet()) {
+			Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> threadPseudoSchedule = thread.getPseudoSchedule();
+			for(Map.Entry<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> e : threadPseudoSchedule.entrySet()) {
 				if(MapUtils.getMap(e.getKey().getFirst(), pseudoSchedule).put(e.getKey().getSecond(), e.getValue()) != null) {
-					throw new RuntimeException("Tried to assign a pseudoStopSequence twice to " + e.getKey());
+					throw new RuntimeException("Tried to assign a pseudoStopS equence twice to " + e.getKey());
 				}
 			}
 		}
@@ -463,7 +464,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 		private List<TransitLine> queue = new ArrayList<>();
 		private Set<Tuple<LinkCandidateImpl, LinkCandidateImpl>> artificialLinksToBeCreated = new HashSet<>();
-		private Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStopImpl>> threadPseudoSchedule = new HashMap<>();
+		private Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> threadPseudoSchedule = new HashMap<>();
 
 		private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
 
@@ -615,7 +616,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 					// run Dijkstra
 					pseudoGraph.runDijkstra();
-					LinkedList<PseudoRouteStopImpl> pseudoPath = pseudoGraph.getShortestPseudoPath();
+					List<PseudoRouteStop> pseudoPath = pseudoGraph.getShortestPseudoPath();
 
 					if(pseudoPath == null) {
 						log.warn("PseudoGraph has no path from SOURCE to DESTIONATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
@@ -632,7 +633,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 			return artificialLinksToBeCreated;
 		}
 
-		public Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStopImpl>> getPseudoSchedule() {
+		public Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> getPseudoSchedule() {
 			return threadPseudoSchedule;
 		}
 	}

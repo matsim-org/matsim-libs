@@ -20,7 +20,6 @@ package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
@@ -37,19 +36,19 @@ import java.util.Map;
  *
  * @author polettif
  */
-public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, Comparable<PseudoRouteStopImpl> {
+public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 	private static PublicTransitMappingConfigGroup config;
 
 	// dijkstra
-	public final Map<PseudoRouteStopImpl, Double> neighbours = new HashMap<>();
-	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
-	public PseudoRouteStopImpl previous = null;
+	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
+	public double travelCostToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
+	public PseudoRouteStop previous = null;
 
-	private final double linkWeight;
+	private final double linkTravelCost;
 
 	// schedule values
-	public final Id<PseudoRouteStopImpl> id;
+	public final Id<PseudoRouteStop> id;
 	private final String name;
 
 	private final String linkId;
@@ -70,13 +69,17 @@ public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, C
 		config = configGroup;
 	}
 
+	PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidateImpl linkCandidate) {
+		this(order, routeStop, (LinkCandidate) linkCandidate);
+	}
+
 	/**
 	 * Constructor. All primitive values are stored
 	 * as well to make access easier during
 	 * stop facility replacement.
 	 */
-	/*package*/ PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidateImpl linkCandidate) {
-		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStopImpl.class);
+	/*package*/ PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
 		this.linkId = linkCandidate.getLinkIdStr();
@@ -95,7 +98,7 @@ public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, C
 		this.awaitDepartureTime = routeStop.isAwaitDepartureTime();
 
 		// link value
-		this.linkWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
+		this.linkTravelCost = linkCandidate.getLinkTravelCost();
 	}
 
 	/**
@@ -105,10 +108,10 @@ public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, C
 	 */
 	public PseudoRouteStopImpl(String id) {
 		if(id.equals(PseudoGraphImpl.SOURCE)) {
-			this.id = Id.create(PseudoGraphImpl.SOURCE, PseudoRouteStopImpl.class);
-			this.distToSource = 0;
+			this.id = Id.create(PseudoGraphImpl.SOURCE, PseudoRouteStop.class);
+			this.travelCostToSource = 0;
 		} else {
-			this.id = Id.create(PseudoGraphImpl.DESTINATION, PseudoRouteStopImpl.class);
+			this.id = Id.create(PseudoGraphImpl.DESTINATION, PseudoRouteStop.class);
 		}
 		this.name = id;
 		this.linkCandidateId = null;
@@ -131,35 +134,61 @@ public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, C
 		this.awaitDepartureTime = false;
 
 		// link value
-		this.linkWeight = 0.0;
+		this.linkTravelCost = 0.0;
 	}
 
 	@Override
-	public Id<PseudoRouteStopImpl> getId() {
+	public Id<PseudoRouteStop> getId() {
 		return id;
 	}
 
 	@Override
-	public int compareTo(PseudoRouteStopImpl other) {
+	public int compareTo(PseudoRouteStop other) {
 		if(other.getId().equals(this.id)) {
 			return 0;
 		}
-		return Double.compare(distToSource, other.distToSource);
-	}
-
-	public double getLinkWeight() {
-		return linkWeight;
+		return Double.compare(travelCostToSource, other.getTravelCostToSource());
 	}
 
 	public double getDepartureOffset() {
 		return departureOffset;
 	}
 
+	@Override
+	public double getLinkTravelCost() {
+		return linkTravelCost;
+	}
+
+	@Override
+	public Map<PseudoRouteStop, Double> getNeighbours() {
+		return neighbours;
+	}
+
+	@Override
+	public double getTravelCostToSource() {
+		return travelCostToSource;
+	}
+
+	@Override
+	public void setTravelCostToSource(double cost) {
+		this.travelCostToSource = cost;
+	}
+
+	@Override
+	public PseudoRouteStop getClosestPrecedingRouteStop() {
+		return previous;
+	}
+
+	@Override
+	public void setClosestPrecedingRouteSTop(PseudoRouteStop stop) {
+		this.previous = stop;
+	}
+
 	public double getArrivalOffset() {
 		return arrivalOffset;
 	}
 
-	public boolean isAwaitDepartureTime() {
+	public boolean awaitsDepartureTime() {
 		return awaitDepartureTime;
 	}
 
@@ -172,7 +201,7 @@ public class PseudoRouteStopImpl implements Identifiable<PseudoRouteStopImpl>, C
 		return coord;
 	}
 
-	public boolean getIsBlockingLane() {
+	public boolean isBlockingLane() {
 		return isBlockingLane;
 	}
 

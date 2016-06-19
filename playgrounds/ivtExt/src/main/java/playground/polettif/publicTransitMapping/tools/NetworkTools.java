@@ -97,7 +97,7 @@ public class NetworkTools {
 	public static Link getNearestLink(Network network, Coord coord) {
 		if(network instanceof NetworkImpl) {
 			NetworkImpl networkImpl = (NetworkImpl) network;
-			double nodeSearchRadius = 200.0;
+			double nodeSearchRadius = 1000.0;
 
 			Link closestLink = null;
 			double minDistance = Double.MAX_VALUE;

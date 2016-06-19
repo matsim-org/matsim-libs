@@ -29,19 +29,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * TODO doc
  */
 public class PseudoScheduleImpl implements PseudoSchedule {
 
-	private Set<PseudoRouteImpl> pseudoSchedule = new HashSet<>();
+	private Set<PseudoRoute> pseudoSchedule = new HashSet<>();
 
 	@Override
-	public void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStopImpl> pseudoStopSequence) {
+	public void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence) {
 		pseudoSchedule.add(new PseudoRouteImpl(transitLine, transitRoute, pseudoStopSequence));
 	}
 
 	@Override
-	public Set<PseudoRouteImpl> getPseudoRoutes() {
+	public Set<PseudoRoute> getPseudoRoutes() {
 		return pseudoSchedule;
 	}
 
@@ -55,11 +55,11 @@ public class PseudoScheduleImpl implements PseudoSchedule {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<Id<TransitLine>, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(PseudoRouteImpl pseudoRoute : pseudoSchedule) {
-			List<PseudoRouteStopImpl> pseudoStopSequence = pseudoRoute.getPseudoStops();
+		for(PseudoRoute pseudoRoute : pseudoSchedule) {
+			List<PseudoRouteStop> pseudoStopSequence = pseudoRoute.getPseudoStops();
 			List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
-			for(PseudoRouteStopImpl pseudoStop : pseudoStopSequence) {
+			for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
 				String idStr = pseudoStop.getParentStopFacilityId() + PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES + pseudoStop.getLinkIdStr();
 				Id<TransitStopFacility> childStopFacilityId = Id.create(idStr, TransitStopFacility.class);
 
@@ -68,7 +68,7 @@ public class PseudoScheduleImpl implements PseudoSchedule {
 					TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
 							Id.create(childStopFacilityId, TransitStopFacility.class),
 							pseudoStop.getCoord(),
-							pseudoStop.getIsBlockingLane()
+							pseudoStop.isBlockingLane()
 					);
 					newFacility.setLinkId(Id.createLinkId(pseudoStop.getLinkIdStr()));
 					newFacility.setName(pseudoStop.getFacilityName());
@@ -81,7 +81,7 @@ public class PseudoScheduleImpl implements PseudoSchedule {
 						schedule.getFacilities().get(childStopFacilityId),
 						pseudoStop.getArrivalOffset(),
 						pseudoStop.getDepartureOffset());
-				newTransitRouteStop.setAwaitDepartureTime(pseudoStop.isAwaitDepartureTime());
+				newTransitRouteStop.setAwaitDepartureTime(pseudoStop.awaitsDepartureTime());
 				newStopSequence.add(newTransitRouteStop);
 			}
 

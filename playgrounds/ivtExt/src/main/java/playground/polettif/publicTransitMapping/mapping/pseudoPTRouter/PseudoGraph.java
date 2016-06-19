@@ -18,22 +18,20 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-public interface PseudoSchedule {
+/**
+ * TODO doc
+ */
+public interface PseudoGraph {
 
-	void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence);
+	List<PseudoRouteStop> getLeastCostPath();
 
-	Set<PseudoRoute> getPseudoRoutes();
+	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
 
-	void mergePseudoSchedule(PseudoSchedule otherPseudoSchedule);
-
-	void createAndReplaceFacilities(TransitSchedule schedule);
+	void addDummyEdges(List<TransitRouteStop> transitRouteStops, Collection<LinkCandidate> firstStopLinkCandidates, Collection<LinkCandidate> lastStopLinkCandidates);
 
 }
-

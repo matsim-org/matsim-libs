@@ -30,13 +30,13 @@ import java.util.List;
  *
  * @author polettif
  */
-public class PseudoRouteImpl {
+public class PseudoRouteImpl implements PseudoRoute {
 
-	private final Id<TransitLine> transitLineId;
-	private final List<PseudoRouteStopImpl> pseudoRouteStops;
+ 	private final Id<TransitLine> transitLineId;
+	private final List<PseudoRouteStop> pseudoRouteStops;
 	private final TransitRoute transitRoute;
 
-	public PseudoRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStopImpl> pseudoRouteStops) {
+	public PseudoRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoRouteStops) {
 		this.transitLineId = transitLine.getId();
 		this.transitRoute = transitRoute;
 		this.pseudoRouteStops = pseudoRouteStops;
@@ -50,7 +50,7 @@ public class PseudoRouteImpl {
 		return transitRoute;
 	}
 
-	public List<PseudoRouteStopImpl> getPseudoStops() {
+	public List<PseudoRouteStop> getPseudoStops() {
 		return pseudoRouteStops;
 	}
 }

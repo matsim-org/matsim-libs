@@ -33,6 +33,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStopImpl;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
@@ -130,17 +131,17 @@ public class PTMapperUtils {
 	 * @param schedule                where the facilities should be replaced
 	 * @param pseudoSchedule          defines the actual sequence of pseudoRouteStops
 	 */
-	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStopImpl>>> pseudoSchedule) {
+	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule) {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<Id<TransitLine>, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(Map.Entry<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStopImpl>>> lineEntry : pseudoSchedule.entrySet()) {
-			for(Map.Entry<TransitRoute, List<PseudoRouteStopImpl>> routeEntry : lineEntry.getValue().entrySet()) {
+		for(Map.Entry<Id<TransitLine>, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
+			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
 
-				List<PseudoRouteStopImpl> pseudoStopSequence = routeEntry.getValue();
+				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
 				List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
-				for(PseudoRouteStopImpl pseudoStop : pseudoStopSequence) {
+				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
 					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + suffixChildStopFacilities + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
 
 					// if child stop facility for this link has not yet been generated
@@ -148,7 +149,7 @@ public class PTMapperUtils {
 						TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
 								Id.create(childStopFacilityId, TransitStopFacility.class),
 								pseudoStop.getCoord(),
-								pseudoStop.getIsBlockingLane()
+								pseudoStop.isBlockingLane()
 						);
 						newFacility.setLinkId(Id.createLinkId(pseudoStop.getLinkIdStr()));
 						newFacility.setName(pseudoStop.getFacilityName());
@@ -161,7 +162,7 @@ public class PTMapperUtils {
 							schedule.getFacilities().get(childStopFacilityId),
 							pseudoStop.getArrivalOffset(),
 							pseudoStop.getDepartureOffset());
-					newTransitRouteStop.setAwaitDepartureTime(pseudoStop.isAwaitDepartureTime());
+					newTransitRouteStop.setAwaitDepartureTime(pseudoStop.awaitsDepartureTime());
 					newStopSequence.add(newTransitRouteStop);
 				}
 
