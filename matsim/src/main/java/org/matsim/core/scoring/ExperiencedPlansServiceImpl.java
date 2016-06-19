@@ -68,7 +68,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	public void writePlans(String iterationFilename) {
 		Population tmpPop = PopulationUtils.createPopulation(config);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Person person = PopulationUtils.createPerson(entry.getKey());
+			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			if (scoringFunctionsForPopulation != null) {
 				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId()).getScore());

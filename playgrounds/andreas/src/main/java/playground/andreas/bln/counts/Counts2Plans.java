@@ -175,7 +175,7 @@ public class Counts2Plans {
 	}
 
 	private Person createPerson(){
-		Person person = PopulationUtils.createPerson(Id.create(this.runningID, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(this.runningID, Person.class));
 		PersonUtils.createAndAddPlan(person, true);
 		this.runningID++;
 		return person;

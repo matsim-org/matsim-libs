@@ -45,7 +45,7 @@ public class KeepSelectedTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testSelected() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
 		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, true);
 		plan2.setScore(10.0);

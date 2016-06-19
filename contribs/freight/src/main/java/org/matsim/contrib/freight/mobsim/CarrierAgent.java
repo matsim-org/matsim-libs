@@ -306,7 +306,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Person createDriverPerson(Id<Person> driverId) {
-		Person person = PopulationUtils.createPerson(driverId);
+		final Id<Person> id = driverId;
+		Person person = PopulationUtils.getFactory().createPerson(id);
 		return person;
 	}
 

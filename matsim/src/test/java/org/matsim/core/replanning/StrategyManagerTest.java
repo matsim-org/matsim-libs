@@ -57,7 +57,7 @@ public class StrategyManagerTest {
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 1000; i++) {
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			population.addPerson(p);
 		}
 
@@ -147,7 +147,7 @@ public class StrategyManagerTest {
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 100; i++) {
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			population.addPerson(p);
 		}
 
@@ -207,7 +207,7 @@ public class StrategyManagerTest {
 		Person person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
-		person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plans[0] = PersonUtils.createAndAddPlan(person, false);
 		plans[1] = PersonUtils.createAndAddPlan(person, false);
 		plans[1].setScore(Double.valueOf(0.0));
@@ -257,7 +257,7 @@ public class StrategyManagerTest {
 		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
-		Person p = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl[] plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = PersonUtils.createAndAddPlan(p, false);

@@ -168,7 +168,7 @@ public class GraphBuilderTXT {
 	}
 	
 	private SocialPerson createPerson(RespondentData data) {
-		Person matsimPerson = PopulationUtils.createPerson(Id.create(data.id, Person.class));
+		Person matsimPerson = PopulationUtils.getFactory().createPerson(Id.create(data.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		return person;
 	}

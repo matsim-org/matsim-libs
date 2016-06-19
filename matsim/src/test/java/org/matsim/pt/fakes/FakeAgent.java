@@ -54,7 +54,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
-	private final Person dummyPerson = PopulationUtils.createPerson(Id.create(1, Person.class));
+	private final Person dummyPerson = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	// as long as all instance variables are final, the "resetCaches" method can remain empty.  kai, oct'10
 
 	/**

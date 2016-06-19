@@ -47,7 +47,7 @@ public class LexicographicRemoverTest {
 		final JointPlans jointPlans = new JointPlans();
 
 		for ( int i=0; i < 4; i++ ) {
-			final Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			final Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			group.addPerson( person );
 
 			for ( double score = 0; score < 3; score++ ) {
@@ -71,7 +71,7 @@ public class LexicographicRemoverTest {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
-			group.addPerson(PopulationUtils.createPerson(Id.create(i, Person.class)));
+			group.addPerson(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class)));
 		}
 		
 		final JointPlans jointPlans = new JointPlans();
@@ -105,7 +105,7 @@ public class LexicographicRemoverTest {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
-			group.addPerson(PopulationUtils.createPerson(Id.create(i, Person.class)));
+			group.addPerson(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class)));
 		}
 		
 		final JointPlans jointPlans = new JointPlans();

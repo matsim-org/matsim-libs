@@ -103,7 +103,8 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 		for (int i=0; i < 100; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
-			Person person = PopulationUtils.createPerson(driverId);
+			final Id<Person> id = driverId;
+			Person person = PopulationUtils.getFactory().createPerson(id);
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
@@ -111,7 +112,8 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
-			person = PopulationUtils.createPerson(passengerId);
+			final Id<Person> id1 = passengerId;
+			person = PopulationUtils.getFactory().createPerson(id1);
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
@@ -130,7 +132,8 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 		for (int i=0; i < 100; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
-			Person person = PopulationUtils.createPerson(driverId);
+			final Id<Person> id = driverId;
+			Person person = PopulationUtils.getFactory().createPerson(id);
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
@@ -142,7 +145,8 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
-			person = PopulationUtils.createPerson(passengerId);
+			final Id<Person> id1 = passengerId;
+			person = PopulationUtils.getFactory().createPerson(id1);
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );

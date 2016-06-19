@@ -61,7 +61,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta2() {
 		this.config.planCalcScore().setBrainExpBeta(2.0);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false); // weight: 0.0003.35462627902512
 		plan1.setScore(96.0);
@@ -113,7 +113,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta1() {
 		this.config.planCalcScore().setBrainExpBeta(1.0);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
@@ -175,7 +175,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		final double EPSILON_R = 1e-7;
 		
 		this.config.planCalcScore().setBrainExpBeta(2.0);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
 		plan1.setScore(180.0);
 		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false);

@@ -151,7 +151,8 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				// generate persons only after it's clear that they have a home location:
 				for ( int ii=0 ; ii<nPersons ; ii++ ) {
 					Id<Person> personId = Id.create( personCnt, Person.class ) ;
-					Person person = PopulationUtils.createPerson(personId);
+					final Id<Person> id = personId;
+					Person person = PopulationUtils.getFactory().createPerson(id);
 					personCnt++ ;
 					if ( personCnt > 10 ) {
 						log.error( "hack" ) ;

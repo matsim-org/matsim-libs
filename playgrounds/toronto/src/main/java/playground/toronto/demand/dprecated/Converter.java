@@ -169,7 +169,7 @@ public class Converter {
 				p.addPlan(nonCarPlan);
 			}
 
-			Person p = PopulationUtils.createPerson(Id.create(personId, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
 			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 			// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 			endTime = convertTime(tabs[3]);

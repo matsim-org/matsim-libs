@@ -325,8 +325,9 @@ public class ReadFromUrbanSimModel {
 				// see reason of this flag below
 				compensationFlag = false;
 				currentZoneLocations	 = new ZoneLocations();
+				final Id<Person> id = personId;
 				
-				Person newPerson = PopulationUtils.createPerson(personId);
+				Person newPerson = PopulationUtils.getFactory().createPerson(id);
 
 				// get home location id
 				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
@@ -443,8 +444,9 @@ public class ReadFromUrbanSimModel {
 				
 				// see reason of this flag below
 				compensationFlag = false;
+				final Id<Person> id = personId;
 				
-				Person newPerson = PopulationUtils.createPerson(personId);
+				Person newPerson = PopulationUtils.getFactory().createPerson(id);
 
 				// get home location id
 				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );

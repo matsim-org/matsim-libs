@@ -239,7 +239,8 @@ public class CreatePlansFromTrips {
 			Person P;
 
 			if (!scenario.getPopulation().getPersons().containsKey(pid)) {
-				P = PopulationUtils.createPerson(pid);
+				final Id<Person> id = pid;
+				P = PopulationUtils.getFactory().createPerson(id);
 				scenario.getPopulation().addPerson(P);
 				personHouseholdMap.put(pid, tr.current().get("hhid"));
 								
@@ -452,8 +453,9 @@ public class CreatePlansFromTrips {
 					
 					//Create the new person
 					Id newPid = Id.create(newHhId + "-" + pid.toString().split("-")[1], Person.class); //Assumes that person Ids are formatted as "[hhid]-[person#]"
-					personHouseholdMap.put(newPid, newHhId); //Map the new person to the new household
-					Person P = PopulationUtils.createPerson(newPid);
+					personHouseholdMap.put(newPid, newHhId);
+					final Id<Person> id = newPid; //Map the new person to the new household
+					Person P = PopulationUtils.getFactory().createPerson(id);
 					scenario.getPopulation().addPerson(P);
 					personsAdded++;
 					
@@ -796,8 +798,9 @@ public class CreatePlansFromTrips {
 			Id oId = e.getKey();
 			Id nId = scrambler[e.getValue()];
 			
-			Person op = this.scenario.getPopulation().getPersons().remove(oId); //Removed from the population
-			Person np = PopulationUtils.createPerson(nId);
+			Person op = this.scenario.getPopulation().getPersons().remove(oId);
+			final Id<Person> id = nId; //Removed from the population
+			Person np = PopulationUtils.getFactory().createPerson(id);
 			np.addPlan(op.getSelectedPlan());
 			
 			this.scenario.getPopulation().addPerson(np);

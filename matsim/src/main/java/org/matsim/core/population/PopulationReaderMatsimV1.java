@@ -151,7 +151,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startPerson(final Attributes atts) {
-		this.currperson = PopulationUtils.createPerson(Id.create(atts.getValue("id"), Person.class));
+		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
 		
 		PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));

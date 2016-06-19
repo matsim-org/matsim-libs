@@ -47,7 +47,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
     @Override
 	public Person createPerson(final Id<Person> id) {
-        return PopulationUtils.createPerson(id);
+        return PopulationUtils.getFactory().createPerson(id) ;
 	}
 
 	@Override

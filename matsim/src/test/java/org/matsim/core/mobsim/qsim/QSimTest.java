@@ -158,7 +158,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link3
-		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -196,7 +196,7 @@ public class QSimTest {
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
@@ -235,7 +235,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link3
-		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -281,7 +281,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link3
-		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(0);
@@ -325,7 +325,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link1
-		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -394,7 +394,7 @@ public class QSimTest {
 		Link loopLink = f.network.createAndAddLink(Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1);
 
 		// add a single person with leg from link1 to loop-link
-		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -461,7 +461,7 @@ public class QSimTest {
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("home", f.link1.getId());
 		f.plans.addPerson(person);
@@ -488,7 +488,7 @@ public class QSimTest {
 	public void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
@@ -516,7 +516,7 @@ public class QSimTest {
 	public void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
@@ -552,7 +552,7 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
@@ -614,7 +614,7 @@ public class QSimTest {
 		
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 3; i++) {
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
@@ -667,7 +667,7 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
@@ -718,7 +718,7 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
@@ -731,7 +731,7 @@ public class QSimTest {
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
@@ -778,7 +778,7 @@ public class QSimTest {
 	@Test
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -833,7 +833,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -849,7 +849,7 @@ public class QSimTest {
 		plan.createAndAddActivity("l", f.link3.getId());
 		f.plans.addPerson(person);
 
-		Person personWhoBringsTheCar = PopulationUtils.createPerson(Id.create(2, Person.class));
+		Person personWhoBringsTheCar = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
 		PlanImpl planWhichBringsTheCar = PersonUtils.createAndAddPlan(personWhoBringsTheCar, true);
 		ActivityImpl aa1 = planWhichBringsTheCar.createAndAddActivity("h", f.link1.getId());
 		aa1.setEndTime(7.0*3600 + 30);
@@ -923,7 +923,7 @@ public class QSimTest {
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -973,7 +973,7 @@ public class QSimTest {
 	@Test
 	public void testAssignedVehicles() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
@@ -1029,7 +1029,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -1086,7 +1086,7 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -1242,7 +1242,7 @@ public class QSimTest {
 		((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
-		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);

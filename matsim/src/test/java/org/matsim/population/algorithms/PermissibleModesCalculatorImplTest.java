@@ -66,7 +66,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNothing() {
 		String name = "no information";
-		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
@@ -74,7 +74,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoLicense() {
 		String name = "no License";
-		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		PersonUtils.setLicence(person, "no");
 		fixtures.add( new Fixture( name , plan , false ) );
@@ -83,7 +83,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
-		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		PersonUtils.setCarAvail(person, "never");
 		fixtures.add( new Fixture( name , plan , false ) );
@@ -92,7 +92,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
-		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		PersonUtils.setCarAvail(person, "sometimes");
 		fixtures.add( new Fixture( name , plan , true ) );

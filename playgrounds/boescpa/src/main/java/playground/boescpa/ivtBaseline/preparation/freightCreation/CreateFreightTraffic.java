@@ -159,7 +159,7 @@ public class CreateFreightTraffic {
 
 	private void createSingleTripAgent(String type, int index, ActivityFacility startFacility, ActivityFacility endFacility) {
 		// create and add new agent
-		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(FREIGHT_TAG + "_" + index, Person.class));
+		Person p = org.matsim.core.population.PopulationUtils.getFactory().createPerson(Id.create(FREIGHT_TAG + "_" + index, Person.class));
 		freightPopulation.addPerson(p);
 		freightPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", FREIGHT_TAG);
 		freightPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "freight_type", type);

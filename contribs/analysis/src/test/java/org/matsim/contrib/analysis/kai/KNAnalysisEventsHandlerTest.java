@@ -73,7 +73,7 @@ public class KNAnalysisEventsHandlerTest {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		this.population = scenario.getPopulation();
-		Person person = PopulationUtils.createPerson(DEFAULT_PERSON_ID);
+		Person person = PopulationUtils.getFactory().createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("act1", new Coord(100.0, 100.0));

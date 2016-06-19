@@ -47,7 +47,7 @@ public class TourModeUnifierAlgorithmTest {
 
 	@Test
 	public void testPlanWithOneSingleTour() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("jojo", Person.class)));
+		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink1 = Id.create( "anchor1" , Link.class );
 		final Id<Link> anchorLink2 = Id.create( "anchor2" , Link.class );
@@ -140,7 +140,7 @@ public class TourModeUnifierAlgorithmTest {
 
 	@Test
 	public void testPlanWithTwoToursOnOpenTour() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("jojo", Person.class)));
+		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> entranceLink = Id.create( "entrance" , Link.class );
 		final Id<Link> exitLink = Id.create( "exit" , Link.class );
@@ -240,7 +240,7 @@ public class TourModeUnifierAlgorithmTest {
 
 	@Test
 	public void testPlanWithTwoHomeBasedTours() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("jojo", Person.class)));
+		final Plan plan = new PlanImpl(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink = Id.create( "anchor" , Link.class );
 		final Random random = new Random( 234 );

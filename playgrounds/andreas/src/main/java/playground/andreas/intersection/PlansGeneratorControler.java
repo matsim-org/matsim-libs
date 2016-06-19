@@ -160,7 +160,7 @@ public class PlansGeneratorControler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
-		Person p = PopulationUtils.createPerson(Id.create(String.valueOf(ii), Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(String.valueOf(ii), Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));

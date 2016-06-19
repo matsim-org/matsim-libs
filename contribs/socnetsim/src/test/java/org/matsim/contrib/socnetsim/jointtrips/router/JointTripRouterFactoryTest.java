@@ -99,9 +99,10 @@ public class JointTripRouterFactoryTest {
 		Population pop = sc.getPopulation();
 		Id<Person> driverId = Id.create( "driver" , Person.class );
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
+		final Id<Person> id = driverId;
 
 		// driver
-		Person pers = PopulationUtils.createPerson(driverId);
+		Person pers = PopulationUtils.getFactory().createPerson(id);
 		PlanImpl plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -118,9 +119,10 @@ public class JointTripRouterFactoryTest {
 		DriverRoute dRoute = new DriverRoute( link1 , link3 );
 		dRoute.addPassenger( passengerId );
 		dLeg.setRoute( dRoute );
+		final Id<Person> id1 = passengerId;
 
 		// passenger
-		pers = PopulationUtils.createPerson(passengerId);
+		pers = PopulationUtils.getFactory().createPerson(id1);
 		plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );

@@ -653,7 +653,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
-		Person person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
 		Activity act1a = plan1.createAndAddActivity("home", (Id<Link>) null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
@@ -784,7 +784,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			this.network.createAndAddLink(Id.create("8", Link.class), node8, node9, 5000, 50, 3600, 1);
 			Link link9 = this.network.createAndAddLink(Id.create("9", Link.class), node9, node10, 500, 25, 3600, 1);
 
-			this.person = PopulationUtils.createPerson(Id.create("1", Person.class));
+			this.person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			this.person.getCustomAttributes().put("incomeAlphaFactor",testee_incomeAlphaFactor);

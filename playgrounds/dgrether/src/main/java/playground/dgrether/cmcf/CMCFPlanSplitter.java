@@ -68,7 +68,7 @@ public class CMCFPlanSplitter {
 		  		idStringBuffer.append("leg");
 		  		idStringBuffer.append(Integer.toString(i));
 
-		  		Person pNew = PopulationUtils.createPerson(Id.create(idStringBuffer.toString(), Person.class));
+		  		Person pNew = PopulationUtils.getFactory().createPerson(Id.create(idStringBuffer.toString(), Person.class));
 		  		PlanImpl planNew = new PlanImpl(pNew);
 		  		Leg leg = (Leg) pe;
 
