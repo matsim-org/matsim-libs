@@ -55,8 +55,8 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  * Also returns mode2PersonId2RouteDistances.
  * @author amit
  */
-public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAnalysisModule{
-	private final static Logger LOG = Logger.getLogger(LegModeRouteDistanceDistributionFromPlansHandler.class);
+public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisModule{
+	private final static Logger LOG = Logger.getLogger(LegModeBeelineDistanceDistributionHandler.class);
 
 	private Scenario scenario;
 	private final List<Integer> distanceClasses;
@@ -65,8 +65,8 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 	private final SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
 	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
 
-	public LegModeRouteDistanceDistributionFromPlansHandler(){
-		super(LegModeRouteDistanceDistributionFromPlansHandler.class.getSimpleName());
+	public LegModeBeelineDistanceDistributionHandler(){
+		super(LegModeBeelineDistanceDistributionHandler.class.getSimpleName());
 		LOG.info("enabled");
 
 		this.distanceClasses = new ArrayList<Integer>();
