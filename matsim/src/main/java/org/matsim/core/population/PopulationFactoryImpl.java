@@ -47,27 +47,31 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
     @Override
 	public Person createPerson(final Id<Person> id) {
-        return PopulationUtils.getFactory().createPerson(id) ;
+        return new PersonImpl(id) ;
 	}
 
 	@Override
 	public Plan createPlan(){
-		return PopulationUtils.createPlan();
+		return new PlanImpl() ;
 	}
 
 	@Override
 	public Activity createActivityFromCoord(final String actType, final Coord coord) {
-        return PopulationUtils.createActivityFromCoord(actType, coord);
+        ActivityImpl act = new ActivityImpl(actType) ;
+        act.setCoord(coord); 
+        return act ;
 	}
 
 	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
-        return PopulationUtils.createActivityFromLinkId(actType, linkId);
+	        ActivityImpl act = new ActivityImpl(actType) ;
+	        act.setLinkId(linkId);
+	        return act ;
 	}
 
 	@Override
 	public Leg createLeg(final String legMode) {
-		return PopulationUtils.createLeg(legMode);
+		return new LegImpl(legMode) ;
 	}
 
 	/**

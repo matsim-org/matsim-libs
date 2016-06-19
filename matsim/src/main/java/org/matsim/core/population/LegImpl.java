@@ -26,7 +26,7 @@ import org.matsim.core.utils.misc.Time;
 
 public final class LegImpl implements Leg {
 
-	protected Route route = null;
+	private Route route = null;
 
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
@@ -34,7 +34,7 @@ public final class LegImpl implements Leg {
 
 	private double arrTime = Time.UNDEFINED_TIME;
 
-	private LegImpl(final String transportMode) {
+	/* deliberately package */  LegImpl(final String transportMode) {
 		this.mode = transportMode;
 	}
 
