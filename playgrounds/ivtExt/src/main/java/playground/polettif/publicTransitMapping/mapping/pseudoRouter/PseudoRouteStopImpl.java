@@ -16,11 +16,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
 import java.util.HashMap;
@@ -51,7 +53,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 	public final Id<PseudoRouteStop> id;
 	private final String name;
 
-	private final String linkId;
+	private final Id<Link> linkId;
 
 	private final double departureOffset;
 	private final double arrivalOffset;
@@ -61,8 +63,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 	private final boolean isBlockingLane;
 	private final String facilityName;
 	private final String stopPostAreaId;
-	private final String parentStopFacilityId;
-	private final String linkCandidateId;
+	private final Id<TransitStopFacility> parentStopFacilityId;
 	private final double stopFacilityDistance;
 
 	public static void setConfig(PublicTransitMappingConfigGroup configGroup) {
@@ -80,14 +81,13 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 	 */
 	/*package*/ PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
-		this.linkCandidateId = linkCandidate.getId();
-		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
-		this.linkId = linkCandidate.getLinkIdStr();
+		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkId() + ")";
+		this.linkId = linkCandidate.getLinkId();
 		this.stopFacilityDistance = linkCandidate.getStopFacilityDistance();
 
 		// stop facility values
 		this.coord = routeStop.getStopFacility().getCoord();
-		this.parentStopFacilityId = routeStop.getStopFacility().getId().toString();
+		this.parentStopFacilityId = routeStop.getStopFacility().getId();
 		this.isBlockingLane = routeStop.getStopFacility().getIsBlockingLane();
 		this.facilityName = routeStop.getStopFacility().getName();
 		this.stopPostAreaId = routeStop.getStopFacility().getStopPostAreaId();
@@ -103,8 +103,6 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 	/**
 	 * This constructor is only used to set dummy stops
-	 *
-	 * @param id
 	 */
 	public PseudoRouteStopImpl(String id) {
 		if(id.equals(PseudoGraphImpl.SOURCE)) {
@@ -114,7 +112,6 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 			this.id = Id.create(PseudoGraphImpl.DESTINATION, PseudoRouteStop.class);
 		}
 		this.name = id;
-		this.linkCandidateId = null;
 
 		previous = null;
 
@@ -148,6 +145,11 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 			return 0;
 		}
 		return Double.compare(travelCostToSource, other.getTravelCostToSource());
+	}
+
+	@Override
+	public Id<Link> getLinkId() {
+		return linkId;
 	}
 
 	public double getDepartureOffset() {
@@ -192,9 +194,9 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 		return awaitDepartureTime;
 	}
 
-	@Deprecated
-	public String getChildStopFacilityId() {
-		return linkCandidateId;
+	@Override
+	public Id<TransitStopFacility> getParentStopFacilityId() {
+		return parentStopFacilityId;
 	}
 
 	public Coord getCoord() {
@@ -211,14 +213,6 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 	public String getStopPostAreaId() {
 		return stopPostAreaId;
-	}
-
-	public String getLinkIdStr() {
-		return linkId;
-	}
-
-	public String getParentStopFacilityId() {
-		return parentStopFacilityId;
 	}
 
 	@Override

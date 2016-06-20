@@ -45,13 +45,16 @@ import java.util.Set;
  */
 public class ModeDependentRouter implements Router {
 
-	private final Set<String> routingTransportModes;
-    private final LeastCostPathCalculator pathCalculator;
-    private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
+	private final Network network;
 
+	private final Set<String> routingTransportModes;
+	private final LeastCostPathCalculator pathCalculator;
+
+    private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
+		this.network = network;
 		this.routingTransportModes = new HashSet<>();
 		this.routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
 		if(routingTransportModes != null) {
@@ -78,8 +81,8 @@ public class ModeDependentRouter implements Router {
     }
 
 	@Override
-	public LeastCostPathCalculator.Path calcLeastCostPath(Link fromLink, Link toLink) {
-		return calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode());
+	public Network getNetwork() {
+		return network;
 	}
 
 
@@ -88,7 +91,6 @@ public class ModeDependentRouter implements Router {
 	 * @param time The departure time (in seconds since 00:00) at the beginning of the link for which the disutility is calculated.
 	 * @param person The person that wants to travel along the link. Note that this parameter can be <code>null</code>!
 	 * @param vehicle The vehicle with which the person wants to travel along the link. Note that this parameter can be <code>null</code>!
-	 * @return
 	 */
     @Override
     public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
@@ -97,7 +99,6 @@ public class ModeDependentRouter implements Router {
 
 	/**
 	 * @param link the link for which the minimal travel disutility over all time slots is calculated
-	 * @return
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
@@ -115,4 +116,6 @@ public class ModeDependentRouter implements Router {
 	public boolean linkHasRoutingMode(Link link) {
 		return MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), routingTransportModes);
 	}
+
+
 }

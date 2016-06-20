@@ -39,10 +39,10 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoGraphImpl;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStopImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoGraphImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoRouteStop;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoRouteStopImpl;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
@@ -60,6 +60,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperPseudoRouting extends PTMapper {
 
 	// pseudoRouting

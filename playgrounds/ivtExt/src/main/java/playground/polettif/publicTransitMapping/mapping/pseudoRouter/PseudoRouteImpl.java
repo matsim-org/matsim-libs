@@ -16,22 +16,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
- * TODO doc
+ * A container class for pseudo route stop sequences. Used to store
+ * the original transit route and transit line.
+ *
+ * @author polettif
  */
-public interface PseudoGraph {
+public class PseudoRouteImpl implements PseudoRoute {
 
-	List<PseudoRouteStop> getLeastCostPath();
+ 	private final Id<TransitLine> transitLineId;
+	private final List<PseudoRouteStop> pseudoRouteStops;
+	private final TransitRoute transitRoute;
 
-	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
+	public PseudoRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoRouteStops) {
+		this.transitLineId = transitLine.getId();
+		this.transitRoute = transitRoute;
+		this.pseudoRouteStops = pseudoRouteStops;
+	}
 
-	void addDummyEdges(List<TransitRouteStop> transitRouteStops, Collection<LinkCandidate> firstStopLinkCandidates, Collection<LinkCandidate> lastStopLinkCandidates);
+	public Id<TransitLine> getTransitLineId() {
+		return transitLineId;
+	}
 
+	public TransitRoute getTransitRoute() {
+		return transitRoute;
+	}
+
+	public List<PseudoRouteStop> getPseudoStops() {
+		return pseudoRouteStops;
+	}
 }

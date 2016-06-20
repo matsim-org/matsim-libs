@@ -17,12 +17,11 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 

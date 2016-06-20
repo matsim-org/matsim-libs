@@ -16,41 +16,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * A container class for pseudo route stop sequences. Used to store
- * the original transit route and transit line.
- *
- * @author polettif
+ * TODO doc
  */
-public class PseudoRouteImpl implements PseudoRoute {
+public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
 
- 	private final Id<TransitLine> transitLineId;
-	private final List<PseudoRouteStop> pseudoRouteStops;
-	private final TransitRoute transitRoute;
+	Id<TransitStopFacility> getParentStopFacilityId();
 
-	public PseudoRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoRouteStops) {
-		this.transitLineId = transitLine.getId();
-		this.transitRoute = transitRoute;
-		this.pseudoRouteStops = pseudoRouteStops;
-	}
+	Coord getCoord();
 
-	public Id<TransitLine> getTransitLineId() {
-		return transitLineId;
-	}
+	boolean isBlockingLane();
 
-	public TransitRoute getTransitRoute() {
-		return transitRoute;
-	}
+	boolean awaitsDepartureTime();
 
-	public List<PseudoRouteStop> getPseudoStops() {
-		return pseudoRouteStops;
-	}
+	String getFacilityName();
+
+	String getStopPostAreaId();
+
+	double getArrivalOffset();
+
+	double getDepartureOffset();
+
+	double getLinkTravelCost();
+
+	Map<PseudoRouteStop, Double> getNeighbours();
+
+	double getTravelCostToSource();
+	void setTravelCostToSource(double alternateDist);
+
+	PseudoRouteStop getClosestPrecedingRouteStop();
+	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
+
+	int compareTo(PseudoRouteStop other);
+
+	Id<Link> getLinkId();
 }

@@ -28,8 +28,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidateImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateImpl;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 

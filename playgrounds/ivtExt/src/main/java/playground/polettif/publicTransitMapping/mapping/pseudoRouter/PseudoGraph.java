@@ -16,40 +16,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * TODO doc
  */
-public interface LinkCandidate extends Comparable<LinkCandidate> {
+public interface PseudoGraph {
 
-	Coord getToNodeCoord();
+	List<PseudoRouteStop> getLeastCostPath();
 
-	Coord getFromNodeCoord();
+	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
 
-	String getToNodeIdStr();
+	void addDummyEdges(List<TransitRouteStop> transitRouteStops, Collection<LinkCandidate> firstStopLinkCandidates, Collection<LinkCandidate> lastStopLinkCandidates);
 
-	String getFromNodeIdStr();
-
-	String getLinkIdStr();
-
-	String getId();
-
-	double getStopFacilityDistance();
-
-	double getLinkTravelCost();
-
-	/**
-	 * @return the link candidates priority compared to all other
-	 * link candidates for the same stop and transport mode. The priority
-	 * is scaled 0..1 (1 being high priority).
-	 */
-	double getPriority();
-
-	void setPriority(double priority);
-
-	int compareTo(LinkCandidate other);
 }

@@ -274,7 +274,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		TransitRouteStop toRouteStop = routeStops.get(routeStops.indexOf(fromRouteStop) + 1);
 
 		Id<Link> cutFromLinkId = fromRouteStop.getStopFacility().getLinkId();
-		Link cutFromLInk = network.getLinks().get(cutFromLinkId);
+		Link cutFromLink = network.getLinks().get(cutFromLinkId);
 		Id<Link> cutToLinkId = toRouteStop.getStopFacility().getLinkId();
 		Link cutToLink = network.getLinks().get(cutToLinkId);
 		Link viaLink = network.getLinks().get(viaLinkId);
@@ -282,8 +282,8 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		NetworkRoute routeBeforeCut = transitRoute.getRoute().getSubRoute(transitRoute.getRoute().getStartLinkId(), cutFromLinkId);
 		NetworkRoute routeAfterCut = transitRoute.getRoute().getSubRoute(cutToLinkId, transitRoute.getRoute().getEndLinkId());
 
-		LeastCostPathCalculator.Path path1 = router.calcLeastCostPath(cutFromLInk, viaLink);
-		LeastCostPathCalculator.Path path2 = router.calcLeastCostPath(viaLink, cutToLink);
+		LeastCostPathCalculator.Path path1 = router.calcLeastCostPath(cutFromLink.getToNode(), viaLink.getFromNode());
+		LeastCostPathCalculator.Path path2 = router.calcLeastCostPath(viaLink.getToNode(), cutToLink.getFromNode());
 
 		List<Id<Link>> newLinkSequence = new ArrayList<>();
 		if(path1 != null && path2 != null) {

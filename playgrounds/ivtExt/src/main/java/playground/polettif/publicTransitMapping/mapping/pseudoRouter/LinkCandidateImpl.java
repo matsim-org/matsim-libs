@@ -17,10 +17,12 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
@@ -38,14 +40,14 @@ public class LinkCandidateImpl implements LinkCandidate {
 	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
 
 	private final String id;
-	private final String parentStopFacilityId;
+	private final Id<TransitStopFacility> parentStopFacilityId;
 	private double priority;
 	private final double stopFacilityDistance;
 	private final double linkTravelCost;
 
-	private final String linkId;
-	private final String fromNodeId;
-	private final String toNodeId;
+	private final Id<Link> linkId;
+	private final Id<Node> fromNodeId;
+	private final Id<Node> toNodeId;
 
 	private final Coord stopFacilityCoord;
 	private final Coord fromNodeCoord;
@@ -53,9 +55,9 @@ public class LinkCandidateImpl implements LinkCandidate {
 
 	public LinkCandidateImpl(Link link, TransitStopFacility parentStopFacility) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
-		this.parentStopFacilityId = parentStopFacility.getId().toString();
+		this.parentStopFacilityId = parentStopFacility.getId();
 
-		this.linkId = link.getId().toString();
+		this.linkId = link.getId();
 
 		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 			this.linkTravelCost = link.getLength() / link.getFreespeed();
@@ -63,8 +65,8 @@ public class LinkCandidateImpl implements LinkCandidate {
 			this.linkTravelCost = link.getLength();
 		}
 
-		this.fromNodeId = link.getFromNode().getId().toString();
-		this.toNodeId = link.getToNode().getId().toString();
+		this.fromNodeId = link.getFromNode().getId();
+		this.toNodeId = link.getToNode().getId();
 		this.stopFacilityCoord = parentStopFacility.getCoord();
 
 		this.fromNodeCoord = link.getFromNode().getCoord();
@@ -81,6 +83,26 @@ public class LinkCandidateImpl implements LinkCandidate {
 	@Override
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public Id<TransitStopFacility> getParentStopFacilityId() {
+		return parentStopFacilityId;
+	}
+
+	@Override
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+
+	@Override
+	public Id<Node> getToNodeId() {
+		return toNodeId;
+	}
+
+	@Override
+	public Id<Node> getFromNodeId() {
+		return fromNodeId;
 	}
 
 	@Override
@@ -104,15 +126,15 @@ public class LinkCandidateImpl implements LinkCandidate {
 	}
 
 	public String getToNodeIdStr() {
-		return toNodeId;
+		return toNodeId.toString();
 	}
 
 	public String getFromNodeIdStr() {
-		return fromNodeId;
+		return fromNodeId.toString();
 	}
 
 	public String getLinkIdStr() {
-		return linkId;
+		return linkId.toString();
 	}
 
 	public Coord getFromNodeCoord() {

@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -25,6 +25,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * todo javadoc
+ */
 public interface PseudoSchedule {
 
 	void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence);

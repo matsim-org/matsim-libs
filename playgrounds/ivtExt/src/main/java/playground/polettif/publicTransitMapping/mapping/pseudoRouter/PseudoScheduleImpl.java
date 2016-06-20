@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
@@ -60,7 +60,7 @@ public class PseudoScheduleImpl implements PseudoSchedule {
 			List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
 			for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
-				String idStr = pseudoStop.getParentStopFacilityId() + PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES + pseudoStop.getLinkIdStr();
+				String idStr = pseudoStop.getParentStopFacilityId() + PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES + pseudoStop.getLinkId();
 				Id<TransitStopFacility> childStopFacilityId = Id.create(idStr, TransitStopFacility.class);
 
 				// if child stop facility for this link has not yet been generated
@@ -70,7 +70,7 @@ public class PseudoScheduleImpl implements PseudoSchedule {
 							pseudoStop.getCoord(),
 							pseudoStop.isBlockingLane()
 					);
-					newFacility.setLinkId(Id.createLinkId(pseudoStop.getLinkIdStr()));
+					newFacility.setLinkId(pseudoStop.getLinkId());
 					newFacility.setName(pseudoStop.getFacilityName());
 					newFacility.setStopPostAreaId(pseudoStop.getStopPostAreaId());
 					schedule.addStopFacility(newFacility);

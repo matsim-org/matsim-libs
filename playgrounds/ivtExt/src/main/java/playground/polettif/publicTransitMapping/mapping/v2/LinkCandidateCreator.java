@@ -19,9 +19,8 @@
 package playground.polettif.publicTransitMapping.mapping.v2;
 
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 
-import java.util.List;
 import java.util.SortedSet;
 
 public interface LinkCandidateCreator {
