@@ -35,7 +35,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -71,6 +70,7 @@ import org.matsim.facilities.ActivityFacility;
  */
 public final class PopulationUtils {
 	private static final Logger log = Logger.getLogger( PopulationUtils.class );
+	private static final PopulationFactory populationFactory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory() ;
 
 	/**
 	 * Is a namespace, so don't instantiate:
@@ -647,8 +647,12 @@ public final class PopulationUtils {
 		return false;
 	}
 	public static PopulationFactory getFactory() {
-		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
-		return scenario.getPopulation().getFactory() ;
+//		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
+//		return scenario.getPopulation().getFactory() ;
+		// the above is too slow. kai, jun'16
+		
+//		return new PopulationFactoryImpl( new RouteFactoryImpl() ) ;
+		return populationFactory ;
 	}
 
 	public static PlanImpl createPlan(Person person) {
@@ -658,8 +662,7 @@ public final class PopulationUtils {
 	}
 
 	public static PlanImpl createPlan() {
-		Plan plan = getFactory().createPlan() ;
-		return (PlanImpl) plan ;
+		return (PlanImpl) getFactory().createPlan() ;
 	}
 
 	public static ActivityImpl createActivityFromLinkId(String type, Id<Link> linkId) {
