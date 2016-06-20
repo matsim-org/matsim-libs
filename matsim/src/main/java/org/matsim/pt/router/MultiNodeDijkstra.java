@@ -54,8 +54,9 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 
 	@SuppressWarnings("unchecked")
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
-		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(network, costFunction, timeFunction, swapNodes(fromNodes), person);
-		return tree.getPath(swapNodes(toNodes));
+		Map<Node, TransitLeastCostPathTree.InitialNode> swapedToNodes = swapNodes(toNodes);
+		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(network, costFunction, timeFunction, swapNodes(fromNodes), swapedToNodes, person);
+		return tree.getPath(swapedToNodes);
 	}
 
 	private Map<Node, TransitLeastCostPathTree.InitialNode> swapNodes(final Map<Node, InitialNode> original) {
