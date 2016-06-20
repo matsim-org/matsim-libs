@@ -19,26 +19,44 @@
 
 package playground.michalm.taxi.data;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 
 import playground.michalm.ev.data.*;
 
 
-public class ETaxi
+public class EvrpVehicle
     extends VehicleImpl
 {
-    private final ElectricVehicle ev;
-
-
-    public ETaxi(Vehicle vehicle, double batteryCapacity, double initialSoc)
+    public class Ev
+        extends ElectricVehicleImpl
     {
-        super(vehicle.getId(), vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(),
-                vehicle.getT1());
-        ev = new ElectricVehicleImpl(new BatteryImpl(batteryCapacity, initialSoc));
+        public Ev(Id<Vehicle> id, Battery battery)
+        {
+            super(Id.createVehicleId(id), battery);
+        }
+
+
+        public EvrpVehicle getEvrpVehicle()
+        {
+            return EvrpVehicle.this;
+        }
     }
 
 
-    public ElectricVehicle getEv()
+    private final Ev ev;
+
+
+    public EvrpVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1,
+            double batteryCapacity, double initialSoc)
+    {
+        super(id, startLink, capacity, t0, t1);
+        ev = new Ev(id, new BatteryImpl(batteryCapacity, initialSoc));
+    }
+
+
+    public Ev getEv()
     {
         return ev;
     }

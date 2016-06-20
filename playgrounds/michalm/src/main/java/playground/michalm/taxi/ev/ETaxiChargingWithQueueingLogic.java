@@ -17,70 +17,85 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.charging;
+package playground.michalm.taxi.ev;
 
 import java.util.*;
 
-import com.google.common.collect.Iterables;
-
+import playground.michalm.ev.charging.FixedSpeedChargingWithQueueingLogic;
 import playground.michalm.ev.data.*;
+import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.data.EvrpVehicle.Ev;
+import playground.michalm.taxi.vrpagent.ETaxiAtChargerActivity;
 
 
 /**
  * Fast charging up to 80% of the battery capacity
  */
-public class PartialFastChargingWithQueueingLogic
-    implements ChargingLogic
+public class ETaxiChargingWithQueueingLogic
+    extends FixedSpeedChargingWithQueueingLogic
 {
     private static final double MAX_RELATIVE_SOC = 0.8;
-
-    private final Charger charger;
-    private final Queue<ElectricVehicle> vehicles = new LinkedList<>();
-    private final Iterable<ElectricVehicle> pluggedVehicles;
+    private List<ElectricVehicle> evsToUnplug = new ArrayList<>();
 
 
-    public PartialFastChargingWithQueueingLogic(Charger charger)
+    public ETaxiChargingWithQueueingLogic(Charger charger)
     {
-        this.charger = charger;
-        pluggedVehicles = Iterables.limit(vehicles, charger.getCapacity());
-        charger.setLogic(this);
-    }
-
-
-    public Charger getCharger()
-    {
-        return charger;
-    }
-
-
-    public void addVehicle(ElectricVehicle vehicle)
-    {
-        vehicles.add(vehicle);
-    }
-
-
-    public void removeVehicle(ElectricVehicle vehicle)
-    {
-        vehicles.remove(vehicle);
+        super(charger);
     }
 
 
     @Override
-    public void chargeVehicles(double chargeTime)
+    public void chargeVehicles(double chargePeriod)
     {
-        double energy = charger.getPower() * chargeTime;
-        for (ElectricVehicle v : pluggedVehicles) {
-            //we charge around 4% of SOC per minute, so when updating SOC every 10 seconds,
-            //SOC will never reach 81% 
-            Battery b = v.getBattery();
-            b.charge(energy);
+        super.chargeVehicles(chargePeriod);
 
-            if (b.getSoc() >= MAX_RELATIVE_SOC * b.getCapacity()) {
-                removeVehicle(v);
-            }
+        for (ElectricVehicle ev : evsToUnplug) {
+            unplugVehicle(ev);
+        }
+        evsToUnplug.clear();
+
+        int fromQueuedToPluggedCount = Math.min(queuedVehicles.size(),
+                charger.getCapacity() - pluggedVehicles.size());
+        for (int i = 0; i < fromQueuedToPluggedCount; i++) {
+            plugVehicle(queuedVehicles.poll());
         }
     }
 
+
+    @Override
+    protected void chargeVehicle(ElectricVehicle ev, double chargePeriod)
+    {
+        super.chargeVehicle(ev, chargePeriod);
+
+        Battery b = ev.getBattery();
+        if (b.getSoc() >= MAX_RELATIVE_SOC * b.getCapacity()) {
+            evsToUnplug.add(ev);
+        }
+    }
+
+
+    private ETaxiAtChargerActivity getActivity(ElectricVehicle vehicle)
+    {
+        EvrpVehicle evrpVehicle = ((Ev)vehicle).getEvrpVehicle();
+        return (ETaxiAtChargerActivity)evrpVehicle.getAgentLogic().getDynAgent().getCurrentAction();
+    }
+
+
+    @Override
+    protected void notifyChargingStarted(ElectricVehicle vehicle)
+    {
+        getActivity(vehicle).notifyChargingStarted();
+    }
+
+
+    @Override
+    protected void notifyChargingEnded(ElectricVehicle vehicle)
+    {
+        getActivity(vehicle).notifyChargingEnded();
+    }
+
+
+    //============= ????
 
     public double getEnergyToCharge(ElectricVehicle vehicle)
     {
@@ -91,23 +106,15 @@ public class PartialFastChargingWithQueueingLogic
 
     public double estimateMaxWaitTime(ChargerImpl charger)
     {
-        if (vehicles.size() < charger.getCapacity()) {
+        if (queuedVehicles.size() < charger.getCapacity()) {
             return 0;
         }
 
         double energyToCharge = 0;
-        for (ElectricVehicle v : vehicles) {
-            Battery b = v.getBattery();
-            energyToCharge += MAX_RELATIVE_SOC * b.getCapacity() - b.getSoc();
+        for (ElectricVehicle ev : allVehicles) {
+            energyToCharge += getEnergyToCharge(ev);
         }
 
         return energyToCharge / charger.getPower() / charger.getCapacity();
-    }
-    
-    
-    @Override
-    public void reset()
-    {
-        vehicles.clear();
     }
 }

@@ -19,9 +19,24 @@
 
 package playground.michalm.ev.charging;
 
+import playground.michalm.ev.data.*;
+
+
 public interface ChargingLogic
 {
-    void chargeVehicles(double chargeTime);
+    void addVehicle(ElectricVehicle ev);
+
+
+    void removeVehicle(ElectricVehicle vehicle);
+
+
+    boolean isPlugged(ElectricVehicle ev);
+
+
+    void chargeVehicles(double chargePeriod);
+
+
+    Charger getCharger();
 
 
     void reset();

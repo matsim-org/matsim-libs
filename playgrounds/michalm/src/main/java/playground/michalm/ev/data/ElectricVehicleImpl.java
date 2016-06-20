@@ -19,21 +19,33 @@
 
 package playground.michalm.ev.data;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
+
 import playground.michalm.ev.discharging.*;
 
 
 public class ElectricVehicleImpl
     implements ElectricVehicle
 {
+    private final Id<Vehicle> vehicleId;
     private Battery battery;//not final -- can be swapped
 
     private DriveEnergyConsumption driveEnergyConsumption;
     private AuxEnergyConsumption auxEnergyConsumption;
 
 
-    public ElectricVehicleImpl(Battery battery)
+    public ElectricVehicleImpl(Id<Vehicle> vehicleId, Battery battery)
     {
+        this.vehicleId = vehicleId;
         this.battery = battery;
+    }
+
+
+    @Override
+    public Id<Vehicle> getId()
+    {
+        return vehicleId;
     }
 
 

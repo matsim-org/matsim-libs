@@ -30,7 +30,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
-import playground.michalm.taxi.data.file.ETaxiReader;
+import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.ETaxiUtils;
 
 
@@ -53,7 +53,7 @@ public class RunETaxiScenario
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
-        new ETaxiReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new EvrpVehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario, evData).parse(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);

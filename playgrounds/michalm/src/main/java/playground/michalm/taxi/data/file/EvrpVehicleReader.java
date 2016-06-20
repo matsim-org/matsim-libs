@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.data.file;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.*;
+import org.xml.sax.Attributes;
 
-import playground.michalm.ev.discharging.*;
+import playground.michalm.ev.UnitConversionRatios;
+import playground.michalm.taxi.data.EvrpVehicle;
 
 
-public interface ElectricVehicle
-    extends Identifiable<Vehicle>
+public class EvrpVehicleReader
+    extends VehicleReader
 {
-    DriveEnergyConsumption getDriveEnergyConsumption();
+    public EvrpVehicleReader(Network network, VrpData data)
+    {
+        super(network, data);
+    }
 
 
-    AuxEnergyConsumption getAuxEnergyConsumption();
-
-
-    Battery getBattery();
-
-
-    Battery swapBattery(Battery battery);
+    @Override
+    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0,
+            double t1, Attributes atts)
+    {
+        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
+                * UnitConversionRatios.J_PER_kWh;
+        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * 20)
+                * UnitConversionRatios.J_PER_kWh;
+        return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity, initialSoc);
+    }
 }

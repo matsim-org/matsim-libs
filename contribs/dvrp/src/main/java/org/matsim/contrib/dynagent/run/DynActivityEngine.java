@@ -44,6 +44,8 @@ import org.matsim.core.mobsim.qsim.*;
 public class DynActivityEngine
     extends ActivityEngine
 {
+    public static final double END_ACTIVITY_LATER = Double.MAX_VALUE;
+    
     private InternalInterface internalInterface;
 
     private final List<DynAgent> dynAgents = new LinkedList<>();
@@ -88,6 +90,7 @@ public class DynActivityEngine
                     dynAgentIter.remove();
                 }
             }
+            //TODO what if not activity?
         }
 
         super.doSimStep(time);

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.schedule;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 
-import playground.michalm.ev.discharging.*;
+import playground.michalm.ev.data.Charger;
 
 
-public interface ElectricVehicle
-    extends Identifiable<Vehicle>
+public interface ETaxiTask
+    extends TaxiTask
 {
-    DriveEnergyConsumption getDriveEnergyConsumption();
-
-
-    AuxEnergyConsumption getAuxEnergyConsumption();
-
-
-    Battery getBattery();
-
-
-    Battery swapBattery(Battery battery);
+    Charger getCharger();
 }

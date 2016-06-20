@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.schedule;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.*;
-import org.xml.sax.Attributes;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
-import playground.michalm.ev.*;
-import playground.michalm.taxi.data.ETaxi;
+import playground.michalm.ev.data.Charger;
 
 
-public class ETaxiReader
-    extends VehicleReader
+public class ETaxiToChargerDriveTask
+    extends DriveTaskImpl
+    implements ETaxiTask
 {
-    public ETaxiReader(Network network, VrpData data)
+    private final Charger charger;
+
+
+    public ETaxiToChargerDriveTask(VrpPathWithTravelData path, Charger charger)
     {
-        super(network, data);
+        super(path);
+
+        if (charger.getLink() != path.getToLink()) {
+            throw new IllegalArgumentException();
+        }
+
+        this.charger = charger;
     }
 
 
     @Override
-    protected Vehicle createVehicle(Attributes atts)
+    public Charger getCharger()
     {
-        Vehicle v = super.createVehicle(atts);
-        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
-                * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * 20)
-                * UnitConversionRatios.J_PER_kWh;
-        return new ETaxi(v, batteryCapacity, initialSoc);
+        return charger;
+    }
+
+
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.EMPTY_DRIVE;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
     }
 }

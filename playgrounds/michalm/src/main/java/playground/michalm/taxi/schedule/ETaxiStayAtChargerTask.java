@@ -17,25 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.schedule;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
-import playground.michalm.ev.discharging.*;
+import playground.michalm.ev.data.Charger;
 
 
-public interface ElectricVehicle
-    extends Identifiable<Vehicle>
+public class ETaxiStayAtChargerTask
+    extends StayTaskImpl
+    implements ETaxiTask
 {
-    DriveEnergyConsumption getDriveEnergyConsumption();
+    private final Charger charger;
 
 
-    AuxEnergyConsumption getAuxEnergyConsumption();
+    public ETaxiStayAtChargerTask(double beginTime, double endTime, Charger charger)
+    {
+        super(beginTime, endTime, charger.getLink());
+        this.charger = charger;
+    }
 
 
-    Battery getBattery();
+    @Override
+    public Charger getCharger()
+    {
+        return charger;
+    }
 
 
-    Battery swapBattery(Battery battery);
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.STAY;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+    }
 }
