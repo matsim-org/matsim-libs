@@ -1,28 +1,20 @@
-package playground.nmviljoen.network;
+package playground.nmviljoen.gridExperiments;
 
-
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import java.io.BufferedWriter;
-
-
-import org.matsim.core.utils.io.IOUtils;
 import org.apache.commons.collections15.Transformer;
+import org.matsim.core.utils.io.IOUtils;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
-
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
 import edu.uci.ics.jung.algorithms.scoring.BetweennessCentrality;
 import edu.uci.ics.jung.algorithms.scoring.ClosenessCentrality;
 import edu.uci.ics.jung.algorithms.scoring.EigenvectorCentrality;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
 import edu.uci.ics.jung.graph.DirectedGraph;
-
 
 public class JungCentrality {
 	public static void calculateAndWriteUnweightedCloseness(DirectedGraph<NmvNode,NmvLink> myGraph, String nodeCloseUnweighted,
@@ -689,7 +681,4 @@ public class JungCentrality {
 	        //the sequence of the matrix indices is the sequence of nodeList
 	         return matrix;
 	  }
-		 
-
 }
-

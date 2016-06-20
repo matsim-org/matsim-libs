@@ -1,5 +1,4 @@
-package playground.nmviljoen.network;
-
+package playground.nmviljoen.gridExperiments;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -7,6 +6,8 @@ import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
+//import playground.nmviljoen.network.NmvLink;
+//import playground.nmviljoen.network.NmvNode;
 
 public class NmvNode implements Comparable<NmvNode>{
 	public String intID;
@@ -81,5 +82,6 @@ public class NmvNode implements Comparable<NmvNode>{
 		log.info("Check if graph contains n11: " + graph.containsVertex(n11));
 		
 	}
+
 
 }

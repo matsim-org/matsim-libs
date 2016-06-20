@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
+import playground.nmviljoen.gridExperiments.NmvLink;
+import playground.nmviljoen.gridExperiments.NmvNode;
 import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
