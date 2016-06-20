@@ -1,23 +1,4 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-package playground.nmviljoen.network.maliklab;
+package playground.nmviljoen.gridExperiments;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -26,40 +7,34 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
-import playground.nmviljoen.network.JungCentrality;
-import playground.nmviljoen.network.JungClusters;
-import playground.nmviljoen.network.JungGraphDistance;
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
-import playground.nmviljoen.network.generator.ShortestPath;
-import playground.southafrica.utilities.Header;
 
-public class MalikLabExperiments {
-	private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
+public class NavabiLabExperiments {
+private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 	
 	private DirectedGraph<NmvNode, NmvLink> myGraphGrid; 
-	private DirectedGraph<NmvNode, NmvLink> myGraphMalik;
+
 	private DirectedGraph<NmvNode, NmvLink> myGraphGhost;
+	private DirectedGraph<NmvNode, NmvLink> myGraphNavabi;
 	private String path;
 	private int[][] assocList;
 	
-	public MalikLabExperiments(String path, int ModeSwitch, int SimDim, int fullPathSize, int segSize, int segPathLength) {       
+	public NavabiLabExperiments(String path, int ModeSwitch, int SimDim, int fullPathSize, int segSize, int segPathLength) {       
 		this.path = path;
 		if (ModeSwitch == 0){
-			this.myGraphMalik = TriGraphConstructor.constructMalikGraph(path);
-			LOG.info("Malik Graph created");
+			this.myGraphNavabi = TriGraphConstructor.constructNavabiGraph(path);
+			LOG.info("Navabi Graph created");
 			this.myGraphGrid = TriGraphConstructor.constructGridGraph(path);
 			LOG.info("Grid Graph created");
-			assocList = TriGraphConstructor.layerMalik(path,myGraphMalik,myGraphGrid);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraph(path, assocList,fullPathSize, segSize, segPathLength );
+			assocList = TriGraphConstructor.layerNavabi(path,myGraphNavabi,myGraphGrid);
+			this.myGraphGhost = TriGraphConstructor.constructGhostGraphNavabi(path, assocList,fullPathSize, segSize, segPathLength );
 			LOG.info("The ghost lives");
 		}else{
-			this.myGraphMalik = TriGraphConstructor.constructMalikGraph(path);
-			LOG.info("Malik Graph created");
+			this.myGraphNavabi = TriGraphConstructor.constructNavabiGraph(path);
+			LOG.info("Navabi Graph created");
 			this.myGraphGrid = TriGraphConstructor.constructGridGraphSim(path,SimDim);
 			LOG.info("Grid Graph created");
-			assocList = TriGraphConstructor.layerMalikSim(path);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraph(path, assocList,fullPathSize , segSize,segPathLength);
+			assocList = TriGraphConstructor.layerNavabiSim(path);
+			this.myGraphGhost = TriGraphConstructor.constructGhostGraphNavabi(path, assocList,fullPathSize , segSize,segPathLength);
 			LOG.info("The ghost lives");	
 		}
 		
@@ -71,10 +46,10 @@ public class MalikLabExperiments {
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
 		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
 		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
-		LinkedList<NmvLink> linkListMalik = new LinkedList<NmvLink>(myGraphMalik.getEdges());
-		ArrayList<NmvNode> nodeListMalik = new ArrayList<NmvNode>(myGraphMalik.getVertices());
-		String shortFile=path+"MalikShortPathStat.csv";
-		ShortestPath.collectShortest(myGraphGrid, myGraphMalik, linkListGrid, linkListMalik, nodeListGrid, nodeListMalik, assocList, shortFile);
+		LinkedList<NmvLink> linkListNavabi = new LinkedList<NmvLink>(myGraphNavabi.getEdges());
+		ArrayList<NmvNode> nodeListNavabi = new ArrayList<NmvNode>(myGraphNavabi.getVertices());
+		String shortFile=path+"NavabiShortPathStat.csv";
+		ShortestPath.collectShortest(myGraphGrid, myGraphNavabi, linkListGrid, linkListNavabi, nodeListGrid, nodeListNavabi, assocList, shortFile);
 		
 		//Grid graph metrics
 		String Gridpath=path+"GridGraph";
@@ -115,7 +90,8 @@ public class MalikLabExperiments {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException{
-//		Header.printHeader(MalikLabExperiments.class.toString(), args);
+//		Header.printHeader(NavabiLabExperimentsLocal.class.toString(), args);
+		
 		
 		int ModeSwitch = Integer.parseInt(args[2]); //if ModeSwitch = 0 then it's a base run; if =1 then it's a simulation
 		int runStart = Integer.parseInt(args[3]);
@@ -128,12 +104,12 @@ public class MalikLabExperiments {
 			String path = args[0];
 			String sim =args[1];
 			if(ModeSwitch==0){
-				path = path+y+"/";
+				path = path+y+"/"+"Base_"+y+"/";
 			}else{
 				path = path+y+"/"+sim+y+"/";
 			}
 			
-			MalikLabExperiments mle = new MalikLabExperiments(path, ModeSwitch, SimDim,fullPathSize,segSize,segPathLength);
+			NavabiLabExperiments mle = new NavabiLabExperiments(path, ModeSwitch, SimDim,fullPathSize,segSize,segPathLength);
 			mle.runThisSpecificExperiment();
 		}
 		

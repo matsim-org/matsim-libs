@@ -39,7 +39,8 @@ public class OptimisePT {
 		final String originalOutputDirectory = scenario.getConfig().controler()
 				.getOutputDirectory(); // gets otherwise overwritten in config
 		final AbstractModule module = new ControlerDefaultsModule();
- 
+//		final AbstractModule module = new ControlerDefaultsWithRoadPricingModule();
+
 		
 		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;  // revisit this based on available RAM
 		final boolean interpolate = true; // always
@@ -47,7 +48,7 @@ public class OptimisePT {
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE; // revisit this later
 		final boolean includeCurrentBest = false; // always
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				4,2);
+				100,50);
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
 				3600, 24); // OK to start with
 		final ObjectiveFunction objectiveFunction = new PTObjectiveFunction(scenario); // TODO this is minimized

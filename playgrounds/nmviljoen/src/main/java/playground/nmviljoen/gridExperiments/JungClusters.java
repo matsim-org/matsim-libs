@@ -1,15 +1,18 @@
-package playground.nmviljoen.network;
+package playground.nmviljoen.gridExperiments;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.algorithms.metrics.Metrics;
 import edu.uci.ics.jung.algorithms.metrics.TriadicCensus;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 
 public class JungClusters {
 	public static void calculateAndWriteClusteringCoefficient(DirectedGraph<NmvNode,NmvLink> myGraph, String clusterFile){
@@ -88,5 +91,6 @@ public class JungClusters {
 		}
 		
 	}
+
 
 }

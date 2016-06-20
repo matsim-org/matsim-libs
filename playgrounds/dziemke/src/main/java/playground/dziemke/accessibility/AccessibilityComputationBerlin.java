@@ -7,10 +7,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -155,19 +157,19 @@ public class AccessibilityComputationBerlin {
 
 						@Override
 						public ControlerListener get() {
-							GridBasedAccessibilityControlerListenerV3 listener =
-									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario, ConfigUtils.addOrGetModule((Config) config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2((double) 4574000, (double) 5802000, (double) 4620000, (double) 5839000, cellSize));
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes,
+							travelDisutilityFactories, 4574000, 5802000, 4620000, 5839000, cellSize);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 
 							listener.addAdditionalFacilityData(homes) ;
 //							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 							// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
-							listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
-//							listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
 							listener.writeToSubdirectoryWithName(actType);
 							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;

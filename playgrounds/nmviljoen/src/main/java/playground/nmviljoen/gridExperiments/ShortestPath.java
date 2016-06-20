@@ -1,24 +1,4 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-package playground.nmviljoen.network.generator;
-
+package playground.nmviljoen.gridExperiments;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,8 +11,6 @@ import org.matsim.core.utils.io.IOUtils;
 
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
 
 public class ShortestPath {
 	public static void collectShortest(DirectedGraph<NmvNode, NmvLink> myGraphGrid,DirectedGraph<NmvNode, NmvLink> myGraphHub, LinkedList<NmvLink> gridLinks, LinkedList<NmvLink> hubLinks,ArrayList<NmvNode> gridNodes,ArrayList<NmvNode> hubNodes, int [][] assocList, String shortListFile){
@@ -117,8 +95,8 @@ public class ShortestPath {
 					}
 
 
-					//					Iterator<NmvLink> PathIterator = shortestPath.iterator();
-					//					Collection<NmvNode> nodeTrack =null;
+					//					Iterator<NmvLinkLocal> PathIterator = shortestPath.iterator();
+					//					Collection<NmvNodeLocal> nodeTrack =null;
 					//					System.out.println("SHORTEST PATH");
 					//					while (PathIterator.hasNext()){
 					//						nodeTrack = myGraphGrid.getIncidentVertices(PathIterator.next());

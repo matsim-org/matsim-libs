@@ -1,23 +1,4 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-package playground.nmviljoen.network.maliklab;
+package playground.nmviljoen.gridExperiments;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,7 +8,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.matsim.core.utils.io.IOUtils;
-
 
 public class GhostLinkList {
 	public static int[][] linkList(String path, int marker){
@@ -96,25 +76,25 @@ public class GhostLinkList {
 			linkList[t1][1] = edges[t1][1];
 		}
 
-		//write out full link list for testing
-		String filename = path+"detailGhostLinkList.csv";
-		BufferedWriter bd = IOUtils.getBufferedWriter(filename);
-		try{
-			bd.write("From,To");
-			bd.newLine();
-			for (int j =0; j< linkList.length;j++){
-				bd.write(String.format("%d,%d\n",linkList[j][0],linkList[j][1]));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally{
-			try {
-				bd.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Ghost LinkList (detailed) written to file "+filename);
+//		//write out full link list for testing
+//		String filename = path+"detailGhostLinkList.csv";
+//		BufferedWriter bd = IOUtils.getBufferedWriter(filename);
+//		try{
+//			bd.write("From,To");
+//			bd.newLine();
+//			for (int j =0; j< linkList.length;j++){
+//				bd.write(String.format("%d,%d\n",linkList[j][0],linkList[j][1]));
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally{
+//			try {
+//				bd.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		System.out.println("Ghost LinkList (detailed) written to file "+filename);
 		//now create a weighted linkList
 		int[][] weightedLinkListTemp = new int[linkList.length][3];
 		int count1=1;
@@ -147,7 +127,7 @@ public class GhostLinkList {
 		}
 
 		//write weighted edgelist to file - tested it, it creates the list correctly
-		filename = path+"aggregatedGhostLinkList.csv";
+		String filename = path+"aggregatedGhostLinkList.csv";
 		BufferedWriter be = IOUtils.getBufferedWriter(filename);
 		try{
 			be.write("From,To,Weight");
@@ -219,5 +199,4 @@ public class GhostLinkList {
 		}
 //		int [][] Links = linkList("/Users/nadiaviljoen/Documents/PhD_gridNetwork/MalikLab/Run_6 troubleshoot/",fullpathset);
 	}
-
 }

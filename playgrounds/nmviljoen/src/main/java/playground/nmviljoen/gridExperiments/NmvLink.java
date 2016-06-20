@@ -1,4 +1,8 @@
-package playground.nmviljoen.network;
+package playground.nmviljoen.gridExperiments;
+
+//import playground.nmviljoen.network.NmvLink;
+
+//import playground.nmviljoen.network.NmvLink;
 
 public class NmvLink implements Comparable<NmvLink>{
 	String id;
@@ -41,6 +45,4 @@ public class NmvLink implements Comparable<NmvLink>{
 	public int compareTo(NmvLink o) {
 		return this.getId().compareTo(o.getId());
 	}
-	
-
 }

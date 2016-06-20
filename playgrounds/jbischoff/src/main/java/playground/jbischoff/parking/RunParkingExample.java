@@ -40,6 +40,8 @@ public class RunParkingExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");
+		config.plans().setInputFile("../../../shared-svn/projects/bmw_carsharing/example/population100.xml");
+		config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/output");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);

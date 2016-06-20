@@ -17,44 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.network;
+/**
+ * 
+ */
+package playground.jbischoff.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.OsmNetworkReader;
-
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
-* @author amit
-*/
+ * @author  jbischoff
+ *
+ */
 
-public class PatnaOSM2MatsimNetwork {
-	
-	private static final String osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/osmNetworkFile.osm";
+public class WriteTestPopulation {
+
 	
 	public static void main(String[] args) {
-		
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
-		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), PatnaUtils.COORDINATE_TRANSFORMATION);
-//		reader.setKeepPaths(true);
-		reader.parse(osmNetworkFile);
-		
-		NetworkSimplifier simplifier = new NetworkSimplifier();
-		simplifier.run(sc.getNetwork());
-		
-//		new NetworkCleaner().run(PatnaUtils.INPUT_FILES_DIR +"/networkFromOSM.xml.gz",PatnaUtils.INPUT_FILES_DIR +"/networkFromOSM_cleaned.xml.gz");
-		
-		
-		new NetworkWriter(sc.getNetwork()).write(PatnaUtils.INPUT_FILES_DIR +"/networkFromOSM.xml.gz");
+		// TODO Auto-generated method stub
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationFactory fac = scenario.getPopulation().getFactory();
+		int n = 100;
+		for (int i = 0 ; i < n; i++){
+			Person p = fac.createPerson(Id.createPersonId(i));
+			Plan plan = fac.createPlan();
+			p.addPlan(plan);
+			Activity h1 = fac.createActivityFromLinkId("home", Id.createLinkId(114));
+			h1.setEndTime(7*3600+i*60);
+			plan.addActivity(h1);
+			Leg l1 = fac.createLeg("car");
+			plan.addLeg(l1);
+			Activity w1 = fac.createActivityFromLinkId("work", Id.createLinkId(349));
+			w1.setEndTime(8*3600+i*60);
+			plan.addActivity(w1);
+			plan.addLeg(fac.createLeg("car"));
+			Activity h2 = fac.createActivityFromLinkId("home", Id.createLinkId(114));
+			plan.addActivity(h2);
+			scenario.getPopulation().addPerson(p);
+		}
+		new PopulationWriter(scenario.getPopulation()).write("../../../shared-svn/projects/bmw_carsharing/example/population"+n+".xml");
+				
 	}
-	
 
 }
-
-
-	

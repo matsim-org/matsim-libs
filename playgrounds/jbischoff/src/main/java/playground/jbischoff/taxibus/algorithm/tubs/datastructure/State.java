@@ -21,9 +21,15 @@ package playground.jbischoff.taxibus.algorithm.tubs.datastructure;
 
 public class State {
 
-	double time;
-	double slack;
+	int time;
+	int slack;
 	Integer confirmations;
+	
+	State(int time, int slack, int confirmations) {
+		this.time = time;
+		this.slack = slack;
+		this.confirmations = confirmations;
+	}
 	
 	
 	

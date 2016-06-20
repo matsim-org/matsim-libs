@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -16,8 +19,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import floetteroed.opdyts.DecisionVariable;
 import saleem.stockholmscenario.utils.CollectionUtil;
+import floetteroed.opdyts.DecisionVariable;
 
 public class PTSchedule implements DecisionVariable{
 	TransitSchedule schedule;
@@ -28,6 +31,41 @@ public class PTSchedule implements DecisionVariable{
 		this.vehicles=vehicles;
 		this.scenario=scenario;
 		
+	}
+	public void removeAllNodesAndLinks(){
+		CollectionUtil<Id<Node>> cutil = new CollectionUtil<Id<Node>>();
+		Network network = this.scenario.getNetwork();
+		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
+		ArrayList<Id<Node>> nodeids = cutil.toArrayList(network.getNodes().keySet().iterator());
+		Iterator<Id<Node>> nodeidsiter = nodeids.iterator();
+		while(nodeidsiter.hasNext()){
+			nodes.remove(nodeidsiter.next());
+		}
+		
+		CollectionUtil<Id<Link>> cutillinks = new CollectionUtil<Id<Link>>();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		ArrayList<Id<Link>> linkids = cutillinks.toArrayList(network.getLinks().keySet().iterator());
+		Iterator<Id<Link>> linkidsiter = linkids.iterator();
+		while(linkidsiter.hasNext()){
+			links.remove(linkidsiter.next());
+		}
+		
+	}
+	public void addNodesAndLinks(Network newnetwork){
+		Network network = this.scenario.getNetwork();
+		Map<Id<Node>, ? extends Node> nodes = newnetwork.getNodes();
+		Iterator<Id<Node>> nodeidsiter = newnetwork.getNodes().keySet().iterator();
+		while(nodeidsiter.hasNext()){
+			network.addNode(nodes.get(nodeidsiter.next()));
+		}
+		
+		CollectionUtil<Id<Link>> cutillinks = new CollectionUtil<Id<Link>>();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		ArrayList<Id<Link>> linkids = cutillinks.toArrayList(network.getLinks().keySet().iterator());
+		Iterator<Id<Link>> linkidsiter = linkids.iterator();
+		while(linkidsiter.hasNext()){
+			links.remove(linkidsiter.next());
+		}
 	}
 	//Removes all vehicle types, vehicles, stop facilities and transit lines from a transit schedule
 	public void removeEntireScheduleAndVehicles(){
@@ -134,6 +172,8 @@ public class PTSchedule implements DecisionVariable{
 		TransitSchedule copiedschedule = adapter.deepCopyTransitSchedule(schedule);
 		Vehicles copiedvehicles = adapter.deepCopyVehicles(vehicles);
 		removeEntireScheduleAndVehicles();//Removes all vehicle types, vehicles, stop facilities and transit lines from a transit schedule
+//		removeAllNodesAndLinks();
+//		addNodesAndLinks(network);
 		addVehicles(copiedvehicles);//Adds all vehicle types and vehicles from an updated stand alone vehicles object into the current scenario vehicles object
 		addTransitSchedule(copiedschedule);//Add all stop facilities and transit lines from a stand alone updated transit schedule into the current scenario transit schedule
 		

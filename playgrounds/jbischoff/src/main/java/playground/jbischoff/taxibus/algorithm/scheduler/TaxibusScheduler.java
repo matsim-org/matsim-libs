@@ -163,12 +163,12 @@ public class TaxibusScheduler {
 		Schedule<TaxibusTask> bestSched = (Schedule<TaxibusTask>) best.vehicle.getSchedule();
 
 		TaxibusTask lastTask = Schedules.getLastTask(bestSched);
-//		log.info("Bus " + best.vehicle.getId() + " Scheduled Route");
-//		for (VrpPathWithTravelData path : best.path) {
-//			log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
-//		}
-//		log.info("End of route");
-//		log.info("scheduled to bus: " + best.requests);
+		log.info("Bus " + best.vehicle.getId() + " Scheduled Route");
+		for (VrpPathWithTravelData path : best.path) {
+			log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
+		}
+		log.info("End of route");
+		log.info("scheduled to bus: " + best.requests);
 		Iterator<VrpPathWithTravelData> iterator = best.path.iterator();
 		double lastEndTime;
 		VrpPathWithTravelData path;
@@ -200,7 +200,7 @@ public class TaxibusScheduler {
 			}
 
 		} else if (lastTask.getTaxibusTaskType() == TaxibusTaskType.PICKUP) {
-			best.failIfRequestNotUnplannedOrDispatched();
+//			best.failIfRequestNotUnplannedOrDispatched();
 			lastEndTime = lastTask.getEndTime();
 			path = iterator.next();
 
@@ -262,6 +262,7 @@ public class TaxibusScheduler {
 		}
 
 		appendTasksAfterDropoff(bestSched);
+		
 //		log.info("Done Scheduling");
 	}
 

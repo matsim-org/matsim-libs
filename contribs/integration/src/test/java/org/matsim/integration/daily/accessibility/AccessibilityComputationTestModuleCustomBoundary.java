@@ -7,11 +7,16 @@ import javax.inject.Provider;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -48,15 +53,13 @@ class AccessibilityComputationTestModuleCustomBoundary extends AbstractModule {
 				@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 				@Override
 				public ControlerListener get() {
-					GridBasedAccessibilityControlerListenerV3 listener =
-							new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType), ptMatrix, getConfig(), scenario, travelTimes, travelDisutilityFactories);
+					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+					accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize));
+					GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType), ptMatrix, getConfig(), scenario, travelTimes, travelDisutilityFactories, boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
 					listener.addAdditionalFacilityData(networkDensityFacilities);
-//					listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-					listener.generateGridsAndMeasuringPointsByCustomBoundary(boundingBox.getXMin(), boundingBox.getYMin(),
-							boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
 					listener.writeToSubdirectoryWithName(activityType);
 					// for push to geoserver
-					listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
+					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
 					listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 					return listener;
 				}
