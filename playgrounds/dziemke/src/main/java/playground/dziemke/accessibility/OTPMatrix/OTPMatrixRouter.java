@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author gthunig
@@ -30,17 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class OTPMatrixRouter {
 
     private static final Logger log = LoggerFactory.getLogger(OTPMatrixRouter.class);
-
-    //editable constants
-//    private final static String INPUT_ROOT = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/";
-//    private final static String INPUT_ROOT = "input/";
-//    private final static String GRAPH_NAME = "Graph.obj";
-//    private final static String OUTPUT_DIR = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/output_2/";
-//    private final static String OUTPUT_DIR = "output/";
-
-//    private final static String TIME_ZONE_STRING = "Europe/Berlin";
-//    private final static String DATE_STRING = "2016-04-01";
-//    private final static int DEPARTURE_TIME = 8 * 60 * 60;
 
     public static void main(String[] args) {
 
@@ -78,19 +66,29 @@ public class OTPMatrixRouter {
         CSVReader reader = new CSVReader(fileName, ",");
 
         List<Individual> individuals = new ArrayList<>();
-        reader.readLine();
         String[] line = reader.readLine();
+        int columnCount = line.length;
+        // every stop.txt from a gtfsfeed has to have "stop_id", "stop_lon" and "stop_lat" as columns
+        int idColumn = CSVReader.getColumnNumber(line, "stop_id");
+        int lonColumn = CSVReader.getColumnNumber(line, "stop_lon");
+        int latColumn = CSVReader.getColumnNumber(line, "stop_lat");
+        line = reader.readLine();
         while (line != null) {
-        	if (line.length == 9) {
-//                individuals.add(new Individual(line[0], Double.parseDouble(line[5]), Double.parseDouble(line[4]), 0));
-                Individual individual = new Individual(line[0], Double.parseDouble(line[4]), Double.parseDouble(line[3]), 0);
-                individuals.add(individual);
-            } else if (line.length == 10) {
-                individuals.add(new Individual(line[0], Double.parseDouble(line[5]), Double.parseDouble(line[4]), 0));
-//                individuals.add(new Individual(line[0], Double.parseDouble(line[6]), Double.parseDouble(line[5]), 0));
+        	int currentLonColumn;
+        	int currentLatColumn;
+            if (line.length == columnCount ) {
+                currentLonColumn = lonColumn;
+                currentLatColumn = latColumn;
+            } else if (line.length == columnCount + 1) {
+                //assuming that "stop_name" contains a ","
+                currentLonColumn = lonColumn + 1;
+                currentLatColumn = latColumn + 1;
             } else {
                 break;
             }
+            Individual individual = new Individual(line[idColumn],
+                    Double.parseDouble(line[currentLonColumn]), Double.parseDouble(line[currentLatColumn]), 0);
+            individuals.add(individual);
             line = reader.readLine() ;
         }
         log.info("Found " + individuals.size() + " coordinates.");
@@ -175,7 +173,6 @@ public class OTPMatrixRouter {
             individualsWriter.writeField(individual.lon);
             individualsWriter.writeNewLine();
         }
-        System.out.println("counter = " + counter);
         log.info("Left out " + counter + " individuals because no sample could be found for their coordinates. Probably out of bounds.");
         log.info(individuals.size() + " individuals will be used for computation.");
         individualsWriter.close();
