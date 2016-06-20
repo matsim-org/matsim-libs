@@ -115,7 +115,7 @@ public class GeneticAlgorithmDC {
 			for(Person person:scenario.getPopulation().getPersons().values()) {
 				Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
 				PlanImpl copyPlan = PopulationUtils.createPlan(copyPerson);
-				copyPlan.copyFrom(person.getSelectedPlan());
+				PopulationUtils.copyFromTo(person.getSelectedPlan(), copyPlan);
 				copyPerson.addPlan(copyPlan);
 				transitActsRemover.run(copyPlan);
 				module.handlePlan(copyPlan);

@@ -218,7 +218,7 @@ public class PlanImplTest {
 		leg.setRoute(route);
 
 		PlanImpl plan2 = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
-		plan2.copyFrom(plan);
+		PopulationUtils.copyFromTo(plan, plan2);
 
 		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
@@ -245,7 +245,7 @@ public class PlanImplTest {
 		leg.setRoute(route);
 
 		PlanImpl plan2 = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(2, Person.class)));
-		plan2.copyFrom(plan);
+		PopulationUtils.copyFromTo(plan, plan2);
 
 		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());

@@ -93,7 +93,7 @@ public class MATSimState implements SimulatorState {
 		final List<Plan> toPlanList = new ArrayList<>(fromPlanList.size());
 		for (Plan fromPlan : fromPlanList) {
 			final PlanImpl toPlan = PopulationUtils.createPlan(fromPlan.getPerson());
-			toPlan.copyFrom(fromPlan);
+			PopulationUtils.copyFromTo(fromPlan, toPlan);
 			toPlanList.add(toPlan);
 		}
 		return toPlanList;

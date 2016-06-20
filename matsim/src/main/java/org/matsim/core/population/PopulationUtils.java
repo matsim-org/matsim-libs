@@ -654,6 +654,8 @@ public final class PopulationUtils {
 //		return new PopulationFactoryImpl( new RouteFactoryImpl() ) ;
 		return populationFactory ;
 	}
+	
+	// --- plain factories: 
 
 	public static PlanImpl createPlan(Person person) {
 		Plan plan = getFactory().createPlan() ;
@@ -678,6 +680,12 @@ public final class PopulationUtils {
 		act.setLinkId(linkId);
 		return (ActivityImpl) act ;
 	}
+	
+	public static LegImpl createLeg(String transportMode) {
+		return (LegImpl) getFactory().createLeg(transportMode) ;
+	}
+
+	// --- copy factories:
 
 	public static ActivityImpl createActivity(Activity act) {
 		// yyyy somehow combine this with copyFromTo method.
@@ -697,10 +705,6 @@ public final class PopulationUtils {
 		return (ActivityImpl) newAct ;
 	}
 
-	public static LegImpl createLeg(String transportMode) {
-		return (LegImpl) getFactory().createLeg(transportMode) ;
-	}
-
 	/**
 	 * Makes a deep copy of this leg, however only when the Leg has a route which is
 	 * instance of Route or BasicRoute. Other route instances are not considered.
@@ -715,6 +719,51 @@ public final class PopulationUtils {
 			leg.setRoute(leg.getRoute().clone());
 		}
 		return leg ;
+	}
+	
+	// --- static copy methods:
+
+	/** loads a copy of an existing plan, but keeps the person reference
+	 * <p/>
+	 * Design comments:<ul>
+	 * <li> In my intuition, this is really a terrible method: (1) Plan is a data object, not a behavioral object, and thus it should be accessed
+	 * from static, interface-based methods only.
+	 * (2) It is not clear about the fact if it is doing a deep or a shallow copy.  The only excuse is that this is one of the oldest parts of
+	 * matsim.  kai, jan'13
+	 * </ul>
+	 * (This may be resolved now.  kai, jun'16)
+	 * 
+	 * @param in a plan who's data will be loaded into this plan
+	 * @param out 
+	 **/
+	public static final void copyFromTo(final Plan in, Plan out) {
+	  out.getPlanElements().clear();
+		out.setScore(in.getScore());
+		out.setType(in.getType());
+		for (PlanElement pe : in.getPlanElements()) {
+			if (pe instanceof Activity) {
+				//no need to cast to ActivityImpl here
+				out.getPlanElements().add(createActivity((Activity) pe));
+			} else if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
+				LegImpl l2 = ((PlanImpl)out).createAndAddLeg(l.getMode());
+				copyFromTo(l, l2);
+			} else {
+				throw new IllegalArgumentException("unrecognized plan element type discovered");
+			}
+		}
+	}
+
+	public static void copyFromTo(Leg in, Leg out) {
+		out.setDepartureTime(in.getDepartureTime());
+		out.setTravelTime(in.getTravelTime());
+		if (in instanceof LegImpl) {
+			// get the arrival time information only if available
+			((LegImpl) out).setArrivalTime(((LegImpl) in).getArrivalTime());
+		}
+		if (in.getRoute() != null) {
+			out.setRoute(in.getRoute().clone());
+		}
 	}
 	
 }

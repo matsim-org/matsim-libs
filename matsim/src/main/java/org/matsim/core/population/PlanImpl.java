@@ -221,43 +221,6 @@ public final class PlanImpl implements Plan {
 				"[personId=" + personIdString + "]" ;
 	}
 
-	/** loads a copy of an existing plan, but keeps the person reference
-	 * <p/>
-	 * Design comments:<ul>
-	 * <li> In my intuition, this is really a terrible method: (1) Plan is a data object, not a behavioral object, and thus it should be accessed
-	 * from static, interface-based methods only.
-	 * (2) It is not clear about the fact if it is doing a deep or a shallow copy.  The only excuse is that this is one of the oldest parts of
-	 * matsim.  kai, jan'13
-	 * </ul>
-	 * @param in a plan who's data will be loaded into this plan
-	 **/
-	public final void copyFrom(final Plan in) {
-        this.getPlanElements().clear();
-		setScore(in.getScore());
-		this.setType(in.getType());
-		for (PlanElement pe : in.getPlanElements()) {
-			if (pe instanceof Activity) {
-				//no need to cast to ActivityImpl here
-				Activity a = (Activity) pe;
-				getPlanElements().add(PopulationUtils.createActivity(a));
-			} else if (pe instanceof Leg) {
-				Leg l = (Leg) pe;
-				LegImpl l2 = createAndAddLeg(l.getMode());
-				l2.setDepartureTime(l.getDepartureTime());
-				l2.setTravelTime(l.getTravelTime());
-				if (pe instanceof LegImpl) {
-					// get the arrival time information only if available
-					l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
-				}
-				if (l.getRoute() != null) {
-					l2.setRoute(l.getRoute().clone());
-				}
-			} else {
-				throw new IllegalArgumentException("unrecognized plan element type discovered");
-			}
-		}
-	}
-
 	/**
 	 * Inserts a leg and a following act at position <code>pos</code> into the plan.
 	 *

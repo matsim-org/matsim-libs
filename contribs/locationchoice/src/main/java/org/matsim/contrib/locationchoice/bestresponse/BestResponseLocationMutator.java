@@ -43,7 +43,6 @@ import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
@@ -122,7 +121,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			Plan bestPlan = PopulationUtils.createPlan(person);
 			
 			// bestPlan is initialized as a copy from the old/input plan:
-			((PlanImpl) bestPlan).copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, bestPlan);
 			
 			// this will probably generate an improved bestPlan (?):
 			int personIndex = this.lcContext.getPersonIndex(person.getId());

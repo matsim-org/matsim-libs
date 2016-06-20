@@ -256,7 +256,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(network, activityChainString, originalMode);
 			PlanImpl originalPlan = PopulationUtils.createPlan(person);
-			originalPlan.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, false);
@@ -273,7 +273,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
 			PlanImpl originalPlan = PopulationUtils.createPlan(person);
-			originalPlan.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, true);
@@ -289,7 +289,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(network, activityChainString, originalMode);
 			PlanImpl originalPlan = PopulationUtils.createPlan(person);
-			originalPlan.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
@@ -305,7 +305,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
 			PlanImpl originalPlan = PopulationUtils.createPlan(person);
-			originalPlan.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
@@ -322,7 +322,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
 			PlanImpl originalPlan = PopulationUtils.createPlan(person);
-			originalPlan.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, true);
@@ -339,7 +339,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(network, activityChainString, originalMode);
 			PlanImpl originalPlan = PopulationUtils.createPlan(person);
-			originalPlan.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
 			assertSubTourMutated(plan, originalPlan, expectedMode, false);

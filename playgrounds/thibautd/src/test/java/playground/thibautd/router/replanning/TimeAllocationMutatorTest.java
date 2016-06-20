@@ -95,11 +95,11 @@ public class TimeAllocationMutatorTest {
 		for (PlanImpl plan : plans) {
 			counter.incCounter();
 			PlanImpl planTransit = PopulationUtils.createPlan();
-			planTransit.copyFrom( plan );
+			PopulationUtils.copyFromTo( plan, planTransit );
 			transit.run( planTransit );
 
 			PlanImpl planTrips2Legs = PopulationUtils.createPlan();
-			planTrips2Legs.copyFrom( plan );
+			PopulationUtils.copyFromTo( plan, planTrips2Legs );
 			trips2legs.run( planTrips2Legs );
 			regular.run( planTrips2Legs );
 

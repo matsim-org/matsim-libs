@@ -20,7 +20,7 @@ package org.matsim.population.algorithms;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.withinday.controller.ExecutedPlansService;
 
 /**
@@ -39,7 +39,7 @@ public final class LastExecutedPlanKeeper implements PlanAlgorithm {
 	public void run(Plan plan) {
 		Plan newPlan = executedPlans.getAgentRecords().get( plan.getPerson().getId() ) ;
 		Gbl.assertNotNull( newPlan ) ;
-		((PlanImpl) plan).copyFrom(newPlan);
+		PopulationUtils.copyFromTo(newPlan, plan);
 		// yyyy would not be able to solve this by copy constructor!
 	}
 

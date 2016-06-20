@@ -152,7 +152,7 @@ public class ChainChopper {
 					Activity cutActivityEnd = PopulationUtils.createActivityFromCoord("chopEnd", cCut);
 					currentPlan.addActivity(cutActivityEnd);
 					PlanImpl segment = PopulationUtils.createPlan();
-					segment.copyFrom(currentPlan);
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 
 					/* Add the remaining portion to the start of the new
@@ -174,7 +174,7 @@ public class ChainChopper {
 					
 					/* Add the final segment to the list. */
 					PlanImpl segment = PopulationUtils.createPlan();
-					segment.copyFrom(currentPlan);
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 					
 					currentPlan = PopulationUtils.createPlan();
@@ -193,7 +193,7 @@ public class ChainChopper {
 					currentPlan.addActivity(endPortion);
 					endPortion.setMaximumDuration(Time.UNDEFINED_TIME);
 					PlanImpl segment = PopulationUtils.createPlan();
-					segment.copyFrom(currentPlan);
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 
 					/* Add the remainder to the start of the new plan. */
@@ -223,7 +223,7 @@ public class ChainChopper {
 			if(i == plan.getPlanElements().size()-1){
 				if(currentPlan.getPlanElements().size() >= 3){
 					PlanImpl segment = PopulationUtils.createPlan();
-					segment.copyFrom(currentPlan);
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 				}
 			}

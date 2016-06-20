@@ -137,7 +137,7 @@ public class PlanUtils {
 		
 	public static void copyFrom(Plan srcPlan, Plan destPlan) {
 		if (destPlan instanceof PlanImpl) {
-			((PlanImpl) destPlan).copyFrom(srcPlan);
+			PopulationUtils.copyFromTo(srcPlan, destPlan);
 		} else if (destPlan instanceof LCPlan) {
 			if (srcPlan instanceof LCPlan) {
 				LCPlan.copyFrom((LCPlan) srcPlan, (LCPlan) destPlan);				
@@ -148,7 +148,7 @@ public class PlanUtils {
 	public static Plan createCopy(Plan plan) {
 		if (plan instanceof PlanImpl) {
 			PlanImpl planTmp = PopulationUtils.createPlan();
-			planTmp.copyFrom(plan);
+			PopulationUtils.copyFromTo(plan, planTmp);
 			return planTmp;			
 		} else if (plan instanceof LCPlan) {
 			LCPlan planTmp = new LCPlan((LCPlan) plan);

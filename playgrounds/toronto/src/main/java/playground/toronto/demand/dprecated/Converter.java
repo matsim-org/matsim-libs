@@ -160,7 +160,7 @@ public class Converter {
 
 				// make a copy of the just finished plan and set it to use public transit mode
 				PlanImpl nonCarPlan = PopulationUtils.createPlan(p);
-				nonCarPlan.copyFrom(tmpPl);
+				PopulationUtils.copyFromTo(tmpPl, nonCarPlan);
 				for (PlanElement pe : nonCarPlan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						((Leg) pe).setMode(TransportMode.pt);

@@ -248,7 +248,7 @@ public class CapeTownScenarioCleaner {
 		for(Id<Person> id : scPersons.getPopulation().getPersons().keySet()){
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
 			PlanImpl plan = PopulationUtils.createPlan();
-			plan.copyFrom(scPersons.getPopulation().getPersons().get(id).getSelectedPlan());
+			PopulationUtils.copyFromTo(scPersons.getPopulation().getPersons().get(id).getSelectedPlan(), plan);
 			for(PlanElement pe : plan.getPlanElements()){
 				/* Check and add modes. */
 				if(pe instanceof Leg){
@@ -285,7 +285,7 @@ public class CapeTownScenarioCleaner {
 			String[] sa = id.toString().split("_");
 			Person person = pf.createPerson(Id.createPersonId("coct_c_" + sa[1]));
 			PlanImpl plan = PopulationUtils.createPlan();
-			plan.copyFrom(scCom.getPopulation().getPersons().get(id).getSelectedPlan());
+			PopulationUtils.copyFromTo(scCom.getPopulation().getPersons().get(id).getSelectedPlan(), plan);
 			for(PlanElement pe : plan.getPlanElements()){
 				if(pe instanceof Leg){
 					/* Check and add modes. */

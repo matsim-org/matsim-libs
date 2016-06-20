@@ -198,7 +198,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		if (firstTimeToGetModifiablePlan) {
 			firstTimeToGetModifiablePlan = false ;
 			PlanImpl newPlan = PopulationUtils.createPlan(this.getCurrentPlan().getPerson());
-			newPlan.copyFrom(this.getCurrentPlan());
+			PopulationUtils.copyFromTo(this.getCurrentPlan(), newPlan);
 			this.plan = newPlan;
 		}
 		return this.getCurrentPlan();

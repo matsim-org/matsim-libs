@@ -222,7 +222,7 @@ class CreateDemand {
 	
 	private Plan adaptAndCopyPlan(Person person, Plan plan, boolean worker) {		
 		PlanImpl newPlan = PopulationUtils.createPlan();
-		newPlan.copyFrom(plan);
+		PopulationUtils.copyFromTo(plan, newPlan);
 		/*
 		 * Go through plan and adapt locations and times
 		 */

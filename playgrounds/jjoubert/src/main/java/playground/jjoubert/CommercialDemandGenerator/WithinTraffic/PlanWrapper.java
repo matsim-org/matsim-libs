@@ -64,7 +64,7 @@ public class PlanWrapper {
 	public static List<Plan> wrapPlan(Plan plan, String timeWindow) {
 		List<Plan> list = new ArrayList<Plan>();
 		PlanImpl tmpPlan = PopulationUtils.createPlan();
-		tmpPlan.copyFrom(plan);
+		PopulationUtils.copyFromTo(plan, tmpPlan);
 		
 		int dayCount = 1;
 		
@@ -101,7 +101,7 @@ public class PlanWrapper {
 							segment.addActivity(end);
 							
 							PlanImpl p = PopulationUtils.createPlan();
-							p.copyFrom(segment);
+							PopulationUtils.copyFromTo(segment, p);
 							list.add(p);
 												
 							/* Start a new segment. */
@@ -122,7 +122,7 @@ public class PlanWrapper {
 							act.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount-1));
 							segment.addActivity(act);
 							PlanImpl p = PopulationUtils.createPlan();
-							p.copyFrom(segment);
+							PopulationUtils.copyFromTo(segment, p);
 							list.add(p);	
 							
 							/* Start a new segment. */
@@ -155,7 +155,7 @@ public class PlanWrapper {
 					/* Finish off the current segment. */
 					segment.addActivity(chopEnd);
 					PlanImpl p = PopulationUtils.createPlan();
-					p.copyFrom(segment);
+					PopulationUtils.copyFromTo(segment, p);
 					list.add(p);
 										
 					/* Start a new segment. */

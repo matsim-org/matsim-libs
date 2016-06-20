@@ -123,7 +123,7 @@ public class ExternalModule implements PlanStrategyModule {
 		
 		final Person personWithOnlySelectedPlan = this.exportPopulation.getFactory().createPerson(plan.getPerson().getId());
 		final PlanImpl planForNewPerson = PopulationUtils.createPlan(personWithOnlySelectedPlan);
-		planForNewPerson.copyFrom(plan);
+		PopulationUtils.copyFromTo(plan, planForNewPerson);
 		personWithOnlySelectedPlan.addPlan(planForNewPerson);
 		this.exportPopulation.addPerson(personWithOnlySelectedPlan);
 		this.plansToMutate.put(plan.getPerson().getId(), plan);
@@ -180,7 +180,7 @@ public class ExternalModule implements PlanStrategyModule {
 			Plan newPlan = dummyPerson.getPlans().get(0);
 			Plan planToMutate = plansToMutate.get(dummyPerson.getId());
             planToMutate.getPlanElements().clear();
-			((PlanImpl) planToMutate).copyFrom(newPlan);
+			PopulationUtils.copyFromTo(newPlan, planToMutate);
 		}
 	}
 
