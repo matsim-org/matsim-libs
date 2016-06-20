@@ -32,10 +32,7 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is based on and similar to org.matsim.pt.router.MultiNodeDijkstra
@@ -69,18 +66,20 @@ public class TransitLeastCostPathTree {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TransitTravelDisutility costFunction;
+	private final TransitTravelDisutility costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and time step.
 	 */
-	final TravelTime timeFunction;
+	private final TravelTime timeFunction;
 
-	final HashMap<Id<Node>, DijkstraNodeData> nodeData;
+	private final HashMap<Id<Node>, DijkstraNodeData> nodeData;
 	private Person person = null;
 	private Vehicle vehicle = null;
 	private CustomDataManager customDataManager = new CustomDataManager();
 	private Map<Node, InitialNode> fromNodes = null;
+
+	private RouterPriorityQueue<Node> pendingNodes;
 
 	public TransitLeastCostPathTree(final Network network, final TransitTravelDisutility costFunction,
 									final TravelTime timeFunction,
@@ -97,7 +96,7 @@ public class TransitLeastCostPathTree {
 		this.customDataManager.reset();
 		this.fromNodes = fromNodes;
 
-		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
+		pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
 		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
 			DijkstraNodeData data = getData(entry.getKey());
 			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
@@ -110,9 +109,34 @@ public class TransitLeastCostPathTree {
 		}
 	}
 
+	public TransitLeastCostPathTree(final Network network, final TransitTravelDisutility costFunction,
+									final TravelTime timeFunction,
+									final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes,
+									final Person person) {
+		this.network = network;
+		this.costFunction = costFunction;
+		this.timeFunction = timeFunction;
+
+		this.nodeData = new HashMap<>((int)(network.getNodes().size() * 1.1), 0.95f);
+
+		//create tree
+		this.resetNetworkVisited();
+		this.person = person;
+		this.customDataManager.reset();
+		this.fromNodes = fromNodes;
+
+		pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
+		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
+			DijkstraNodeData data = getData(entry.getKey());
+			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
+		}
+
+		expandNodeData(toNodes);
+	}
+
 	private int getIterationId() {
 //		TODO could delete all the now unnecessary occurrences of the IterationID especially in DijkstraNodeData and
-//		TODO replace it with a flag visited but that would interfere the useage of th MultiNodeDijkstra
+//		TODO replace it with a flag visited but that would interfere the useage of the MultiNodeDijkstra
 		return 0;
 	}
 
@@ -126,8 +150,37 @@ public class TransitLeastCostPathTree {
 		}
 	}
 
+	private void expandNodeData(final Map<Node, InitialNode> toNodes) {
+		Set<Node> endNodes = new HashSet<>(toNodes.keySet());
+		double minCost = Double.POSITIVE_INFINITY;
+
+		// do the real work
+		while (endNodes.size() > 0) {
+			Node outNode = pendingNodes.poll();
+
+			if (outNode == null) {
+				// seems we have no more nodes left, but not yet reached all endNodes...
+				endNodes.clear();
+			} else {
+				DijkstraNodeData data = getData(outNode);
+				boolean isEndNode = endNodes.remove(outNode);
+				if (isEndNode) {
+					InitialNode initData = toNodes.get(outNode);
+					double cost = data.getCost() + initData.initialCost;
+					if (cost < minCost) {
+						minCost = cost;
+					}
+				}
+				if (data.getCost() > minCost) {
+					endNodes.clear(); // we can't get any better now
+				} else {
+					relaxNode(outNode, pendingNodes);
+				}
+			}
+		}
+	}
+
 	/**
-	 * TODO changed
 	 * Method to request the path from the (cached) fromNodes to the passed toNodes.
 	 * Should only be requested after calling createTransitLeastCostPathTree().
 	 *
@@ -145,6 +198,10 @@ public class TransitLeastCostPathTree {
 		double minCost = Double.POSITIVE_INFINITY;
 		Node minCostNode = null;
 		for (Node currentNode: toNodes.keySet()) {
+			DijkstraNodeData r = this.nodeData.get(currentNode.getId());
+			if (r == null) {
+				expandNodeData(toNodes);
+			}
 			DijkstraNodeData data = getData(currentNode);
 			InitialNode initData = toNodes.get(currentNode);
 			double cost = data.getCost() + initData.initialCost;
