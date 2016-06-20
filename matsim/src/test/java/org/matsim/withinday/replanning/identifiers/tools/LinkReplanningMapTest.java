@@ -20,31 +20,27 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.controller.WithinDayModule;
-import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 import javax.inject.Inject;
 
+/**
+ * @author cdobler
+ */
 public class LinkReplanningMapTest extends MatsimTestCase {
 
-	/**
-	 * @author cdobler
-	 */
+
 	public void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
