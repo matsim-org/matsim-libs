@@ -26,7 +26,7 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
 
 public class ETaxiActionCreator
@@ -46,21 +46,10 @@ public class ETaxiActionCreator
     @Override
     public DynAction createAction(Task task, double now)
     {
-        if (! (task instanceof ETaxiTask)) {
-            return super.createAction(task, now);
+        if (task instanceof ETaxiChargingTask) {
+            return new ETaxiAtChargerActivity((ETaxiChargingTask)task, timer);
         }
 
-        ETaxiTask ett = (ETaxiTask)task;
-
-        switch (ett.getTaxiTaskType()) {
-            case EMPTY_DRIVE:
-                return super.createAction(task, now);
-
-            case STAY:
-                return new ETaxiAtChargerActivity((ETaxiStayAtChargerTask)ett, timer);
-
-            default:
-                throw new IllegalArgumentException();
-        }
+        return super.createAction(task, now);
     }
 }

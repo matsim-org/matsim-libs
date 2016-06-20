@@ -17,67 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.vrpagent;
+package playground.michalm.taxi.scheduler;
 
-import org.matsim.contrib.dynagent.AbstractDynActivity;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.*;
 
+import playground.michalm.ev.data.Charger;
 import playground.michalm.taxi.data.EvrpVehicle;
-import playground.michalm.taxi.data.EvrpVehicle.Ev;
 import playground.michalm.taxi.ev.ETaxiChargingWithQueueingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
 
-public class ETaxiAtChargerActivity
-    extends AbstractDynActivity
+public class ETaxiScheduler
+    extends TaxiScheduler
 {
-    public static final String STAY_AT_CHARGER_ACTIVITY_TYPE = "ETaxiStayAtCharger";
 
-    private final Ev ev;
-    private final ETaxiChargingWithQueueingLogic logic;
-    private final MobsimTimer timer;
-    private boolean chargingEnded = false;
-
-    private double endTime;
-
-
-    public ETaxiAtChargerActivity(ETaxiChargingTask chargingTask, MobsimTimer timer)
+    public ETaxiScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
+            TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        super(STAY_AT_CHARGER_ACTIVITY_TYPE);
-        this.timer = timer;
-        ev = ((EvrpVehicle)chargingTask.getSchedule().getVehicle()).getEv();
-        logic = (ETaxiChargingWithQueueingLogic)chargingTask.getCharger().getLogic();
-
-        logic.addVehicle(ev);
-        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTime() + logic.estimateChargeTime(ev);
+        super(scenario, taxiData, timer, params, travelTime, travelDisutility);
     }
 
 
-    @Override
-    public void doSimStep(double now)
+    public void scheduleCharging(EvrpVehicle vehicle, Charger charger,
+            VrpPathWithTravelData vrpPath)
     {
-        if (!chargingEnded && endTime <= now) {
-            endTime = now + 1;
-        }
-    }
+        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        divertOrAppendDrive(schedule, vrpPath);
 
+        ETaxiChargingWithQueueingLogic logic = (ETaxiChargingWithQueueingLogic)charger.getLogic();
+        double chargingEndTime = vrpPath.getArrivalTime() + logic.estimateMaxWaitTime()
+                + logic.estimateChargeTime(vehicle.getEv());
+        schedule.addTask(new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger));
 
-    @Override
-    public double getEndTime()
-    {
-        return endTime;
-    }
-
-
-    public void notifyChargingStarted()
-    {
-        endTime = timer.getTimeOfDay() + logic.estimateChargeTime(ev);
-    }
-
-
-    public void notifyChargingEnded()
-    {
-        chargingEnded = true;
-        endTime = timer.getTimeOfDay();
+        appendStayTask(schedule);//equivalent to TaxiScheduler.appendTasksAfterDropoff 
     }
 }

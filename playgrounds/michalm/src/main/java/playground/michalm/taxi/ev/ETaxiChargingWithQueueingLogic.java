@@ -104,7 +104,13 @@ public class ETaxiChargingWithQueueingLogic
     }
 
 
-    public double estimateMaxWaitTime(ChargerImpl charger)
+    public double estimateChargeTime(ElectricVehicle vehicle)
+    {
+        return getEnergyToCharge(vehicle) / charger.getPower();
+    }
+
+
+    public double estimateMaxWaitTime()
     {
         if (queuedVehicles.size() < charger.getCapacity()) {
             return 0;

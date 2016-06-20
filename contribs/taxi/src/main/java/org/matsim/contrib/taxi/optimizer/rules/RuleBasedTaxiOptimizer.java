@@ -37,7 +37,7 @@ public class RuleBasedTaxiOptimizer
 {
     protected final BestDispatchFinder dispatchFinder;
 
-    private final IdleTaxiZonalRegistry idleTaxiRegistry;
+    protected final IdleTaxiZonalRegistry idleTaxiRegistry;
     private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
     private final RuleBasedTaxiOptimizerParams params;

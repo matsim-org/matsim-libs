@@ -86,7 +86,7 @@ public class PrtScheduler
         bestSched.addTask(new NPersonsPickupStayTask(best.path.getArrivalTime(), t3, req));
 
         if (params.destinationKnown) {
-            appendDriveAndDropoffAfterPickup(bestSched);
+            appendOccupiedDriveAndDropoff(bestSched);
             appendTasksAfterDropoff(bestSched);
         }
 
@@ -117,7 +117,7 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendDriveAndDropoffAfterPickup(Schedule<TaxiTask> schedule)
+    protected void appendOccupiedDriveAndDropoff(Schedule<TaxiTask> schedule)
     {
         NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules
                 .getLastTask(schedule);

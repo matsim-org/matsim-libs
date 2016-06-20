@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,32 +19,26 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 
 import playground.michalm.ev.data.Charger;
 
 
-public class ETaxiToChargerDriveTask
-    extends DriveTaskImpl
-    implements ETaxiTask
+public class ETaxiChargingTask
+    extends StayTaskImpl
+    implements TaxiTask
 {
     private final Charger charger;
 
 
-    public ETaxiToChargerDriveTask(VrpPathWithTravelData path, Charger charger)
+    public ETaxiChargingTask(double beginTime, double endTime, Charger charger)
     {
-        super(path);
-
-        if (charger.getLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
-        }
-
+        super(beginTime, endTime, charger.getLink());
         this.charger = charger;
     }
 
 
-    @Override
     public Charger getCharger()
     {
         return charger;
@@ -54,7 +48,7 @@ public class ETaxiToChargerDriveTask
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.EMPTY_DRIVE;
+        return TaxiTaskType.STAY;
     }
 
 
