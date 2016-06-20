@@ -28,9 +28,11 @@ import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -176,16 +178,16 @@ public class AccessibilityComputationNMBNew {
 
 						@Override
 						public ControlerListener get() {
-							GridBasedAccessibilityControlerListenerV3 listener =
-									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-
+							BoundingBox bb = BoundingBox.createBoundingBox(((Scenario) scenario).getNetwork());
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule((Config) config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize));
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 							listener.addAdditionalFacilityData(homes) ;
-							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 							listener.writeToSubdirectoryWithName(actType);
 							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;
