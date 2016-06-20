@@ -19,9 +19,6 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.network;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
@@ -48,13 +45,9 @@ public class PatnaOSM2MatsimNetwork {
 		reader.parse(osmNetworkFile);
 		
 		NetworkSimplifier simplifier = new NetworkSimplifier();
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-
-		nodeTypesToMerge.add(Integer.valueOf(4));
-		nodeTypesToMerge.add(Integer.valueOf(5));
-
-		simplifier.setNodesToMerge(nodeTypesToMerge);
 		simplifier.run(sc.getNetwork());
+		
+//		new NetworkCleaner().run(PatnaUtils.INPUT_FILES_DIR +"/networkFromOSM.xml.gz",PatnaUtils.INPUT_FILES_DIR +"/networkFromOSM_cleaned.xml.gz");
 		
 		
 		new NetworkWriter(sc.getNetwork()).write(PatnaUtils.INPUT_FILES_DIR +"/networkFromOSM.xml.gz");
