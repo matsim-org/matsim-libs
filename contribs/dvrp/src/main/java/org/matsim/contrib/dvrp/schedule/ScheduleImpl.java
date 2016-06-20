@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.schedule;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
@@ -122,6 +123,7 @@ public class ScheduleImpl<T extends AbstractTask>
             }
 
             if (Tasks.getEndLink(previousTask) != beginLink) {
+            	Logger.getLogger(getClass()).error("Last task End link: "+Tasks.getEndLink(previousTask).getId()+ " ; next Task start link: "+ beginLink.getId());
                 throw new IllegalArgumentException();
             }
         }
