@@ -52,8 +52,8 @@ import playground.dziemke.utils.LogToOutputSaver;
 /**
  * @author dziemke
  */
-public class AccessibilityComputationNairobiLandUse {
-	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiLandUse.class ) ;
+public class AccessibilityComputationNairobi {
+	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobi.class ) ;
 
 	private static final Double cellSize = 500.;
 
@@ -61,8 +61,8 @@ public class AccessibilityComputationNairobiLandUse {
 		// Input and output
 		String networkFile = "../../../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network.xml";
 //		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
-		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/facilities.xml";
-		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/11/";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/facilities.xml";
+		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/15/";
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters

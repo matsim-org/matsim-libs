@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.controler.AbstractModule;
@@ -55,7 +56,7 @@ class AccessibilityComputationTestModuleCustomBoundary extends AbstractModule {
 							boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
 					listener.writeToSubdirectoryWithName(activityType);
 					// for push to geoserver
-//					listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
+					listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
 					listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 					return listener;
 				}

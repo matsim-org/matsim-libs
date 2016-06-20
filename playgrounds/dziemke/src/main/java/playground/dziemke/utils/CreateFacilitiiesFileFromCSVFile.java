@@ -45,10 +45,10 @@ public class CreateFacilitiiesFileFromCSVFile {
 	private final static Logger LOG = Logger.getLogger(CreateFacilitiiesFileFromCSVFile.class);
 
 	public static void main(String[] args) {
-		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/public_primary_school_2007/Public_Primary_School_listed_by_2007.csv";
-		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/public_primary_school_2007/facilities_2.xml";
+		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/Public_Primary_School_listed_by_2007.csv";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/facilities.xml";
 		
-		String facilitiesFileDescription = "Facilities in Nairobi based on Land-Use Shapefile";
+		String facilitiesFileDescription = "Public Primary Schools in Kenya";
 		String inputCRS = "EPSG:4326";
 		String outputCRS = "EPSG:21037";
 		String headOfCoordColumn = "Geolocation";
