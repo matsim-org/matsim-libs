@@ -20,34 +20,51 @@
 /**
  * 
  */
-package playground.jbischoff.parking;
+package playground.jbischoff.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.parking.sim.SetupParking;
-
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
 
-public class RunParkingExample {
+public class WriteTestPopulation {
 
+	
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");
-		config.plans().setInputFile("../../../shared-svn/projects/bmw_carsharing/example/population100.xml");
-		config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/output");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		SetupParking.installParkingModules(controler);
-		controler.run();
-
+		// TODO Auto-generated method stub
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationFactory fac = scenario.getPopulation().getFactory();
+		int n = 100;
+		for (int i = 0 ; i < n; i++){
+			Person p = fac.createPerson(Id.createPersonId(i));
+			Plan plan = fac.createPlan();
+			p.addPlan(plan);
+			Activity h1 = fac.createActivityFromLinkId("home", Id.createLinkId(114));
+			h1.setEndTime(7*3600+i*60);
+			plan.addActivity(h1);
+			Leg l1 = fac.createLeg("car");
+			plan.addLeg(l1);
+			Activity w1 = fac.createActivityFromLinkId("work", Id.createLinkId(349));
+			w1.setEndTime(8*3600+i*60);
+			plan.addActivity(w1);
+			plan.addLeg(fac.createLeg("car"));
+			Activity h2 = fac.createActivityFromLinkId("home", Id.createLinkId(114));
+			plan.addActivity(h2);
+			scenario.getPopulation().addPerson(p);
+		}
+		new PopulationWriter(scenario.getPopulation()).write("../../../shared-svn/projects/bmw_carsharing/example/population"+n+".xml");
+				
 	}
 
 }
