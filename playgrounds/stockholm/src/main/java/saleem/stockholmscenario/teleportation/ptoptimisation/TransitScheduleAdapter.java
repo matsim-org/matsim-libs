@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -56,7 +57,7 @@ public class TransitScheduleAdapter {
 		int size = lines.size();
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
-			if(Math.random()<=0.1){//With 5% probability
+			if(Math.random()<=0.1){//With 10% probability
 //				if(Math.random()<=0.5){//With 50% probability
 					vehadder.addDeparturesToLine(tline, 0.1);//Adds 10 % departures and corresponding vehicles from tline
 //				}
@@ -84,14 +85,16 @@ public class TransitScheduleAdapter {
 	public PTSchedule updateScheduleDeleteRoute(Scenario scenario, Vehicles vehicles, TransitSchedule schedule){
 		RouteAdderRemover routeremover = new RouteAdderRemover();
 		routeremover.deleteRandomRoutes(schedule, vehicles);
-		writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\TransitScheduleRoutesRemoved.xml");
+//		writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\TransitScheduleRoutesRemoved.xml");
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
 		//With 10 % chance of selecting a line, and 10% chance of removing each of its route.
 	public PTSchedule updateScheduleAddRoute(Scenario scenario, Vehicles vehicles, TransitSchedule schedule){
-		RouteAdderRemover routeremover = new RouteAdderRemover();
-		routeremover.addRandomRoutes(scenario, schedule, vehicles);
-		writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\TransitScheduleRoutesAdded.xml");
+		RouteAdderRemover routeadder = new RouteAdderRemover();
+		routeadder.addRandomRoutes(scenario, schedule, vehicles);
+//		writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\TransitScheduleRoutesAdded.xml");
+//		NetworkWriter networkWriter =  new NetworkWriter(scenario.getNetwork());
+//		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\RouteAddedNetwork.xml");
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
 
@@ -160,6 +163,29 @@ public class TransitScheduleAdapter {
 			newvehicles.addVehicle(veh);
 		}
 		return newvehicles;
+	}
+	public int getUnusedVehs(TransitSchedule schedule){//Vehicles after simulation end time
+		int unusedvehs=0;
+		Map<Id<TransitLine>, TransitLine> lines = schedule.getTransitLines();
+		Iterator<Id<TransitLine>> linesiterator =  lines.keySet().iterator();
+		while(linesiterator.hasNext()){
+			TransitLine tline = lines.get(linesiterator.next());
+			Map<Id<TransitRoute>, TransitRoute> routes = tline.getRoutes();
+			Iterator<Id<TransitRoute>> routesiterator =  routes.keySet().iterator();
+			while(routesiterator.hasNext()){
+				TransitRoute troute = routes.get(routesiterator.next());
+				Map<Id<Departure>, Departure> departures = troute.getDepartures();
+				Iterator<Id<Departure>> depsiterator =  departures.keySet().iterator();
+				while(depsiterator.hasNext()){
+					Departure departure = departures.get(depsiterator.next());
+					if(departure.getDepartureTime()==115200){
+						unusedvehs++;
+					}
+				}
+			}
+		}
+	
+		return unusedvehs;
 	}
 	//Just for debugging purposes, no functional importance
 //	public void removeEntireScheduleAndVehicles(){

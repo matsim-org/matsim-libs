@@ -3,14 +3,16 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import opdytsintegration.MATSimState;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import opdytsintegration.MATSimState;
 
 
 /**
@@ -38,10 +40,12 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 			result -= selectedPlan.getScore();
 		}
 		int currenttotal = scenario.getTransitVehicles().getVehicles().size();
-		int added = currenttotal-totalVeh;
+		TransitScheduleAdapter adapter = new TransitScheduleAdapter();
+		int unusedvehs = adapter.getUnusedVehs(scenario.getTransitSchedule());
+		int added = currenttotal-totalVeh-unusedvehs;
 		if(added>0){
 			for(int i=0; i<added; i++){
-				result = result + 4.5;//Thats an adverse efffect on total score
+				result = result + 4.5;//Thats an adverse effect on total score
 			}
 		}
 		else if (added<0){
