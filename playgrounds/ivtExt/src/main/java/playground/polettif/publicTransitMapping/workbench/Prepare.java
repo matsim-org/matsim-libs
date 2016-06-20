@@ -29,6 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReader;
@@ -37,7 +38,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -51,10 +51,12 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.matsim.contrib.accessibility.FacilityTypes.HOME;
-import static org.matsim.contrib.accessibility.FacilityTypes.WORK;
+import static org.matsim.contrib.accessibility.FacilityTypes.*;
 
 /**
  * workbench class to do some scenario preparation
@@ -74,11 +76,30 @@ public class Prepare {
 
 	public static void main(final String[] args) {
 
-		String inputNetwork = "../output/2016-06-10/ch_ll_network.xml.gz";
-		String inputSchedule = "../output/2016-06-10/ch_ll_schedule.xml.gz";
+		String inputNetwork = "../output/2016-06-15/ch_network.xml.gz";
+		String inputSchedule = "../output/2016-06-15/ch_schedule.xml.gz";
 		String inputVehicles = "../data/vehicles/ch_hafas_vehicles.xml.gz";
 		String inputPopulation;
 		String scenName;
+
+		// Switzerland 10%
+		scenName = "ch_ten";
+		inputPopulation = "population/ch_10prct.xml.gz";
+		final Config configCH = createConfig(scenName);
+		configCH.qsim().setFlowCapFactor(0.1);
+
+		Prepare prepareCH = new Prepare(configCH, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		prepareCH.removeInvalidLines();
+//		prepareCH.cutSchedule();
+		prepareCH.population();
+		prepareCH.vehicles(0.1);
+		prepareCH.writeFiles(scenName);
+
+		try {
+			TransitScheduleValidator.main(new String[]{scenName+"/"+configCH.transit().getTransitScheduleFile(), scenName+"/"+configCH.network().getInputFile()});
+		} catch (IOException | SAXException | ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 
 		// Zurich 1%
 		// no delay
@@ -126,26 +147,6 @@ public class Prepare {
 		prepareZH10Tel.population();
 		prepareZH10Tel.vehicles(0.1);
 		prepareZH10Tel.writeFiles(scenName);
-
-
-		// Switzerland 10%
-		scenName = "ch_ten";
-		inputPopulation = "population/ch_10prct.xml.gz";
-		final Config configCH = createConfig(scenName);
-		configCH.qsim().setFlowCapFactor(0.1);
-
-		Prepare prepareCH = new Prepare(configCH, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
-		prepareCH.removeInvalidLines();
-//		prepareCH.cutSchedule();
-		prepareCH.population();
-		prepareCH.vehicles(0.1);
-		prepareCH.writeFiles(scenName);
-
-		try {
-			TransitScheduleValidator.main(new String[]{scenName+"/"+configCH.transit().getTransitScheduleFile(), scenName+"/"+configCH.network().getInputFile()});
-		} catch (IOException | SAXException | ParserConfigurationException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public Prepare(Config config, String inputNetwork, String inputSchedule, String inputVehicles, String inputPopulation) {
@@ -160,39 +161,17 @@ public class Prepare {
 		this.population = sc.getPopulation();
 	}
 
-	private void removeInvalidLines() {
-		Set<String> set = new HashSet<>();
 
-		// copy/paste
-		set.add("AB-_line21");
-		set.add("AB-_line21");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("SBG_line7312");
-		set.add("SBG_line7312");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("FAR_line2");
-		set.add("PAG_line581");
+	public Prepare(Config config, Network network, String inputSchedule, String inputVehicles, String inputPopulation) {
+		this.config = config;
+		this.network = network;
+		this.schedule = ScheduleTools.readTransitSchedule(inputSchedule);
+		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
-
-		for(String e : set) {
-			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
-			if(tl != null) schedule.removeTransitLine(tl);
-		}
-
-		ScheduleCleaner.removeRoute(schedule, Id.create("VBZ_line31", TransitLine.class), Id.create("05060_155", TransitRoute.class));
-		ScheduleCleaner.removeRoute(schedule, Id.create("AAG_line401", TransitLine.class), Id.create("00001_001", TransitRoute.class));
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		reader.readFile(inputPopulation);
+		this.population = sc.getPopulation();
 	}
 
 	private void writeFiles(String folder) {
@@ -219,22 +198,24 @@ public class Prepare {
 		log.info("adapting plans...");
 		Counter personCounter = new Counter(" person # ");
 		for(Person person : population.getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
 			personCounter.incCounter();
-			List<PlanElement> elements = plan.getPlanElements();
-			for(PlanElement e : elements) {
-				if(e instanceof ActivityImpl) {
-					Activity activity = (Activity) e;
-					switch (activity.getType()) {
-						case "home" :
-							break;
-						case "work" :
-							break;
-						default :
-							activity.setType("work");
+			List<? extends Plan> plans = person.getPlans();
+			for(Plan plan : plans) {
+				List<PlanElement> elements = plan.getPlanElements();
+				for(PlanElement e : elements) {
+					if(e instanceof ActivityImpl) {
+						Activity activity = (Activity) e;
+						switch (activity.getType()) {
+							case "home" :
+								break;
+							case "work" :
+								break;
+							default :
+								activity.setType(OTHER);
+						}
+						activity.setFacilityId(null);
+						activity.setLinkId(NetworkTools.getNearestLink(carNetwork, activity.getCoord()).getId());
 					}
-					activity.setFacilityId(null);
-					activity.setLinkId(NetworkTools.getNearestLink(carNetwork, activity.getCoord()).getId());
 				}
 			}
 		}
@@ -242,9 +223,10 @@ public class Prepare {
 
 	private void cutSchedule() {
 		Coord effretikon = new Coord(2693780.0, 1253409.0);
+		Coord zurichHB = new Coord(2682830.0, 1248125.0);
 		double radius = 20000;
 
-		ScheduleCleaner.cutSchedule(schedule, effretikon, radius);
+		ScheduleCleaner.cutSchedule(schedule, zurichHB, radius);
 		Set<String> modesToKeep = new HashSet<>();
 		modesToKeep.add("car");
 		modesToKeep.add("rail");
@@ -255,42 +237,101 @@ public class Prepare {
 	}
 
 	private static Config createConfig(String folder) {
+		int nThreads = 12;
+
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setLastIteration(400);
+		config.controler().setLastIteration(200);
 		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("../output/"+folder);
+		config.controler().setOutputDirectory("/cluster/scratch/polettif/scenario_output/"+folder);
 
-		config.global().setNumberOfThreads(8);
+		config.global().setNumberOfThreads(nThreads);
 		config.global().setRandomSeed(6129);
 		config.global().setCoordinateSystem(TransformationFactory.CH1903_LV03_Plus);
 
 		config.network().setInputFile("network.xml.gz");
 
-		config.parallelEventHandling().setNumberOfThreads(8);
+		config.parallelEventHandling().setNumberOfThreads(nThreads);
 
 		PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		workParams.setActivityType(WORK);
 		workParams.setTypicalDuration(Time.parseTime("08:00:00"));
-
 		PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		homeParams.setActivityType(HOME);
-		homeParams.setTypicalDuration(Time.parseTime("8:00:00"));
-
+		homeParams.setTypicalDuration(Time.parseTime("08:00:00"));
+		PlanCalcScoreConfigGroup.ActivityParams otherParams = new PlanCalcScoreConfigGroup.ActivityParams();
+		otherParams.setActivityType(OTHER);
 		config.planCalcScore().addActivityParams(homeParams);
 		config.planCalcScore().addActivityParams(workParams);
+		config.planCalcScore().addActivityParams(otherParams);
 
 		config.plans().setInputFile("plans.xml.gz");
 
 		config.qsim().setEndTime(Time.parseTime("30:00:00"));
-		config.qsim().setNumberOfThreads(8);
+		config.qsim().setNumberOfThreads(nThreads);
 
 		config.transit().setUseTransit(true);
 		config.transit().setTransitScheduleFile("transitSchedule.xml.gz");
 		config.transit().setVehiclesFile("transitVehicles.xml.gz");
 
+		// strategy
+		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+		changeExpBeta.setStrategyName("ChangeExpBeta");
+		changeExpBeta.setWeight(0.5);
+		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings();
+		reRoute.setStrategyName("ReRoute");
+		reRoute.setWeight(0.2);
+		StrategyConfigGroup.StrategySettings changeTripMode = new StrategyConfigGroup.StrategySettings();
+		changeTripMode.setStrategyName("ChangeTripMode");
+		changeTripMode.setWeight(0.2);
+		config.strategy().addStrategySettings(changeExpBeta);
+		config.strategy().addStrategySettings(reRoute);
+		config.strategy().addStrategySettings(changeTripMode);
+
 		return config;
+	}
+
+	private void removeInvalidLines() {
+		ScheduleCleaner.removeInvalidTransitRoutes(TransitScheduleValidator.validateAll(schedule, network), schedule);
+
+/*
+		Set<String> set = new HashSet<>();
+
+		// copy/paste
+
+		set.add("AB-_line21");
+		set.add("AB-_line21");
+		set.add("PAG_line581");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line2");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("RVB_line4");
+		set.add("SBG_line7312");
+		set.add("SBG_line7312");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("VBZ_line303");
+		set.add("FAR_line2");
+		set.add("PAG_line581");
+
+
+		for(String e : set) {
+			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
+			if(tl != null) schedule.removeTransitLine(tl);
+		}
+*/
+
+//		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04121_042", TransitRoute.class));
+//		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04051_003", TransitRoute.class));
+//		ScheduleCleaner.removeRoute(schedule, Id.create("PAG_line581", TransitLine.class), Id.create("00012_012", TransitRoute.class));
+//		ScheduleCleaner.removeRoute(schedule, Id.create("TL_line16", TransitLine.class), Id.create("06154_001", TransitRoute.class));
 	}
 
 

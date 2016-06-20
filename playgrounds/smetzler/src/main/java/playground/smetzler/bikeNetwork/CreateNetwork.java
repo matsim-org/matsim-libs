@@ -19,12 +19,18 @@ public class CreateNetwork {
 		String DHDN_GK4 = "EPSG:31468"; //String DHDN = "EPSG:3068";
 		
 		
-		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/innenring/innenring.osm";
+//		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/innenring/innenring.osm";
 //		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/berlin/berlin-latest.osm";
 		
+		//brasilia
+		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/brasilia/brasilia.osm.gz";
 
-		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_MATsim_bikeAndCar_EUDEM.xml";
-		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_bikeatt_bikeAndCar_EUDEM.xml";
+		//brasilia
+		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/brasilia_MATsim_bikeAndCar.xml";
+		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/brasilia_bikeatt_bikeAndCar.xml";
+
+//		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_MATsim_bikeAndCar_EUDEM.xml";
+//		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_bikeatt_bikeAndCar_EUDEM.xml";
 //		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin_MATsim.xml";
 //		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin_bikeatt.xml";
 		
@@ -34,7 +40,7 @@ public class CreateNetwork {
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = 
-				TransformationFactory.getCoordinateTransformation(WGS84, DHDN_GK4); //TransformationFactory.WGS84
+				TransformationFactory.getCoordinateTransformation(WGS84, WGS84);//DHDN_GK4); //TransformationFactory.WGS84
 
 		//wie kann ich die bike-Interfaces einbringen??
 		BikeCustomizedOsmNetworkReader bikeNetworkReader = new BikeCustomizedOsmNetworkReader(net,ct);

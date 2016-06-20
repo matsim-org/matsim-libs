@@ -30,17 +30,6 @@ public class OTPMatrixRouter {
 
     private static final Logger log = LoggerFactory.getLogger(OTPMatrixRouter.class);
 
-    //editable constants
-//    private final static String INPUT_ROOT = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/";
-//    private final static String INPUT_ROOT = "input/";
-//    private final static String GRAPH_NAME = "Graph.obj";
-//    private final static String OUTPUT_DIR = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/output_2/";
-//    private final static String OUTPUT_DIR = "output/";
-
-//    private final static String TIME_ZONE_STRING = "Europe/Berlin";
-//    private final static String DATE_STRING = "2016-04-01";
-//    private final static int DEPARTURE_TIME = 8 * 60 * 60;
-
     public static void main(String[] args) {
 
         if (args.length != 7) {
@@ -56,7 +45,14 @@ public class OTPMatrixRouter {
             List<Individual> fromIndividuals = readIndividuals(args[0]);
             List<Individual> toIndividuals = readIndividuals(args[1]);
 
+            long startTime = System.currentTimeMillis();
             routeMatrix(fromIndividuals, toIndividuals, args[2], args[3], args[4], args[5], Integer.parseInt(args[6]));
+            long endTime = System.currentTimeMillis();
+            long elapsedTime = (endTime - startTime) / 1000;
+            int hours = (int) elapsedTime / 3600;
+            int minutes = (int) (elapsedTime - hours * 3600) / 60;
+            int seconds = (int) (elapsedTime - hours * 3600 - minutes * 60);
+            log.info("Elapsed time = " + hours + ":" + minutes + ":" + seconds);
         }
     }
 
@@ -70,16 +66,29 @@ public class OTPMatrixRouter {
         CSVReader reader = new CSVReader(fileName, ",");
 
         List<Individual> individuals = new ArrayList<>();
-        reader.readLine();
         String[] line = reader.readLine();
+        int columnCount = line.length;
+        // every stop.txt from a gtfsfeed has to have "stop_id", "stop_lon" and "stop_lat" as columns
+        int idColumn = CSVReader.getColumnNumber(line, "stop_id");
+        int lonColumn = CSVReader.getColumnNumber(line, "stop_lon");
+        int latColumn = CSVReader.getColumnNumber(line, "stop_lat");
+        line = reader.readLine();
         while (line != null) {
-            if (line.length == 9) {
-                individuals.add(new Individual(line[0], Double.parseDouble(line[5]), Double.parseDouble(line[4]), 0));
-            } else if (line.length == 10) {
-                individuals.add(new Individual(line[0], Double.parseDouble(line[6]), Double.parseDouble(line[5]), 0));
+        	int currentLonColumn;
+        	int currentLatColumn;
+            if (line.length == columnCount ) {
+                currentLonColumn = lonColumn;
+                currentLatColumn = latColumn;
+            } else if (line.length == columnCount + 1) {
+                //assuming that "stop_name" contains a ","
+                currentLonColumn = lonColumn + 1;
+                currentLatColumn = latColumn + 1;
             } else {
                 break;
             }
+            Individual individual = new Individual(line[idColumn],
+                    Double.parseDouble(line[currentLonColumn]), Double.parseDouble(line[currentLatColumn]), 0);
+            individuals.add(individual);
             line = reader.readLine() ;
         }
         log.info("Found " + individuals.size() + " coordinates.");
@@ -87,7 +96,7 @@ public class OTPMatrixRouter {
         return individuals;
     }
 
-    private static void routeMatrix(List<Individual> fromindividuals, List<Individual> toindividuals,
+    private static void routeMatrix(List<Individual> fromindividuals, List<Individual> toIndividuals,
                             String graphDir, String outputDir, String timeZone, String date, int departureTime) {
 
         buildGraph(graphDir);
@@ -98,7 +107,7 @@ public class OTPMatrixRouter {
 
         mkdir(outputDir);
 
-        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, "fromIDs.csv"), indexIndividuals(graph, toindividuals, "toIDs.csv"), outputDir);
+        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, "fromIDs.csv"), indexIndividuals(graph, toIndividuals, "toIDs.csv"), outputDir);
         log.info("Shutdown");
     }
 
@@ -148,13 +157,24 @@ public class OTPMatrixRouter {
         log.info("Start indexing vertices and writing them out...");
         InputsCSVWriter individualsWriter = new InputsCSVWriter(filePath, ",");
         SampleFactory sampleFactory = graph.getSampleFactory();
-        for (Individual individual : individuals) {
-            individual.sample = sampleFactory.getSample(individual.lon, individual.lat);
+        int counter = 0;
+        for (int i = 0; i < individuals.size(); i++) {
+            Individual individual = individuals.get(i);
+            Sample sample = sampleFactory.getSample(individual.lon, individual.lat);
+            if (sample == null) {
+                counter++;
+                individuals.remove(individual);
+                i--;
+                continue;
+            }
+            individual.sample = sample;
             individualsWriter.writeField(individual.label);
             individualsWriter.writeField(individual.lat);
             individualsWriter.writeField(individual.lon);
             individualsWriter.writeNewLine();
         }
+        log.info("Left out " + counter + " individuals because no sample could be found for their coordinates. Probably out of bounds.");
+        log.info(individuals.size() + " individuals will be used for computation.");
         individualsWriter.close();
         log.info("Indexing vertices and writing them out: done.");
         return individuals;
@@ -177,8 +197,8 @@ public class OTPMatrixRouter {
             request.setRoutingContext(graph);
         } catch (Exception e) {
             log.error(e.getMessage());
-            System.out.println("Latitude  = " + individual.lat);
-            System.out.println("Longitude = " + individual.lon);
+            log.error("Latitude  = " + individual.lat);
+            log.error("Longitude = " + individual.lon);
             return null;
         }
         return request;
@@ -189,7 +209,8 @@ public class OTPMatrixRouter {
         InputsCSVWriter timeWriter = new InputsCSVWriter(outputDir + "tt.csv", " ");
         InputsCSVWriter distanceWriter = new InputsCSVWriter(outputDir + "td.csv", " ");
 
-        for (Individual fromIndividual : fromIndividuals) {
+        for (int i = 0; i < fromIndividuals.size(); i++) {
+            Individual fromIndividual = fromIndividuals.get(i);
             long t0 = System.currentTimeMillis();
 
             RoutingRequest request = getRoutingRequest(graph, calendar, fromIndividual);
@@ -213,7 +234,7 @@ public class OTPMatrixRouter {
 
             }
             long t1 = System.currentTimeMillis();
-            System.out.printf("Time: %d\n", t1-t0);
+            log.info((i+1) + "/" + fromIndividuals.size() + " Millis: " + (t1-t0));
         }
         timeWriter.close();
         distanceWriter.close();
@@ -225,7 +246,7 @@ public class OTPMatrixRouter {
         List<State> states = eval(spt, toIndividual.sample);
 
         long elapsedTime = Long.MAX_VALUE;
-        double distance = Double.MAX_VALUE;
+        double distance = 0;
 
         for (State state : states) {
             Edge backEdge = state.getBackEdge();

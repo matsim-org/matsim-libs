@@ -48,6 +48,7 @@ import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -144,12 +145,8 @@ public class PlausibilityCheck {
 
 		// stop facility histogram
 		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
-		try {
-			histogram.createCsv(outputFolder + "stopfacilities.csv");
-			histogram.createPng(outputFolder + "stopfacilities_histogram.png");
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			log.warn("Could not write stopfacilities.csv");
-		}
+		histogram.createCsv(outputFolder + "stopfacilities.csv");
+		histogram.createPng(outputFolder + "stopfacilities_histogram.png");
 	}
 
 	/**
@@ -259,7 +256,7 @@ public class PlausibilityCheck {
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
 				.addAttribute("diff [s]", Double.class)
-				.addAttribute("diff [%]", Double.class)
+				.addAttribute("diff [ratio]", Double.class)
 				.addAttribute("expected", Double.class)
 				.addAttribute("actual", Double.class)
 				.create();

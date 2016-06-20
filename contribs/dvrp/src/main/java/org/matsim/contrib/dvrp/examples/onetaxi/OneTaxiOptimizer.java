@@ -62,8 +62,9 @@ public class OneTaxiOptimizer
         router = new Dijkstra(scenario.getNetwork(), new TimeAsTravelDisutility(travelTime),
                 travelTime);
 
+        vrpData.clearRequestsAndResetSchedules();//necessary if we run more than 1 iteration
+        
         vehicle = vrpData.getVehicles().values().iterator().next();
-        vehicle.resetSchedule();//necessary if we run more than 1 iteration
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
         schedule.addTask(
                 new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));

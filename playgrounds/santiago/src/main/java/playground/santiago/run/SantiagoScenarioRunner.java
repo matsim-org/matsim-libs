@@ -51,6 +51,9 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
+
+import com.google.inject.Binder;
 
 import playground.santiago.SantiagoScenarioConstants;
 
@@ -62,24 +65,30 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
-	private static String inputPath = "../../../runs-svn/santiago/casoBase5_NP/input/";
+	private static String inputPath = "../../../runs-svn/santiago/policy1/input/";
+//	private static String inputPath = "net/ils4/lcamus/runs-svn/santiago/cluster_2/input/";
 	private static boolean doModeChoice = true;
 //	private static boolean mapActs2Links = true;
 	private static boolean mapActs2Links = false;
+	
+	private static boolean pricing = false;
+	private static double sigma = 3.0;
 	
 	private static String configFile;
 	
 	public static void main(String args[]){
 
 		if(args.length==0){
-			configFile = inputPath + "new_input/expanded_config_final.xml";
+			configFile = inputPath + "new-input/randomized_config_final.xml";
 //			configFile = inputPath + "config_triangleCordon.xml";
 		} else {
 			configFile = args[0];
 			mapActs2Links = Boolean.parseBoolean(args[1]);
+			pricing = Boolean.parseBoolean(args[2]);
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile);
+//		config.controler().setOutputDirectory(outputDirectory);
 //		config.qsim().setNumberOfThreads(1);
 //		config.parallelEventHandling().setNumberOfThreads(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -103,8 +112,18 @@ public class SantiagoScenarioRunner {
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
+		if (pricing){			
+			
+		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+		rpcg.setTollLinksFile(inputPath + "outerCordon.xml");
+		// adding some randomness to the router so to explore more possible routes.
+		config.plansCalcRoute().setRoutingRandomness(sigma); 
 		// adding roadpricing contrib for cordon policies
-//		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+	
+
+		
+		}
 		
 		controler.run();
 	}
@@ -217,7 +236,8 @@ public class SantiagoScenarioRunner {
 				final String[] chainBasedModes2 = {};
 				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new SubtourModeChoiceProvider(availableModes2, chainBasedModes2));
 			}
-		});
+		});		
+
 	}
 	/**
 	 * @author benjamin

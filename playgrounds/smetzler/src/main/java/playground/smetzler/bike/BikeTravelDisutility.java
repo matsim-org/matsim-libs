@@ -19,11 +19,16 @@ import org.matsim.vehicles.Vehicle;
  * (straßen mit radwegen/radwege bevorzugen bzw. starßen ohne radwege mit extra dis)
  * 
  * following parameters may be added in the future
- * smoothness? (vs surface), weather/wind?, #crossings (info in nodes), parkende autos?, prefere routes that are offical bike routes
+ * smoothness? (vs surface), weather/wind?, #crossings (info in nodes), on-street-parking cars?, prefere routes that are offical bike routes
  */
 
 
 public class BikeTravelDisutility implements TravelDisutility {
+	
+	int count1 = 0;
+	int count2 = 0;
+	int count3 = 0;
+	int count4 = 0;
 	
 	private final static Logger log = Logger.getLogger(BikeTravelTime.class);
 
@@ -209,20 +214,33 @@ public class BikeTravelDisutility implements TravelDisutility {
 		
 		
 		
+		// Randomfactor with
+		Random r = new Random();
+		double standardDeviation = 0.2;
+		int mean = 1;
+		double randomfactor = r.nextGaussian() * standardDeviation + mean;
+		
+//		if (randomfactor <0.5)
+//		count1++;
+//		if (randomfactor >0.5 && randomfactor <1)
+//		count2++;
+//		if (randomfactor >1 && randomfactor <1.5)
+//		count3++;
+//		if (randomfactor >1.5)
+//		count4++;
+	//	
+//		System.out.println("count1 " + count1);
+//		System.out.println("count2 " + count2);
+//		System.out.println("count3 " + count3);
+//		System.out.println("count4 " + count4);
+		
 	double travelTimeDisutility     = -(marginalUtilityOfTime/3600 * travelTime);
 	double distanceDisutility	    = -(marginalUtilityOfDistance * distance);
 	double comfortDisutility_util_m = -(marginalUtilityOfComfort *(Math.abs(surfaceFactor-100) + Math.abs(streetFactor-100))/100);   //     (Math.pow((1/surfaceFactor), 2) + Math.pow((1/streetFactor), 2)); // vielleicht quadratisch?
 	double comfortDisutility 	    = comfortDisutility_util_m * distance;
 			
-
-	// Randomfactor with
-//	Random r = new Random();
-//	int standardDeviation = 1;
-//	int mean = 1;
-//	double randomfactor = r.nextGaussian()*standardDeviation+mean;
 	
-	
-	double disutility = (travelTimeDisutility + distanceDisutility + comfortDisutility); //* randomfactor; //TODO add randomfactor (see example below)
+	double disutility = travelTimeDisutility + (distanceDisutility + comfortDisutility) * randomfactor;
 	
 
 
@@ -243,7 +261,7 @@ public class BikeTravelDisutility implements TravelDisutility {
 //
 //	System.out.println("travelTimeDisutility    " + travelTimeDisutility);
 //	System.out.println("distanceDisutility      " + distanceDisutility);
-//	System.out.println("comfortDisutility_perM  " + comfortDisutility_perM);
+//	System.out.println("comfortDisutility_util_m  " + comfortDisutility_util_m);
 //	System.out.println("comfortDisutility       " + comfortDisutility);
 //	
 //	

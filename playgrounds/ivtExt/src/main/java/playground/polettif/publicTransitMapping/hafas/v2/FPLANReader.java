@@ -49,10 +49,9 @@ public class FPLANReader {
 	 *
 	 * @return the list of FPLANRoutes
 	 */
-	public static List<FPLANRoute> parseFPLAN(Set<Integer> bitfeldNummern, Map<String, String> operators, String FPLANfile) {
+	public static List<FPLANRoute> parseFPLAN(Set<Integer> bitfeldNummern, Map<String, String> operators, String FPLANfile) throws IOException {
 		List<FPLANRoute> hafasRoutes = new ArrayList<>();
 
-		try {
 			FPLANRoute currentFPLANRoute = null;
 
 			Counter counter = new Counter("FPLAN line # ");
@@ -171,6 +170,9 @@ public class FPLANReader {
 				 57−57 	CHAR (optional) "X", falls diese Haltestelle auf dem Laufschild der Fahrt aufgeführt wird.
 				 */
 				else {
+					boolean arrivalTimeNegative = newLine.charAt(29) == '-';
+					boolean departureTimeNegative = newLine.charAt(36) == '-';
+
 					if(currentFPLANRoute != null) {
 						double arrivalTime = 0;
 						try {
@@ -184,7 +186,11 @@ public class FPLANReader {
 									Double.parseDouble(newLine.substring(40, 42)) * 60;
 						} catch (Exception e) {
 						}
-						currentFPLANRoute.addRouteStop(newLine.substring(0, 7), arrivalTime, departureTime);
+
+						// only add if stop is not "Durchfahrt" or "Diensthalt"
+						if(!(arrivalTimeNegative && departureTimeNegative)) {
+							currentFPLANRoute.addRouteStop(newLine.substring(0, 7), arrivalTime, departureTime);
+						}
 					} /*else {
 						log.error("Laufweg-Line before appropriate *Z-Line.");
 					}*/
@@ -195,10 +201,6 @@ public class FPLANReader {
 			}
 			readsLines.close();
 			counter.printCounter();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		return hafasRoutes;
 	}

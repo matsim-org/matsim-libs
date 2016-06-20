@@ -33,8 +33,8 @@ class MIPSolutionScheduler
         this.m = vData.dimension;
         this.n = rData.dimension;
 
-        router = new DijkstraWithThinPath(optimContext.getNetwork(),
-                optimContext.travelDisutility, optimContext.travelTime);
+        router = new DijkstraWithThinPath(optimContext.network, optimContext.travelDisutility,
+                optimContext.travelTime);
     }
 
 

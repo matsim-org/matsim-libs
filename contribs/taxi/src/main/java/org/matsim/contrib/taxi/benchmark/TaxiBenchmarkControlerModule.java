@@ -22,7 +22,6 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsManagerModule;
@@ -32,7 +31,6 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 
 public class TaxiBenchmarkControlerModule
@@ -60,8 +58,7 @@ public class TaxiBenchmarkControlerModule
         //install(new VspPlansCleanerModule());
         //install(new SnapshotWritersModule());
 
-        addTravelTimeBinding(TransportMode.car).toInstance(new FreeSpeedTravelTime());
-        addTravelTimeBinding(VrpTravelTimeModules.DVRP_ESTIMATED)
-                .toInstance(new FreeSpeedTravelTime());
+        //instead of TravelTimeCalculatorModule
+        install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
     }
 }

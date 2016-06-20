@@ -21,20 +21,15 @@
 
 package playground.polettif.publicTransitMapping.mapping.router;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.workbench.Run;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +49,7 @@ public class ModeDependentRouter implements Router {
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
-	private static PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType = PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength;
+	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
 		this.routingTransportModes = new HashSet<>();

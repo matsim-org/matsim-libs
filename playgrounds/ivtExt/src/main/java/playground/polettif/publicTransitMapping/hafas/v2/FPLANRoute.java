@@ -75,7 +75,7 @@ public class FPLANRoute {
 	}
 
 	public void setRouteDescription(String nr) {
-		this.routeDescription = "line" + nr;
+		this.routeDescription = nr;
 	}
 
 

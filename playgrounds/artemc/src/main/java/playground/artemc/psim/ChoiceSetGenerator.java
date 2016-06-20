@@ -32,10 +32,13 @@ public class ChoiceSetGenerator implements ShutdownListener {
 	static private String outputDirectory;
 	static private String eventFilePath;
 
-	private static String simType = "2min";
-	private static String schema = "corridor_2min";
+	private static String simType = "10min";
+	private static String schema = "corridor_10min";
 
-	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_Dwell/";
+	private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_homo/";
+
+	//private static String dataPath = "/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_5min_1000it_intCrowd_Comfort/";
+
 	private static String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
 
 	private static final Logger log = Logger.getLogger(ChoiceSetGenerator.class);
@@ -274,8 +277,14 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 			/*Clear all plans from initial person*/
 			population.getPersons().get(personId).getPlans().clear();
-			population.getPersons().get(personId).addPlan(initialPlans.get(personId));
-			population.getPersons().get(personId).setSelectedPlan(initialPlans.get(personId));
+
+			Person tempPerson = population.getFactory().createPerson(Id.create(20000, Person.class));
+			tempPerson.addPlan(initialPlans.get(personId));
+			tempPerson.setSelectedPlan(initialPlans.get(personId));
+			tempPerson.createCopyOfSelectedPlanAndMakeSelected();
+			Plan tempPlan = tempPerson.getSelectedPlan();
+			population.getPersons().get(personId).addPlan(tempPlan);
+			population.getPersons().get(personId).setSelectedPlan(tempPlan);
 		}
 
 		/*Add new agents to the simulation*/
@@ -285,7 +294,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 	/*Write out new population file*/
 //		System.out.println("New number of persons: " + population.getPersons().size());
-		new org.matsim.core.population.PopulationWriter(population, controler.getScenario().getNetwork()).write("/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_Dwell/popText.xml");
+//		new org.matsim.core.population.PopulationWriter(population, controler.getScenario().getNetwork()).write("/Volumes/DATA 1 (WD 2 TB)/output_SelectExp1_5p_"+simType+"_1000it_Dwell/popText.xml");
 
 	}
 
@@ -335,6 +344,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		tableSuffix = tableSuffix.replaceAll("-", "_");
 		tableSuffix = tableSuffix.replaceAll("\\.5", "5");
 		tableSuffix = tableSuffix.replaceAll("\\.1", "1");
+		tableSuffix = tableSuffix.replaceAll("\\.0", "0");
 		tableName = tableName + tableSuffix;
 
 		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getServices().getConfig(), newPopulation);

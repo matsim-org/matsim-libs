@@ -28,6 +28,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.Maps;
@@ -69,9 +70,8 @@ public class VrpTravelTimeEstimator
         this.network = network;
         alpha = params.alpha;
 
-        int maxTime = 30 * 3600;//TODO TTC default
         interval = ttCalcConfig.getTraveltimeBinSize();
-        intervalCount = maxTime / interval + 1;
+        intervalCount = TimeBinUtils.getTimeBinCount(ttCalcConfig.getMaxTime(), interval);
 
         linkTTs = Maps.newHashMapWithExpectedSize(network.getLinks().size());
         init(params.initialTT);
@@ -92,9 +92,7 @@ public class VrpTravelTimeEstimator
     public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle)
     {
         //TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
-
-        //the last time bin in TTC is used for a freely large time  
-        int idx = Math.min((int)time / interval, intervalCount - 1);
+        int idx = TimeBinUtils.getTimeBinIndex(time, interval, intervalCount);
         return linkTTs.get(link.getId())[idx];
     }
 

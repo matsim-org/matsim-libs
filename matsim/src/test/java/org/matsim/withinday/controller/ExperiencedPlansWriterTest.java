@@ -108,7 +108,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 			public void install() {
 				install(new WithinDayModule());
 				addControlerListenerBinding().to(WriterInitializer.class);
-				addControlerListenerBinding().to(ExperiencedPlansWriter.class);
+				addControlerListenerBinding().to(ExecutedPlansServiceImpl.class);
 				// only for debugging
 				addEventHandlerBinding().toInstance(new EventsPrinter());
 			}
@@ -120,12 +120,12 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		 * routes match what we expect (route 01 unchanged, route 02 adapted).
 		 */
 		File file = new File(this.utils.getOutputDirectory() + "/ITERS/it.0/0." + 
-				ExperiencedPlansWriter.EXPERIENCEDPLANSFILE);
+				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
 		Assert.assertTrue(file.exists());
 		
 		Config experiencedConfig = ConfigUtils.createConfig();
 		experiencedConfig.plans().setInputFile(this.utils.getOutputDirectory() + "/ITERS/it.0/0." + 
-				ExperiencedPlansWriter.EXPERIENCEDPLANSFILE);
+				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
 		
 		Scenario experiencedScenario = ScenarioUtils.loadScenario(experiencedConfig);
 		

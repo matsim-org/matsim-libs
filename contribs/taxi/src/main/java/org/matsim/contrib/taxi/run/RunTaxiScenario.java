@@ -44,14 +44,20 @@ public class RunTaxiScenario
 
     public static Controler createControler(Config config, boolean otfvis)
     {
-        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        return createControler(scenario, taxiData, otfvis);
+    }
 
+
+    public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
+    {
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
         double expAveragingAlpha = 0.05;//from the AV flow paper 

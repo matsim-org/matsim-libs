@@ -18,30 +18,30 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.gtfs.Gtfs2TransitSchedule;
 import playground.polettif.publicTransitMapping.mapping.PTMapper;
-import playground.polettif.publicTransitMapping.mapping.PTMapperPseudoRouting;
-import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
+import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class CompareMapping {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 		String inputGtfs = "data/gtfs/zvv/";
 		String ct = "EPSG:2056";
 		String unmappedMTS = "data/mts/fromGtfs/zvv_mostServices.xml.gz";
-		String networkFile = "data/network/mm/zurich.xml.gz";
-		String output = "analysis/compare/";
+		String filteredUnmappedMTS = "data/mts/fromGtfs/zvv_mostServices_bus.xml.gz";
+		String networkFile = "data/network/mm/zurich_detail.xml.gz";
+		String output = args[0];
 
 
 		// gtfs 2 matsim
@@ -59,13 +59,16 @@ public class CompareMapping {
 		modesToRemove.add("ferry");
 		ScheduleCleaner.removeTransitRouteByMode(schedule, modesToRemove);
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+		ScheduleTools.writeTransitSchedule(schedule, filteredUnmappedMTS);
 
 		// ptm
 		PublicTransitMappingConfigGroup ptmConfig = PublicTransitMappingConfigGroup.createDefaultConfig();
-		ptmConfig.setMaxNClosestLinks(6);
-		ptmConfig.setMaxLinkCandidateDistance(60);
-		ptmConfig.setThreads(4);
-		ptmConfig.setModeRoutingAssignmentStr("bus:bus,car");
+		ptmConfig.setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType.travelTime);
+		ptmConfig.setMaxNClosestLinks(10);
+		ptmConfig.setLinkDistanceTolerance(1.1);
+		ptmConfig.setMaxLinkCandidateDistance(80);
+		ptmConfig.setNumOfThreads(4);
+		ptmConfig.setModeRoutingAssignmentStr("bus:bus,car|tram:tram");
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
 		ptmConfig.setOutputScheduleFile(output + "ptm_schedule.xml.gz");
 
@@ -73,6 +76,10 @@ public class CompareMapping {
 
 		// shapeFile
 		ScheduleShapeFileWriter.run(schedule, network, ct, output);
+
+		// stop facilities histogram
+		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
+		histogram.createCsv(output+"gtfs_stopFacilities.csv");
 
 		// check and shapefile
 //		PlausibilityCheck check = new PlausibilityCheck(schedule, network, ct);

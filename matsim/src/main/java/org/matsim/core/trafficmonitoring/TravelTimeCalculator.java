@@ -146,14 +146,13 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Inject
 	TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network) {
-		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes()));
+		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes()));
 		eventsManager.addHandler(this);
 		configure(this, ttconfigGroup, network);
 	}
 
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
-		// yyyy the hard-coded 30 hours seems a bit dangerous ... assume someone wants to run matsim for a week?? kai, jan'16
+		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup);
 	}
 
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
@@ -167,7 +166,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		this.filterAnalyzedModes = filterModes;
 		this.analyzedModes = strings;
 		this.timeSlice = timeslice;
-		this.numSlots = (maxTime / this.timeSlice) + 1;
+		this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeslice);
 		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeSlice);
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		if (this.calculateLinkTravelTimes){

@@ -28,6 +28,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.io.IOException;
+
 /**
  * Contract class to convert (Swiss) HAFAS data to
  * an unmapped MATSim Transit Schedule.
@@ -52,7 +54,7 @@ public abstract class Hafas2TransitSchedule {
 	 *             [2] outputScheduleFile<br/>
 	 *             [3] outputVehicleFile<br/>
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		run(args[0], args[1], args[2], args[3]);
 	}
 
@@ -60,12 +62,12 @@ public abstract class Hafas2TransitSchedule {
 	 * Converts all files in <tt>hafasFolder</tt> and writes the output schedule and vehicle file to
 	 * <tt>outputFolder</tt>. Stop Facility coordinates are transformed to <tt>outputCoordinateSystem</tt>.
 	 */
-	public static void run(String hafasFolder, String outputCoordinateSystem, String outputScheduleFile, String outputVehicleFile) {
+	public static void run(String hafasFolder, String outputCoordinateSystem, String outputScheduleFile, String outputVehicleFile) throws IOException {
 		TransitSchedule schedule = ScheduleTools.createSchedule();
 		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
 
-		new HafasConverterLines(schedule, vehicles, transformation).createSchedule(hafasFolder);
+		new HafasConverter(schedule, vehicles, transformation).createSchedule(hafasFolder);
 
 		ScheduleTools.writeTransitSchedule(schedule, outputScheduleFile);
 		ScheduleTools.writeVehicles(vehicles, outputVehicleFile);
@@ -83,5 +85,5 @@ public abstract class Hafas2TransitSchedule {
 	/**
 	 * This method creates a Transit Schedule which is unlinked to any network, but else complete.
 	 */
-	public abstract void createSchedule(String pathToInputFiles);
+	public abstract void createSchedule(String pathToInputFiles) throws IOException;
 }

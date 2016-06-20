@@ -87,7 +87,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
         @Override
         public TravelTimeCalculator get() {
-            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
+            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), config.getMaxTime(), config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
             eventsManager.addHandler(calculator);
             return TravelTimeCalculator.configure(calculator, config, network);
         }

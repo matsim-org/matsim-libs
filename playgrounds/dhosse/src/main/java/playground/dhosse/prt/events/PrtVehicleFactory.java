@@ -30,9 +30,9 @@ public class PrtVehicleFactory {
 		
 		if(event.getIteration() > 0){
 			
-			ETaxiData data = new ETaxiData();
+			TaxiDataWithRanks data = new TaxiDataWithRanks();
 			
-			for(TaxiRank rank : ((ETaxiData)this.vrpData).getTaxiRanks().values()){
+			for(TaxiRank rank : ((TaxiDataWithRanks)this.vrpData).getTaxiRanks().values()){
 				data.addTaxiRank(rank);
 			}
 			
@@ -43,7 +43,7 @@ public class PrtVehicleFactory {
 			
 			double maxWTime = Double.NEGATIVE_INFINITY;
 			TaxiRank maxWTimeRank = null;
-			for(TaxiRank rank : ((ETaxiData)this.vrpData).getTaxiRanks().values()){
+			for(TaxiRank rank : ((TaxiDataWithRanks)this.vrpData).getTaxiRanks().values()){
 				if(this.handler.rankIds2PassengerWaitingTimes.containsKey(rank.getId())){
 					double wtime = this.handler.rankIds2PassengerWaitingTimes.get(rank.getId()).getMax();
 					if(wtime > maxWTime){

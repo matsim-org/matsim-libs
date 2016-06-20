@@ -41,10 +41,9 @@ import java.util.Set;
 public class BitfeldAnalyzer {
 	protected static Logger log = Logger.getLogger(BitfeldAnalyzer.class);
 
-	public static Set<Integer> findBitfeldnumbersOfBusiestDay(String FPLAN, String BITFELD) {
+	public static Set<Integer> findBitfeldnumbersOfBusiestDay(String FPLAN, String BITFELD) throws IOException {
 		final Set<Integer> bitfeldNummern = new HashSet<>();
 		final int posMaxFVals = find4DayBlockWithMostFVals(FPLAN, BITFELD);
-		try {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BITFELD), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
@@ -71,9 +70,6 @@ public class BitfeldAnalyzer {
 				newLine = readsLines.readLine();
 			}
 			readsLines.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		bitfeldNummern.add(0);
 		return bitfeldNummern;
 	}

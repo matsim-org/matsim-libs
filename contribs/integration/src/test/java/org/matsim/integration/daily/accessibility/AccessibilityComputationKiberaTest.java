@@ -3,6 +3,7 @@ package org.matsim.integration.daily.accessibility;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -29,7 +30,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationKiberaTest.class ) ;
 
-//	private static final double cellSize = 25.;
+//	private static final Double cellSize = 25.;
 	private static final Double cellSize = 100.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -51,12 +52,12 @@ public class AccessibilityComputationKiberaTest {
 		
 		
 		// Parameters
-		boolean createQGisOutput = false;
+		boolean createQGisOutput = true;
 		boolean includeDensityLayer = false;
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		String name = "ke_kibera_" + cellSize.toString().split("\\.")[0];
 		
-		Double lowerBound = 2.;
+		Double lowerBound = -3.5;
 		Double upperBound = 5.5;
 		Integer range = 9; // in the current implementation, this need always be 9
 		int symbolSize = 110;
@@ -114,8 +115,11 @@ public class AccessibilityComputationKiberaTest {
 		
 
 		// collect activity types
-		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
-		log.warn( "found activity types: " + activityTypes );
+		List<String> activityTypes = new LinkedList<>();
+//		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+//		log.warn( "found activity types: " + activityTypes );
+		activityTypes.add("drinking_water");
+		activityTypes.add("toilet");
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
@@ -147,10 +151,10 @@ public class AccessibilityComputationKiberaTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if (!actType.equals("drinking_water")) {
-						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-						continue ;
-					}
+//					if !(actType.equals("drinking_water") ) {
+//						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//						continue ;
+//					}
 					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);

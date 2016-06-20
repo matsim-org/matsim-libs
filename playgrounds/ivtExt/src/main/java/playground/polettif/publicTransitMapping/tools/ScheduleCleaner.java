@@ -28,6 +28,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
@@ -439,6 +440,43 @@ public class ScheduleCleaner {
 				if(modesToRemove.contains(transitRoute.getTransportMode())) {
 					transitLine.removeRoute(transitRoute);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Removes all invalid transit routes based on a TransitScheduleValidator result.
+	 * @deprecated Experimental. Guesses the ids based on the error strings, might not always work
+	 */
+	@Deprecated
+	public static void removeInvalidTransitRoutes(TransitScheduleValidator.ValidationResult result, TransitSchedule schedule) {
+		for(String error : result.getErrors()) {
+			String[] lineSplit = error.split(", route ");
+			String tranistLineId = lineSplit[0].substring(13);
+
+			String transitRouteId = null;
+			if(lineSplit[1].contains				(" contains a link that is not part of the network")) {
+				transitRouteId = lineSplit[1].split	(" contains a link that is not part of the network")[0];
+			} else 	if(lineSplit[1].contains		(" has inconsistent network route")) {
+				transitRouteId = lineSplit[1].split	(" has inconsistent network route")[0];
+			} else if(lineSplit[1].contains			(" has no network route")) {
+				transitRouteId = lineSplit[1].split	(" has no network route")[0];
+			} else if(lineSplit[1].contains			(" contains a link that is not part of the network: ")) {
+				transitRouteId = lineSplit[1].split	(" contains a link that is not part of the network: ")[0];
+			} else if(lineSplit[1].contains			(": Stop ")) {
+				transitRouteId = lineSplit[1].split	(": Stop ")[0];
+			} else if(lineSplit[1].contains			(" has no linkId, but is used by transit line ")) {
+				transitRouteId = lineSplit[1].split	(" has no linkId, but is used by transit line ")[0];
+			} else if(lineSplit[1].contains			(" contains a stop ")) {
+				transitRouteId = lineSplit[1].split	(" contains a stop ")[0];
+			} else if(lineSplit[1].contains			(": The ")) {
+				transitRouteId = lineSplit[1].split	(": The ")[0];
+			} else {
+				throw new IllegalArgumentException("Error String from ValidationResult not recognised! ("+error+")");
+			}
+
+			if(transitRouteId != null) {
+				ScheduleCleaner.removeRoute(schedule, Id.create(tranistLineId, TransitLine.class), Id.create(transitRouteId, TransitRoute.class));
 			}
 		}
 	}

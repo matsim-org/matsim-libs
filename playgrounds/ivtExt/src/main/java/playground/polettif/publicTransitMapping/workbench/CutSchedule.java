@@ -19,24 +19,20 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
-import java.util.Collections;
-
 public class CutSchedule {
 	
 	public static void main(final String[] args) {
-//		cutScheduleToZurich("mts/fromHafas/ch.xml.gz", "vehicles/ch_vehicles.xml.gz", "mts/fromHafas/zurich.xml.gz", "vehicles/zurich_vehicles.xml.gz");
-		TransitSchedule schedule = ScheduleTools.readTransitSchedule("mts/fromHafas/ch.xml.gz");
+		cutScheduleToZurich("mts/fromHafas/ch.xml.gz", "vehicles/ch_hafas_vehicles.xml.gz", "mts/fromHafas/test.xml.gz", "vehicles/test.xml.gz");
+//		TransitSchedule schedule = ScheduleTools.readTransitSchedule("mts/fromHafas/ch.xml.gz");
 
-		ScheduleCleaner.cutSchedule(schedule, Collections.singleton(Id.create(8503000, TransitStopFacility.class)));
+//		ScheduleCleaner.cutSchedule(schedule, Collections.singleton(Id.create(8503000, TransitStopFacility.class)));
 
-		ScheduleTools.writeTransitSchedule(schedule, "mts/fromHafas/debug_zurich_HB.xml.gz");
+//		ScheduleTools.writeTransitSchedule(schedule, "mts/fromHafas/test.xml.gz");
 	}
 
 	private static void cutScheduleToZurich(String scheduleFile, String vehiclesFile, String outputSchedule, String outputVehicles) {
@@ -45,7 +41,7 @@ public class CutSchedule {
 
 //		Coord city = new Coord(2683518.0, 1246836.0);
 		Coord effretikon = new Coord(2693780.0, 1253409.0);
-		double radius = 15000;
+		double radius = 5000;
 
 		ScheduleCleaner.cutSchedule(schedule, effretikon, radius);
 		ScheduleCleaner.cleanVehicles(schedule, vehicles);

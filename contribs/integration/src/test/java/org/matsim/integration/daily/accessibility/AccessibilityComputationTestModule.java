@@ -48,13 +48,11 @@ class AccessibilityComputationTestModule extends AbstractModule {
 					listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 					listener.writeToSubdirectoryWithName(activityType);
 					// for push to geoserver
-					listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
+//					listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
 					listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 					return listener;
 				}
 			});
-			System.out.println("here-10");
 		}
 	}
-
 }

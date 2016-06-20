@@ -63,7 +63,7 @@ public class VrpAgentSource
     @Override
     public void insertAgentsIntoMobsim()
     {
-        VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
+        VehiclesFactory vehicleFactory = VehicleUtils.getFactory();
         for (Vehicle vrpVeh : vrpData.getVehicles().values()) {
             Id<Vehicle> id = vrpVeh.getId();
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();
@@ -71,7 +71,7 @@ public class VrpAgentSource
             VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
             DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId,
                     qSim.getEventsManager(), vrpAgentLogic);
-            QVehicle mobsimVehicle = new QVehicle(qSimVehicleFactory
+            QVehicle mobsimVehicle = new QVehicle(vehicleFactory
                     .createVehicle(Id.create(id, org.matsim.vehicles.Vehicle.class), vehicleType));
             vrpAgent.setVehicle(mobsimVehicle);
             mobsimVehicle.setDriver(vrpAgent);

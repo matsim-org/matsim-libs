@@ -40,11 +40,10 @@ public class Gtfs2TransitSchedule {
 	protected static Logger log = Logger.getLogger(Gtfs2TransitSchedule.class);
 
 	public static final String ALL_SERVICE_IDS = "all";
-	public static final String MOST_USED_SINGLE_ID = "mostUsedSingleId";
 	public static final String DAY_WITH_MOST_TRIPS = "dayWithMostTrips";
 	public static final String DAY_WITH_MOST_SERVICES = "dayWithMostServices";
 
-	public enum ServiceParam{dayWithMostTrips, dayWithMostServices, mostUsedSingleId, all}
+	public enum ServiceParam{dayWithMostTrips, dayWithMostServices, all}
 
 	protected TransitSchedule schedule;
 	protected Vehicles vehicles;
@@ -64,9 +63,7 @@ public class Gtfs2TransitSchedule {
 	 *                  <li>dayWithMostServices</li>
 	 *                  <li>date in the format yyyymmdd</li>
 	 *                  <li>dayWithMostTrips</li>
-	 *                  <li>mostUsedSingleId</li>
 	 *                  <li>all</li>
-	 *                  </li>
 	 *                  </ul>
 	 *              [2] the output coordinate system. Use WGS84 for no transformation.<br/>
 	 *              [3] output transit schedule file
@@ -100,7 +97,6 @@ public class Gtfs2TransitSchedule {
 	 *     				             	<li>dayWithMostServices (default)</li>
 	 *     				             	<li>dayWithMostTrips</li>
 	 *     				             	<li>date in the format yyyymmdd</li>
-	 *     				             	<li>mostUsedSingleId</li>
 	 *     				             	<li>all</li>
 	 *     				             	</ul>
 	 * @param outputCoordinateSystem 	the output coordinate system. Use WGS84 for no transformation.

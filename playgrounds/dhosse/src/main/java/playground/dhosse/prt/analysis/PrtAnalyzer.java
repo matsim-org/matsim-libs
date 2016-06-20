@@ -5,6 +5,7 @@ import java.io.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.*;
@@ -12,8 +13,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.michalm.taxi.data.file.ETaxiReader;
 
 public class PrtAnalyzer {
 	
@@ -41,7 +40,7 @@ public class PrtAnalyzer {
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		VrpData data = new VrpDataImpl();
-		ETaxiReader vehReader = new ETaxiReader(scenario.getNetwork(), data);
+		VehicleReader vehReader = new VehicleReader(scenario.getNetwork(), data);
 		vehReader.parse("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
 		
 		EventsManager events = EventsUtils.createEventsManager();

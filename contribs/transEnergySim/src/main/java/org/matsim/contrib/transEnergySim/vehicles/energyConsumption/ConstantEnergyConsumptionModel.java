@@ -38,5 +38,10 @@ public class ConstantEnergyConsumptionModel implements EnergyConsumptionModel {
 		return energyConsumptionPerMeterTraveled*drivenDistanceInMeters;
 	}
 
+	@Override
+	public double getEnergyConsumptionRateInJoulesPerMeter() {
+		return energyConsumptionPerMeterTraveled;
+	}
+
 }
 

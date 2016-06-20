@@ -18,6 +18,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -34,7 +36,7 @@ import com.vividsolutions.jts.geom.Point;
 public class RandomizeCoordinatesWithFacilitiesInfo {
 	
 	/*******/
-	final String SAMPLED_PLANS_FINAL = "../../../runs-svn/santiago/casoBase10_NP/input/new-input/sampled_plans_final_1.xml.gz";
+	final String NEW_INPUT = "../../../runs-svn/santiago/basecase1/input/new-input/";	
 	/*******/
 	
 	
@@ -45,22 +47,27 @@ public class RandomizeCoordinatesWithFacilitiesInfo {
 	
 	
 	/*******/
-	final String FINAL_RANDOM_PLANS = "../../../runs-svn/santiago/casoBase10_NP/input/new-input/randomized_sampled_plans_final_1.xml.gz";
+//	final String SAMPLED_CONFIG_FINAL = NEW_INPUT + "sampled_config_final.xml";
+	final String EXPANDED_CONFIG_FINAL = NEW_INPUT + "expanded_config_final.xml";
+//	final String FINAL_SAMPLED_RANDOM_PLANS = NEW_INPUT + "randomized_sampled_plans_final.xml.gz";
+	final String FINAL_EXPANDED_RANDOM_PLANS = NEW_INPUT + "randomized_expanded_plans_final.xml.gz";
+	final String FINAL_CONFIG_FILE = NEW_INPUT + "randomized_expanded_config_final.xml";
+
 	/*******/
 	
 	/*Run the script*/
 	private void Run(){
 		
 		
-		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(SAMPLED_PLANS_FINAL);
-		
+
+		Config config = ConfigUtils.loadConfig(EXPANDED_CONFIG_FINAL);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Population originalPlans = scenario.getPopulation();
 		Map <Id,Integer> AgentCondition = getAgentCondition(originalPlans);		
 		Population newPlans = createNewPlans(AgentCondition, originalPlans, features);
-		writeNewPopulation (newPlans,  FINAL_RANDOM_PLANS);
+		writeNewPopulation (newPlans,  FINAL_EXPANDED_RANDOM_PLANS);
+		writeNewConfig (config);
 
 		
 	}
@@ -424,6 +431,7 @@ public class RandomizeCoordinatesWithFacilitiesInfo {
 					
 					
 				}
+
 				
 				
 			} else if (agentCondition.get(p.getId()).equals(0)) {
@@ -446,7 +454,7 @@ public class RandomizeCoordinatesWithFacilitiesInfo {
 						
 						Activity actIn = (Activity)pe;
 						Activity actOut = newPlans.getFactory().createActivityFromCoord(actIn.getType(), actIn.getCoord());
-						planIn.addActivity(actOut);
+						planIn.addActivity(actOut);				
 						actOut.setEndTime(actIn.getEndTime());
 						actOut.setStartTime(actIn.getStartTime());
 
@@ -473,6 +481,12 @@ public class RandomizeCoordinatesWithFacilitiesInfo {
 		
 	}
 	
-	
+	private void writeNewConfig (Config config){
+		
+		PlansConfigGroup plans = config.plans();
+		plans.setInputFile(FINAL_EXPANDED_RANDOM_PLANS);
+		new ConfigWriter(config).write(FINAL_CONFIG_FILE);
+		
+	}
 	
 }

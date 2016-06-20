@@ -24,11 +24,14 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dynagent.DriverDynLeg;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
+import playground.jbischoff.parking.events.StartParkingSearchEvent;
 import playground.jbischoff.parking.manager.ParkingManager;
 
 public class ParkingDynLeg implements DriverDynLeg {
@@ -41,9 +44,11 @@ public class ParkingDynLeg implements DriverDynLeg {
 	ParkingManager parkingManager;
 	Id<Vehicle> vehicleId;
 	private ParkingChoiceLogic logic;
+	private MobsimTimer timer;
+	private EventsManager events;
 
 	public ParkingDynLeg(String mode, NetworkRoute route, ParkingChoiceLogic logic, ParkingManager parkingManager,
-			Id<Vehicle> vehicleId) {
+			Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		this.mode = mode;
 		this.route = route;
 		currentLinkIdx = -1;
@@ -51,12 +56,22 @@ public class ParkingDynLeg implements DriverDynLeg {
 		this.logic = logic;
 		this.parkingManager = parkingManager;
 		this.vehicleId = vehicleId;
+		this.timer = timer;
+		this.events=events;
 	}
 
 	@Override
 	public void movedOverNode(Id<Link> newLinkId) {
 		currentLinkIdx++;
 		currentLinkId = newLinkId;
+		
+		if (currentLinkId.equals(this.getDestinationLinkId())) {
+			this.parkingMode = true;
+			this.events.processEvent(
+							new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
+				}
+			
+		
 	}
 
 	@Override
@@ -65,7 +80,6 @@ public class ParkingDynLeg implements DriverDynLeg {
 			List<Id<Link>> linkIds = route.getLinkIds();
 
 			if (currentLinkIdx == linkIds.size() - 1) {
-				this.parkingMode = true;
 				return route.getEndLinkId();
 			}
 

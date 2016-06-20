@@ -46,8 +46,7 @@ public class RuleBasedTaxiOptimizer
     public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext,
             RuleBasedTaxiOptimizerParams params)
     {
-        this(optimContext, params,
-                new SquareGridSystem(optimContext.getNetwork(), params.cellSize));
+        this(optimContext, params, new SquareGridSystem(optimContext.network, params.cellSize));
     }
 
 

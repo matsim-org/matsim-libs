@@ -30,19 +30,18 @@ import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.ev.*;
-import playground.michalm.taxi.data.*;
+import playground.michalm.ev.data.*;
 
 
 public class ChargerReader
 {
     private final NetworkImpl network;
-    private final ETaxiData data;
+    private final EvData data;
     private final Map<Id<Zone>, Zone> zones;
     private final double power;
 
 
-    public ChargerReader(Scenario scenario, ETaxiData data, Map<Id<Zone>, Zone> zones, double power)
+    public ChargerReader(Scenario scenario, EvData data, Map<Id<Zone>, Zone> zones, double power)
     {
         this.network = (NetworkImpl)scenario.getNetwork();
         this.data = data;
@@ -69,10 +68,6 @@ public class ChargerReader
                 Link link = network.getNearestLinkExactly(coord);
                 data.addCharger(
                         new ChargerImpl(Id.create(id, Charger.class), power, capacity, link));
-
-                //???
-                data.addTaxiRank(
-                        new TaxiRank(Id.create(id, TaxiRank.class), id, link, 10 * capacity));
             }
         }
         catch (IOException e) {
@@ -96,7 +91,7 @@ public class ChargerReader
 
         Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);
 
-        ETaxiData data = new ETaxiData();
+        EvData data = new EvDataImpl();
 
         new ChargerReader(scenario, data, zones, power).readFile(file);
         System.out.println(data.getChargers().size());

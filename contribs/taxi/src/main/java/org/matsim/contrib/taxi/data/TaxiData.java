@@ -40,12 +40,6 @@ public class TaxiData
 //    }
 
 
-//    public Map<Id<Vehicle>, Taxi> getTaxis()
-//    {
-//        return convertMap(getVehicles());
-//    }
-
-
     public Map<Id<Request>, TaxiRequest> getTaxiRequests()
     {
         return convertMap(getRequests());
@@ -60,7 +54,7 @@ public class TaxiData
 
     //casts Collection of supertype S to Collection of type T
     @SuppressWarnings("unchecked")
-    private static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
+    protected static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
     {
         return (Map<I, T>)collection;
     }

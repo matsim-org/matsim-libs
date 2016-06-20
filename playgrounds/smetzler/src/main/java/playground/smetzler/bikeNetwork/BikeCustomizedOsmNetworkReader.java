@@ -783,7 +783,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			case "cycleway": 			bike_freespeed_highway= 18; break;
 
 			case "path":				bike_freespeed_highway= 12; break; 
-			case "footway": 			bike_freespeed_highway=  8; break; 
+			case "footway": 			bike_freespeed_highway=  8; break; //TODO lets rethink this
 			case "pedestrian":			bike_freespeed_highway=  8; break; 
 			case "track": 				bike_freespeed_highway= 12; break; 
 			case "service": 			bike_freespeed_highway= 14; break; 

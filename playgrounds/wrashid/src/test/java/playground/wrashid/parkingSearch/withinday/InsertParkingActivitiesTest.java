@@ -78,6 +78,10 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 	public void testInsertParkingActivities() {
 		Config config = super.loadConfig(null);
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with "true".  kai, jun'16
+		
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		createFacilities(sc);

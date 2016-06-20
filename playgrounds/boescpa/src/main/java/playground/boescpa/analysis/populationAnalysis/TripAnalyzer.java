@@ -22,15 +22,10 @@
 package playground.boescpa.analysis.populationAnalysis;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.io.IOUtils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,18 +38,26 @@ public class TripAnalyzer extends PopulationAnalyzer {
 
 	private final Map<String, long[]> distanceSums = new HashMap<>();
 	private final Map<String, long[]> travelTimes = new HashMap<>();
-	private final String activityType;
 
-	public TripAnalyzer(final String activityType) {
-		this.activityType = activityType;
+	public TripAnalyzer(Population population) {
+		super(population);
+	}
+
+	public TripAnalyzer(String pop2bAnalyzed) {
+		super(pop2bAnalyzed);
 	}
 
 	public static void main(final String[] args) {
 		final String pop2bAnalyzed = args[0];
 		final String resultsDest = args[1];
 		final String actTypeToAnalyze = args.length > 2 ? args[2] : null;
-		TripAnalyzer tripAnalyzer = new TripAnalyzer(actTypeToAnalyze);
-		PopulationAnalyzer.analyzePopulation(tripAnalyzer, pop2bAnalyzed, resultsDest);
+		new TripAnalyzer(pop2bAnalyzed).analyzePopulation(resultsDest, actTypeToAnalyze);
+	}
+
+	@Override
+	final protected void reset() {
+		distanceSums.clear();
+		travelTimes.clear();
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class TripAnalyzer extends PopulationAnalyzer {
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (activityType == null || activity.getType().equals(activityType)) {
+				if (formerActCoord != null && (getActivityType() == null || activity.getType().equals(getActivityType()))) {
 					classifyTravelTime("total", activity.getStartTime()-formerActEndTime);
 					classifyTravelDist("total", 1.44*CoordUtils.calcEuclideanDistance(formerActCoord, activity.getCoord()));
 					classifyTravelTime(mode, activity.getStartTime()-formerActEndTime);
@@ -86,6 +89,7 @@ public class TripAnalyzer extends PopulationAnalyzer {
 		synchronized (distanceSums) {
 			if (!distanceSums.keySet().contains(mode)) {
 				distanceSums.put(mode, new long[5]);
+				modes.add(mode);
 			}
 		}
 		if (travelDistance < 1000) {
@@ -105,6 +109,7 @@ public class TripAnalyzer extends PopulationAnalyzer {
 		synchronized (travelTimes) {
 			if (!travelTimes.keySet().contains(mode)) {
 				travelTimes.put(mode, new long[5]);
+				modes.add(mode);
 			}
 		}
 		if (travelTime < 15*60) {
@@ -121,28 +126,7 @@ public class TripAnalyzer extends PopulationAnalyzer {
 	}
 
 	@Override
-	final protected void writeResults(String resultsDest) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(resultsDest);
-		try {
-			if (activityType == null) {
-				writer.write("TRIP ANALYSIS FOR ALL ACTIVITIES");
-			} else {
-				writer.write("TRIP ANALYSIS FOR " + activityType.toUpperCase() + "-TRIPS");
-			}
-			writer.newLine();
-			for (String mode : distanceSums.keySet()) {
-				log.info(getModeString(mode));
-				writer.newLine();
-				writer.write(getModeString(mode));
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private String getModeString(String mode) {
+	final protected String getResultString(String mode) {
 		String modeString = "************************" + "\n" + "mode: " + mode + "\n" + "\n";
 		modeString = modeString + "0-1km   " + "\t" + distanceSums.get(mode)[0] + "\n";
 		modeString = modeString + "1-5km   " + "\t" + distanceSums.get(mode)[1] + "\n";
@@ -155,5 +139,10 @@ public class TripAnalyzer extends PopulationAnalyzer {
 		modeString = modeString + "45-60min" + "\t" + travelTimes.get(mode)[3] + "\n";
 		modeString = modeString + ">60min  " + "\t" + travelTimes.get(mode)[4] + "\n";
 		return modeString;
+	}
+
+	@Override
+	final protected Tuple<String, double[]> getSeries(String mode) {
+		return null;
 	}
 }

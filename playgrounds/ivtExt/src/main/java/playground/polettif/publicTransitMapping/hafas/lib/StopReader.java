@@ -58,13 +58,12 @@ public class StopReader {
 		this.pathToBFKOORD_GEOFile = pathToBFKOORD_GEOFile;
 	}
 
-	public static void run(TransitSchedule schedule, CoordinateTransformation transformation, String pathToBFKOORD_GEOFile) {
+	public static void run(TransitSchedule schedule, CoordinateTransformation transformation, String pathToBFKOORD_GEOFile) throws IOException {
 		new StopReader(schedule, transformation, pathToBFKOORD_GEOFile).createStops();
 	}
 
-	private void createStops() {
+	private void createStops() throws IOException {
 		log.info("  Read transit stops...");
-		try {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(pathToBFKOORD_GEOFile), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
@@ -87,9 +86,6 @@ public class StopReader {
 				newLine = readsLines.readLine();
 			}
 			readsLines.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		log.info("  Read transit stops... done.");
 	}
 

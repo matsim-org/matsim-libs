@@ -29,8 +29,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.publicTransitMapping.config.ManualLinkCandidates;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
@@ -233,28 +233,29 @@ public class PTMapperUtils {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				boolean hasStopLoop = ScheduleTools.routeHasStopSequenceLoop(transitRoute);
 				if(transitRoute.getRoute() != null) {
+					TransitRouteStop currentStop;
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
+
 					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
+//					stopsIterator.next(); // first stop is ignored
 
 					List<Id<Link>> linkIdList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
-					TransitRouteStop currentStop = stopsIterator.next();
-
+					currentStop = stopsIterator.next();
 					// look for a closer link before the route's start
-					// removed because it messes up more than it solves...
-					/*
 					if(!hasStopLoop) {
-						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
+						Set<Link> inlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(0).getFromNode().getInLinks().values(), linkList.get(0).getAllowedModes());
+						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), inlinksWithSameMode);
 						if(closerLinkBefore != null) {
 							linkIdList.add(0, closerLinkBefore);
 						}
 						currentStop = stopsIterator.next();
 					}
-					*/
 
 					// optimize referenced links between start and end
 					for(int i = 1; i < linkList.size()-1; i++) {
+
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
@@ -269,16 +270,14 @@ public class PTMapperUtils {
 					}
 
 					// look for a closer link after the route's end
-					// removed because it messes up more than it solves...
-					/*
 					if(!hasStopLoop) {
 						currentStop = routeStops.get(routeStops.size() - 1);
-						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
+						Set<Link> outlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(linkList.size() - 1).getToNode().getOutLinks().values(), linkList.get(linkList.size() - 1).getAllowedModes());
+						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), outlinksWithSameMode);
 						if(closerLinkAfter != null) {
 							linkIdList.add(closerLinkAfter);
 						}
 					}
-					*/
 
 					// set the new link list
 					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdList, network));
@@ -359,8 +358,8 @@ public class PTMapperUtils {
 	 * adds manually defined link candidates from config (if available)
 	 */
 	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
-		for(ConfigGroup e : config.getParameterSets(ManualLinkCandidates.SET_NAME)) {
-			ManualLinkCandidates manualCandidates = (ManualLinkCandidates) e;
+		for(ConfigGroup e : config.getParameterSets(PublicTransitMappingConfigGroup.ManualLinkCandidates.SET_NAME)) {
+			PublicTransitMappingConfigGroup.ManualLinkCandidates manualCandidates = (PublicTransitMappingConfigGroup.ManualLinkCandidates) e;
 
 			Set<String> modes = manualCandidates.getModes();
 			if(modes.size() == 0) {
@@ -376,8 +375,14 @@ public class PTMapperUtils {
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if(link == null) {
-							log.warn("link " + manualCandidates.getStopFacilityId() + " not found in network.");
+							log.warn("link " + linkId + " not found in network.");
 						} else {
+							if(CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord()) > config.getMaxLinkCandidateDistance()) {
+								log.warn("Distance from manual link candidate " + link.getId() + " to stop facility " +
+										manualCandidates.getStopFacilityIdStr() + " is more than " + config.getMaxLinkCandidateDistance() +
+										"("+CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord())+")");
+								log.info("Manual link candidate will still be used");
+							}
 							lcSet.add(new LinkCandidate(link, parentStopFacility));
 						}
 					}
@@ -389,7 +394,7 @@ public class PTMapperUtils {
 
 	/**
 	 * Changes the free speed of links based on the necessary travel times
-	 * given by the schedule. Highly experimental and only recommended for
+	 * given by the schedule. Rather experimental and only recommended for
 	 * artificial and possibly rail links.
 	 */
 	public static void setFreeSpeedBasedOnSchedule(Network network, TransitSchedule schedule, Set<String> networkModes) {
@@ -399,21 +404,42 @@ public class PTMapperUtils {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 
+				Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
 				List<Link> links = NetworkTools.getLinksFromIds(network, linkIds);
-				double totalLength = 0;
-				for(Link link : links) {
-					totalLength += link.getLength();
-				}
 
-				List<TransitRouteStop> stops = transitRoute.getStops();
-				double timeDiff = stops.get(stops.size()-1).getArrivalOffset();
+				List<Id<Link>> linkIdsUpToCurrentStop = new ArrayList<>();
+				TransitRouteStop previousStop = stopsIterator.next();
+				TransitRouteStop nextStop = stopsIterator.next();
+				double lengthUpToCurrentStop = 0;
+				double departTime = previousStop.getDepartureOffset();
 
-				double theoreticalMinSpeed = (totalLength / timeDiff) * 1.05;
+				for(int i = 0; i < links.size() - 2; i++) {
+					Link linkFrom = links.get(i);
+					Link linkTo = links.get(i + 1);
 
-				for(Id<Link> linkId : linkIds) {
-					double setMinSpeed = MapUtils.getDouble(linkId, necessaryMinSpeeds, 0);
-					if(theoreticalMinSpeed > setMinSpeed) {
-						necessaryMinSpeeds.put(linkId, theoreticalMinSpeed);
+					linkIdsUpToCurrentStop.add(linkFrom.getId());
+
+					// get schedule travel time and necessary freespeed
+					lengthUpToCurrentStop += linkFrom.getLength();
+					if(nextStop.getStopFacility().getLinkId().equals(linkTo.getId())) {
+						double ttSchedule = nextStop.getArrivalOffset() - departTime;
+						double theoreticalMinSpeed = (lengthUpToCurrentStop / ttSchedule) * 1.02;
+
+						for(Id<Link> linkId : linkIdsUpToCurrentStop) {
+							double setMinSpeed = MapUtils.getDouble(linkId, necessaryMinSpeeds, 0);
+							if(theoreticalMinSpeed > setMinSpeed) {
+								necessaryMinSpeeds.put(linkId, theoreticalMinSpeed);
+							}
+						}
+
+						// reset
+						lengthUpToCurrentStop = 0;
+						linkIdsUpToCurrentStop = new ArrayList<>();
+						previousStop = nextStop;
+						departTime = previousStop.getDepartureOffset();
+						if(!nextStop.equals(transitRoute.getStops().get(transitRoute.getStops().size() - 1))) {
+							nextStop = stopsIterator.next();
+						}
 					}
 				}
 			}

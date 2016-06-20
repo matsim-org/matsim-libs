@@ -63,7 +63,7 @@ public class ShapeFileTools {
 		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
 				.setName("gtfs_shapes")
 				.setCrs(MGC.getCRS(outputCoordinateSystem))
-				.addAttribute("id", String.class)
+				.addAttribute("shape_id", String.class)
 				.addAttribute("trip_id", String.class)
 				.addAttribute("trip_name", String.class)
 				.addAttribute("route_id", String.class)

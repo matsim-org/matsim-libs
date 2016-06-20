@@ -47,8 +47,9 @@ public class TaxibusScheduler {
 		this.timer = timer;
 		this.params = params;
 
+        vrpData.clearRequestsAndResetSchedules();
+
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
-			veh.resetSchedule();
 			Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
 			schedule.addTask(new TaxibusStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
 		}
