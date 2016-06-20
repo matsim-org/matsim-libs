@@ -1,4 +1,4 @@
-package org.matsim.integration.daily.accessibility;
+package org.matsim.contrib.accessibility.utils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
-class GeoserverUpdater implements FacilityDataExchangeInterface {
+public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
 	static Logger log = Logger.getLogger(GeoserverUpdater.class);
 
