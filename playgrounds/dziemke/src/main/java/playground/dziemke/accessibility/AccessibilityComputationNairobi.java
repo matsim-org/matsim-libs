@@ -27,6 +27,7 @@ import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
@@ -37,7 +38,9 @@ import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
@@ -63,10 +66,15 @@ public class AccessibilityComputationNairobi {
 	public static void main(String[] args) {
 		// Input and output
 		String networkFile = "../../../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network.xml";
-//		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
-		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/facilities.xml";
-		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/15/";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilites.xml";
+//		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/facilities.xml";
+		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/19/";
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
+		
+		// minibus-pt
+		String travelTimeMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv";
+		String travelDistanceMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/td.csv";
+		String ptStops = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv";
 		
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
@@ -78,7 +86,7 @@ public class AccessibilityComputationNairobi {
 		Double lowerBound = -3.5; // (upperBound - lowerBound) is ideally easily divisible by 7
 		Double upperBound = 3.5;
 		Integer range = 9; // in the current implementation, this must always be 9
-		int symbolSize = 2010;
+		int symbolSize = 510;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
 		// Config and scenario
@@ -110,8 +118,41 @@ public class AccessibilityComputationNairobi {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 //		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 
-		
-		// no pt block
+
+
+		// matrix-based pt
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		mbpcg.setPtStopsInputFile(ptStops);
+		mbpcg.setUsingTravelTimesAndDistances(true);
+		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
+		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
+
+
+		// plansClacRoute parameters
+		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+
+		// if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
+		// teleported mode speed for pt also required, see PtMatrix:120
+//		ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
+//		ptParameters.setTeleportedModeSpeed(50./3.6);
+//		plansCalcRoute.addModeRoutingParams(ptParameters);
+
+		// by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
+		// the walk and bike parameters are needed, however. This is why they have to be set here again
+
+		// teleported mode speed for walking also required, see PtMatrix:141
+		ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
+		walkParameters.setTeleportedModeSpeed(3./3.6);
+		plansCalcRoute.addModeRoutingParams(walkParameters );
+
+		// teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
+		ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
+		bikeParameters.setTeleportedModeSpeed(15./3.6);
+		plansCalcRoute.addModeRoutingParams(bikeParameters );
+
+		// pt matrix
+//		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
 		
 		// collect activity types
@@ -162,7 +203,7 @@ public class AccessibilityComputationNairobi {
 //							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 
 //							listener.addAdditionalFacilityData(homes) ;
 //							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);

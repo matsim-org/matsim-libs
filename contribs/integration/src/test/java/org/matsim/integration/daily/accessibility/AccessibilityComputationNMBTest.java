@@ -83,7 +83,7 @@ public class AccessibilityComputationNMBTest {
 
 		// Config and scenario
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -118,22 +118,12 @@ public class AccessibilityComputationNMBTest {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		
 		// matrix-based pt
-		{
-			MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-			mbpcg.setPtStopsInputFile(ptStopsFilePT);
-			mbpcg.setUsingTravelTimesAndDistances(true);
-			mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
-			mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
-		}
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		mbpcg.setPtStopsInputFile(ptStopsFilePT);
+		mbpcg.setUsingTravelTimesAndDistances(true);
+		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
+		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
 
-//		{
-//			MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-//			mbpcg.setPtStopsInputFile(ptStopsFileParatransit);
-//			mbpcg.setUsingTravelTimesAndDistances(true);
-//			mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFileParatransit);
-//			mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFileParatransit);
-//		}
-		
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
 
