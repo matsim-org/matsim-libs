@@ -39,6 +39,7 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
  *
  * @author polettif
  */
+@Deprecated
 public abstract class PTMapper {
 
 	protected static Logger log = Logger.getLogger(PTMapper.class);

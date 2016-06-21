@@ -496,7 +496,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 					 * sequence can be calculated (using Dijkstra). From this sequence, the actual
 					 * path on the network can be routed later on.
 					 */
-					PseudoGraphImpl pseudoGraph = new PseudoGraphImpl(config);
+					PseudoGraphImpl pseudoGraph = new PseudoGraphImpl();
 
 					/** [4.2]
 					 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility

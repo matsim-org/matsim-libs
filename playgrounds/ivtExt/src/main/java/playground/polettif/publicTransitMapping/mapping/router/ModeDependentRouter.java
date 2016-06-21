@@ -25,7 +25,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
@@ -43,6 +45,7 @@ import java.util.Set;
  *
  * @author polettif
  */
+@Deprecated
 public class ModeDependentRouter implements Router {
 
 	private final Network network;

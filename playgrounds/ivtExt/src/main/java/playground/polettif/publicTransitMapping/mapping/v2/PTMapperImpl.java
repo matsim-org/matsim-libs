@@ -137,9 +137,9 @@ public class PTMapperImpl extends PTMapper {
 
 		// initiate
 		int numThreads = config.getNumOfThreads() > 0 ? config.getNumOfThreads() : 1;
-		PseudoRouting[] pseudoRoutingThreads = new PseudoRouting[numThreads];
+		PseudoRoutingImpl[] pseudoRoutingThreads = new PseudoRoutingImpl[numThreads];
 		for(int i = 0; i < numThreads; i++) {
-			pseudoRoutingThreads[i] = new PseudoRouting(config, modeSeparatedRouters, linkCandidates);
+			pseudoRoutingThreads[i] = new PseudoRoutingImpl(config, modeSeparatedRouters, linkCandidates);
 		}
 
 		// spread transit lines on threads
@@ -149,10 +149,10 @@ public class PTMapperImpl extends PTMapper {
 		}
 
 		// start pseudoRouting
-		for(PseudoRouting thread : pseudoRoutingThreads) {
+		for(PseudoRoutingImpl thread : pseudoRoutingThreads) {
 			thread.start();
 		}
-		for(PseudoRouting thread : pseudoRoutingThreads) {
+		for(PseudoRoutingImpl thread : pseudoRoutingThreads) {
 			try {
 				thread.join();
 			} catch (InterruptedException e) {
@@ -167,7 +167,7 @@ public class PTMapperImpl extends PTMapper {
 		 */
 		log.info("=====================================");
 		log.info("Adding artificial links to network...");
-		for(PseudoRouting thread : pseudoRoutingThreads) {
+		for(PseudoRoutingImpl thread : pseudoRoutingThreads) {
 			thread.addArtificialLinks(network);
 			pseudoSchedule.mergePseudoSchedule(thread.getPseudoSchedule());
 		}

@@ -23,6 +23,7 @@ package playground.polettif.publicTransitMapping.mapping.v2;
  */
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -49,9 +50,9 @@ import java.util.*;
  *
  * @author polettif
  */
-public class PseudoRouting extends Thread {
+public class PseudoRoutingImpl extends Thread {
 
-	protected static Logger log = Logger.getLogger(PseudoRouting.class);
+	protected static Logger log = Logger.getLogger(PseudoRoutingImpl.class);
 
 	private static Counter counterPseudoRouting = new Counter("route # ");
 	private static int artificialId = 0;
@@ -62,12 +63,12 @@ public class PseudoRouting extends Thread {
 	private final LinkCandidateCreator linkCandidates;
 
 	private List<TransitLine> queue = new ArrayList<>();
-	private Set<Tuple<LinkCandidate, LinkCandidate>> artificialLinksToBeCreated = new HashSet<>();
+	private Set<ArtificialLink> artificialLinksToBeCreated = new HashSet<>();
 	private PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
 
 	private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
 
-	public PseudoRouting(PublicTransitMappingConfigGroup config, Map<String, Router> modeSeparatedRouters, LinkCandidateCreator linkCandidates) {
+	public PseudoRoutingImpl(PublicTransitMappingConfigGroup config, Map<String, Router> modeSeparatedRouters, LinkCandidateCreator linkCandidates) {
 		this.config = config;
 		this.modeSeparatedRouters = modeSeparatedRouters;
 		this.linkCandidates = linkCandidates;
@@ -98,7 +99,7 @@ public class PseudoRouting extends Thread {
 				 * sequence can be calculated (using Dijkstra). From this sequence, the actual
 				 * path on the network can be routed later on.
 				 */
-				PseudoGraph pseudoGraph = new PseudoGraphImpl(config);
+				PseudoGraph pseudoGraph = new PseudoGraphImpl();
 
 				/** [4.2]
 				 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
@@ -164,13 +165,9 @@ public class PseudoRouting extends Thread {
 								}
 								/**
 								 * Use artificial path between two linkCandidates
-								 *
-								 * Note: the actual artificial link is not considered
-								 * during subsequent shortest path searches since this would
-								 * require reinitializing the router.
 								 */
 								else {
-									artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
+									artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
 
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getBeelineDistanceMaxFactor();
 									double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
@@ -193,7 +190,7 @@ public class PseudoRouting extends Thread {
 					else {
 						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
+								artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
 
 								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
 								double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
@@ -240,28 +237,25 @@ public class PseudoRouting extends Thread {
 			connections.add(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()));
 		}
 
-		for(Tuple<LinkCandidate, LinkCandidate> c : artificialLinksToBeCreated) {
-			LinkCandidate fromLinkCandidate = c.getFirst();
-			LinkCandidate toLinkCandidate = c.getSecond();
-
-			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(fromLinkCandidate.getToNodeId(), toLinkCandidate.getFromNodeId());
+		for(ArtificialLink a : artificialLinksToBeCreated) {
+			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getToNodeId(), a.getFromNodeId());
 
 			if(!connections.contains(key)) {
 				connections.add(key);
 				String newLinkIdStr = config.getPrefixArtificial() + artificialId++;
-				Id<Node> fromNodeId = fromLinkCandidate.getToNodeId();
+				Id<Node> fromNodeId = a.getToNodeId();
 				Node fromNode;
-				Id<Node> toNodeId = toLinkCandidate.getFromNodeId();
+				Id<Node> toNodeId = a.getFromNodeId();
 				Node toNode;
 
 				if(!network.getNodes().containsKey(fromNodeId)) {
-					fromNode = network.getFactory().createNode(fromNodeId, fromLinkCandidate.getFromNodeCoord());
+					fromNode = network.getFactory().createNode(fromNodeId, a.getFromNodeCoord());
 					network.addNode(fromNode);
 				} else {
 					fromNode = network.getNodes().get(fromNodeId);
 				}
 				if(!network.getNodes().containsKey(toNodeId)) {
-					toNode = network.getFactory().createNode(toNodeId, toLinkCandidate.getToNodeCoord());
+					toNode = network.getFactory().createNode(toNodeId, a.getToNodeCoord());
 					network.addNode(toNode);
 				} else {
 					toNode = network.getNodes().get(toNodeId);
@@ -284,4 +278,50 @@ public class PseudoRouting extends Thread {
 		counterPseudoRouting.incCounter();
 	}
 
+	/**
+	 * Container class for artificial links
+	 */
+	public static class ArtificialLink {
+
+		private Id<Node> fromNodeId;
+		private Id<Node> toNodeId;
+		private Coord fromNodeCoord;
+		private Coord toNodeCoord;
+
+		public ArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+			this.fromNodeId = fromLinkCandidate.getToNodeId();
+			this.toNodeId = toLinkCandidate.getFromNodeId();
+			this.fromNodeCoord = fromLinkCandidate.getToNodeCoord();
+			this.toNodeCoord = toLinkCandidate.getFromNodeCoord();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if(this == obj)
+				return true;
+			if(obj == null)
+				return false;
+			if(getClass() != obj.getClass())
+				return false;
+
+			ArtificialLink other = (ArtificialLink) obj;
+			return fromNodeId.equals(other.getFromNodeId()) && toNodeId.equals(other.getToNodeId());
+		}
+
+		public Id<Node> getToNodeId() {
+			return toNodeId;
+		}
+
+		public Id<Node> getFromNodeId() {
+			return fromNodeId;
+		}
+
+		public Coord getFromNodeCoord() {
+			return fromNodeCoord;
+		}
+
+		public Coord getToNodeCoord() {
+			return toNodeCoord;
+		}
+	}
 }

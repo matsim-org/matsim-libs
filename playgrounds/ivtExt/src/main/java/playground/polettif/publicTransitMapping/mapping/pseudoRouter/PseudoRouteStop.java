@@ -49,15 +49,30 @@ public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparab
 
 	double getLinkTravelCost();
 
-	Map<PseudoRouteStop, Double> getNeighbours();
-
-	double getTravelCostToSource();
-	void setTravelCostToSource(double alternateDist);
-
-	PseudoRouteStop getClosestPrecedingRouteStop();
-	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
-
 	int compareTo(PseudoRouteStop other);
 
 	Id<Link> getLinkId();
+
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	Map<PseudoRouteStop, Double> getNeighbours();
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	double getTravelCostToSource();
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	void setTravelCostToSource(double alternateDist);
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	PseudoRouteStop getClosestPrecedingRouteStop();
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
+
+
 }

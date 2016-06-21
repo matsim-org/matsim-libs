@@ -23,7 +23,6 @@ package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
 import java.util.*;
 
@@ -47,13 +46,9 @@ public class PseudoGraphImpl implements PseudoGraph {
 	private final Id<PseudoRouteStop> DESTINATION_ID = Id.create(DESTINATION, PseudoRouteStop.class);
 	private final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStopImpl(DESTINATION);
 
-	private final PublicTransitMappingConfigGroup config;
-
 	private final Map<Id<PseudoRouteStop>, PseudoRouteStop> graph;
 
-	public PseudoGraphImpl(PublicTransitMappingConfigGroup configGroup) {
-		this.config = configGroup;
-		PseudoRouteStopImpl.setConfig(configGroup);
+	public PseudoGraphImpl() {
 		this.graph = new HashMap<>();
 	}
 
@@ -66,8 +61,6 @@ public class PseudoGraphImpl implements PseudoGraph {
 			System.err.printf("Graph doesn't contain dummy PseudoRouteStop \"%s\"\n", SOURCE_ID);
 			return;
 		}
-
-		double incr = 0.001;
 
 		NavigableSet<PseudoRouteStop> queue = new TreeSet<>();
 
@@ -86,9 +79,7 @@ public class PseudoGraphImpl implements PseudoGraph {
 					queue.remove(neighbour);
 					neighbour.setTravelCostToSource(alternateDist);
 					neighbour.setClosestPrecedingRouteSTop(currentStop);
-					while(!queue.add(neighbour)) {
-						neighbour.setTravelCostToSource(neighbour.getTravelCostToSource()-incr);
-					}
+					queue.add(neighbour);
 				}
 			}
 		}
