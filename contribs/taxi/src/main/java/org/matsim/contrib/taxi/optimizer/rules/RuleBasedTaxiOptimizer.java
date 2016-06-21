@@ -120,10 +120,10 @@ public class RuleBasedTaxiOptimizer
                             params.nearestVehiclesLimit)
                     : idleTaxiRegistry.getVehicles();
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    selectedVehs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestVehicleForRequest(req, selectedVehs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
@@ -146,13 +146,13 @@ public class RuleBasedTaxiOptimizer
                                     params.nearestRequestsLimit)
                             : unplannedRequests;
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestRequestForVehicle(veh,
-                    selectedReqs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestRequestForVehicle(veh, selectedReqs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-            unplannedRequests.remove(best.request);
-            unplannedRequestRegistry.removeRequest(best.request);
+            unplannedRequests.remove(best.destination);
+            unplannedRequestRegistry.removeRequest(best.destination);
         }
     }
 
