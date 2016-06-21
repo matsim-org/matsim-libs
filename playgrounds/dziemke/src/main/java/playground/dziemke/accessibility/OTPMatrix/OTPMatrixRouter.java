@@ -1,6 +1,11 @@
 package playground.dziemke.accessibility.OTPMatrix;
 
 import com.vividsolutions.jts.geom.Coordinate;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
@@ -32,21 +37,25 @@ public class OTPMatrixRouter {
 
     public static void main(String[] args) {
 
-        if (args.length != 7) {
-            log.error("The args schould contain 7 parameters: " +
+        if (args.length != 9) {
+            log.error("The args schould contain 9 parameters: " +
                     "1.fromIndividualsFilePath " +
                     "2.toIndividualsFilePath " +
                     "3.graphParentDirecoryPath " +
                     "4.outputDirectory" +
                     "5.timeZone" +
                     "6.date" +
-                    "7.departureTime");
+                    "7.departureTime" +
+                    "8.inputCRS" +
+                    "9.outputCRS");
         } else {
-            List<Individual> fromIndividuals = readIndividuals(args[0]);
+        	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(args[7], args[8]);
+        	
+        	List<Individual> fromIndividuals = readIndividuals(args[0]);
             List<Individual> toIndividuals = readIndividuals(args[1]);
 
             long startTime = System.currentTimeMillis();
-            routeMatrix(fromIndividuals, toIndividuals, args[2], args[3], args[4], args[5], Integer.parseInt(args[6]));
+            routeMatrix(fromIndividuals, toIndividuals, ct, args[2], args[3], args[4], args[5], Integer.parseInt(args[6]));
             long endTime = System.currentTimeMillis();
             long elapsedTime = (endTime - startTime) / 1000;
             int hours = (int) elapsedTime / 3600;
@@ -86,8 +95,7 @@ public class OTPMatrixRouter {
             } else {
                 break;
             }
-            Individual individual = new Individual(line[idColumn],
-                    Double.parseDouble(line[currentLonColumn]), Double.parseDouble(line[currentLatColumn]), 0);
+            Individual individual = new Individual(line[idColumn], Double.parseDouble(line[currentLonColumn]), Double.parseDouble(line[currentLatColumn]), 0);
             individuals.add(individual);
             line = reader.readLine() ;
         }
@@ -97,7 +105,7 @@ public class OTPMatrixRouter {
     }
 
     private static void routeMatrix(List<Individual> fromindividuals, List<Individual> toIndividuals,
-                            String graphDir, String outputDir, String timeZone, String date, int departureTime) {
+    		CoordinateTransformation ct, String graphDir, String outputDir, String timeZone, String date, int departureTime) {
 
         buildGraph(graphDir);
         Graph graph = loadGraph(graphDir);
@@ -107,7 +115,7 @@ public class OTPMatrixRouter {
 
         mkdir(outputDir);
 
-        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, outputDir + "fromIDs.csv"), indexIndividuals(graph, toIndividuals, outputDir + "toIDs.csv"), outputDir);
+        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, ct, outputDir + "fromIDs.csv"), indexIndividuals(graph, toIndividuals, ct, outputDir + "toIDs.csv"), outputDir);
         log.info("Shutdown");
     }
 
@@ -153,9 +161,9 @@ public class OTPMatrixRouter {
         return calendar;
     }
 
-    private static List<Individual> indexIndividuals(Graph graph, List<Individual> individuals, String filePath) {
+    private static List<Individual> indexIndividuals(Graph graph, List<Individual> individuals, CoordinateTransformation ct, String filePath) {
         log.info("Start indexing vertices and writing them out...");
-        InputsCSVWriter individualsWriter = new InputsCSVWriter(filePath, ",");
+        InputsCSVWriter individualsWriter = new InputsCSVWriter(filePath, ",");        
         SampleFactory sampleFactory = graph.getSampleFactory();
         int counter = 0;
         for (int i = 0; i < individuals.size(); i++) {
@@ -167,10 +175,15 @@ public class OTPMatrixRouter {
                 i--;
                 continue;
             }
+            Coord inputCoord = CoordUtils.createCoord(individual.lon, individual.lat);
+            Coord outputCoord = ct.transform(inputCoord);
+          
             individual.sample = sample;
             individualsWriter.writeField(individual.label);
-            individualsWriter.writeField(individual.lat);
-            individualsWriter.writeField(individual.lon);
+//			individualsWriter.writeField(individual.lat);
+//			individualsWriter.writeField(individual.lon);
+            individualsWriter.writeField(outputCoord.getX());
+            individualsWriter.writeField(outputCoord.getY());
             individualsWriter.writeNewLine();
         }
         log.info("Left out " + counter + " individuals because no sample could be found for their coordinates. Probably out of bounds.");
