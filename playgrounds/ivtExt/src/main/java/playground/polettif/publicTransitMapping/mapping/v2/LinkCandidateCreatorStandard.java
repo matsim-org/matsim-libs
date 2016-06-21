@@ -81,12 +81,16 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 						if(stopFacility.getLinkId() != null) {
 							modeLinkCandidates.add(new LinkCandidateImpl(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
 						} else {
-							// limits number of links, for all links within search radius
-							List<Link> closestLinks = NetworkTools.findClosestLinks(network,
-									stopFacility.getCoord(), config.getNodeSearchRadius(),
-									config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(),
-									config.getModeRoutingAssignment().get(scheduleTransportMode), config.getMaxLinkCandidateDistance());
-
+							List<Link> closestLinks;
+							if(config.getModeRoutingAssignment().get(scheduleTransportMode).contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+								closestLinks = new ArrayList<>();
+							} else {
+								// limits number of links, for all links within search radius
+								closestLinks  = NetworkTools.findClosestLinks(network,
+										stopFacility.getCoord(), config.getNodeSearchRadius(),
+										config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(),
+										config.getModeRoutingAssignment().get(scheduleTransportMode), config.getMaxLinkCandidateDistance());
+							}
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
 								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), 20, loopLinkModes);

@@ -443,7 +443,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 			newLink = this.network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode, toNode);
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-			double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getBeelineDistanceMaxFactor();
+			double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getMaxTravelCostFactor();
 			newLink.setLength(l);
 			newLink.setCapacity(9999);
 			// needs to be set low so busses don't use those links during modeRouting.
@@ -511,9 +511,9 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 						double maxAllowedPathCost;
 						if(config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
-							maxAllowedPathCost = (routeStops.get(i+1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getBeelineDistanceMaxFactor();
+							maxAllowedPathCost = (routeStops.get(i+1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getMaxTravelCostFactor();
 						} else {
-							maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
+							maxAllowedPathCost = beelineDistance * config.getMaxTravelCostFactor();
 						}
 
 						//Check if one of the two stops is outside the network
@@ -571,7 +571,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 									else {
 										artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
-										double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getBeelineDistanceMaxFactor();
+										double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
 										double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
 										PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
