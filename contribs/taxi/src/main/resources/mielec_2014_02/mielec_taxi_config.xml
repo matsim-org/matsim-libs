@@ -9,6 +9,7 @@
 		<param name="onlineVehicleTracker" value="false" />
 
 		<param name="taxisFile" value="src/main/resources/mielec_2014_02/taxis-25.xml" />
+		<!-- param name="taxisFile" value="src/main/resources/mielec_2014_02/taxis-50.xml" / -->
 
 		<param name="timeProfiles" value="true" />
 		<param name="detailedStats" value="true" />
@@ -30,7 +31,8 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="src/main/resources/mielec_2014_02/plans_taxi_2.0.xml.gz" />
+		<!-- param name="inputPlansFile" value="src/main/resources/mielec_2014_02/plans_taxi_1.0.xml.gz" / -->
+		<param name="inputPlansFile" value="src/main/resources/mielec_2014_02/plans_taxi_4.0.xml.gz" />
 	</module>
 
 	<module name="qsim">
