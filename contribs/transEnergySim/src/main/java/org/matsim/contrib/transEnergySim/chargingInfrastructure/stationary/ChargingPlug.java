@@ -22,4 +22,6 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	double getActualChargingPowerInWatt();
 
 	double getEnergyDeliveredByTime(double time);
+
+	ChargingSite getChargingSite();
 }

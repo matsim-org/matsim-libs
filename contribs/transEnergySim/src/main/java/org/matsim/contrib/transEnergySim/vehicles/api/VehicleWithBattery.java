@@ -162,4 +162,8 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return getRemainingRangeInMeters() >= nextLegTravelDistanceInMeters;
 	}
 
+	public double getRequiredEnergyInJoulesToDriveDistance(double routeDistanceInMeters) {
+		return routeDistanceInMeters * this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
+	}
+
 }
