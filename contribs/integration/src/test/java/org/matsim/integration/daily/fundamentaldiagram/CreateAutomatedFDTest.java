@@ -126,6 +126,12 @@ public class CreateAutomatedFDTest {
 	public void fdsCarBikeFastCapacityUpdate(){
 		run(this.linkDynamics,this.trafficDynamics,true);
 	}
+	
+	@Test
+	public void fdsCarOnly(){
+		this.travelModes = new String [] {"car"};
+		run(this.linkDynamics,this.trafficDynamics,false);
+	}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
@@ -161,33 +167,25 @@ public class CreateAutomatedFDTest {
 
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
-		//equal modal split run
-		Map<String, Integer> minSteps = new HashMap<String, Integer>();
-
-		double pcu1 = modeVehicleTypes.get(travelModes[0]).getPcuEquivalents();
-		double pcu2 = modeVehicleTypes.get(travelModes[1]).getPcuEquivalents();
-
-		if(pcu1==1 && pcu2 == 0.25) { //car bike
-			minSteps.put(travelModes[0], 1);
-			minSteps.put(travelModes[1], 4);
-		} else { //car truck
-			minSteps.put(travelModes[0], 3);
-			minSteps.put(travelModes[1], 1);
-		}
-
 		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
 
 		double networkDensity = 3.*(1000./7.5);
-		double sumOfPCUInEachStep = (modeVehicleTypes.get(travelModes[0]).getPcuEquivalents() * minSteps.get(travelModes[0]) ) + 
-				(modeVehicleTypes.get(travelModes[1]).getPcuEquivalents() * minSteps.get(travelModes[1]) );
-		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * sumOfPCUInEachStep))+5;
+		
+		double sumOfPCUInEachStep = 0.;
+		
+		//equal modal split run
+		for (String mode : travelModes) {
+			sumOfPCUInEachStep += modeVehicleTypes.get(mode).getPcuEquivalents() *  getMinNumberOfAgentAtStart(mode) ;
+		};
+		
+		int numberOfPoints = (int) Math.ceil( networkDensity/ (reduceNoOfDataPointsInPlot * sumOfPCUInEachStep) ) + 5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
 
 		for (int m=1; m<numberOfPoints; m++){
 			Map<String,Integer> pointToRun = new HashMap<>();
 			for (String mode:travelModes){
-				pointToRun.put(mode,minSteps.get(mode)*m*reduceNoOfDataPointsInPlot);
+				pointToRun.put(mode,  getMinNumberOfAgentAtStart(mode)   * m * reduceNoOfDataPointsInPlot);
 			}
 
 			double density =0 ;
@@ -288,6 +286,17 @@ public class CreateAutomatedFDTest {
 
 		//plotting data
 		scatterPlot(outData,outFile);
+	}
+	
+	int getMinNumberOfAgentAtStart(final String mode) {//equal modal split run
+		// only three different modes (and pcus) are used in this test ie -- car(1), truck(3), bike(0.25)
+		switch (mode) {
+		case "car": return 1;
+		case "truck": return 3;
+		case "motorbike":
+		case "bike": return 4;
+		default : throw new RuntimeException("The test is not designed for this "+ mode + "yet.");
+		}
 	}
 	
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
@@ -493,28 +502,33 @@ public class CreateAutomatedFDTest {
 	private void scatterPlot (Map<Double, Map<String, Tuple<Double, Double>>> inputData, String outFile){
 
 		String mode1 = travelModes[0];
-		String mode2 = travelModes[1];
-
 		XYSeries carFlow = new XYSeries(mode1+" flow");
-		XYSeries bikeFlow = new XYSeries(mode2+" flow");
 		XYSeries carSpeed = new XYSeries(mode1+" speed");
-		XYSeries bikeSpeed = new XYSeries(mode2+" speed");
+
+		XYSeries bikeFlow = null;
+		XYSeries bikeSpeed = null;
+		
+		if(travelModes.length==2) {
+			bikeFlow = new XYSeries(travelModes[1]+" flow");
+			bikeSpeed = new XYSeries(travelModes[1]+" speed");
+		}
 
 		for(double d :inputData.keySet()){
 			carFlow.add(d, inputData.get(d).get(mode1).getFirst());
 			carSpeed.add(d, inputData.get(d).get(mode1).getSecond());
-
-			bikeFlow.add(d, inputData.get(d).get(mode2).getFirst());
-			bikeSpeed.add(d, inputData.get(d).get(mode2).getSecond());
+			
+			if(travelModes.length == 2) {
+				bikeFlow.add(d, inputData.get(d).get(travelModes[1]).getFirst());
+				bikeSpeed.add(d, inputData.get(d).get(travelModes[1]).getSecond());
+			}
 		}
 
 		// flow vs density
 		XYSeriesCollection flowDataset = new XYSeriesCollection();
 		flowDataset.addSeries(carFlow);
-		flowDataset.addSeries(bikeFlow);
 
 		NumberAxis flowAxis = new NumberAxis("Flow (PCU/h)");
-		flowAxis.setRange(0.0, 1400.0);
+		flowAxis.setRange(0.0, 1700.0);
 
 		XYPlot plot1 = new XYPlot(flowDataset, null, flowAxis, new XYLineAndShapeRenderer(false,true));
 		plot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -522,10 +536,14 @@ public class CreateAutomatedFDTest {
 		// speed vs density
 		XYSeriesCollection speedDataset = new XYSeriesCollection();
 		speedDataset.addSeries(carSpeed);
-		speedDataset.addSeries(bikeSpeed);
+		
+		if ( travelModes.length==2 ) {
+			flowDataset.addSeries(bikeFlow);
+			speedDataset.addSeries(bikeSpeed);
+		}
 
 		NumberAxis speedAxis = new NumberAxis("Speed (m/s)");
-		speedAxis.setRange(0.0, 17.0);
+		speedAxis.setRange(0.0, 17.0); 
 
 		XYPlot plot2 = new XYPlot(speedDataset, null, speedAxis, new XYLineAndShapeRenderer(false,true));
 		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);

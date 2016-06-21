@@ -26,7 +26,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Analyses departure times for a given plans-file.
@@ -34,6 +36,9 @@ import java.util.Map;
  * @author boescpa
  */
 public class DepartureTimeAnalyzer extends PopulationAnalyzer{
+
+	// Flag determining if only the first departure of the day for each activity should be recorded or if all departures.
+	private final static boolean ONLY_FIRST_DEPARTURE_OF_DAY = false;
 
 	private final Map<String, long[]> depTimes = new HashMap<>();
 	private final int statisticInterval = 60; // mins
@@ -64,19 +69,16 @@ public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 	final protected void analyzeAgent(Person person) {
 		double formerActDepTime = 0;
 		String mode = null;
+		Set<String> alreadyCheckedOnThisDay = new HashSet<>();
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
 				if (!activity.getType().equals("pt interaction")) {
-					if (mode != null && (getActivityType() == null || activity.getType().equals(getActivityType()))) {
+					if (mode != null
+							&& (getActivityType() == null || activity.getType().equals(getActivityType()))
+							&& firstDepartureCheck(alreadyCheckedOnThisDay, activity)) {
 						classifyDepTime(formerActDepTime, "total");
 						classifyDepTime(formerActDepTime, mode);
-
-					/*if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
-						double duration = activity.getEndTime() - activity.getStartTime();
-						if (getActivityType() == null) classifyDuration(duration, "total");
-						classifyDuration(duration, activity.getType());
-					}*/
 					}
 					formerActDepTime = activity.getEndTime();
 				}
@@ -86,6 +88,10 @@ public class DepartureTimeAnalyzer extends PopulationAnalyzer{
 				log.error("Unhandled implementation of PlanElement: " + planElement.toString());
 			}
 		}
+	}
+
+	private boolean firstDepartureCheck(Set<String> alreadyCheckedOnThisDay, Activity activity) {
+		return !ONLY_FIRST_DEPARTURE_OF_DAY || alreadyCheckedOnThisDay.add(activity.getType());
 	}
 
 	private void classifyDepTime(double formerActDepTime, String mode) {

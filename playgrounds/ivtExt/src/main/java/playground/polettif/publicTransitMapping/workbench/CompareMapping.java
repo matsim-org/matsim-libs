@@ -30,7 +30,9 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class CompareMapping {
@@ -68,7 +70,8 @@ public class CompareMapping {
 		ptmConfig.setLinkDistanceTolerance(1.1);
 		ptmConfig.setMaxLinkCandidateDistance(80);
 		ptmConfig.setNumOfThreads(4);
-		ptmConfig.setModeRoutingAssignmentStr("bus:bus,car|tram:tram");
+		Map<String, Set<String>> mra = new HashMap<>();
+		ptmConfig.setModeRoutingAssignment(mra);
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
 		ptmConfig.setOutputScheduleFile(output + "ptm_schedule.xml.gz");
 

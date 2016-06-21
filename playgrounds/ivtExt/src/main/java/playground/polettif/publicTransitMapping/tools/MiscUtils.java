@@ -236,10 +236,10 @@ public class MiscUtils {
 	 * @return the set (evt. newly) associated with the key
 	 * @see org.matsim.core.utils.collections.MapUtils
 	 */
-	public static <K, V> TreeSet<V> getTreeSet(
+	public static <K, V> SortedSet<V> getSortedSet(
 			final K key,
-			final Map<K, TreeSet<V>> map) {
-		TreeSet<V> coll = map.get(key);
+			final Map<K, SortedSet<V>> map) {
+		SortedSet<V> coll = map.get(key);
 
 		if(coll == null) {
 			coll = new TreeSet<>();

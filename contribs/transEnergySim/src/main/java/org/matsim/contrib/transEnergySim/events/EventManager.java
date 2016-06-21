@@ -9,5 +9,9 @@ public class EventManager<T> {
 	public void addEventHandler(T handler){
 		handlers.add(handler);
 	}
+	
+	public LinkedList<T> getEventHandlers(){
+		return handlers;
+	}
 
 }

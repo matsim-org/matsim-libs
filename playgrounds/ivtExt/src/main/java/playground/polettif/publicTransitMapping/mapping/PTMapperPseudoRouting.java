@@ -39,9 +39,10 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoGraph;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoGraphImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoRouteStop;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoRouteStopImpl;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
@@ -59,17 +60,18 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperPseudoRouting extends PTMapper {
 
 	// pseudoRouting
 	private static Counter counterPseudoRouting = new Counter("route # ");
 	private Map<String, Network> modeSeparatedNetworks = new HashMap<>();
 	private Map<String, Router> modeSeparatedRouters = new HashMap<>();
-	private Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates;
+	private Map<String, Map<TransitStopFacility, Set<LinkCandidateImpl>>> linkCandidates;
 
 	// helper variables
 	private int artificialId = 0;
-	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
+	private Map<Tuple<LinkCandidateImpl, LinkCandidateImpl>, Link> artificialLinks = new HashMap<>();
 	private Map<TransitStopFacility, Boolean> stopIsInArea;
 
 	public PTMapperPseudoRouting(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
@@ -207,11 +209,11 @@ public class PTMapperPseudoRouting extends PTMapper {
 		 */
 		log.info("=====================================");
 		log.info("Adding artificial links to network...");
-		final Set<Tuple<LinkCandidate, LinkCandidate>> artificialLinksToBeCreated = new HashSet<>();
+		final Set<Tuple<LinkCandidateImpl, LinkCandidateImpl>> artificialLinksToBeCreated = new HashSet<>();
 		for(PseudoRouting thread : pseudoRoutingThreads) {
 			artificialLinksToBeCreated.addAll(thread.getArtificialLinksToBeCreated());
 		}
-		for(Tuple<LinkCandidate, LinkCandidate> artLinkTuple : artificialLinksToBeCreated) {
+		for(Tuple<LinkCandidateImpl, LinkCandidateImpl> artLinkTuple : artificialLinksToBeCreated) {
 			createArtificialLink(artLinkTuple.getFirst(), artLinkTuple.getSecond());
 		}
 
@@ -223,7 +225,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 			Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> threadPseudoSchedule = thread.getPseudoSchedule();
 			for(Map.Entry<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> e : threadPseudoSchedule.entrySet()) {
 				if(MapUtils.getMap(e.getKey().getFirst(), pseudoSchedule).put(e.getKey().getSecond(), e.getValue()) != null) {
-					throw new RuntimeException("Tried to assign a pseudoStopSequence twice to " + e.getKey());
+					throw new RuntimeException("Tried to assign a pseudoStopS equence twice to " + e.getKey());
 				}
 			}
 		}
@@ -412,8 +414,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 	 *
 	 * @return the new link
 	 */
-	private Link createArtificialLink(final LinkCandidate fromLinkCandidate, final LinkCandidate toLinkCandidate) {
-		Tuple<LinkCandidate, LinkCandidate> key = new Tuple<>(fromLinkCandidate, toLinkCandidate);
+	private Link createArtificialLink(final LinkCandidateImpl fromLinkCandidate, final LinkCandidateImpl toLinkCandidate) {
+		Tuple<LinkCandidateImpl, LinkCandidateImpl> key = new Tuple<>(fromLinkCandidate, toLinkCandidate);
 		Link newLink;
 
 		if(this.artificialLinks.containsKey(key)) {
@@ -441,7 +443,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 			newLink = this.network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode, toNode);
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-			double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getBeelineDistanceMaxFactor();
+			double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getMaxTravelCostFactor();
 			newLink.setLength(l);
 			newLink.setCapacity(9999);
 			// needs to be set low so busses don't use those links during modeRouting.
@@ -462,7 +464,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 	private class PseudoRouting extends Thread {
 
 		private List<TransitLine> queue = new ArrayList<>();
-		private Set<Tuple<LinkCandidate, LinkCandidate>> artificialLinksToBeCreated = new HashSet<>();
+		private Set<Tuple<LinkCandidateImpl, LinkCandidateImpl>> artificialLinksToBeCreated = new HashSet<>();
 		private Map<Tuple<Id<TransitLine>, TransitRoute>, List<PseudoRouteStop>> threadPseudoSchedule = new HashMap<>();
 
 		private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
@@ -494,7 +496,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 					 * sequence can be calculated (using Dijkstra). From this sequence, the actual
 					 * path on the network can be routed later on.
 					 */
-					PseudoGraph pseudoGraph = new PseudoGraph(config);
+					PseudoGraphImpl pseudoGraph = new PseudoGraphImpl();
 
 					/** [4.2]
 					 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
@@ -502,16 +504,16 @@ public class PTMapperPseudoRouting extends PTMapper {
 					for(int i = 0; i < routeStops.size() - 1; i++) {
 						TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
 						TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
-						Set<LinkCandidate> linkCandidatesCurrent = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i).getStopFacility());
-						Set<LinkCandidate> linkCandidatesNext = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i + 1).getStopFacility());
+						Set<LinkCandidateImpl> linkCandidatesCurrent = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i).getStopFacility());
+						Set<LinkCandidateImpl> linkCandidatesNext = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i + 1).getStopFacility());
 
 						final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
 
 						double maxAllowedPathCost;
 						if(config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
-							maxAllowedPathCost = (routeStops.get(i+1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getBeelineDistanceMaxFactor();
+							maxAllowedPathCost = (routeStops.get(i+1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getMaxTravelCostFactor();
 						} else {
-							maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
+							maxAllowedPathCost = beelineDistance * config.getMaxTravelCostFactor();
 						}
 
 						//Check if one of the two stops is outside the network
@@ -521,8 +523,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 							/**
 							 * Calculate the shortest path between all link candidates.
 							 */
-							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+							for(LinkCandidateImpl linkCandidateCurrent : linkCandidatesCurrent) {
+								for(LinkCandidateImpl linkCandidateNext : linkCandidatesNext) {
 
 									double pathCost;
 									LeastCostPathCalculator.Path leastCostPath = null;
@@ -555,8 +557,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 									 * if the path between two link candidates is viable, add it to the pseudoGraph
 									 */
 									if(pathCost < maxAllowedPathCost) {
-										PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-										PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+										PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+										PseudoRouteStopImpl pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 										pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost);
 									}
 									/**
@@ -569,11 +571,11 @@ public class PTMapperPseudoRouting extends PTMapper {
 									else {
 										artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
-										double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getBeelineDistanceMaxFactor();
+										double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
 										double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
-										PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-										PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+										PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+										PseudoRouteStopImpl pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 										pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, artificialPathCost);
 									}
 								}
@@ -590,15 +592,15 @@ public class PTMapperPseudoRouting extends PTMapper {
 						 * facility and the other linkCandidates).
 						 */
 						else {
-							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+							for(LinkCandidateImpl linkCandidateCurrent : linkCandidatesCurrent) {
+								for(LinkCandidateImpl linkCandidateNext : linkCandidatesNext) {
 									artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
 									double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
-									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+									PseudoRouteStopImpl pseudoRouteStopCurrent = PseudoGraphImpl.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+									PseudoRouteStopImpl pseudoRouteStopNext = PseudoGraphImpl.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight);
 								}
 							}
@@ -615,7 +617,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 					// run Dijkstra
 					pseudoGraph.runDijkstra();
-					LinkedList<PseudoRouteStop> pseudoPath = pseudoGraph.getShortestPseudoPath();
+					List<PseudoRouteStop> pseudoPath = pseudoGraph.getShortestPseudoPath();
 
 					if(pseudoPath == null) {
 						log.warn("PseudoGraph has no path from SOURCE to DESTIONATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
@@ -628,7 +630,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 			}
 		}
 
-		public Set<Tuple<LinkCandidate, LinkCandidate>> getArtificialLinksToBeCreated() {
+		public Set<Tuple<LinkCandidateImpl, LinkCandidateImpl>> getArtificialLinksToBeCreated() {
 			return artificialLinksToBeCreated;
 		}
 

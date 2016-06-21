@@ -13,7 +13,9 @@ public class RunOTPMatrixRouter {
         String timeZone = "Africa/Nairobi";
         String date = "2014-05-26";
         String departureTime = Integer.toString(8*60*60);
-        String[] arguments = new String[7];
+        String inputCRS = "EPSG:4326"; // EPSG:4326 = WGS 84
+        String outputCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S
+        String[] arguments = new String[9];
         arguments[0] = fromIndividualsFilePath;
         arguments[1] = toIndividualsFilePath;
         arguments[2] = graphParentDirectoryPath;
@@ -21,6 +23,8 @@ public class RunOTPMatrixRouter {
         arguments[4] = timeZone;
         arguments[5] = date;
         arguments[6] = departureTime;
+        arguments[7] = inputCRS;
+        arguments[8] = outputCRS;
 
         OTPMatrixRouter.main(arguments);
     }

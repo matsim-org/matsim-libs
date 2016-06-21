@@ -116,11 +116,11 @@ public class ZonalTaxiOptimizer
             }
 
             Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    filteredVehs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {
-                optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+                optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
                 reqIter.remove();
                 idleVehsInZone.remove(best.vehicle);
             }

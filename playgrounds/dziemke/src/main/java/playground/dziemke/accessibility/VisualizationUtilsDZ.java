@@ -39,12 +39,6 @@ public class VisualizationUtilsDZ {
 	public static final Logger log = Logger.getLogger(VisualizationUtilsDZ.class);
 	private VisualizationUtilsDZ(){} // do not instantiate
 
-	
-//	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
-//			String workingDirectory, String crs, boolean includeDensityLayer) {
-//		createQGisOutput(actType, mode, mapViewExtent,workingDirectory, crs, includeDensityLayer, null, 
-//				null, null);
-//	}
 		
 	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
 			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
@@ -90,7 +84,6 @@ public class VisualizationUtilsDZ {
 		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
 		accessibilityLayer.setXField(Labels.X_COORDINATE);
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
-//		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
 		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound, range, symbolSize);
 		if (mode.equals(Modes4Accessibility.freeSpeed)) {
 			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
@@ -121,9 +114,6 @@ public class VisualizationUtilsDZ {
 	 * @param osName
 	 */
 	public static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
-
-		//TODO adapt this method so that maps for different modes are created.
-
 		// if OS is Windows
 		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
 		if ( osName.contains("Win") || osName.contains("win")) {
@@ -159,5 +149,4 @@ public class VisualizationUtilsDZ {
 			log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
 		}
 	}
-
 }

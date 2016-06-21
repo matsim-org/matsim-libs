@@ -27,7 +27,7 @@ import org.opengis.feature.simple.SimpleFeature;
 public class FacilityLocationAnalyzer {
 	// Input file and output directory
 //	private static String inputOutputDirectory = "../../../../Workspace/shared-svn/projects/maxess/data/nairobi/facilities/02/";
-	private static String inputOutputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/kodi/";
+	private static String inputOutputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/";
 	
 	
 	private static String facilitiesFile = inputOutputDirectory + "facilities.xml";

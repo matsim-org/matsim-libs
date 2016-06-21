@@ -19,18 +19,20 @@
 package playground.polettif.publicTransitMapping.mapping.v2;
 
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 public interface LinkCandidateCreator {
 	
 	void createLinkCandidates();
 
-	Set<LinkCandidate> getLinkCandidates(String scheduleTransportMode, TransitStopFacility transitStopFacility);
-
-	void addManualLinkCandidates(Set<PublicTransitMappingConfigGroup.ManualLinkCandidates> manualLinkCandidates);
+	/**
+	 * Returns a list of link candidates for the given stop facility and schedule transport mode.
+	 * The list is ordered ascending by priority (distance, likelihood, etc.).
+	 */
+	SortedSet<LinkCandidate> getLinkCandidates(TransitStopFacility transitStopFacility, String scheduleTransportMode);
 
 	boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode);
+
 }

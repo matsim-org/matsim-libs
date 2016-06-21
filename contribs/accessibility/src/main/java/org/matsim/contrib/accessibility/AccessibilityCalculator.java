@@ -10,7 +10,6 @@ import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -59,7 +58,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author thomas, knagel
  *
  */
-/*package*/ final class AccessibilityCalculator {
+public final class AccessibilityCalculator {
 
 	private static final Logger log = Logger.getLogger(AccessibilityCalculator.class);
 
@@ -68,41 +67,55 @@ import java.util.concurrent.ConcurrentHashMap;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
-	private Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
+	private final Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
 
-	private PtMatrix ptMatrix;
+	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
-	private ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
-
-	private boolean useRawSum	; //= false;
-	private double logitScaleParameter;
-	private double inverseOfLogitScaleParameter;
-	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	private final boolean useRawSum	; //= false;
+	private final double logitScaleParameter;
+	private final double inverseOfLogitScaleParameter;
+	private final double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	private final double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
+	private final double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 
 	private double walkSpeedMeterPerHour = -1;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
-	private Map<String, TravelTime> travelTimes;
-	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-	private Scenario scenario;
-	private AccessibilityConfigGroup config;
+	private final Scenario scenario;
+	private final AccessibilityConfigGroup config;
 
 	@Inject
+	public
 	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
-		this.travelTimes = travelTimes;
-		this.travelDisutilityFactories = travelDisutilityFactories;
+		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
+
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
+			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
+		}
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
+			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
+		}
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
+			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
+		}
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
+			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
+		}
+
+		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
+		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
+		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
+		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+
+		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
+
 		this.scenario = scenario;
 		this.config = config;
-	}
-
-	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
-		this.zoneDataExchangeListeners.add(l);
-	}
-
-	final void initDefaultContributionCalculators() {
 		calculators.put(
 				Modes4Accessibility.car,
 				new NetworkModeAccessibilityContributionCalculator(
@@ -125,47 +138,12 @@ import java.util.concurrent.ConcurrentHashMap;
 				new ConstantSpeedAccessibilityContributionCalculator(
 						TransportMode.bike,
 						scenario));
-		if (ptMatrix != null) {
-			calculators.put(
-					Modes4Accessibility.pt,
-					PtMatrixAccessibilityContributionCalculator.create(
-							ptMatrix,
-							scenario.getConfig()));
-		}
 	}
-	
-	/**
-	 * setting parameter for accessibility calculation
-	 * @param config TODO
-	 */
-	final void initAccessibilityParameters(Config config) {
 
-		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
-
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
-			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
-		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
-			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
-		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
-			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
-		}
-		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
-			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
-		}
-
-		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
-		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
-		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-		walkSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
-
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
+	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
+		this.zoneDataExchangeListeners.add(l);
 	}
+
 
 	/**
 	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
@@ -181,7 +159,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	 * @param opportunities such as workplaces, either given at a parcel- or zone-level
 	 * @param network giving the road network
 	 */
-	final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
+	private void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
 		// yyyy this method ignores the "capacities" of the facilities.  kai, mar'14
 
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
@@ -251,7 +229,8 @@ import java.util.concurrent.ConcurrentHashMap;
 	}
 
 	
-	final void computeAccessibilities( Scenario scenario, Double departureTime ) {
+	public final void computeAccessibilities( Scenario scenario, Double departureTime , ActivityFacilities opportunities) {
+		aggregateOpportunities(opportunities, scenario.getNetwork());
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -361,6 +340,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		this.config.setComputingAccessibilityForMode(mode, val);
 	}
+	
 
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.config.getIsComputingMode();
@@ -389,14 +369,14 @@ import java.util.concurrent.ConcurrentHashMap;
 	}
 
 	public final void setPtMatrix(PtMatrix ptMatrix) {
-		this.ptMatrix = ptMatrix;
+		calculators.put(
+				Modes4Accessibility.pt,
+				PtMatrixAccessibilityContributionCalculator.create(
+						ptMatrix,
+						scenario.getConfig()));
 	}
 
-	ActivityFacilitiesImpl getMeasuringPoints() {
-		return measuringPoints;
-	}
-
-	void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
+	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
 	}
 

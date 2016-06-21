@@ -28,15 +28,19 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A LeastCostPathCalculator using FasAStarLandmarks.
  */
 public class FastAStarRouter implements Router {
-	
+
+	private final Network network;
+
 	private final LeastCostPathCalculator pathCalculator;
 	private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
@@ -47,9 +51,15 @@ public class FastAStarRouter implements Router {
 
 	public FastAStarRouter(Network network) {
 		this.paths = new HashMap<>();
+		this.network = network;
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
+	}
+
+	public static Router createModeSeparatedRouter(Network network, Set<String> transportModes) {
+		Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, transportModes);
+		return new FastAStarRouter(filteredNetwork);
 	}
 
 	/**
@@ -69,8 +79,8 @@ public class FastAStarRouter implements Router {
 	}
 
 	@Override
-	public LeastCostPathCalculator.Path calcLeastCostPath(Link fromLink, Link toLink) {
-		return calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode());
+	public Network getNetwork() {
+		return network;
 	}
 
 	@Override

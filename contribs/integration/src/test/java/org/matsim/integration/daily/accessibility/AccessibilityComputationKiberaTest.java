@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -139,7 +140,7 @@ public class AccessibilityComputationKiberaTest {
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
 
 		final Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, networkDensityFacilities, crs, name, cellSize));
 		controler.run();
 
 

@@ -24,8 +24,8 @@ package playground.jbischoff.parking;
  */
 public class ParkingUtils {
 	
-	static public final String PARKACTIVITYTYPE = "park";
-	static public final String UNPARKACTIVITYTYPE = "unpark";
+	static public final String PARKACTIVITYTYPE = "car interaction";
+	static public final String UNPARKACTIVITYTYPE = "car interaction";
 	static public final double UNPARKDURATION = 60;
 	static public final double PARKDURATION = 60;
 	static public final int NO_OF_LINKS_TO_GET_ON_ROUTE = 5;

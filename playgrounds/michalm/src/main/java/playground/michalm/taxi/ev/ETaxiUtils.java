@@ -25,10 +25,10 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.TaxiData;
 
 import playground.michalm.ev.UnitConversionRatios;
-import playground.michalm.ev.charging.PartialFastChargingWithQueueingLogic;
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.EnergyConsumptions;
-import playground.michalm.taxi.data.ETaxi;
+import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.data.EvrpVehicle.Ev;
 
 
 public class ETaxiUtils
@@ -37,7 +37,7 @@ public class ETaxiUtils
     {
         // TODO reduce charging speed in winter
         for (Charger c : evData.getChargers().values()) {
-            new PartialFastChargingWithQueueingLogic(c);
+            new ETaxiChargingWithQueueingLogic(c);
         }
 
         // TODO variable AUX -- depends on weather etc...
@@ -46,7 +46,7 @@ public class ETaxiUtils
         double auxPower = 0.5 * UnitConversionRatios.W_PER_kW; //0.5 kW
 
         for (Vehicle v : taxiData.getVehicles().values()) {
-            ElectricVehicleImpl ev = (ElectricVehicleImpl) ((ETaxi)v).getEv();
+            Ev ev = ((EvrpVehicle)v).getEv();
             ev.setDriveEnergyConsumption((link, travelTime) -> EnergyConsumptions
                     .consumeFixedDriveEnergy(ev, driveRate, link));
             ev.setAuxEnergyConsumption(

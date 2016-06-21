@@ -79,6 +79,10 @@ public class TaxibusDispatch
     public VrpPathWithTravelData getLastPathAdded(){
     	return this.path.get(path.size()-1);
     }
+    
+    public void removeLastPathAdded(){
+    	this.path.remove(path.size()-1);
+    }
     public void setTwMax(double twMax) {
 		this.twMax = twMax;
 	}
@@ -111,7 +115,10 @@ public class TaxibusDispatch
     	TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
     	for (TaxibusRequest req : this.requests){
     		if (req.getFromLink().equals(link)){
+    			
+    			if(req.getPickupTask()==null){
     			beginningRequests.add(req);
+    			}
     		}
     	}
     	
