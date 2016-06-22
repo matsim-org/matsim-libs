@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -110,7 +111,7 @@ public class PlanGenerator {
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
 
-			LegImpl leg = (LegImpl) pf.createLeg(mode);
+			Leg leg = (Leg) pf.createLeg(mode);
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*7.5 + generator.nextGaussian()*900.0);
 			plan.addActivity(actHome);
@@ -168,7 +169,7 @@ public class PlanGenerator {
 			ActivityImpl actSecondary = (ActivityImpl) pf.createActivityFromCoord("secondary", facilities.get(secondaryFacilityId).getCoord());
 
 			
-			LegImpl leg = (LegImpl) pf.createLeg(mode);
+			Leg leg = (Leg) pf.createLeg(mode);
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*7.75 + generator.nextDouble()*3600.0*12);
 			plan.addActivity(actHome);

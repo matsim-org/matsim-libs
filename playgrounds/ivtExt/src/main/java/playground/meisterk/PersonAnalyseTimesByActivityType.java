@@ -21,7 +21,6 @@
 package playground.meisterk;
 
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -251,10 +250,10 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 			} else if (o instanceof Leg) {
 				depTime = ((Leg) o).getDepartureTime();
-				LegImpl r = ((LegImpl) o);
-				if (o instanceof LegImpl && 
+				Leg r = ((Leg) o);
+				if (o instanceof Leg && 
 						r.getDepartureTime() + r.getTravelTime() != Time.UNDEFINED_TIME) {
-					LegImpl r1 = ((LegImpl) o);
+					Leg r1 = ((Leg) o);
 					arrTime = r1.getDepartureTime() + r1.getTravelTime();
 				}
 				else {

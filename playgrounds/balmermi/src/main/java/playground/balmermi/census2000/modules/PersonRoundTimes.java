@@ -24,12 +24,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -114,7 +114,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 		plan_dur = 0.0;
 		for (int i=0; i<acts_legs.size()-2; i=i+2) {
 			ActivityImpl act = (ActivityImpl)acts_legs.get(i);
-			LegImpl leg = (LegImpl)acts_legs.get(i+1);
+			Leg leg = (Leg)acts_legs.get(i+1);
 			double dur = durs[index];
 
 			// durations

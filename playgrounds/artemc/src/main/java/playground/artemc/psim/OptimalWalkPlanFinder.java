@@ -2,11 +2,11 @@ package playground.artemc.psim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -84,14 +84,14 @@ public class OptimalWalkPlanFinder {
 
 		((ActivityImpl) plan.getPlanElements().get(0)).setEndTime(workStartTime - travelTime);
 
-		((LegImpl) plan.getPlanElements().get(1)).setDepartureTime(((ActivityImpl) plan.getPlanElements().get(0)).getEndTime());
+		((Leg) plan.getPlanElements().get(1)).setDepartureTime(((ActivityImpl) plan.getPlanElements().get(0)).getEndTime());
 
 		((ActivityImpl) plan.getPlanElements().get(2)).setStartTime(workStartTime);
 		((ActivityImpl) plan.getPlanElements().get(2)).setEndTime(workStartTime + workDuration);
 
-		((LegImpl) plan.getPlanElements().get(3)).setDepartureTime(((ActivityImpl) plan.getPlanElements().get(2)).getEndTime());
+		((Leg) plan.getPlanElements().get(3)).setDepartureTime(((ActivityImpl) plan.getPlanElements().get(2)).getEndTime());
 
-		((ActivityImpl) plan.getPlanElements().get(4)).setStartTime(((LegImpl) plan.getPlanElements().get(3)).getDepartureTime() + travelTime);
+		((ActivityImpl) plan.getPlanElements().get(4)).setStartTime(((Leg) plan.getPlanElements().get(3)).getDepartureTime() + travelTime);
 
 		return plan;
 	}

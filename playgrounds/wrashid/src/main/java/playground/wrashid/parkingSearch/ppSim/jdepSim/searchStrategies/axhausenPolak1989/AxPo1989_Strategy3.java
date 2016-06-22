@@ -23,10 +23,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -118,7 +118,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 		Id personId = aem.getPerson().getId();
 		if (!garageParkingScore.containsKey(personId)) {
 
-			Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+			Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 			Id endLinkId = leg.getRoute().getEndLinkId();
 			
 			Link parkingLink = network.getLinks().get(endLinkId);
@@ -182,7 +182,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 	private double getTravelTimeFromActivityToGP(AgentWithParking aem) {
 		Id nextActLinkId = ((ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 3))
 				.getLinkId();
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 
@@ -236,7 +236,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 	}
 
 	private void findClosestFreeGarageAndDriveThere(AgentWithParking aem) {
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		Id closestFreeGarageParking = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(getCurrentLinkCoordinate(aem),aem.getInvalidLinkForParking());
 		Id linkOfParking = AgentWithParking.parkingManager.getLinkOfParking(closestFreeGarageParking);
 		EditRoute.globalEditRoute.addLastPartToRoute(aem.getMessageArrivalTime(), leg, linkOfParking);

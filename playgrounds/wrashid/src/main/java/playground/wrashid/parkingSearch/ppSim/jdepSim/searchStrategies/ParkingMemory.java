@@ -25,9 +25,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -79,7 +79,7 @@ public class ParkingMemory {
 						if (ZHScenarioGlobal.iteration > 0) {
 							List<PlanElement> planElements = ZHScenarioGlobal.scenario.getPopulation().getPersons().get(personId)
 									.getSelectedPlan().getPlanElements();
-							LegImpl leg = (LegImpl) planElements.get(legIndex);
+							Leg leg = (Leg) planElements.get(legIndex);
 
 							ActivityImpl previousAct = (ActivityImpl) planElements.get(legIndex - 3);
 

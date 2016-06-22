@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.LocationMutator;
@@ -38,7 +39,6 @@ import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -185,7 +185,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 	}
 
 	protected double computeTravelTime(Person person, Activity fromAct, Activity toAct) {
-		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
 		leg.setTravelTime( 0.0 - leg.getDepartureTime() );
@@ -202,14 +202,14 @@ public class RecursiveLocationMutator extends LocationMutator {
 			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
 
 			if (super.defineFlexibleActivities.getFlexibleTypes().contains(this.defineFlexibleActivities.getConverter().convertType(act.getType()))) { // found secondary activity
-				manager.secondaryActivityFound(act, (LegImpl)actslegs.get(j+1));
+				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}
 			else {		// found primary activity
 				if (j == (actslegs.size()-1)) {
 					manager.primaryActivityFound(act, null);
 				}
 				else {
-					manager.primaryActivityFound(act, (LegImpl)actslegs.get(j+1));
+					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
 				}
 			}
 		}

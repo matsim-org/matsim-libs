@@ -24,10 +24,10 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -235,7 +235,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setMaximumDuration(dur);
-					LegImpl l = plan.createAndAddLeg("undefined");
+					Leg l = plan.createAndAddLeg("undefined");
 					final double arrTime = end_time;
 					l.setTravelTime( arrTime - l.getDepartureTime() );
 					l.setTravelTime(0);

@@ -11,10 +11,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -131,7 +131,7 @@ class PlanFindLegDistances {
 				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
 				if (act.equals(PopulationUtils.getLastActivity(plan)))
 					break;
-				LegImpl leg =  (LegImpl) plan.getPlanElements()
+				Leg leg =  (Leg) plan.getPlanElements()
 						.get(i + 1);
 				ActivityImpl nextact = (ActivityImpl) plan.getPlanElements()
 						.get(i + 2);

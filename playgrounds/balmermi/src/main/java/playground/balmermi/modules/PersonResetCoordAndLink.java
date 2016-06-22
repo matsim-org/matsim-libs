@@ -20,11 +20,11 @@
 
 package playground.balmermi.modules;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -53,8 +53,8 @@ public class PersonResetCoordAndLink extends AbstractPersonAlgorithm implements 
 				a.setCoord(this.facilities.getFacilities().get(a.getFacilityId()).getCoord());
 				a.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(a.getFacilityId())).getLinkId());
 			}
-			else if (pe instanceof LegImpl) {
-				LegImpl l = (LegImpl) pe;
+			else if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
 				l.setTravelTime( l.getDepartureTime() - l.getDepartureTime() );
 				l.setTravelTime(0.0);
 				l.setRoute(null);

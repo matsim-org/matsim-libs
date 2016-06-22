@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -345,7 +345,7 @@ public class Plansgenerator {
 			a.setLinkId(start.getId());
 			a.setEndTime(homeEndtime);
 			//leg to work
-			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			Leg leg = plan.createAndAddLeg(TransportMode.car);
 			NetworkRoute route = new LinkNetworkRouteImpl(start.getId(), target.getId());
 			route.setLinkIds(start.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE))), target.getId());
 			leg.setRoute(route);

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 
-public final class LegImpl implements Leg {
+ final class LegImpl  implements Leg {
 
 	private Route route = null;
 

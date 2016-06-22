@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -49,7 +50,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -229,7 +229,7 @@ public class LinkVolumeAnalyzer {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl activity = (ActivityImpl) pe;
-				if (((LegImpl) plan.getPlanElements().get(i + 1)).getMode().equalsIgnoreCase(TransportMode.car)) {
+				if (((Leg) plan.getPlanElements().get(i + 1)).getMode().equalsIgnoreCase(TransportMode.car)) {
 					return ((ActivityImpl) plan.getPlanElements().get(i + 2)).getFacilityId();
 				}
 			}

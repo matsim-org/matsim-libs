@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -160,7 +159,7 @@ public class QuickLegAnalysisPtPlanbased {
 				}
 				
 				if (pE instanceof Leg) {
-					LegImpl leg = (LegImpl) pE;
+					Leg leg = (Leg) pE;
 					if(leg.getMode().equals("pt")){
 						
 						String routeDescription = leg.getRoute().getRouteDescription();
@@ -204,7 +203,7 @@ public class QuickLegAnalysisPtPlanbased {
 	private void addToTransportModeBin(String mode) {
 	}
 
-	private double getTravelTime(LegImpl leg) {
+	private double getTravelTime(Leg leg) {
 		if(leg.getTravelTime() != Double.NaN){
 			return leg.getTravelTime();
 		}

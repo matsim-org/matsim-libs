@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.AStarLandmarks;
@@ -133,9 +133,9 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			}
 			
 			Object l = plan.getPlanElements().get(i+1);
-			LegImpl leg = null;
+			Leg leg = null;
 			if(l instanceof Leg){
-				leg = (LegImpl) l;
+				leg = (Leg) l;
 			} else{
 				LOG.error("PlanElement between " + ((Activity)a1).getType() + " and " +
 						((Activity)l).getType() + " is not a Leg.");

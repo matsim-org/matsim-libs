@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -48,7 +48,7 @@ public class ChooseRandomSingleLegModeTest {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
@@ -93,7 +93,7 @@ public class ChooseRandomSingleLegModeTest {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
 		String oldMode = leg.getMode();
 		for (int i = 0; i < 5; i++) {
@@ -109,9 +109,9 @@ public class ChooseRandomSingleLegModeTest {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord(0, 0), plan);
-		LegImpl leg1 = plan.createAndAddLeg(TransportMode.car);
+		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
-		LegImpl leg2 = plan.createAndAddLeg(TransportMode.car);
+		Leg leg2 = plan.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
 		String oldMode1 = leg1.getMode();
 		String oldMode2 = leg2.getMode();

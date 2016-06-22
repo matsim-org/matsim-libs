@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -57,7 +57,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Id<Person> person1Id = person1.getId();
 		Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
 		Id<Person> person2Id = person2.getId();
-		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
@@ -107,7 +107,7 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Id<Person> person1Id = person1.getId();
-		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
@@ -146,7 +146,7 @@ public class LegHistogramTest extends MatsimTestCase {
 
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Id<Person> person1Id = person1.getId();
-		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
 		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );

@@ -294,7 +294,7 @@ public class CreateNewZHScenario {
 					}
 					//reset route
 					if (pe instanceof Leg) {
-						LegImpl leg = (LegImpl)pe;
+						Leg leg = (Leg)pe;
 						leg.setRoute(null);
 					}
 				}
@@ -307,7 +307,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
-						LegImpl leg = (LegImpl)pe;
+						Leg leg = (Leg)pe;
 						leg.setRoute(null);
 					}
 				}

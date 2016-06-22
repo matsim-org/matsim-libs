@@ -5,6 +5,7 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -49,8 +50,8 @@ public class RemovePlansNotRelatedToStudyArea {
 				}
 
 				if (!cut) {
-					if (pe instanceof LegImpl) {
-						LegImpl leg = (LegImpl) pe;
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						if (leg.getMode().equalsIgnoreCase("car")) {
 							LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg
 									.getRoute();

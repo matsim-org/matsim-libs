@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -216,7 +217,7 @@ public class PlansCreateFromMZ {
 					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setMaximumDuration(from_act.getEndTime()-from_act.getStartTime());
-					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					Leg leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					final double arrTime = arrival;
@@ -240,7 +241,7 @@ public class PlansCreateFromMZ {
 					final Coord coord = from;
 					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord((String) HOME, coord, ((PlanImpl) plan));
 					homeAct.setEndTime(departure);
-					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					Leg leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					final double arrTime = arrival;
@@ -377,7 +378,7 @@ public class PlansCreateFromMZ {
 
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
 				ActivityImpl prev_act = (ActivityImpl)plan.getPlanElements().get(i-2);
-				LegImpl leg = (LegImpl)plan.getPlanElements().get(i-1);
+				Leg leg = (Leg)plan.getPlanElements().get(i-1);
 				ActivityImpl curr_act = (ActivityImpl)plan.getPlanElements().get(i);
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();

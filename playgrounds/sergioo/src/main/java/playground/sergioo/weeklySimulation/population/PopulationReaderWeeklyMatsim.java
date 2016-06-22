@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -94,7 +94,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 	private BasePersonImpl currperson = null;
 	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
-	private LegImpl currleg = null;
+	private Leg currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
@@ -264,7 +264,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		this.currleg = PopulationUtils.createLeg(mode.intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
-		LegImpl r = this.currleg;
+		Leg r = this.currleg;
 		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 		this.currplan.addLeg(currleg);
 	}

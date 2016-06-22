@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -47,7 +48,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -252,7 +252,7 @@ public class AccessEgressDemoSimple {
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalTrain);
-			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
+			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)), tLine, tRoute, schedule.getFacilities().get(Id.create("13", TransitStopFacility.class))));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("13", TransitStopFacility.class)).getLinkId());
 
@@ -272,7 +272,7 @@ public class AccessEgressDemoSimple {
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalBus);
-			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
+			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)), tLine, tRoute, schedule.getFacilities().get(Id.create("23", TransitStopFacility.class))));
 			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("23", TransitStopFacility.class)).getLinkId());
 

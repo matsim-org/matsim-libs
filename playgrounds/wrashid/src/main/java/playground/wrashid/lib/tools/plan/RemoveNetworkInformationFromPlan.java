@@ -3,13 +3,13 @@ package playground.wrashid.lib.tools.plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 
 
 
@@ -45,7 +45,7 @@ public class RemoveNetworkInformationFromPlan {
 						//activity.setFacilityId(null);
 					}
 					if (pe instanceof Leg){
-						LegImpl leg=(LegImpl) pe;
+						Leg leg=(Leg) pe;
 						leg.setRoute(null);
 					}
 				}

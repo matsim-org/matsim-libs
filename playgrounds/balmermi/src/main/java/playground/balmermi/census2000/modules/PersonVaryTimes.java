@@ -24,12 +24,12 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -93,9 +93,9 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) acts_legs.get(i);
 				leg.setDepartureTime(leg.getDepartureTime()+bias);
-				if (leg instanceof LegImpl) {
-					LegImpl r = ((LegImpl)leg);
-					LegImpl r1 = ((LegImpl)leg);
+				if (leg instanceof Leg) {
+					Leg r = ((Leg)leg);
+					Leg r1 = ((Leg)leg);
 					r1.setTravelTime( r.getDepartureTime() + r.getTravelTime()+bias - r1.getDepartureTime() );
 				}
 			}

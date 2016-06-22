@@ -22,10 +22,10 @@ package org.matsim.population.algorithms;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
 
@@ -135,7 +135,7 @@ public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 				}
 
 			} else {
-				LegImpl leg = (LegImpl) pe;
+				Leg leg = (Leg) pe;
 
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);

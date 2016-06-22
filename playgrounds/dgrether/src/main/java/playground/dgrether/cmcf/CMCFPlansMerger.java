@@ -21,11 +21,11 @@ package playground.dgrether.cmcf;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -73,7 +73,7 @@ public class CMCFPlansMerger {
 			Plan plan = p.getSelectedPlan();
 			int legNumber = Integer.parseInt(idLegNumber[1]);
 			legNumber = (legNumber * 2) + 1;
-			LegImpl leg = (LegImpl) plan.getPlanElements().get(legNumber);
+			Leg leg = (Leg) plan.getPlanElements().get(legNumber);
 			leg.setRoute(PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) ), ((PlanImpl) person.getSelectedPlan())).getRoute());
 		}
 

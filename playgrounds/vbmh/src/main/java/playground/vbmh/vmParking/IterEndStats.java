@@ -3,10 +3,10 @@ package playground.vbmh.vmParking;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -101,7 +101,7 @@ public class IterEndStats {
 			boolean notParked=false;
 			boolean parkedAtHome=false;
 			PlanImpl planImpl=(PlanImpl)personImpl.getSelectedPlan();
-			LegImpl legImpl=(LegImpl)PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( planImpl ), planImpl);
+			Leg legImpl=(Leg)PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( planImpl ), planImpl);
 			Id id = person.getId();
 			LinkedList<ParkingSpot> selectedParkings = parkings.get(id);
 			Activity firstAct = PopulationUtils.getFirstActivity( planImpl );
@@ -324,7 +324,7 @@ public class IterEndStats {
 	double getPlanDistance(PlanImpl plan){
 		double distance=0;
 		for (PlanElement element : plan.getPlanElements()){
-			if(element.getClass()==LegImpl.class){
+			if(element.getClass()==Leg.class){
 				Leg leg = (Leg)element;
 				distance+=leg.getRoute().getDistance();
 			}

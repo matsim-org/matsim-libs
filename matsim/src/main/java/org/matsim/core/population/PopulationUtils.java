@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -699,8 +700,8 @@ public final class PopulationUtils {
 		return (ActivityImpl) act ;
 	}
 	
-	public static LegImpl createLeg(String transportMode) {
-		return (LegImpl) getFactory().createLeg(transportMode) ;
+	public static Leg createLeg(String transportMode) {
+		return (Leg) getFactory().createLeg(transportMode) ;
 	}
 
 	// --- copy factories:
@@ -728,11 +729,11 @@ public final class PopulationUtils {
 	 * instance of Route or BasicRoute. Other route instances are not considered.
 	 * @param leg
 	 */
-	public static LegImpl createLeg(LegImpl leg) {
+	public static Leg createLeg(Leg leg) {
 		Leg newLeg = createLeg( leg.getMode() ) ;
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
-		LegImpl r = ((LegImpl)newLeg);
+		Leg r = ((Leg)newLeg);
 		r.setTravelTime( leg.getDepartureTime() + leg.getTravelTime() - r.getDepartureTime() );
 		if (leg.getRoute() != null) {
 			leg.setRoute(leg.getRoute().clone());
@@ -765,7 +766,7 @@ public final class PopulationUtils {
 				out.getPlanElements().add(createActivity((Activity) pe));
 			} else if (pe instanceof Leg) {
 				Leg l = (Leg) pe;
-				LegImpl l2 = ((PlanImpl)out).createAndAddLeg(l.getMode());
+				Leg l2 = ((PlanImpl)out).createAndAddLeg(l.getMode());
 				copyFromTo(l, l2);
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");

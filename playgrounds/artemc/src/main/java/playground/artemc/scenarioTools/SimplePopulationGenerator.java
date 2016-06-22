@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -100,7 +101,7 @@ public class SimplePopulationGenerator {
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
 			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", workLocation);
 			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
-			LegImpl leg = (LegImpl) pf.createLeg("pt");
+			Leg leg = (Leg) pf.createLeg("pt");
 			actHome.setEndTime(3600.00*8.30 + generator.nextGaussian()*1800);
 			plan.addActivity(actHome);
 			plan.addLeg(leg);

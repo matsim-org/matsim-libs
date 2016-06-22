@@ -12,11 +12,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -151,7 +151,7 @@ public class ModdedConverterE {
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
-						LegImpl leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
+						Leg leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
 						leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 						Coord tmpCoord;
@@ -179,7 +179,7 @@ public class ModdedConverterE {
 							Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 							Plan tmpPl = p.getSelectedPlan();
 
-							LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+							Leg leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
 							leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 							// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -253,7 +253,7 @@ public class ModdedConverterE {
 			Plan tmpPl = p.getSelectedPlan();
 
 
-			LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+			Leg leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord2;

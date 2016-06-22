@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -139,7 +140,7 @@ public class RawDataToPopulation {
 			/*
 			 * create leg
 			 */
-			LegImpl leg = PopulationUtils.createLeg(trip.aggrMode.name());
+			Leg leg = PopulationUtils.createLeg(trip.aggrMode.name());
 			plan.addLeg(leg);
 			/*
 			 * create route
@@ -178,7 +179,7 @@ public class RawDataToPopulation {
 		ActivityImpl previous = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 		if(!previous.getType().equalsIgnoreCase(ActivityType.home.name())) {
 			previous.setEndTime(86399);
-			LegImpl leg = PopulationUtils.createLeg("undefined");
+			Leg leg = PopulationUtils.createLeg("undefined");
 			plan.addLeg(leg);
 			
 			act = PopulationUtils.createActivityFromCoord(ActivityType.home.name(), ((Activity)plan.getPlanElements().get(0)).getCoord());

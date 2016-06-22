@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -203,7 +204,7 @@ public class ExternalTripsCreator {
 		person.setSelectedPlan(plan);
 		//Desires desires = person.createDesires("");
 		
-		LegImpl leg;
+		Leg leg;
 		ActivityImpl activity;
 		ActivityFacility activityFacility;
 
@@ -232,7 +233,7 @@ public class ExternalTripsCreator {
 		activity.setCoord(activityFacility.getCoord());
 		plan.addActivity(activity);
 		
-		leg = (LegImpl) populationFactory.createLeg(TransportMode.car);
+		leg = (Leg) populationFactory.createLeg(TransportMode.car);
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(0.0);
 		final double arrTime = departureTime;

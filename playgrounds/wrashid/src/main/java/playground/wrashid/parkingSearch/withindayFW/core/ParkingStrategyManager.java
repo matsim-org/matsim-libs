@@ -3,6 +3,7 @@ package playground.wrashid.parkingSearch.withindayFW.core;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -15,7 +16,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
@@ -66,9 +67,9 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 				
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
-					if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
+					if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
 
-						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+						Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 
 						if (leg.getMode().equals(TransportMode.car)) {
 							//+1/2 would be parking act/walk leg
@@ -90,9 +91,9 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
 
-					if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
+					if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
 
-						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+						Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 
 
 						if (leg.getMode().equals(TransportMode.car)) {
@@ -232,8 +233,8 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			if (selectedPlan.getPlanElements().get(i) instanceof ActivityImpl) {
 				ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i);
 				legModeActivityTypes.put(agent.getId(), i, activity.getType());
-			} else if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
-				LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+			} else if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
+				Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 				legModeActivityTypes.put(agent.getId(), i, leg.getMode());
 			}
 		}

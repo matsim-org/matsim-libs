@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -98,7 +99,7 @@ public class WeeklyPlans {
 						plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			}
 			else
-				planElementCopy = PopulationUtils.createLeg((LegImpl)planElement);
+				planElementCopy = PopulationUtils.createLeg((Leg)planElement);
 			plan.getPlanElements().add(planElementCopy);
 		}
 	}

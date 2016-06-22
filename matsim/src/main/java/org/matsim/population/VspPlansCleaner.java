@@ -29,7 +29,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -82,7 +81,7 @@ class VspPlansCleaner implements BeforeMobsimListener {
 					Leg leg = (Leg) pe ;
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
 						leg.setDepartureTime(Time.UNDEFINED_TIME) ;
-						LegImpl r = ((LegImpl)leg); // given by activity end time; everything else confuses
+						Leg r = ((Leg)leg); // given by activity end time; everything else confuses
 						r.setTravelTime( Time.UNDEFINED_TIME - r.getDepartureTime() );
 						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015
 					}

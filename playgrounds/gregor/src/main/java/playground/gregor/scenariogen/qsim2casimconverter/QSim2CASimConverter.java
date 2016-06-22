@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,7 +40,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -135,7 +135,7 @@ public class QSim2CASimConverter {
 				for (PlanElement el : pl.getPlanElements()) {
 					if (el instanceof Leg) {
 						((Leg) el).setMode("walkca");
-						((LegImpl) el).setRoute(null);
+						((Leg) el).setRoute(null);
 					} else if (el instanceof ActivityImpl) {
 
 						((ActivityImpl) el).setCoord(null);

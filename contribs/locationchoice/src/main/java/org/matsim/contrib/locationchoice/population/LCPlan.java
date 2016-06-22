@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -196,7 +196,7 @@ public class LCPlan implements Plan {
 				destPlan.planElements.add(new LCLeg(destPlan, legCount, planElementCount));
 				destPlan.routes[legCount] = leg.getRoute();
 				destPlan.depTimes[legCount] = leg.getDepartureTime();
-				LegImpl r = ((LegImpl) leg);
+				Leg r = ((Leg) leg);
 				destPlan.arrTimes[legCount] = r.getDepartureTime() + r.getTravelTime();
 				destPlan.travTimes[legCount] = leg.getTravelTime();
 				destPlan.modes[legCount] = leg.getMode();

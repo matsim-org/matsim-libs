@@ -12,12 +12,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -92,7 +92,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
         //PlansCalcRoute pcr = new PlansCalcRoute(this.services.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.services.getLeastCostPathCalculatorFactory(), routeFactory);
 
-        LegImpl li = PopulationUtils.createLeg(TransportMode.car);
+        Leg li = PopulationUtils.createLeg(TransportMode.car);
         li.setDepartureTime(0.0D);
         //log.info("fromLink " + link);
         //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
@@ -117,7 +117,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
   private double getLegScore(Leg leg, ScoringFunction function)
   {
-	  if ((leg instanceof LegImpl))
+	  if ((leg instanceof Leg))
 	    {
 	      function.handleLeg(leg);
 	    }
@@ -163,7 +163,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
     leg.setDepartureTime(depTime);
     leg.setTravelTime(travTime);
-LegImpl r = ((LegImpl)leg);
+Leg r = ((Leg)leg);
     r.setTravelTime( depTime + travTime - r.getDepartureTime() );
     return travTime;
   }

@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
@@ -69,7 +69,7 @@ public class NewAgentPtPlan extends NewPopulation {
 //						walkPlan.addAct((Act) o);
 					} else if (o instanceof Leg) {
 						Leg leg = (Leg) o;
-						LegImpl ptLeg = PopulationUtils.createLeg((LegImpl) leg);
+						Leg ptLeg = PopulationUtils.createLeg((Leg) leg);
 						ptLeg.setMode(TransportMode.pt);
 						ptLeg.setRoute(null);
 						// -----------------------------------------------
@@ -78,7 +78,7 @@ public class NewAgentPtPlan extends NewPopulation {
 						// automaticly!!
 						// -----------------------------------------------
 						ptPlan.addLeg(ptLeg);
-						LegImpl walkLeg = PopulationUtils.createLeg((LegImpl) leg);
+						Leg walkLeg = PopulationUtils.createLeg((Leg) leg);
 						walkLeg.setMode(TransportMode.walk);
 						walkLeg.setRoute(null);
 //						walkPlan.addLeg(walkLeg);

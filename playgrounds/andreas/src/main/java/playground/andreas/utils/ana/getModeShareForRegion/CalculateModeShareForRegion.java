@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -36,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
@@ -124,7 +124,7 @@ public class CalculateModeShareForRegion {
 					lastActWithinArea = currentActWithinArea;
 				}
 				
-				if (plan_element instanceof LegImpl){
+				if (plan_element instanceof Leg){
 					Leg leg = (Leg) plan_element;
 					
 					lastLeg = leg;

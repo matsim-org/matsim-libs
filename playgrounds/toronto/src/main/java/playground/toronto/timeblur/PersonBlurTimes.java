@@ -20,12 +20,12 @@
 
 package playground.toronto.timeblur;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -89,12 +89,12 @@ public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgo
 				if (dur != Time.UNDEFINED_TIME && dur != Double.POSITIVE_INFINITY){
 					((ActivityImpl) pe).setMaximumDuration(((ActivityImpl) pe).getEndTime() - ((ActivityImpl) pe).getEndTime());
 				}
-			}else if(pe instanceof LegImpl){
-				double dep = ((LegImpl) pe).getDepartureTime();
-				LegImpl r = ((LegImpl) pe);
+			}else if(pe instanceof Leg){
+				double dep = ((Leg) pe).getDepartureTime();
+				Leg r = ((Leg) pe);
 				double arr = r.getDepartureTime() + r.getTravelTime();
-				((LegImpl) pe).setDepartureTime(dep + timeShift);
-				LegImpl r1 = ((LegImpl) pe);
+				((Leg) pe).setDepartureTime(dep + timeShift);
+				Leg r1 = ((Leg) pe);
 				r1.setTravelTime( arr + timeShift - r1.getDepartureTime() );
 				
 			}else{

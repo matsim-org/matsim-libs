@@ -24,13 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.population.LCActivity;
 import org.matsim.contrib.locationchoice.population.LCLeg;
 import org.matsim.contrib.locationchoice.population.LCPlan;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -71,14 +71,14 @@ public class PlanUtils {
 				((ActivityImpl) pe).setMaximumDuration(actTemplate.getMaximumDuration());
 				((ActivityImpl) pe).setStartTime(actTemplate.getStartTime());
 				((ActivityImpl) pe).setType(actTemplate.getType());
-			} else if (pe instanceof LegImpl) {
-				LegImpl legTemplate = ((LegImpl)planTemplate.getPlanElements().get(actLegIndex));
-				LegImpl r = ((LegImpl) pe);
+			} else if (pe instanceof Leg) {
+				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
+				Leg r = ((Leg) pe);
 				r.setTravelTime( legTemplate.getDepartureTime() + legTemplate.getTravelTime() - r.getDepartureTime() );
-				((LegImpl) pe).setDepartureTime(legTemplate.getDepartureTime());
-				((LegImpl) pe).setMode(legTemplate.getMode());
-				((LegImpl) pe).setRoute(legTemplate.getRoute());
-				((LegImpl) pe).setTravelTime(legTemplate.getTravelTime());
+				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				((Leg) pe).setMode(legTemplate.getMode());
+				((Leg) pe).setRoute(legTemplate.getRoute());
+				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -98,14 +98,14 @@ public class PlanUtils {
 				((ActivityImpl) pe).setMaximumDuration(actTemplate.getMaximumDuration());
 				((ActivityImpl) pe).setStartTime(actTemplate.getStartTime());
 				((ActivityImpl) pe).setType(actTemplate.getType());
-			} else if (pe instanceof LegImpl) {
+			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
-				LegImpl r = ((LegImpl) pe);
+				Leg r = ((Leg) pe);
 				r.setTravelTime( legTemplate.getArrivalTime() - r.getDepartureTime() );
-				((LegImpl) pe).setDepartureTime(legTemplate.getDepartureTime());
-				((LegImpl) pe).setMode(legTemplate.getMode());
-				((LegImpl) pe).setRoute(legTemplate.getRoute());
-				((LegImpl) pe).setTravelTime(legTemplate.getTravelTime());
+				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				((Leg) pe).setMode(legTemplate.getMode());
+				((Leg) pe).setRoute(legTemplate.getRoute());
+				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -191,9 +191,9 @@ public class PlanUtils {
 	}
 	
 	public static void setArrivalTime(Leg leg, double arrivalTime) {
-		if (leg instanceof LegImpl) {
+		if (leg instanceof Leg) {
 			final double arrTime = arrivalTime;
-			LegImpl r = ((LegImpl) leg);
+			Leg r = ((Leg) leg);
 			r.setTravelTime( arrTime - r.getDepartureTime() );
 		} else if (leg instanceof LCLeg) {
 			((LCLeg) leg).setArrivalTime(arrivalTime);

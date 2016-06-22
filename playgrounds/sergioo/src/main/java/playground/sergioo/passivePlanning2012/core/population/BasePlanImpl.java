@@ -8,10 +8,10 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
@@ -75,7 +75,7 @@ public class BasePlanImpl implements BasePlan {
 					throw new RuntimeException("Activity without time information");
 			}
 			else {
-				toBeAdded = PopulationUtils.createLeg((LegImpl)planElement);
+				toBeAdded = PopulationUtils.createLeg((Leg)planElement);
 				prevTime = time;
 				if(((Leg)planElement).getTravelTime()!=Time.UNDEFINED_TIME)
 					time += ((Leg)planElement).getTravelTime();
@@ -233,7 +233,7 @@ public class BasePlanImpl implements BasePlan {
 					addLeg(emptyTime);
 				}
 				else
-					addLeg(PopulationUtils.createLeg((LegImpl)pe));
+					addLeg(PopulationUtils.createLeg((Leg)pe));
 			else
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
 		}
@@ -264,7 +264,7 @@ public class BasePlanImpl implements BasePlan {
 			}
 			else {
 				// remove an in-between act
-				LegImpl prev_leg = (LegImpl)getPlanElements().get(index-1); // prev leg;
+				Leg prev_leg = (Leg)getPlanElements().get(index-1); // prev leg;
 				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime( Time.UNDEFINED_TIME - prev_leg.getDepartureTime() );
@@ -287,7 +287,7 @@ public class BasePlanImpl implements BasePlan {
 		else {
 			if (index != getPlanElements().size()-2) {
 				// not the last leg
-				LegImpl next_leg = (LegImpl)getPlanElements().get(index+2);
+				Leg next_leg = (Leg)getPlanElements().get(index+2);
 				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime( Time.UNDEFINED_TIME - next_leg.getDepartureTime() );

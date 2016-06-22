@@ -10,12 +10,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -97,7 +97,7 @@ public class SelectedPlansAnalyzer {
 				
 				for (int i = 0; i< numberOfPlanElements; i++) {
 					if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
-						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+						Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 						
 						mode = leg.getMode();
 						

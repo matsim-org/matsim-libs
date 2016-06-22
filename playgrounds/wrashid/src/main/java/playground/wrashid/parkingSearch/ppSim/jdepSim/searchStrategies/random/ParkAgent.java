@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -117,7 +117,7 @@ public class ParkAgent extends RandomParkingSearch {
 
 				if (endOfLegReached(aem)) {
 					triggerSeachTimeStart(personId, aem.getMessageArrivalTime());
-					Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+					Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
 					String filterParkingType = getParkingFilterType(personId);
 					Id parkingId = getParkingLinkId(aem, filterParkingType);
@@ -219,7 +219,7 @@ public class ParkAgent extends RandomParkingSearch {
 		Id personId = aem.getPerson().getId();
 		ParkAgentAttributes parkingAttr = attributes.get(personId);
 
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		Link nextLink = getNextLink(aem);

@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -136,7 +136,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 		}
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		LegImpl r = ((LegImpl) leg);
+		Leg r = ((Leg) leg);
 		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}

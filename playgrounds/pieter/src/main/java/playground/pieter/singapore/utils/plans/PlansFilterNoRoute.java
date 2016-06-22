@@ -29,12 +29,12 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -86,7 +86,7 @@ public class PlansFilterNoRoute {
 					boolean hasNoRoute = false;
 
 					for (int j = 1; j < plan.getPlanElements().size(); j += 2) {
-						LegImpl leg = (LegImpl) plan.getPlanElements().get(j);
+						Leg leg = (Leg) plan.getPlanElements().get(j);
 
 						if (leg.getRoute() == null
 								&& !leg.getMode().equals("transit_walk")) {

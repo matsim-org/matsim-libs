@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -146,8 +146,8 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		if ( leg instanceof LegImpl ) {
-			LegImpl r = ((LegImpl) leg);
+		if ( leg instanceof Leg ) {
+			Leg r = ((Leg) leg);
 			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
 			// (not in interface!)
 		}

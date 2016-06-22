@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -53,7 +54,6 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -134,7 +134,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	public void setTransitSchedule(TransitSchedule transitSchedule) {
 		this.transitSchedule = transitSchedule;
 	}
-	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
+	private Map<Id<Person>, Leg> legs = new HashMap<>();
 	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
 	private Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new HashMap<>();
 	private Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new HashMap<>();
@@ -174,7 +174,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-	    LegImpl leg = PopulationUtils.createLeg(event.getLegMode());
+	    Leg leg = PopulationUtils.createLeg(event.getLegMode());
 	    leg.setDepartureTime(event.getTime());
 	    legs.put(event.getPersonId(), leg);
 	    
@@ -219,7 +219,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
     
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-	    LegImpl leg = legs.get(event.getPersonId());
+	    Leg leg = legs.get(event.getPersonId());
 	    leg.setTravelTime( event.getTime() - leg.getDepartureTime() );
 	    double travelTime = leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);

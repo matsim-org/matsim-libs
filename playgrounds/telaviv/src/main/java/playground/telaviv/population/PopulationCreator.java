@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -281,7 +282,7 @@ public class PopulationCreator {
 		person.setSelectedPlan(plan);
 		//Desires desires = person.createDesires("");
 
-		LegImpl leg;
+		Leg leg;
 		ActivityImpl activity;
 //		Route route;
 		String transportMode;
@@ -387,7 +388,7 @@ public class PopulationCreator {
 			if (primaryPreStop) {
 				ActivityFacility primaryPreFacility = selectFacilityByZone(primaryPreStopActivityZone, facilitiesToZoneMap);
 
-				leg = (LegImpl) populationFactory.createLeg(transportMode);
+				leg = (Leg) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				final double arrTime = time;
@@ -426,7 +427,7 @@ public class PopulationCreator {
 			 */
 			ActivityFacility primaryFacility = selectFacilityByZone(primaryMainActivityZone, facilitiesToZoneMap);
 
-			leg = (LegImpl) populationFactory.createLeg(transportMode);
+			leg = (Leg) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			final double arrTime = time;
@@ -461,7 +462,7 @@ public class PopulationCreator {
 			if (primaryPostStop) {
 				ActivityFacility primaryPostFacility = selectFacilityByZone(primaryPostStopActivityZone, facilitiesToZoneMap);
 
-				leg = (LegImpl) populationFactory.createLeg(transportMode);
+				leg = (Leg) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				final double arrTime1 = time;
@@ -490,7 +491,7 @@ public class PopulationCreator {
 				time = time + emme2Person.DUR_1_AFT;
 			}
 
-			leg = (LegImpl) populationFactory.createLeg(transportMode);
+			leg = (Leg) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			final double arrTime1 = time;
@@ -533,7 +534,7 @@ public class PopulationCreator {
 			if (secondaryPreStop) {
 				ActivityFacility secondaryPreFacility = selectFacilityByZone(secondaryPreStopActivityZone, facilitiesToZoneMap);
 
-				leg = (LegImpl) populationFactory.createLeg(transportMode);
+				leg = (Leg) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				final double arrTime = time;
@@ -567,7 +568,7 @@ public class PopulationCreator {
 			 */
 			ActivityFacility secondaryFacility = selectFacilityByZone(secondaryMainActivityZone, facilitiesToZoneMap);
 
-			leg = (LegImpl) populationFactory.createLeg(transportMode);
+			leg = (Leg) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			final double arrTime = time;
@@ -601,7 +602,7 @@ public class PopulationCreator {
 			if (secondaryPostStop) {
 				ActivityFacility secondaryPostFacility = selectFacilityByZone(secondaryPostStopActivityZone, facilitiesToZoneMap);
 
-				leg = (LegImpl) populationFactory.createLeg(transportMode);
+				leg = (Leg) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
 				final double arrTime1 = time;
@@ -630,7 +631,7 @@ public class PopulationCreator {
 				time = time + emme2Person.DUR_2_AFT;
 			}
 
-			leg = (LegImpl) populationFactory.createLeg(transportMode);
+			leg = (Leg) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
 			final double arrTime1 = time;

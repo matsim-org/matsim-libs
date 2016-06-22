@@ -2,6 +2,7 @@ package playground.artemc.scenarioTools;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -331,7 +332,7 @@ public class PopulationGeneratorV2 {
 			//Add home location to the plan
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
-			LegImpl leg = (LegImpl) pf.createLeg("car");
+			Leg leg = (Leg) pf.createLeg("car");
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*8.5);
 			plan.addActivity(actHome);

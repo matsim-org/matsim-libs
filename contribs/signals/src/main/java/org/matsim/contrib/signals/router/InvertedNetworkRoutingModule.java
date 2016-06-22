@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -140,7 +140,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(travelTime);
-		LegImpl r = ((LegImpl) leg);
+		Leg r = ((Leg) leg);
 		r.setTravelTime( departureTime + travelTime - r.getDepartureTime() );
 		leg.setRoute(route);
 		return travelTime;

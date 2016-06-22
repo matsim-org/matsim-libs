@@ -35,7 +35,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -403,7 +402,7 @@ public class MainPPSimZurich30km {
 
 			int i = 0;
 			while (i < planElements.size()) {
-				if (planElements.get(i) instanceof LegImpl) {
+				if (planElements.get(i) instanceof Leg) {
 					Leg leg = (Leg) planElements.get(i);
 
 					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
@@ -426,7 +425,7 @@ public class MainPPSimZurich30km {
 
 			int i = 0;
 			while (i < planElements.size()) {
-				if (planElements.get(i) instanceof LegImpl) {
+				if (planElements.get(i) instanceof Leg) {
 					Leg leg = (Leg) planElements.get(i);
 
 					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
@@ -524,7 +523,7 @@ public class MainPPSimZurich30km {
 
 			int i = 0;
 			while (i < planElements.size()) {
-				if (planElements.get(i) instanceof LegImpl) {
+				if (planElements.get(i) instanceof Leg) {
 					Activity prevAct = (Activity) planElements.get(i - 1);
 					Leg leg = (Leg) planElements.get(i);
 					Activity nextAct = (Activity) planElements.get(i + 1);
@@ -538,7 +537,7 @@ public class MainPPSimZurich30km {
 							double walkSpeed = 3.0 / 3.6;
 							double walkDuration = walkDistance / walkSpeed;
 
-							LegImpl walkLeg = PopulationUtils.createLeg(TransportMode.walk);
+							Leg walkLeg = PopulationUtils.createLeg(TransportMode.walk);
 							walkLeg.setTravelTime(walkDuration);
 							planElements.remove(i);
 							planElements.add(i, walkLeg);
@@ -559,7 +558,7 @@ public class MainPPSimZurich30km {
 
 			int i = 0;
 			while (i < planElements.size()) {
-				if (planElements.get(i) instanceof LegImpl) {
+				if (planElements.get(i) instanceof Leg) {
 					Activity prevAct = (Activity) planElements.get(i - 1);
 					Leg leg = (Leg) planElements.get(i);
 					Activity nextAct = (Activity) planElements.get(i + 1);
@@ -573,7 +572,7 @@ public class MainPPSimZurich30km {
 																		// parking!
 						planElements.add(i + 1, parkingAct);
 
-						LegImpl walkLeg = PopulationUtils.createLeg(TransportMode.walk);
+						Leg walkLeg = PopulationUtils.createLeg(TransportMode.walk);
 						// just initializing for testing (should be overwritten
 						// at end of parking search)
 						walkLeg.setTravelTime(3600);
@@ -588,7 +587,7 @@ public class MainPPSimZurich30km {
 																		// parking!
 						planElements.add(i, parkingAct);
 
-						LegImpl walkLeg = PopulationUtils.createLeg(TransportMode.walk);
+						Leg walkLeg = PopulationUtils.createLeg(TransportMode.walk);
 						// just initializing for testing (should be overwritten
 						// at end of parking search)
 						walkLeg.setTravelTime(3600);
@@ -609,7 +608,7 @@ public class MainPPSimZurich30km {
 
 			int i = 0;
 			while (i < planElements.size()) {
-				if (planElements.get(i) instanceof LegImpl) {
+				if (planElements.get(i) instanceof Leg) {
 					ActivityImpl prevAct = (ActivityImpl) planElements.get(i - 1);
 					Leg leg = (Leg) planElements.get(i);
 					ActivityImpl nextAct = (ActivityImpl) planElements.get(i + 1);

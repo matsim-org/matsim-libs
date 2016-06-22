@@ -28,6 +28,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
 
 import java.util.Map;

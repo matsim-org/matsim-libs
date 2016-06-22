@@ -25,10 +25,10 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -114,7 +114,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 			} else if (pe instanceof Leg) {
 
-				LegImpl leg = (LegImpl) pe;
+				Leg leg = (Leg) pe;
 
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);

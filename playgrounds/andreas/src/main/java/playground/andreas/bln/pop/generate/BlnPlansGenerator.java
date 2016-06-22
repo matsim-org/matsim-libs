@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -457,9 +458,9 @@ public class BlnPlansGenerator {
 		return actType;
 	}
 
-	private LegImpl createLeg(String[] tripData){
+	private Leg createLeg(String[] tripData){
 
-		LegImpl leg = null;
+		Leg leg = null;
 
 		if(BlnPlansGenerator.setAllLegsToCar == true){
 
