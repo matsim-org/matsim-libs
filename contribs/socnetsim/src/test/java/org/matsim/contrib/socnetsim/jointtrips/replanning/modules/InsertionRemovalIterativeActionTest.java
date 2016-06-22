@@ -34,23 +34,22 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.framework.population.JointPlan;
+import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.framework.population.JointPlan;
-import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
-import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 /**
  * @author thibautd
@@ -331,7 +330,7 @@ public class InsertionRemovalIterativeActionTest {
 			Person person = PopulationUtils.getFactory().createPerson(id);
 			PlanImpl plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId1 , plan );
-			ActivityImpl act = plan.createAndAddActivityFromLinkId( "first_act_d"+i , Id.create( "some_link" , Link.class ) );
+			Activity act = plan.createAndAddActivityFromLinkId( "first_act_d"+i , Id.create( "some_link" , Link.class ) );
 			act.setEndTime( 10 );
 			act.setCoord( coord1 );
 			plan.createAndAddLeg( TransportMode.car );

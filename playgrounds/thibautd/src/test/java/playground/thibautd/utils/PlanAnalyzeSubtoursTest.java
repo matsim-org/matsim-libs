@@ -20,12 +20,20 @@
 
 package playground.thibautd.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
@@ -40,13 +48,6 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -247,7 +248,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
-			ActivityImpl act;
+			Activity act;
 			act = plan.createAndAddActivityFromLinkId("actOnLink" + locationIdSequence[aa], location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {

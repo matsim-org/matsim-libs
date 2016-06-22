@@ -59,7 +59,7 @@ public final class PlanImpl implements Plan {
 	}
 
 	@Deprecated
-	public final ActivityImpl createAndAddActivityFromLinkId(final String type1, final Id<Link> linkId) {
+	public final Activity createAndAddActivityFromLinkId(final String type1, final Id<Link> linkId) {
 		return (ActivityImpl) PopulationUtils.createAndAddActivityFromLinkId(type1, linkId, this) ;
 	}
 

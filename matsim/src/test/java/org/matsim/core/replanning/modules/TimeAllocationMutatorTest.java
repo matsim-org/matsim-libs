@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
@@ -92,7 +93,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 		// setup person
 		PlanImpl plan;
-		ActivityImpl act1, act2;
+		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
@@ -171,7 +172,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 		// setup person
 		PlanImpl plan;
-		ActivityImpl act1, act2;
+		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).

@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +34,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
@@ -41,7 +49,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
@@ -53,10 +60,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import com.google.inject.Provider;
+import com.google.inject.name.Names;
 
 /**
  * @author thibautd
@@ -128,7 +133,7 @@ public class JointTripRouterFactoryTest {
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
 
-		ActivityImpl a = plan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity a = plan.createAndAddActivityFromLinkId( "home" , link1 );
 		a.setEndTime( 1246534 );
 		a.setCoord(new Coord((double) 0, (double) 1));
 		plan.createAndAddLeg( TransportMode.walk );

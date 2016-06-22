@@ -32,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -790,7 +789,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			this.person.getCustomAttributes().put("incomeAlphaFactor",testee_incomeAlphaFactor);
 			this.person.getCustomAttributes().put("betaFactor",testee_betaFactor);
 
-			ActivityImpl firstActivity = this.plan.createAndAddActivityFromLinkId("h", link1.getId());
+			Activity firstActivity = this.plan.createAndAddActivityFromLinkId("h", link1.getId());
 			firstActivity.setEndTime(firstLegStartTime);
 
 			Leg leg = this.plan.createAndAddLeg(TransportMode.car);
@@ -803,7 +802,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route1.setVehicleId(Id.createVehicleId("dummyVehicle1"));
 			leg.setRoute(route1);
 
-			ActivityImpl secondActivity = this.plan.createAndAddActivityFromLinkId("w", link3.getId());
+			Activity secondActivity = this.plan.createAndAddActivityFromLinkId("w", link3.getId());
 			secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
 			secondActivity.setEndTime(secondLegStartTime);
 			leg = this.plan.createAndAddLeg(TransportMode.pt);
@@ -814,7 +813,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route2.setDistance(20000.0);
 			leg.setRoute(route2);
 
-			ActivityImpl thirdActivity = this.plan.createAndAddActivityFromLinkId("w", link5.getId());
+			Activity thirdActivity = this.plan.createAndAddActivityFromLinkId("w", link5.getId());
 			thirdActivity.setStartTime(secondLegStartTime + secondLegTravelTime);
 			thirdActivity.setEndTime(thirdLegStartTime);
 			leg = this.plan.createAndAddLeg(TransportMode.walk);
@@ -825,7 +824,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route3.setDistance(CoordUtils.calcEuclideanDistance(link5.getCoord(), link7.getCoord()));
 			leg.setRoute(route3);
 
-			ActivityImpl fourthActivity = this.plan.createAndAddActivityFromLinkId("w", link7.getId());
+			Activity fourthActivity = this.plan.createAndAddActivityFromLinkId("w", link7.getId());
 			fourthActivity.setStartTime(thirdLegStartTime + thirdLegTravelTime);
 			fourthActivity.setEndTime(fourthLegStartTime);
 			leg = this.plan.createAndAddLeg(TransportMode.bike);
@@ -836,7 +835,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route4.setDistance(CoordUtils.calcEuclideanDistance(link7.getCoord(), link9.getCoord()));
 			leg.setRoute(route4);
 
-			ActivityImpl fifthActivity = this.plan.createAndAddActivityFromLinkId("h", link9.getId());
+			Activity fifthActivity = this.plan.createAndAddActivityFromLinkId("h", link9.getId());
 			fifthActivity.setStartTime(fourthLegStartTime + fourthLegTravelTime);
 			this.scenario.getPopulation().addPerson(this.person);
 		}

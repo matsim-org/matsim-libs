@@ -27,10 +27,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -63,7 +67,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 
-		ActivityImpl act1 = plan.createAndAddActivityFromLinkId("h", link0.getId());
+		Activity act1 = plan.createAndAddActivityFromLinkId("h", link0.getId());
 		act1.setEndTime(8.0*3600);
 
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
