@@ -20,10 +20,10 @@
 
 package org.matsim.api.core.v01.population;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.core.api.internal.MatsimPopulationObject;
-
-import java.util.List;
 
 /**
  * A plan contains the intention of an agent.  In consequence, all information is <i>expected</i>.  For example,
@@ -54,5 +54,9 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
 	 * you are using this method!.
 	 */
 	public void setPerson(Person person);
+
+	Leg createAndAddLeg(String mode);
+
+	Activity createAndAddActivity(String type);
 
 }

@@ -108,13 +108,13 @@ public class JointTripRouterFactoryTest {
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
 
-		plan.createAndAddActivity( "home" , link1 ).setEndTime( 32454 );
+		plan.createAndAddActivityFromLinkId( "home" , link1 ).setEndTime( 32454 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 ).setMaximumDuration( 0 );
+		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 ).setMaximumDuration( 0 );
 		Leg dLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
-		plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 ).setMaximumDuration( 0 );
+		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 ).setMaximumDuration( 0 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "home" , link3 );
+		plan.createAndAddActivityFromLinkId( "home" , link3 );
 
 		DriverRoute dRoute = new DriverRoute( link1 , link3 );
 		dRoute.addPassenger( passengerId );
@@ -128,19 +128,19 @@ public class JointTripRouterFactoryTest {
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
 
-		ActivityImpl a = plan.createAndAddActivity( "home" , link1 );
+		ActivityImpl a = plan.createAndAddActivityFromLinkId( "home" , link1 );
 		a.setEndTime( 1246534 );
 		a.setCoord(new Coord((double) 0, (double) 1));
 		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 );
+		a = plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 );
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 2));
 		Leg pLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 );
+		a = plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 3));
 		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivity( "home" , link3 );
+		a = plan.createAndAddActivityFromLinkId( "home" , link3 );
 		a.setCoord(new Coord((double) 0, (double) 4));
 
 		PassengerRoute pRoute = new PassengerRoute( link1 , link3 );

@@ -59,55 +59,55 @@ public class RemovalTest {
 
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one passenger trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 );
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one driver trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 );
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one tour with one passenger trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
+		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 );
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one tour with one driver trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
-		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
+		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 );
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("two tours with one passenger trip each", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
+		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 3 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 3 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 ).setEndTime( 4 );
+		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 4 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 );
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("two tours with one and two passenger trips", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
+		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivity( "h" , link1 ).setEndTime( 3 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 3 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 ).setEndTime( 4 );
+		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 4 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivityFromLinkId( "h" , link1 );
 	}
 
 	@Test

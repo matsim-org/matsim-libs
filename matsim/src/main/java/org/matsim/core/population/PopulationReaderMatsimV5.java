@@ -214,7 +214,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startAct(final Attributes atts) {
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
+			this.curract = this.currplan.createAndAddActivityFromLinkId(atts.getValue(ATTR_ACT_TYPE), linkId);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				final Coord coord = parseCoord( atts );
 				this.curract.setCoord(coord);

@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 
@@ -117,7 +118,8 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 							} else {
 								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 							}
-							((PlanImpl) plan).removeActivity(i); // also removes the following leg
+							final int index = i;
+							PopulationUtils.removeActivity(index, ((PlanImpl) plan)); // also removes the following leg
 							n -= 2;
 							i--;
 						}

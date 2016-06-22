@@ -81,7 +81,9 @@ public class PlanImplTest {
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
-		plan.insertLegAct(1, l, a);
+		final Leg leg = l;
+		final Activity act = a;
+		PopulationUtils.insertLegAct(1, leg, act, plan);
 
 		// test
 		assertEquals(5, plan.getPlanElements().size());
@@ -108,7 +110,9 @@ public class PlanImplTest {
 		// modification
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
-		plan.insertLegAct(3, l, a);
+		final Leg leg = l;
+		final Activity act = a;
+		PopulationUtils.insertLegAct(3, leg, act, plan);
 
 		// test
 		assertEquals(5, plan.getPlanElements().size());
@@ -136,7 +140,9 @@ public class PlanImplTest {
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
-			plan.insertLegAct(2, l, a);
+			final Leg leg = l;
+			final Activity act = a;
+			PopulationUtils.insertLegAct(2, leg, act, plan);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -160,7 +166,9 @@ public class PlanImplTest {
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
-			plan.insertLegAct(0, l, a);
+			final Leg leg = l;
+			final Activity act = a;
+			PopulationUtils.insertLegAct(0, leg, act, plan);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -185,14 +193,18 @@ public class PlanImplTest {
 		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
-			plan.insertLegAct(4, l, a);
+			final Leg leg = l;
+			final Activity act = a;
+			PopulationUtils.insertLegAct(4, leg, act, plan);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
 		}
 
 		try {
-			plan.insertLegAct(5, l, a);
+			final Leg leg = l;
+			final Activity act = a;
+			PopulationUtils.insertLegAct(5, leg, act, plan);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -267,10 +279,10 @@ public class PlanImplTest {
 		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("h", new Coord(0, 0));
 
-		testee.removeActivity(3);
+		PopulationUtils.removeActivity(3, testee);
 		assertEquals(5, testee.getPlanElements().size());
 
-		testee.removeActivity(4);
+		PopulationUtils.removeActivity(4, testee);
 		assertEquals(3, testee.getPlanElements().size());
 	}
 
@@ -286,10 +298,10 @@ public class PlanImplTest {
 		testee.createAndAddLeg(TransportMode.car);
 		testee.createAndAddActivity("h", new Coord(0, 0));
 
-		testee.removeLeg(4);
+		PopulationUtils.removeLeg(4, testee);
 		assertEquals(5, testee.getPlanElements().size());
 
-		testee.removeLeg(3);
+		PopulationUtils.removeLeg(3, testee);
 		assertEquals(3, testee.getPlanElements().size());
 	}
 

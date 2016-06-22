@@ -179,6 +179,18 @@ public final class PlanWithCachedJointPlan implements Plan {
 		// yy we really need a more systematic way for plans copying.  kai, nov15
 		PopulationUtils.copyFromTo(in, delegate);
 	}
+
+	@Override
+	public Leg createAndAddLeg(String mode) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Activity createAndAddActivity(String type) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 	
 	
 }

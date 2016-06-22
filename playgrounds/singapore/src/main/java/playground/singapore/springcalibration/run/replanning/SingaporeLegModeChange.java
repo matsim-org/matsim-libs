@@ -225,7 +225,8 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 			//((PlanImpl) plan).removeActivity(act2RemoveIndex);
 			
 			int leg2RemoveIndex = plan.getPlanElements().indexOf(walk2taxiLeg);
-			((PlanImpl) plan).removeLeg(leg2RemoveIndex);
+			final int index = leg2RemoveIndex;
+			PopulationUtils.removeLeg(index, ((PlanImpl) plan));
 		}
 	}
 	

@@ -336,6 +336,18 @@ public final class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
+		public Leg createAndAddLeg(String mode) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Activity createAndAddActivity(String type) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
 	}
 
 	/**
@@ -813,6 +825,90 @@ public final class PopulationUtils {
 			return (Leg) plan.getPlanElements().get(index-1);
 		}
 		return null;
+	}
+
+	/**
+	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,
+	 * the following leg will be emptied to keep consistency (i.e. for the route)
+	 *
+	 * @param index
+	 */
+	public static void removeLeg( int index, Plan plan) {
+		if ((index % 2 == 0) || (index < 1) || (index >= plan.getPlanElements().size()-1)) {
+			log.warn(plan + "[index=" + index +" is wrong. nothing removed]");
+		}
+		else {
+			if (index != plan.getPlanElements().size()-2) {
+				// not the last leg
+				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
+				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
+				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setRoute(null);
+			}
+			plan.getPlanElements().remove(index+1); // following act
+			plan.getPlanElements().remove(index); // leg
+		}
+
+	}
+	public static void removeActivity( int index, Plan plan ) {
+		if ((index % 2 != 0) || (index < 0) || (index > plan.getPlanElements().size()-1)) {
+			log.warn(plan + "[index=" + index +" is wrong. nothing removed]");
+		}
+		else if (plan.getPlanElements().size() == 1) {
+			log.warn(plan + "[index=" + index +" only one act. nothing removed]");
+		}
+		else {
+			if (index == 0) {
+				// remove first act and first leg
+				plan.getPlanElements().remove(index+1); // following leg
+				plan.getPlanElements().remove(index); // act
+			}
+			else if (index == plan.getPlanElements().size()-1) {
+				// remove last act and last leg
+				plan.getPlanElements().remove(index); // act
+				plan.getPlanElements().remove(index-1); // previous leg
+			}
+			else {
+				// remove an in-between act
+				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
+				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
+				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setRoute(null);
+
+				plan.getPlanElements().remove(index+1); // following leg
+				plan.getPlanElements().remove(index); // act
+			}
+		}
+	}
+	/**
+	 * Inserts a leg and a following act at position <code>pos</code> into the plan.
+	 *
+	 * @param pos the position where to insert the leg-act-combo. acts and legs are both counted from the beginning starting at 0.
+	 * @param leg the leg to insert
+	 * @param act the act to insert, following the leg
+	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
+	 */
+	public static void insertLegAct( int pos, Leg leg, Activity act, Plan plan ) {
+		if (pos < plan.getPlanElements().size()) {
+			Object o = plan.getPlanElements().get(pos);
+			if (!(o instanceof Leg)) {
+				throw new IllegalArgumentException("Position to insert leg and act is not valid (act instead of leg at position).");
+			}
+		} else if (pos > plan.getPlanElements().size()) {
+			throw new IllegalArgumentException("Position to insert leg and act is not valid.");
+		}
+		plan.getPlanElements().add(pos, act);
+		plan.getPlanElements().add(pos, leg);
+	}
+	public static Activity createAndAddActivityFromCoord( String type, Coord coord, Plan plan ) {
+		Activity act = plan.createAndAddActivity(type) ;
+		act.setCoord(coord);
+		return act ;
+	}
+	public static Activity createAndAddActivityFromLinkId( String type, Id<Link> linkId, Plan plan ) {
+		Activity act = plan.createAndAddActivity(type) ;
+		act.setLinkId(linkId);
+		return act ;
 	}
 	
 }

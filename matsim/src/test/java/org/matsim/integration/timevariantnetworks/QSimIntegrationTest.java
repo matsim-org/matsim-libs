@@ -300,7 +300,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		for(int i = 0; i < count; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i + (int) departureTime, Person.class));
 			PlanImpl plan1 = PersonUtils.createAndAddPlan(person, true);
-			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink.getId());
+			ActivityImpl a1 = plan1.createAndAddActivityFromLinkId("h", depLink.getId());
 			a1.setEndTime(departureTime);
 			LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);
@@ -308,7 +308,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			NetworkRoute route = new LinkNetworkRouteImpl(depLink.getId(), destLink.getId());
 			route.setLinkIds(depLink.getId(), NetworkUtils.getLinkIds("2"), destLink.getId());
 			leg1.setRoute(route);
-			plan1.createAndAddActivity("w", destLink.getId());
+			plan1.createAndAddActivityFromLinkId("w", destLink.getId());
 
 			persons.add(person);
 			departureTime++;

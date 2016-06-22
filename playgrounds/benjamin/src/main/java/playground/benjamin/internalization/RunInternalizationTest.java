@@ -199,13 +199,13 @@ public class RunInternalizationTest {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			
-			ActivityImpl home = plan.createAndAddActivity("home", Id.create("11", Link.class));
+			ActivityImpl home = plan.createAndAddActivityFromLinkId("home", Id.create("11", Link.class));
 			home.setEndTime(6 * 3600);
 			home.setCoord(new Coord(0.0, 0.0));
 			
 			plan.createAndAddLeg(TransportMode.walk);
 			
-			ActivityImpl home2 = plan.createAndAddActivity("home", Id.create("11", Link.class));
+			ActivityImpl home2 = plan.createAndAddActivityFromLinkId("home", Id.create("11", Link.class));
 			home2.setCoord(new Coord(0.0, 0.0));
 			
 			scenario.getPopulation().addPerson(person);

@@ -20,18 +20,21 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scenario.CustomizableUtils;
-import org.matsim.core.utils.misc.Time;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public final class PlanImpl implements Plan {
 
@@ -48,11 +51,10 @@ public final class PlanImpl implements Plan {
 
 	@Deprecated
 	public final ActivityImpl createAndAddActivity(final String type1, final Coord coord) {
-		ActivityImpl act = createAndAddActivity(type1) ;
-		act.setCoord(coord);
-		return act ;
+		return (ActivityImpl) PopulationUtils.createAndAddActivityFromCoord(type1, coord, this) ;
 	}
 
+	@Override
 	public final ActivityImpl createAndAddActivity(final String type1) {
 		ActivityImpl a = new ActivityImpl(type1);
 		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go through the factory.  kai, jun'16)
@@ -62,17 +64,15 @@ public final class PlanImpl implements Plan {
 	}
 
 	@Deprecated
-	public final ActivityImpl createAndAddActivity(final String type1, final Id<Link> linkId) {
-		ActivityImpl act = createAndAddActivity(type1) ;
-		act.setLinkId(linkId);
-		return act ;
+	public final ActivityImpl createAndAddActivityFromLinkId(final String type1, final Id<Link> linkId) {
+		return (ActivityImpl) PopulationUtils.createAndAddActivityFromLinkId(type1, linkId, this) ;
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated // use scenario.getPopulation().getFactory().createLeg(...) instead, and add it yourself
+	@Override
 	public LegImpl createAndAddLeg(final String mode) {
 		verifyCreateLeg();
 		LegImpl leg = new LegImpl( mode ) ;
@@ -89,72 +89,6 @@ public final class PlanImpl implements Plan {
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Removes the specified act from the plan as well as a leg according to the following rule:
-	 * <ul>
-	 * <li>first act: removes the act and the following leg</li>
-	 * <li>last act: removes the act and the previous leg</li>
-	 * <li>in-between act: removes the act, removes the previous leg's route, and removes the following leg.
-	 * </ul>
-	 *
-	 * @param index
-	 */
-	public final void removeActivity(final int index) {
-		if ((index % 2 != 0) || (index < 0) || (index > getPlanElements().size()-1)) {
-			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
-		}
-		else if (getPlanElements().size() == 1) {
-			log.warn(this + "[index=" + index +" only one act. nothing removed]");
-		}
-		else {
-			if (index == 0) {
-				// remove first act and first leg
-				getPlanElements().remove(index+1); // following leg
-				getPlanElements().remove(index); // act
-			}
-			else if (index == getPlanElements().size()-1) {
-				// remove last act and last leg
-				getPlanElements().remove(index); // act
-				getPlanElements().remove(index-1); // previous leg
-			}
-			else {
-				// remove an in-between act
-				LegImpl prev_leg = (LegImpl)getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
-				prev_leg.setTravelTime( Time.UNDEFINED_TIME - prev_leg.getDepartureTime() );
-				prev_leg.setRoute(null);
-
-				getPlanElements().remove(index+1); // following leg
-				getPlanElements().remove(index); // act
-			}
-		}
-	}
-
-	/**
-	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,
-	 * the following leg will be emptied to keep consistency (i.e. for the route)
-	 *
-	 * @param index
-	 */
-	public final void removeLeg(final int index) {
-		if ((index % 2 == 0) || (index < 1) || (index >= getPlanElements().size()-1)) {
-			log.warn(this + "[index=" + index +" is wrong. nothing removed]");
-		}
-		else {
-			if (index != getPlanElements().size()-2) {
-				// not the last leg
-				LegImpl next_leg = (LegImpl)getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
-				next_leg.setTravelTime(Time.UNDEFINED_TIME);
-				next_leg.setTravelTime( Time.UNDEFINED_TIME - next_leg.getDepartureTime() );
-				next_leg.setRoute(null);
-			}
-			getPlanElements().remove(index+1); // following act
-			getPlanElements().remove(index); // leg
-		}
-	}
 
 	@Override
 	public final Person getPerson() {
@@ -188,7 +122,6 @@ public final class PlanImpl implements Plan {
 
 	@Override
 	public final List<PlanElement> getPlanElements() {
-		// yyyyyy should probably return an UnmodifiableCollection; changes should only be done through interface methods.  kai, jun'16
 		return this.actsLegs;
 	}
 
@@ -219,28 +152,6 @@ public final class PlanImpl implements Plan {
 				"[nof_acts_legs=" + getPlanElements().size() + "]" +
 				"[type=" + this.type + "]" +
 				"[personId=" + personIdString + "]" ;
-	}
-
-	/**
-	 * Inserts a leg and a following act at position <code>pos</code> into the plan.
-	 *
-	 * @param pos the position where to insert the leg-act-combo. acts and legs are both counted from the beginning starting at 0.
-	 * @param leg the leg to insert
-	 * @param act the act to insert, following the leg
-	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
-	 */
-	public final void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
-		if (pos < getPlanElements().size()) {
-			Object o = getPlanElements().get(pos);
-			if (!(o instanceof Leg)) {
-				throw new IllegalArgumentException("Position to insert leg and act is not valid (act instead of leg at position).");
-			}
-		} else if (pos > getPlanElements().size()) {
-			throw new IllegalArgumentException("Position to insert leg and act is not valid.");
-		}
-
-		getPlanElements().add(pos, act);
-		getPlanElements().add(pos, leg);
 	}
 
 	@Override

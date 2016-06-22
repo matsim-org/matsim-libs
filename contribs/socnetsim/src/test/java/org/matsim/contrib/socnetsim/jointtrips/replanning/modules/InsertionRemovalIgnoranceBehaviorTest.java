@@ -107,18 +107,18 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Person person = PopulationUtils.getFactory().createPerson(id);
 			PlanImpl plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
-			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
+			plan.createAndAddActivityFromLinkId( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
-			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
+			plan.createAndAddActivityFromLinkId( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
 			person = PopulationUtils.getFactory().createPerson(id1);
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
-			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
+			plan.createAndAddActivityFromLinkId( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );
-			plan.createAndAddActivity( "second_act_p"+i , Id.create( "space" , Link.class ) );
+			plan.createAndAddActivityFromLinkId( "second_act_p"+i , Id.create( "space" , Link.class ) );
 		}
 
 		return new JointPlanFactory().createJointPlan( individualPlans );
@@ -136,26 +136,26 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Person person = PopulationUtils.getFactory().createPerson(id);
 			PlanImpl plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
-			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
+			plan.createAndAddActivityFromLinkId( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
-			plan.createAndAddActivity( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
 			Leg driverLeg1 = plan.createAndAddLeg( JointActingTypes.DRIVER );
-			plan.createAndAddActivity( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
 			plan.createAndAddLeg( TransportMode.car );
-			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
+			plan.createAndAddActivityFromLinkId( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
 			person = PopulationUtils.getFactory().createPerson(id1);
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
-			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
+			plan.createAndAddActivityFromLinkId( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );
-			plan.createAndAddActivity( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
 			Leg passengerLeg1 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-			plan.createAndAddActivity( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
 			plan.createAndAddLeg( TransportMode.walk );
-			plan.createAndAddActivity( "second_act_p"+i , Id.create( "space" , Link.class ) );
+			plan.createAndAddActivityFromLinkId( "second_act_p"+i , Id.create( "space" , Link.class ) );
 
 			DriverRoute driverRoute = new DriverRoute( puLink , doLink );
 			driverRoute.addPassenger( passengerId );

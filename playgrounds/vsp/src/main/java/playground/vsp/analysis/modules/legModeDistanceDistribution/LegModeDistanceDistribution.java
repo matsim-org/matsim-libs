@@ -117,7 +117,8 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 						} else {
 							throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 						}
-						((PlanImpl) selectedPlan).removeActivity(i); // also removes the following leg
+						final int index = i;
+						PopulationUtils.removeActivity(index, ((PlanImpl) selectedPlan)); // also removes the following leg
 						n -= 2;
 						i--;
 					}
