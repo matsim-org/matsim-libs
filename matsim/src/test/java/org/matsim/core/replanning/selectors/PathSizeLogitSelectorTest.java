@@ -96,7 +96,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 
 		NetworkRoute r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
@@ -118,7 +118,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		PlanImpl p2 = PopulationUtils.createPlan(person);
 		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
@@ -138,7 +138,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		PlanImpl p3 = PopulationUtils.createPlan(person);
 		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
@@ -167,7 +167,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
@@ -198,7 +198,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 
 		NetworkRoute r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
@@ -233,7 +233,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		NetworkRoute r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
@@ -251,7 +251,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		PlanImpl p2 = PopulationUtils.createPlan(person);
 		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
@@ -271,7 +271,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
-		leg.setArrivalTime(10.0);
+		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		PlanImpl p3 = PopulationUtils.createPlan(person);
 		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();

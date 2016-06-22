@@ -390,7 +390,8 @@ public class PopulationCreator {
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
-				leg.setArrivalTime(time);
+				final double arrTime = time;
+				leg.setTravelTime( arrTime - leg.getDepartureTime() );
 //				route = routeFactory.createRoute(previousActivityLinkId, primaryPreLinkId);
 //				leg.setRoute(route);
 				plan.addLeg(leg);
@@ -428,7 +429,8 @@ public class PopulationCreator {
 			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
-			leg.setArrivalTime(time);
+			final double arrTime = time;
+			leg.setTravelTime( arrTime - leg.getDepartureTime() );
 //			route = routeFactory.createRoute(previousActivityLinkId, primaryLinkId);
 //			leg.setRoute(route);
 			plan.addLeg(leg);
@@ -462,7 +464,8 @@ public class PopulationCreator {
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
-				leg.setArrivalTime(time);
+				final double arrTime1 = time;
+				leg.setTravelTime( arrTime1 - leg.getDepartureTime() );
 //				route = routeFactory.createRoute(previousActivityLinkId, primaryPostLinkId);
 //				leg.setRoute(route);
 				plan.addLeg(leg);
@@ -490,7 +493,8 @@ public class PopulationCreator {
 			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
-			leg.setArrivalTime(time);
+			final double arrTime1 = time;
+			leg.setTravelTime( arrTime1 - leg.getDepartureTime() );
 //			route = routeFactory.createRoute(previousActivityLinkId, homeLinkId);
 //			leg.setRoute(route);
 			plan.addLeg(leg);
@@ -532,7 +536,8 @@ public class PopulationCreator {
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
-				leg.setArrivalTime(time);
+				final double arrTime = time;
+				leg.setTravelTime( arrTime - leg.getDepartureTime() );
 //				route = routeFactory.createRoute(previousActivityLinkId, secondaryPreLinkId);
 //				leg.setRoute(route);
 				plan.addLeg(leg);
@@ -565,7 +570,8 @@ public class PopulationCreator {
 			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
-			leg.setArrivalTime(time);
+			final double arrTime = time;
+			leg.setTravelTime( arrTime - leg.getDepartureTime() );
 //			route = routeFactory.createRoute(previousActivityLinkId, secondaryLinkId);
 //			leg.setRoute(route);
 			plan.addLeg(leg);
@@ -598,7 +604,8 @@ public class PopulationCreator {
 				leg = (LegImpl) populationFactory.createLeg(transportMode);
 				leg.setDepartureTime(time);
 				leg.setTravelTime(0.0);
-				leg.setArrivalTime(time);
+				final double arrTime1 = time;
+				leg.setTravelTime( arrTime1 - leg.getDepartureTime() );
 //				route = routeFactory.createRoute(previousActivityLinkId, secondaryPostLinkId);
 //				leg.setRoute(route);
 				plan.addLeg(leg);
@@ -626,7 +633,8 @@ public class PopulationCreator {
 			leg = (LegImpl) populationFactory.createLeg(transportMode);
 			leg.setDepartureTime(time);
 			leg.setTravelTime(0.0);
-			leg.setArrivalTime(time);
+			final double arrTime1 = time;
+			leg.setTravelTime( arrTime1 - leg.getDepartureTime() );
 //			route = routeFactory.createRoute(previousActivityLinkId, homeLinkId);
 //			leg.setRoute(route);
 			plan.addLeg(leg);

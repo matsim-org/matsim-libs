@@ -102,7 +102,7 @@ public final class ActivityImpl implements Activity {
 	public final Coord getCoord() {
 		return this.coord;
 	}
-
+	@Override
 	public void setCoord(final Coord coord) {
 //		testForLocked();
 		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15
@@ -118,11 +118,13 @@ public final class ActivityImpl implements Activity {
 		return this.facilityId;
 	}
 
+	@Override
 	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
 //		testForLocked();
 		this.facilityId = facilityId;
 	}
 
+	@Override
 	public final void setLinkId(final Id<Link> linkId) {
 //		testForLocked();
 		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15

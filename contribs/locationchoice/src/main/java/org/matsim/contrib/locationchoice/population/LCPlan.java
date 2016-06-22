@@ -196,7 +196,8 @@ public class LCPlan implements Plan {
 				destPlan.planElements.add(new LCLeg(destPlan, legCount, planElementCount));
 				destPlan.routes[legCount] = leg.getRoute();
 				destPlan.depTimes[legCount] = leg.getDepartureTime();
-				destPlan.arrTimes[legCount] = ((LegImpl) leg).getArrivalTime();
+				LegImpl r = ((LegImpl) leg);
+				destPlan.arrTimes[legCount] = r.getDepartureTime() + r.getTravelTime();
 				destPlan.travTimes[legCount] = leg.getTravelTime();
 				destPlan.modes[legCount] = leg.getMode();
 				legCount++;

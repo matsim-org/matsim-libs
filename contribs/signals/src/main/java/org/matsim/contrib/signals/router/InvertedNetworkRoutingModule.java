@@ -140,7 +140,8 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(travelTime);
-		((LegImpl) leg).setArrivalTime(departureTime + travelTime);
+		LegImpl r = ((LegImpl) leg);
+		r.setTravelTime( departureTime + travelTime - r.getDepartureTime() );
 		leg.setRoute(route);
 		return travelTime;
 	}

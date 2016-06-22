@@ -262,7 +262,8 @@ public class BasePopulationReaderMatsim extends MatsimXmlParser implements Popul
 		this.currleg = PopulationUtils.createLeg(mode.intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
-		this.currleg.setArrivalTime(Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)));
+		LegImpl r = this.currleg;
+		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 		this.currplan.addLeg(currleg);
 	}
 

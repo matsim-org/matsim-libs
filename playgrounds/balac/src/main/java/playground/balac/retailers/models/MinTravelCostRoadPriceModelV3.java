@@ -303,7 +303,8 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
 
     leg.setDepartureTime(depTime);
     leg.setTravelTime(travTime);
-    ((LegImpl)leg).setArrivalTime(depTime + travTime);
+LegImpl r = ((LegImpl)leg);
+    r.setTravelTime( depTime + travTime - r.getDepartureTime() );
     return travTime;
   }
 

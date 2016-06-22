@@ -208,8 +208,8 @@ public class QuickLegAnalysisPtPlanbased {
 		if(leg.getTravelTime() != Double.NaN){
 			return leg.getTravelTime();
 		}
-		else if(leg.getArrivalTime() != Double.NaN || leg.getDepartureTime() != Double.NaN){
-			return leg.getArrivalTime() - leg.getDepartureTime();
+		else if(leg.getDepartureTime() + leg.getTravelTime() != Double.NaN || leg.getDepartureTime() != Double.NaN){
+			return leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
 		}
 		else {
 			return Double.NaN;

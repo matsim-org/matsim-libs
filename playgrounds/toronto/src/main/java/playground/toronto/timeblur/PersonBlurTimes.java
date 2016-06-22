@@ -91,9 +91,11 @@ public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgo
 				}
 			}else if(pe instanceof LegImpl){
 				double dep = ((LegImpl) pe).getDepartureTime();
-				double arr = ((LegImpl) pe).getArrivalTime();
+				LegImpl r = ((LegImpl) pe);
+				double arr = r.getDepartureTime() + r.getTravelTime();
 				((LegImpl) pe).setDepartureTime(dep + timeShift);
-				((LegImpl) pe).setArrivalTime(arr + timeShift);
+				LegImpl r1 = ((LegImpl) pe);
+				r1.setTravelTime( arr + timeShift - r1.getDepartureTime() );
 				
 			}else{
 				System.err.println("Cannot recognize plan element!");

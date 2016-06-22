@@ -68,15 +68,19 @@ public class OptimalWalkPlanFinderTest {
 
 		((ActivityImpl) optimalPlan.getPlanElements().get(0)).setEndTime(8.5 * 3600 + 60);
 		((LegImpl) optimalPlan.getPlanElements().get(1)).setDepartureTime(((LegImpl) optimalPlan.getPlanElements().get(1)).getDepartureTime() + 60);
-		((LegImpl) optimalPlan.getPlanElements().get(1)).setArrivalTime(((LegImpl) optimalPlan.getPlanElements().get(1)).getArrivalTime() + 60);
+		LegImpl r = ((LegImpl) optimalPlan.getPlanElements().get(1));
+		LegImpl r2 = ((LegImpl) optimalPlan.getPlanElements().get(1));
+		r2.setTravelTime( r.getDepartureTime() + r.getTravelTime() + 60 - r2.getDepartureTime() );
 		((ActivityImpl) optimalPlan.getPlanElements().get(2)).setStartTime(((ActivityImpl) optimalPlan.getPlanElements().get(2)).getStartTime() + 60);
 
 		Double altScore1 =calcScore(f, optimalPlan);
 
 		((ActivityImpl) optimalPlan.getPlanElements().get(2)).setEndTime(18 * 3600 - 60);
 		((LegImpl) optimalPlan.getPlanElements().get(3)).setDepartureTime((((ActivityImpl) optimalPlan.getPlanElements().get(2))).getEndTime());
-		((LegImpl) optimalPlan.getPlanElements().get(3)).setArrivalTime(((LegImpl) optimalPlan.getPlanElements().get(3)).getDepartureTime() + ((LegImpl) optimalPlan.getPlanElements().get(3)).getTravelTime());
-		((ActivityImpl) optimalPlan.getPlanElements().get(4)).setStartTime(((LegImpl) optimalPlan.getPlanElements().get(3)).getArrivalTime());
+		LegImpl r3 = ((LegImpl) optimalPlan.getPlanElements().get(3));
+		r3.setTravelTime( ((LegImpl) optimalPlan.getPlanElements().get(3)).getDepartureTime() + ((LegImpl) optimalPlan.getPlanElements().get(3)).getTravelTime() - r3.getDepartureTime() );
+		LegImpl r1 = ((LegImpl) optimalPlan.getPlanElements().get(3));
+		((ActivityImpl) optimalPlan.getPlanElements().get(4)).setStartTime(r1.getDepartureTime() + r1.getTravelTime());
 
 		Double altScore2 = calcScore(f, optimalPlan);
 

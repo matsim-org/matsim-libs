@@ -132,27 +132,27 @@ public class KNAnalysisEventsHandlerTest {
 
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
-		leg.setArrivalTime(Time.parseTime("07:30:00"));
+		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime() );
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
-		leg.setArrivalTime(Time.parseTime("07:10:00"));
+		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime() );
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
-		leg.setArrivalTime(Time.parseTime("31:22:00"));
+		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime() );
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
-		leg.setArrivalTime(Time.parseTime("30:12:01"));
+		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime() );
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 
 		this.runTest(testee);
 	}

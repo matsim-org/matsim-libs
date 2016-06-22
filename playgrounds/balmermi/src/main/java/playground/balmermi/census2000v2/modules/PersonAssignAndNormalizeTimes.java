@@ -95,7 +95,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				l.setDepartureTime(tod);
 				l.setTravelTime(0.0);
 				if (l instanceof LegImpl) {
-					((LegImpl) l).setArrivalTime(tod);
+					final double arrTime = tod;
+					LegImpl r = ((LegImpl) l);
+					r.setTravelTime( arrTime - r.getDepartureTime() );
 				}
 			}
 		}
@@ -149,7 +151,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				l.setDepartureTime(tod);
 				l.setTravelTime(0.0);
 				if (l instanceof LegImpl) {
-					((LegImpl) l).setArrivalTime(tod);
+					final double arrTime = tod;
+					LegImpl r = ((LegImpl) l);
+					r.setTravelTime( arrTime - r.getDepartureTime() );
 				}
 			}
 		}
@@ -216,7 +220,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
 				leg.setDepartureTime(leg.getDepartureTime()+bias);
-				((LegImpl) leg).setArrivalTime(((LegImpl) leg).getArrivalTime()+bias);
+				LegImpl r = ((LegImpl) leg);
+				LegImpl r1 = ((LegImpl) leg);
+				r1.setTravelTime( r.getDepartureTime() + r.getTravelTime()+bias - r1.getDepartureTime() );
 			}
 		}
 	}

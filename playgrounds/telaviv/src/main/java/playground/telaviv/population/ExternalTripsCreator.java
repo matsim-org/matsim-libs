@@ -235,7 +235,8 @@ public class ExternalTripsCreator {
 		leg = (LegImpl) populationFactory.createLeg(TransportMode.car);
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(0.0);
-		leg.setArrivalTime(departureTime);
+		final double arrTime = departureTime;
+		leg.setTravelTime( arrTime - leg.getDepartureTime() );
 		plan.addLeg(leg);
 		
 		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("tta", destinationLinkId);

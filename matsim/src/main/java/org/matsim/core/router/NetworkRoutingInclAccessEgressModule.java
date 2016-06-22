@@ -236,7 +236,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		LegImpl r = ((LegImpl) leg);
+		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
@@ -284,7 +285,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		if ( leg instanceof LegImpl ) {
-			((LegImpl) leg).setArrivalTime(depTime + travTime); 
+			LegImpl r = ((LegImpl) leg);
+			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
 			// (not in interface!)
 		}
 		return travTime;

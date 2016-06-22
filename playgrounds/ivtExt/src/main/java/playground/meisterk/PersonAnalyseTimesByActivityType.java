@@ -251,9 +251,11 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 			} else if (o instanceof Leg) {
 				depTime = ((Leg) o).getDepartureTime();
+				LegImpl r = ((LegImpl) o);
 				if (o instanceof LegImpl && 
-						((LegImpl) o).getArrivalTime() != Time.UNDEFINED_TIME) {
-					arrTime = ((LegImpl) o).getArrivalTime();
+						r.getDepartureTime() + r.getTravelTime() != Time.UNDEFINED_TIME) {
+					LegImpl r1 = ((LegImpl) o);
+					arrTime = r1.getDepartureTime() + r1.getTravelTime();
 				}
 				else {
 					arrTime = depTime + ((Leg) o).getTravelTime();

@@ -87,7 +87,8 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 			else if (e instanceof LegImpl) {
 				LegImpl l = (LegImpl)e;
 				l.setDepartureTime(now);
-				l.setArrivalTime(now);
+				final double arrTime = now;
+				l.setTravelTime( arrTime - l.getDepartureTime() );
 			}
 			else { throw new RuntimeException("Plan element type not known."); }
 		}

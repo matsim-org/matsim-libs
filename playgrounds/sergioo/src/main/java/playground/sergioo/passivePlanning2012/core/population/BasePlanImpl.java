@@ -267,7 +267,7 @@ public class BasePlanImpl implements BasePlan {
 				LegImpl prev_leg = (LegImpl)getPlanElements().get(index-1); // prev leg;
 				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
-				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
+				prev_leg.setTravelTime( Time.UNDEFINED_TIME - prev_leg.getDepartureTime() );
 				prev_leg.setRoute(null);
 
 				getPlanElements().remove(index+1); // following leg
@@ -290,7 +290,7 @@ public class BasePlanImpl implements BasePlan {
 				LegImpl next_leg = (LegImpl)getPlanElements().get(index+2);
 				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime(Time.UNDEFINED_TIME);
-				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
+				next_leg.setTravelTime( Time.UNDEFINED_TIME - next_leg.getDepartureTime() );
 				next_leg.setRoute(null);
 			}
 			getPlanElements().remove(index+1); // following act

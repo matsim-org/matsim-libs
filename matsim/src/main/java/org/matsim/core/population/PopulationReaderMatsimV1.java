@@ -228,7 +228,8 @@ import org.xml.sax.Attributes;
 		this.currleg = this.currplan.createAndAddLeg(atts.getValue("mode").toLowerCase(Locale.ROOT).intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
-		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
+		LegImpl r = this.currleg;
+		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
 	}
 
 	private void startRoute(final Attributes atts) {

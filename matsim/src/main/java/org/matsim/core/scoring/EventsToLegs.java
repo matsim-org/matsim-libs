@@ -220,8 +220,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 	    LegImpl leg = legs.get(event.getPersonId());
-	    leg.setArrivalTime(event.getTime());
-	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
+	    leg.setTravelTime( event.getTime() - leg.getDepartureTime() );
+	    double travelTime = leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
 	    List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 	    assert experiencedRoute.size() >= 1  ;

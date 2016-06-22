@@ -423,7 +423,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		
 		walkLeg.setDepartureTime(now);
 		walkLeg.setTravelTime(travTime);
-		walkLeg.setArrivalTime(now + travTime);
+		walkLeg.setTravelTime( now + travTime - walkLeg.getDepartureTime() );
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
 		this.cachedRouteLinkIds = null;

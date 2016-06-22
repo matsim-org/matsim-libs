@@ -73,7 +73,8 @@ public class PlanUtils {
 				((ActivityImpl) pe).setType(actTemplate.getType());
 			} else if (pe instanceof LegImpl) {
 				LegImpl legTemplate = ((LegImpl)planTemplate.getPlanElements().get(actLegIndex));
-				((LegImpl) pe).setArrivalTime(legTemplate.getArrivalTime());
+				LegImpl r = ((LegImpl) pe);
+				r.setTravelTime( legTemplate.getDepartureTime() + legTemplate.getTravelTime() - r.getDepartureTime() );
 				((LegImpl) pe).setDepartureTime(legTemplate.getDepartureTime());
 				((LegImpl) pe).setMode(legTemplate.getMode());
 				((LegImpl) pe).setRoute(legTemplate.getRoute());
@@ -99,7 +100,8 @@ public class PlanUtils {
 				((ActivityImpl) pe).setType(actTemplate.getType());
 			} else if (pe instanceof LegImpl) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
-				((LegImpl) pe).setArrivalTime(legTemplate.getArrivalTime());
+				LegImpl r = ((LegImpl) pe);
+				r.setTravelTime( legTemplate.getArrivalTime() - r.getDepartureTime() );
 				((LegImpl) pe).setDepartureTime(legTemplate.getDepartureTime());
 				((LegImpl) pe).setMode(legTemplate.getMode());
 				((LegImpl) pe).setRoute(legTemplate.getRoute());
@@ -190,7 +192,9 @@ public class PlanUtils {
 	
 	public static void setArrivalTime(Leg leg, double arrivalTime) {
 		if (leg instanceof LegImpl) {
-			((LegImpl) leg).setArrivalTime(arrivalTime);
+			final double arrTime = arrivalTime;
+			LegImpl r = ((LegImpl) leg);
+			r.setTravelTime( arrTime - r.getDepartureTime() );
 		} else if (leg instanceof LCLeg) {
 			((LCLeg) leg).setArrivalTime(arrivalTime);
 		} else throw new RuntimeException("Unexpected type of leg was found: " + leg.getClass().toString() + ". Aborting!");

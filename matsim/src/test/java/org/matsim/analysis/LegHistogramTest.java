@@ -60,7 +60,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
-		leg.setArrivalTime(Time.UNDEFINED_TIME);
+		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
 		LegHistogram histo = new LegHistogram(5*60);
 		histo.handleEvent(new PersonDepartureEvent(7*3600, person1Id, linkId, leg.getMode()));
 		histo.handleEvent(new PersonDepartureEvent(7*3600 + 6*60, person2Id, linkId, leg.getMode()));
@@ -110,7 +110,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
-		leg.setArrivalTime(Time.UNDEFINED_TIME);
+		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
 
 		LegHistogram histo = new LegHistogram(5*60, 10); // latest time-bin: 2700-2999
 
@@ -149,7 +149,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(7*3600);
 		leg.setTravelTime(Time.UNDEFINED_TIME);
-		leg.setArrivalTime(Time.UNDEFINED_TIME);
+		leg.setTravelTime( Time.UNDEFINED_TIME - leg.getDepartureTime() );
 
 		LegHistogram histo = new LegHistogram(5*60);
 

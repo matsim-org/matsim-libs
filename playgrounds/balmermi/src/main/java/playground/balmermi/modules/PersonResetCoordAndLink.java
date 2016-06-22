@@ -55,7 +55,7 @@ public class PersonResetCoordAndLink extends AbstractPersonAlgorithm implements 
 			}
 			else if (pe instanceof LegImpl) {
 				LegImpl l = (LegImpl) pe;
-				l.setArrivalTime(l.getDepartureTime());
+				l.setTravelTime( l.getDepartureTime() - l.getDepartureTime() );
 				l.setTravelTime(0.0);
 				l.setRoute(null);
 			}

@@ -188,7 +188,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		LegImpl leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
-		leg.setArrivalTime(0.0);
+		leg.setTravelTime( 0.0 - leg.getDepartureTime() );
 
 		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();

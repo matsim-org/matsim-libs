@@ -73,7 +73,7 @@ public abstract class Plans2LegHistogram {
 				for(int i = 1; i < pe.size(); i += 2){
 					LegImpl l = (LegImpl) pe.get(i);
 					histo.handleEvent(new PersonDepartureEvent(l.getDepartureTime(), null, null, l.getMode()));
-					double arrivaltime = (l.getArrivalTime() == Time.UNDEFINED_TIME) ? l.getDepartureTime() + l.getTravelTime() : l.getArrivalTime();
+					double arrivaltime = (l.getDepartureTime() + l.getTravelTime() == Time.UNDEFINED_TIME) ? l.getDepartureTime() + l.getTravelTime() : l.getDepartureTime() + l.getTravelTime();
 					histo.handleEvent(new PersonArrivalEvent(arrivaltime, null, null, l.getMode()));
 				}
 			}

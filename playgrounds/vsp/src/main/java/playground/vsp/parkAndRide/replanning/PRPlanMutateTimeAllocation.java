@@ -136,8 +136,9 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 				if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
 					now += leg.getTravelTime();
 				}
+				final double arrTime = now;
 				// set planned arrival time accordingly
-				leg.setArrivalTime(now);
+				leg.setTravelTime( arrTime - leg.getDepartureTime() );
 			}
 		}
 	}

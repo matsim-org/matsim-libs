@@ -142,7 +142,7 @@ public class PlanGenome implements Plan {
                 LegImpl prev_leg = (LegImpl) getPlanElements().get(index - 1); // prev leg;
                 prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
                 prev_leg.setTravelTime(Time.UNDEFINED_TIME);
-                prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
+                prev_leg.setTravelTime( Time.UNDEFINED_TIME - prev_leg.getDepartureTime() );
                 prev_leg.setRoute(null);
 
                 getPlanElements().remove(index + 1); // following leg
@@ -170,7 +170,7 @@ public class PlanGenome implements Plan {
                 LegImpl next_leg = (LegImpl) getPlanElements().get(index + 2);
                 next_leg.setDepartureTime(Time.UNDEFINED_TIME);
                 next_leg.setTravelTime(Time.UNDEFINED_TIME);
-                next_leg.setArrivalTime(Time.UNDEFINED_TIME);
+                next_leg.setTravelTime( Time.UNDEFINED_TIME - next_leg.getDepartureTime() );
                 next_leg.setRoute(null);
             }
             getPlanElements().remove(index + 1); // following act
@@ -274,7 +274,8 @@ public class PlanGenome implements Plan {
                 l2.setTravelTime(l.getTravelTime());
                 if (pe instanceof LegImpl) {
                     // get the arrival time information only if available
-                    l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
+                    LegImpl r = ((LegImpl) pe);
+			l2.setTravelTime( r.getDepartureTime() + r.getTravelTime() - l2.getDepartureTime() );
                 }
                 if (l.getRoute() != null) {
                     l2.setRoute(l.getRoute().clone());

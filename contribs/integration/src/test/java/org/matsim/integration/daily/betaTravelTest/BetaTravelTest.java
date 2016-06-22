@@ -487,7 +487,9 @@ public class BetaTravelTest extends MatsimTestCase {
 					}
 					// set planned arrival time accordingly
 					if (pe instanceof LegImpl) {
-						((LegImpl) leg).setArrivalTime(now);
+						final double arrTime = now;
+						LegImpl r = ((LegImpl) leg);
+						r.setTravelTime( arrTime - r.getDepartureTime() );
 					}
 
 				}

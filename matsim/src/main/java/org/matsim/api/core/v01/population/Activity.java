@@ -73,4 +73,6 @@ public interface Activity extends PlanElement {
 	
 	public void setFacilityId(final Id<ActivityFacility> id);
 
+	void setCoord(Coord coord);
+
 }

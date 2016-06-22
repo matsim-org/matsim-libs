@@ -32,8 +32,6 @@ public final class LegImpl implements Leg {
 	private double travTime = Time.UNDEFINED_TIME;
 	private String mode;
 
-	private double arrTime = Time.UNDEFINED_TIME;
-
 	/* deliberately package */  LegImpl(final String transportMode) {
 		this.mode = transportMode;
 	}
@@ -68,14 +66,6 @@ public final class LegImpl implements Leg {
 		this.travTime = travTime;
 	}
 
-	public final double getArrivalTime() {
-		return this.arrTime;
-	}
-
-	public final void setArrivalTime(final double arrTime) {
-		this.arrTime = arrTime;
-	}
-
 	@Override
 	public Route getRoute() {
 		return this.route;
@@ -91,7 +81,7 @@ public final class LegImpl implements Leg {
 		return "[mode=" + this.getMode() + "]" +
 				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +
+				"[arrTime=" + Time.writeTime(this.getDepartureTime() + this.getTravelTime()) + "]" +
 				"[route=" + this.route + "]";
 	}
 

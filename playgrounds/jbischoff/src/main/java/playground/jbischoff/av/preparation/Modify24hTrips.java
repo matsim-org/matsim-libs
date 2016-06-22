@@ -71,8 +71,9 @@ public class Modify24hTrips {
 					double newDep = leg1.getDepartureTime()-24*3600;
 					leg1.setDepartureTime(newDep);
 					
-					double newArr = leg1.getArrivalTime()-24*3600;
-					leg1.setArrivalTime(newArr);
+					double newArr = leg1.getDepartureTime() + leg1.getTravelTime()-24*3600;
+					final double arrTime = newArr;
+					leg1.setTravelTime( arrTime - leg1.getDepartureTime() );
 					
 				}
 				

@@ -170,8 +170,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
 		if (leg instanceof LegImpl){
 			LegImpl l = (LegImpl)leg;
-			if (l.getArrivalTime() != Time.UNDEFINED_TIME)
-				out.write(" arr_time=\"" + Time.writeTime(l.getArrivalTime()) + "\"");
+			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME)
+				out.write(" arr_time=\"" + Time.writeTime(l.getDepartureTime() + l.getTravelTime()) + "\"");
 		}
 		out.write(">\n");
 	}

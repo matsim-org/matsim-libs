@@ -253,6 +253,12 @@ public final class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
+		@Override
+		public void setCoord(Coord coord) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
 	}
 
 	/**
@@ -714,7 +720,8 @@ public final class PopulationUtils {
 		Leg newLeg = createLeg( leg.getMode() ) ;
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
-		((LegImpl)newLeg).setArrivalTime(leg.getArrivalTime());
+		LegImpl r = ((LegImpl)newLeg);
+		r.setTravelTime( leg.getDepartureTime() + leg.getTravelTime() - r.getDepartureTime() );
 		if (leg.getRoute() != null) {
 			leg.setRoute(leg.getRoute().clone());
 		}
@@ -757,10 +764,6 @@ public final class PopulationUtils {
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setDepartureTime(in.getDepartureTime());
 		out.setTravelTime(in.getTravelTime());
-		if (in instanceof LegImpl) {
-			// get the arrival time information only if available
-			((LegImpl) out).setArrivalTime(((LegImpl) in).getArrivalTime());
-		}
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
