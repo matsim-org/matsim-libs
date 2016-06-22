@@ -53,7 +53,7 @@ public class IncidentWithinDayReplanning {
 	private static final String withinDayReplanningOutputDirectory = "../../../runs-svn/incidents/output/2016-03-15_withinDayReplanning/";
 	private static final String networkChangeEventsFile = "../../../runs-svn/incidents/input/networkChangeEvents_2016-03-15.xml.gz";
 	
-	private static final boolean reducePopulationToAffectedAgents = true;
+	private static final boolean reducePopulationToAffectedAgents = false;
 		
 // ############################################################################################################################################
 	

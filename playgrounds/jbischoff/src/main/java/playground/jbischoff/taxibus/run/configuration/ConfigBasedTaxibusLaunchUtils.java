@@ -33,6 +33,8 @@ import com.google.inject.util.Providers;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
+import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateLookupTable;
+import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
 
@@ -60,10 +62,19 @@ public class ConfigBasedTaxibusLaunchUtils {
         new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFile());
         final TaxibusPassengerOrderManager orderManager;
         final LineDispatcher dispatcher;
+        final StateLookupTable lookuptable;
 		if (tbcg.getAlgorithmConfig().endsWith("ine")){
 			dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),vrpData,tbcg);}
 		else  {
 			dispatcher = null;}
+		if (tbcg.getAlgorithmConfig().equals("stateBased")){
+			lookuptable = new StateLookupTable(7.25*3600, 8*3600, 60, 0, controler.getConfig().controler().getOutputDirectory());
+			controler.addControlerListener(lookuptable);
+		} else {
+			lookuptable = null;
+		}
+
+		
 		if (tbcg.isPrebookTrips()){	
 		orderManager = new TaxibusPassengerOrderManager();
 		} else {
@@ -89,6 +100,13 @@ public class ConfigBasedTaxibusLaunchUtils {
 				}else {
 					bind(TaxibusPassengerOrderManager.class).toProvider(Providers.of(null));
 				}
+				if (lookuptable!=null){
+					bind(StateSpace.class).toInstance(lookuptable);
+					}
+				else {
+					bind(StateSpace.class).toProvider(Providers.of(null));
+				}
+				
 				
 				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
 				bind(VrpData.class).toInstance(vrpData);

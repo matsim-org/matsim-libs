@@ -19,10 +19,14 @@
 
 package playground.michalm.ev.data;
 
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.vehicles.Vehicle;
+
 import playground.michalm.ev.discharging.*;
 
 
 public interface ElectricVehicle
+    extends Identifiable<Vehicle>
 {
     DriveEnergyConsumption getDriveEnergyConsumption();
 
@@ -33,6 +37,5 @@ public interface ElectricVehicle
     Battery getBattery();
 
 
-    //used for swapping
-    void setBattery(Battery battery);
+    Battery swapBattery(Battery battery);
 }

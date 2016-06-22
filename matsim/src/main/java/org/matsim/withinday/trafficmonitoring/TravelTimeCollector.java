@@ -47,6 +47,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,6 +62,7 @@ import java.util.concurrent.CyclicBarrier;
  * 
  * @author cdobler
  */
+@Singleton
 public class TravelTimeCollector implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
 		VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,

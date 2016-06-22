@@ -19,10 +19,13 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
+import java.util.HashSet;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
+import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 /**
@@ -47,6 +50,9 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
 	protected Id<Vehicle> vehicleId;
+	private boolean isBEV = true; //TODO set this based on vehicle type
+	private Double maxDischargingPowerInKW, maxLevel2ChargingPowerInKW, maxLevel3ChargingPowerInKW;
+	private HashSet<ChargingPlugType> compatiblePlugTypes;
 
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
@@ -75,20 +81,14 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double chargeVehicle(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
-			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
-					&& socInJoules > getUsableBatteryCapacityInJoules()) {
-				DebugLib.stopSystemAndReportInconsistency(
-						"the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
+			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
+				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
 			}
 		}
 		
 		return energyChargeInJoule;
 	}
 	
-	public double chargeVehicle(double duration, double chargerPowerInWatt){
-		return chargeVehicle(duration*chargerPowerInWatt);
-	}
-
 	public double getUsableBatteryCapacityInJoules() {
 		return usableBatteryCapacityInJoules;
 	}
@@ -110,5 +110,56 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double calcEndCharingTimeOfVehicle(double curTime, double chargerPowerInWatt){
 		return curTime + getRequiredEnergyInJoules()/chargerPowerInWatt;
 	}
-	
+
+	public double getMaxChargingPowerInKW(ChargingPlugType plugType) {
+		switch(plugType.getNominalLevel()){
+			case 1:
+				return 1.5;
+			case 2:
+				return 6.7;
+			case 3:
+				return 50;
+		}
+		return 0.0;
+	}
+
+	public double getRemainingRangeInMeters() {
+		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
+	}
+
+	public boolean isBEV() {
+		return this.isBEV;
+	}
+
+	public void setChargingFields(String vehicleTypeName, Double maxDischargingPowerInKW,
+			Double maxLevel2ChargingPowerInKW, Double maxLevel3ChargingPowerInKW, HashSet<ChargingPlugType> compatiblePlugTypes) {
+		this.maxDischargingPowerInKW = maxDischargingPowerInKW;
+		this.maxLevel2ChargingPowerInKW = maxLevel2ChargingPowerInKW;
+		this.maxLevel3ChargingPowerInKW = maxLevel3ChargingPowerInKW;
+		this.compatiblePlugTypes = compatiblePlugTypes;
+	}
+
+	public Double getMaxDischargingPowerInKW() {
+		return maxDischargingPowerInKW;
+	}
+
+	public void setMaxDischargingPowerInKW(Double maxDischargingPowerInKW) {
+	}
+
+	public Double getMaxLevel2ChargingPowerInKW() {
+		return maxLevel2ChargingPowerInKW;
+	}
+
+	public Double getMaxLevel3CharginPowerInKW() {
+		return maxLevel3ChargingPowerInKW;
+	}
+
+	public HashSet<ChargingPlugType> getCompatiblePlugTypes() {
+		return compatiblePlugTypes;
+	}
+
+	public boolean hasEnoughEnergyToDriveDistance(double nextLegTravelDistanceInMeters) {
+		return getRemainingRangeInMeters() >= nextLegTravelDistanceInMeters;
+	}
+
 }

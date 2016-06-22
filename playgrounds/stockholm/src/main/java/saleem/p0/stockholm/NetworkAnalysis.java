@@ -69,13 +69,13 @@ public class NetworkAnalysis {
 		eventsPlainNoP0.addHandler(handlerPlainNoP0);
 		//events.addHandler(handler);
 		final MatsimEventsReader readerPlainNoP0 = new MatsimEventsReader(eventsPlainNoP0);
-		readerPlainNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\PNP02\\it.1000\\1000.events.xml.gz");
+		readerPlainNoP0.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\PNP04\\it.950\\950.events.xml.gz");
 		
 		final EventsManager eventsP0 = EventsUtils.createEventsManager(config);
 		EventsHandler handlerP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
 		eventsP0.addHandler(handlerP0);
 		final MatsimEventsReader readerP0 = new MatsimEventsReader(eventsP0);
-		readerP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P02\\it.1000\\1000.events.xml.gz");
+		readerP0.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\P04\\it.950\\950.events.xml.gz");
 		plotDelays("./ihop2/matsim-input/delays.png",handlerP0.getTimes(), handlerP0.getDelays(),handlerPlainNoP0.getDelays());
 		plotTravellersThroughNodes("./ihop2/matsim-input/travellersthrooughnodes.png",handlerP0.getTimes(), handlerP0.getNumAgentsThroughIntersections(), handlerPlainNoP0.getNumAgentsThroughIntersections());
 		plotTravellersOnIncomingLinks("./ihop2/matsim-input/travellersonincominglinks.png",handlerP0.getTimes(), handlerP0.getAgentsOnIncomingLinks(),handlerPlainNoP0.getAgentsOnIncomingLinks());
@@ -119,7 +119,7 @@ public class NetworkAnalysis {
 	    scenario.getPopulation().getPersons().clear();
 	    final MatsimPopulationReader popReader = new MatsimPopulationReader(
 				scenario);
-		popReader.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\PNP04\\it.1000\\1000.plans.xml.gz");
+		popReader.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\PNP01\\it.1000\\1000.plans.xml.gz");
 //	    popReader.readFile("./ihop2/matsim-input/5.plans.xml.gz");
 		Population population = scenario.getPopulation();
 		ArrayList<Person> persons = cutil.toArrayList((Iterator<Person>) population.getPersons().values().iterator());
@@ -130,12 +130,17 @@ public class NetworkAnalysis {
 		Map<String, List<Link>> inlinksforjunctions = sth.getInLinksForJunctions(timednodes, network);
 		Iterator<String> nodes = inlinksforjunctions.keySet().iterator();//List of incoming links for each pretimed node
 		while(nodes.hasNext()){
-			List<Link> inlinks = inlinksforjunctions.get(nodes.next());
-			Iterator<Link> linksiter = inlinks.iterator();
-			while(linksiter.hasNext()){
-				allincominglinksids.add(linksiter.next().getId().toString());
+			String node = nodes.next();
+			List<Link> inlinks = inlinksforjunctions.get(node);
+			if(inlinks.size()<2){
+				System.out.println(node);
 			}
-			
+			else{
+				Iterator<Link> linksiter = inlinks.iterator();
+				while(linksiter.hasNext()){
+					allincominglinksids.add(linksiter.next().getId().toString());
+				}
+			}
 		}
 		boolean keep = false;
 		int size = persons.size();

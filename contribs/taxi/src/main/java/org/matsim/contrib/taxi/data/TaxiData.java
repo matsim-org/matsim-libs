@@ -40,12 +40,6 @@ public class TaxiData
 //    }
 
 
-//    public Map<Id<Vehicle>, Taxi> getTaxis()
-//    {
-//        return convertMap(getVehicles());
-//    }
-
-
     public Map<Id<Request>, TaxiRequest> getTaxiRequests()
     {
         return convertMap(getRequests());

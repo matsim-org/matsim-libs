@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -304,6 +305,40 @@ public class PopulationUtils {
 		LOG.info("--------------------------------------------");
 	}
 	
+	private static void printModeStatistics(String population){
+		LOG.info("Parsing different modes observed in population...");
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		pr.readFile(population);
+		
+		Map<String, Integer> map = new TreeMap<>();
+		Counter counter = new Counter(" person # ");
+		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
+			Plan plan = sc.getPopulation().getPersons().get(id).getSelectedPlan();
+			if(plan != null){
+				for(PlanElement pe : plan.getPlanElements()){
+					if(pe instanceof Leg){
+						Leg leg = (Leg) pe;
+						if(!map.containsKey(leg.getMode())){
+							map.put(leg.getMode(), new Integer(1));
+						} else{
+							map.put(leg.getMode(), map.get(leg.getMode()) + 1 );
+						}
+					}
+				}
+			}
+			counter.incCounter();
+		}
+		counter.printCounter();
+		
+		LOG.info("Done parsing modes.");
+		LOG.info("--------------------------------------------");
+		for(String mode : map.keySet()){
+			LOG.info(String.format("%12s: %d", mode, map.get(mode)));
+		}
+		LOG.info("--------------------------------------------");
+	}
+	
 	
 	/**
 	 * An implementation to quickly use to print statistics.
@@ -327,6 +362,9 @@ public class PopulationUtils {
 			break;
 		case 5:
 			printNumberOfAgentTypes(args[1]);
+			break;
+		case 6:
+			printModeStatistics(args[1]);
 			break;
 		default:
 			LOG.warn("Cannot print any statistics for option `" + option + "'");

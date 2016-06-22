@@ -18,12 +18,20 @@
  * *********************************************************************** */
 package org.matsim.withinday.controller;
 
-import org.matsim.core.population.PlansService;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+
+import java.util.Map;
 
 /**
  * @author nagel
  *
  */
-public interface ExecutedPlansService extends PlansService {
+public interface ExecutedPlansService {
+
+	void writeExecutedPlans(String filename);
+
+	Map<Id<Person>, Plan> getExecutedPlans();
 
 }

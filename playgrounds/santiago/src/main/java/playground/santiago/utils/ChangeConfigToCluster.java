@@ -11,12 +11,12 @@ import org.matsim.pt.config.TransitConfigGroup;
 
 public class ChangeConfigToCluster {
 	
-	final static String pathForCluster = "/net/ils4/lcamus/runs-svn/santiago/cluster_1/";
-	final static String randomizedConfigFile = "../../../runs-svn/santiago/cluster_1/input/new-input/";
+	final static String pathForCluster = "/net/ils4/lcamus/runs-svn/santiago/basecase1/";
+	final static String randomizedConfigFile = "../../../runs-svn/santiago/basecase1/input/new-input/";
 	
 	public static void main(String args[]){
 		
-		Config config = ConfigUtils.loadConfig(randomizedConfigFile + "randomized_config_final.xml");
+		Config config = ConfigUtils.loadConfig(randomizedConfigFile + "randomized_expanded_config_final.xml");
 
 		ControlerConfigGroup cc = config.controler();
 		cc.setOutputDirectory(pathForCluster + "output/" );
@@ -35,7 +35,7 @@ public class ChangeConfigToCluster {
 		transit.setTransitScheduleFile(pathForCluster + "input/transitschedule_simplified.xml" );
 		transit.setVehiclesFile(pathForCluster + "input/transitvehicles.xml" );
 		
-		new ConfigWriter(config).write(randomizedConfigFile + "cluster_randomized_config_final.xml");
+		new ConfigWriter(config).write(randomizedConfigFile + "cluster_randomized_expanded_config_final.xml");
 		
 		
 		

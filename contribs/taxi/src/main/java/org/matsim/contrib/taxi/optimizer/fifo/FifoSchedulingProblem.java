@@ -31,8 +31,7 @@ public class FifoSchedulingProblem
     private final BestDispatchFinder dispatchFinder;
 
 
-    public FifoSchedulingProblem(TaxiOptimizerContext optimContext,
-            BestDispatchFinder vrpFinder)
+    public FifoSchedulingProblem(TaxiOptimizerContext optimContext, BestDispatchFinder vrpFinder)
     {
         this.optimContext = optimContext;
         this.dispatchFinder = vrpFinder;
@@ -44,9 +43,9 @@ public class FifoSchedulingProblem
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    optimContext.taxiData.getVehicles().values());
-            
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestVehicleForRequest(req, optimContext.taxiData.getVehicles().values());
+
             //TODO search only through available vehicles
             //TODO what about k-nearstvehicle filtering?
 
@@ -54,7 +53,7 @@ public class FifoSchedulingProblem
                 return;
             }
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
             unplannedRequests.poll();
         }
     }

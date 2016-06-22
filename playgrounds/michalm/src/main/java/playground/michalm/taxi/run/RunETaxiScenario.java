@@ -19,13 +19,19 @@
 
 package playground.michalm.taxi.run;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
+import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
+import playground.michalm.taxi.data.file.EvrpVehicleReader;
+import playground.michalm.taxi.ev.ETaxiUtils;
 
 
 public class RunETaxiScenario
@@ -40,26 +46,28 @@ public class RunETaxiScenario
 
     public static Controler createControler(Config config, boolean otfvis)
     {
-        Controler controler = RunTaxiScenario.createControler(config, otfvis);
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         EvConfigGroup evCfg = EvConfigGroup.get(config);
+        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.checkConsistency();
 
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        TaxiData taxiData = new TaxiData();
+        new EvrpVehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(controler.getScenario(), evData).parse(evCfg.getChargerFile());// create xml and DTD
-        
-        //TODO unfinished
-        
-        controler.addOverridingModule(new EvModule(evData));
-        
-        
+        new ChargerReader(scenario, evData).parse(evCfg.getChargerFile());
+        ETaxiUtils.initEvData(taxiData, evData);
 
+        Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
+        controler.addOverridingModule(new EvModule(evData));
         return controler;
     }
 
 
     public static void main(String[] args)
     {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
         //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
-        RunETaxiScenario.run(configFile, true);
+        RunETaxiScenario.run(configFile, false);
     }
 }

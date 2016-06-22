@@ -26,7 +26,7 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.io.FileReader;
@@ -120,23 +120,23 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
 				"\t\tMust be >= 1.");
 		map.put(TRAVEL_COST_TYPE,
-				"Defines which link attribute should be used for routing. Possible values \""+ TravelCostType.linkLength+"\" (default) " +
+				"Defines which link attribute should be used for routing. Possible values \""+ TravelCostType.linkLength+"\" (default) \n" +
 				"\t\tand \""+ TravelCostType.travelTime+"\".");
 		map.put(MAX_NCLOSEST_LINKS,
 				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
 				"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
 		map.put(NODE_SEARCH_RADIUS,
-				"(concerns Link Candidates) Defines the radius [meter] from a stop facility within nodes are searched. Values up to 2000 do" +
+				"(concerns Link Candidates) Defines the radius [meter] from a stop facility within nodes are searched. Values up to 2000 do \n" +
 				"\t\tdon't have a significant impact on performance.");
 		map.put(MAX_LINK_CANDIDATE_DISTANCE,
 				"(concerns Link Candidates) The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(SCHEDULE_FREESPEED_MODES,
-				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel" +
-				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all" +
-				"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional" +
+				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel \n" +
+				"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all \n" +
+				"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional \n" +
 				"\t\tmodes (rail is recommended) can be added, separated by commas.");
 		map.put(MAX_TRAVEL_COST_FACTOR,
 				"If all paths between two stops have a [travelCost] > ["+MAX_TRAVEL_COST_FACTOR+"] * [minTravelCost], \n" +
@@ -162,6 +162,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		switch(type) {
 			case ManualLinkCandidates.SET_NAME :
 				return new ManualLinkCandidates();
+			case ModeRoutingAssignment.SET_NAME :
+				return new ModeRoutingAssignment();
 			default:
 				throw new IllegalArgumentException("Unknown parameterset name!");
 		}
@@ -183,54 +185,34 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * <li>7 - Funicular. Any rail system designed for steep inclines.</li>
 	 * </ul>
 	 */
-	private Map<String, Set<String>> modeRoutingAssignment = new HashMap<>();
+	private Map<String, Set<String>> modeRoutingAssignment = null;
+	private Map<String, Boolean> mapArtificial = null;
 
 	public Map<String, Set<String>> getModeRoutingAssignment() {
-		return this.modeRoutingAssignment;
+		if(modeRoutingAssignment == null) initiateParamSet();
+		return modeRoutingAssignment;
 	}
 
 	public void setModeRoutingAssignment(Map<String, Set<String>> modeRoutingAssignment) {
 		this.modeRoutingAssignment = modeRoutingAssignment;
 	}
 
-	@StringGetter(MODE_ROUTING_ASSIGNMENT)
-	private String getModeRoutingAssignmentStr() {
-		String ret = "";
-		for(Map.Entry<String, Set<String>> entry : modeRoutingAssignment.entrySet()) {
-			ret += "|" + entry.getKey() + ":";
-			String value = "";
-			for(String mode : entry.getValue()) {
-				value += "," + mode;
-			}
-			ret += value.substring(1);
-		}
-		return this.modeRoutingAssignment.size() == 0 ? "" : ret.substring(1);
+	public Map<String, Boolean> getMapArtificial() {
+		if(modeRoutingAssignment == null) initiateParamSet();
+		return mapArtificial;
 	}
 
-	@StringSetter(MODE_ROUTING_ASSIGNMENT)
-	public void setModeRoutingAssignmentStr(String modeRoutingAssignmentString) {
-		if(modeRoutingAssignmentString == null) {
-			this.modeRoutingAssignment = null;
-			return;
-		}
-
-		if(modeRoutingAssignmentString.equals("")) {
-			throw new IllegalArgumentException("No modeRoutingAssignment defined in config!");
-		}
-
-		for(String assignment : modeRoutingAssignmentString.split("\\|")) {
-			String[] tuple = assignment.split(":");
-			Set<String> set = new HashSet<>();
-			for(String networkMode : tuple[1].trim().split(",")) {
-				set.add(networkMode.trim());
-			}
-			this.modeRoutingAssignment.put(tuple[0].trim(), set);
-		}
+	public boolean mapArtificial(String scheduleTransportMode) {
+		return mapArtificial.get(scheduleTransportMode);
 	}
 
-	public void addModeRoutingAssignment(String key, String value) {
-		Set<String> set = MapUtils.getSet(key, this.modeRoutingAssignment);
-		set.add(value);
+	private void initiateParamSet() {
+		mapArtificial = new HashMap<>();
+		modeRoutingAssignment = new HashMap<>();
+		for(ConfigGroup e : this.getParameterSets(PublicTransitMappingConfigGroup.ModeRoutingAssignment.SET_NAME)) {
+			ModeRoutingAssignment mra = (ModeRoutingAssignment) e;
+			modeRoutingAssignment.put(mra.getScheduleMode(), mra.getNetworkModes());
+		}
 	}
 
 	/**
@@ -453,22 +435,22 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * If all paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance,
+	 * If all paths between two stops have a length > maxTravelCostFactor * beelineDistance,
 	 * an artificial link is created.
 	 */
-	private double beelineDistanceMaxFactor = 5.0;
+	private double maxTravelCostFactor = 5.0;
 
 	@StringGetter(MAX_TRAVEL_COST_FACTOR)
-	public double getBeelineDistanceMaxFactor() {
-		return beelineDistanceMaxFactor;
+	public double getMaxTravelCostFactor() {
+		return maxTravelCostFactor;
 	}
 
 	@StringSetter(MAX_TRAVEL_COST_FACTOR)
-	public void setBeelineDistanceMaxFactor(double beelineDistanceMaxFactor) {
-		if(beelineDistanceMaxFactor < 1) {
-			throw new RuntimeException("beelineDistanceMaxFactor cannnot be less than 1!");
+	public void setMaxTravelCostFactor(double maxTravelCostFactor) {
+		if(maxTravelCostFactor < 1) {
+			throw new RuntimeException("maxTravelCostFactor cannnot be less than 1!");
 		}
-		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
+		this.maxTravelCostFactor = maxTravelCostFactor;
 	}
 
 
@@ -523,7 +505,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(MANUAL_LINK_CANDIDATE_CSV_FILE)
 	public void setManualLinkCandidateCsvFile(String file) {
-		this.manualLinkCandidateCsvFile = file;
+		this.manualLinkCandidateCsvFile = file.equals("") ? null :file;
 	}
 
 	public void loadManualLinkCandidatesCsv() {
@@ -554,10 +536,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(NETWORK_FILE)
-	public String setNetworkFile(String networkFile) {
-		final String old = this.networkFile;
-		this.networkFile = networkFile;
-		return old;
+	public void setNetworkFile(String networkFile) {
+		this.networkFile = networkFile.equals("") ? null : networkFile;
 	}
 
 	@StringGetter(SCHEDULE_FILE)
@@ -569,10 +549,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(SCHEDULE_FILE)
-	public String setScheduleFile(String scheduleFile) {
-		final String old = this.scheduleFile;
-		this.scheduleFile = scheduleFile;
-		return old;
+	public void setScheduleFile(String scheduleFile) {
+		this.scheduleFile = scheduleFile.equals("") ? null : scheduleFile;
 	}
 
 	@StringGetter(OUTPUT_NETWORK_FILE)
@@ -596,10 +574,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(OUTPUT_STREET_NETWORK_FILE)
-	public String setOutputStreetNetworkFile(String outputStreetNetwork) {
-		final String old = this.outputStreetNetworkFile;
-		this.outputStreetNetworkFile = outputStreetNetwork;
-		return old;
+	public void setOutputStreetNetworkFile(String outputStreetNetworkFile) {
+		this.outputStreetNetworkFile = outputStreetNetworkFile.equals("") ? null : outputStreetNetworkFile;
 	}
 
 	public String getOutputScheduleFile() {
@@ -617,6 +593,64 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		this.outputScheduleFile = outputSchedule;
 		return old;
 	}
+
+	public Set<ManualLinkCandidates> getManualLinkCandidates() {
+		Set<ManualLinkCandidates> manualCandidates = new HashSet<>();
+		for(ConfigGroup e : this.getParameterSets(PublicTransitMappingConfigGroup.ManualLinkCandidates.SET_NAME)) {
+			manualCandidates.add((PublicTransitMappingConfigGroup.ManualLinkCandidates) e);
+		}
+		return manualCandidates;
+	}
+
+	/**
+	 * Parameterset that define which network transport modes the router
+	 * can use for each schedule transport mode.<p/>
+	 *
+	 * Network transport modes are the ones in {@link Link#getAllowedModes()}, schedule
+	 * transport modes are from {@link TransitRoute#getTransportMode()}.
+	 */
+	public static class ModeRoutingAssignment extends ReflectiveConfigGroup implements MatsimParameters {
+
+		public final static String SET_NAME = "modeRoutingAssignment";
+
+		private static final String SCHEDULE_MODE = "scheduleMode";
+		private static final String NETWORK_MODES = "networkModes";
+
+		private String scheduleMode;
+		private Set<String> networkModes;
+
+		public ModeRoutingAssignment() {
+			super(SET_NAME);
+		}
+
+		public ModeRoutingAssignment(String scheduleMode, Set<String> networkModes, boolean mapArtificial) {
+			super(SET_NAME);
+			this.scheduleMode = scheduleMode;
+			this.networkModes = networkModes;
+		}
+
+		@StringGetter(SCHEDULE_MODE)
+		public String getScheduleMode() {
+			return scheduleMode;
+		}
+		@StringSetter(SCHEDULE_MODE)
+		public void setScheduleMode(String scheduleMode) {
+			this.scheduleMode = scheduleMode;
+		}
+
+		@StringGetter(NETWORK_MODES)
+		public Set<String> getNetworkModes() {
+			return networkModes;
+		}
+		@StringSetter(NETWORK_MODES)
+		public void setNetworkModesStr(String networkModesStr) {
+			this.networkModes = CollectionUtils.stringToSet(networkModesStr);
+		}
+		public void setNetworkModes(Set<String> networkModes) {
+			this.networkModes = networkModes;
+		}
+	}
+
 
 	/**
 	 * Link candidates for complicated stops can be defined manually

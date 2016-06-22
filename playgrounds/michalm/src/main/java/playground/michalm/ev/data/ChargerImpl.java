@@ -30,17 +30,17 @@ public class ChargerImpl
 {
     private final Id<Charger> id;
     private final double power;
-    private final int capacity;
+    private final int plugs;
     private final Link link;
 
     private ChargingLogic logic;
 
 
-    public ChargerImpl(Id<Charger> id, double power, int capacity, Link link)
+    public ChargerImpl(Id<Charger> id, double power, int plugs, Link link)
     {
         this.id = id;
         this.power = power;
-        this.capacity = capacity;
+        this.plugs = plugs;
         this.link = link;
     }
 
@@ -74,9 +74,9 @@ public class ChargerImpl
 
 
     @Override
-    public int getCapacity()
+    public int getPlugs()
     {
-        return capacity;
+        return plugs;
     }
 
 

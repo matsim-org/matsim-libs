@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
+import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 
 import java.util.*;
@@ -97,7 +97,7 @@ public class NetworkTools {
 	public static Link getNearestLink(Network network, Coord coord) {
 		if(network instanceof NetworkImpl) {
 			NetworkImpl networkImpl = (NetworkImpl) network;
-			double nodeSearchRadius = 200.0;
+			double nodeSearchRadius = 1000.0;
 
 			Link closestLink = null;
 			double minDistance = Double.MAX_VALUE;
@@ -281,22 +281,7 @@ public class NetworkTools {
 	 * @return true if the coordinate is on the right hand side of the link (or on the link).
 	 */
 	public static boolean coordIsOnRightSideOfLink(Coord coord, Link link) {
-		double azLink = CoordTools.getAzimuth(link.getFromNode().getCoord(), link.getToNode().getCoord());
-		double azToCoord = CoordTools.getAzimuth(link.getFromNode().getCoord(), coord);
-
-		double diff = azToCoord-azLink;
-
-		if(diff == 0 || azToCoord-Math.PI == azLink) {
-			return true;
-		} else if(diff > 0 && diff < Math.PI) {
-			return true;
-		} else if(diff > 0 && diff > Math.PI) {
-			return false;
-		} else if(diff < 0 && diff < -Math.PI){
-			return true;
-		} else {
-			return false;
-		}
+		return CoordTools.coordIsOnRightSideOfLine(coord, link.getFromNode().getCoord(), link.getToNode().getCoord());
 	}
 
 	/**
@@ -560,9 +545,6 @@ public class NetworkTools {
 
 	/**
 	 * Creates mode dependent routers based on the actual network modes used.
-	 * @param schedule
-	 * @param network
-	 * @return
 	 */
 	public static Map<String, Router> guessRouters(TransitSchedule schedule, Network network) {
 		Map<String, Set<String>> modeAssignments = new HashMap<>();
@@ -579,7 +561,7 @@ public class NetworkTools {
 		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
 		for(Set<String> networkModes : modeAssignments.values()) {
 			if(!modeDependentRouters.containsKey(networkModes)) {
-				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
+				modeDependentRouters.put(networkModes, FastAStarRouter.createModeSeparatedRouter(network, networkModes));
 			}
 		}
 
@@ -616,6 +598,19 @@ public class NetworkTools {
 				link.setAllowedModes(modesPt);
 			}
 		}
+	}
+
+	/**
+	 * @return only links that have the same allowed modes set
+	 */
+	public static Set<Link> filterLinkSetExactlyByModes(Collection<? extends Link> links, Set<String> transportModes) {
+		Set<Link> returnSet = new HashSet<>();
+		for(Link l : links) {
+			if(l.getAllowedModes().equals(transportModes)) {
+				returnSet.add(l);
+			}
+		}
+		return returnSet;
 	}
 
 	/**

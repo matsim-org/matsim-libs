@@ -133,7 +133,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
 			this.arp = arp;
 			this.withinDayEngine = withinDayEngine;
-			this.agents = new LinkedHashMap<Id<Person>, MobsimAgent>();
+			this.agents = new LinkedHashMap<>();
 		}
 
 		@Override

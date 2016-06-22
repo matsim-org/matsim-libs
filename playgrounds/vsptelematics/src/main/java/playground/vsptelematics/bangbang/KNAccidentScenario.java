@@ -164,24 +164,25 @@ public class KNAccidentScenario {
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
-				MobsimDataProvider mdp = new MobsimDataProvider() ;
-				bind( MobsimDataProvider.class ).toInstance( mdp ) ;
-				addMobsimListenerBinding().toInstance( mdp ) ;	
-
-				bind( ExecutedPlansServiceImpl.class ).asEagerSingleton(); 
-				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
-				
-				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecuted.class) ;
-
-
-				this.bind( MyIterationCounter.class ).asEagerSingleton();
+//				MobsimDataProvider mdp = new MobsimDataProvider() ;
+//				bind( MobsimDataProvider.class ).toInstance( mdp ) ;
+//				addMobsimListenerBinding().toInstance( mdp ) ;	
+//
+//				bind( ExecutedPlansServiceImpl.class ).asEagerSingleton(); 
+//				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
+//				
+//				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecuted.class) ;
+//
+//
+//				this.bind( MyIterationCounter.class ).asEagerSingleton();
 				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
 
 				//				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
 
 				this.addEventHandlerBinding().toInstance( travelTime ) ;
 				this.addMobsimListenerBinding().toInstance( travelTime );
-				this.bind( TravelTime.class ).toInstance( travelTime );
+//				this.bind( TravelTime.class ).toInstance( travelTime );
+				this.bindNetworkTravelTime().toInstance( travelTime ) ;
 			}
 		}) ;
 

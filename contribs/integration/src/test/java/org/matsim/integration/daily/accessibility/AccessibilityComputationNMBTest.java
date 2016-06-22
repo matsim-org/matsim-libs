@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
@@ -82,7 +83,7 @@ public class AccessibilityComputationNMBTest {
 
 		// Config and scenario
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -117,22 +118,12 @@ public class AccessibilityComputationNMBTest {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		
 		// matrix-based pt
-		{
-			MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-			mbpcg.setPtStopsInputFile(ptStopsFilePT);
-			mbpcg.setUsingTravelTimesAndDistances(true);
-			mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
-			mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
-		}
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		mbpcg.setPtStopsInputFile(ptStopsFilePT);
+		mbpcg.setUsingTravelTimesAndDistances(true);
+		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
+		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
 
-//		{
-//			MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-//			mbpcg.setPtStopsInputFile(ptStopsFileParatransit);
-//			mbpcg.setUsingTravelTimesAndDistances(true);
-//			mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFileParatransit);
-//			mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFileParatransit);
-//		}
-		
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
 
@@ -190,7 +181,7 @@ public class AccessibilityComputationNMBTest {
 //		modes.add( Modes4Accessibility.bike ) ;
 //		modes.add( Modes4Accessibility.pt ) ;
 		
-		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, homes, crs, layerName, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, homes, crs, layerName, cellSize));
 		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
