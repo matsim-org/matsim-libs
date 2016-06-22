@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dziemke.accessibility;
+package playground.dziemke.nairobi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +53,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 
+import playground.dziemke.accessibility.VisualizationUtilsDZ;
 import playground.dziemke.utils.LogToOutputSaver;
 
 /**

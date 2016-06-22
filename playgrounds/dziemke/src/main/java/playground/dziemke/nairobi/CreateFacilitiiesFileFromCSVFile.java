@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dziemke.utils;
+package playground.dziemke.nairobi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
