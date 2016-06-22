@@ -46,26 +46,26 @@ public final class PlanImpl implements Plan {
 
 	private Customizable customizableDelegate;
 
-	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
+	@Deprecated
 	public final ActivityImpl createAndAddActivity(final String type1, final Coord coord) {
-		ActivityImpl a = PopulationUtils.createActivityFromCoord(type1, coord);
-		getPlanElements().add(a);
-		return a;
+		ActivityImpl act = createAndAddActivity(type1) ;
+		act.setCoord(coord);
+		return act ;
 	}
 
-	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type1) {
 		ActivityImpl a = new ActivityImpl(type1);
-		getPlanElements().add(a);
+		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go through the factory.  kai, jun'16)
+
+		this.addActivity(a) ;
 		return a;
 	}
 
-
-	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
+	@Deprecated
 	public final ActivityImpl createAndAddActivity(final String type1, final Id<Link> linkId) {
-		ActivityImpl a = PopulationUtils.createActivityFromLinkId(type1, linkId);
-		getPlanElements().add(a);
-		return a;
+		ActivityImpl act = createAndAddActivity(type1) ;
+		act.setLinkId(linkId);
+		return act ;
 	}
 
 	//////////////////////////////////////////////////////////////////////
