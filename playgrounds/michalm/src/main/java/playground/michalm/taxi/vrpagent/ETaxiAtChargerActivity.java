@@ -22,9 +22,8 @@ package playground.michalm.taxi.vrpagent;
 import org.matsim.contrib.dynagent.AbstractDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
-import playground.michalm.taxi.ev.ETaxiChargingWithQueueingLogic;
+import playground.michalm.taxi.ev.ETaxiChargingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
 
@@ -33,23 +32,33 @@ public class ETaxiAtChargerActivity
 {
     public static final String STAY_AT_CHARGER_ACTIVITY_TYPE = "ETaxiStayAtCharger";
 
-    private final Ev ev;
-    private final ETaxiChargingWithQueueingLogic logic;
+    private final ETaxiChargingTask chargingTask;
     private final MobsimTimer timer;
-    private boolean chargingEnded = false;
 
+    private boolean chargingEnded = false;
     private double endTime;
 
 
     public ETaxiAtChargerActivity(ETaxiChargingTask chargingTask, MobsimTimer timer)
     {
         super(STAY_AT_CHARGER_ACTIVITY_TYPE);
+        this.chargingTask = chargingTask;
         this.timer = timer;
-        ev = ((EvrpVehicle)chargingTask.getSchedule().getVehicle()).getEv();
-        logic = (ETaxiChargingWithQueueingLogic)chargingTask.getCharger().getLogic();
 
+        onActivityStart();
+    }
+
+
+    private void onActivityStart()
+    {
+        ETaxiChargingLogic logic = chargingTask.getLogic();
+        Ev ev = chargingTask.getEv();
+
+        logic.removeDispatchedVehicle(ev);
         logic.addVehicle(ev);
-        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTime() + logic.estimateChargeTime(ev);
+        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTimeOnArrival()
+                + logic.estimateChargeTime(ev);
+
     }
 
 
@@ -71,7 +80,8 @@ public class ETaxiAtChargerActivity
 
     public void notifyChargingStarted()
     {
-        endTime = timer.getTimeOfDay() + logic.estimateChargeTime(ev);
+        endTime = timer.getTimeOfDay()
+                + chargingTask.getLogic().estimateChargeTime(chargingTask.getEv());
     }
 
 

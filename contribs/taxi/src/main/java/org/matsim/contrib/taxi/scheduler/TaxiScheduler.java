@@ -42,7 +42,7 @@ public class TaxiScheduler
     implements TaxiScheduleInquiry
 {
     private final TaxiData taxiData;
-    private final TaxiSchedulerParams params;
+    protected final TaxiSchedulerParams params;
     private final MobsimTimer timer;
 
     private final TravelTime travelTime;
@@ -523,7 +523,7 @@ public class TaxiScheduler
                             throw new RuntimeException("Currently won't happen");
                         }
 
-                        //diversion -- no STAY afterwards
+                        //if diversion -- no STAY afterwards
                         return;
 
                     default:
@@ -545,7 +545,7 @@ public class TaxiScheduler
     }
 
 
-    private Integer countUnremovablePlannedTasks(Schedule<TaxiTask> schedule)
+    protected Integer countUnremovablePlannedTasks(Schedule<TaxiTask> schedule)
     {
         TaxiTask currentTask = schedule.getCurrentTask();
         switch (currentTask.getTaxiTaskType()) {
@@ -579,21 +579,26 @@ public class TaxiScheduler
     }
 
 
-    private void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx)
+    protected void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx)
     {
         List<TaxiTask> tasks = schedule.getTasks();
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
             TaxiTask task = tasks.get(i);
             schedule.removeTask(task);
+            taskRemovedFromSchedule(schedule, task);
+        }
+    }
+    
+    
+    protected void taskRemovedFromSchedule(Schedule<TaxiTask> schedule, TaxiTask task)
+    {
+        if (task instanceof TaxiTaskWithRequest) {
+            TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
+            taskWithReq.removeFromRequest();
 
-            if (task instanceof TaxiTaskWithRequest) {
-                TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-                taskWithReq.removeFromRequest();
-
-                if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-                    removedRequests.add(taskWithReq.getRequest());
-                }
+            if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+                removedRequests.add(taskWithReq.getRequest());
             }
         }
     }

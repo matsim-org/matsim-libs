@@ -35,15 +35,15 @@ public class ETaxiUtils
 {
     public static void initEvData(TaxiData taxiData, EvData evData)
     {
-        // TODO reduce charging speed in winter
-        for (Charger c : evData.getChargers().values()) {
-            new ETaxiChargingWithQueueingLogic(c);
-        }
-
         // TODO variable AUX -- depends on weather etc...
         // TODO add the Leaf's consumption model for driving 
         double driveRate = 15. * UnitConversionRatios.J_m_PER_kWh_100km; //15 kWh/100km == 150 Wh/km
         double auxPower = 0.5 * UnitConversionRatios.W_PER_kW; //0.5 kW
+        double chargingSpeedFactor = 1.; //full speed
+
+        for (Charger c : evData.getChargers().values()) {
+            new ETaxiChargingLogic(c, auxPower, chargingSpeedFactor);
+        }
 
         for (Vehicle v : taxiData.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();

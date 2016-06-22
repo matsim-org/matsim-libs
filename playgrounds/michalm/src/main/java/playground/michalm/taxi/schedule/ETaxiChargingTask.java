@@ -23,6 +23,9 @@ import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 
 import playground.michalm.ev.data.Charger;
+import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.data.EvrpVehicle.Ev;
+import playground.michalm.taxi.ev.ETaxiChargingLogic;
 
 
 public class ETaxiChargingTask
@@ -30,18 +33,42 @@ public class ETaxiChargingTask
     implements TaxiTask
 {
     private final Charger charger;
+    private final ETaxiChargingLogic logic;
+    private final Ev ev;
 
 
     public ETaxiChargingTask(double beginTime, double endTime, Charger charger)
     {
         super(beginTime, endTime, charger.getLink());
         this.charger = charger;
+        logic = (ETaxiChargingLogic)charger.getLogic();
+        ev = ((EvrpVehicle)getSchedule().getVehicle()).getEv();
+
+        logic.addDispatchedVehicle(ev);
+    }
+
+
+    public void removeFromCharger()
+    {
+        logic.removeDispatchedVehicle(ev);
     }
 
 
     public Charger getCharger()
     {
         return charger;
+    }
+
+
+    public ETaxiChargingLogic getLogic()
+    {
+        return logic;
+    }
+
+
+    public Ev getEv()
+    {
+        return ev;
     }
 
 

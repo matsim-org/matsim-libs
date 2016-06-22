@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.optimizer;
 
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.*;
 
-import playground.michalm.ev.charging.ChargingLogic;
+import playground.michalm.ev.data.EvData;
+import playground.michalm.taxi.scheduler.ETaxiScheduler;
 
 
-public interface Charger
-    extends BasicLocation<Charger>
+public class ETaxiOptimizerContext
+    extends TaxiOptimizerContext
 {
-    ChargingLogic getLogic();
+    public final EvData evData;
 
 
-    void setLogic(ChargingLogic logic);
-
-
-    Link getLink();
-
-
-    /**
-     * @return max power at a single plug, in [W]
-     */
-    double getPower();
-
-
-    /**
-     * @return number of plugs
-     */
-    int getPlugs();
-
-
-    void resetLogic();
+    public ETaxiOptimizerContext(TaxiData taxiData, Network network, MobsimTimer timer,
+            TravelTime travelTime, TravelDisutility travelDisutility, ETaxiScheduler scheduler,
+            EvData evData)
+    {
+        super(taxiData, network, timer, travelTime, travelDisutility, scheduler);
+        this.evData = evData;
+    }
 }

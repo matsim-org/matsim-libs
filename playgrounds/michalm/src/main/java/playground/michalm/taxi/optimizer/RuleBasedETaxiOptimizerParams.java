@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.optimizer;
 
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.network.Link;
-
-import playground.michalm.ev.charging.ChargingLogic;
+import org.apache.commons.configuration.Configuration;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 
-public interface Charger
-    extends BasicLocation<Charger>
+public class RuleBasedETaxiOptimizerParams
+    extends RuleBasedTaxiOptimizerParams
 {
-    ChargingLogic getLogic();
+    public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
+    public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
+
+    public final double minRelativeSoc;
+    public final int socCheckTimeStep;
 
 
-    void setLogic(ChargingLogic logic);
+    public RuleBasedETaxiOptimizerParams(Configuration optimizerConfig)
+    {
+        super(optimizerConfig);
 
+        //30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
+        //alternatively, in cold winter, it is enough to travel for 1 hour
+        //(for approx. 20 km => 3kWh) with 3 kW-heating on
+        minRelativeSoc = optimizerConfig.getDouble(MIN_RELATIVE_SOC, 0.3);
 
-    Link getLink();
-
-
-    /**
-     * @return max power at a single plug, in [W]
-     */
-    double getPower();
-
-
-    /**
-     * @return number of plugs
-     */
-    int getPlugs();
-
-
-    void resetLogic();
+        //in cold winter, 3kW heating consumes 1.25% SOC every 5 min
+        socCheckTimeStep = optimizerConfig.getInt(SOC_CHECK_TIME_STEP, 300);
+    }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,86 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev.data;
+package playground.michalm.taxi.optimizer;
 
-import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 
-import playground.michalm.ev.charging.ChargingLogic;
+import com.google.common.base.Function;
+
+import playground.michalm.ev.data.Charger;
 
 
-public class ChargerImpl
-    implements Charger
+public class BestEDispatchFinder
 {
-    private final Id<Charger> id;
-    private final double power;
-    private final int plugs;
-    private final Link link;
+    private static final Function<Charger, Link> CHARGER_TO_LINK = (charger) -> charger.getLink();
 
-    private ChargingLogic logic;
+    private final BestDispatchFinder dispatchFinder;
 
 
-    public ChargerImpl(Id<Charger> id, double power, int plugs, Link link)
+    public BestEDispatchFinder(BestDispatchFinder dispatchFinder)
     {
-        this.id = id;
-        this.power = power;
-        this.plugs = plugs;
-        this.link = link;
+        this.dispatchFinder = dispatchFinder;
     }
 
 
-    @Override
-    public ChargingLogic getLogic()
+    public Dispatch<Charger> findBestChargerForVehicle(Vehicle veh, Iterable<Charger> chargers)
     {
-        return logic;
-    }
-
-
-    @Override
-    public void setLogic(ChargingLogic logic)
-    {
-        this.logic = logic;
-    }
-
-
-    @Override
-    public Id<Charger> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public double getPower()
-    {
-        return power;
-    }
-
-
-    @Override
-    public int getPlugs()
-    {
-        return plugs;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return link;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return link.getCoord();
-    }
-    
-    
-    @Override
-    public void resetLogic()
-    {
-        logic.reset();
+        return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);
     }
 }
