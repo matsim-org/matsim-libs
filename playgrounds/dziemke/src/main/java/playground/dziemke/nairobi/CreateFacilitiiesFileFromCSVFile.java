@@ -49,10 +49,10 @@ public class CreateFacilitiiesFileFromCSVFile {
 
 	public static void main(String[] args) {
 //		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/Public_Primary_School_listed_by_2007.csv";
-		String csvUrl = "https://www.opendata.go.ke/api/views/p452-xb7c/rows.csv";
-		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/facilities.xml";
+		String csvUrl = "https://www.opendata.go.ke/api/views/p452-xb7c/rows.csv"; // Public Schools
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_from_url/facilities.xml";
 		
-		String facilitiesFileDescription = "Public Primary Schools in Kenya";
+		String facilitiesFileDescription = "Primary Schools in Kenya";
 		String inputCRS = "EPSG:4326";
 		String outputCRS = "EPSG:21037";
 		String headOfCoordColumn = "Geolocation";
@@ -60,6 +60,7 @@ public class CreateFacilitiiesFileFromCSVFile {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 
+		// Option 1: Get input data from URL
 		try {
 			BufferedReader reader = getBufferedReaderFromCsvUrl(csvUrl);
 			ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(reader, facilitiesFileDescription,
@@ -68,6 +69,8 @@ public class CreateFacilitiiesFileFromCSVFile {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// Option 2: Get input data from locally stroed CSV file
 //		ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(csvFile, facilitiesFileDescription,
 //				headOfCoordColumn, ct, separator);
 //		writeFacilitiesFile(activityFacilities, facilitiesFile);
