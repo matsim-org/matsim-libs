@@ -17,12 +17,12 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.osm.lib;
 
 import org.apache.log4j.Logger;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmNodeHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmRelationHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmWayHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmWayHandler;
 
 import java.util.*;
 
@@ -72,9 +72,9 @@ public class OsmParserHandler implements OsmNodeHandler, OsmRelationHandler, Osm
 	private TagFilter wayFilter;
 	private TagFilter relationFilter;
 
-	private Map<Long, OsmParser.OsmNode> nodes = new HashMap<>();
-	private Map<Long, OsmParser.OsmRelation> relations = new HashMap<>();
-	private Map<Long, OsmParser.OsmWay> ways = new HashMap<>();
+	private final Map<Long, OsmParser.OsmNode> nodes = new HashMap<>();
+	private final Map<Long, OsmParser.OsmRelation> relations = new HashMap<>();
+	private final Map<Long, OsmParser.OsmWay> ways = new HashMap<>();
 
 	public OsmParserHandler() {
 	}

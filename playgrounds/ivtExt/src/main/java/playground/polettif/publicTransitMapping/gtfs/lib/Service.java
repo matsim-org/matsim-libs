@@ -32,20 +32,11 @@ public class Service {
 	private final boolean[] days;
 	private final LocalDate startDate;
 	private final LocalDate endDate;
-	private Collection<LocalDate> additions;
-	private Collection<LocalDate> exceptions;
+	private final Collection<LocalDate> additions;
+	private final Collection<LocalDate> exceptions;
 
-	public static Map<LocalDate, Set<String>> dateStats = new HashMap<>();
+	public static final Map<LocalDate, Set<String>> dateStats = new HashMap<>();
 
-	//Methods
-
-	/**
-	 *
-	 * @param serviceId
-	 * @param days
-	 * @param startDateStr
-	 * @param endDateStr
-	 */
 	public Service(String serviceId, boolean[] days, String startDateStr, String endDateStr) {
 		super();
 		this.id = serviceId;
@@ -98,7 +89,6 @@ public class Service {
 	}
 	/**
 	 * Adds a new addition date
-	 * @param addition
 	 */
 	public void addAddition(String addition) {
 		LocalDate additionDate = parseDateFormat(addition);
@@ -107,7 +97,6 @@ public class Service {
 	}
 	/**
 	 * Adds a new exception date
-	 * @param exception
 	 */
 	public void addException(String exception) {
 		LocalDate exceptionDate = parseDateFormat(exception);

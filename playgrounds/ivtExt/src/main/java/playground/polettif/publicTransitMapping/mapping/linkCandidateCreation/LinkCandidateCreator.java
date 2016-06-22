@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core.handler;
+package playground.polettif.publicTransitMapping.mapping.linkCandidateCreation;
 
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelation;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-/**
- * @author mrieser / Senozon AG
- */
-public interface OsmRelationHandler extends OsmHandler {
+import java.util.SortedSet;
 
-	void handleRelation(final OsmRelation relation);
+public interface LinkCandidateCreator {
+	
+	void createLinkCandidates();
+
+	/**
+	 * Returns a list of link candidates for the given stop facility and schedule transport mode.
+	 * The list is ordered ascending by priority (distance, likelihood, etc.).
+	 */
+	SortedSet<LinkCandidate> getLinkCandidates(TransitStopFacility transitStopFacility, String scheduleTransportMode);
+
+	boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode);
 
 }

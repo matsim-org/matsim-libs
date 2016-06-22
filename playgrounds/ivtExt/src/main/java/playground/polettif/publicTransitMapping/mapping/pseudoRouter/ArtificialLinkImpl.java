@@ -16,19 +16,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.Set;
 
 /**
  * Container class for artificial links
  */
+@SuppressWarnings("ALL")
 public class ArtificialLinkImpl implements ArtificialLink {
 
 	private final Id<Node> fromNodeId;
@@ -37,6 +38,7 @@ public class ArtificialLinkImpl implements ArtificialLink {
 	private final Coord toNodeCoord;
 	private final double freespeed;
 	private final double linkLength;
+	@SuppressWarnings("FieldCanBeLocal")
 	private final double capacity = 9999;
 	private final Set<String> transportModes = PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET;
 

@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,41 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
+package playground.polettif.publicTransitMapping.osm.lib.handler;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-
-import java.util.List;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmWay;
 
 /**
- * A container class for pseudo route stop sequences. Used to store
- * the original transit route and transit line.
- *
- * @author polettif
+ * @author mrieser / Senozon AG
  */
-public class PseudoRouteImpl implements PseudoRoute {
+public interface OsmWayHandler extends OsmHandler {
+	
+	void handleWay(final OsmWay way);
 
- 	private final Id<TransitLine> transitLineId;
-	private final List<PseudoRouteStop> pseudoRouteStops;
-	private final TransitRoute transitRoute;
-
-	public PseudoRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoRouteStops) {
-		this.transitLineId = transitLine.getId();
-		this.transitRoute = transitRoute;
-		this.pseudoRouteStops = pseudoRouteStops;
-	}
-
-	public Id<TransitLine> getTransitLineId() {
-		return transitLineId;
-	}
-
-	public TransitRoute getTransitRoute() {
-		return transitRoute;
-	}
-
-	public List<PseudoRouteStop> getPseudoStops() {
-		return pseudoRouteStops;
-	}
 }

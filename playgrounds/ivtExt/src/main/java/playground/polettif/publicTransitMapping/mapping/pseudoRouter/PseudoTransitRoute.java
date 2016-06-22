@@ -25,9 +25,12 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import java.util.List;
 
 /**
- * TODO doc
+ * A container class for pseudoRouteStop sequences. Used to store
+ * the original transit route and transit line.
+ *
+ * @author polettif
  */
-public interface PseudoRoute {
+public interface PseudoTransitRoute {
 
 	Id<TransitLine> getTransitLineId();
 

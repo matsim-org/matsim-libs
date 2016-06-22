@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.router;
+package playground.polettif.publicTransitMapping.mapping.networkRouter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,9 +30,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLink;
-import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLinkImpl;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.HashMap;

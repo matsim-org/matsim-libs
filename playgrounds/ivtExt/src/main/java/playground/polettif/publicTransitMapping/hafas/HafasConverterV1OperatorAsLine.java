@@ -39,9 +39,9 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class HafasConverterOperatorAsLine extends Hafas2TransitSchedule {
+public class HafasConverterV1OperatorAsLine extends Hafas2TransitSchedule {
 
-	public HafasConverterOperatorAsLine(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public HafasConverterV1OperatorAsLine(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		super(schedule, vehicles, transformation);
 	}
 

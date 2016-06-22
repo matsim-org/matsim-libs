@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.osm.lib;
 
 import org.matsim.core.utils.collections.MapUtils;
 
@@ -43,7 +43,7 @@ public class TagFilter {
 
 	/**
 	 *
-	 * @param key
+	 * @param key tag name
 	 * @param value <code>null</code> if all values should be taken
 	 */
 	public void add(final String key, final String value) {
@@ -60,7 +60,7 @@ public class TagFilter {
 	}
 
 	/**
-	 * @param tags
+	 * @param tags key,value pairs
 	 * @return <code>true</code> if at least one of the given tags matches any one of the specified filter-tags.
 	 */
 	public boolean matches(final Map<String, String> tags) {

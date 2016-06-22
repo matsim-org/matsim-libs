@@ -16,58 +16,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
-
-/**
- * Created by polettif on 17.06.2016.
- */
+package playground.polettif.publicTransitMapping.mapping;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.ArtificialLink;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.ArtificialLinkImpl;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.*;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 
 import java.util.*;
 
 /**
- * Generates and calculates the pseudoTransitRoutes for all the queued
+ * Generates and calculates the pseudoRoutes for all the queued
  * transit lines. If no route on the network can be found (or the
  * scheduleTransportMode should not be mapped to the network), artificial
  * links between link candidates are stored to be created later.
  *
  * @author polettif
  */
-@Deprecated
-public class PseudoRoutingImpl extends Thread {
+public class PseudoRoutingImpl implements PseudoRouting {
 
 	protected static Logger log = Logger.getLogger(PseudoRoutingImpl.class);
 
 	private static Counter counterPseudoRouting = new Counter("route # ");
 	private static int artificialId = 0;
+	private static boolean warnMinTravelCost = true;
 
 	private final PublicTransitMappingConfigGroup config;
-
-	private final Map<String, Router> modeSeparatedRouters;
 	private final LinkCandidateCreator linkCandidates;
+	private final Map<String, Router> modeSeparatedRouters;
+	private final List<TransitLine> queue = new ArrayList<>();
 
-	private List<TransitLine> queue = new ArrayList<>();
-	private Set<ArtificialLinkDep> artificialLinksToBeCreated = new HashSet<>();
-	private PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
+	private final Set<ArtificialLink> artificialLinks = new HashSet<>();
+	private final Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
 
-	private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
+	private final PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
 
 	public PseudoRoutingImpl(PublicTransitMappingConfigGroup config, Map<String, Router> modeSeparatedRouters, LinkCandidateCreator linkCandidates) {
 		this.config = config;
@@ -75,23 +71,22 @@ public class PseudoRoutingImpl extends Thread {
 		this.linkCandidates = linkCandidates;
 	}
 
+	@Override
 	public void addTransitLineToQueue(TransitLine transitLine) {
 		queue.add(transitLine);
 	}
 
+	@Override
 	public void run() {
 		for(TransitLine transitLine : queue) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 
 				String scheduleTransportMode = transitRoute.getTransportMode();
 
-				boolean mapScheduleModeArtificial = config.getModeRoutingAssignment().get(scheduleTransportMode).
-						contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-
 				Router modeRouter = modeSeparatedRouters.get(scheduleTransportMode);
-				Network modeNetwork = modeRouter != null ? modeRouter.getNetwork() : null;
+				Network modeNetwork = modeRouter.getNetwork();
 
-				/** [4.1]
+				/** [1]
 				 * Initiate pseudoGraph and Dijkstra algorithm for the current transitRoute.
 				 *
 				 * In the pseudoGraph, all link candidates are represented as nodes and the
@@ -102,37 +97,36 @@ public class PseudoRoutingImpl extends Thread {
 				 */
 				PseudoGraph pseudoGraph = new PseudoGraphImpl();
 
-				/** [4.2]
+				/** [2]
 				 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
 				 */
 				List<TransitRouteStop> routeStops = transitRoute.getStops();
 				for(int i = 0; i < routeStops.size() - 1; i++) {
-					TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
-					TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
 					Set<LinkCandidate> linkCandidatesCurrent = linkCandidates.getLinkCandidates(routeStops.get(i).getStopFacility(), scheduleTransportMode);
 					Set<LinkCandidate> linkCandidatesNext = linkCandidates.getLinkCandidates(routeStops.get(i + 1).getStopFacility(), scheduleTransportMode);
 
-					final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
+					double minTravelCost = modeRouter.getMinimalTravelCost(routeStops.get(i), routeStops.get(i + 1));
+					double maxAllowedTravelCost = minTravelCost * config.getMaxTravelCostFactor();
 
-					// todo move threshold calculation to Router implementation
-					double maxAllowedPathCost;
-					if(config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
-						maxAllowedPathCost = (routeStops.get(i + 1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getMaxTravelCostFactor();
-					} else {
-						maxAllowedPathCost = beelineDistance * config.getMaxTravelCostFactor();
+					if(minTravelCost == 0 && warnMinTravelCost) {
+						log.warn("There are stop pairs where minTravelCost is 0.0! This might happen if departure and arrival time of two subsequent stops are identical. Further messages are suppressed.");
+						warnMinTravelCost = false;
 					}
 
-					//Check if one of the two stops is outside the network
-					boolean bothStopsWithLoopLinks = (!linkCandidates.stopFacilityOnlyHasLoopLink(currentStopFacility, scheduleTransportMode) && !linkCandidates.stopFacilityOnlyHasLoopLink(currentStopFacility, scheduleTransportMode));
+					/** [3]
+					 * Calculate the shortest path between all link candidates.
+					 */
+					for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+						for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 
-					if(!mapScheduleModeArtificial && bothStopsWithLoopLinks && modeNetwork != null) {
-						/**
-						 * Calculate the shortest path between all link candidates.
-						 */
-						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+							boolean useExistingNetworkLinks = false;
+							double pathCost = 2 * maxAllowedTravelCost;
 
-								double pathCost;
+							/** [3.1]
+							 * If both link candidates are loop links we don't have to search
+							 * a least cost path on the network.
+							 */
+							if(!linkCandidateCurrent.isLoopLink() && !linkCandidateNext.isLoopLink()) {
 								LeastCostPathCalculator.Path leastCostPath = null;
 								Node nodeA = modeNetwork.getNodes().get(linkCandidateCurrent.getToNodeId());
 								Node nodeB = modeNetwork.getNodes().get(linkCandidateNext.getFromNodeId());
@@ -150,67 +144,55 @@ public class PseudoRoutingImpl extends Thread {
 								// path is null if links are on separate networks
 								if(leastCostPath != null) {
 									pathCost = leastCostPath.travelCost;
-
 									// if both links are the same, cost should get higher
 									if(linkCandidateCurrent.getLinkId().equals(linkCandidateNext.getLinkId())) {
 										pathCost *= 4;
 									}
-								} else {
-									pathCost = maxAllowedPathCost * 2;
 								}
 
-								/**
-								 * if the path between two link candidates is viable, add it to the pseudoGraph
-								 */
-								if(pathCost < maxAllowedPathCost) {
-									pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
-								}
-								/**
-								 * Use artificial path between two linkCandidates
-								 */
-								else {
-									artificialLinksToBeCreated.add(new ArtificialLinkDep(linkCandidateCurrent, linkCandidateNext));
-
-									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
-									double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
-
-									pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, artificialPathCost);
-								}
+								useExistingNetworkLinks = pathCost < maxAllowedTravelCost;
 							}
-						}
-					}
 
-					/** [.]
-					 * Create artificial links between two routeStops if:
-					 * 	 - scheduleMode should use artificial links
-					 *   - one of the two stops is outside the network area
-					 *
-					 * Artificial links are created between all LinkCandidates
-					 * (usually this means between one dummy link for the stop
-					 * facility and the other linkCandidates).
-					 */
-					else {
-						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								artificialLinksToBeCreated.add(new ArtificialLinkDep(linkCandidateCurrent, linkCandidateNext));
+							/** [3.2]
+							 * If a path on the network could be found and its travel cost are
+							 * below maxAllowedTravelCost, a normal edge is added to the pseudoGraph
+							 */
+							if(useExistingNetworkLinks) {
+								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
+							}
+							/** [3.2]
+							 * Create artificial links between two routeStops if:
+							 * 	 - no path on the network could be found
+							 *   - the travel cost of the path are greater than maxAllowedTravelCost
+							 *
+							 * Artificial links are created between all LinkCandidates
+							 * (usually this means between one dummy link for the stop
+							 * facility and the other linkCandidates).
+							 */
+							else {
+								double freespeed = modeRouter.getArtificialLinkFreeSpeed(maxAllowedTravelCost, linkCandidateCurrent, linkCandidateNext);
+								double length = modeRouter.getArtificialLinkLength(maxAllowedTravelCost, linkCandidateCurrent, linkCandidateNext);
+								ArtificialLink artificialLink = new ArtificialLinkImpl(linkCandidateCurrent, linkCandidateNext, freespeed, length);
+								artificialLinks.add(artificialLink);
 
-								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
-								double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
+								double artificialEdgeWeight = maxAllowedTravelCost - 0.5 * linkCandidateCurrent.getLinkTravelCost() - 0.5 * linkCandidateNext.getLinkTravelCost();
 
-								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, newPathWeight);
+								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, artificialEdgeWeight);
 							}
 						}
 					}
 				} // - routeStop loop
 
-				/** [4.3]
-				 * Build pseudo network and find shortest path using dijkstra
+				/** [4]
+				 * Finish the pseudoGraph by adding dummy nodes.
 				 */
 				pseudoGraph.addDummyEdges(routeStops,
 						linkCandidates.getLinkCandidates(routeStops.get(0).getStopFacility(), scheduleTransportMode),
 						linkCandidates.getLinkCandidates(routeStops.get(routeStops.size() - 1).getStopFacility(), scheduleTransportMode));
 
-				// run Dijkstra
+				/** [5]
+				 * Find the least cost path i.e. the PseudoRouteStop sequence
+				 */
 				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostStopSequence();
 
 				if(pseudoPath == null) {
@@ -226,24 +208,31 @@ public class PseudoRoutingImpl extends Thread {
 	/**
 	 * @return a pseudo schedule generated during run()
 	 */
+	@Override
 	public PseudoSchedule getPseudoSchedule() {
 		return threadPseudoSchedule;
 	}
 
 	/**
-	 * Adds the artificial links to the network. Not thread safe.
+	 * Adds the artificial links to the network. Note: All possible artificial links are added to the
+	 * network, not only the ones actually needed by a PseudoPath. It is easier to add them and remove
+	 * unused links afterwards than to extract them from the PseudoPath (in the current implementation)
+	 *
+	 * Not thread safe.
 	 */
+	@Override
 	public void addArtificialLinks(Network network) {
-		Set<Tuple<Id<Node>, Id<Node>>> connections = new HashSet<>();
+		Map<Tuple<Id<Node>, Id<Node>>, Link> existingLinks = new HashMap<>();
 		for(Link l : network.getLinks().values()) {
-			connections.add(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()));
+			existingLinks.put(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()), l);
 		}
 
-		for(ArtificialLinkDep a : artificialLinksToBeCreated) {
+		for(ArtificialLink a : artificialLinks) {
 			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getToNodeId(), a.getFromNodeId());
 
-			if(!connections.contains(key)) {
-				connections.add(key);
+			Link existingLink = existingLinks.get(key);
+
+			if(existingLink == null || a.getFreespeed() > existingLink.getFreespeed() || a.getLength() > existingLink.getLength()) {
 				String newLinkIdStr = config.getPrefixArtificial() + artificialId++;
 				Id<Node> fromNodeId = a.getToNodeId();
 				Node fromNode;
@@ -264,13 +253,11 @@ public class PseudoRoutingImpl extends Thread {
 				}
 
 				Link newLink = network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode, toNode);
+				newLink.setAllowedModes(a.getAllowedModes());
+				newLink.setLength(a.getLength());
+				newLink.setFreespeed(a.getFreespeed());
+				newLink.setCapacity(a.getCapacity());
 
-				newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-				double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getMaxTravelCostFactor();
-				newLink.setLength(l);
-				newLink.setCapacity(9999);
-				// needs to be set low so busses don't use those links during modeRouting.
-				newLink.setFreespeed(0.5);
 				network.addLink(newLink);
 			}
 		}
@@ -280,51 +267,4 @@ public class PseudoRoutingImpl extends Thread {
 		counterPseudoRouting.incCounter();
 	}
 
-	/**
-	 * Container class for artificial links
-	 */
-	@Deprecated
-	public static class ArtificialLinkDep {
-
-		private Id<Node> fromNodeId;
-		private Id<Node> toNodeId;
-		private Coord fromNodeCoord;
-		private Coord toNodeCoord;
-
-		public ArtificialLinkDep(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-			this.fromNodeId = fromLinkCandidate.getToNodeId();
-			this.toNodeId = toLinkCandidate.getFromNodeId();
-			this.fromNodeCoord = fromLinkCandidate.getToNodeCoord();
-			this.toNodeCoord = toLinkCandidate.getFromNodeCoord();
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if(this == obj)
-				return true;
-			if(obj == null)
-				return false;
-			if(getClass() != obj.getClass())
-				return false;
-
-			ArtificialLinkDep other = (ArtificialLinkDep) obj;
-			return fromNodeId.equals(other.getFromNodeId()) && toNodeId.equals(other.getToNodeId());
-		}
-
-		public Id<Node> getToNodeId() {
-			return toNodeId;
-		}
-
-		public Id<Node> getFromNodeId() {
-			return fromNodeId;
-		}
-
-		public Coord getFromNodeCoord() {
-			return fromNodeCoord;
-		}
-
-		public Coord getToNodeCoord() {
-			return toNodeCoord;
-		}
-	}
 }

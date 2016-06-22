@@ -17,14 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.osm.lib;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A simple cache for strings to make sure we don't have multiple
  * string objects with the same text in them, wasting memory.
- * Note that the cache itself keeps regular references to te strings,
+ * Note that the cache itself keeps regular references to the strings,
  * so the memory is not freed if a String is not use anymore. Thus, the
  * cache should only be used in limited areas, e.g. during parsing of 
  * data, and be disposed afterwards. 

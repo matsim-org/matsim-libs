@@ -37,7 +37,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 
 import java.util.*;
 

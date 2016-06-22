@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.osm.lib;
 
 import java.util.Locale;
 import java.util.Stack;
@@ -27,15 +27,15 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmNode;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelation;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelationMember;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelationMemberType;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmWay;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmNodeHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmRelationHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmWayHandler;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmNode;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmRelation;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmRelationMember;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmRelationMemberType;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmWay;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmWayHandler;
 
 /**
  * @author mrieser / Senozon AG

@@ -47,13 +47,6 @@ public class FPLANReaderV1 {
 	/**
 	 * Only reads the PtRoutes and leaves line/route
 	 * separation to a later process
-	 *
-	 * @param schedule
-	 * @param vehicles
-	 * @param bitfeldNummern
-	 * @param operators
-	 * @param FPLAN
-	 * @return
 	 */
 	public static Map<String, Integer> readLines(
 			TransitSchedule schedule, Vehicles vehicles, Set<Integer> bitfeldNummern, Map<String, String> operators, String FPLAN) {
@@ -120,7 +113,6 @@ public class FPLANReaderV1 {
 						Abfahrtszeitpunkt // 26-27 hour, 28-29 minute
 						31−36 [#]INT32 (optional) Index für das x. Auftreten oder
 						Ankunftszeitpunkt*/
-						boolean addToSchedule = true;
 						if(currentRouteFPLAN != null) {
 							// Vehicle Id:
 							Id<VehicleType> typeId = Id.create(newLine.substring(3, 6).trim(), VehicleType.class);

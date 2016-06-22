@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.PTMapper;
+import playground.polettif.publicTransitMapping.mapping.PTMapperImpl;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
@@ -84,7 +84,7 @@ public class CompareMapping {
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
 		ptmConfig.setOutputScheduleFile(output + "ptm_schedule.xml.gz");
 
-		PTMapper.run(ptmConfig, schedule, network);
+		PTMapperImpl.run(ptmConfig, schedule, network);
 
 		// shapeFile
 		ScheduleShapeFileWriter.run(schedule, network, ct, output);

@@ -23,7 +23,6 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;

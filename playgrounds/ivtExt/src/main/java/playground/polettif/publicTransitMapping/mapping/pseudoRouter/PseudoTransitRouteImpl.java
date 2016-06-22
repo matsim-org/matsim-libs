@@ -16,23 +16,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
-import java.util.SortedSet;
+import java.util.List;
 
-public interface LinkCandidateCreator {
-	
-	void createLinkCandidates();
+/**
+ * @author polettif
+ */
+public class PseudoTransitRouteImpl implements PseudoTransitRoute {
 
-	/**
-	 * Returns a list of link candidates for the given stop facility and schedule transport mode.
-	 * The list is ordered ascending by priority (distance, likelihood, etc.).
-	 */
-	SortedSet<LinkCandidate> getLinkCandidates(TransitStopFacility transitStopFacility, String scheduleTransportMode);
+ 	private final Id<TransitLine> transitLineId;
+	private final List<PseudoRouteStop> pseudoRouteStops;
+	private final TransitRoute transitRoute;
 
-	boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode);
+	public PseudoTransitRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoRouteStops) {
+		this.transitLineId = transitLine.getId();
+		this.transitRoute = transitRoute;
+		this.pseudoRouteStops = pseudoRouteStops;
+	}
 
+	public Id<TransitLine> getTransitLineId() {
+		return transitLineId;
+	}
+
+	public TransitRoute getTransitRoute() {
+		return transitRoute;
+	}
+
+	public List<PseudoRouteStop> getPseudoStops() {
+		return pseudoRouteStops;
+	}
 }

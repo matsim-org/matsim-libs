@@ -35,11 +35,10 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
  * implementation of public transit mapping.
  *
  * Currently redirects to the only implementation
- * {@link PTMapperPseudoRouting}.
+ * {@link PTMapperImpl}.
  *
  * @author polettif
  */
-@Deprecated
 public abstract class PTMapper {
 
 	protected static Logger log = Logger.getLogger(PTMapper.class);
@@ -60,7 +59,7 @@ public abstract class PTMapper {
 		if(args.length == 1) {
 			run(args[0]);
 		} else {
-			throw new IllegalArgumentException("Incorrect number of arguments: [0] config file");
+			throw new IllegalArgumentException("Incorrect number of arguments: [0] Public Transit Mapping config file");
 		}
 	}
 
@@ -73,23 +72,11 @@ public abstract class PTMapper {
 	 * @param configFile the PublicTransitMapping config file
 	 */
 	public static void run(String configFile) {
-		new PTMapperPseudoRouting(configFile).run();
+		new PTMapperImpl(configFile).run();
 	}
 
 	public static void run(PublicTransitMappingConfigGroup ptmConfig, TransitSchedule schedule, Network network) {
-		new PTMapperPseudoRouting(ptmConfig, schedule, network).run();
-	}
-
-	/**
-	 * If the config has schedule and network files defined, they are loaded.
-	 * <p/>
-	 *
-	 * @param config the config
-	 */
-	public PTMapper(PublicTransitMappingConfigGroup config) {
-		this.config = config;
-		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
-		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
+		new PTMapperImpl(ptmConfig, schedule, network).run();
 	}
 
 	/**

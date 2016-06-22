@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.mapping.linkCandidateCreation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -28,9 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateV2;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
@@ -40,17 +38,17 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 
 	protected static Logger log = Logger.getLogger(LinkCandidateCreatorStandard.class);
 
-	private static Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE+","+PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
+	private static final Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE+","+PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
 	private final Map<String, Router> modeSeparatedRouters;
 
 	private Map<String, PublicTransitMappingConfigGroup.LinkCandidateCreatorParams> lccParams;
 
-	private TransitSchedule schedule;
-	private Network network;
-	private PublicTransitMappingConfigGroup config;
+	private final TransitSchedule schedule;
+	private final Network network;
+	private final PublicTransitMappingConfigGroup config;
 
-	private Map<String, Map<TransitStopFacility, SortedSet<LinkCandidate>>> linkCandidates = new HashMap<>();
-	private Set<Tuple<TransitStopFacility, String>> loopLinks = new HashSet<>();
+	private final Map<String, Map<TransitStopFacility, SortedSet<LinkCandidate>>> linkCandidates = new HashMap<>();
+	private final Set<Tuple<TransitStopFacility, String>> loopLinks = new HashSet<>();
 
 	public LinkCandidateCreatorStandard(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config, Map<String, Router> modeSeparatedRouters) {
 		this.schedule = schedule;
@@ -90,7 +88,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 						// if stop facilty already has a referenced link
 						if(stopFacility.getLinkId() != null) {
 							Link link = network.getLinks().get(stopFacility.getLinkId());
-							modeLinkCandidates.add(new LinkCandidateV2(link, stopFacility, modeRouter.getLinkTravelCost(link)));
+							modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility, modeRouter.getLinkTravelCost(link)));
 						// search for close links
 						} else {
 							List<Link> closestLinks;
@@ -114,7 +112,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 							 * generate a LinkCandidate for each close link
 							 */
 							for(Link link : closestLinks) {
-								modeLinkCandidates.add(new LinkCandidateV2(link, stopFacility, modeRouter.getLinkTravelCost(link)));
+								modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility, modeRouter.getLinkTravelCost(link)));
 							}
 						}
 					}
@@ -161,7 +159,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 										"("+CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord())+")");
 								log.info("Manual link candidate will still be used");
 							}
-							lcSet.add(new LinkCandidateV2(link, parentStopFacility, modeRouter.getLinkTravelCost(link)));
+							lcSet.add(new LinkCandidateImpl(link, parentStopFacility, modeRouter.getLinkTravelCost(link)));
 						}
 					}
 					MapUtils.getMap(scheduleMode, linkCandidates).put(parentStopFacility, lcSet);
