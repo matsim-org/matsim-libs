@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLink;
 
 /**
  * A Router interface combining travelDisUtility and TravelTime.
@@ -45,6 +47,7 @@ public interface Router extends TravelDisutility, TravelTime {
 
     Network getNetwork();
 
-	double getArtificialTravelCost(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
+	double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop);
 
+	ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
 }

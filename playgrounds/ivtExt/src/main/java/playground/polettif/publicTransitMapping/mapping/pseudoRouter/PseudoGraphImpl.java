@@ -147,7 +147,7 @@ public class PseudoGraphImpl implements PseudoGraph {
 		if(!graph.containsKey(to.getId())) {
 			graph.put(to.getId(), to);
 		}
-		double weight = pathTravelCost + 0.5 * from.getLinkTravelCost() + 0.5 * to.getLinkTravelCost();
+		double weight = pathTravelCost + 0.5 * from.getLinkCandidate().getLinkTravelCost() + 0.5 * to.getLinkCandidate().getLinkTravelCost();
 		graph.get(from.getId()).getNeighbours().put(graph.get(to.getId()), weight);
 	}
 

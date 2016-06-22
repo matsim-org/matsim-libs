@@ -26,9 +26,12 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLink;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.HashMap;
@@ -85,10 +88,23 @@ public class FastAStarRouter implements Router {
 	}
 
 	@Override
-	public double getArtificialTravelCost(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-		return 0;
+	public double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop) {
+		double travelTime = (toStop.getArrivalOffset() - fromStop.getDepartureOffset());
+		double beelineDistance = CoordUtils.calcEuclideanDistance(fromStop.getStopFacility().getCoord(), fromStop.getStopFacility().getCoord());
+
+		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
+			return travelTime;
+		} else {
+			return beelineDistance;
+		}
 	}
 
+	@Override
+	public ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		return new ArtificialLink(fromLinkCandidate, toLinkCandidate);
+	}
+
+	// LeastCostPathCalculator methods
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		return this.getLinkMinimumTravelDisutility(link);

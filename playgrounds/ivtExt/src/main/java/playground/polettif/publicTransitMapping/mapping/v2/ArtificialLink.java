@@ -16,65 +16,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
+package playground.polettif.publicTransitMapping.mapping.v2;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.Map;
+import org.matsim.api.core.v01.network.Node;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 
 /**
- * TODO doc
+ * Container class for artificial links
  */
-public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
+public class ArtificialLink {
 
-	Id<TransitStopFacility> getParentStopFacilityId();
+	private Id<Node> fromNodeId;
+	private Id<Node> toNodeId;
+	private Coord fromNodeCoord;
+	private Coord toNodeCoord;
 
-	LinkCandidate getLinkCandidate();
+	public ArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		this.fromNodeId = fromLinkCandidate.getToNodeId();
+		this.toNodeId = toLinkCandidate.getFromNodeId();
+		this.fromNodeCoord = fromLinkCandidate.getToNodeCoord();
+		this.toNodeCoord = toLinkCandidate.getFromNodeCoord();
+	}
 
-	Coord getCoord();
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
 
-	boolean isBlockingLane();
+		ArtificialLink other = (ArtificialLink) obj;
+		return fromNodeId.equals(other.getFromNodeId()) && toNodeId.equals(other.getToNodeId());
+	}
 
-	boolean awaitsDepartureTime();
+	public Id<Node> getToNodeId() {
+		return toNodeId;
+	}
 
-	String getFacilityName();
+	public Id<Node> getFromNodeId() {
+		return fromNodeId;
+	}
 
-	String getStopPostAreaId();
+	public Coord getFromNodeCoord() {
+		return fromNodeCoord;
+	}
 
-	double getArrivalOffset();
-
-	double getDepartureOffset();
-
-	@Deprecated
-	double getLinkTravelCost();
-
-	int compareTo(PseudoRouteStop other);
-
-	Id<Link> getLinkId();
-
-	/**
-	 * Used for Dijkstra in {@link PseudoGraph}
-	 */
-	Map<PseudoRouteStop, Double> getNeighbours();
-	/**
-	 * Used for Dijkstra in {@link PseudoGraph}
-	 */
-	double getTravelCostToSource();
-	/**
-	 * Used for Dijkstra in {@link PseudoGraph}
-	 */
-	void setTravelCostToSource(double alternateDist);
-	/**
-	 * Used for Dijkstra in {@link PseudoGraph}
-	 */
-	PseudoRouteStop getClosestPrecedingRouteStop();
-	/**
-	 * Used for Dijkstra in {@link PseudoGraph}
-	 */
-	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
-
+	public Coord getToNodeCoord() {
+		return toNodeCoord;
+	}
 }

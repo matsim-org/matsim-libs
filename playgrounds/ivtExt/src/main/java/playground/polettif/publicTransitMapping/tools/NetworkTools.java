@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
+import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 
 import java.util.*;
@@ -561,7 +561,7 @@ public class NetworkTools {
 		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
 		for(Set<String> networkModes : modeAssignments.values()) {
 			if(!modeDependentRouters.containsKey(networkModes)) {
-				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
+				modeDependentRouters.put(networkModes, FastAStarRouter.createModeSeparatedRouter(network, networkModes));
 			}
 		}
 

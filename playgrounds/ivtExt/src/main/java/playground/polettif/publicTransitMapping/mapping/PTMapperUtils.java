@@ -96,6 +96,7 @@ public class PTMapperUtils {
 	 * twice in a stop sequence) are ignored.
 	 */
 	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
+		int nPulled = 0;
 		log.info("Pulling child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
@@ -117,6 +118,7 @@ public class PTMapperUtils {
 						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), inlinksWithSameMode);
 						if(closerLinkBefore != null) {
 							linkIdList.add(0, closerLinkBefore);
+							nPulled++;
 						}
 						currentStop = stopsIterator.next();
 					}
@@ -129,7 +131,9 @@ public class PTMapperUtils {
 							testSet.add(linkList.get(i));
 							testSet.add(linkList.get(i-1));
 							testSet.add(linkList.get(i+1));
-							useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), testSet);
+							Id<Link> check = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), testSet);
+
+							if(check != null) nPulled++;
 
 							if(stopsIterator.hasNext()) {
 								currentStop = stopsIterator.next();
@@ -144,6 +148,7 @@ public class PTMapperUtils {
 						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), outlinksWithSameMode);
 						if(closerLinkAfter != null) {
 							linkIdList.add(closerLinkAfter);
+							nPulled++;
 						}
 					}
 
@@ -152,12 +157,16 @@ public class PTMapperUtils {
 				}
 			}
 		}
+
+		log.info("... "+ nPulled + " child facilities pulled");
 	}
 
 
 	/**
 	 * If a link of <tt>comparingLinks</tt> is closer to the stop facility than
 	 * its currently referenced link, the closest link is used.
+	 * @return The id of the new closest link or <tt>null</tt> if the existing ref link
+	 * was used.
 	 */
 	private static Id<Link> useCloserRefLinkForChildStopFacility(TransitSchedule schedule, Network network, TransitRoute transitRoute, TransitStopFacility stopFacility, Collection<? extends Link> comparingLinks) {
 		// check if previous link is closer to stop facility

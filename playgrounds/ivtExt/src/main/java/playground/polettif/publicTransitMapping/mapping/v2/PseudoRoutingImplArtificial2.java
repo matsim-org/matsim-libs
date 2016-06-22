@@ -18,12 +18,7 @@
 
 package playground.polettif.publicTransitMapping.mapping.v2;
 
-/**
- * Created by polettif on 17.06.2016.
- */
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -35,7 +30,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.*;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
@@ -82,6 +76,8 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 		for(TransitLine transitLine : queue) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 
+				Map<Tuple<PseudoRouteStop, PseudoRouteStop>, ArtificialLink> possibleArtificialLinks = new HashMap<>();
+
 				String scheduleTransportMode = transitRoute.getTransportMode();
 
 				Router modeRouter = modeSeparatedRouters.get(scheduleTransportMode);
@@ -103,25 +99,12 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 				 */
 				List<TransitRouteStop> routeStops = transitRoute.getStops();
 				for(int i = 0; i < routeStops.size() - 1; i++) {
-					TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
-					TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
 					Set<LinkCandidate> linkCandidatesCurrent = linkCandidates.getLinkCandidates(routeStops.get(i).getStopFacility(), scheduleTransportMode);
 					Set<LinkCandidate> linkCandidatesNext = linkCandidates.getLinkCandidates(routeStops.get(i + 1).getStopFacility(), scheduleTransportMode);
 
-					final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
+					double minTravelCost = modeRouter.getMinimalTravelCost(routeStops.get(i), routeStops.get(i + 1));
+					double maxAllowedTravelCost = minTravelCost * config.getMaxTravelCostFactor();
 
-					// todo move threshold calculation to Router implementation
-					double maxAllowedPathCost;
-					if(config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
-						maxAllowedPathCost = (routeStops.get(i + 1).getArrivalOffset() - routeStops.get(i).getDepartureOffset()) * config.getMaxTravelCostFactor();
-					} else {
-						maxAllowedPathCost = beelineDistance * config.getMaxTravelCostFactor();
-					}
-
-					//Check if one of the two stops is outside the network
-//					boolean bothStopsWithLoopLinks = (!linkCandidates.stopFacilityOnlyHasLoopLink(currentStopFacility, scheduleTransportMode) && !linkCandidates.stopFacilityOnlyHasLoopLink(currentStopFacility, scheduleTransportMode));
-
-//					if(!mapScheduleModeArtificial && bothStopsWithLoopLinks && modeNetwork != null) {
 					/**
 					 * Calculate the shortest path between all link candidates.
 					 */
@@ -129,7 +112,7 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 						for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 
 							boolean useExistingNetworkLinks = false;
-							double pathCost = 2 * maxAllowedPathCost;
+							double pathCost = 2 * maxAllowedTravelCost;
 							/**
 							 * if both link candidates are loop links we don't have to search
 							 * a least cost path on the network
@@ -158,46 +141,33 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 									}
 								}
 
-								useExistingNetworkLinks = pathCost < maxAllowedPathCost;
+								useExistingNetworkLinks = pathCost < maxAllowedTravelCost;
 							}
 
 							if(useExistingNetworkLinks) {
 								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
-							} else {
-								artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
+							}
+							/** [.]
+							 * Create artificial links between two routeStops if:
+							 * 	 - scheduleMode should use artificial links
+							 *   - one of the two stops is outside the network area
+							 *
+							 * Artificial links are created between all LinkCandidates
+							 * (usually this means between one dummy link for the stop
+							 * facility and the other linkCandidates).
+							 */
+							else {
+								artificialLinksToBeCreated.add(modeRouter.createArtificialLink(linkCandidateCurrent, linkCandidateNext));
 
-								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
-								pathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
+//								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
+//								pathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
-								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
+								double artificialEdgeWeight = maxAllowedTravelCost-linkCandidateCurrent.getLinkTravelCost()-linkCandidateNext.getLinkTravelCost();
+
+								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, artificialEdgeWeight);
 							}
 						}
 					}
-//					}
-
-					/** [.]
-					 * Create artificial links between two routeStops if:
-					 * 	 - scheduleMode should use artificial links
-					 *   - one of the two stops is outside the network area
-					 *
-					 * Artificial links are created between all LinkCandidates
-					 * (usually this means between one dummy link for the stop
-					 * facility and the other linkCandidates).
-					 */
-					/*
-					else {
-						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
-
-								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
-								double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
-
-								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, newPathWeight);
-							}
-						}
-					}
-					*/
 				} // - routeStop loop
 
 				/** [4.3]
@@ -277,50 +247,4 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 		counterPseudoRouting.incCounter();
 	}
 
-	/**
-	 * Container class for artificial links
-	 */
-	public static class ArtificialLink {
-
-		private Id<Node> fromNodeId;
-		private Id<Node> toNodeId;
-		private Coord fromNodeCoord;
-		private Coord toNodeCoord;
-
-		public ArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-			this.fromNodeId = fromLinkCandidate.getToNodeId();
-			this.toNodeId = toLinkCandidate.getFromNodeId();
-			this.fromNodeCoord = fromLinkCandidate.getToNodeCoord();
-			this.toNodeCoord = toLinkCandidate.getFromNodeCoord();
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if(this == obj)
-				return true;
-			if(obj == null)
-				return false;
-			if(getClass() != obj.getClass())
-				return false;
-
-			ArtificialLink other = (ArtificialLink) obj;
-			return fromNodeId.equals(other.getFromNodeId()) && toNodeId.equals(other.getToNodeId());
-		}
-
-		public Id<Node> getToNodeId() {
-			return toNodeId;
-		}
-
-		public Id<Node> getFromNodeId() {
-			return fromNodeId;
-		}
-
-		public Coord getFromNodeCoord() {
-			return fromNodeCoord;
-		}
-
-		public Coord getToNodeCoord() {
-			return toNodeCoord;
-		}
-	}
 }

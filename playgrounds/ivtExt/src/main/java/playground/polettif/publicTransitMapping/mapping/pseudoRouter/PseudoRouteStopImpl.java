@@ -41,6 +41,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 	// dijkstra
 	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
+	private final LinkCandidate linkCandidate;
 	public double travelCostToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
 	public PseudoRouteStop previous = null;
 
@@ -92,6 +93,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 		// link value
 		this.linkTravelCost = linkCandidate.getLinkTravelCost();
+		this.linkCandidate = linkCandidate;
 	}
 
 	/**
@@ -125,6 +127,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 		// link value
 		this.linkTravelCost = 0.0;
+		this.linkCandidate = null;
 	}
 
 
@@ -192,6 +195,11 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 	@Override
 	public Id<TransitStopFacility> getParentStopFacilityId() {
 		return parentStopFacilityId;
+	}
+
+	@Override
+	public LinkCandidate getLinkCandidate() {
+		return linkCandidate;
 	}
 
 	@Override

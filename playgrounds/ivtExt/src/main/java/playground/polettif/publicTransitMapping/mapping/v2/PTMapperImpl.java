@@ -217,7 +217,6 @@ public class PTMapperImpl extends PTMapper {
 		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
 
 		// Remove unnecessary parts of schedule
-		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
 		if(config.getRemoveNotUsedStopFacilities()) ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
@@ -325,7 +324,6 @@ public class PTMapperImpl extends PTMapper {
 		log.info("       average nr created  " + String.format("%.2f", histogram.average()));
 		log.info("       max nr created      " + String.format("%.0f", histogram.max()));
 		log.info("    Transit Routes:");
-		log.info("       removed from schedule            " + routesRemoved);
 		log.info("       total routes in schedule         " + nRoutes);
 		log.info("       routes without artificial links  " + withoutArtificialLinks);
 		log.info("");
