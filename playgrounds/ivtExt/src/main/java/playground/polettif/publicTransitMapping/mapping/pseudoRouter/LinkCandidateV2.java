@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
 
 /**
@@ -38,11 +37,8 @@ import playground.polettif.publicTransitMapping.tools.CoordTools;
  */
 public class LinkCandidateV2 implements LinkCandidate {
 
-	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
-
 	private final String id;
 	private final Id<TransitStopFacility> parentStopFacilityId;
-	private final String scheduleTransportMode;
 
 	private double priority;
 	private final double stopFacilityDistance;
@@ -57,18 +53,12 @@ public class LinkCandidateV2 implements LinkCandidate {
 	private final Coord toNodeCoord;
 	private boolean loopLink;
 
-	public LinkCandidateV2(Link link, TransitStopFacility parentStopFacility, String scheduleTransportMode) {
+	public LinkCandidateV2(Link link, TransitStopFacility parentStopFacility, double linkTravelCost) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
 		this.parentStopFacilityId = parentStopFacility.getId();
-		this.scheduleTransportMode = scheduleTransportMode;
+		this.linkTravelCost = linkTravelCost;
 
 		this.linkId = link.getId();
-
-		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
-			this.linkTravelCost = link.getLength() / link.getFreespeed();
-		} else {
-			this.linkTravelCost = link.getLength();
-		}
 
 		this.fromNodeId = link.getFromNode().getId();
 		this.toNodeId = link.getToNode().getId();
@@ -83,8 +73,24 @@ public class LinkCandidateV2 implements LinkCandidate {
 		this.loopLink = link.getFromNode().getId().toString().equals(link.getToNode().getId().toString());
 	}
 
-	public static void setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType travelCostType) {
-		LinkCandidateV2.travelCostType = travelCostType;
+	public LinkCandidateV2() {
+		this.id = "dummy";
+		this.parentStopFacilityId = null;
+		this.linkTravelCost = 0;
+
+		this.linkId = null;
+
+		this.fromNodeId = null;
+		this.toNodeId = null;
+		this.stopFacilityCoord = null;
+
+		this.fromNodeCoord = null;
+		this.toNodeCoord = null;
+
+		this.stopFacilityDistance = 0.0;
+		this.priority = 0.0;
+
+		this.loopLink = true;
 	}
 
 	@Override

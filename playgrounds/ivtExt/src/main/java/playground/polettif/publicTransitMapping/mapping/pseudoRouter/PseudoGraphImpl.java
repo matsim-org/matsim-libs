@@ -128,7 +128,7 @@ public class PseudoGraphImpl implements PseudoGraph {
 	}
 
 	@Override
-	public List<PseudoRouteStop> getLeastCostPath() {
+	public List<PseudoRouteStop> getLeastCostStopSequence() {
 		runDijkstra();
 		return getShortestPseudoPath();
 	}
@@ -155,7 +155,6 @@ public class PseudoGraphImpl implements PseudoGraph {
 	/**
 	 * DEPRECATED
 	 */
-
 	@Deprecated
 	public void addSourceDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidateImpl> linkCandidates) {
 		for(LinkCandidateImpl lc : linkCandidates) {

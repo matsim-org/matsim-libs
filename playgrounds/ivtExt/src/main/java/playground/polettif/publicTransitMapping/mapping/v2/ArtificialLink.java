@@ -21,51 +21,23 @@ package playground.polettif.publicTransitMapping.mapping.v2;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 
 /**
- * Container class for artificial links
+ * todo javadoc
  */
-public class ArtificialLink {
+public interface ArtificialLink {
 
-	private Id<Node> fromNodeId;
-	private Id<Node> toNodeId;
-	private Coord fromNodeCoord;
-	private Coord toNodeCoord;
+	Id<Node> getToNodeId();
 
-	public ArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-		this.fromNodeId = fromLinkCandidate.getToNodeId();
-		this.toNodeId = toLinkCandidate.getFromNodeId();
-		this.fromNodeCoord = fromLinkCandidate.getToNodeCoord();
-		this.toNodeCoord = toLinkCandidate.getFromNodeCoord();
-	}
+	Id<Node> getFromNodeId();
 
-	@Override
-	public boolean equals(Object obj) {
-		if(this == obj)
-			return true;
-		if(obj == null)
-			return false;
-		if(getClass() != obj.getClass())
-			return false;
+	Coord getFromNodeCoord();
 
-		ArtificialLink other = (ArtificialLink) obj;
-		return fromNodeId.equals(other.getFromNodeId()) && toNodeId.equals(other.getToNodeId());
-	}
+	Coord getToNodeCoord();
 
-	public Id<Node> getToNodeId() {
-		return toNodeId;
-	}
+	double getFreespeed();
 
-	public Id<Node> getFromNodeId() {
-		return fromNodeId;
-	}
+	double getLength();
 
-	public Coord getFromNodeCoord() {
-		return fromNodeCoord;
-	}
-
-	public Coord getToNodeCoord() {
-		return toNodeCoord;
-	}
+	boolean equals(Object obj);
 }

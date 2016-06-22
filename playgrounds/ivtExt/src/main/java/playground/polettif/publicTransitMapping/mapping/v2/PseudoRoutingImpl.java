@@ -50,6 +50,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PseudoRoutingImpl extends Thread {
 
 	protected static Logger log = Logger.getLogger(PseudoRoutingImpl.class);
@@ -63,7 +64,7 @@ public class PseudoRoutingImpl extends Thread {
 	private final LinkCandidateCreator linkCandidates;
 
 	private List<TransitLine> queue = new ArrayList<>();
-	private Set<ArtificialLink> artificialLinksToBeCreated = new HashSet<>();
+	private Set<ArtificialLinkDep> artificialLinksToBeCreated = new HashSet<>();
 	private PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
 
 	private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
@@ -168,7 +169,7 @@ public class PseudoRoutingImpl extends Thread {
 								 * Use artificial path between two linkCandidates
 								 */
 								else {
-									artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
+									artificialLinksToBeCreated.add(new ArtificialLinkDep(linkCandidateCurrent, linkCandidateNext));
 
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
 									double artificialPathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
@@ -191,7 +192,7 @@ public class PseudoRoutingImpl extends Thread {
 					else {
 						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
+								artificialLinksToBeCreated.add(new ArtificialLinkDep(linkCandidateCurrent, linkCandidateNext));
 
 								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
 								double newPathWeight = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
@@ -210,7 +211,7 @@ public class PseudoRoutingImpl extends Thread {
 						linkCandidates.getLinkCandidates(routeStops.get(routeStops.size() - 1).getStopFacility(), scheduleTransportMode));
 
 				// run Dijkstra
-				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostPath();
+				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostStopSequence();
 
 				if(pseudoPath == null) {
 					log.warn("PseudoGraph has no path from SOURCE to DESTINATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
@@ -238,7 +239,7 @@ public class PseudoRoutingImpl extends Thread {
 			connections.add(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()));
 		}
 
-		for(ArtificialLink a : artificialLinksToBeCreated) {
+		for(ArtificialLinkDep a : artificialLinksToBeCreated) {
 			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getToNodeId(), a.getFromNodeId());
 
 			if(!connections.contains(key)) {
@@ -282,14 +283,15 @@ public class PseudoRoutingImpl extends Thread {
 	/**
 	 * Container class for artificial links
 	 */
-	public static class ArtificialLink {
+	@Deprecated
+	public static class ArtificialLinkDep {
 
 		private Id<Node> fromNodeId;
 		private Id<Node> toNodeId;
 		private Coord fromNodeCoord;
 		private Coord toNodeCoord;
 
-		public ArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		public ArtificialLinkDep(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
 			this.fromNodeId = fromLinkCandidate.getToNodeId();
 			this.toNodeId = toLinkCandidate.getFromNodeId();
 			this.fromNodeCoord = fromLinkCandidate.getToNodeCoord();
@@ -305,7 +307,7 @@ public class PseudoRoutingImpl extends Thread {
 			if(getClass() != obj.getClass())
 				return false;
 
-			ArtificialLink other = (ArtificialLink) obj;
+			ArtificialLinkDep other = (ArtificialLinkDep) obj;
 			return fromNodeId.equals(other.getFromNodeId()) && toNodeId.equals(other.getToNodeId());
 		}
 

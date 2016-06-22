@@ -127,7 +127,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 		// link value
 		this.linkTravelCost = 0.0;
-		this.linkCandidate = null;
+		this.linkCandidate = new LinkCandidateV2();
 	}
 
 

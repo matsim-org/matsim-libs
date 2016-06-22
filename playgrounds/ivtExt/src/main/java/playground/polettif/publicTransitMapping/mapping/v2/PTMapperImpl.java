@@ -91,18 +91,9 @@ public class PTMapperImpl extends PTMapper {
 			}
 		}
 
-		/** [1]
-		 * Load the closest links and create LinkCandidates. StopFacilities
-		 * with no links within search radius are given a dummy loop link right
-		 * on their coordinates. Each Link Candidate is a possible new stop facility
-		 * after PseudoRouting.
-		 */
-		log.info("=============================");
-		log.info("Searching for link candidates");
-		LinkCandidateCreator linkCandidates = new LinkCandidateCreatorStandard(this.schedule, this.network, this.config);
-		linkCandidates.createLinkCandidates();
 
-		/** [2]
+
+		/** [1]
 		 * Create a separate network for all schedule modes and
 		 * initiate routers.
 		 */
@@ -114,6 +105,17 @@ public class PTMapperImpl extends PTMapper {
 			log.info("Initiating network and router for schedule mode " +scheduleMode+". Network modes " + modeRoutingAssignment.get(scheduleMode));
 			modeSeparatedRouters.put(scheduleMode, FastAStarRouter.createModeSeparatedRouter(network, modeRoutingAssignment.get(scheduleMode)));
 		}
+
+		/** [2]
+		 * Load the closest links and create LinkCandidates. StopFacilities
+		 * with no links within search radius are given a dummy loop link right
+		 * on their coordinates. Each Link Candidate is a possible new stop facility
+		 * after PseudoRouting.
+		 */
+		log.info("=============================");
+		log.info("Searching for link candidates");
+		LinkCandidateCreator linkCandidates = new LinkCandidateCreatorStandard(this.schedule, this.network, this.config, this.modeSeparatedRouters);
+		linkCandidates.createLinkCandidates();
 
 		/** [3]
 		 * PseudoRouting

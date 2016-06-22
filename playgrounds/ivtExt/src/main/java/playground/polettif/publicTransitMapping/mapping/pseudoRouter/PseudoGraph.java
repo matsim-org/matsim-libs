@@ -28,7 +28,7 @@ import java.util.List;
  */
 public interface PseudoGraph {
 
-	List<PseudoRouteStop> getLeastCostPath();
+	List<PseudoRouteStop> getLeastCostStopSequence();
 
 	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
 

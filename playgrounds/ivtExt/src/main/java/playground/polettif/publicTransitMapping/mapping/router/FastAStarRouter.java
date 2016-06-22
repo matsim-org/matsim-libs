@@ -32,6 +32,7 @@ import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLink;
+import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLinkImpl;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.HashMap;
@@ -101,7 +102,22 @@ public class FastAStarRouter implements Router {
 
 	@Override
 	public ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-		return new ArtificialLink(fromLinkCandidate, toLinkCandidate);
+		double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
+		return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, 0.5, linkLength);
+		/*
+		double linkTravelCost = travelCost - 0.5*fromLinkCandidate.getLinkTravelCost() - 0.5*toLinkCandidate.getLinkTravelCost();
+		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
+			double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
+			return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, linkLength / linkTravelCost, linkLength);
+		} else {
+			return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, 0.5, travelCost);
+		}
+		*/
+	}
+
+	@Override
+	public double getLinkTravelCost(Link link) {
+		return getLinkMinimumTravelDisutility(link);
 	}
 
 	// LeastCostPathCalculator methods

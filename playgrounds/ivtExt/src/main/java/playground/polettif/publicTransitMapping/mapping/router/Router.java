@@ -21,6 +21,7 @@
 
 package playground.polettif.publicTransitMapping.mapping.router;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -50,4 +51,6 @@ public interface Router extends TravelDisutility, TravelTime {
 	double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop);
 
 	ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
+
+	double getLinkTravelCost(Link link);
 }

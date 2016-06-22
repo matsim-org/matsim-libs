@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -159,10 +158,7 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 							else {
 								artificialLinksToBeCreated.add(modeRouter.createArtificialLink(linkCandidateCurrent, linkCandidateNext));
 
-//								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
-//								pathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
-
-								double artificialEdgeWeight = maxAllowedTravelCost-linkCandidateCurrent.getLinkTravelCost()-linkCandidateNext.getLinkTravelCost();
+								double artificialEdgeWeight = maxAllowedTravelCost - 0.5 * linkCandidateCurrent.getLinkTravelCost() - 0.5 * linkCandidateNext.getLinkTravelCost();
 
 								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, artificialEdgeWeight);
 							}
@@ -178,7 +174,7 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 						linkCandidates.getLinkCandidates(routeStops.get(routeStops.size() - 1).getStopFacility(), scheduleTransportMode));
 
 				// run Dijkstra
-				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostPath();
+				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostStopSequence();
 
 				if(pseudoPath == null) {
 					log.warn("PseudoGraph has no path from SOURCE to DESTINATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
@@ -233,11 +229,9 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 				Link newLink = network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode, toNode);
 
 				newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-				double l = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * config.getMaxTravelCostFactor();
-				newLink.setLength(l);
+				newLink.setLength(a.getLength());
+				newLink.setFreespeed(a.getFreespeed());
 				newLink.setCapacity(9999);
-				// needs to be set low so busses don't use those links during modeRouting.
-				newLink.setFreespeed(0.5);
 				network.addLink(newLink);
 			}
 		}
