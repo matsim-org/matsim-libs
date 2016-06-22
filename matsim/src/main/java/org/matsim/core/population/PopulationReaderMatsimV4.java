@@ -283,8 +283,7 @@ import org.xml.sax.Attributes;
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			final Coord coord = parseCoord( atts );
-			this.curract = this.currplan.createAndAddActivity(
-					atts.getValue(ATTR_TYPE), coord);
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(atts.getValue(ATTR_TYPE), coord, this.currplan);
 		} else {
 			throw new IllegalArgumentException(
 					"In this version of MATSim either the coords or the link must be specified for an Act.");

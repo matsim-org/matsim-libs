@@ -122,27 +122,27 @@ public class MyControler1 {
 
 			try {
 				PlanImpl plan1 = PopulationUtils.createPlan(p);
-				Activity act1a = plan1.createAndAddActivity("h", new Coord(100., 100.));
+				Activity act1a = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan1);
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createAndAddLeg(TransportMode.car);
 				NetworkRoute route = new LinkNetworkRouteImpl(link9.getId(), link15.getId());
 				route.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 4"))), link15.getId());
 				leg.setRoute(route);
-				Activity act1b = plan1.createAndAddActivity("h", new Coord(200., 200.));
+				Activity act1b = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(200., 200.), plan1);
 				act1b.setLinkId(link15.getId());
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
 				PlanImpl plan2 = PopulationUtils.createPlan(p);
-				Activity act2a = plan1.createAndAddActivity("h", new Coord(100., 100.));
+				Activity act2a = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan1);
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 				NetworkRoute route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId());
 				route2.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 6 4"))), link15.getId());
 				leg2.setRoute(route2);
-				Activity act2b = plan1.createAndAddActivity("h", new Coord(200., 200.));
+				Activity act2b = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(200., 200.), plan1);
 				act2b.setLinkId(link15.getId());
 				act2b.setStartTime(8*60*60);
 				p.addPlan(plan2);
@@ -319,13 +319,13 @@ public class MyControler1 {
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(ii, Person.class));
 		PlanImpl plan = PopulationUtils.createPlan(p);
 		try {
-			Activity act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
+			Activity act1 = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan);
 			act1.setLinkId(sourceLink.getId());
 			act1.setStartTime(0.);
 			act1.setEndTime(0 * 60 * 60.);
 
 			plan.createAndAddLeg(TransportMode.car);
-			Activity act2 = plan.createAndAddActivity("h", new Coord(200., 200.));
+			Activity act2 = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(200., 200.), plan);
 			act2.setLinkId(destLink.getId());
 			act2.setStartTime(8 * 60 * 60);
 

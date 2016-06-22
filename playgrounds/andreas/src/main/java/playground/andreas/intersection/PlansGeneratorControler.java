@@ -163,13 +163,13 @@ public class PlansGeneratorControler {
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(String.valueOf(ii), Person.class));
 		PlanImpl plan = PopulationUtils.createPlan(p);
 		try {
-			Activity act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
+			Activity act1 = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan);
 			act1.setLinkId(fromLink.getId());
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
 			plan.createAndAddLeg(TransportMode.car);
-			Activity act2 = plan.createAndAddActivity("h", new Coord(200., 200.));
+			Activity act2 = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(200., 200.), plan);
 			act2.setLinkId(toLink.getId());
 			act2.setStartTime(8 * 60 * 60);
 

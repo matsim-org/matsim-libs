@@ -30,6 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -217,7 +218,8 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					Activity a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
+					final String type1 = type;
+					Activity a = PopulationUtils.createAndAddActivityFromCoord(type1, new Coord(0.0, 0.0), plan);
 					a.setStartTime(start_time);
 				}
 				catch (Exception e) { throw new RuntimeException(e); }
@@ -228,7 +230,8 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				time_sum += dur;
 				int end_time = time_sum;
 				try {
-					Activity a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
+					final String type1 = type;
+					Activity a = PopulationUtils.createAndAddActivityFromCoord(type1, new Coord(0.0, 0.0), plan);
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setMaximumDuration(dur);

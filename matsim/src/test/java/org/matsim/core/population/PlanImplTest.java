@@ -58,11 +58,11 @@ public class PlanImplTest {
 		} catch (IllegalStateException e) {
 			log.debug("catched expected exception.", e);
 		}
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 		plan.createAndAddLeg(TransportMode.bike);
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 	}
 
 	/**
@@ -71,9 +71,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_Between() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		Activity homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
+		Activity homeAct = PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
-		Activity workAct = plan.createAndAddActivity("w", new Coord(100, 200));
+		Activity workAct = PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -100,9 +100,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_AtEnd() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		Activity homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
+		Activity homeAct = PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
-		Activity workAct = plan.createAndAddActivity("w", new Coord(100, 200));
+		Activity workAct = PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -129,9 +129,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_AtWrongPosition() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -155,9 +155,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_AtStart() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -182,9 +182,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_BehindEnd() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -222,9 +222,9 @@ public class PlanImplTest {
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 		Route route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
@@ -249,9 +249,9 @@ public class PlanImplTest {
 		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
 
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), plan);
 		Route route = new GenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
@@ -273,11 +273,11 @@ public class PlanImplTest {
 	public void testRemoveActivity() {
 
 		PlanImpl testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		testee.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), testee);
 		testee.createAndAddLeg(TransportMode.car);
-		testee.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), testee);
 		testee.createAndAddLeg(TransportMode.car);
-		testee.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), testee);
 
 		PopulationUtils.removeActivity(3, testee);
 		assertEquals(5, testee.getPlanElements().size());
@@ -292,11 +292,11 @@ public class PlanImplTest {
 	@Test
 	public void testRemoveLeg() {
 		PlanImpl testee = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		testee.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), testee);
 		testee.createAndAddLeg(TransportMode.car);
-		testee.createAndAddActivity("w", new Coord(100, 200));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord(100, 200), testee);
 		testee.createAndAddLeg(TransportMode.car);
-		testee.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), testee);
 
 		PopulationUtils.removeLeg(4, testee);
 		assertEquals(5, testee.getPlanElements().size());

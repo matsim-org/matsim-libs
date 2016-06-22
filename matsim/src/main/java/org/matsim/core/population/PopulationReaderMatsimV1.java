@@ -202,7 +202,7 @@ import org.xml.sax.Attributes;
 			}
 		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 			final Coord coord = parseCoord( atts );
-			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
+			act = PopulationUtils.createAndAddActivityFromCoord(atts.getValue("type"), coord, this.currplan);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}

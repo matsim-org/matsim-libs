@@ -626,8 +626,10 @@ public class CreatePlansFromTrips {
 				}else{
 					c = getRandomCoordInZone(Id.create(T.zone_o, Zone.class));
 				}
+				final String type1 = act_o;
+				final Coord coord = c;
 				
-				Activity act = p.createAndAddActivity(act_o, c);
+				Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord, p);
 				act.setEndTime(convertTime(T.start_time)); //We only know when an activity episode ends! We don't know when it starts (or how long it is) because we have no information about travel time.
 				
 				int type;

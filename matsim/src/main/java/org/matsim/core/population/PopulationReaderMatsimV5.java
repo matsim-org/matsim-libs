@@ -221,7 +221,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			final Coord coord = parseCoord( atts );
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), coord);
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(atts.getValue(ATTR_ACT_TYPE), coord, this.currplan);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}

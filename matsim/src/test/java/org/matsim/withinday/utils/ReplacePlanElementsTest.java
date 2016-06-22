@@ -87,11 +87,11 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	private Plan createSamplePlan() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
-		plan.createAndAddActivity("h", new Coord(0, 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), plan);
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord((double) 100, (double) 100));
+		PopulationUtils.createAndAddActivityFromCoord("w", new Coord((double) 100, (double) 100), plan);
 		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("h", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddActivityFromCoord("h", new Coord((double) 0, (double) 0), plan);
 		
 		return plan;
 	}

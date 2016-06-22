@@ -76,15 +76,15 @@ public class KNAnalysisEventsHandlerTest {
 		Person person = PopulationUtils.getFactory().createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
-		plan.createAndAddActivity("act1", new Coord(100.0, 100.0));
+		PopulationUtils.createAndAddActivityFromCoord("act1", new Coord(100.0, 100.0), plan);
 		plan.createAndAddLeg("undefined");
-		plan.createAndAddActivity("act2", new Coord(200.0, 200.0));
+		PopulationUtils.createAndAddActivityFromCoord("act2", new Coord(200.0, 200.0), plan);
 		plan.createAndAddLeg("undefined");
-		plan.createAndAddActivity("act3", new Coord(200.0, 200.0));
+		PopulationUtils.createAndAddActivityFromCoord("act3", new Coord(200.0, 200.0), plan);
 		plan.createAndAddLeg("undefined");
-		plan.createAndAddActivity("act4", new Coord(200.0, 200.0));
+		PopulationUtils.createAndAddActivityFromCoord("act4", new Coord(200.0, 200.0), plan);
 		plan.createAndAddLeg("undefined");
-		plan.createAndAddActivity("act5", new Coord(200.0, 200.0));
+		PopulationUtils.createAndAddActivityFromCoord("act5", new Coord(200.0, 200.0), plan);
 		plan.setScore(12.);
 
 		this.network = scenario.getNetwork();

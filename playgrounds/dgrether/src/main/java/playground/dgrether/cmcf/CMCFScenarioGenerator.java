@@ -177,7 +177,7 @@ public class CMCFScenarioGenerator {
 			if ((i-1) % 3 == 0){
 				homeEndTime++;
 			}
-			Activity act1 = plan.createAndAddActivity("h", l1.getCoord());
+			Activity act1 = PopulationUtils.createAndAddActivityFromCoord((String) "h", l1.getCoord(), plan);
 			act1.setLinkId(l1.getId());
 			act1.setEndTime(homeEndTime);
 			//leg to home
@@ -190,7 +190,7 @@ public class CMCFScenarioGenerator {
 				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "2 3 5 6"))), l6.getId());
 			}
 			leg.setRoute(route);
-			Activity act2 = plan.createAndAddActivity("h", l6.getCoord());
+			Activity act2 = PopulationUtils.createAndAddActivityFromCoord((String) "h", l6.getCoord(), plan);
 			act2.setLinkId(l6.getId());
 			this.plans.addPerson(p);
 		}

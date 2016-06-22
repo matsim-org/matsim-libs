@@ -341,7 +341,7 @@ public class Plansgenerator {
 			p.addPlan(plan);
 			//home
 			homeEndtime += Math.floor(Math.random() * DURATION); //0.05 * 60;
-			Activity a = plan.createAndAddActivity("h", homeCoord);
+			Activity a = PopulationUtils.createAndAddActivityFromCoord((String) "h", homeCoord, plan);
 			a.setLinkId(start.getId());
 			a.setEndTime(homeEndtime);
 			//leg to work
@@ -350,7 +350,7 @@ public class Plansgenerator {
 			route.setLinkIds(start.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE))), target.getId());
 			leg.setRoute(route);
 			//work
-			a = plan.createAndAddActivity("w", workCoord);
+			a = PopulationUtils.createAndAddActivityFromCoord((String) "w", workCoord, plan);
 			a.setLinkId(target.getId());
 
 			this.plans.addPerson(p);

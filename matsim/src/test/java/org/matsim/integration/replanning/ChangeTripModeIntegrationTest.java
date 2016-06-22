@@ -84,11 +84,11 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
-		Activity act = plan.createAndAddActivity("home", new Coord(0, 0));
+		Activity act = PopulationUtils.createAndAddActivityFromCoord("home", new Coord(0, 0), plan);
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.car);
-		act = plan.createAndAddActivity("work", new Coord((double) 0, (double) 500));
+		act = PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 500), plan);
 		act.setLinkId(link.getId());
 
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {

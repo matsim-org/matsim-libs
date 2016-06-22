@@ -49,11 +49,6 @@ public final class PlanImpl implements Plan {
 
 	private Customizable customizableDelegate;
 
-	@Deprecated
-	public final Activity createAndAddActivity(final String type1, final Coord coord) {
-		return PopulationUtils.createAndAddActivityFromCoord(type1, coord, this) ;
-	}
-
 	@Override
 	public final ActivityImpl createAndAddActivity(final String type1) {
 		ActivityImpl a = new ActivityImpl(type1);

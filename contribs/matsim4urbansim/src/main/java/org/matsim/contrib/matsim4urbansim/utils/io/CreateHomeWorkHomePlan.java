@@ -26,7 +26,8 @@ public class CreateHomeWorkHomePlan {
 	 * @author nagel
 	 */
 	public static void makeHomePlan( PlanImpl plan, Coord homeCoord, ActivityFacility homeLocation) {
-		Activity act = plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord) ;
+		final Coord coord = homeCoord;
+		Activity act = PopulationUtils.createAndAddActivityFromCoord(InternalConstants.ACT_HOME, coord, plan) ;
 		act.setFacilityId( homeLocation.getId() );	// tnicolai: added facility id to compute zone2zone trips
 	}
 
@@ -56,18 +57,20 @@ public class CreateHomeWorkHomePlan {
 		
 		// set Leg
 		plan.createAndAddLeg(TransportMode.car);
+		final Coord coord = workCoord;
 		
 		// set second activity (work)
-		act = plan.createAndAddActivity( InternalConstants.ACT_WORK, workCoord );
+		act = PopulationUtils.createAndAddActivityFromCoord(InternalConstants.ACT_WORK, coord, plan);
 		act.setFacilityId( jobLocation.getId() );
 //		act.setMaximumDuration( 8.*3600. ) ; // tnicolai: make configurable: actType1.setTypicalDuration(8*60*60);
 		act.setEndTime( hmDpTime + 9.*3600. ) ; // avoid durations except when short (e.g. plugging in hybrid veh).  kai, may'13
 		
 		// set Leg
 		plan.createAndAddLeg(TransportMode.car) ;
+		final Coord coord1 = homeCoord;
 		
 		// set last activity (=first activity) and complete home-work-home plan.
-		plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord );
+		PopulationUtils.createAndAddActivityFromCoord(InternalConstants.ACT_HOME, coord1, plan);
 		act = (ActivityImpl)PopulationUtils.getLastActivity(plan);
 		act.setFacilityId( homeId );
 	}
