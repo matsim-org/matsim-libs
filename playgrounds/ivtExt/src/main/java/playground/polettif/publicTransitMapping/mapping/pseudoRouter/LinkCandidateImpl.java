@@ -35,6 +35,7 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
  *
  * @author polettif
  */
+@Deprecated
 public class LinkCandidateImpl implements LinkCandidate {
 
 	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;

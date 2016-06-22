@@ -75,7 +75,11 @@ public class FastAStarRouter implements Router {
 		if(fromNode != null && toNode != null) {
 			Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
 			if(!paths.containsKey(nodes)) {
-				paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
+				try {
+					paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			return paths.get(nodes);
 		} else {
@@ -101,18 +105,25 @@ public class FastAStarRouter implements Router {
 	}
 
 	@Override
-	public ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-		double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
-		return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, 0.5, linkLength);
-		/*
-		double linkTravelCost = travelCost - 0.5*fromLinkCandidate.getLinkTravelCost() - 0.5*toLinkCandidate.getLinkTravelCost();
+	public double getArtificialLinkFreeSpeed(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		return 1;
+		/* Varying freespeeds do not work with maxAllowedTravelcost == 0
 		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 			double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
-			return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, linkLength / linkTravelCost, linkLength);
+			return linkLength / maxAllowedTravelCost;
 		} else {
-			return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, 0.5, travelCost);
+			return 1;
 		}
 		*/
+	}
+
+	@Override
+	public double getArtificialLinkLength(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
+			return CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
+		} else {
+			return maxAllowedTravelCost;
+		}
 	}
 
 	@Override

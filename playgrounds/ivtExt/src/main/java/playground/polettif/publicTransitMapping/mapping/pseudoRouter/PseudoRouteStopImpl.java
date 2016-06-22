@@ -160,7 +160,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 	@Override
 	public int compareTo(PseudoRouteStop other) {
-		if(other.getId().equals(this.id)) {
+		if(this.equals(other)) {
 			return 0;
 		}
 		int dCompare = Double.compare(travelCostToSource, other.getTravelCostToSource());

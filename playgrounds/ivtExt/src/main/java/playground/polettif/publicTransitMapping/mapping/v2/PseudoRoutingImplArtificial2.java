@@ -49,14 +49,16 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 
 	private static Counter counterPseudoRouting = new Counter("route # ");
 	private static int artificialId = 0;
+	private static boolean warnMinTravelCost =true;
 
 	private final PublicTransitMappingConfigGroup config;
 
 	private final Map<String, Router> modeSeparatedRouters;
 	private final LinkCandidateCreator linkCandidates;
 
+	private Set<ArtificialLink> artificialLinks = new HashSet<>();
+
 	private List<TransitLine> queue = new ArrayList<>();
-	private Set<ArtificialLink> artificialLinksToBeCreated = new HashSet<>();
 	private PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
 
 	private Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
@@ -74,8 +76,6 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 	public void run() {
 		for(TransitLine transitLine : queue) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-
-				Map<Tuple<PseudoRouteStop, PseudoRouteStop>, ArtificialLink> possibleArtificialLinks = new HashMap<>();
 
 				String scheduleTransportMode = transitRoute.getTransportMode();
 
@@ -103,6 +103,11 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 
 					double minTravelCost = modeRouter.getMinimalTravelCost(routeStops.get(i), routeStops.get(i + 1));
 					double maxAllowedTravelCost = minTravelCost * config.getMaxTravelCostFactor();
+
+					if(minTravelCost == 0 && warnMinTravelCost) {
+						log.warn("There are stop pairs where the minTravelCost is 0. This can happen if departure and arrival time of two subsequent stops are identical. This message is only given once.");
+						warnMinTravelCost = false;
+					}
 
 					/**
 					 * Calculate the shortest path between all link candidates.
@@ -156,7 +161,10 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 							 * facility and the other linkCandidates).
 							 */
 							else {
-								artificialLinksToBeCreated.add(modeRouter.createArtificialLink(linkCandidateCurrent, linkCandidateNext));
+								double freespeed = modeRouter.getArtificialLinkFreeSpeed(maxAllowedTravelCost, linkCandidateCurrent, linkCandidateNext);
+								double length = modeRouter.getArtificialLinkLength(maxAllowedTravelCost, linkCandidateCurrent, linkCandidateNext);
+								ArtificialLink artificialLink = new ArtificialLinkImpl(linkCandidateCurrent, linkCandidateNext, freespeed, length);
+								artificialLinks.add(artificialLink);
 
 								double artificialEdgeWeight = maxAllowedTravelCost - 0.5 * linkCandidateCurrent.getLinkTravelCost() - 0.5 * linkCandidateNext.getLinkTravelCost();
 
@@ -186,6 +194,16 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 		}
 	}
 
+	@Deprecated
+	private Collection<ArtificialLink> getNecessaryArtificialLinks(Map<Tuple<Id<Node>, Id<Node>>, ArtificialLink> all, List<PseudoRouteStop> pseudoPath) {
+		List<ArtificialLink> set = new ArrayList<>();
+		for(int i = 0; i < pseudoPath.size() - 2; i++) {
+			ArtificialLink val = all.get(new Tuple<>(pseudoPath.get(i).getLinkCandidate().getToNodeId(), pseudoPath.get(i + 1).getLinkCandidate().getFromNodeId()));
+			if(val != null) set.add(val);
+		}
+		return set;
+	}
+
 	/**
 	 * @return a pseudo schedule generated during run()
 	 */
@@ -197,16 +215,17 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 	 * Adds the artificial links to the network. Not thread safe.
 	 */
 	public void addArtificialLinks(Network network) {
-		Set<Tuple<Id<Node>, Id<Node>>> connections = new HashSet<>();
+		Map<Tuple<Id<Node>, Id<Node>>, Link> existingLinks = new HashMap<>();
 		for(Link l : network.getLinks().values()) {
-			connections.add(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()));
+			existingLinks.put(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()), l);
 		}
 
-		for(ArtificialLink a : artificialLinksToBeCreated) {
+		for(ArtificialLink a : artificialLinks) {
 			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getToNodeId(), a.getFromNodeId());
 
-			if(!connections.contains(key)) {
-				connections.add(key);
+			Link existingLink = existingLinks.get(key);
+
+			if(existingLink == null || a.getFreespeed() > existingLink.getFreespeed() || a.getLength() > existingLink.getLength()) {
 				String newLinkIdStr = config.getPrefixArtificial() + artificialId++;
 				Id<Node> fromNodeId = a.getToNodeId();
 				Node fromNode;
@@ -227,12 +246,15 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 				}
 
 				Link newLink = network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode, toNode);
-
-				newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
+				newLink.setAllowedModes(a.getAllowedModes());
 				newLink.setLength(a.getLength());
 				newLink.setFreespeed(a.getFreespeed());
-				newLink.setCapacity(9999);
+				newLink.setCapacity(a.getCapacity());
+
 				network.addLink(newLink);
+
+//				if(existingLink != null && existingLink.getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE))
+//					network.removeLink(existingLink.getId());
 			}
 		}
 	}

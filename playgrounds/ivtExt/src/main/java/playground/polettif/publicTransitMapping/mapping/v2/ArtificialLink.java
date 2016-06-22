@@ -22,6 +22,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
+import java.util.Set;
+
 /**
  * todo javadoc
  */
@@ -40,4 +42,8 @@ public interface ArtificialLink {
 	double getLength();
 
 	boolean equals(Object obj);
+
+	double getCapacity();
+
+	Set<String> getAllowedModes();
 }

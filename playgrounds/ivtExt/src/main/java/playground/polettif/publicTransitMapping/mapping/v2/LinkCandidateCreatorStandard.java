@@ -94,6 +94,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 										config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(),
 										config.getModeRoutingAssignment().get(scheduleTransportMode), config.getMaxLinkCandidateDistance());
 							}
+
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
 								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), 20, loopLinkModes);
@@ -168,5 +169,5 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	public boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode) {
 		return loopLinks.contains(new Tuple<>(stopFacility, transportMode));
 	}
-	
+
 }

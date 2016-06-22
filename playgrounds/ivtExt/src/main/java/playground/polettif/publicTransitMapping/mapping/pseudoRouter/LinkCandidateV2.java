@@ -160,7 +160,7 @@ public class LinkCandidateV2 implements LinkCandidate {
 
 	@Override
 	public int compareTo(LinkCandidate other) {
-		if(other.getId().equals(this.id)) {
+		if(this.equals(other)) {
 			return 0;
 		}
 		int dCompare = Double.compare(stopFacilityDistance, other.getStopFacilityDistance());

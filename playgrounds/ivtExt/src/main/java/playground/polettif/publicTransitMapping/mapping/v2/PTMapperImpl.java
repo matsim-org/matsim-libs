@@ -164,6 +164,7 @@ public class PTMapperImpl extends PTMapper {
 			pseudoSchedule.mergePseudoSchedule(thread.getPseudoSchedule());
 		}
 
+
 		/** [5]
 		 * Replace the parent stop facilities in each transitRoute's routeProfile
 		 * with child StopFacilities. Add the new transitRoutes to the schedule.
@@ -179,19 +180,29 @@ public class PTMapperImpl extends PTMapper {
 		log.info("=======================================================================================");
 		log.info("Initiating final routers to map transit routes with referenced facilities to the network");
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
-		// create router for artificial network
-		Router artificialOnlyRouter = FastAStarRouter.createModeSeparatedRouter(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
-		// create router for other mode networks
-		for(Map.Entry<String, Set<String>> modeAssignment : modeRoutingAssignment.entrySet()) {
-			if(modeAssignment.getValue().size() == 1 && modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
-				finalRouters.put(modeAssignment.getKey(), artificialOnlyRouter);
-			} else {
-				Set<String> routingTransportModes = new HashSet<>(modeAssignment.getValue());
-				routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-				log.info("Router for " + routingTransportModes);
-				finalRouters.put(modeAssignment.getKey(), FastAStarRouter.createModeSeparatedRouter(network, routingTransportModes));
-			}
+
+		for(String scheduleMode : scheduleTransportModes) {
+			Set<String> routingTransportModes = new HashSet<>(modeRoutingAssignment.get(scheduleMode));
+			routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+			Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, routingTransportModes);
+			log.info("Initiating network and router for schedule mode " +scheduleMode+". Network modes " + routingTransportModes);
+
+//			finalRouters.put(scheduleMode, FastAStarRouter.createModeSeparatedRouter(network, routingTransportModes));
+			finalRouters.put(scheduleMode, new FastAStarRouter(filteredNetwork));
 		}
+		// create router for artificial network
+//		Router artificialOnlyRouter = FastAStarRouter.createModeSeparatedRouter(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
+//		 create router for other mode networks
+//		for(Map.Entry<String, Set<String>> modeAssignment : modeRoutingAssignment.entrySet()) {
+//			if(modeAssignment.getValue().size() == 1 && modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+//				finalRouters.put(modeAssignment.getKey(), artificialOnlyRouter);
+//			} else {
+//				Set<String> routingTransportModes = new HashSet<>(modeAssignment.getValue());
+//				routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+//				log.info("Router for " + routingTransportModes);
+//				finalRouters.put(modeAssignment.getKey(), FastAStarRouter.createModeSeparatedRouter(network, routingTransportModes));
+//			}
+//		}
 
 		/** [7]
 		 * Route all transitRoutes with the new referenced links. The shortest path

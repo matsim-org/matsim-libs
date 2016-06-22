@@ -50,7 +50,9 @@ public interface Router extends TravelDisutility, TravelTime {
 
 	double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop);
 
-	ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
-
 	double getLinkTravelCost(Link link);
+
+	double getArtificialLinkFreeSpeed(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
+
+	double getArtificialLinkLength(double maxAllowedTravelCost, LinkCandidate linkCandidateCurrent, LinkCandidate linkCandidateNext);
 }
