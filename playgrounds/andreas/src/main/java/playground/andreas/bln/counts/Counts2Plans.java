@@ -90,13 +90,13 @@ public class Counts2Plans {
 		for (int i = 1; i <= number; i++) {
 
 			Person person = createPerson();
-			Activity a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivityFromLinkId("start", this.transitSchedule.getFacilities().get(from).getLinkId());
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId((String) "start", this.transitSchedule.getFacilities().get(from).getLinkId(), ((PlanImpl) person.getSelectedPlan()));
 			a.setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
 
 			((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
 			PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) ).setEndTime(time);
 
-			a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivityFromLinkId("finish", this.transitSchedule.getFacilities().get(to).getLinkId());
+			a = PopulationUtils.createAndAddActivityFromLinkId((String) "finish", this.transitSchedule.getFacilities().get(to).getLinkId(), ((PlanImpl) person.getSelectedPlan()));
 			a.setCoord(this.transitSchedule.getFacilities().get(to).getCoord());
 
 			this.completedAgents.add(person);
@@ -135,7 +135,7 @@ public class Counts2Plans {
 									log.warn("StopID: " + stopID + ", Passenger should leave the vehicle, but none is there");
 									this.numberOfPersonsCouldNotLeaveTheBusWhenSupposedTo++;
 								} else {
-									Activity a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivityFromLinkId("finish", this.transitSchedule.getFacilities().get(stopID).getLinkId());
+									Activity a = PopulationUtils.createAndAddActivityFromLinkId((String) "finish", this.transitSchedule.getFacilities().get(stopID).getLinkId(), ((PlanImpl) person.getSelectedPlan()));
 									a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 									//									((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.egress.getCount(stopID).getCoord());
 									this.completedAgents.add(person);
@@ -150,7 +150,7 @@ public class Counts2Plans {
 
 							for (int i = 0; i < this.access.getCount(stopIdAsLink).getVolume(hour).getValue(); i++) {
 								Person person = createPerson();
-								Activity a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivityFromLinkId("start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
+								Activity a = PopulationUtils.createAndAddActivityFromLinkId((String) "start", this.transitSchedule.getFacilities().get(stopID).getLinkId(), ((PlanImpl) person.getSelectedPlan()));
 								a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 								//								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.access.getCount(stopID).getCoord());
 								((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);

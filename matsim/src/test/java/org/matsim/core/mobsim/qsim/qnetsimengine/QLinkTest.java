@@ -388,13 +388,13 @@ public final class QLinkTest extends MatsimTestCase {
 		final Id<Person> id = personId;
 		Person p = PopulationUtils.getFactory().createPerson(id);
 		PlanImpl plan = PersonUtils.createAndAddPlan(p, true);
-		plan.createAndAddActivityFromLinkId("h", link1.getId());
+		PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, link1.getId(), link2.getId());
 		leg.setRoute(route);
 		route.setLinkIds(link1.getId(), null, link2.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivityFromLinkId("w", link2.getId());
+		PopulationUtils.createAndAddActivityFromLinkId("w", link2.getId(), plan);
 		return p;
 	}
 

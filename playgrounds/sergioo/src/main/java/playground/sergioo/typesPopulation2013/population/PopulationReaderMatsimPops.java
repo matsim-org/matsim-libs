@@ -217,7 +217,8 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		Coord coord = null;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			this.curract = this.currplan.createAndAddActivityFromLinkId(atts.getValue(ATTR_ACT_TYPE), linkId);
+			final Id<Link> linkId1 = linkId;
+			this.curract = PopulationUtils.createAndAddActivityFromLinkId((String) atts.getValue(ATTR_ACT_TYPE), linkId1, this.currplan);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 				this.curract.setCoord(coord);

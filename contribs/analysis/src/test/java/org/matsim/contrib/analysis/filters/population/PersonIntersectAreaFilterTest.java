@@ -67,14 +67,14 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 
-		Activity act1 = plan.createAndAddActivityFromLinkId("h", link0.getId());
+		Activity act1 = PopulationUtils.createAndAddActivityFromLinkId("h", link0.getId(), plan);
 		act1.setEndTime(8.0*3600);
 
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 
-		plan.createAndAddActivityFromLinkId("w", link5.getId());
+		PopulationUtils.createAndAddActivityFromLinkId("w", link5.getId(), plan);
 
 		NetworkRoute route = new LinkNetworkRouteImpl(link0.getId(), link5.getId());
 		leg.setRoute(route);

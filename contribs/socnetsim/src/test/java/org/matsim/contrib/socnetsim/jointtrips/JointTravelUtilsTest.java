@@ -68,30 +68,30 @@ public class JointTravelUtilsTest {
 		// plan 1
 		// just one passenger
 		PlanImpl plan = PopulationUtils.createPlan(driver);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		Leg driverLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( driver.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger1);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		Leg passengerLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		PassengerRoute passengerRoute = new PassengerRoute( link2 , link3 );
 		passengerRoute.setDriverId( driver.getId() );
 		passengerLeg.setRoute( passengerRoute );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger1.getId() , plan );
 
@@ -129,52 +129,52 @@ public class JointTravelUtilsTest {
 		// two passenger, two ODs
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		PlanImpl plan = PopulationUtils.createPlan(driver);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		final Leg driverLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
 
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		Leg driverLeg2 = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link3 , link4 ),
 					Arrays.asList(
 						passenger1.getId(),
 						passenger2.getId())));
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( driver.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger1);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		final Leg passengerLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute = new PassengerRoute( link2 , link4 );
 		passengerRoute.setDriverId( driver.getId() );
 		passengerLeg.setRoute( passengerRoute );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger1.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger2);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg passengerLeg2 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link3 , link4 );
 		passengerRoute2.setDriverId( driver.getId() );
 		passengerLeg2.setRoute( passengerRoute2 );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger2.getId() , plan );
 
@@ -221,71 +221,71 @@ public class JointTravelUtilsTest {
 		// plan 3
 		// two passenger, two ODs, two JT for one passenger
 		PlanImpl plan = PopulationUtils.createPlan(driver);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		final Leg driverLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
 
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg driverLeg2 = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link3 , link4 ),
 					Arrays.asList(
 						passenger1.getId(),
 						passenger2.getId())));
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "take a nap" , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId("take a nap", link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg driverLeg3 = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg3.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link3 , link1 ),
 					Arrays.asList(
 						passenger1.getId())));
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( driver.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger1);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		final Leg passengerLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute = new PassengerRoute( link2 , link4 );
 		passengerRoute.setDriverId( driver.getId() );
 		passengerLeg.setRoute( passengerRoute );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "sunbath" , link4);
+		PopulationUtils.createAndAddActivityFromLinkId("sunbath", link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg passengerLeg3 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link3 , link1 );
 		passengerRoute2.setDriverId( driver.getId() );
 		passengerLeg3.setRoute( passengerRoute2 );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger1.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger2);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg passengerLeg2 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute3 = new PassengerRoute( link3 , link4 );
 		passengerRoute3.setDriverId( driver.getId() );
 		passengerLeg2.setRoute( passengerRoute3 );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger2.getId() , plan );
 
@@ -342,58 +342,58 @@ public class JointTravelUtilsTest {
 		// plan 4
 		// two passengers, "midle trip"
 		PlanImpl plan = PopulationUtils.createPlan(driver);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		final Leg driverLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
 
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg driverLeg2 = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link3 , link4 ),
 					Arrays.asList(
 						passenger1.getId(),
 						passenger2.getId())));
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		final Leg driverLeg3 = plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg3.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link4 , link1 ),
 					Arrays.asList(
 						passenger1.getId())));
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( driver.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger1);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
 		final Leg passengerLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute = new PassengerRoute( link2 , link1);
 		passengerRoute.setDriverId( driver.getId() );
 		passengerLeg.setRoute( passengerRoute );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger1.getId() , plan );
 
 		plan = PopulationUtils.createPlan(passenger2);
-		plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, plan);
 		final Leg passengerLeg2 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link3 , link4 );
 		passengerRoute2.setDriverId( driver.getId() );
 		passengerLeg2.setRoute( passengerRoute2 );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link4, plan);
 		plan.createAndAddLeg( TransportMode.walk );
-		plan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 
 		plans.put( passenger2.getId() , plan );
 
@@ -437,48 +437,48 @@ public class JointTravelUtilsTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl dPlan = PopulationUtils.createPlan(driver);
-		dPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, dPlan);
 		final Leg driverLeg1 = dPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, dPlan);
 		final Leg driverLeg2 = dPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 
 		plans.put( driver.getId() , dPlan );
 
 		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
-		pPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg1 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute1 = new PassengerRoute( link2 , link3 );
 		passengerRoute1.setDriverId( driver.getId() );
 		passengerLeg1.setRoute( passengerRoute1 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg2 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link2 , link3 );
 		passengerRoute2.setDriverId( driver.getId() );
 		passengerLeg2.setRoute( passengerRoute2 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 
 
 		plans.put( passenger1.getId() , pPlan );
@@ -527,53 +527,53 @@ public class JointTravelUtilsTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl d1Plan = PopulationUtils.createPlan(driver1);
-		d1Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d1Plan);
 		d1Plan.createAndAddLeg( TransportMode.walk );
-		d1Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d1Plan);
 		final Leg driverLeg1 = d1Plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		d1Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, d1Plan);
 		d1Plan.createAndAddLeg( TransportMode.walk );
-		d1Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d1Plan);
 
 		plans.put( driver1.getId() , d1Plan );
 
 		final PlanImpl d2Plan = PopulationUtils.createPlan(driver2);
-		d2Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d2Plan);
 		d2Plan.createAndAddLeg( TransportMode.walk );
-		d2Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d2Plan);
 		final Leg driverLeg2 = d2Plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		d2Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, d2Plan);
 		d2Plan.createAndAddLeg( TransportMode.walk );
-		d2Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d2Plan);
 
 		plans.put( driver2.getId() , d2Plan );
 
 		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
-		pPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg1 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute1 = new PassengerRoute( link2 , link3 );
 		passengerRoute1.setDriverId( driver1.getId() );
 		passengerLeg1.setRoute( passengerRoute1 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg2 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link2 , link3 );
 		passengerRoute2.setDriverId( driver2.getId() );
 		passengerLeg2.setRoute( passengerRoute2 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 
 
 		plans.put( passenger1.getId() , pPlan );
@@ -623,53 +623,53 @@ public class JointTravelUtilsTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl d1Plan = PopulationUtils.createPlan(driver1);
-		d1Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d1Plan);
 		d1Plan.createAndAddLeg( TransportMode.walk );
-		d1Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d1Plan);
 		final Leg driverLeg1 = d1Plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		d1Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, d1Plan);
 		d1Plan.createAndAddLeg( TransportMode.walk );
-		d1Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d1Plan);
 
 		plans.put( driver1.getId() , d1Plan );
 
 		final PlanImpl d2Plan = PopulationUtils.createPlan(driver2);
-		d2Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d2Plan);
 		d2Plan.createAndAddLeg( TransportMode.walk );
-		d2Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d2Plan);
 		final Leg driverLeg2 = d2Plan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		d2Plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, d2Plan);
 		d2Plan.createAndAddLeg( TransportMode.walk );
-		d2Plan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d2Plan);
 
 		plans.put( driver2.getId() , d2Plan );
 
 		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
-		pPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg1 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute1 = new PassengerRoute( link2 , link3 );
 		passengerRoute1.setDriverId( driver2.getId() );
 		passengerLeg1.setRoute( passengerRoute1 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg2 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link2 , link3 );
 		passengerRoute2.setDriverId( driver1.getId() );
 		passengerLeg2.setRoute( passengerRoute2 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 
 
 		plans.put( passenger1.getId() , pPlan );
@@ -723,48 +723,48 @@ public class JointTravelUtilsTest {
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl dPlan = PopulationUtils.createPlan(driver);
-		dPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, dPlan);
 		final Leg driverLeg1 = dPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link2 , link3 ),
 					Arrays.asList( passenger1.getId() )));
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, dPlan);
 		final Leg driverLeg2 = dPlan.createAndAddLeg( JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
 					new LinkNetworkRouteImpl( link3 , link2 ),
 					Arrays.asList( passenger1.getId() )));
-		dPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
-		dPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 
 		plans.put( driver.getId() , dPlan );
 
 		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
-		pPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		final Leg passengerLeg1 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute1 = new PassengerRoute( link3 , link2 );
 		passengerRoute1.setDriverId( driver.getId() );
 		passengerLeg1.setRoute( passengerRoute1 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
 		final Leg passengerLeg2 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute passengerRoute2 = new PassengerRoute( link2 , link3 );
 		passengerRoute2.setDriverId( driver.getId() );
 		passengerLeg2.setRoute( passengerRoute2 );
-		pPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
-		pPlan.createAndAddActivityFromLinkId( "home" , link1);
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 
 
 		plans.put( passenger1.getId() , pPlan );

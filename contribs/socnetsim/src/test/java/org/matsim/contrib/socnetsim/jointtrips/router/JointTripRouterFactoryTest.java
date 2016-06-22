@@ -112,14 +112,18 @@ public class JointTripRouterFactoryTest {
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
+		final Id<Link> linkId = link1;
 
-		plan.createAndAddActivityFromLinkId( "home" , link1 ).setEndTime( 32454 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId, plan).setEndTime( 32454 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 ).setMaximumDuration( 0 );
+		final Id<Link> linkId1 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId1, plan).setMaximumDuration( 0 );
 		Leg dLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
-		plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 ).setMaximumDuration( 0 );
+		final Id<Link> linkId2 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId2, plan).setMaximumDuration( 0 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivityFromLinkId( "home" , link3 );
+		final Id<Link> linkId3 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId3, plan);
 
 		DriverRoute dRoute = new DriverRoute( link1 , link3 );
 		dRoute.addPassenger( passengerId );
@@ -132,20 +136,24 @@ public class JointTripRouterFactoryTest {
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
+		final Id<Link> linkId4 = link1;
 
-		Activity a = plan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity a = PopulationUtils.createAndAddActivityFromLinkId("home", linkId4, plan);
 		a.setEndTime( 1246534 );
 		a.setCoord(new Coord((double) 0, (double) 1));
 		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link1 );
+		final Id<Link> linkId5 = link1;
+		a = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId5, plan);
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 2));
 		Leg pLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-		a = plan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId6 = link3;
+		a = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId6, plan);
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 3));
 		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivityFromLinkId( "home" , link3 );
+		final Id<Link> linkId7 = link3;
+		a = PopulationUtils.createAndAddActivityFromLinkId("home", linkId7, plan);
 		a.setCoord(new Coord((double) 0, (double) 4));
 
 		PassengerRoute pRoute = new PassengerRoute( link1 , link3 );

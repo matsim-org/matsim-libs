@@ -100,13 +100,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			 */
 			Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			plan = PersonUtils.createAndAddPlan(person, true);
-			act1 = plan.createAndAddActivityFromLinkId("h", link1.getId());
+			act1 = PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 			act1.setEndTime(4*3600);
 			plan.createAndAddLeg(TransportMode.car);
-			act2 = plan.createAndAddActivityFromLinkId("w", link1.getId());
+			act2 = PopulationUtils.createAndAddActivityFromLinkId("w", link1.getId(), plan);
 			act2.setMaximumDuration(14*3600);
 			plan.createAndAddLeg(TransportMode.car);
-			plan.createAndAddActivityFromLinkId("h", link1.getId());
+			PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -179,13 +179,13 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			 */
 			Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			plan = PersonUtils.createAndAddPlan(person, true);
-			act1 = plan.createAndAddActivityFromLinkId("h", link1.getId());
+			act1 = PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 			act1.setEndTime(4*3600);
 			plan.createAndAddLeg(TransportMode.car);
-			act2 = plan.createAndAddActivityFromLinkId("w", link1.getId());
+			act2 = PopulationUtils.createAndAddActivityFromLinkId("w", link1.getId(), plan);
 			act2.setMaximumDuration(14*3600);
 			plan.createAndAddLeg(TransportMode.car);
-			plan.createAndAddActivityFromLinkId("h", link1.getId());
+			PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

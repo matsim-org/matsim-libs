@@ -59,55 +59,75 @@ public class RemovalTest {
 
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one passenger trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
+		final Id<Link> linkId = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId, plan).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "h" , link1 );
+		final Id<Link> linkId1 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId1, plan);
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one driver trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
+		final Id<Link> linkId2 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId2, plan).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
-		plan.createAndAddActivityFromLinkId( "h" , link1 );
+		final Id<Link> linkId3 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId3, plan);
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one tour with one passenger trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
+		final Id<Link> linkId4 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId4, plan).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
+		final Id<Link> linkId5 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "w", linkId5, plan).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivityFromLinkId( "h" , link1 );
+		final Id<Link> linkId6 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId6, plan);
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one tour with one driver trip", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
+		final Id<Link> linkId7 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId7, plan).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
-		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
+		final Id<Link> linkId8 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "w", linkId8, plan).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivityFromLinkId( "h" , link1 );
+		final Id<Link> linkId9 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId9, plan);
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("two tours with one passenger trip each", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
+		final Id<Link> linkId10 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId10, plan).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
+		final Id<Link> linkId11 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "w", linkId11, plan).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 3 );
+		final Id<Link> linkId12 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId12, plan).setEndTime( 3 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 4 );
+		final Id<Link> linkId13 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "w", linkId13, plan).setEndTime( 4 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivityFromLinkId( "h" , link1 );
+		final Id<Link> linkId14 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId14, plan);
 
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("two tours with one and two passenger trips", Person.class)));
 		plans.add( plan );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 1 );
+		final Id<Link> linkId15 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId15, plan).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 2 );
+		final Id<Link> linkId16 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "w", linkId16, plan).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivityFromLinkId( "h" , link1 ).setEndTime( 3 );
+		final Id<Link> linkId17 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId17, plan).setEndTime( 3 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "w" , link2 ).setEndTime( 4 );
+		final Id<Link> linkId18 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "w", linkId18, plan).setEndTime( 4 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivityFromLinkId( "h" , link1 );
+		final Id<Link> linkId19 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId19, plan);
 	}
 
 	@Test

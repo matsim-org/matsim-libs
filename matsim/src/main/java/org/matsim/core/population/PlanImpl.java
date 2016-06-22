@@ -58,10 +58,7 @@ public final class PlanImpl implements Plan {
 		return a;
 	}
 
-	@Deprecated
-	public final Activity createAndAddActivityFromLinkId(final String type1, final Id<Link> linkId) {
-		return (ActivityImpl) PopulationUtils.createAndAddActivityFromLinkId(type1, linkId, this) ;
-	}
+	
 
 	//////////////////////////////////////////////////////////////////////
 	// create methods

@@ -195,7 +195,7 @@ import org.xml.sax.Attributes;
 		Activity act = null;
 		if (atts.getValue("link") != null) {
 			final Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
-			act = this.currplan.createAndAddActivityFromLinkId(atts.getValue("type"), linkId);
+			act = PopulationUtils.createAndAddActivityFromLinkId(atts.getValue("type"), linkId, this.currplan);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 				final Coord coord = parseCoord( atts );
 				act.setCoord(coord);

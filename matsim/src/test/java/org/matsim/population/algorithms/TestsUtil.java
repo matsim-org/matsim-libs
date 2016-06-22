@@ -61,7 +61,7 @@ public class TestsUtil {
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
 			Activity act;
-			act = plan.createAndAddActivityFromLinkId("actOnLink" + locationIdSequence[aa], location.getId());
+			act = PopulationUtils.createAndAddActivityFromLinkId("actOnLink" + locationIdSequence[aa], (Id<Link>) location.getId(), plan);
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
 				plan.createAndAddLeg(mode);

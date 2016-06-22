@@ -654,7 +654,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		// score the same plan twice
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
-		Activity act1a = plan1.createAndAddActivityFromLinkId("home", (Id<Link>) null);//, 0, 7.0*3600, 7*3600, false);
+		Activity act1a = PopulationUtils.createAndAddActivityFromLinkId((String) "home", (Id<Link>) null, plan1);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
 		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
 		leg1.setDepartureTime(f.secondLegStartTime);
@@ -662,7 +662,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Route route2 = new GenericRouteImpl(null, null);
 		leg1.setRoute(route2);
 		route2.setDistance(20000.0);
-		Activity act1b = plan1.createAndAddActivityFromLinkId("work", (Id<Link>) null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Activity act1b = PopulationUtils.createAndAddActivityFromLinkId((String) "work", (Id<Link>) null, plan1);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		act1b.setStartTime(f.secondLegStartTime + f.secondLegTravelTime);
 		ScoringFunction sf1 = getScoringFunctionInstance(f, person1);
 		sf1.handleActivity(act1a);
@@ -789,7 +789,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			this.person.getCustomAttributes().put("incomeAlphaFactor",testee_incomeAlphaFactor);
 			this.person.getCustomAttributes().put("betaFactor",testee_betaFactor);
 
-			Activity firstActivity = this.plan.createAndAddActivityFromLinkId("h", link1.getId());
+			Activity firstActivity = PopulationUtils.createAndAddActivityFromLinkId((String) "h", link1.getId(), this.plan);
 			firstActivity.setEndTime(firstLegStartTime);
 
 			Leg leg = this.plan.createAndAddLeg(TransportMode.car);
@@ -802,7 +802,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route1.setVehicleId(Id.createVehicleId("dummyVehicle1"));
 			leg.setRoute(route1);
 
-			Activity secondActivity = this.plan.createAndAddActivityFromLinkId("w", link3.getId());
+			Activity secondActivity = PopulationUtils.createAndAddActivityFromLinkId((String) "w", link3.getId(), this.plan);
 			secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
 			secondActivity.setEndTime(secondLegStartTime);
 			leg = this.plan.createAndAddLeg(TransportMode.pt);
@@ -813,7 +813,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route2.setDistance(20000.0);
 			leg.setRoute(route2);
 
-			Activity thirdActivity = this.plan.createAndAddActivityFromLinkId("w", link5.getId());
+			Activity thirdActivity = PopulationUtils.createAndAddActivityFromLinkId((String) "w", link5.getId(), this.plan);
 			thirdActivity.setStartTime(secondLegStartTime + secondLegTravelTime);
 			thirdActivity.setEndTime(thirdLegStartTime);
 			leg = this.plan.createAndAddLeg(TransportMode.walk);
@@ -824,7 +824,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route3.setDistance(CoordUtils.calcEuclideanDistance(link5.getCoord(), link7.getCoord()));
 			leg.setRoute(route3);
 
-			Activity fourthActivity = this.plan.createAndAddActivityFromLinkId("w", link7.getId());
+			Activity fourthActivity = PopulationUtils.createAndAddActivityFromLinkId((String) "w", link7.getId(), this.plan);
 			fourthActivity.setStartTime(thirdLegStartTime + thirdLegTravelTime);
 			fourthActivity.setEndTime(fourthLegStartTime);
 			leg = this.plan.createAndAddLeg(TransportMode.bike);
@@ -835,7 +835,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route4.setDistance(CoordUtils.calcEuclideanDistance(link7.getCoord(), link9.getCoord()));
 			leg.setRoute(route4);
 
-			Activity fifthActivity = this.plan.createAndAddActivityFromLinkId("h", link9.getId());
+			Activity fifthActivity = PopulationUtils.createAndAddActivityFromLinkId((String) "h", link9.getId(), this.plan);
 			fifthActivity.setStartTime(fourthLegStartTime + fourthLegTravelTime);
 			this.scenario.getPopulation().addPerson(this.person);
 		}

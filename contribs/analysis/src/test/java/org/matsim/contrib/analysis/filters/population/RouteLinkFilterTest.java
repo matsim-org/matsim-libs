@@ -76,35 +76,35 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 		person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a = plan.createAndAddActivityFromLinkId("h", link1.getId());
+		Activity a = PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivityFromLinkId("w", link20.getId());
+		PopulationUtils.createAndAddActivityFromLinkId("w", link20.getId(), plan);
 		population.addPerson(person);
 
 		person = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a2 = plan.createAndAddActivityFromLinkId("h", link1.getId());
+		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivityFromLinkId("w", link20.getId());
+		PopulationUtils.createAndAddActivityFromLinkId("w", link20.getId(), plan);
 		population.addPerson(person);
 
 		person = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a3 = plan.createAndAddActivityFromLinkId("h", link1.getId());
+		Activity a3 = PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("5 14"), link20.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivityFromLinkId("w", link20.getId());
+		PopulationUtils.createAndAddActivityFromLinkId("w", link20.getId(), plan);
 		population.addPerson(person);
 
 		return population;

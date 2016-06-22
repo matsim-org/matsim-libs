@@ -97,29 +97,37 @@ public class JointTripRemoverAlgorithmTest {
 
 		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
+		final Id<Link> linkId = link1;
 
 		// the fantaisist modes are not (only) for fun: they allow to check from
 		// where the mode of the replacement comes. This can be important due
 		// to the possibility that access/egress legs constitute subtours and thus
 		// break the mode chain.
-		Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId, driverPlan);
 		driverPlan.createAndAddLeg( "horse" );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId1 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId1, driverPlan);
 		Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId2 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId2, driverPlan);
 		driverPlan.createAndAddLeg( "unicycle" );
-		Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId3 = link1;
+		Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId3, driverPlan);
 
 		PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
+		final Id<Link> linkId4 = link1;
 
-		Activity pAct1 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity pAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId4, passengerPlan);
 		passengerPlan.createAndAddLeg( "jetpack" );
-		passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId5 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId5, passengerPlan);
 		Leg jointPassengerLeg = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId6 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId6, passengerPlan);
 		passengerPlan.createAndAddLeg( "paraglider" );
-		Activity pAct2 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId7 = link1;
+		Activity pAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId7, passengerPlan);
 
 		DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger.getId() );
@@ -163,36 +171,48 @@ public class JointTripRemoverAlgorithmTest {
 
 		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
+		final Id<Link> linkId = link1;
 
-		Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId, driverPlan);
 		driverPlan.createAndAddLeg( "skateboard" );
-		Activity dPu = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId1 = link2;
+		Activity dPu = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId1, driverPlan);
 		Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dDo = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId2 = link3;
+		Activity dDo = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId2, driverPlan);
 		driverPlan.createAndAddLeg( "elevator" );
-		Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId3 = link1;
+		Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId3, driverPlan);
 
 		PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
+		final Id<Link> linkId4 = link1;
 
-		Activity p1Act1 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity p1Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId4, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "jetpack" );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId5 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId5, passengerPlan1);
 		Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId6 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId6, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "paraglider" );
-		Activity p1Act2 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId7 = link1;
+		Activity p1Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId7, passengerPlan1);
 
 		PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
+		final Id<Link> linkId8 = link1;
 
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId8, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "jetpack" );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId9 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId9, passengerPlan2);
 		Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId10 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId10, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "paraglider" );
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId11 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId11, passengerPlan2);
 
 		DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger1.getId() );
@@ -250,40 +270,54 @@ public class JointTripRemoverAlgorithmTest {
 
 		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
+		final Id<Link> linkId = link1;
 
-		Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId, driverPlan);
 		driverPlan.createAndAddLeg( "Rollerblade" );
-		Activity dPu1 = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId1 = link2;
+		Activity dPu1 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId1, driverPlan);
 		Leg jointDriverLeg1 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId2 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId2, driverPlan);
 		Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		final Id<Link> linkId3 = link4;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId3, driverPlan);
 		Leg jointDriverLeg3 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dDo2 = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link5 );
+		final Id<Link> linkId4 = link5;
+		Activity dDo2 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId4, driverPlan);
 		driverPlan.createAndAddLeg( "iceskate" );
-		Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId5 = link1;
+		Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId5, driverPlan);
 
 		PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
+		final Id<Link> linkId6 = link1;
 
-		Activity p1Act1 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity p1Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId6, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "kayak" );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId7 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId7, passengerPlan1);
 		Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		final Id<Link> linkId8 = link4;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId8, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "submarine" );
-		Activity p1Act2 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId9 = link1;
+		Activity p1Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId9, passengerPlan1);
 
 		PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
+		final Id<Link> linkId10 = link1;
 
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId10, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "spitfire" );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId11 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId11, passengerPlan2);
 		Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link5 );
+		final Id<Link> linkId12 = link5;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId12, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "deltaplane" );
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId13 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId13, passengerPlan2);
 
 		DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger2.getId() );
@@ -350,40 +384,54 @@ public class JointTripRemoverAlgorithmTest {
 
 		PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
+		final Id<Link> linkId = link1;
 
-		Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId, driverPlan);
 		driverPlan.createAndAddLeg( "poney" );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId1 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId1, driverPlan);
 		Leg jointDriverLeg1 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dPu2 = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId2 = link3;
+		Activity dPu2 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId2, driverPlan);
 		Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		Activity dDo1 = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		final Id<Link> linkId3 = link4;
+		Activity dDo1 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId3, driverPlan);
 		Leg jointDriverLeg3 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link5 );
+		final Id<Link> linkId4 = link5;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId4, driverPlan);
 		driverPlan.createAndAddLeg( "donkey" );
-		Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId5 = link1;
+		Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId5, driverPlan);
 
 		PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
+		final Id<Link> linkId6 = link1;
 
-		Activity p1Act1 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		Activity p1Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId6, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "cablecar" );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Id<Link> linkId7 = link2;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId7, passengerPlan1);
 		Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link5 );
+		final Id<Link> linkId8 = link5;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId8, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "ski" );
-		Activity p1Act2 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId9 = link1;
+		Activity p1Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", linkId9, passengerPlan1);
 
 		PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
+		final Id<Link> linkId10 = link1;
 
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId10, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "hand walking" );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Id<Link> linkId11 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId11, passengerPlan2);
 		Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link4 );
+		final Id<Link> linkId12 = link4;
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, linkId12, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "jumps" );
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Id<Link> linkId13 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId("home", linkId13, passengerPlan2);
 
 		DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger1.getId() );
@@ -453,29 +501,29 @@ public class JointTripRemoverAlgorithmTest {
 		// where the mode of the replacement comes. This can be important due
 		// to the possibility that access/egress legs constitute subtours and thus
 		// break the mode chain.
-		final Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 		driverPlan.createAndAddLeg( "horse" );
-		driverPlan.createAndAddActivityFromLinkId( stageType , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(stageType, link1, driverPlan);
 		driverPlan.createAndAddLeg( "horse" );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, driverPlan);
 		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, driverPlan);
 		driverPlan.createAndAddLeg( "unicycle" );
 		driverPlan.createAndAddLeg( "unicycle" );
-		driverPlan.createAndAddActivityFromLinkId( stageType , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(stageType, link1, driverPlan);
 		driverPlan.createAndAddLeg( "unicycle" );
-		final Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 
 		final PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
-		final Activity pAct1 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan);
 		passengerPlan.createAndAddLeg( "jetpack" );
-		passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, passengerPlan);
 		final Leg jointPassengerLeg = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, passengerPlan);
 		passengerPlan.createAndAddLeg( "paraglider" );
-		final Activity pAct2 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan);
 
 		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger.getId() );
@@ -524,29 +572,29 @@ public class JointTripRemoverAlgorithmTest {
 		// where the mode of the replacement comes. This can be important due
 		// to the possibility that access/egress legs constitute subtours and thus
 		// break the mode chain.
-		final Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 		driverPlan.createAndAddLeg( "horse" );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, driverPlan);
 		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, driverPlan);
 		driverPlan.createAndAddLeg( "unicycle" );
-		final Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 
 		final PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
-		final Activity pAct1 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan);
 		passengerPlan.createAndAddLeg( "jetpack" );
-		passengerPlan.createAndAddActivityFromLinkId( stageType , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(stageType, link1, passengerPlan);
 		passengerPlan.createAndAddLeg( "jetpack" );
-		passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, passengerPlan);
 		final Leg jointPassengerLeg = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, passengerPlan);
 		passengerPlan.createAndAddLeg( "paraglider" );
-		passengerPlan.createAndAddActivityFromLinkId( stageType , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId(stageType, link1, passengerPlan);
 		passengerPlan.createAndAddLeg( "paraglider" );
 		passengerPlan.createAndAddLeg( "paraglider" );
-		final Activity pAct2 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan);
 
 		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger.getId() );
@@ -591,41 +639,41 @@ public class JointTripRemoverAlgorithmTest {
 		final PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
-		final Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 		driverPlan.createAndAddLeg( "skateboard" );
-		/*final Activity dPu =*/ driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		/*final Activity dPu =*/ PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, driverPlan);
 		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		/*final Activity dDo =*/ driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		/*final Activity dDo =*/ PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, driverPlan);
 		driverPlan.createAndAddLeg( "elevator" );
-		final Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 		final Leg dAccess2 = driverPlan.createAndAddLeg( "skateboard" );
-		final Activity dPu2 = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Activity dPu2 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, driverPlan);
 		final Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		final Activity dDo2 = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Activity dDo2 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, driverPlan);
 		final Leg dEgress2 = driverPlan.createAndAddLeg( "elevator" );
-		final Activity dAct3 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct3 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, driverPlan);
 
 		final PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
-		final Activity p1Act1 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity p1Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "jetpack" );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, passengerPlan1);
 		final Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "paraglider" );
-		final Activity p1Act2 = passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity p1Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan1);
 
 		final PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "jetpack" );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, passengerPlan2);
 		final Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "paraglider" );
-		passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", link1, passengerPlan2);
 
 		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger1.getId() );
@@ -680,41 +728,41 @@ public class JointTripRemoverAlgorithmTest {
 		final PlanImpl driverPlan = PopulationUtils.createPlan(driver);
 		plans.put( driver.getId() , driverPlan );
 
-		final Activity dAct1 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan);
 		final Leg dAccess = driverPlan.createAndAddLeg( "skateboard" );
-		final Activity dPu = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Activity dPu = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, driverPlan);
 		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		final Activity dDo = driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Activity dDo = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, driverPlan);
 		final Leg dEgress = driverPlan.createAndAddLeg( "elevator" );
-		final Activity dAct2 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan);
 		driverPlan.createAndAddLeg( "skateboard" );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, driverPlan);
 		final Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, driverPlan);
 		driverPlan.createAndAddLeg( "elevator" );
-		final Activity dAct3 = driverPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity dAct3 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan);
 
 		final PlanImpl passengerPlan1 = PopulationUtils.createPlan(passenger1);
 		plans.put( passenger1.getId() , passengerPlan1 );
 
-		passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "jetpack" );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, passengerPlan1);
 		final Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, passengerPlan1);
 		passengerPlan1.createAndAddLeg( "paraglider" );
-		passengerPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan1);
 
 		final PlanImpl passengerPlan2 = PopulationUtils.createPlan(passenger2);
 		plans.put( passenger2.getId() , passengerPlan2 );
 
-		final Activity p2Act1 = passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity p2Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "jetpack" );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, passengerPlan2);
 		final Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
-		passengerPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, passengerPlan2);
 		passengerPlan2.createAndAddLeg( "paraglider" );
-		final Activity p2Act2 = passengerPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity p2Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan2);
 
 		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
 		dRoute.addPassenger( passenger1.getId() );
@@ -770,45 +818,45 @@ public class JointTripRemoverAlgorithmTest {
 		final PlanImpl driverPlan1 = PopulationUtils.createPlan(driver1);
 		plans.put( driver1.getId() , driverPlan1 );
 
-		final Activity d1Act1 = driverPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity d1Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan1);
 		driverPlan1.createAndAddLeg( "skateboard" );
-		driverPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, driverPlan1);
 		final Leg jointDriverLeg1 = driverPlan1.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan1.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, driverPlan1);
 		driverPlan1.createAndAddLeg( "elevator" );
-		final Activity d1Act2 = driverPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity d1Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan1);
 		final Leg d1Leg = driverPlan1.createAndAddLeg( "skateboard" );
-		final Activity d1Act3 = driverPlan1.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity d1Act3 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan1);
 
 		final PlanImpl driverPlan2 = PopulationUtils.createPlan(driver2);
 		plans.put( driver2.getId() , driverPlan2 );
 
-		final Activity d2Act1 = driverPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity d2Act1 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan2);
 		final Leg d2Leg = driverPlan2.createAndAddLeg( "skateboard" );
-		final Activity d2Act2 = driverPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity d2Act2 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan2);
 		driverPlan2.createAndAddLeg( "skateboard" );
-		driverPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, driverPlan2);
 		final Leg jointDriverLeg2 = driverPlan2.createAndAddLeg( JointActingTypes.DRIVER );
-		driverPlan2.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, driverPlan2);
 		driverPlan2.createAndAddLeg( "elevator" );
-		final Activity d2Act3 = driverPlan2.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity d2Act3 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, driverPlan2);
 
 		final PlanImpl passengerPlan = PopulationUtils.createPlan(passenger);
 		plans.put( passenger.getId() , passengerPlan );
 
-		final Activity pAct1 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct1 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan);
 		final Leg pAccess1 = passengerPlan.createAndAddLeg( "jetpack" );
-		final Activity pPu1 = passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Activity pPu1 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, passengerPlan);
 		final Leg jointPassengerLeg1 = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
-		final Activity pDo1 = passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Activity pDo1 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, passengerPlan);
 		final Leg pEgress1 = passengerPlan.createAndAddLeg( "paraglider" );
-		final Activity pAct2 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct2 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan);
 		final Leg pAccess2 = passengerPlan.createAndAddLeg( "jetpack" );
-		final Activity pPu2 = passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link2 );
+		final Activity pPu2 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link2, passengerPlan);
 		final Leg jointPassengerLeg2 = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
-		final Activity pDo2 = passengerPlan.createAndAddActivityFromLinkId( JointActingTypes.INTERACTION , link3 );
+		final Activity pDo2 = PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, (Id<Link>) link3, passengerPlan);
 		final Leg pEgress2 = passengerPlan.createAndAddLeg( "paraglider" );
-		final Activity pAct3 = passengerPlan.createAndAddActivityFromLinkId( "home" , link1 );
+		final Activity pAct3 = PopulationUtils.createAndAddActivityFromLinkId("home", (Id<Link>) link1, passengerPlan);
 
 		final DriverRoute dRoute1 = new DriverRoute( link2 , link3 );
 		dRoute1.addPassenger( passenger.getId() );
