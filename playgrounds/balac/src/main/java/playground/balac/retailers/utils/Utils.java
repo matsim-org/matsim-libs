@@ -32,6 +32,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -160,7 +161,7 @@ public abstract class Utils
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
     QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
       for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
-        Coord c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(((PlanImpl)p.getSelectedPlan()).getFirstActivity().getFacilityId())).getCoord();
+        Coord c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(PopulationUtils.getFirstActivity( ((PlanImpl)p.getSelectedPlan()) ).getFacilityId())).getCoord();
       personQuadTree.put(c.getX(), c.getY(), p);
     }
     log.info("PersonQuadTree has been created");

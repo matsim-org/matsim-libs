@@ -217,8 +217,8 @@ public class ReadFromUrbansimParcelModel {
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
-					Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-					Activity newHomeAct =    ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity() ;
+					Activity oldHomeAct = PopulationUtils.getFirstActivity( ((PlanImpl) oldPerson.getSelectedPlan()) );
+					Activity newHomeAct =    PopulationUtils.getFirstActivity( ((PlanImpl) newPerson.getSelectedPlan()) ) ;
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;

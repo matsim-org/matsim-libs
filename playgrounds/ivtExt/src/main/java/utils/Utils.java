@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -195,8 +196,10 @@ public abstract class Utils {
 		}
 		else {		// its a trip back home
 			// not the first home act!
-			if (((PlanImpl) plan).getPreviousLeg(act) != null) {
-				return getLongestActivityForRoundTrip((PlanImpl) plan, ((PlanImpl) plan).getPreviousActivity(((PlanImpl) plan).getPreviousLeg(act)));
+			final Activity act1 = act;
+			if (PopulationUtils.getPreviousLeg(act1, ((PlanImpl) plan)) != null) {
+				final Activity act2 = act;
+				return getLongestActivityForRoundTrip((PlanImpl) plan, PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act2, ((PlanImpl) plan)), ((PlanImpl) plan)));
 			}
 			else {
 				return "home";
@@ -213,7 +216,8 @@ public abstract class Utils {
 		// home_pre <- ... act (== home)
 		ActivityImpl actTemp = (ActivityImpl) act;
 		while (actTemp != null && !actTemp.getType().startsWith("h")) {
-			actTemp = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(actTemp));
+			final Activity act1 = actTemp;
+			actTemp = (ActivityImpl) PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act1, plan), plan);
 			if (actTemp.getMaximumDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
 				maxActDur = actTemp.getMaximumDuration();
 				longestActivity = actTemp.getType();

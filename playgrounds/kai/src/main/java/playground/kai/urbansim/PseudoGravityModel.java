@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -120,7 +121,7 @@ public class PseudoGravityModel {
 		// compute the extent of the coordinates for persons:
 		for ( Person person : population.getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
-			Activity act = ((PlanImpl) plan).getFirstActivity();
+			Activity act = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
 			Coord homeCoord = act.getCoord() ;
 			checkMax( homeCoord ) ;
 		}
@@ -152,7 +153,7 @@ public class PseudoGravityModel {
 		// for every worker, add it to the pseudoCell
 		for ( Person pp : population.getPersons().values() ) {
 			if ( PersonUtils.isEmployed(pp) ) {
-				Coord cc = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
+				Coord cc = PopulationUtils.getFirstActivity( ((PlanImpl) pp.getSelectedPlan()) ).getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
 				PseudoCell pc = pseudoCells.get(bin) ;
 //				System.out.println ( "adding a worker" ) ;
@@ -222,7 +223,7 @@ public class PseudoGravityModel {
 			Plan plan = pp.getSelectedPlan();
 
 			// get home coordinates:
-			Coord homeCoord = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
+			Coord homeCoord = PopulationUtils.getFirstActivity( ((PlanImpl) pp.getSelectedPlan()) ).getCoord(); // awkward
 
 			// get relevant bin:
 			int homeBin = binFromXY( homeCoord.getX(), homeCoord.getY() ) ;

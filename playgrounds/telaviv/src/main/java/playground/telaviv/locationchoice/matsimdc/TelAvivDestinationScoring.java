@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
 import playground.telaviv.locationchoice.Coefficients;
@@ -47,7 +48,8 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 	}
 	
 	public double getZonalScore(PlanImpl plan, ActivityImpl act) {
-		Activity previousActivity = plan.getPreviousActivity(plan.getPreviousLeg(act));
+		final Activity act1 = act;
+		Activity previousActivity = PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act1, plan), plan);
 		int fromZoneIndex = this.getZoneIndex(previousActivity.getFacilityId());
 		int toZoneIndex = this.getZoneIndex(act.getFacilityId());
 		

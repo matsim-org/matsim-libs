@@ -158,7 +158,7 @@ public class PlanUtils {
 	
 	public static Leg getPreviousLeg(final Plan plan, final Activity activity) {
 		if (plan instanceof PlanImpl) {
-			return ((PlanImpl) plan).getPreviousLeg(activity);
+			return PopulationUtils.getPreviousLeg(activity, ((PlanImpl) plan));
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getPreviousLeg((LCPlan) plan, (LCActivity) activity);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");
@@ -166,7 +166,7 @@ public class PlanUtils {
 	
 	public static Activity getPreviousActivity(final Plan plan, final Leg leg) {
 		if (plan instanceof PlanImpl) {
-			return ((PlanImpl) plan).getPreviousActivity(leg);
+			return PopulationUtils.getPreviousActivity(leg, ((PlanImpl) plan)) ;
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getPreviousActivity((LCPlan) plan,  (LCLeg) leg);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");
@@ -174,7 +174,7 @@ public class PlanUtils {
 	
 	public static Leg getNextLeg(final Plan plan, final Activity activity) {
 		if (plan instanceof PlanImpl) {
-			return ((PlanImpl) plan).getNextLeg(activity);
+			return PopulationUtils.getNextLeg(activity, ((PlanImpl) plan)) ;
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getNextLeg((LCPlan) plan, (LCActivity) activity);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");
@@ -182,7 +182,7 @@ public class PlanUtils {
 	
 	public static Activity getNextActivity(final Plan plan, final Leg leg) {
 		if (plan instanceof PlanImpl) {
-			return ((PlanImpl) plan).getNextActivity(leg);
+			return PopulationUtils.getNextActivity(leg, ((PlanImpl) plan)) ;
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getNextActivity((LCPlan) plan,  (LCLeg) leg);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");

@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -889,8 +890,8 @@ public class ParkControl {
 		
 		
 		//Pruefen ob letzte am Tag:
-		if(activity.equals(plan.getLastActivity())){
-			endTime = plan.getFirstActivity().getEndTime();
+		if(activity.equals(PopulationUtils.getLastActivity(plan))){
+			endTime = PopulationUtils.getFirstActivity( plan ).getEndTime();
 			double [] returnValue = {24*3600-event.getTime()+endTime, 0}; //Letzte activity >> Parkdauer laenger als Rest der Iteration
 			return returnValue;
 		}
@@ -901,16 +902,19 @@ public class ParkControl {
 		boolean foundNextCarLeg = false;
 		Leg nextCarLeg=null;
 		while (foundNextCarLeg == false){
-			Leg leg = plan.getNextLeg(activity);
+			final Activity act1 = activity;
+			Leg leg = PopulationUtils.getNextLeg(act1, plan);
 			if(leg.getMode().equalsIgnoreCase("car")){
 				//endTime = leg.getDepartureTime(); //!!!!!!! MatSim provides a wrong time !!!
 				endTime=activity.getEndTime();
 				nextCarLeg=leg;
 				foundNextCarLeg=true;
 			}else{
-				Activity act = plan.getNextActivity(leg);
+				final Leg leg1 = leg;
+				Activity act = PopulationUtils.getNextActivity(leg1, plan);
 				if(act==null){return null;}
-				leg=plan.getNextLeg(act);
+				final Activity act2 = act;
+				leg=PopulationUtils.getNextLeg(act2, plan);
 				if(leg==null){
 					System.out.println("F E H L E R letzte activity nicht identifiziert");
 					System.out.println("Person: "+person.getId().toString()+" count: "+actCount);
@@ -926,12 +930,14 @@ public class ParkControl {
 		restOfDayDistance+=nextCarLeg.getRoute().getDistance();
 		boolean goOn = true;
 		while(goOn){
-			Activity act = plan.getNextActivity(nextCarLeg);
+			final Leg leg = nextCarLeg;
+			Activity act = PopulationUtils.getNextActivity(leg, plan);
 			if(act==null){
 				goOn=false;
 				break;
 			}
-			nextCarLeg=plan.getNextLeg(act);
+			final Activity act1 = act;
+			nextCarLeg=PopulationUtils.getNextLeg(act1, plan);
 			if(nextCarLeg==null){
 				break;
 			}

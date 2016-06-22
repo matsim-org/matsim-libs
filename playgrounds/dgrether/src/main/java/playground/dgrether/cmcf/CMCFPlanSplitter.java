@@ -71,10 +71,12 @@ public class CMCFPlanSplitter {
 		  		Person pNew = PopulationUtils.getFactory().createPerson(Id.create(idStringBuffer.toString(), Person.class));
 		  		PlanImpl planNew = PopulationUtils.createPlan(pNew);
 		  		Leg leg = (Leg) pe;
+				final Leg leg2 = leg;
 
-		  		planNew.addActivity(((PlanImpl) pl).getPreviousActivity(leg));
+		  		planNew.addActivity(PopulationUtils.getPreviousActivity(leg2, ((PlanImpl) pl)));
 		  		planNew.addLeg(leg);
-		  		planNew.addActivity(((PlanImpl) pl).getNextActivity(leg));
+				final Leg leg1 = leg;
+		  		planNew.addActivity(PopulationUtils.getNextActivity(leg1, ((PlanImpl) pl)));
 
 		  		pNew.addPlan(planNew);
 

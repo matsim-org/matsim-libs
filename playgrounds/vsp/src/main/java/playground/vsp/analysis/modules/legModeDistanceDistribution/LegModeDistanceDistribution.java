@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
@@ -252,8 +253,10 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 						if(pe instanceof Leg){
 							Leg leg = (Leg) pe;
 							String legMode = leg.getMode();
-							Coord from = plan.getPreviousActivity(leg).getCoord();
-							Coord to = plan.getNextActivity(leg).getCoord();
+							final Leg leg2 = leg;
+							Coord from = PopulationUtils.getPreviousActivity(leg2, plan).getCoord();
+							final Leg leg1 = leg;
+							Coord to = PopulationUtils.getNextActivity(leg1, plan).getCoord();
 							Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 
 							if(legMode.equals(mode)){
@@ -296,8 +299,10 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
 					Leg leg = (Leg) pe;
-					Coord from = plan.getPreviousActivity(leg).getCoord();
-					Coord to = plan.getNextActivity(leg).getCoord();
+					final Leg leg2 = leg;
+					Coord from = PopulationUtils.getPreviousActivity(leg2, plan).getCoord();
+					final Leg leg1 = leg;
+					Coord to = PopulationUtils.getNextActivity(leg1, plan).getCoord();
 					Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 					
 					if(legBeelineDist > longestBeelineDistance){

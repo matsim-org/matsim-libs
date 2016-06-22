@@ -535,7 +535,7 @@ public class CreatePlansFromTrips {
 		for (Person P : scenario.getPopulation().getPersons().values()){
 			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
 			
-			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
+			ActivityImpl a = (ActivityImpl) PopulationUtils.getFirstActivity( plan );
 			Link nearestLink = NetworkUtils.getNearestLink(network, a.getCoord());
 			
 			a.setLinkId(nearestLink.getId());

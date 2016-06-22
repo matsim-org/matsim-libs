@@ -30,6 +30,7 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -93,16 +94,16 @@ public class ComparingDistanceStats implements IterationEndsListener {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							plan.getPreviousLeg((Activity)pe).getMode().equals(this.mode)) {
+							PopulationUtils.getPreviousLeg((Activity)pe, plan).getMode().equals(this.mode)) {
 						double distance = -1.0;
-						Leg previousLeg = plan.getPreviousLeg((Activity)pe);
+						Leg previousLeg = PopulationUtils.getPreviousLeg((Activity)pe, plan);
 						Route route = previousLeg.getRoute();
 						if (route instanceof NetworkRoute) {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
 							else distance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, event.getServices().getScenario().getNetwork());
 						} else {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
-							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
+							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg((Activity)pe, plan), plan).getCoord());
 						}
 						this.bins.addVal(distance, 1.0);
 					}	

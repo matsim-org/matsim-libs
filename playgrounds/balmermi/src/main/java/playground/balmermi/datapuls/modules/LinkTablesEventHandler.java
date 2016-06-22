@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEndEventHandler  {
@@ -90,8 +91,10 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 			}
 			Person p = population.getPersons().get(Id.create(event.getVehicleId(), Person.class));
 			Activity fromAct = fromActs.get(p.getId());
-			Leg leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
-			Activity toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
+			final Activity act = fromAct;
+			Leg leg = PopulationUtils.getNextLeg(act, ((PlanImpl) p.getSelectedPlan()));
+			final Leg leg1 = leg;
+			Activity toAct = PopulationUtils.getNextActivity(leg1, ((PlanImpl) p.getSelectedPlan()));
 
 			out.write(event.getLinkId().toString()+"\t"+p.getId()+"\t");
 			out.write(fromAct.getType()+"\t"+fromAct.getFacilityId()+"\t");
@@ -103,12 +106,14 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 	public void handleEvent(ActivityEndEvent event) {
 		Person p = population.getPersons().get(event.getPersonId());
 		if (!fromActs.containsKey(p.getId())) {
-			fromActs.put(p.getId(),((PlanImpl) p.getSelectedPlan()).getFirstActivity());
+			fromActs.put(p.getId(),PopulationUtils.getFirstActivity( ((PlanImpl) p.getSelectedPlan()) ));
 		}
 		else {
 			Activity fromAct = fromActs.get(p.getId());
-			Leg leg = ((PlanImpl) p.getSelectedPlan()).getNextLeg(fromAct);
-			Activity toAct = ((PlanImpl) p.getSelectedPlan()).getNextActivity(leg);
+			final Activity act = fromAct;
+			Leg leg = PopulationUtils.getNextLeg(act, ((PlanImpl) p.getSelectedPlan()));
+			final Leg leg1 = leg;
+			Activity toAct = PopulationUtils.getNextActivity(leg1, ((PlanImpl) p.getSelectedPlan()));
 			fromActs.put(p.getId(),toAct);
 		}
 	}

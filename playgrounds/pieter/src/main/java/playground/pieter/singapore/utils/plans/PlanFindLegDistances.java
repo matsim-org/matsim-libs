@@ -17,6 +17,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -128,7 +129,7 @@ class PlanFindLegDistances {
 //			new TransitActsRemover().run(plan);
 			for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
 				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
-				if (act.equals(plan.getLastActivity()))
+				if (act.equals(PopulationUtils.getLastActivity(plan)))
 					break;
 				LegImpl leg =  (LegImpl) plan.getPlanElements()
 						.get(i + 1);

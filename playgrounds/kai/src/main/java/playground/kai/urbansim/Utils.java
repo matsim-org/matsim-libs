@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -165,7 +166,7 @@ public class Utils {
 	 * @param workCoord
 	 */
 	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord ) {
-		Activity act = plan.getFirstActivity();
+		Activity act = PopulationUtils.getFirstActivity( plan );
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 

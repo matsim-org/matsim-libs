@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class DistanceStats implements IterationEndsListener {	
@@ -81,8 +82,8 @@ public class DistanceStats implements IterationEndsListener {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							plan.getPreviousLeg((Activity)pe).getMode().equals(this.mode)) {
-						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord()); 
+							PopulationUtils.getPreviousLeg((Activity)pe, plan).getMode().equals(this.mode)) {
+						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg((Activity)pe, plan), plan).getCoord()); 
 						this.bins.addVal(distance, 1.0);
 					}	
 				}

@@ -7,6 +7,7 @@ import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
 
@@ -40,7 +41,7 @@ public class CreateHomeWorkHomePlan {
 	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord, ActivityFacility jobLocation ) {
 		
 		// complete the first activity (home) by setting end time. 
-		ActivityImpl act = (ActivityImpl)plan.getFirstActivity();
+		ActivityImpl act = (ActivityImpl)PopulationUtils.getFirstActivity( plan );
 
 		final double hmDpTime = (6.+2.*MatsimRandom.getRandom().nextDouble())*3600.;
 		act.setEndTime( hmDpTime ) ;
@@ -66,7 +67,7 @@ public class CreateHomeWorkHomePlan {
 		
 		// set last activity (=first activity) and complete home-work-home plan.
 		plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord );
-		act = (ActivityImpl)plan.getLastActivity();
+		act = (ActivityImpl)PopulationUtils.getLastActivity(plan);
 		act.setFacilityId( homeId );
 	}
 

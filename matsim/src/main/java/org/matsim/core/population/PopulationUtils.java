@@ -765,5 +765,51 @@ public final class PopulationUtils {
 			out.setRoute(in.getRoute().clone());
 		}
 	}
+
+	public static Activity getFirstActivity(Plan plan) {
+		return (Activity) plan.getPlanElements().get(0);
+	}
+	public static Activity getLastActivity( Plan plan ) {
+		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+	}
+	public static Activity getNextActivity( Leg leg, Plan plan ) {
+		int index = getActLegIndex(leg,plan);
+		if (index != -1) {
+			return (Activity) plan.getPlanElements().get(index+1);
+		}
+		return null;
+	}
+	public static int getActLegIndex( PlanElement pe , Plan plan ) {
+		if ((pe instanceof Leg) || (pe instanceof Activity)) {
+			for (int i = 0; i < plan.getPlanElements().size(); i++) {
+				if (plan.getPlanElements().get(i).equals(pe)) {
+					return i;
+				}
+			}
+			return -1;
+		}
+		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
+	}
+	public static Leg getNextLeg( Activity act, Plan plan ) {
+		int index = PopulationUtils.getActLegIndex(act, plan);
+		if ((index < plan.getPlanElements().size() - 1) && (index != -1)) {
+			return (Leg) plan.getPlanElements().get(index+1);
+		}
+		return null;
+	}
+	public static Activity getPreviousActivity( Leg leg, Plan plan ) {
+		int index = PopulationUtils.getActLegIndex(leg, plan);
+		if (index != -1) {
+			return (Activity) plan.getPlanElements().get(index-1);
+		}
+		return null;
+	}
+	public static Leg getPreviousLeg( Activity act, Plan plan ) {
+		int index = PopulationUtils.getActLegIndex(act, plan);
+		if (index != -1) {
+			return (Leg) plan.getPlanElements().get(index-1);
+		}
+		return null;
+	}
 	
 }

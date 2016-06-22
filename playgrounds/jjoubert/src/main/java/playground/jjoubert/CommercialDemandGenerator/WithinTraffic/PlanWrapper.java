@@ -139,7 +139,8 @@ public class PlanWrapper {
 					/* The activity starts in a new day. Add a dummy activity
 					 * at midnight, the location being proportionally between 
 					 * the two activities. */
-					Activity previousActivity = tmpPlan.getPreviousActivity(tmpPlan.getPreviousLeg(act));
+					final Activity act1 = act;
+					Activity previousActivity = PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act1, tmpPlan), tmpPlan);
 					double chopFraction = (Time.MIDNIGHT*dayCount - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
 					double distance = CoordUtils.calcEuclideanDistance(act.getCoord(), previousActivity.getCoord()) * chopFraction;
 					double dy = act.getCoord().getY() - previousActivity.getCoord().getY();
@@ -161,7 +162,8 @@ public class PlanWrapper {
 					/* Start a new segment. */
 					segment = PopulationUtils.createPlan();
 					segment.addActivity(chopStart);
-					segment.addLeg(tmpPlan.getPreviousLeg(act));
+					final Activity act2 = act;
+					segment.addLeg(PopulationUtils.getPreviousLeg(act2, tmpPlan));
 					Activity firstRealActivity = PopulationUtils.createActivity(act);
 					firstRealActivity.setStartTime(act.getStartTime() - Time.MIDNIGHT*dayCount);
 					firstRealActivity.setEndTime(act.getEndTime() - Time.MIDNIGHT*dayCount);

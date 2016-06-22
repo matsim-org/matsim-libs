@@ -33,6 +33,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -137,7 +138,8 @@ public class AnalyzeMicrocensus {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
-						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
+						final Activity act1 = act;
+						if (PopulationUtils.getPreviousLeg(act1, plan).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							zh_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
@@ -156,7 +158,8 @@ public class AnalyzeMicrocensus {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
-						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
+						final Activity act3 = act;
+						if (PopulationUtils.getPreviousLeg(act3, plan).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							ch_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
@@ -166,9 +169,11 @@ public class AnalyzeMicrocensus {
 								
 								//check the subsequent activities
 								Activity actTmp = act;
-								String nextType = plan.getNextActivity(plan.getNextLeg(actTmp)).getType();
+								final Activity act1 = actTmp;
+								String nextType = PopulationUtils.getNextActivity(PopulationUtils.getNextLeg(act1, plan), plan).getType();
 								while (nextType.startsWith(this.type)  || this.type.equals("allTypes")) {
-									actTmp = plan.getNextActivity(plan.getNextLeg(actTmp));
+									final Activity act2 = actTmp;
+									actTmp = PopulationUtils.getNextActivity(PopulationUtils.getNextLeg(act2, plan), plan);
 									nextType = actTmp.getType();
 								}
 								if (nextType.equals("h")) {

@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -84,7 +85,7 @@ public class PopulationClipping {
 			for(int i = 1; i < selected.getPlanElements().size(); i = 1) {
 				selected.getPlanElements().remove(i);
 			}
-			Coord c = ((PlanImpl) p.getPlans().get(0)).getFirstActivity().getCoord();
+			Coord c = PopulationUtils.getFirstActivity( ((PlanImpl) p.getPlans().get(0)) ).getCoord();
 
 			if(r > 0) {
 				double dx = Math.abs(c.getX() - x);

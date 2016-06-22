@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Date;
@@ -54,7 +55,7 @@ public class PopulationCut {
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			boolean removeIt = false;
 			for (Plan plan : p.getPlans()) {
-				Activity a = ((PlanImpl) plan).getFirstActivity();
+				Activity a = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
 				Coord c = a.getCoord();
 				if (c == null) { removeIt = true; }
 				else {

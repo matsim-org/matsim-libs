@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -149,8 +150,10 @@ public class ModalSplitAnalysis {
 						Leg leg = (Leg) pe;
 						String legMode = leg.getMode();
 						if(legMode.equals(mode)){
-							Coord from = plan.getPreviousActivity(leg).getCoord();
-							Coord to = plan.getNextActivity(leg).getCoord();
+							final Leg leg2 = leg;
+							Coord from = PopulationUtils.getPreviousActivity(leg2, plan).getCoord();
+							final Leg leg1 = leg;
+							Coord to = PopulationUtils.getNextActivity(leg1, plan).getCoord();
 							Double legDist = CoordUtils.calcEuclideanDistance(from, to);
 							noOfLegs ++;
 							sumOfBeelineDistances += legDist;

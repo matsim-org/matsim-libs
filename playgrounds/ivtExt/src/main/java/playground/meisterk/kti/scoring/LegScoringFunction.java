@@ -31,6 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -145,7 +146,9 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 				//				String nanoMsg = "Scoring kti pt:\t";
 
 				//				long nanos = System.nanoTime();
-				dist = ktiPtRoute.calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
+				final Leg leg1 = leg;
+				final Leg leg2 = leg;
+				dist = ktiPtRoute.calcAccessEgressDistance(PopulationUtils.getPreviousActivity(leg2, ((PlanImpl) this.plan)), PopulationUtils.getNextActivity(leg1, ((PlanImpl) this.plan)));
 				//				nanos = System.nanoTime() - nanos;
 				//				nanoMsg += Long.toString(nanos) + "\t";
 

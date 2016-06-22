@@ -276,7 +276,7 @@ public class PlansCreateFromMZ {
 	private final void setHomeLocations(final Population plans, final Map<Id<Person>,String> person_strings) {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			Activity home = ((PlanImpl) plan).getFirstActivity();
+			Activity home = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
 				Activity act = (ActivityImpl)plan.getPlanElements().get(i);
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {

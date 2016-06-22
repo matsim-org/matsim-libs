@@ -191,7 +191,7 @@ public class CreateSelectedPlansTables {
 
 				Plan selectedPlan = person.getSelectedPlan();
 				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
-				Activity firstActivity = selectedPlanImpl.getFirstActivity();
+				Activity firstActivity = PopulationUtils.getFirstActivity( selectedPlanImpl );
 				Coord c = null;
 				String link_id = "-";
 				

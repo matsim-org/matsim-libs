@@ -14,6 +14,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PlansFileParser {
@@ -38,12 +39,14 @@ public class PlansFileParser {
 			travelTimeBins[(int)Math.floor(time/binTime)][0] = time;
 		for(Person person:plans.getPersons().values()) {
 			PlanImpl plan = (PlanImpl)person.getSelectedPlan();
-			for(Activity activity = plan.getFirstActivity();!activity.equals(plan.getLastActivity());) {
-				Leg leg = plan.getNextLeg(activity);
+			for(Activity activity = PopulationUtils.getFirstActivity( plan );!activity.equals(PopulationUtils.getLastActivity(plan));) {
+				final Activity act = activity;
+				Leg leg = PopulationUtils.getNextLeg(act, plan);
 				int numBin = (int) Math.floor(leg.getDepartureTime()/binTime);
 				travelTimeBins[numBin][1]=travelTimeBins[numBin][1]+leg.getTravelTime();
 				travelTimeBins[numBin][2]++;
-				activity = plan.getNextActivity(leg);
+				final Leg leg1 = leg;
+				activity = PopulationUtils.getNextActivity(leg1, plan);
 			}
 		}
 		PrintWriter writer = new PrintWriter(new File(args[4]));

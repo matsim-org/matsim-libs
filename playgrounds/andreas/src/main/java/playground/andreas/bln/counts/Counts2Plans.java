@@ -89,7 +89,7 @@ public class Counts2Plans {
 			a.setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
 
 			((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
-			((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime(time);
+			PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) ).setEndTime(time);
 
 			a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(to).getLinkId());
 			a.setCoord(this.transitSchedule.getFacilities().get(to).getCoord());
@@ -152,9 +152,9 @@ public class Counts2Plans {
 
 								// Verlegen der Nachfrage auf die Zeit des OEV-Angebots. Dieses geht von 3:30 bis 27:30 Uhr.
 								if(hour < 4){
-									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour + 24 - 1 + rnd.nextDouble()) * 3600);
+									PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) ).setEndTime((hour + 24 - 1 + rnd.nextDouble()) * 3600);
 								} else {
-									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour - 1 + rnd.nextDouble()) * 3600);
+									PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) ).setEndTime((hour - 1 + rnd.nextDouble()) * 3600);
 								}
 								passengersInVehicle.add(person);
 							}

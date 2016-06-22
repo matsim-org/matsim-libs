@@ -189,6 +189,7 @@ public final class PlanImpl implements Plan {
 
 	@Override
 	public final List<PlanElement> getPlanElements() {
+		// yyyyyy should probably return an UnmodifiableCollection; changes should only be done through interface methods.  kai, jun'16
 		return this.actsLegs;
 	}
 
@@ -229,7 +230,7 @@ public final class PlanImpl implements Plan {
 	 * @param act the act to insert, following the leg
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
+	public final void insertLegAct(final int pos, final Leg leg, final Activity act) throws IllegalArgumentException {
 		if (pos < getPlanElements().size()) {
 			Object o = getPlanElements().get(pos);
 			if (!(o instanceof Leg)) {
@@ -243,60 +244,8 @@ public final class PlanImpl implements Plan {
 		getPlanElements().add(pos, leg);
 	}
 
-	public Leg getPreviousLeg(final Activity act) {
-		int index = this.getActLegIndex(act);
-		if (index != -1) {
-			return (Leg) getPlanElements().get(index-1);
-		}
-		return null;
-	}
-
-	public Activity getPreviousActivity(final Leg leg) {
-		int index = this.getActLegIndex(leg);
-		if (index != -1) {
-			return (Activity) getPlanElements().get(index-1);
-		}
-		return null;
-	}
-
-	public Leg getNextLeg(final Activity act) {
-		int index = this.getActLegIndex(act);
-		if ((index < getPlanElements().size() - 1) && (index != -1)) {
-			return (Leg) getPlanElements().get(index+1);
-		}
-		return null;
-	}
-
-	public Activity getNextActivity(final Leg leg) {
-		int index = this.getActLegIndex(leg);
-		if (index != -1) {
-			return (Activity) getPlanElements().get(index+1);
-		}
-		return null;
-	}
-
-	public int getActLegIndex(final PlanElement o) {
-		if ((o instanceof Leg) || (o instanceof Activity)) {
-			for (int i = 0; i < getPlanElements().size(); i++) {
-				if (getPlanElements().get(i).equals(o)) {
-					return i;
-				}
-			}
-			return -1;
-		}
-		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
-	}
-
-	public Activity getFirstActivity() {
-		return (Activity) getPlanElements().get(0);
-	}
-
-	public Activity getLastActivity() {
-		return (Activity) getPlanElements().get(getPlanElements().size() - 1);
-	}
-
 	@Override
-	public Map<String, Object> getCustomAttributes() {
+	public final Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
 			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}

@@ -59,7 +59,7 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(((PlanImpl)plan).getLastActivity()))
+				else if(!planElement.equals(PopulationUtils.getLastActivity(((PlanImpl)plan))))
 					throw new RuntimeException("Activity without time information");
 			}
 			else if(planElement instanceof Activity) {
@@ -71,7 +71,7 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(((PlanImpl)plan).getLastActivity()))
+				else if(!planElement.equals(PopulationUtils.getLastActivity(((PlanImpl)plan))))
 					throw new RuntimeException("Activity without time information");
 			}
 			else {

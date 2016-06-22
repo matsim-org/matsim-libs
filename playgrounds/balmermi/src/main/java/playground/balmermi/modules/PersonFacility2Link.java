@@ -20,10 +20,12 @@
 
 package playground.balmermi.modules;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -45,10 +47,11 @@ public class PersonFacility2Link extends AbstractPersonAlgorithm implements Plan
 	}
 
 	public void run(final Plan plan) {
-		ActivityImpl act = (ActivityImpl) ((PlanImpl) plan).getFirstActivity();
-		while (act != ((PlanImpl) plan).getLastActivity()) {
+		ActivityImpl act = (ActivityImpl) PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
+		while (act != PopulationUtils.getLastActivity(((PlanImpl) plan))) {
 			act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
-			act = (ActivityImpl) ((PlanImpl) plan).getNextActivity(((PlanImpl) plan).getNextLeg(act));
+			final Activity act1 = act;
+			act = (ActivityImpl) PopulationUtils.getNextActivity(PopulationUtils.getNextLeg(act1, ((PlanImpl) plan)), ((PlanImpl) plan));
 		}
 		act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 	}

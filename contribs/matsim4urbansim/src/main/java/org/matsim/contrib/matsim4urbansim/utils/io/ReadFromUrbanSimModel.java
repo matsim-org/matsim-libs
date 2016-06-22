@@ -641,8 +641,8 @@ public class ReadFromUrbanSimModel {
 			}
 			
 			// get home location from old plans file and current UrbanSim data
-			Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-			Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
+			Activity oldHomeAct = PopulationUtils.getFirstActivity( ((PlanImpl) oldPerson.getSelectedPlan()) );
+			Activity newHomeAct = PopulationUtils.getFirstActivity( ((PlanImpl) newPerson.getSelectedPlan()) );
 			
 			// for parcels check if activity location has changed. if true accept as new person
 			if ( isParcel && actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // for parcels

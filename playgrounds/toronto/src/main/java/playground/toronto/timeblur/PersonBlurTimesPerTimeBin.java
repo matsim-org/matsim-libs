@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -71,7 +72,7 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 		for (PlanElement e : plan.getPlanElements()) {
 			if (e instanceof Activity) {
 				Activity a = (Activity)e;
-				if (!a.equals(((PlanImpl) plan).getLastActivity())) {
+				if (!a.equals(PopulationUtils.getLastActivity(((PlanImpl) plan)))) {
 					a.setStartTime(now);
 					int min = now;
 					int endTime = (int)Math.round(a.getEndTime());

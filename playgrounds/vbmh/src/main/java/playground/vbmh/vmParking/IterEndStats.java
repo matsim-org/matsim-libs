@@ -9,6 +9,8 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+
 import playground.vbmh.util.CSVWriter;
 import playground.vbmh.util.VMCharts;
 import playground.vbmh.vmEV.EVControl;
@@ -99,11 +101,12 @@ public class IterEndStats {
 			boolean notParked=false;
 			boolean parkedAtHome=false;
 			PlanImpl planImpl=(PlanImpl)personImpl.getSelectedPlan();
-			LegImpl legImpl=(LegImpl)planImpl.getNextLeg(planImpl.getFirstActivity());
+			LegImpl legImpl=(LegImpl)PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( planImpl ), planImpl);
 			Id id = person.getId();
 			LinkedList<ParkingSpot> selectedParkings = parkings.get(id);
-			Activity firstAct = planImpl.getFirstActivity();
-			String actType = planImpl.getNextActivity(legImpl).getType();
+			Activity firstAct = PopulationUtils.getFirstActivity( planImpl );
+			final Leg leg = legImpl;
+			String actType = PopulationUtils.getNextActivity(leg, planImpl).getType();
 			ParkingSpot firstSelectedSpot;
 			ParkingSpot homeSpot;
 			String facId = firstAct.getFacilityId().toString();
