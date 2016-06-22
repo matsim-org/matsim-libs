@@ -319,8 +319,9 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		this.currleg = this.currplan.createAndAddLeg(mode.intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
-		LegImpl r = this.currleg;
-		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
+//		LegImpl r = this.currleg;
+//		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 	}
 
 	private void startRoute(final Attributes atts) {

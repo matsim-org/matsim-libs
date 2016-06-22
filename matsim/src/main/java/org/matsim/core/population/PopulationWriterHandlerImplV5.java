@@ -221,14 +221,16 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");
 		}
-		if (leg instanceof LegImpl) {
-			LegImpl l = (LegImpl)leg;
-			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
-				out.write(" arr_time=\"");
-				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
-				out.write("\"");
-			}
-		}
+//		if (leg instanceof LegImpl) {
+//			LegImpl l = (LegImpl)leg;
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
+//				out.write(" arr_time=\"");
+//				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
+//				out.write("\"");
+//			}
+//		}
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
+
 		out.write(">\n");
 	}
 

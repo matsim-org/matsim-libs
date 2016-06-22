@@ -229,8 +229,9 @@ import org.xml.sax.Attributes;
 		this.currleg = this.currplan.createAndAddLeg(atts.getValue("mode").toLowerCase(Locale.ROOT).intern());
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
-		LegImpl r = this.currleg;
-		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
+//		LegImpl r = this.currleg;
+//		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 	}
 
 	private void startRoute(final Attributes atts) {

@@ -36,6 +36,7 @@
           dep_time       CDATA                                                 #IMPLIED
           trav_time      CDATA                                                 #IMPLIED
           arr_time       CDATA                                                 #IMPLIED>
+<!-- arr_time is not in the API and so should be removed from next version of the DTD.  kai, jun'16 -->
 
 <!ELEMENT route          (#PCDATA)>
 <!ATTLIST route
