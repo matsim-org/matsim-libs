@@ -225,7 +225,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					Activity act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -235,7 +235,7 @@ public class PlansCreateFromMZ {
 					}
 				}
 				else {
-					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
+					Activity homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
 					homeAct.setEndTime(departure);
 					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
@@ -246,7 +246,7 @@ public class PlansCreateFromMZ {
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					Activity act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
 					act.setStartTime(arrival);
 				}
 			}

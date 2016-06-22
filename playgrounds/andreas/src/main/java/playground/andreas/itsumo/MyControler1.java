@@ -20,7 +20,8 @@
 
 package playground.andreas.itsumo;
 
-import com.google.inject.Provider;
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -54,7 +56,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.run.Events2Snapshot;
 
-import java.io.File;
+import com.google.inject.Provider;
 
 
 public class MyControler1 {
@@ -120,27 +122,27 @@ public class MyControler1 {
 
 			try {
 				PlanImpl plan1 = PopulationUtils.createPlan(p);
-				ActivityImpl act1a = plan1.createAndAddActivity("h", new Coord(100., 100.));
+				Activity act1a = plan1.createAndAddActivity("h", new Coord(100., 100.));
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
 				LegImpl leg = plan1.createAndAddLeg(TransportMode.car);
 				NetworkRoute route = new LinkNetworkRouteImpl(link9.getId(), link15.getId());
 				route.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 4"))), link15.getId());
 				leg.setRoute(route);
-				ActivityImpl act1b = plan1.createAndAddActivity("h", new Coord(200., 200.));
+				Activity act1b = plan1.createAndAddActivity("h", new Coord(200., 200.));
 				act1b.setLinkId(link15.getId());
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
 				PlanImpl plan2 = PopulationUtils.createPlan(p);
-				ActivityImpl act2a = plan1.createAndAddActivity("h", new Coord(100., 100.));
+				Activity act2a = plan1.createAndAddActivity("h", new Coord(100., 100.));
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
 				LegImpl leg2 = plan2.createAndAddLeg(TransportMode.car);
 				NetworkRoute route2 = new LinkNetworkRouteImpl(link9.getId(), link15.getId());
 				route2.setLinkIds(link9.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, "3 6 4"))), link15.getId());
 				leg2.setRoute(route2);
-				ActivityImpl act2b = plan1.createAndAddActivity("h", new Coord(200., 200.));
+				Activity act2b = plan1.createAndAddActivity("h", new Coord(200., 200.));
 				act2b.setLinkId(link15.getId());
 				act2b.setStartTime(8*60*60);
 				p.addPlan(plan2);
@@ -317,13 +319,13 @@ public class MyControler1 {
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(ii, Person.class));
 		PlanImpl plan = PopulationUtils.createPlan(p);
 		try {
-			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
+			Activity act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
 			act1.setLinkId(sourceLink.getId());
 			act1.setStartTime(0.);
 			act1.setEndTime(0 * 60 * 60.);
 
 			plan.createAndAddLeg(TransportMode.car);
-			ActivityImpl act2 = plan.createAndAddActivity("h", new Coord(200., 200.));
+			Activity act2 = plan.createAndAddActivity("h", new Coord(200., 200.));
 			act2.setLinkId(destLink.getId());
 			act2.setStartTime(8 * 60 * 60);
 

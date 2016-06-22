@@ -11,13 +11,13 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -135,7 +135,7 @@ public class Converter {
 				tmpCoord = this.tmpHome;
 			}
 
-			ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[7], tmpCoord);
+			Activity act = ((PlanImpl) pl).createAndAddActivity(tabs[7], tmpCoord);
 			act.setEndTime(convertTime(tabs[3]));
 			act.setMaximumDuration(dur);
 
@@ -156,7 +156,7 @@ public class Converter {
 				if (this.tmpTabs[10].equals("H")) {
 					tmpCoord2 = this.tmpHome;
 				}
-				ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[10], tmpCoord2);
+				Activity lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[10], tmpCoord2);
 
 				// make a copy of the just finished plan and set it to use public transit mode
 				PlanImpl nonCarPlan = PopulationUtils.createPlan(p);
@@ -175,7 +175,7 @@ public class Converter {
 			endTime = convertTime(tabs[3]);
 
 			this.tmpHome = getRandomCoordInZone(tabs[9]);
-			ActivityImpl homeAct = pl.createAndAddActivity(tabs[7], this.tmpHome);
+			Activity homeAct = pl.createAndAddActivity(tabs[7], this.tmpHome);
 			homeAct.setEndTime(convertTime(tabs[3]));
 			p.addPlan(pl);
 			this.pop.addPerson(p);

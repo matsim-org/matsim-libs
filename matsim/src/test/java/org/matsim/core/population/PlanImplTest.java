@@ -71,9 +71,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_Between() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		ActivityImpl homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
+		Activity homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
-		ActivityImpl workAct = plan.createAndAddActivity("w", new Coord(100, 200));
+		Activity workAct = plan.createAndAddActivity("w", new Coord(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());
@@ -100,9 +100,9 @@ public class PlanImplTest {
 	@Test
 	public void testInsertActLeg_AtEnd() {
 		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		ActivityImpl homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
+		Activity homeAct = plan.createAndAddActivity("h", new Coord(0, 0));
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
-		ActivityImpl workAct = plan.createAndAddActivity("w", new Coord(100, 200));
+		Activity workAct = plan.createAndAddActivity("w", new Coord(100, 200));
 
 		// precondition
 		assertEquals(3, plan.getPlanElements().size());

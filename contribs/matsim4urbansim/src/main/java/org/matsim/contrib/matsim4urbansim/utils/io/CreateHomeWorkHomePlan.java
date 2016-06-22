@@ -3,6 +3,7 @@ package org.matsim.contrib.matsim4urbansim.utils.io;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -25,7 +26,7 @@ public class CreateHomeWorkHomePlan {
 	 * @author nagel
 	 */
 	public static void makeHomePlan( PlanImpl plan, Coord homeCoord, ActivityFacility homeLocation) {
-		ActivityImpl act = plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord) ;
+		Activity act = plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord) ;
 		act.setFacilityId( homeLocation.getId() );	// tnicolai: added facility id to compute zone2zone trips
 	}
 
@@ -41,7 +42,7 @@ public class CreateHomeWorkHomePlan {
 	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord, ActivityFacility jobLocation ) {
 		
 		// complete the first activity (home) by setting end time. 
-		ActivityImpl act = (ActivityImpl)PopulationUtils.getFirstActivity( plan );
+		Activity act = (ActivityImpl)PopulationUtils.getFirstActivity( plan );
 
 		final double hmDpTime = (6.+2.*MatsimRandom.getRandom().nextDouble())*3600.;
 		act.setEndTime( hmDpTime ) ;

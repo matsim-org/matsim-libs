@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
@@ -93,12 +92,12 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 
 	private Person currperson = null;
 	private PlanImpl currplan = null;
-	private ActivityImpl curract = null;
+	private Activity curract = null;
 	private LegImpl currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	public PopulationReaderMatsimV5(final Scenario scenario) {
 		this.scenario = scenario;

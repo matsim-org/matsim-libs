@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
@@ -74,7 +75,7 @@ import org.xml.sax.Attributes;
 	private NetworkRoute currroute = null;
 	private String routeNodes = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	public PopulationReaderMatsimV1(final Scenario scenario) {
 		this( new IdentityTransformation() , scenario );
@@ -191,7 +192,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startAct(final Attributes atts) {
-		ActivityImpl act = null;
+		Activity act = null;
 		if (atts.getValue("link") != null) {
 			final Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivityFromLinkId(atts.getValue("type"), linkId);

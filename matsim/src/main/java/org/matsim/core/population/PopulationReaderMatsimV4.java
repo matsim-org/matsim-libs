@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
@@ -85,12 +86,12 @@ import org.xml.sax.Attributes;
 	private String curracttype = null;
 	private ActivityOption curractivity = null;
 	private PlanImpl currplan = null;
-	private ActivityImpl curract = null;
+	private Activity curract = null;
 	private LegImpl currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 

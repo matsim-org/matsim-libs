@@ -23,10 +23,13 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.*;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -214,7 +217,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					ActivityImpl a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
+					Activity a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
 					a.setStartTime(start_time);
 				}
 				catch (Exception e) { throw new RuntimeException(e); }
@@ -225,7 +228,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				time_sum += dur;
 				int end_time = time_sum;
 				try {
-					ActivityImpl a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
+					Activity a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setMaximumDuration(dur);

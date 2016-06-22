@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -35,7 +36,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -177,7 +177,7 @@ public class CMCFScenarioGenerator {
 			if ((i-1) % 3 == 0){
 				homeEndTime++;
 			}
-			ActivityImpl act1 = plan.createAndAddActivity("h", l1.getCoord());
+			Activity act1 = plan.createAndAddActivity("h", l1.getCoord());
 			act1.setLinkId(l1.getId());
 			act1.setEndTime(homeEndTime);
 			//leg to home
@@ -190,7 +190,7 @@ public class CMCFScenarioGenerator {
 				route.setLinkIds(l1.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, "2 3 5 6"))), l6.getId());
 			}
 			leg.setRoute(route);
-			ActivityImpl act2 = plan.createAndAddActivity("h", l6.getCoord());
+			Activity act2 = plan.createAndAddActivity("h", l6.getCoord());
 			act2.setLinkId(l6.getId());
 			this.plans.addPerson(p);
 		}

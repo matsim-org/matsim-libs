@@ -94,12 +94,12 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 
 	private Person currperson = null;
 	private PlanImpl currplan = null;
-	private ActivityImpl curract = null;
+	private Activity curract = null;
 	private LegImpl currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	public PopulationReaderMatsimV5(final Scenario scenario) {
 		this( new IdentityTransformation() , scenario );

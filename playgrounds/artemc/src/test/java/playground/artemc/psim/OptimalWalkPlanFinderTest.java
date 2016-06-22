@@ -291,7 +291,7 @@ public class OptimalWalkPlanFinderTest {
 			Coord homeLocation = new Coord(0.0, 1.0);
 			Coord workLocation = new Coord(1153.8461538461538, 1.0);
 
-			ActivityImpl firstActivity = this.plan.createAndAddActivity("home", homeLocation);
+			Activity firstActivity = this.plan.createAndAddActivity("home", homeLocation);
 			firstActivity.setEndTime(firstLegStartTime);
 
 			Leg leg = this.plan.createAndAddLeg(TransportMode.walk);
@@ -302,7 +302,7 @@ public class OptimalWalkPlanFinderTest {
 			route1.setDistance(CoordUtils.calcEuclideanDistance(homeLocation, workLocation));
 			leg.setRoute(route1);
 
-			ActivityImpl secondActivity = this.plan.createAndAddActivity("work", workLocation);
+			Activity secondActivity = this.plan.createAndAddActivity("work", workLocation);
 			secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
 			secondActivity.setEndTime(secondLegStartTime);
 
@@ -314,7 +314,7 @@ public class OptimalWalkPlanFinderTest {
 			route2.setDistance(CoordUtils.calcEuclideanDistance(homeLocation, workLocation));
 			leg.setRoute(route2);
 
-			ActivityImpl lastActivity = this.plan.createAndAddActivity("home", homeLocation);
+			Activity lastActivity = this.plan.createAndAddActivity("home", homeLocation);
 			lastActivity.setStartTime(secondLegStartTime + secondLegTravelTime);
 
 			this.scenario.getPopulation().addPerson(this.person);

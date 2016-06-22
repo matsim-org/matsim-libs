@@ -171,7 +171,7 @@ import org.xml.sax.Attributes;
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
 
-		ActivityImpl act;
+		Activity act;
 		if (atts.getValue("link") != null) {
 			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivityFromLinkId(atts.getValue("type"), linkId);

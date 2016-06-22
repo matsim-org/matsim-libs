@@ -11,11 +11,11 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -166,7 +166,7 @@ public class ModdedConverterE {
 							tmpCoord = getRandomCoordInZone(Id.create(tabs[6], Zone.class));
 						}
 						this.tmpType = tabs[7];
-						ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
+						Activity act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
 						act.setEndTime(convertTime(tabs[3]));
 						act.setMaximumDuration(dur);
 					} else {
@@ -194,7 +194,7 @@ public class ModdedConverterE {
 								this.count2+=1;
 								System.out.println(this.tmpPersonId);
 							}
-							ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
+							Activity lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 
 						}
 
@@ -222,7 +222,7 @@ public class ModdedConverterE {
 							this.count1 += 1;
 							System.out.println(personId);
 						}
-						ActivityImpl homeAct = pl.createAndAddActivity(tabs[4], tmpCoord3);
+						Activity homeAct = pl.createAndAddActivity(tabs[4], tmpCoord3);
 						homeAct.setEndTime(convertTime(tabs[3]));
 						p.addPlan(pl);
 						this.pop.addPerson(p);
@@ -265,7 +265,7 @@ public class ModdedConverterE {
 				this.count2+=1;
 				System.out.println(this.tmpPersonId);
 			}
-			ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
+			Activity lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 			System.out.println("# of chains that do not start at home: " + this.count1);
 			System.out.println("# of chains that do not end at home: " + this.count2);
 		}
