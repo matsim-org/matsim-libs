@@ -36,6 +36,9 @@ public class LinearTimeAllocationProblem {
 	// coefficient for waiting in front of a closed facility
 	private final double betaWait_1_s;
 
+	// slack in time interval bound constraints
+	private final double slack_s;
+
 	// (chronological) sequence of trips to be time-optimized
 	private final List<Trip> trips = new ArrayList<>();
 
@@ -43,13 +46,14 @@ public class LinearTimeAllocationProblem {
 
 	public LinearTimeAllocationProblem(final InterpolatedTravelTimes interpolatedTravelTimes, final double betaDur_1_s,
 			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s,
-			final double betaWait_1_s) {
+			final double betaWait_1_s, final double slack_s) {
 		this.travelTimes = interpolatedTravelTimes;
 		this.betaDur_1_s = betaDur_1_s;
 		this.betaTravel_1_s = betaTravel_1_s;
 		this.betaLateArr_1_s = betaLateArr_1_s;
 		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
 		this.betaWait_1_s = betaWait_1_s;
+		this.slack_s = slack_s;
 	}
 
 	// -------------------- HELPERS --------------------
@@ -279,7 +283,8 @@ public class LinearTimeAllocationProblem {
 			 * <=>  dptTime  >=  -------------------------------------
 			 *                        1 + dTravelTime / dDptTime 
 			 *             
-			 * Combined into one lower bound by taking the maximum of the lower bounds (1) and (2).                             
+			 * Combined into one lower bound by taking the maximum of the lower 
+			 * bounds (1) and (2). An additional slack may be allowed for.
 			 *                               
 			 * TODO This assumes that one is dividing through a strictly 
 			 * positive number.                               
@@ -290,7 +295,7 @@ public class LinearTimeAllocationProblem {
 				coeffs.setEntry(tripIndex, 1.0);
 				final double lowerBound = Math.max(dptTimeStepStart_s,
 						(arrTimeStepStart_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
-				constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, lowerBound));
+				constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, lowerBound - this.slack_s));
 			}
 
 			/*-----------------------------------------------------------------
@@ -312,7 +317,8 @@ public class LinearTimeAllocationProblem {
 			 * <=>  dptTime  <=  -----------------------------------
 			 *                       1 + dTravelTime / dDptTime
 			 *             
-			 * Combined into one upper bound by taking the minimum of the upper bounds (1) and (2).                             
+			 * Combined into one upper bound by taking the minimum of the upper 
+			 * bounds (1) and (2). An additional slack may be allowed for.                             
 			 *                   
 			 * TODO This assumes that one is dividing through a strictly 
 			 * positive number.                               
@@ -323,10 +329,12 @@ public class LinearTimeAllocationProblem {
 				coeffs.setEntry(tripIndex, 1.0);
 				final double upperBound = Math.min(dptTimeStepEnd_s,
 						(arrTimeStepEnd_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
-				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, upperBound));
+				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, upperBound + this.slack_s));
 			}
 
 			/*-----------------------------------------------------------------
+			 * TODO Not sure if this is of any use.
+			 * 
 			 * DURATION OF NEXT ACTIVITY MUST BE NON-NEGATIVE.
 			 * 
 			 * nextArrTime <= nextDptTime
@@ -340,22 +348,23 @@ public class LinearTimeAllocationProblem {
 			 * TODO Making the activity duration strictly positive would help
 			 * to deal with negative-infinity problems in the logarithmic 
 			 * activity duration scoring.
+			 * 
+			 * FIXME 24hr wrap-around is not accounted for.
 			 *-----------------------------------------------------------------
 			 */
-			/*
-			{
-				final int nextTripIndex;
-				if (tripIndex == this.trips.size() - 1) {
-					nextTripIndex = 0;
-				} else {
-					nextTripIndex = tripIndex + 1;
-				}
-				final RealVector coeffs = new ArrayRealVector(this.trips.size());
-				coeffs.setEntry(tripIndex, 1.0 + dTravelTime_dDptTime);
-				coeffs.setEntry(nextTripIndex, -1.0);
-				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, -travelTimeOffset_s));
-			}
-			*/
+			// {
+			// final int nextTripIndex;
+			// if (tripIndex == this.trips.size() - 1) {
+			// nextTripIndex = 0;
+			// } else {
+			// nextTripIndex = tripIndex + 1;
+			// }
+			// final RealVector coeffs = new ArrayRealVector(this.trips.size());
+			// coeffs.setEntry(tripIndex, 1.0 + dTravelTime_dDptTime);
+			// coeffs.setEntry(nextTripIndex, -1.0);
+			// constraints.add(new LinearConstraint(coeffs, Relationship.LEQ,
+			// -travelTimeOffset_s));
+			// }
 		}
 
 		return new LinearConstraintSet(constraints);
