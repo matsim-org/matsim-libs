@@ -84,9 +84,6 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 
 				String scheduleTransportMode = transitRoute.getTransportMode();
 
-				boolean mapScheduleModeArtificial = config.getModeRoutingAssignment().get(scheduleTransportMode).
-						contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-
 				Router modeRouter = modeSeparatedRouters.get(scheduleTransportMode);
 				Network modeNetwork = modeRouter.getNetwork();
 
@@ -131,7 +128,7 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 					for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 						for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 
-							boolean useArtificialLink = true;
+							boolean useExistingNetworkLinks = false;
 							double pathCost = 2 * maxAllowedPathCost;
 							/**
 							 * if both link candidates are loop links we don't have to search
@@ -161,17 +158,17 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 									}
 								}
 
-								useArtificialLink = pathCost < maxAllowedPathCost;
+								useExistingNetworkLinks = pathCost < maxAllowedPathCost;
 							}
 
-							if(useArtificialLink) {
+							if(useExistingNetworkLinks) {
+								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
+							} else {
 								artificialLinksToBeCreated.add(new ArtificialLink(linkCandidateCurrent, linkCandidateNext));
 
 								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord()) * config.getMaxTravelCostFactor();
 								pathCost = (config.getTravelCostType().equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime) ? length / 0.5 : length);
 
-								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
-							} else {
 								pseudoGraph.addEdge(i, routeStops.get(i), linkCandidateCurrent, routeStops.get(i+1), linkCandidateNext, pathCost);
 							}
 						}

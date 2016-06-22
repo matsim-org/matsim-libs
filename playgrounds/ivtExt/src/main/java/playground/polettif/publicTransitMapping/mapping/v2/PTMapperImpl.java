@@ -79,6 +79,17 @@ public class PTMapperImpl extends PTMapper {
 
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
+		Set<String> scheduleTransportModes = new HashSet<>();
+		// schedule statistics
+		Map<TransitLine, Integer> statTransitLine = new HashMap<>();
+		int nTransitRoutes = 0;
+		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				scheduleTransportModes.add(transitRoute.getTransportMode());
+				MapUtils.addToInteger(transitLine, statTransitLine, transitRoute.getStops().size(), transitRoute.getStops().size());
+				nTransitRoutes++;
+			}
+		}
 
 		/** [1]
 		 * Load the closest links and create LinkCandidates. StopFacilities
@@ -99,12 +110,9 @@ public class PTMapperImpl extends PTMapper {
 		log.info("Creating mode separated network and routers");
 		Map<String, Set<String>> modeRoutingAssignment = config.getModeRoutingAssignment();
 		FastAStarRouter.setTravelCostType(config.getTravelCostType());
-		for(Map.Entry<String, Set<String>> modeAssignment : modeRoutingAssignment.entrySet()) {
-			log.info("Initiating network and router for " + modeAssignment.getValue());
-			// filter network
-			Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, modeAssignment.getValue());
-			// store network and router in maps
-			modeSeparatedRouters.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork));
+		for(String scheduleMode : scheduleTransportModes) {
+			log.info("Initiating network and router for schedule mode " +scheduleMode+". Network modes " + modeRoutingAssignment.get(scheduleMode));
+			modeSeparatedRouters.put(scheduleMode, FastAStarRouter.createModeSeparatedRouter(network, modeRoutingAssignment.get(scheduleMode)));
 		}
 
 		/** [3]
@@ -112,24 +120,10 @@ public class PTMapperImpl extends PTMapper {
 		 * Initiate and start threads, calculate PseudoTransitRoutes
 		 * for all transit routes.
 		 */
-		final PseudoSchedule pseudoSchedule = new PseudoScheduleImpl();
-
-		// schedule statistics
-		Map<TransitLine, Integer> statTransitLine = new HashMap<>();
-		int nTransitRoutes = 0;
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				String transportMode = transitRoute.getTransportMode();
-				if(!modeRoutingAssignment.containsKey(transportMode)) {
-					throw new IllegalArgumentException("No routing assignment defined for schedule transport mode " + transportMode);
-				}
-				MapUtils.addToInteger(transitLine, statTransitLine, transitRoute.getStops().size(), transitRoute.getStops().size());
-				nTransitRoutes++;
-			}
-		}
-
 		log.info("==================================");
 		log.info("Calculating pseudoTransitRoutes... ("+nTransitRoutes+" transit routes in "+schedule.getTransitLines().size()+" transit lines)");
+
+		final PseudoSchedule pseudoSchedule = new PseudoScheduleImpl();
 
 		// initiate
 		int numThreads = config.getNumOfThreads() > 0 ? config.getNumOfThreads() : 1;
