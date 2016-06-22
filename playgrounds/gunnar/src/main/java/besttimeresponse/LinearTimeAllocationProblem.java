@@ -7,6 +7,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.LinearConstraintSet;
+import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.commons.math3.optim.linear.Relationship;
 
 /**
@@ -18,18 +19,24 @@ public class LinearTimeAllocationProblem {
 
 	// -------------------- MEMBERS --------------------
 
-	private final InterpolatedTravelTimes interpolatedTravelTimes;
+	private final InterpolatedTravelTimes travelTimes;
 
+	// coefficient for duration of an activity
 	private final double betaDur_1_s;
 
+	// coefficient for travel duration
 	private final double betaTravel_1_s;
 
+	// coefficient for early departure
 	private final double betaEarlyDpt_1_s;
 
+	// coefficient for late arrival
 	private final double betaLateArr_1_s;
 
+	// coefficient for waiting in front of a closed facility
 	private final double betaWait_1_s;
 
+	// (chronological) sequence of trips to be time-optimized
 	private final List<Trip> trips = new ArrayList<>();
 
 	// -------------------- CONSTRUCTION --------------------
@@ -37,7 +44,7 @@ public class LinearTimeAllocationProblem {
 	public LinearTimeAllocationProblem(final InterpolatedTravelTimes interpolatedTravelTimes, final double betaDur_1_s,
 			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s,
 			final double betaWait_1_s) {
-		this.interpolatedTravelTimes = interpolatedTravelTimes;
+		this.travelTimes = interpolatedTravelTimes;
 		this.betaDur_1_s = betaDur_1_s;
 		this.betaTravel_1_s = betaTravel_1_s;
 		this.betaLateArr_1_s = betaLateArr_1_s;
@@ -47,44 +54,26 @@ public class LinearTimeAllocationProblem {
 
 	// -------------------- HELPERS --------------------
 
-	private int getBin(final double time_s) {
-		return this.interpolatedTravelTimes.getTimeDiscretization().getBin(time_s);
+	private int getStep(final double time_s) {
+		return this.travelTimes.getTimeDiscretization().getBin(time_s);
 	}
 
 	private int getBinStartTime_s(final int bin) {
-		return this.interpolatedTravelTimes.getTimeDiscretization().getBinStartTime_s(bin);
+		return this.travelTimes.getTimeDiscretization().getBinStartTime_s(bin);
 	}
 
 	private int getBinEndTime_s(final int bin) {
-		return this.interpolatedTravelTimes.getTimeDiscretization().getBinEndTime_s(bin);
+		return this.travelTimes.getTimeDiscretization().getBinEndTime_s(bin);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public void addTrip(final Object origin, final Object destination, final int departureTime_s, final Object mode,
-			final double originTimePressure, final double destinationTimePressure, final int originClosingTime_s,
-			final int earliestDepartureTime_s, final int destinationOpeningTime_s, final int latestArrivalTime_s) {
+	public void addTrip(final Trip trip) {
+		this.trips.add(trip);
+	}
 
-		final int departureTimeStep = this.getBin(departureTime_s);
-		final double arrivalTime_s = departureTime_s
-				+ this.interpolatedTravelTimes.getTravelTime_s(origin, destination, departureTime_s, mode);
-		final int arrivalTimeStep = this.getBin(arrivalTime_s);
-
-		final int originClosingTimeStep = this.getBin(originClosingTime_s);
-		final boolean originClosesBeforeDeparture = (originClosingTimeStep <= departureTimeStep);
-
-		final int earliestDepartureTimeStep = this.getBin(earliestDepartureTime_s);
-		final boolean earlyDepartureFromOrigin = (departureTimeStep < earliestDepartureTimeStep);
-
-		final int destinationOpeningTimeStep = this.getBin(destinationOpeningTime_s);
-		final boolean destinationOpensAfterArrival = (destinationOpeningTimeStep <= arrivalTimeStep);
-
-		final int latestArrivalTimeStep = this.getBin(latestArrivalTime_s);
-		final boolean lateArrivalToDestination = (latestArrivalTimeStep <= arrivalTimeStep);
-
-		this.trips.add(new Trip(origin, destination, departureTime_s, mode, originTimePressure, destinationTimePressure,
-				originClosesBeforeDeparture, earlyDepartureFromOrigin, destinationOpensAfterArrival,
-				lateArrivalToDestination));
+	public void addTrips(final List<Trip> tripList) {
+		this.trips.addAll(tripList);
 	}
 
 	public RealVector get__dScore_dDptTimes__1_s() {
@@ -92,19 +81,17 @@ public class LinearTimeAllocationProblem {
 		final RealVector dScore_dDptTimes__1_s = new ArrayRealVector(this.trips.size());
 
 		for (int tripIndex = 0; tripIndex < this.trips.size(); tripIndex++) {
-
 			final Trip trip = this.trips.get(tripIndex);
 
-			final double dTravelTime_dDptTime = this.interpolatedTravelTimes.get_dTravelTime_dDptTime(trip);
+			final double dTravelTime_dDptTime = this.travelTimes.get_dTravelTime_dDptTime(trip);
 
 			/*-----------------------------------------------------------------
-			 * EFFECT OF DEPARTURE TIME ON PREVIOUS ACTIVITY DURATION SCORE.
-			 * 
-			 * If the previous closing time binds, i.e if 
-			 * dptTime > closingTime, then there is no effect. If the previous 
-			 * closing time does not bind, then
-			 * 
+			 * EFFECT OF DEPARTURE TIME ON ORIGIN ACTIVITY DURATION SCORE.
+			 *
 			 * S_act = beta_dur * dur_desired * log(dur_realized)
+			 *
+			 * If the origin activity closes before departure, then there is 
+			 * no effect. Otherwise,
 			 * 
 			 * dS_act                dur_desired    dDur_realized
 			 * -------- = beta_dur * ------------ * -------------
@@ -131,8 +118,8 @@ public class LinearTimeAllocationProblem {
 			/*-----------------------------------------------------------------
 			 * EFFECT OF DEPARTURE TIME ON EARLY DEPARTURE SCORE.
 			 * 	
-			 * If there is no early departure, i.e if dptTime > earliest.dp,
-			 * then there is no effect. If there is an early departure, then
+			 * If there is no early departure, then there is no effect. 
+			 * Otherwise,
 			 * 
 			 * S_early.dpt = beta_early.dp * (earliest.dp - dptTime)
 			 * 
@@ -147,11 +134,10 @@ public class LinearTimeAllocationProblem {
 			}
 
 			/*-----------------------------------------------------------------
-			 * EFFECT OF DEPARTURE TIME ON FOLLOWING ACTIVITY DURATION SCORE.
+			 * EFFECT OF DEPARTURE TIME ON DESTINATION ACTIVITY DURATION SCORE.
 			 * 
-			 * If the following opening time binds, i.e if 
-			 * dptTime + travelTime(dptTime) < openingTime, then there is no 
-			 * effect. If the following opening time does not bind, then
+			 * If the destination activity opens after arrival, then there is 
+			 * no effect. Otherwise,
 			 * 
 			 * dS_act                               dDur_realized
 			 * -------- = beta_dur * timePressure * -------------
@@ -159,15 +145,15 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * where
 			 * 
-			 * dDur_realized   dDur_realized   dArrivalTime     dArrivalTime
-			 * ------------- = ------------- * ------------ = - ------------.
-			 * dDptTime        dArrivalTime    dDptTime         dDptTime
+			 * dDur_realized   dDur_realized   dArrivalTime   - dArrivalTime
+			 * ------------- = ------------- * ------------ = --------------.
+			 * dDptTime        dArrivalTime    dDptTime       dDptTime
 			 * 
 			 * From
 			 * 
-			 * arrivalTime = dptTime + travelTime(dptTime)
+			 * arrivalTime = dptTime + travelTime(dptTime),
 			 * 
-			 * one has
+			 * one obtains
 			 *  
 			 * dArrivalTime       dTravelTime
 			 * ------------ = 1 + -----------.
@@ -181,17 +167,16 @@ public class LinearTimeAllocationProblem {
 			}
 
 			/*-----------------------------------------------------------------
-			 * EFFECT OF DEPARTURE TIME ON WAIT-FOR-FOLLOWING ACTIVITY SCORE.
+			 * EFFECT OF DEPARTURE TIME ON WAIT-FOR-DESTINATION-ACTIVITY SCORE.
 			 * 
-			 * If the following opening time does not bind, i.e if 
-			 * dptTime + travelTime(dptTime) > openingTime, then there is no 
-			 * effect. If the following opening time does bind, then
+			 * This only has an effect if the destination activity opens after
+			 * arrival. Then,
 			 * 
 			 * S_wait = beta_wait * (openingTime - arrivalTime)
 			 * 
-			 * dS_wait                  dArrivalTime
-			 * -------- = - beta_wait * ------------
-			 * dDptTime                 dDptTime
+			 * dS_wait                - dArrivalTime
+			 * -------- = beta_wait * ------------
+			 * dDptTime               dDptTime
 			 * 
 			 * where, again,
 			 *  
@@ -202,14 +187,13 @@ public class LinearTimeAllocationProblem {
 			 * ----------------------------------------------------------------
 			 */
 			if (trip.destinationOpensAfterArrival) {
-				dScore_dDptTimes__1_s.addToEntry(tripIndex, -this.betaWait_1_s * (1.0 + dTravelTime_dDptTime));
+				dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaWait_1_s * -(1.0 + dTravelTime_dDptTime));
 			}
 
 			/*-----------------------------------------------------------------
-			 * EFFECT OF DEPARTURE TIME ON LATE ARRIVAL SCORE.
+			 * EFFECT OF DEPARTURE TIME ON LATE ARRIVAL AT DESTINATION SCORE.
 			 * 	
-			 * If there is no late arrival, i.e. arrivalTime < latest.arr, 
-			 * then there is no effect. If there is a late arrival, then
+			 * This only has an effect if there is a late arrival. Then,
 			 * 
 			 * S_late.ar = beta_late.ar * (arrivalTime - latest.ar)
 			 * 
@@ -230,7 +214,7 @@ public class LinearTimeAllocationProblem {
 			}
 
 			/*-----------------------------------------------------------------
-			 * EFFECT ON TRAVEL TIME DURATION.
+			 * EFFECT OF DEPARTURE TIME ON TRAVEL TIME DURATION.
 			 * 	
 			 * S_travel = beta_travel * travelTime(dptTime)
 			 * 
@@ -246,72 +230,67 @@ public class LinearTimeAllocationProblem {
 		return dScore_dDptTimes__1_s;
 	}
 
-	public LinearConstraintSet getLinearConstraints() {
+	public LinearObjectiveFunction getObjectiveFunction() {
+		return new LinearObjectiveFunction(this.get__dScore_dDptTimes__1_s(), 0.0);
+	}
+
+	public LinearConstraintSet getConstraints() {
 		final List<LinearConstraint> constraints = new ArrayList<>();
 
-		/*-----------------------------------------------------------------
-		 * THE FIRST DEPARTURE MUST NOT OCCUR BEFORE MIDNIGHT.
-		 * ----------------------------------------------------------------
-		 */
+		// The first departure must not occur before midnight.
 		{
 			final RealVector coeffs = new ArrayRealVector(this.trips.size());
 			coeffs.setEntry(0, 1.0);
 			constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, 0.0));
 		}
 
+		// The remaining constraints apply to all trip departure times.
 		for (int tripIndex = 0; tripIndex < this.trips.size(); tripIndex++) {
-
 			final Trip trip = this.trips.get(tripIndex);
-			final int nextTripIndex;
-			if (tripIndex == this.trips.size() - 1) {
-				nextTripIndex = 0;
-			} else {
-				nextTripIndex = tripIndex + 1;
-			}
 
-			final int dptTimeBin = this.getBin(trip.departureTime_s);
-			final int dptTimeStepStart_s = this.getBinStartTime_s(dptTimeBin);
-			final int dptTimeStepEnd_s = this.getBinEndTime_s(dptTimeBin);
+			final int dptTimeStep = this.getStep(trip.departureTime_s);
+			final double dptTimeStepStart_s = this.getBinStartTime_s(dptTimeStep);
+			final double dptTimeStepEnd_s = this.getBinEndTime_s(dptTimeStep);
 
-			final double arrivalTime_s = trip.departureTime_s + this.interpolatedTravelTimes.getTravelTime_s(trip);
-			final int arrTimeStep = this.getBin(arrivalTime_s);
-			final int arrTimeStepStart_s = this.getBinStartTime_s(arrTimeStep);
-			final int arrTimeStepEnd_s = this.getBinEndTime_s(arrTimeStep);
+			final double arrivalTime_s = this.travelTimes.getArrivalTime_s(trip);
+			final int arrTimeStep = this.getStep(arrivalTime_s);
+			final double arrTimeStepStart_s = this.getBinStartTime_s(arrTimeStep);
+			final double arrTimeStepEnd_s = this.getBinEndTime_s(arrTimeStep);
 
-			final double dTravelTime_dDptTime = this.interpolatedTravelTimes.get_dTravelTime_dDptTime(trip);
-			final double travelTimeOffset_s = this.interpolatedTravelTimes.getTravelTimeOffset_s(trip);
+			final double dTravelTime_dDptTime = this.travelTimes.get_dTravelTime_dDptTime(trip);
+			final double travelTimeOffset_s = this.travelTimes.getTravelTimeOffset_s(trip);
 
 			/*-----------------------------------------------------------------
 			 * LOWER BOUND CONSTRAINTS.
 			 * 
 			 * (1) Lower bound on departure time (to stay within departure time bin):
 			 * 
-			 * dptTime >= minValue(dptTimeBin)
+			 * dptTime >= start(dptTimeBin)
 			 * 
 			 * (2) Lower bound on arrival time (to stay within arrival time bin):
 			 * 
-			 * arrivalTime >= minValue(arrivalTimeBin)
+			 * arrivalTime >= start(arrivalTimeBin)
 			 *    
 			 *                dTravelTime
-			 *  =>  dptTime + ----------- * dptTime + dptTimeOffset  >=  minValue(arrivalTimeBin)
+			 *  =>  dptTime + ----------- * dptTime + dptTimeOffset  >=  start(arrivalTimeBin)
 			 *                dDptTime   
 			 * 
-			 *                   minValue(arrivalTimeBin) - dptTimeOffset
-			 * <=>  dptTime  >=  ----------------------------------------
-			 *                              dTravelTime 
-			 *                          1 + ----------- 
-			 *                              dDptTime    
+			 *                   start(arrivalTimeBin) - dptTimeOffset
+			 * <=>  dptTime  >=  -------------------------------------
+			 *                        1 + dTravelTime / dDptTime 
 			 *             
 			 * Combined into one lower bound by taking the maximum of the lower bounds (1) and (2).                             
 			 *                               
+			 * TODO This assumes that one is dividing through a strictly 
+			 * positive number.                               
 			 *-----------------------------------------------------------------
 			 */
 			{
-				final RealVector lowerBoundCoeffs = new ArrayRealVector(this.trips.size());
-				lowerBoundCoeffs.setEntry(tripIndex, 1.0);
+				final RealVector coeffs = new ArrayRealVector(this.trips.size());
+				coeffs.setEntry(tripIndex, 1.0);
 				final double lowerBound = Math.max(dptTimeStepStart_s,
 						(arrTimeStepStart_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
-				constraints.add(new LinearConstraint(lowerBoundCoeffs, Relationship.GEQ, lowerBound));
+				constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, lowerBound));
 			}
 
 			/*-----------------------------------------------------------------
@@ -319,32 +298,32 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * (1) Upper bound on departure time (to stay within departure time bin):
 			 * 
-			 * dptTime <= maxValue(dptTimeBin)
+			 * dptTime <= end(dptTimeBin)
 			 * 
 			 * (2) Upper bound on arrival time (to stay within arrival time bin):
 			 * 
-			 * arrivalTime <= maxValue(arrivalTimeBin)
+			 * arrivalTime <= end(arrivalTimeBin)
 			 *    
 			 *                dTravelTime
-			 *  =>  dptTime + ----------- * dptTime + dptTimeOffset  <=  maxValue(arrivalTimeBin)
+			 *  =>  dptTime + ----------- * dptTime + dptTimeOffset  <=  end(arrivalTimeBin)
 			 *                dDptTime   
 			 * 
-			 *                   maxValue(arrivalTimeBin) - dptTimeOffset
-			 * <=>  dptTime  <=  ----------------------------------------
-			 *                              dTravelTime 
-			 *                          1 + ----------- 
-			 *                              dDptTime    
+			 *                   end(arrivalTimeBin) - dptTimeOffset
+			 * <=>  dptTime  <=  -----------------------------------
+			 *                       1 + dTravelTime / dDptTime
 			 *             
 			 * Combined into one upper bound by taking the minimum of the upper bounds (1) and (2).                             
-			 *                               
+			 *                   
+			 * TODO This assumes that one is dividing through a strictly 
+			 * positive number.                               
 			 *-----------------------------------------------------------------
 			 */
 			{
-				final RealVector upperBoundCoeffs = new ArrayRealVector(this.trips.size());
-				upperBoundCoeffs.setEntry(tripIndex, 1.0);
+				final RealVector coeffs = new ArrayRealVector(this.trips.size());
+				coeffs.setEntry(tripIndex, 1.0);
 				final double upperBound = Math.min(dptTimeStepEnd_s,
 						(arrTimeStepEnd_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
-				constraints.add(new LinearConstraint(upperBoundCoeffs, Relationship.LEQ, upperBound));
+				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, upperBound));
 			}
 
 			/*-----------------------------------------------------------------
@@ -358,14 +337,25 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * <=>  (1 + dTravelTime / dDptTime) * dptTime - nextDptTime <= -travelTimeOffset
 			 * 
+			 * TODO Making the activity duration strictly positive would help
+			 * to deal with negative-infinity problems in the logarithmic 
+			 * activity duration scoring.
 			 *-----------------------------------------------------------------
 			 */
+			/*
 			{
+				final int nextTripIndex;
+				if (tripIndex == this.trips.size() - 1) {
+					nextTripIndex = 0;
+				} else {
+					nextTripIndex = tripIndex + 1;
+				}
 				final RealVector coeffs = new ArrayRealVector(this.trips.size());
 				coeffs.setEntry(tripIndex, 1.0 + dTravelTime_dDptTime);
 				coeffs.setEntry(nextTripIndex, -1.0);
 				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, -travelTimeOffset_s));
 			}
+			*/
 		}
 
 		return new LinearConstraintSet(constraints);
