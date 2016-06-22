@@ -242,7 +242,12 @@ public class NetworkTools {
 
 
 	/**
-	 * @return the filtered network, input network is not filtered!
+ 	 * Creates and returns a mode filtered network.
+	 * @param network the input network, is not modified
+	 * @param transportModes Links of the input network that share at least one network mode
+	 *                       with this set are added to the new network. The returned network
+	 *                       is empty if <tt>null</tt>.
+	 * @return the filtered new network
 	 */
 	public static Network filterNetworkByLinkMode(Network network, Set<String> transportModes) {
 		NetworkFilterManager filterManager = new NetworkFilterManager(network);

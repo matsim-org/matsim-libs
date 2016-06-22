@@ -62,6 +62,9 @@ public class FastAStarRouter implements Router {
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
 	}
 
+	/**
+	 * Filters the network with the given transport modes and creates a router with it
+	 */
 	public static Router createModeSeparatedRouter(Network network, Set<String> transportModes) {
 		Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, transportModes);
 		return new FastAStarRouter(filteredNetwork);
@@ -95,7 +98,7 @@ public class FastAStarRouter implements Router {
 	@Override
 	public double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop) {
 		double travelTime = (toStop.getArrivalOffset() - fromStop.getDepartureOffset());
-		double beelineDistance = CoordUtils.calcEuclideanDistance(fromStop.getStopFacility().getCoord(), fromStop.getStopFacility().getCoord());
+		double beelineDistance = CoordUtils.calcEuclideanDistance(fromStop.getStopFacility().getCoord(), toStop.getStopFacility().getCoord());
 
 		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 			return travelTime;

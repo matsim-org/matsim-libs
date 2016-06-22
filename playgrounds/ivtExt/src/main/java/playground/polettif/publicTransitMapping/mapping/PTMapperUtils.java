@@ -290,12 +290,13 @@ public class PTMapperUtils {
 	@Deprecated
 	public static List<Link> findClosestLinksByScheduleMode(Network network, Coord coord, String
 			scheduleTransportMode, PublicTransitMappingConfigGroup config) {
-		return NetworkTools.findClosestLinks(
-				network,
-				coord,
-				config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(), config.getModeRoutingAssignment().get(scheduleTransportMode),
-				config.getMaxLinkCandidateDistance()
-		);
+//		return NetworkTools.findClosestLinks(
+//				network,
+//				coord,
+//				config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(), config.getModeRoutingAssignment().get(scheduleTransportMode),
+//				config.getMaxLinkCandidateDistance()
+//		);
+		throw new IllegalArgumentException("deprecated");
 	}
 
 	/**
@@ -374,10 +375,11 @@ public class PTMapperUtils {
 	 */
 	@Deprecated
 	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidateImpl>>> linkCandidates, PublicTransitMappingConfigGroup config) {
+		/*
 		for(ConfigGroup e : config.getParameterSets(PublicTransitMappingConfigGroup.ManualLinkCandidates.SET_NAME)) {
 			PublicTransitMappingConfigGroup.ManualLinkCandidates manualCandidates = (PublicTransitMappingConfigGroup.ManualLinkCandidates) e;
 
-			Set<String> modes = manualCandidates.getModes();
+			Set<String> modes = manualCandidates.getScheduleModes();
 			if(modes.size() == 0) {
 				modes = linkCandidates.keySet();
 			}
@@ -406,6 +408,8 @@ public class PTMapperUtils {
 				}
 			}
 		}
+		*/
+		throw new IllegalArgumentException("deprecated!");
 	}
 
 	/**

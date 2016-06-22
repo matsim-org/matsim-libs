@@ -49,7 +49,7 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 
 	private static Counter counterPseudoRouting = new Counter("route # ");
 	private static int artificialId = 0;
-	private static boolean warnMinTravelCost =true;
+	private static boolean warnMinTravelCost = true;
 
 	private final PublicTransitMappingConfigGroup config;
 
@@ -105,7 +105,7 @@ public class PseudoRoutingImplArtificial2 extends Thread {
 					double maxAllowedTravelCost = minTravelCost * config.getMaxTravelCostFactor();
 
 					if(minTravelCost == 0 && warnMinTravelCost) {
-						log.warn("There are stop pairs where the minTravelCost is 0. This can happen if departure and arrival time of two subsequent stops are identical. This message is only given once.");
+						log.warn("There are stop pairs where minTravelCost is 0.0! This might happen if departure and arrival time of two subsequent stops are identical. Further messages are suppressed.");
 						warnMinTravelCost = false;
 					}
 

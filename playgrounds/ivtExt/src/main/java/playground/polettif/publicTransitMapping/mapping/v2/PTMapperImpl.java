@@ -77,6 +77,8 @@ public class PTMapperImpl extends PTMapper {
 
 		setLogLevels();
 
+		config.loadParameterSets();
+
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
 		Set<String> scheduleTransportModes = new HashSet<>();
@@ -102,7 +104,7 @@ public class PTMapperImpl extends PTMapper {
 		Map<String, Set<String>> modeRoutingAssignment = config.getModeRoutingAssignment();
 		FastAStarRouter.setTravelCostType(config.getTravelCostType());
 		for(String scheduleMode : scheduleTransportModes) {
-			log.info("Initiating network and router for schedule mode " +scheduleMode+". Network modes " + modeRoutingAssignment.get(scheduleMode));
+			log.info("Initiating network and router for schedule mode \"" +scheduleMode+"\", network modes " + modeRoutingAssignment.get(scheduleMode));
 			modeSeparatedRouters.put(scheduleMode, FastAStarRouter.createModeSeparatedRouter(network, modeRoutingAssignment.get(scheduleMode)));
 		}
 
@@ -113,7 +115,7 @@ public class PTMapperImpl extends PTMapper {
 		 * after PseudoRouting.
 		 */
 		log.info("=============================");
-		log.info("Searching for link candidates");
+		log.info("Creating link candidates");
 		LinkCandidateCreator linkCandidates = new LinkCandidateCreatorStandard(this.schedule, this.network, this.config, this.modeSeparatedRouters);
 		linkCandidates.createLinkCandidates();
 
@@ -182,13 +184,13 @@ public class PTMapperImpl extends PTMapper {
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
 
 		for(String scheduleMode : scheduleTransportModes) {
-			Set<String> routingTransportModes = new HashSet<>(modeRoutingAssignment.get(scheduleMode));
-			routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-			Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, routingTransportModes);
-			log.info("Initiating network and router for schedule mode " +scheduleMode+". Network modes " + routingTransportModes);
+			Set<String> routingTransportModes = new HashSet<>(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
+			if(modeRoutingAssignment.get(scheduleMode) != null) routingTransportModes.addAll(modeRoutingAssignment.get(scheduleMode));
+//			Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, routingTransportModes);
+			log.info("Initiating network and router for schedule mode \"" +scheduleMode+"\", network modes " + routingTransportModes);
 
-//			finalRouters.put(scheduleMode, FastAStarRouter.createModeSeparatedRouter(network, routingTransportModes));
-			finalRouters.put(scheduleMode, new FastAStarRouter(filteredNetwork));
+			finalRouters.put(scheduleMode, FastAStarRouter.createModeSeparatedRouter(network, routingTransportModes));
+//			finalRouters.put(scheduleMode, new FastAStarRouter(filteredNetwork));
 		}
 		// create router for artificial network
 //		Router artificialOnlyRouter = FastAStarRouter.createModeSeparatedRouter(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);

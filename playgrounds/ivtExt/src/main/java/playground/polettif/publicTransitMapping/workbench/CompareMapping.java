@@ -19,6 +19,7 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapper;
@@ -65,13 +66,21 @@ public class CompareMapping {
 
 		// ptm
 		PublicTransitMappingConfigGroup ptmConfig = PublicTransitMappingConfigGroup.createDefaultConfig();
+
 		ptmConfig.setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType.travelTime);
-		ptmConfig.setMaxNClosestLinks(10);
-		ptmConfig.setLinkDistanceTolerance(1.1);
-		ptmConfig.setMaxLinkCandidateDistance(80);
+
+		PublicTransitMappingConfigGroup.LinkCandidateCreatorParams lccParamBus = new PublicTransitMappingConfigGroup.LinkCandidateCreatorParams("bus");
+		lccParamBus.setMaxNClosestLinks(6);
+		lccParamBus.setLinkDistanceTolerance(1.1);
+		lccParamBus.setMaxLinkCandidateDistance(80);
+		ptmConfig.addParameterSet(lccParamBus);
 		ptmConfig.setNumOfThreads(4);
+
 		Map<String, Set<String>> mra = new HashMap<>();
+		mra.put("bus", CollectionUtils.stringToSet("bus,car"));
+		mra.put("tram", CollectionUtils.stringToSet("tram"));
 		ptmConfig.setModeRoutingAssignment(mra);
+
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
 		ptmConfig.setOutputScheduleFile(output + "ptm_schedule.xml.gz");
 

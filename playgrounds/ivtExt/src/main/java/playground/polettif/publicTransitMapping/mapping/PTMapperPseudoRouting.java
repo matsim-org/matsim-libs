@@ -110,9 +110,9 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("=============================");
 		log.info("Searching for link candidates");
 		log.info("   search radius: " + config.getNodeSearchRadius());
-		log.info("   max N closest links: " + config.getMaxNClosestLinks());
-		log.info("   max link candidate distance: " + config.getMaxLinkCandidateDistance());
-		log.info("   link distance tolerance: " + config.getLinkDistanceTolerance());
+//		log.info("   max N closest links: " + config.getMaxNClosestLinks());
+//		log.info("   max link candidate distance: " + config.getMaxLinkCandidateDistance());
+//		log.info("   link distance tolerance: " + config.getLinkDistanceTolerance());
 		log.info("   Note: loop links for stop facilities are created if no link candidate can be found.");
 		linkCandidates = PTMapperUtils.generateModeLinkCandidates(this.schedule, this.network, this.config);
 
@@ -289,7 +289,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
 
 		// Remove unnecessary parts of schedule
-		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
+//		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
 		if(config.getRemoveNotUsedStopFacilities()) ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
@@ -397,7 +397,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("       average nr created  " + String.format("%.2f", histogram.average()));
 		log.info("       max nr created      " + String.format("%.0f", histogram.max()));
 		log.info("    Transit Routes:");
-		log.info("       removed from schedule            " + routesRemoved);
+//		log.info("       removed from schedule            " + routesRemoved);
 		log.info("       total routes in schedule         " + nRoutes);
 		log.info("       routes without artificial links  " + withoutArtificialLinks);
 		log.info("");
