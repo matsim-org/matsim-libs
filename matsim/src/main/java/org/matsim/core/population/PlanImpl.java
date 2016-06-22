@@ -75,8 +75,7 @@ public final class PlanImpl implements Plan {
 	@Deprecated // use scenario.getPopulation().getFactory().createLeg(...) instead, and add it yourself
 	public LegImpl createAndAddLeg(final String mode) {
 		verifyCreateLeg();
-		LegImpl leg = PopulationUtils.createLeg(mode);
-		// Override leg number with an appropriate value
+		LegImpl leg = new LegImpl( mode ) ;
 		getPlanElements().add(leg);
 		return leg;
 	}
