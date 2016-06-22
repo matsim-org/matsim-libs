@@ -59,7 +59,7 @@ public class RunTaxiScenario
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
+        controler.addOverridingModule(new TaxiModule(taxiData));
         double expAveragingAlpha = 0.05;//from the AV flow paper 
         controler.addOverridingModule(
                 VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
