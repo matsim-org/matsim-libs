@@ -65,8 +65,8 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputDirectory = "../../../runs-svn/decongestion/output/decongestion_1000it_60_50_0.05/";
-//			outputDirectory = "../../../runs-svn/decongestion/output/baseCase/";
+			outputDirectory = "../../../runs-svn/decongestion/output/decongestion_1000it_10_50_0.5/";
+//			outputDirectory = "../../../runs-svn/decongestion/output/baseCase_1000it/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();

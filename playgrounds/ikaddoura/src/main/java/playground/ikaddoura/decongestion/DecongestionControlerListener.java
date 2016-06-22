@@ -164,6 +164,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	public void notifyIterationEnds(IterationEndsEvent event) {
 				
 		// Store and write out some aggregated numbers for analysis purposes.
+		
 		this.iteration2totalDelay.put(event.getIteration(), this.delayComputation.getTotalDelay());
 		this.iteration2totalTollPayments.put(event.getIteration(), this.intervalBasedTolling.getTotalTollPayments());
 		this.iteration2totalTravelTime.put(event.getIteration(), this.delayComputation.getTotalTravelTime());

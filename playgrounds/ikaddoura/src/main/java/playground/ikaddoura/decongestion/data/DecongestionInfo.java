@@ -40,7 +40,7 @@ public class DecongestionInfo {
 	private final int WRITE_OUTPUT_ITERATION = 10;
 	private final int UPDATE_PRICE_INTERVAL = 50;
 	private final double TOLERATED_AVERAGE_DELAY_SEC = 1.;
-	private final double TOLL_ADJUSTMENT_RATE = 0.05;
+	private final double TOLL_ADJUSTMENT_RATE = 0.5;
 	private final double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
 	
 	private final Scenario scenario;
