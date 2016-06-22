@@ -31,6 +31,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 
 import java.util.HashMap;
@@ -86,6 +87,11 @@ public class ModeDependentRouter implements Router {
 	@Override
 	public Network getNetwork() {
 		return network;
+	}
+
+	@Override
+	public double getArtificialTravelCost(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		return 0;
 	}
 
 

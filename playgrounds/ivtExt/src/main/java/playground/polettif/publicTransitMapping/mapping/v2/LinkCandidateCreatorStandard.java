@@ -29,7 +29,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateV2;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
@@ -62,7 +62,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 		log.info("   link distance tolerance: " + config.getLinkDistanceTolerance());
 		log.info("   Note: loop links for stop facilities are created if no link candidate can be found.");
 
-		LinkCandidateImpl.setTravelCostType(config.getTravelCostType());
+		LinkCandidateV2.setTravelCostType(config.getTravelCostType());
 
 		/**
 		 * get closest links for each stop facility (separated by mode)
@@ -79,7 +79,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 					if(modeLinkCandidates.size() == 0) {
 						// if stop facilty already has a referenced link
 						if(stopFacility.getLinkId() != null) {
-							modeLinkCandidates.add(new LinkCandidateImpl(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
+							modeLinkCandidates.add(new LinkCandidateV2(network.getLinks().get(stopFacility.getLinkId()), stopFacility, scheduleTransportMode));
 						} else {
 							List<Link> closestLinks;
 							if(config.getModeRoutingAssignment().get(scheduleTransportMode).contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
@@ -102,7 +102,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 							 * generate a LinkCandidate for each close link
 							 */
 							for(Link link : closestLinks) {
-								modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility));
+								modeLinkCandidates.add(new LinkCandidateV2(link, stopFacility, scheduleTransportMode));
 							}
 						}
 					}
@@ -145,7 +145,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 										"("+CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord())+")");
 								log.info("Manual link candidate will still be used");
 							}
-							lcSet.add(new LinkCandidateImpl(link, parentStopFacility));
+							lcSet.add(new LinkCandidateV2(link, parentStopFacility, mode));
 						}
 					}
 					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);

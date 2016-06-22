@@ -47,6 +47,8 @@ public interface LinkCandidate extends Comparable<LinkCandidate> {
 
 	double getLinkTravelCost();
 
+	String getScheduleTransportMode();
+
 	/**
 	 * @return the link candidates priority compared to all other
 	 * link candidates for the same stop and transport mode. The priority
@@ -58,4 +60,5 @@ public interface LinkCandidate extends Comparable<LinkCandidate> {
 
 	int compareTo(LinkCandidate other);
 
+	boolean isLoopLink();
 }

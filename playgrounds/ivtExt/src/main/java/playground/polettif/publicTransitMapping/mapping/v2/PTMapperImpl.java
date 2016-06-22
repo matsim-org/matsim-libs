@@ -100,15 +100,11 @@ public class PTMapperImpl extends PTMapper {
 		Map<String, Set<String>> modeRoutingAssignment = config.getModeRoutingAssignment();
 		FastAStarRouter.setTravelCostType(config.getTravelCostType());
 		for(Map.Entry<String, Set<String>> modeAssignment : modeRoutingAssignment.entrySet()) {
-			if(!modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
-				log.info("Initiating network and router for " + modeAssignment.getValue());
-				// filter network
-				Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, modeAssignment.getValue());
-				// store network and router in maps
-				modeSeparatedRouters.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork));
-			} else {
-				modeSeparatedRouters.put(modeAssignment.getKey(), null);
-			}
+			log.info("Initiating network and router for " + modeAssignment.getValue());
+			// filter network
+			Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, modeAssignment.getValue());
+			// store network and router in maps
+			modeSeparatedRouters.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork));
 		}
 
 		/** [3]
@@ -137,9 +133,9 @@ public class PTMapperImpl extends PTMapper {
 
 		// initiate
 		int numThreads = config.getNumOfThreads() > 0 ? config.getNumOfThreads() : 1;
-		PseudoRoutingImpl[] pseudoRoutingThreads = new PseudoRoutingImpl[numThreads];
+		PseudoRoutingImplArtificial2[] pseudoRoutingThreads = new PseudoRoutingImplArtificial2[numThreads];
 		for(int i = 0; i < numThreads; i++) {
-			pseudoRoutingThreads[i] = new PseudoRoutingImpl(config, modeSeparatedRouters, linkCandidates);
+			pseudoRoutingThreads[i] = new PseudoRoutingImplArtificial2(config, modeSeparatedRouters, linkCandidates);
 		}
 
 		// spread transit lines on threads
@@ -149,10 +145,10 @@ public class PTMapperImpl extends PTMapper {
 		}
 
 		// start pseudoRouting
-		for(PseudoRoutingImpl thread : pseudoRoutingThreads) {
+		for(PseudoRoutingImplArtificial2 thread : pseudoRoutingThreads) {
 			thread.start();
 		}
-		for(PseudoRoutingImpl thread : pseudoRoutingThreads) {
+		for(PseudoRoutingImplArtificial2 thread : pseudoRoutingThreads) {
 			try {
 				thread.join();
 			} catch (InterruptedException e) {
@@ -167,7 +163,7 @@ public class PTMapperImpl extends PTMapper {
 		 */
 		log.info("=====================================");
 		log.info("Adding artificial links to network...");
-		for(PseudoRoutingImpl thread : pseudoRoutingThreads) {
+		for(PseudoRoutingImplArtificial2 thread : pseudoRoutingThreads) {
 			thread.addArtificialLinks(network);
 			pseudoSchedule.mergePseudoSchedule(thread.getPseudoSchedule());
 		}

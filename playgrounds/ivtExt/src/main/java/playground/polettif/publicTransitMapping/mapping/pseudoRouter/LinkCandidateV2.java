@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.tools.CoordTools;
 
 /**
  * A possible link for a stop facility. A LinkCandidate contains
@@ -35,12 +36,14 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
  *
  * @author polettif
  */
-public class LinkCandidateImpl implements LinkCandidate {
+public class LinkCandidateV2 implements LinkCandidate {
 
 	private static PublicTransitMappingConfigGroup.TravelCostType travelCostType = PublicTransitMappingConfigGroup.TravelCostType.linkLength;
 
 	private final String id;
 	private final Id<TransitStopFacility> parentStopFacilityId;
+	private final String scheduleTransportMode;
+
 	private double priority;
 	private final double stopFacilityDistance;
 	private final double linkTravelCost;
@@ -52,10 +55,12 @@ public class LinkCandidateImpl implements LinkCandidate {
 	private final Coord stopFacilityCoord;
 	private final Coord fromNodeCoord;
 	private final Coord toNodeCoord;
+	private boolean loopLink;
 
-	public LinkCandidateImpl(Link link, TransitStopFacility parentStopFacility) {
+	public LinkCandidateV2(Link link, TransitStopFacility parentStopFacility, String scheduleTransportMode) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
 		this.parentStopFacilityId = parentStopFacility.getId();
+		this.scheduleTransportMode = scheduleTransportMode;
 
 		this.linkId = link.getId();
 
@@ -74,10 +79,12 @@ public class LinkCandidateImpl implements LinkCandidate {
 
 		this.stopFacilityDistance = CoordUtils.distancePointLinesegment(fromNodeCoord, toNodeCoord, stopFacilityCoord);
 		this.priority = 1/stopFacilityDistance;
+
+		this.loopLink = link.getFromNode().getId().toString().equals(link.getToNode().getId().toString());
 	}
 
 	public static void setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType travelCostType) {
-		LinkCandidateImpl.travelCostType = travelCostType;
+		LinkCandidateV2.travelCostType = travelCostType;
 	}
 
 	@Override
@@ -130,22 +137,12 @@ public class LinkCandidateImpl implements LinkCandidate {
 		this.priority = priority;
 	}
 
-	public String getToNodeIdStr() {
-		return toNodeId.toString();
-	}
-
-	public String getFromNodeIdStr() {
-		return fromNodeId.toString();
-	}
-
-	public String getLinkIdStr() {
-		return linkId.toString();
-	}
-
+	@Override
 	public Coord getFromNodeCoord() {
 		return fromNodeCoord;
 	}
 
+	@Override
 	public Coord getToNodeCoord() {
 		return toNodeCoord;
 	}
@@ -160,12 +157,17 @@ public class LinkCandidateImpl implements LinkCandidate {
 		if(other.getId().equals(this.id)) {
 			return 0;
 		}
-		return Double.compare(stopFacilityDistance, other.getStopFacilityDistance());
+		int dCompare = Double.compare(stopFacilityDistance, other.getStopFacilityDistance());
+		if(dCompare == 0) {
+			return CoordTools.coordIsOnRightSideOfLine(stopFacilityCoord, fromNodeCoord, toNodeCoord) ? 1 : -1;
+		} else {
+			return dCompare;
+		}
 	}
 
 	@Override
 	public boolean isLoopLink() {
-		return false;
+		return loopLink;
 	}
 
 	@Override
@@ -177,7 +179,7 @@ public class LinkCandidateImpl implements LinkCandidate {
 		if(getClass() != obj.getClass())
 			return false;
 
-		LinkCandidateImpl other = (LinkCandidateImpl) obj;
+		LinkCandidateV2 other = (LinkCandidateV2) obj;
 		if(id == null) {
 			if(other.id != null)
 				return false;

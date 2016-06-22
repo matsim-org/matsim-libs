@@ -281,22 +281,7 @@ public class NetworkTools {
 	 * @return true if the coordinate is on the right hand side of the link (or on the link).
 	 */
 	public static boolean coordIsOnRightSideOfLink(Coord coord, Link link) {
-		double azLink = CoordTools.getAzimuth(link.getFromNode().getCoord(), link.getToNode().getCoord());
-		double azToCoord = CoordTools.getAzimuth(link.getFromNode().getCoord(), coord);
-
-		double diff = azToCoord-azLink;
-
-		if(diff == 0 || azToCoord-Math.PI == azLink) {
-			return true;
-		} else if(diff > 0 && diff < Math.PI) {
-			return true;
-		} else if(diff > 0 && diff > Math.PI) {
-			return false;
-		} else if(diff < 0 && diff < -Math.PI){
-			return true;
-		} else {
-			return false;
-		}
+		return CoordTools.coordIsOnRightSideOfLine(coord, link.getFromNode().getCoord(), link.getToNode().getCoord());
 	}
 
 	/**

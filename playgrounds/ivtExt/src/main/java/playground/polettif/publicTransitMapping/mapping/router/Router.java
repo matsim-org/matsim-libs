@@ -21,14 +21,12 @@
 
 package playground.polettif.publicTransitMapping.mapping.router;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import java.util.Set;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
 
 /**
  * A Router interface combining travelDisUtility and TravelTime.
@@ -46,5 +44,7 @@ public interface Router extends TravelDisutility, TravelTime {
     LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode);
 
     Network getNetwork();
+
+	double getArtificialTravelCost(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
 
 }
