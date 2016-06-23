@@ -79,7 +79,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	private final SortedMap<Integer, Double> iteration2userBenefits = new TreeMap<>();
 	
 	private final DecongestionInfo congestionInfo;
-	private final DecongestionTollComputation tollComputation;
+	private final DecongestionTollingV1 tollComputation;
 	
 	private IntervalBasedTolling intervalBasedTolling;
 	private DelayAnalysis delayComputation;
@@ -87,13 +87,13 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Inject
 	public DecongestionControlerListener(Scenario scenario){
 		this.congestionInfo = new DecongestionInfo(scenario);
-		this.tollComputation = new DecongestionTollComputation(congestionInfo);
+		this.tollComputation = new DecongestionTollingV1(congestionInfo);
 	}
 	
 	@Inject
 	public DecongestionControlerListener(DecongestionInfo congestionInfo){
 		this.congestionInfo = congestionInfo;
-		this.tollComputation = new DecongestionTollComputation(congestionInfo);
+		this.tollComputation = new DecongestionTollingV1(congestionInfo);
 	}
 	
 	@Override

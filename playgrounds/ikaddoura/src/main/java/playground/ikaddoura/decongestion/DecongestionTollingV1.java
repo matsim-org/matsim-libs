@@ -29,39 +29,38 @@ import org.matsim.api.core.v01.network.Link;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
- * Computes the tolls per link and time bin.
+ * Computes the initial tolls based on the average delay per link and time bin.
+ * Increases the tolls applying the adjustment rate.
+ * Setting tolls to zero if the average delay is zero.
  * 
  * @author ikaddoura
  */
 
-public class DecongestionTollComputation {
+public class DecongestionTollingV1 implements DecongestionTollSetting {
 	
-	private static final Logger log = Logger.getLogger(DecongestionTollComputation.class);
+	private static final Logger log = Logger.getLogger(DecongestionTollingV1.class);
 
 	private final DecongestionInfo congestionInfo;
 	private final double vtts_hour;
-	private final boolean setTollsToZero = true;
 
-	public DecongestionTollComputation(DecongestionInfo congestionInfo) {
+	public DecongestionTollingV1(DecongestionInfo congestionInfo) {
 		this.congestionInfo = congestionInfo;
 		this.vtts_hour = (this.congestionInfo.getScenario().getConfig().planCalcScore().getPerforming_utils_hr() - this.congestionInfo.getScenario().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling()) / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("VTTS [monetary units / hour]: " + this.vtts_hour);
 	}
 
+	@Override
 	public void updateTolls() {
-		
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
-						
+			
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
 
 				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);
 								
 				if (averageDelay <= this.congestionInfo.getTOLERATED_AVERAGE_DELAY_SEC()) {
 					
-					if (setTollsToZero) {
-						if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
-							this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().remove(intervalNr);
-						}
+					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
+						this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().remove(intervalNr);
 					}
 
 				} else {
@@ -82,5 +81,7 @@ public class DecongestionTollComputation {
 			}
 		}
 	}
+
+	
 }
 
