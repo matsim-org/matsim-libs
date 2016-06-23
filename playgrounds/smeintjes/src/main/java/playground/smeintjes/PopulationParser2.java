@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -21,25 +21,24 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-
-import playground.southafrica.utilities.Header;
-import playground.southafrica.utilities.containers.MyZone;
-import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+
+import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.containers.MyZone;
+import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 /** This class parses synthetic populations to determine the 
  *  chain start times and areas in which minor activities are 
@@ -51,7 +50,7 @@ import com.vividsolutions.jts.geom.Point;
 public class PopulationParser2 {
 	private final static Logger LOG = Logger.getLogger(PopulationParser2.class.toString()); 
 	private Scenario scenario;
-	private PopulationReaderMatsimV5 reader;
+	private MatsimPopulationReader reader;
 
 	public static void main(String[] args) {
 		Header.printHeader(PopulationParser2.class.toString(), args);
@@ -386,7 +385,7 @@ public class PopulationParser2 {
 	
 	public PopulationParser2() {
 		this.scenario =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.reader = new PopulationReaderMatsimV5(this.scenario);
+		this.reader = new MatsimPopulationReader(this.scenario);
 	}
 
 	public Collection<? extends Person> readPopulation(String populationFile) {

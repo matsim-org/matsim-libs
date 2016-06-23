@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -159,7 +159,7 @@ public class IKNetworkPopulationWriter {
 	
 	private void exportActivities2Shp(){
 		
-		new PopulationReaderMatsimV5(scenario).readFile(populationFile);
+		new MatsimPopulationReader(scenario).readFile(populationFile);
 		
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
 		.setCrs(MGC.getCRS(crs))

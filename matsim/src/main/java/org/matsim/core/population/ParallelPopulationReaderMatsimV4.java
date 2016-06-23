@@ -57,7 +57,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * 
  * @author cdobler
  */
-public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
+ class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	
 	static final Logger log = Logger.getLogger(ParallelPopulationReaderMatsimV4.class);
 

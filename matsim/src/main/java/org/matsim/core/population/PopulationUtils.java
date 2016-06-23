@@ -39,13 +39,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
@@ -396,6 +393,9 @@ public final class PopulationUtils {
 	}
 
 	private static int missingFacilityCnt = 0 ;
+	/**
+	 * @param config  
+	 */
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
@@ -424,6 +424,9 @@ public final class PopulationUtils {
 		}
 	}
 
+	/**
+	 * @param config  
+	 */
 	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
@@ -681,25 +684,25 @@ public final class PopulationUtils {
 	public static Plan createPlan(Person person) {
 		Plan plan = getFactory().createPlan() ;
 		plan.setPerson(person);
-		return (Plan) plan ;
+		return plan ;
 	}
 
 	public static Plan createPlan() {
-		return (Plan) getFactory().createPlan() ;
+		return getFactory().createPlan() ;
 	}
 
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
-		return (Activity) getFactory().createActivityFromLinkId(type, linkId) ;
+		return getFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
 	public static Activity createActivityFromCoord(String type, Coord coord) {
-		return (Activity) getFactory().createActivityFromCoord(type, coord) ;
+		return getFactory().createActivityFromCoord(type, coord) ;
 	}
 
 	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
-		return (Activity) act ;
+		return act ;
 	}
 	
 	public static Leg createLeg(String transportMode) {
@@ -723,7 +726,7 @@ public final class PopulationUtils {
 		newAct.setMaximumDuration(act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 		
-		return (Activity) newAct ;
+		return newAct ;
 	}
 
 	/**
@@ -768,7 +771,7 @@ public final class PopulationUtils {
 				out.getPlanElements().add(createActivity((Activity) pe));
 			} else if (pe instanceof Leg) {
 				Leg l = (Leg) pe;
-				Leg l2 = ((Plan)out).createAndAddLeg(l.getMode());
+				Leg l2 = out.createAndAddLeg(l.getMode());
 				copyFromTo(l, l2);
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");

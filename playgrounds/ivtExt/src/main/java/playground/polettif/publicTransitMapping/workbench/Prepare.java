@@ -18,11 +18,28 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
+import static org.matsim.contrib.accessibility.FacilityTypes.HOME;
+import static org.matsim.contrib.accessibility.FacilityTypes.OTHER;
+import static org.matsim.contrib.accessibility.FacilityTypes.WORK;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -30,8 +47,8 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
@@ -41,18 +58,10 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;
+
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.matsim.contrib.accessibility.FacilityTypes.*;
 
 /**
  * workbench class to do some scenario preparation
@@ -152,7 +161,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		PopulationReader reader = new MatsimPopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -165,7 +174,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		PopulationReader reader = new MatsimPopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
