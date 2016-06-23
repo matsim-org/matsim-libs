@@ -903,7 +903,7 @@ public class ParkControl {
 		Leg nextCarLeg=null;
 		while (foundNextCarLeg == false){
 			final Activity act1 = activity;
-			Leg leg = PopulationUtils.getNextLeg(act1, plan);
+			Leg leg = PopulationUtils.getNextLeg(plan, act1);
 			if(leg.getMode().equalsIgnoreCase("car")){
 				//endTime = leg.getDepartureTime(); //!!!!!!! MatSim provides a wrong time !!!
 				endTime=activity.getEndTime();
@@ -911,10 +911,10 @@ public class ParkControl {
 				foundNextCarLeg=true;
 			}else{
 				final Leg leg1 = leg;
-				Activity act = PopulationUtils.getNextActivity(leg1, plan);
+				Activity act = PopulationUtils.getNextActivity(plan, leg1);
 				if(act==null){return null;}
 				final Activity act2 = act;
-				leg=PopulationUtils.getNextLeg(act2, plan);
+				leg=PopulationUtils.getNextLeg(plan, act2);
 				if(leg==null){
 					System.out.println("F E H L E R letzte activity nicht identifiziert");
 					System.out.println("Person: "+person.getId().toString()+" count: "+actCount);
@@ -931,13 +931,13 @@ public class ParkControl {
 		boolean goOn = true;
 		while(goOn){
 			final Leg leg = nextCarLeg;
-			Activity act = PopulationUtils.getNextActivity(leg, plan);
+			Activity act = PopulationUtils.getNextActivity(plan, leg);
 			if(act==null){
 				goOn=false;
 				break;
 			}
 			final Activity act1 = act;
-			nextCarLeg=PopulationUtils.getNextLeg(act1, plan);
+			nextCarLeg=PopulationUtils.getNextLeg(plan, act1);
 			if(nextCarLeg==null){
 				break;
 			}

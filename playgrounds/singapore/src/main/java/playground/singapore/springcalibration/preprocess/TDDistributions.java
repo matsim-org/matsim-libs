@@ -155,7 +155,7 @@ public class TDDistributions {
 				double endTime = ((Activity) pe).getEndTime();
 				
 				if (index > 0) {
-					Leg previousLeg = PopulationUtils.getPreviousLeg((Activity)pe, ((PlanImpl)plan));
+					Leg previousLeg = PopulationUtils.getPreviousLeg(((PlanImpl)plan), (Activity)pe);
 					String mode = previousLeg.getMode();			
 					double travelTime = (startTime - prevendTime) / 60.0; // in minutes				
 					double travelDistance = CoordUtils.calcEuclideanDistance(coords, prevcoords) / 1000.0; // in km

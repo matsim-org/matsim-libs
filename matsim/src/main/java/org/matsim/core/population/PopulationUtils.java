@@ -788,7 +788,7 @@ public final class PopulationUtils {
 	public static Activity getLastActivity( Plan plan ) {
 		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 	}
-	public static Activity getNextActivity( Leg leg, Plan plan ) {
+	public static Activity getNextActivity( Plan plan, Leg leg ) {
 		int index = getActLegIndex(leg,plan);
 		if (index != -1) {
 			return (Activity) plan.getPlanElements().get(index+1);
@@ -806,21 +806,21 @@ public final class PopulationUtils {
 		}
 		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
 	}
-	public static Leg getNextLeg( Activity act, Plan plan ) {
+	public static Leg getNextLeg( Plan plan, Activity act ) {
 		int index = PopulationUtils.getActLegIndex(act, plan);
 		if ((index < plan.getPlanElements().size() - 1) && (index != -1)) {
 			return (Leg) plan.getPlanElements().get(index+1);
 		}
 		return null;
 	}
-	public static Activity getPreviousActivity( Leg leg, Plan plan ) {
+	public static Activity getPreviousActivity( Plan plan, Leg leg ) {
 		int index = PopulationUtils.getActLegIndex(leg, plan);
 		if (index != -1) {
 			return (Activity) plan.getPlanElements().get(index-1);
 		}
 		return null;
 	}
-	public static Leg getPreviousLeg( Activity act, Plan plan ) {
+	public static Leg getPreviousLeg( Plan plan, Activity act ) {
 		int index = PopulationUtils.getActLegIndex(act, plan);
 		if (index != -1) {
 			return (Leg) plan.getPlanElements().get(index-1);
@@ -831,10 +831,9 @@ public final class PopulationUtils {
 	/**
 	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,
 	 * the following leg will be emptied to keep consistency (i.e. for the route)
-	 *
 	 * @param index
 	 */
-	public static void removeLeg( int index, Plan plan) {
+	public static void removeLeg( Plan plan, int index) {
 		if ((index % 2 == 0) || (index < 1) || (index >= plan.getPlanElements().size()-1)) {
 			log.warn(plan + "[index=" + index +" is wrong. nothing removed]");
 		}
@@ -851,7 +850,7 @@ public final class PopulationUtils {
 		}
 
 	}
-	public static void removeActivity( int index, Plan plan ) {
+	public static void removeActivity( Plan plan, int index ) {
 		if ((index % 2 != 0) || (index < 0) || (index > plan.getPlanElements().size()-1)) {
 			log.warn(plan + "[index=" + index +" is wrong. nothing removed]");
 		}
@@ -883,13 +882,13 @@ public final class PopulationUtils {
 	}
 	/**
 	 * Inserts a leg and a following act at position <code>pos</code> into the plan.
-	 *
 	 * @param pos the position where to insert the leg-act-combo. acts and legs are both counted from the beginning starting at 0.
 	 * @param leg the leg to insert
 	 * @param act the act to insert, following the leg
+	 *
 	 * @throws IllegalArgumentException If the leg and act cannot be inserted at the specified position without retaining the correct order of legs and acts.
 	 */
-	public static void insertLegAct( int pos, Leg leg, Activity act, Plan plan ) {
+	public static void insertLegAct( Plan plan, int pos, Leg leg, Activity act ) {
 		if (pos < plan.getPlanElements().size()) {
 			Object o = plan.getPlanElements().get(pos);
 			if (!(o instanceof Leg)) {

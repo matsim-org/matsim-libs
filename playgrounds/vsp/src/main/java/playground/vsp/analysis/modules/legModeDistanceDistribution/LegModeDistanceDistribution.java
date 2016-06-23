@@ -118,7 +118,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 							throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 						}
 						final int index = i;
-						PopulationUtils.removeActivity(index, ((PlanImpl) selectedPlan)); // also removes the following leg
+						PopulationUtils.removeActivity(((PlanImpl) selectedPlan), index); // also removes the following leg
 						n -= 2;
 						i--;
 					}
@@ -255,9 +255,9 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 							Leg leg = (Leg) pe;
 							String legMode = leg.getMode();
 							final Leg leg2 = leg;
-							Coord from = PopulationUtils.getPreviousActivity(leg2, plan).getCoord();
+							Coord from = PopulationUtils.getPreviousActivity(plan, leg2).getCoord();
 							final Leg leg1 = leg;
-							Coord to = PopulationUtils.getNextActivity(leg1, plan).getCoord();
+							Coord to = PopulationUtils.getNextActivity(plan, leg1).getCoord();
 							Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 
 							if(legMode.equals(mode)){
@@ -301,9 +301,9 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 				if(pe instanceof Leg){
 					Leg leg = (Leg) pe;
 					final Leg leg2 = leg;
-					Coord from = PopulationUtils.getPreviousActivity(leg2, plan).getCoord();
+					Coord from = PopulationUtils.getPreviousActivity(plan, leg2).getCoord();
 					final Leg leg1 = leg;
-					Coord to = PopulationUtils.getNextActivity(leg1, plan).getCoord();
+					Coord to = PopulationUtils.getNextActivity(plan, leg1).getCoord();
 					Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 					
 					if(legBeelineDist > longestBeelineDistance){

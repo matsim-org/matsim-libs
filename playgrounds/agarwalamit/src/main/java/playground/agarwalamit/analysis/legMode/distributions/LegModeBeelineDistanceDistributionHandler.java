@@ -119,7 +119,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 							}
 							final int index = i;
-							PopulationUtils.removeActivity(index, ((PlanImpl) plan)); // also removes the following leg
+							PopulationUtils.removeActivity(((PlanImpl) plan), index); // also removes the following leg
 							n -= 2;
 							i--;
 						}

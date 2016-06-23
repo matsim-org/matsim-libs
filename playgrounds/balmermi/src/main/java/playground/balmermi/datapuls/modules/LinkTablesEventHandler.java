@@ -92,9 +92,9 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 			Person p = population.getPersons().get(Id.create(event.getVehicleId(), Person.class));
 			Activity fromAct = fromActs.get(p.getId());
 			final Activity act = fromAct;
-			Leg leg = PopulationUtils.getNextLeg(act, ((PlanImpl) p.getSelectedPlan()));
+			Leg leg = PopulationUtils.getNextLeg(((PlanImpl) p.getSelectedPlan()), act);
 			final Leg leg1 = leg;
-			Activity toAct = PopulationUtils.getNextActivity(leg1, ((PlanImpl) p.getSelectedPlan()));
+			Activity toAct = PopulationUtils.getNextActivity(((PlanImpl) p.getSelectedPlan()), leg1);
 
 			out.write(event.getLinkId().toString()+"\t"+p.getId()+"\t");
 			out.write(fromAct.getType()+"\t"+fromAct.getFacilityId()+"\t");
@@ -111,9 +111,9 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 		else {
 			Activity fromAct = fromActs.get(p.getId());
 			final Activity act = fromAct;
-			Leg leg = PopulationUtils.getNextLeg(act, ((PlanImpl) p.getSelectedPlan()));
+			Leg leg = PopulationUtils.getNextLeg(((PlanImpl) p.getSelectedPlan()), act);
 			final Leg leg1 = leg;
-			Activity toAct = PopulationUtils.getNextActivity(leg1, ((PlanImpl) p.getSelectedPlan()));
+			Activity toAct = PopulationUtils.getNextActivity(((PlanImpl) p.getSelectedPlan()), leg1);
 			fromActs.put(p.getId(),toAct);
 		}
 	}

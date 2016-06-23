@@ -197,9 +197,9 @@ public abstract class Utils {
 		else {		// its a trip back home
 			// not the first home act!
 			final Activity act1 = act;
-			if (PopulationUtils.getPreviousLeg(act1, ((PlanImpl) plan)) != null) {
+			if (PopulationUtils.getPreviousLeg(((PlanImpl) plan), act1) != null) {
 				final Activity act2 = act;
-				return getLongestActivityForRoundTrip((PlanImpl) plan, PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act2, ((PlanImpl) plan)), ((PlanImpl) plan)));
+				return getLongestActivityForRoundTrip((PlanImpl) plan, PopulationUtils.getPreviousActivity(((PlanImpl) plan), PopulationUtils.getPreviousLeg(((PlanImpl) plan), act2)));
 			}
 			else {
 				return "home";
@@ -217,7 +217,7 @@ public abstract class Utils {
 		ActivityImpl actTemp = (ActivityImpl) act;
 		while (actTemp != null && !actTemp.getType().startsWith("h")) {
 			final Activity act1 = actTemp;
-			actTemp = (ActivityImpl) PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act1, plan), plan);
+			actTemp = (ActivityImpl) PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, act1));
 			if (actTemp.getMaximumDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
 				maxActDur = actTemp.getMaximumDuration();
 				longestActivity = actTemp.getType();

@@ -321,9 +321,9 @@ class MATSim4UrbanSimParcel{
 							Leg leg = (Leg) pe ;
 							if ( leg.getMode().equals(TransportMode.pt) ) {
 								final Leg leg2 = leg;
-								Activity fromAct = PopulationUtils.getPreviousActivity(leg2, ((PlanImpl)plan)) ;
+								Activity fromAct = PopulationUtils.getPreviousActivity(((PlanImpl)plan), leg2) ;
 								final Leg leg1 = leg;
-								Activity toAct = PopulationUtils.getNextActivity(leg1, ((PlanImpl)plan)) ;
+								Activity toAct = PopulationUtils.getNextActivity(((PlanImpl)plan), leg1) ;
 								Route route = leg.getRoute() ;
 								route.setDistance( ptMatrix.getPtTravelDistance_meter(fromAct.getCoord(), toAct.getCoord()) ) ;
 							}

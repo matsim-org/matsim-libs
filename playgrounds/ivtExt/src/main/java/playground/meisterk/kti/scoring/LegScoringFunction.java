@@ -148,7 +148,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 				//				long nanos = System.nanoTime();
 				final Leg leg1 = leg;
 				final Leg leg2 = leg;
-				dist = ktiPtRoute.calcAccessEgressDistance(PopulationUtils.getPreviousActivity(leg2, ((PlanImpl) this.plan)), PopulationUtils.getNextActivity(leg1, ((PlanImpl) this.plan)));
+				dist = ktiPtRoute.calcAccessEgressDistance(PopulationUtils.getPreviousActivity(((PlanImpl) this.plan), leg2), PopulationUtils.getNextActivity(((PlanImpl) this.plan), leg1));
 				//				nanos = System.nanoTime() - nanos;
 				//				nanoMsg += Long.toString(nanos) + "\t";
 

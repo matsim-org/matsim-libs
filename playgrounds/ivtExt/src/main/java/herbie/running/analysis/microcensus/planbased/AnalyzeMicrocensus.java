@@ -139,7 +139,7 @@ public class AnalyzeMicrocensus {
 					ActivityImpl act = (ActivityImpl)pe;
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						final Activity act1 = act;
-						if (PopulationUtils.getPreviousLeg(act1, plan).getMode().equals(this.mode)) {
+						if (PopulationUtils.getPreviousLeg(plan, act1).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							zh_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
@@ -159,7 +159,7 @@ public class AnalyzeMicrocensus {
 					ActivityImpl act = (ActivityImpl)pe;
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						final Activity act3 = act;
-						if (PopulationUtils.getPreviousLeg(act3, plan).getMode().equals(this.mode)) {
+						if (PopulationUtils.getPreviousLeg(plan, act3).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							ch_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
@@ -170,10 +170,10 @@ public class AnalyzeMicrocensus {
 								//check the subsequent activities
 								Activity actTmp = act;
 								final Activity act1 = actTmp;
-								String nextType = PopulationUtils.getNextActivity(PopulationUtils.getNextLeg(act1, plan), plan).getType();
+								String nextType = PopulationUtils.getNextActivity(plan, PopulationUtils.getNextLeg(plan, act1)).getType();
 								while (nextType.startsWith(this.type)  || this.type.equals("allTypes")) {
 									final Activity act2 = actTmp;
-									actTmp = PopulationUtils.getNextActivity(PopulationUtils.getNextLeg(act2, plan), plan);
+									actTmp = PopulationUtils.getNextActivity(plan, PopulationUtils.getNextLeg(plan, act2));
 									nextType = actTmp.getType();
 								}
 								if (nextType.equals("h")) {

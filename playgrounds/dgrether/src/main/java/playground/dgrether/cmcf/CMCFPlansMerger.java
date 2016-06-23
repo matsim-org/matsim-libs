@@ -74,7 +74,7 @@ public class CMCFPlansMerger {
 			int legNumber = Integer.parseInt(idLegNumber[1]);
 			legNumber = (legNumber * 2) + 1;
 			Leg leg = (Leg) plan.getPlanElements().get(legNumber);
-			leg.setRoute(PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) ), ((PlanImpl) person.getSelectedPlan())).getRoute());
+			leg.setRoute(PopulationUtils.getNextLeg(((PlanImpl) person.getSelectedPlan()), PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) )).getRoute());
 		}
 
 		MatsimIo.writePlans(plans, net, outPlansFile);

@@ -94,16 +94,16 @@ public class ComparingDistanceStats implements IterationEndsListener {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							PopulationUtils.getPreviousLeg((Activity)pe, plan).getMode().equals(this.mode)) {
+							PopulationUtils.getPreviousLeg(plan, (Activity)pe).getMode().equals(this.mode)) {
 						double distance = -1.0;
-						Leg previousLeg = PopulationUtils.getPreviousLeg((Activity)pe, plan);
+						Leg previousLeg = PopulationUtils.getPreviousLeg(plan, (Activity)pe);
 						Route route = previousLeg.getRoute();
 						if (route instanceof NetworkRoute) {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
 							else distance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, event.getServices().getScenario().getNetwork());
 						} else {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
-							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg((Activity)pe, plan), plan).getCoord());
+							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord());
 						}
 						this.bins.addVal(distance, 1.0);
 					}	

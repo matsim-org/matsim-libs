@@ -82,8 +82,8 @@ public class DistanceStats implements IterationEndsListener {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							PopulationUtils.getPreviousLeg((Activity)pe, plan).getMode().equals(this.mode)) {
-						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg((Activity)pe, plan), plan).getCoord()); 
+							PopulationUtils.getPreviousLeg(plan, (Activity)pe).getMode().equals(this.mode)) {
+						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord()); 
 						this.bins.addVal(distance, 1.0);
 					}	
 				}

@@ -60,9 +60,9 @@ public class CMCFFirstActPlansMerger {
 		Population plans = MatsimIo.loadPlans(plansFile, net);
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
-			Leg l = PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( ((PlanImpl) pl) ), ((PlanImpl) pl));
+			Leg l = PopulationUtils.getNextLeg(((PlanImpl) pl), PopulationUtils.getFirstActivity( ((PlanImpl) pl) ));
 			Plan plcmcf = plansCmcf.getPersons().get(p.getId()).getSelectedPlan();
-			Leg lcmcf = PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( ((PlanImpl) plcmcf) ), ((PlanImpl) plcmcf));
+			Leg lcmcf = PopulationUtils.getNextLeg(((PlanImpl) plcmcf), PopulationUtils.getFirstActivity( ((PlanImpl) plcmcf) ));
 			l.setRoute(lcmcf.getRoute());
 		}
 		MatsimIo.writePlans(plans, net, outPlansFile);

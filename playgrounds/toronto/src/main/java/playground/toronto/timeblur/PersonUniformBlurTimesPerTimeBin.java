@@ -75,7 +75,7 @@ public class PersonUniformBlurTimesPerTimeBin extends AbstractPersonAlgorithm im
 			if (!actBins.containsKey(binIndex)) { actBins.put(binIndex,new ArrayList<Activity>()); }
 			actBins.get(binIndex).add(currAct);
 			final Activity act = currAct;
-			currAct = PopulationUtils.getNextActivity(PopulationUtils.getNextLeg(act, ((PlanImpl) plan)), ((PlanImpl) plan));
+			currAct = PopulationUtils.getNextActivity(((PlanImpl) plan), PopulationUtils.getNextLeg(((PlanImpl) plan), act));
 		}
 		for (Integer binIndex : actBins.keySet()) {
 			ArrayList<Activity> acts = actBins.get(binIndex);

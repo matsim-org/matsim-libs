@@ -49,7 +49,7 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 	
 	public double getZonalScore(PlanImpl plan, ActivityImpl act) {
 		final Activity act1 = act;
-		Activity previousActivity = PopulationUtils.getPreviousActivity(PopulationUtils.getPreviousLeg(act1, plan), plan);
+		Activity previousActivity = PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, act1));
 		int fromZoneIndex = this.getZoneIndex(previousActivity.getFacilityId());
 		int toZoneIndex = this.getZoneIndex(act.getFacilityId());
 		

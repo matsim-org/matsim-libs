@@ -40,14 +40,14 @@ public class ManageSubchainsTest extends MatsimTestCase {
         Plan plan = initializer.getControler().getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		Activity act = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
 		final Activity act1 = act;
-		Leg leg = PopulationUtils.getNextLeg(act1, ((PlanImpl) plan));
+		Leg leg = PopulationUtils.getNextLeg(((PlanImpl) plan), act1);
 		manager.primaryActivityFound(act, leg);
 		assertEquals(act, manager.getSubChains().get(0).getFirstPrimAct());
 		final Leg leg1 = leg;
 
-		act = PopulationUtils.getNextActivity(leg1, ((PlanImpl) plan));
+		act = PopulationUtils.getNextActivity(((PlanImpl) plan), leg1);
 		final Activity act2 = act;
-		manager.secondaryActivityFound(act, PopulationUtils.getNextLeg(act2, ((PlanImpl) plan)));
+		manager.secondaryActivityFound(act, PopulationUtils.getNextLeg(((PlanImpl) plan), act2));
 		assertEquals(act, manager.getSubChains().get(0).getSlActs().get(0));
 	}
 }

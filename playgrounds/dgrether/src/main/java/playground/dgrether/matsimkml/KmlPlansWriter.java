@@ -94,7 +94,7 @@ public class KmlPlansWriter {
 					log.warn("Not yet implemented: Adding act KML features of type " + abstractFeature.getClass());
 				}
 				// ---
-				Leg leg = PopulationUtils.getNextLeg(act, plan);
+				Leg leg = PopulationUtils.getNextLeg(plan, act);
 				abstractFeature = this.featureFactory.createLegFeature(leg, this.networkLinkStyle);
 				if (abstractFeature.getClass().equals(FolderType.class)) {
 					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
@@ -102,9 +102,9 @@ public class KmlPlansWriter {
 					log.warn("Not yet implemented: Adding leg KML features of type " + abstractFeature.getClass());
 				}
 				// ---
-				act = PopulationUtils.getNextActivity(leg, plan);
+				act = PopulationUtils.getNextActivity(plan, leg);
 			}
-			while (PopulationUtils.getNextLeg(act, plan) != null);
+			while (PopulationUtils.getNextLeg(plan, act) != null);
 			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(planFolder));
 		}
 

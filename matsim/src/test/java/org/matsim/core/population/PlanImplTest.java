@@ -83,7 +83,7 @@ public class PlanImplTest {
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		final Leg leg = l;
 		final Activity act = a;
-		PopulationUtils.insertLegAct(1, leg, act, plan);
+		PopulationUtils.insertLegAct(plan, 1, leg, act);
 
 		// test
 		assertEquals(5, plan.getPlanElements().size());
@@ -112,7 +112,7 @@ public class PlanImplTest {
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		final Leg leg = l;
 		final Activity act = a;
-		PopulationUtils.insertLegAct(3, leg, act, plan);
+		PopulationUtils.insertLegAct(plan, 3, leg, act);
 
 		// test
 		assertEquals(5, plan.getPlanElements().size());
@@ -142,7 +142,7 @@ public class PlanImplTest {
 		try {
 			final Leg leg = l;
 			final Activity act = a;
-			PopulationUtils.insertLegAct(2, leg, act, plan);
+			PopulationUtils.insertLegAct(plan, 2, leg, act);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -168,7 +168,7 @@ public class PlanImplTest {
 		try {
 			final Leg leg = l;
 			final Activity act = a;
-			PopulationUtils.insertLegAct(0, leg, act, plan);
+			PopulationUtils.insertLegAct(plan, 0, leg, act);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -195,7 +195,7 @@ public class PlanImplTest {
 		try {
 			final Leg leg = l;
 			final Activity act = a;
-			PopulationUtils.insertLegAct(4, leg, act, plan);
+			PopulationUtils.insertLegAct(plan, 4, leg, act);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -204,7 +204,7 @@ public class PlanImplTest {
 		try {
 			final Leg leg = l;
 			final Activity act = a;
-			PopulationUtils.insertLegAct(5, leg, act, plan);
+			PopulationUtils.insertLegAct(plan, 5, leg, act);
 			fail("expected Exception because of wrong act/leg-index.");
 		} catch (IllegalArgumentException e) {
 			log.debug("catched expected exception.", e);
@@ -279,10 +279,10 @@ public class PlanImplTest {
 		testee.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), testee);
 
-		PopulationUtils.removeActivity(3, testee);
+		PopulationUtils.removeActivity(testee, 3);
 		assertEquals(5, testee.getPlanElements().size());
 
-		PopulationUtils.removeActivity(4, testee);
+		PopulationUtils.removeActivity(testee, 4);
 		assertEquals(3, testee.getPlanElements().size());
 	}
 
@@ -298,10 +298,10 @@ public class PlanImplTest {
 		testee.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("h", new Coord(0, 0), testee);
 
-		PopulationUtils.removeLeg(4, testee);
+		PopulationUtils.removeLeg(testee, 4);
 		assertEquals(5, testee.getPlanElements().size());
 
-		PopulationUtils.removeLeg(3, testee);
+		PopulationUtils.removeLeg(testee, 3);
 		assertEquals(3, testee.getPlanElements().size());
 	}
 

@@ -51,7 +51,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 				Activity act = (Activity) pe;
 				if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
 					final int index = i;
-					PopulationUtils.removeActivity(index, ((PlanImpl) plan));
+					PopulationUtils.removeActivity(((PlanImpl) plan), index);
 					n -= 2;
 					i--; // i will be incremented again in next loop-iteration, so we'll check the next act
 				}

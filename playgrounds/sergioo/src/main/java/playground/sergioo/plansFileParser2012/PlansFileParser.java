@@ -41,12 +41,12 @@ public class PlansFileParser {
 			PlanImpl plan = (PlanImpl)person.getSelectedPlan();
 			for(Activity activity = PopulationUtils.getFirstActivity( plan );!activity.equals(PopulationUtils.getLastActivity(plan));) {
 				final Activity act = activity;
-				Leg leg = PopulationUtils.getNextLeg(act, plan);
+				Leg leg = PopulationUtils.getNextLeg(plan, act);
 				int numBin = (int) Math.floor(leg.getDepartureTime()/binTime);
 				travelTimeBins[numBin][1]=travelTimeBins[numBin][1]+leg.getTravelTime();
 				travelTimeBins[numBin][2]++;
 				final Leg leg1 = leg;
-				activity = PopulationUtils.getNextActivity(leg1, plan);
+				activity = PopulationUtils.getNextActivity(plan, leg1);
 			}
 		}
 		PrintWriter writer = new PrintWriter(new File(args[4]));

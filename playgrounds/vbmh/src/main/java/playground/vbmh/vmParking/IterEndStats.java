@@ -101,12 +101,12 @@ public class IterEndStats {
 			boolean notParked=false;
 			boolean parkedAtHome=false;
 			PlanImpl planImpl=(PlanImpl)personImpl.getSelectedPlan();
-			Leg legImpl=(Leg)PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( planImpl ), planImpl);
+			Leg legImpl=(Leg)PopulationUtils.getNextLeg(planImpl, PopulationUtils.getFirstActivity( planImpl ));
 			Id id = person.getId();
 			LinkedList<ParkingSpot> selectedParkings = parkings.get(id);
 			Activity firstAct = PopulationUtils.getFirstActivity( planImpl );
 			final Leg leg = legImpl;
-			String actType = PopulationUtils.getNextActivity(leg, planImpl).getType();
+			String actType = PopulationUtils.getNextActivity(planImpl, leg).getType();
 			ParkingSpot firstSelectedSpot;
 			ParkingSpot homeSpot;
 			String facId = firstAct.getFacilityId().toString();

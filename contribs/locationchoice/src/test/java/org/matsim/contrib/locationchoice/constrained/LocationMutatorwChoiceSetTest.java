@@ -56,7 +56,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		Plan plan = scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		locationmutator.run(plan);
 		assertEquals(PopulationUtils.getFirstActivity( ((PlanImpl) plan) ).getCoord().getX(), -25000.0, EPSILON);
-		assertEquals(PopulationUtils.getNextLeg(PopulationUtils.getFirstActivity( ((PlanImpl) plan) ), ((PlanImpl) plan)).getRoute(), null);
+		assertEquals(PopulationUtils.getNextLeg(((PlanImpl) plan), PopulationUtils.getFirstActivity( ((PlanImpl) plan) )).getRoute(), null);
 	}
 
 	public void testCalcActChains() {

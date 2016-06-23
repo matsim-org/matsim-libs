@@ -73,10 +73,10 @@ public class CMCFPlanSplitter {
 		  		Leg leg = (Leg) pe;
 				final Leg leg2 = leg;
 
-		  		planNew.addActivity(PopulationUtils.getPreviousActivity(leg2, ((PlanImpl) pl)));
+		  		planNew.addActivity(PopulationUtils.getPreviousActivity(((PlanImpl) pl), leg2));
 		  		planNew.addLeg(leg);
 				final Leg leg1 = leg;
-		  		planNew.addActivity(PopulationUtils.getNextActivity(leg1, ((PlanImpl) pl)));
+		  		planNew.addActivity(PopulationUtils.getNextActivity(((PlanImpl) pl), leg1));
 
 		  		pNew.addPlan(planNew);
 

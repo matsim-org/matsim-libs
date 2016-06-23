@@ -49,7 +49,7 @@ public class PersonSetFirstActEndTime extends AbstractPersonAlgorithm implements
 		Activity firstAct = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
 		firstAct.setEndTime(this.firstActEndTime);
 		final Activity act = firstAct;
-		Leg firstLeg = PopulationUtils.getNextLeg(act, ((PlanImpl) plan));
+		Leg firstLeg = PopulationUtils.getNextLeg(((PlanImpl) plan), act);
 		firstLeg.setDepartureTime(this.firstActEndTime);
 	}
 

@@ -213,18 +213,18 @@ public class PlanAnalyzeTourModeChoiceSet implements PlanAlgorithm {
 					currentLocation = modeTracker.get(legMode);
 					if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 						final Leg leg = currentLeg;
-						requiredLocation = (BasicLocation) facilities.getFacilities().get(PopulationUtils.getPreviousActivity(leg, ((PlanImpl) plan)).getFacilityId());
+						requiredLocation = (BasicLocation) facilities.getFacilities().get(PopulationUtils.getPreviousActivity(((PlanImpl) plan), leg).getFacilityId());
 					} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 						final Leg leg = currentLeg;
-						requiredLocation = (BasicLocation) network.getLinks().get(PopulationUtils.getPreviousActivity(leg, ((PlanImpl) plan)).getLinkId());
+						requiredLocation = (BasicLocation) network.getLinks().get(PopulationUtils.getPreviousActivity(((PlanImpl) plan), leg).getLinkId());
 					}
 					if (currentLocation.equals(requiredLocation)) {
 						if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 							final Leg leg = currentLeg;
-							nextLocation = (BasicLocation) facilities.getFacilities().get(PopulationUtils.getNextActivity(leg, ((PlanImpl) plan)).getFacilityId());
+							nextLocation = (BasicLocation) facilities.getFacilities().get(PopulationUtils.getNextActivity(((PlanImpl) plan), leg).getFacilityId());
 						} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
 							final Leg leg = currentLeg;
-							nextLocation = (BasicLocation) network.getLinks().get(PopulationUtils.getNextActivity(leg, ((PlanImpl) plan)).getLinkId());
+							nextLocation = (BasicLocation) network.getLinks().get(PopulationUtils.getNextActivity(((PlanImpl) plan), leg).getLinkId());
 						}
 						modeTracker.put(legMode, nextLocation);
 					} else {

@@ -57,7 +57,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 					double travelTime = ((Leg) plan.getPlanElements().get(i-1)).getTravelTime();
 					Route route = ((Leg) plan.getPlanElements().get(i-1)).getRoute();
 					final int index = i;
-					PopulationUtils.removeActivity(index, ((PlanImpl) plan));
+					PopulationUtils.removeActivity(((PlanImpl) plan), index);
 					((Leg) plan.getPlanElements().get(i-1)).setTravelTime(travelTime);
 					((Leg) plan.getPlanElements().get(i-1)).setRoute(route);
 					n -= 2;
