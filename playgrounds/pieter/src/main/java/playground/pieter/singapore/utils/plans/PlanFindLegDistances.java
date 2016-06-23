@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -35,7 +35,7 @@ class PlanFindLegDistances {
 	private final MutableScenario scenario;
 	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
 	private final NetworkImpl network;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactoriesRegister routeFactory;
 	private final DataBaseAdmin dba;
 	private final FastAStarLandmarks leastCostPathCalculator;
 
@@ -72,7 +72,7 @@ class PlanFindLegDistances {
 		leastCostPathCalculator = (FastAStarLandmarks) routerFactory.createPathCalculator(network, travelMinCost, timeFunction);
 		this.dba = dba;
 		routeFactory = ((PopulationFactoryImpl) scenario.getPopulation()
-				.getFactory()).getRouteFactory();
+				.getFactory()).getRouteFactoriesRegister();
 	}
 
 	public double getShortestPathDistance(Coord startCoord, Coord endCoord) {

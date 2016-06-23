@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -342,7 +342,7 @@ import org.xml.sax.Attributes;
 			}
 		}
 		
-		RouteFactoryImpl factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactory();
+		RouteFactoriesRegister factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactoriesRegister();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
 		
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(

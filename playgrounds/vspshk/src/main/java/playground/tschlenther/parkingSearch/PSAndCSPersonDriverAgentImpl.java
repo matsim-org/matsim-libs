@@ -48,7 +48,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -136,7 +136,7 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl)pf).getRouteFactory() ;
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl)pf).getRouteFactoriesRegister() ;
 
 		// === walk leg: ===
 
@@ -197,7 +197,7 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 				
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
 				PopulationFactory pf = scenario.getPopulation().getFactory() ;
-				RouteFactoryImpl routeFactory = ((PopulationFactoryImpl)pf).getRouteFactory() ;
+				RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl)pf).getRouteFactoriesRegister() ;
 
 				// === walk leg: ===
 

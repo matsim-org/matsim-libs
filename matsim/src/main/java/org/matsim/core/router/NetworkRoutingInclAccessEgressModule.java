@@ -41,7 +41,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -82,7 +82,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactoriesRegister routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 	private String stageActivityType;
 
@@ -91,7 +91,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final PopulationFactory populationFactory,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			final RouteFactoryImpl routeFactory, PlansCalcRouteConfigGroup calcRouteConfig) {
+			final RouteFactoriesRegister routeFactory, PlansCalcRouteConfigGroup calcRouteConfig) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeFactory = routeFactory;

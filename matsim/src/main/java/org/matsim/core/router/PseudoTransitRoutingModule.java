@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -46,7 +46,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactoriesRegister routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 	private final double speedFactor;
 	private final double beelineDistanceFactor;
@@ -58,7 +58,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			final LeastCostPathCalculator routeAlgo,
 			final double speedFactor,
 			double beelineDistanceFactor,
-			final RouteFactoryImpl routeFactory) {
+			final RouteFactoriesRegister routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.speedFactor = speedFactor;

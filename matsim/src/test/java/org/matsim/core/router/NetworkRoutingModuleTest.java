@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -55,7 +55,7 @@ public class NetworkRoutingModuleTest {
 	@Test
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactoriesRegister();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
@@ -90,7 +90,7 @@ public class NetworkRoutingModuleTest {
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord((double) 0, (double) 3000));
 		((Activity) toAct).setLinkId(Id.create("3", Link.class));
 		
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactoriesRegister();
 
 		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 

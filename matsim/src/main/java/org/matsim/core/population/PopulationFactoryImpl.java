@@ -31,17 +31,17 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 
 /**
  * @author dgrether, mrieser
  */
 public class PopulationFactoryImpl implements PopulationFactory {
 
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactoriesRegister routeFactory;
 
     @Inject
-	PopulationFactoryImpl(RouteFactoryImpl routeFactory) {
+	PopulationFactoryImpl(RouteFactoriesRegister routeFactory) {
         this.routeFactory = routeFactory;
     }
 
@@ -98,7 +98,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	@Deprecated // "createRoute(...)", which is already in the official PopulationFactory interface, should be able to achieve the same thing. kai, apr'16
-	public RouteFactoryImpl getRouteFactory() {
+	public RouteFactoriesRegister getRouteFactoriesRegister() {
 		return this.routeFactory;
 	}
 

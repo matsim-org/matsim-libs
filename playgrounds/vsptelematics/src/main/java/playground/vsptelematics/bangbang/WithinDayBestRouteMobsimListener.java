@@ -43,7 +43,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -75,7 +75,7 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 		{
 			TravelDisutility travelDisutility = travelDisutilityFactories.get(TransportMode.car).createTravelDisutility( travelTime ) ;
 			LeastCostPathCalculator pathAlgo = pathAlgoFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime) ;
-			RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory() ;
+			RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactoriesRegister() ;
 			this.editRoutes = new EditRoutes( scenario.getNetwork(), pathAlgo, routeFactory ) ;
 			this.iterationCounter = ic ;
 		}

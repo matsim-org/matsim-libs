@@ -32,7 +32,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -89,7 +89,7 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
         TravelDisutilityFactory travelDisutilityFactory = controler.getTravelDisutilityFactory();
         TravelTime travelTime = controler.getLinkTravelTimes();
         LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
-        RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory();
+        RouteFactoriesRegister modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactoriesRegister();
         PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
         Scenario scenario = controler.getScenario();
 		

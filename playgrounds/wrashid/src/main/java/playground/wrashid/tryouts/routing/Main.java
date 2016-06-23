@@ -36,7 +36,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -76,7 +76,7 @@ public class Main {
 //
 //		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 		
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactoriesRegister();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0 / 3600, +6.0 / 3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, freespeed, freespeed);
 

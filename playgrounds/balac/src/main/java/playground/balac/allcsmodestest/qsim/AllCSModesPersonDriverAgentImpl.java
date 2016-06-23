@@ -443,7 +443,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		Leg carLeg = PopulationUtils.createLeg(mode);
 		
 		carLeg.setTravelTime( travelTime );
-		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
 		
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);

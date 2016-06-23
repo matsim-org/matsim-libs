@@ -61,7 +61,7 @@ public class HitchHikingTripRouterFactory /* extends DefaultTripRouterFactoryImp
 				new HitchHikingPassengerRoutingModule(
 					instance.getRoutingModule( TransportMode.pt ),
 					spots,
-					((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory(),
+					((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactoriesRegister(),
 					spotWeighter,
 					config,
 					// XXX here or higher level?
