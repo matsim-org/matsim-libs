@@ -138,7 +138,7 @@ public class ScheduleShapeFileWriter {
 			pf.setAttribute("linkId", stopFacility.getLinkId().toString());
 			pf.setAttribute("postAreaId", stopFacility.getStopPostAreaId());
 			pf.setAttribute("isBlocking", stopFacility.getIsBlockingLane());
-			pf.setAttribute("routes", CollectionUtils.idSetToString(routesOnStopFacility.get(stopFacility)));
+			if(routesOnStopFacility.get(stopFacility) != null) pf.setAttribute("routes", CollectionUtils.idSetToString(routesOnStopFacility.get(stopFacility)));
 			pointFeatures.add(pf);
 
 			SimpleFeature lf = polylineFeatureFactory.createPolyline(coordinates);
@@ -147,7 +147,7 @@ public class ScheduleShapeFileWriter {
 			lf.setAttribute("linkId", stopFacility.getLinkId().toString());
 			lf.setAttribute("postAreaId", stopFacility.getStopPostAreaId());
 			lf.setAttribute("isBlocking", stopFacility.getIsBlockingLane());
-			pf.setAttribute("routes", CollectionUtils.idSetToString(routesOnStopFacility.get(stopFacility)));
+			if(routesOnStopFacility.get(stopFacility) != null) pf.setAttribute("routes", CollectionUtils.idSetToString(routesOnStopFacility.get(stopFacility)));
 			lineFeatures.add(lf);
 		}
 

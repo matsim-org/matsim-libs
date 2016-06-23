@@ -253,7 +253,7 @@ public class PlausibilityCheck {
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
 				.addAttribute("diff [s]", Double.class)
-				.addAttribute("diff [ratio]", Double.class)
+				.addAttribute("diff [%]", Double.class)
 				.addAttribute("expected", Double.class)
 				.addAttribute("actual", Double.class)
 				.create();
