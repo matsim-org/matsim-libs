@@ -290,7 +290,7 @@ public class Prepare {
 	}
 
 	private void removeInvalidLines() {
-//		ScheduleCleaner.removeInvalidTransitRoutes(TransitScheduleValidator.validateAll(schedule, network), schedule);
+		ScheduleCleaner.removeInvalidTransitRoutes(TransitScheduleValidator.validateAll(schedule, network), schedule);
 
 /*
 		Set<String> set = new HashSet<>();

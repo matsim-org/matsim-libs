@@ -76,11 +76,7 @@ public class FastAStarRouter implements Router {
 		if(fromNode != null && toNode != null) {
 			Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
 			if(!paths.containsKey(nodes)) {
-				try {
 					paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 			}
 			return paths.get(nodes);
 		} else {

@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.gtfs.Gtfs2TransitSchedule;
 import playground.polettif.publicTransitMapping.mapping.PTMapperImpl;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -48,7 +49,7 @@ public class CompareMapping {
 
 
 		// gtfs 2 matsim
-//		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, unmappedMTS, null, output+"gtfs.shp");
+		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, unmappedMTS, null, output+"gtfs.shp");
 
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(unmappedMTS);
 		Network network = NetworkTools.readNetwork(networkFile);
@@ -76,10 +77,10 @@ public class CompareMapping {
 		ptmConfig.addParameterSet(lccParamBus);
 		ptmConfig.setNumOfThreads(4);
 
-		Map<String, Set<String>> mra = new HashMap<>();
-		mra.put("bus", CollectionUtils.stringToSet("bus,car"));
-		mra.put("tram", CollectionUtils.stringToSet("tram"));
-		ptmConfig.setModeRoutingAssignment(mra);
+
+		PublicTransitMappingConfigGroup.ModeRoutingAssignment mra = new PublicTransitMappingConfigGroup.ModeRoutingAssignment("bus");
+		mra.setNetworkModesStr("bus,car");
+		ptmConfig.addParameterSet(mra);
 
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
 		ptmConfig.setOutputScheduleFile(output + "ptm_schedule.xml.gz");

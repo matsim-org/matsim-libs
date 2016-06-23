@@ -123,14 +123,17 @@ public class PseudoRoutingImpl implements PseudoRouting {
 							double pathCost = 2 * maxAllowedTravelCost;
 
 							/** [3.1]
-							 * If both link candidates are loop links we don't have to search
-							 * a least cost path on the network.
+							 * If one or both link candidates are loop links we don't have
+							 * to search a least cost path on the network.
 							 */
 							if(!linkCandidateCurrent.isLoopLink() && !linkCandidateNext.isLoopLink()) {
 								LeastCostPathCalculator.Path leastCostPath = null;
 								Node nodeA = modeNetwork.getNodes().get(linkCandidateCurrent.getToNodeId());
 								Node nodeB = modeNetwork.getNodes().get(linkCandidateNext.getFromNodeId());
 
+								/**
+								 * Calculate the least cost path on the network
+								 */
 								if(nodeA != null && nodeB != null) {
 									String key = scheduleTransportMode + "--" + nodeA.toString() + "--" + nodeB.toString();
 									if(!localStoredPaths.containsKey(key)) {
@@ -149,7 +152,6 @@ public class PseudoRoutingImpl implements PseudoRouting {
 										pathCost *= 4;
 									}
 								}
-
 								useExistingNetworkLinks = pathCost < maxAllowedTravelCost;
 							}
 
@@ -228,15 +230,15 @@ public class PseudoRoutingImpl implements PseudoRouting {
 		}
 
 		for(ArtificialLink a : artificialLinks) {
-			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getToNodeId(), a.getFromNodeId());
+			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getFromNodeId(), a.getToNodeId());
 
 			Link existingLink = existingLinks.get(key);
 
-			if(existingLink == null || a.getFreespeed() > existingLink.getFreespeed() || a.getLength() > existingLink.getLength()) {
+			if(existingLink == null) {
 				String newLinkIdStr = config.getPrefixArtificial() + artificialId++;
-				Id<Node> fromNodeId = a.getToNodeId();
+				Id<Node> fromNodeId = a.getFromNodeId();
 				Node fromNode;
-				Id<Node> toNodeId = a.getFromNodeId();
+				Id<Node> toNodeId = a.getToNodeId();
 				Node toNode;
 
 				if(!network.getNodes().containsKey(fromNodeId)) {
@@ -259,6 +261,7 @@ public class PseudoRoutingImpl implements PseudoRouting {
 				newLink.setCapacity(a.getCapacity());
 
 				network.addLink(newLink);
+				existingLinks.put(new Tuple<>(fromNodeId, toNodeId), newLink);
 			}
 		}
 	}

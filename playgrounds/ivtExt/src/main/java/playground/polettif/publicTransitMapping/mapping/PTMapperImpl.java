@@ -45,6 +45,7 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -77,23 +78,25 @@ public class PTMapperImpl extends PTMapper {
 		}
 
 		setLogLevels();
-
 		config.loadParameterSets();
 
+		log.info("======================================");
 		log.info("Mapping transit schedule to network...");
-		int nStopFacilities = schedule.getFacilities().size();
+
+		/**
+		 * Some schedule statistics
+ 		 */
 		Set<String> scheduleTransportModes = new HashSet<>();
-		// schedule statistics
-		Map<TransitLine, Integer> statTransitLine = new HashMap<>();
+		Map<TransitLine, Integer> totalStopsPerTransitLine = new HashMap<>();
+		int nStopFacilities = schedule.getFacilities().size();
 		int nTransitRoutes = 0;
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				scheduleTransportModes.add(transitRoute.getTransportMode());
-				MapUtils.addToInteger(transitLine, statTransitLine, transitRoute.getStops().size(), transitRoute.getStops().size());
+				MapUtils.addToInteger(transitLine, totalStopsPerTransitLine, transitRoute.getStops().size(), transitRoute.getStops().size());
 				nTransitRoutes++;
 			}
 		}
-
 
 
 		/** [1]
@@ -115,8 +118,8 @@ public class PTMapperImpl extends PTMapper {
 		 * on their coordinates. Each Link Candidate is a possible new stop facility
 		 * after PseudoRouting.
 		 */
-		log.info("=============================");
-		log.info("Creating link candidates");
+		log.info("===========================");
+		log.info("Creating link candidates...");
 		LinkCandidateCreator linkCandidates = new LinkCandidateCreatorStandard(this.schedule, this.network, this.config, this.modeSeparatedRouters);
 		linkCandidates.createLinkCandidates();
 
@@ -138,7 +141,7 @@ public class PTMapperImpl extends PTMapper {
 		}
 		// spread transit lines on threads
 		int thr = 0;
-		for(TransitLine transitLine : new LinkedList<>(MiscUtils.sortDescendingByValue(statTransitLine).keySet())) {
+		for(TransitLine transitLine : new LinkedList<>(MiscUtils.sortDescendingByValue(totalStopsPerTransitLine).keySet())) {
 			pseudoRoutingThreads[thr++ % numThreads].addTransitLineToQueue(transitLine);
 		}
 
@@ -181,10 +184,9 @@ public class PTMapperImpl extends PTMapper {
 		 * The final routing should be done on the merged network, so a mode dependent
 		 * router for each schedule mode is initialized using the same merged network.
 		 */
-		log.info("=======================================================================================");
-		log.info("Initiating final routers to map transit routes with referenced facilities to the network");
-		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
-
+		log.info("===========================================================================================");
+		log.info("Initiating final routers to map transit routes with referenced facilities to the network...");
+		Map<String, Router> finalRouters = new HashMap<>();
 		for(String scheduleMode : scheduleTransportModes) {
 			Set<String> routingTransportModes = new HashSet<>(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
 			if(modeRoutingAssignment.get(scheduleMode) != null) routingTransportModes.addAll(modeRoutingAssignment.get(scheduleMode));
@@ -222,7 +224,7 @@ public class PTMapperImpl extends PTMapper {
 		 */
 		log.info("======================");
 		log.info("Validating schedule...");
-		validateSchedule();
+		printValidateSchedule();
 
 		/** [11]
 		 * Write output files if defined in config
@@ -239,6 +241,79 @@ public class PTMapperImpl extends PTMapper {
 		printStatistics(nStopFacilities);
 	}
 
+	private void cleanScheduleAndNetwork() {
+		// changing the freespeed of the artificial links (value is used in simulations)
+		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
+
+		// Remove unnecessary parts of schedule
+		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
+		if(config.getRemoveNotUsedStopFacilities()) ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+
+		// change the network transport modes
+		ScheduleTools.assignScheduleModesToLinks(schedule, network);
+		if(config.getCombinePtModes()) {
+			NetworkTools.replaceNonCarModesWithPT(network);
+		} else if(config.getAddPtMode()) {
+			ScheduleTools.addPTModeToNetwork(schedule, network);
+		}
+	}
+
+	/**
+	 * Write the schedule and network to output files (if defined in config)
+	 */
+	private void writeOutputFiles() {
+		if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
+			log.info("Writing schedule and network to file...");
+			try {
+				ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
+				NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
+			} catch (Exception e) {
+				log.error("Cannot write to output directory! Trying to write schedule and network file in working directory");
+				long t = System.nanoTime() / 1000000;
+				try {
+					ScheduleTools.writeTransitSchedule(schedule, t + "schedule.xml.gz");
+					NetworkTools.writeNetwork(network, t + "network.xml.gz");
+				} catch (Exception e1) {
+					throw new RuntimeException("Files could not be written in working directory");
+				}
+			}
+			if(config.getOutputStreetNetworkFile() != null) {
+				NetworkTools.writeNetwork(NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getOutputStreetNetworkFile());
+			}
+		} else {
+			log.info("");
+			log.info("No output paths defined, schedule and network are not written to files.");
+		}
+	}
+
+	/**
+	 * Log the result of the schedule validator
+	 */
+	private void printValidateSchedule() {
+		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(schedule, network);
+		if(validationResult.isValid()) {
+			log.info("Schedule appears valid!");
+		} else {
+			log.warn("Schedule is NOT valid!");
+		}
+		if(validationResult.getErrors().size() > 0) {
+			log.info("Validation errors:");
+			for(String e : validationResult.getErrors()) {
+				log.info(e);
+			}
+		}
+		if(validationResult.getWarnings().size() > 0) {
+			log.info("Validation warnings:");
+			for(String w : validationResult.getWarnings()) {
+				log.info(w);
+			}
+		}
+	}
+
+	/**
+	 * Print some basic mapping statistics.
+	 */
 	private void printStatistics(int inputNStopFacilities) {
 		int nArtificialLinks = 0;
 		for(Link l : network.getLinks().values()) {
@@ -285,70 +360,6 @@ public class PTMapperImpl extends PTMapper {
 		log.info("    Run PlausibilityCheck for further analysis");
 		log.info("");
 		log.info("==================================================");
-	}
-
-	private void writeOutputFiles() {
-		if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
-			log.info("Writing schedule and network to file...");
-			try {
-				ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
-				NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
-			} catch (Exception e) {
-				log.error("Cannot write to output directory! Trying to write schedule and network file in working directory");
-				long t = System.nanoTime() / 1000000;
-				try {
-					ScheduleTools.writeTransitSchedule(schedule, t + "schedule.xml.gz");
-					NetworkTools.writeNetwork(network, t + "network.xml.gz");
-				} catch (Exception e1) {
-					throw new RuntimeException("Files could not be written in working directory");
-				}
-			}
-			if(config.getOutputStreetNetworkFile() != null) {
-				NetworkTools.writeNetwork(NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getOutputStreetNetworkFile());
-			}
-		} else {
-			log.info("");
-			log.info("No output paths defined, schedule and network are not written to files.");
-		}
-	}
-
-	private void validateSchedule() {
-		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(schedule, network);
-		if(validationResult.isValid()) {
-			log.info("Schedule appears valid!");
-		} else {
-			log.warn("Schedule is NOT valid!");
-		}
-		if(validationResult.getErrors().size() > 0) {
-			log.info("Validation errors:");
-			for(String e : validationResult.getErrors()) {
-				log.info(e);
-			}
-		}
-		if(validationResult.getWarnings().size() > 0) {
-			log.info("Validation warnings:");
-			for(String w : validationResult.getWarnings()) {
-				log.info(w);
-			}
-		}
-	}
-
-	private void cleanScheduleAndNetwork() {
-		// changing the freespeed of the artificial links (value is used in simulations)
-		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
-
-		// Remove unnecessary parts of schedule
-		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp(), true);
-		if(config.getRemoveNotUsedStopFacilities()) ScheduleCleaner.removeNotUsedStopFacilities(schedule);
-
-		// change the network transport modes
-		ScheduleTools.assignScheduleModesToLinks(schedule, network);
-		if(config.getCombinePtModes()) {
-			NetworkTools.replaceNonCarModesWithPT(network);
-		} else if(config.getAddPtMode()) {
-			ScheduleTools.addPTModeToNetwork(schedule, network);
-		}
 	}
 
 	private static void setLogLevels() {
