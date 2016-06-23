@@ -27,10 +27,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
@@ -158,8 +156,8 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan instanceof Plan){
-			Plan p = (Plan)plan;
+		if (plan != null){
+			Plan p = plan;
 			if ((p.getType() != null)) {
 				out.write(" type=\"");
 				out.write(p.getType());
@@ -206,14 +204,11 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act instanceof Activity){
-			Activity a = (Activity)act;
-			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
+			if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" dur=\"");
-				out.write(Time.writeTime(a.getMaximumDuration()));
+				out.write(Time.writeTime(act.getMaximumDuration()));
 				out.write("\"");
 			}
-		}
 		if (act.getEndTime() != Time.UNDEFINED_TIME) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));

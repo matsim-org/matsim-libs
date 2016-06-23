@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Route;
  */
 public abstract class AbstractPopulationWriterHandler implements PopulationWriterHandler {
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(AbstractPopulationWriterHandler.class);
 	
 	@Override

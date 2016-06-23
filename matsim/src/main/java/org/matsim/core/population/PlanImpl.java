@@ -42,6 +42,7 @@ import org.matsim.core.scenario.CustomizableUtils;
 
 	private String type = null;
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(Plan.class);
 
 	private Customizable customizableDelegate;

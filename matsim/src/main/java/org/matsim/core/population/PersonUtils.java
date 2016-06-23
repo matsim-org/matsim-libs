@@ -1,12 +1,11 @@
 package org.matsim.core.population;
 
+import java.util.Iterator;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
-
-import java.util.Iterator;
-import java.util.TreeSet;
 
 public class PersonUtils {
 	private final static String SEX_ATTRIBUTE="sex";
@@ -103,6 +102,7 @@ public class PersonUtils {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Deprecated // use PersonAttributes
 	public static TreeSet<String> getTravelcards(Person person) {
 		return (TreeSet<String>) person.getCustomAttributes().get(TRAVELCARDS);
