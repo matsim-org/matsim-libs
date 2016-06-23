@@ -80,7 +80,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final static String ATTR_LEG_MODE = "mode";
 	private final static String ATTR_LEG_DEPTIME = "dep_time";
 	private final static String ATTR_LEG_TRAVTIME = "trav_time";
-	private final static String ATTR_LEG_ARRTIME = "arr_time";
+//	private final static String ATTR_LEG_ARRTIME = "arr_time";
 	private static final String ATTR_ROUTE_STARTLINK = "start_link";
 	private static final String ATTR_ROUTE_ENDLINK = "end_link";
 
