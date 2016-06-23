@@ -186,12 +186,12 @@ import junit.framework.TestCase;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
 		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
-		PopulationUtils.createAndAddActivityFromLinkId("h", (Id<Link>) homeLinkId, plan).setEndTime(Time.parseTime(startTime));
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "h", (Id<Link>) homeLinkId).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = new LinkNetworkRouteImpl(homeLinkId, workLinkId);
 		route.setLinkIds(homeLinkId, routeLinkIds, workLinkId);
 		leg.setRoute(route);
-		PopulationUtils.createAndAddActivityFromLinkId("w", (Id<Link>) workLinkId, plan);
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", (Id<Link>) workLinkId);
 		return person;
 	}
 
@@ -199,15 +199,15 @@ import junit.framework.TestCase;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
 		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
-		Activity act = PopulationUtils.createAndAddActivityFromLinkId("h", homeLink.getId(), plan);
+		Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", homeLink.getId());
 		act.setCoord(homeLink.getCoord());
 		act.setEndTime(Time.parseTime(startTime));
 		plan.createAndAddLeg(TransportMode.car);
-		act = PopulationUtils.createAndAddActivityFromLinkId("w", workLink.getId(), plan);
+		act = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", workLink.getId());
 		act.setCoord(workLink.getCoord());
 		act.setEndTime(16.0 * 3600);
 		plan.createAndAddLeg(TransportMode.car);
-		act = PopulationUtils.createAndAddActivityFromLinkId("h", finishLink.getId(), plan);
+		act = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", finishLink.getId());
 		act.setCoord(finishLink.getCoord());
 		return person;
 	}

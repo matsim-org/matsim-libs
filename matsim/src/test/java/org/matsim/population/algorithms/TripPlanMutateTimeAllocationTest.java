@@ -45,25 +45,25 @@ public class TripPlanMutateTimeAllocationTest {
 		// setup population with one person
 		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		Activity act = PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.transit_walk);
-		Activity ptAct1 = PopulationUtils.createAndAddActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100), plan);
+		Activity ptAct1 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100));
 		ptAct1.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.pt);
-		Activity ptAct2 = PopulationUtils.createAndAddActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100), plan);
+		Activity ptAct2 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100));
 		ptAct2.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.transit_walk);
-		act = PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 500), plan);
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 500));
 		act.setEndTime(16*3600);
 		plan.createAndAddLeg(TransportMode.transit_walk);
-		Activity ptAct3 = PopulationUtils.createAndAddActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100), plan);
+		Activity ptAct3 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100));
 		ptAct3.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.pt);
-		Activity ptAct4 = PopulationUtils.createAndAddActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100), plan);
+		Activity ptAct4 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord((double) 0, (double) 100));
 		ptAct4.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.transit_walk);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 500), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 500));
 		boolean affectingDuration = true ;
 
 		TripPlanMutateTimeAllocation mutator =

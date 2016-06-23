@@ -166,7 +166,7 @@ public class ModdedConverter {
 						}
 						this.tmpType = tabs[7];
 						final Coord coord = tmpCoord;
-						Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[4], coord, ((Plan) pl));
+						Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) pl), (String) tabs[4], coord);
 						act.setEndTime(convertTime(tabs[3]));
 						act.setMaximumDuration(dur);
 					} else {
@@ -195,7 +195,7 @@ public class ModdedConverter {
 								System.out.println(personId);
 							}
 							final Coord coord = tmpCoord2;
-							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((Plan) tmpPl));
+							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) tmpPl), (String) this.tmpTabs[7], coord);
 						}
 
 						Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
@@ -223,7 +223,7 @@ public class ModdedConverter {
 							System.out.println(personId);
 						}
 						final Coord coord = tmpCoord3;
-						Activity homeAct = PopulationUtils.createAndAddActivityFromCoord((String) tabs[4], coord, pl);
+						Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(pl, (String) tabs[4], coord);
 						homeAct.setEndTime(convertTime(tabs[3]));
 						p.addPlan(pl);
 						this.pop.addPerson(p);
@@ -265,7 +265,7 @@ public class ModdedConverter {
 				System.out.println(this.tmpPersonId);
 			}
 			final Coord coord = tmpCoord2;
-			Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, tmpPl);
+			Activity lastAct = PopulationUtils.createAndAddActivityFromCoord(tmpPl, (String) this.tmpTabs[7], coord);
 			System.out.println("# of chains that do not start at home: " + this.count1);
 			System.out.println("# of chains that do not end at home: " + this.count2);
 		}

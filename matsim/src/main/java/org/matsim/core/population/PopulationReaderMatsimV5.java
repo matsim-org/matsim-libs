@@ -217,14 +217,14 @@ import org.xml.sax.Attributes;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			final Id<Link> linkId1 = linkId;
-			this.curract = PopulationUtils.createAndAddActivityFromLinkId(atts.getValue(ATTR_ACT_TYPE), linkId1, this.currplan);
+			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				final Coord coord = parseCoord( atts );
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			final Coord coord = parseCoord( atts );
-			this.curract = PopulationUtils.createAndAddActivityFromCoord(atts.getValue(ATTR_ACT_TYPE), coord, this.currplan);
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}

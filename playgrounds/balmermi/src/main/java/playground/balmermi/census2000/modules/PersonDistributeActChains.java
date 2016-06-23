@@ -219,7 +219,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				int start_time = time_sum;
 				try {
 					final String type1 = type;
-					Activity a = PopulationUtils.createAndAddActivityFromCoord(type1, new Coord(0.0, 0.0), plan);
+					Activity a = PopulationUtils.createAndAddActivityFromCoord(plan, type1, new Coord(0.0, 0.0));
 					a.setStartTime(start_time);
 				}
 				catch (Exception e) { throw new RuntimeException(e); }
@@ -231,7 +231,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				int end_time = time_sum;
 				try {
 					final String type1 = type;
-					Activity a = PopulationUtils.createAndAddActivityFromCoord(type1, new Coord(0.0, 0.0), plan);
+					Activity a = PopulationUtils.createAndAddActivityFromCoord(plan, type1, new Coord(0.0, 0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setMaximumDuration(dur);

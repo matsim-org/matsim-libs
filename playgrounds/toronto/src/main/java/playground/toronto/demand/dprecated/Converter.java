@@ -136,7 +136,7 @@ public class Converter {
 			}
 			final Coord coord = tmpCoord;
 
-			Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[7], coord, ((Plan) pl));
+			Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) pl), (String) tabs[7], coord);
 			act.setEndTime(convertTime(tabs[3]));
 			act.setMaximumDuration(dur);
 
@@ -158,7 +158,7 @@ public class Converter {
 					tmpCoord2 = this.tmpHome;
 				}
 				final Coord coord = tmpCoord2;
-				Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[10], coord, ((Plan) tmpPl));
+				Activity lastAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) tmpPl), (String) this.tmpTabs[10], coord);
 
 				// make a copy of the just finished plan and set it to use public transit mode
 				Plan nonCarPlan = PopulationUtils.createPlan(p);
@@ -178,7 +178,7 @@ public class Converter {
 
 			this.tmpHome = getRandomCoordInZone(tabs[9]);
 			final Coord coord = this.tmpHome;
-			Activity homeAct = PopulationUtils.createAndAddActivityFromCoord((String) tabs[7], coord, pl);
+			Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(pl, (String) tabs[7], coord);
 			homeAct.setEndTime(convertTime(tabs[3]));
 			p.addPlan(pl);
 			this.pop.addPerson(p);

@@ -230,7 +230,7 @@ public class PlansCreateFromMZ {
 					route.setTravelTime(leg.getTravelTime());
 					final String type1 = acttype;
 					final Coord coord = to;
-					Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord, ((Plan) plan));
+					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord);
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -241,7 +241,7 @@ public class PlansCreateFromMZ {
 				}
 				else {
 					final Coord coord = from;
-					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord((String) HOME, coord, ((Plan) plan));
+					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, coord);
 					homeAct.setEndTime(departure);
 					Leg leg = ((Plan) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
@@ -254,7 +254,7 @@ public class PlansCreateFromMZ {
 					route.setTravelTime(leg.getTravelTime());
 					final String type1 = acttype;
 					final Coord coord1 = to;
-					Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord1, ((Plan) plan));
+					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord1);
 					act.setStartTime(arrival);
 				}
 			}

@@ -152,7 +152,7 @@ public class Utils {
 	 */
 	public static void makeHomePlan( Plan plan, Coord homeCoord ) {
 		final Coord coord = homeCoord;
-		PopulationUtils.createAndAddActivityFromCoord((String) ACT_HOME, coord, plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_HOME, coord);
 	}
 
 	public static void makeHomePlan( PopulationFactory pb, Plan plan, Coord homeCoord ) {
@@ -173,12 +173,12 @@ public class Utils {
 
 		plan.createAndAddLeg(TransportMode.car);
 		final Coord coord = workCoord;
-		act = PopulationUtils.createAndAddActivityFromCoord((String) ACT_WORK, coord, plan) ;
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_WORK, coord) ;
 		((Activity) act).setMaximumDuration( 8.*3600. ) ;
 
 		plan.createAndAddLeg(TransportMode.car) ;
 		final Coord coord1 = homeCoord;
-		PopulationUtils.createAndAddActivityFromCoord((String) ACT_HOME, coord1, plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_HOME, coord1);
 	}
 
 }

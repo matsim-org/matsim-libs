@@ -736,14 +736,8 @@ public final class PopulationUtils {
 	 */
 	public static Leg createLeg(Leg leg) {
 		Leg newLeg = createLeg( leg.getMode() ) ;
-		newLeg.setDepartureTime(leg.getDepartureTime());
-		newLeg.setTravelTime(leg.getTravelTime());
-		Leg r = (newLeg);
-		r.setTravelTime( leg.getDepartureTime() + leg.getTravelTime() - r.getDepartureTime() );
-		if (leg.getRoute() != null) {
-			leg.setRoute(leg.getRoute().clone());
-		}
-		return leg ;
+		copyFromTo( leg, newLeg ) ;
+		return newLeg ;
 	}
 	
 	// --- static copy methods:
@@ -761,7 +755,7 @@ public final class PopulationUtils {
 	 * @param in a plan who's data will be loaded into this plan
 	 * @param out 
 	 **/
-	public static final void copyFromTo(final Plan in, Plan out) {
+	public static void copyFromTo(final Plan in, Plan out) {
 	  out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
@@ -905,12 +899,12 @@ public final class PopulationUtils {
 		plan.getPlanElements().add(pos, act);
 		plan.getPlanElements().add(pos, leg);
 	}
-	public static Activity createAndAddActivityFromCoord( String type, Coord coord, Plan plan ) {
+	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
 		Activity act = plan.createAndAddActivity(type) ;
 		act.setCoord(coord);
 		return act ;
 	}
-	public static Activity createAndAddActivityFromLinkId( String type, Id<Link> linkId, Plan plan ) {
+	public static Activity createAndAddActivityFromLinkId( Plan plan, String type, Id<Link> linkId ) {
 		Activity act = plan.createAndAddActivity(type) ;
 		act.setLinkId(linkId);
 		return act ;

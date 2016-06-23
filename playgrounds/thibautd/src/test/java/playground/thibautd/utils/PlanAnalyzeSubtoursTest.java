@@ -249,7 +249,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
 			Activity act;
-			act = PopulationUtils.createAndAddActivityFromLinkId((String) ("actOnLink" + locationIdSequence[aa]), (Id<Link>) location.getId(), plan);
+			act = PopulationUtils.createAndAddActivityFromLinkId(plan, (String) ("actOnLink" + locationIdSequence[aa]), (Id<Link>) location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
 				plan.createAndAddLeg(mode);

@@ -218,7 +218,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			final Id<Link> linkId1 = linkId;
-			this.curract = PopulationUtils.createAndAddActivityFromLinkId((String) atts.getValue(ATTR_ACT_TYPE), linkId1, this.currplan);
+			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, (String) atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 				this.curract.setCoord(coord);
@@ -226,7 +226,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			final Coord coord1 = coord;
-			this.curract = PopulationUtils.createAndAddActivityFromCoord((String) atts.getValue(ATTR_ACT_TYPE), coord1, this.currplan);
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, (String) atts.getValue(ATTR_ACT_TYPE), coord1);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}

@@ -197,14 +197,14 @@ import org.xml.sax.Attributes;
 		Activity act = null;
 		if (atts.getValue("link") != null) {
 			final Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
-			act = PopulationUtils.createAndAddActivityFromLinkId(atts.getValue("type"), linkId, this.currplan);
+			act = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue("type"), linkId);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 				final Coord coord = parseCoord( atts );
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 			final Coord coord = parseCoord( atts );
-			act = PopulationUtils.createAndAddActivityFromCoord(atts.getValue("type"), coord, this.currplan);
+			act = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}

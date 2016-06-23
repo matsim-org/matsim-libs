@@ -400,11 +400,11 @@ public class EditRoutesTest extends MatsimTestCase {
 	private void createSamplePlan() {
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
-		Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId("h", Id.create("l1", Link.class), ((Plan) plan));
+		Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
 		((Plan) plan).createAndAddLeg(TransportMode.car);
-		Activity activityW1 = PopulationUtils.createAndAddActivityFromLinkId("w", Id.create("l3", Link.class), ((Plan) plan));
+		Activity activityW1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "w", Id.create("l3", Link.class));
 		((Plan) plan).createAndAddLeg(TransportMode.car);
-		Activity activityH2 = PopulationUtils.createAndAddActivityFromLinkId("h", Id.create("l1", Link.class), ((Plan) plan));
+		Activity activityH2 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
 		
 		/*
 		 * set activity start times and durations

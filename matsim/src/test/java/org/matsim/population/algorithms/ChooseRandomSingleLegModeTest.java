@@ -47,9 +47,9 @@ public class ChooseRandomSingleLegModeTest {
 	public void testRandomChoice() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
@@ -83,7 +83,7 @@ public class ChooseRandomSingleLegModeTest {
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord(0, 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
@@ -92,9 +92,9 @@ public class ChooseRandomSingleLegModeTest {
 	public void testHandlePlan_DifferentThanLastMode() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		String oldMode = leg.getMode();
 		for (int i = 0; i < 5; i++) {
 			algo.run(plan);
@@ -108,11 +108,11 @@ public class ChooseRandomSingleLegModeTest {
 	public void testHandlePlan_OnlySingleLegChanged() {
 		ChooseRandomSingleLegMode algo = new ChooseRandomSingleLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord(0, 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
 		Leg leg1 = plan.createAndAddLeg(TransportMode.car);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		Leg leg2 = plan.createAndAddLeg(TransportMode.car);
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		String oldMode1 = leg1.getMode();
 		String oldMode2 = leg2.getMode();
 		for (int i = 0; i < 5; i++) {
@@ -139,9 +139,9 @@ public class ChooseRandomSingleLegModeTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
 		Plan plan = PopulationUtils.createPlan(person);
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
 		algo.run(plan);
@@ -159,9 +159,9 @@ public class ChooseRandomSingleLegModeTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
 		Plan plan = PopulationUtils.createPlan(person);
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
@@ -173,9 +173,9 @@ public class ChooseRandomSingleLegModeTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "always");
 		Plan plan = PopulationUtils.createPlan(person);
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		plan.createAndAddLeg(TransportMode.pt);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode());
 		algo.run(plan);

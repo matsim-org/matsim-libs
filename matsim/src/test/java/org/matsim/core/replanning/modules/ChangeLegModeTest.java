@@ -84,9 +84,9 @@ public class ChangeLegModeTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
 		Plan plan = PopulationUtils.createPlan(person);
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.pt);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 
 		HashMap<String, Integer> counter = new HashMap<String, Integer>();
 		for (String mode : modes) {
@@ -105,9 +105,9 @@ public class ChangeLegModeTest {
 		module.prepareReplanning(null);
 
 		Plan plan = PopulationUtils.createPlan(null);
-		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
-		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 
 		HashMap<String, Integer> counter = new HashMap<String, Integer>();
 		for (String mode : possibleModes) {
