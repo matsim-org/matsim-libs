@@ -21,6 +21,7 @@ package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
+import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
@@ -60,6 +61,7 @@ public class RunETaxiScenario
 
         Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
         controler.addOverridingModule(new EvModule(evData));
+        controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
         return controler;
     }
 
@@ -68,6 +70,6 @@ public class RunETaxiScenario
     {
         String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
         //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
-        RunETaxiScenario.run(configFile, false);
+        RunETaxiScenario.run(configFile, true);
     }
 }
