@@ -99,11 +99,12 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		event.getServices().getEvents().addHandler(new PersonVehicleTracker(congestionInfo));
-				
+		// required by the pricing approach:
 		this.intervalBasedTolling = new IntervalBasedTolling(congestionInfo, event.getServices().getEvents());
 		event.getServices().getEvents().addHandler(this.intervalBasedTolling);
+		event.getServices().getEvents().addHandler(new PersonVehicleTracker(congestionInfo));
 		
+		// for analysis purposes only:
 		this.delayComputation = new DelayAnalysis(this.congestionInfo.getScenario());
 		event.getServices().getEvents().addHandler(delayComputation);
 	}
