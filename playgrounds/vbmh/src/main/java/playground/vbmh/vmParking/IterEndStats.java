@@ -6,9 +6,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 import playground.vbmh.util.CSVWriter;
@@ -100,7 +100,7 @@ public class IterEndStats {
 			double soc;
 			boolean notParked=false;
 			boolean parkedAtHome=false;
-			PlanImpl planImpl=(PlanImpl)personImpl.getSelectedPlan();
+			Plan planImpl=(Plan)personImpl.getSelectedPlan();
 			Leg legImpl=(Leg)PopulationUtils.getNextLeg(planImpl, PopulationUtils.getFirstActivity( planImpl ));
 			Id id = person.getId();
 			LinkedList<ParkingSpot> selectedParkings = parkings.get(id);
@@ -321,7 +321,7 @@ public class IterEndStats {
 	}
 	
 	
-	double getPlanDistance(PlanImpl plan){
+	double getPlanDistance(Plan plan){
 		double distance=0;
 		for (PlanElement element : plan.getPlanElements()){
 			if(element.getClass()==Leg.class){

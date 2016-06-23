@@ -17,9 +17,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -127,7 +127,7 @@ public class Converter {
 			endTime = convertTime(tabs[3]);
 			double dur = endTime - this.tmpEndTime;
 
-			Leg leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
+			Leg leg = ((Plan) pl).createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord = getRandomCoordInZone(tabs[9]);
@@ -136,7 +136,7 @@ public class Converter {
 			}
 			final Coord coord = tmpCoord;
 
-			Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[7], coord, ((PlanImpl) pl));
+			Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[7], coord, ((Plan) pl));
 			act.setEndTime(convertTime(tabs[3]));
 			act.setMaximumDuration(dur);
 
@@ -149,7 +149,7 @@ public class Converter {
 				Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 				Plan tmpPl = p.getSelectedPlan();
 
-				Leg leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+				Leg leg = ((Plan) tmpPl).createAndAddLeg(TransportMode.car);
 				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 				// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -158,10 +158,10 @@ public class Converter {
 					tmpCoord2 = this.tmpHome;
 				}
 				final Coord coord = tmpCoord2;
-				Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[10], coord, ((PlanImpl) tmpPl));
+				Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[10], coord, ((Plan) tmpPl));
 
 				// make a copy of the just finished plan and set it to use public transit mode
-				PlanImpl nonCarPlan = PopulationUtils.createPlan(p);
+				Plan nonCarPlan = PopulationUtils.createPlan(p);
 				PopulationUtils.copyFromTo(tmpPl, nonCarPlan);
 				for (PlanElement pe : nonCarPlan.getPlanElements()) {
 					if (pe instanceof Leg) {
@@ -172,7 +172,7 @@ public class Converter {
 			}
 
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
-			PlanImpl pl = PopulationUtils.createPlan(p);
+			Plan pl = PopulationUtils.createPlan(p);
 			// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 			endTime = convertTime(tabs[3]);
 

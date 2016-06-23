@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -81,7 +82,7 @@ public class PopulationWriterHandlerImplV5Test {
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		Person person = pb.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = (PlanImpl) pb.createPlan();
+		Plan plan = (Plan) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
 		Leg leg = pb.createLeg(TransportMode.car);
@@ -126,7 +127,7 @@ public class PopulationWriterHandlerImplV5Test {
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		Person person = pb.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = (PlanImpl) pb.createPlan();
+		Plan plan = (Plan) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
 		Leg leg = pb.createLeg(TransportMode.walk);

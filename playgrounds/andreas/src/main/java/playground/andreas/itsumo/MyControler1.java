@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -48,7 +49,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -121,7 +121,7 @@ public class MyControler1 {
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i + 1, Person.class));
 
 			try {
-				PlanImpl plan1 = PopulationUtils.createPlan(p);
+				Plan plan1 = PopulationUtils.createPlan(p);
 				Activity act1a = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan1);
 				act1a.setLinkId(link9.getId());
 				act1a.setEndTime(0*60*60.);
@@ -134,7 +134,7 @@ public class MyControler1 {
 				act1b.setStartTime(8*60*60);
 				p.addPlan(plan1);
 
-				PlanImpl plan2 = PopulationUtils.createPlan(p);
+				Plan plan2 = PopulationUtils.createPlan(p);
 				Activity act2a = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan1);
 				act2a.setLinkId(link9.getId());
 				act2a.setEndTime(0*60*60.);
@@ -317,7 +317,7 @@ public class MyControler1 {
 
 	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Population population){
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(ii, Person.class));
-		PlanImpl plan = PopulationUtils.createPlan(p);
+		Plan plan = PopulationUtils.createPlan(p);
 		try {
 			Activity act1 = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan);
 			act1.setLinkId(sourceLink.getId());

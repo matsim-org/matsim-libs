@@ -44,11 +44,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -112,7 +112,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	public void testHandleEmptyPlan() {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() , new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
-		PlanImpl plan = PopulationUtils.createPlan(null);
+		Plan plan = PopulationUtils.createPlan(null);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
@@ -121,7 +121,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	public void testHandlePlanWithoutLeg() {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 		ChooseRandomLegModeForSubtour algo = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
-		PlanImpl plan = PopulationUtils.createPlan(null);
+		Plan plan = PopulationUtils.createPlan(null);
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
@@ -254,8 +254,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(network, activityChainString, originalMode);
-			PlanImpl originalPlan = PopulationUtils.createPlan(person);
+			Plan plan = createPlan(network, activityChainString, originalMode);
+			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
@@ -271,8 +271,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
-			PlanImpl originalPlan = PopulationUtils.createPlan(person);
+			Plan plan = createPlan(facilities, activityChainString, originalMode);
+			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
@@ -287,8 +287,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(network, activityChainString, originalMode);
-			PlanImpl originalPlan = PopulationUtils.createPlan(person);
+			Plan plan = createPlan(network, activityChainString, originalMode);
+			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
@@ -303,8 +303,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
-			PlanImpl originalPlan = PopulationUtils.createPlan(person);
+			Plan plan = createPlan(facilities, activityChainString, originalMode);
+			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
@@ -320,8 +320,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
-			PlanImpl originalPlan = PopulationUtils.createPlan(person);
+			Plan plan = createPlan(facilities, activityChainString, originalMode);
+			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
@@ -337,8 +337,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(network, activityChainString, originalMode);
-			PlanImpl originalPlan = PopulationUtils.createPlan(person);
+			Plan plan = createPlan(network, activityChainString, originalMode);
+			Plan originalPlan = PopulationUtils.createPlan(person);
 			PopulationUtils.copyFromTo(plan, originalPlan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
@@ -352,7 +352,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
 
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(network, activityChainString, originalMode);
+			Plan plan = createPlan(network, activityChainString, originalMode);
 			testee.run(plan);
 			Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
 			Activity firstActivity = (Activity) peIterator.next();
@@ -387,7 +387,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
 		
 		for (String activityChainString : activityChainStrings) {
-			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
+			Plan plan = createPlan(facilities, activityChainString, originalMode);
 			testee.run(plan);
 			Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
 			Activity firstActivity = (Activity) peIterator.next();
@@ -477,15 +477,15 @@ public class ChooseRandomLegModeForSubtourTest {
 				nMutatedWithoutMutatedFather);
 	}
 
-	private static PlanImpl createPlan(ActivityFacilities facilities, String facString, String mode) {
+	private static Plan createPlan(ActivityFacilities facilities, String facString, String mode) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
-		PlanImpl plan = TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, mode, facString);
+		Plan plan = TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, mode, facString);
 		return plan;
 	}
 
-	private static PlanImpl createPlan(NetworkImpl network, String facString, String mode) {
+	private static Plan createPlan(NetworkImpl network, String facString, String mode) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
-		PlanImpl plan = TestsUtil.createPlanFromLinks(network, person, mode, facString);
+		Plan plan = TestsUtil.createPlanFromLinks(network, person, mode, facString);
 		return plan;
 	}
 

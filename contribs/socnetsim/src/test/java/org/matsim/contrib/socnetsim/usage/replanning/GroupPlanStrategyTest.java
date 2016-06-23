@@ -34,8 +34,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -207,7 +207,7 @@ public class GroupPlanStrategyTest {
 		Id<Person> id = Id.createPersonId( count );
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );
 		if ( !PersonUtils.isSelected(plan) ) throw new RuntimeException();

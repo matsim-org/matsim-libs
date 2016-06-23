@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
@@ -57,7 +57,7 @@ public class RemovalTest {
 		Id<Link> link1 = Id.create( "link1" , Link.class );
 		Id<Link> link2 = Id.create( "link2" , Link.class );
 
-		PlanImpl plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one passenger trip", Person.class)));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one passenger trip", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId = link1;
 		PopulationUtils.createAndAddActivityFromLinkId((String) "h", linkId, plan).setEndTime( 1 );

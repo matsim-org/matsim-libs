@@ -41,13 +41,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -102,7 +102,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 10 );
@@ -139,7 +139,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 10 );
@@ -174,7 +174,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 //		desires.putActivityDuration( "h" , 12 * 3600 );
 //		desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 100 );
@@ -224,7 +224,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 
 		for (double tt=60; tt <= 2*3600; tt *= 1.5) {
 			Activity act = plan.createAndAddActivity( "w" );

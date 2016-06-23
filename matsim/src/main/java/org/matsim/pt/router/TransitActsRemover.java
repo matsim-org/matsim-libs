@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
@@ -51,7 +51,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 				Activity act = (Activity) pe;
 				if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
 					final int index = i;
-					PopulationUtils.removeActivity(((PlanImpl) plan), index);
+					PopulationUtils.removeActivity(((Plan) plan), index);
 					n -= 2;
 					i--; // i will be incremented again in next loop-iteration, so we'll check the next act
 				}

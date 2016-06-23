@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -33,7 +34,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -653,7 +653,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 
 		// score the same plan twice
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
+		Plan plan1 = PersonUtils.createAndAddPlan(person1, true);
 		Activity act1a = PopulationUtils.createAndAddActivityFromLinkId((String) "home", (Id<Link>) null, plan1);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
 		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
@@ -700,7 +700,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 	private static class Fixture {
 		protected Config config = null;
 		private Person person = null;
-		private PlanImpl plan = null;
+		private Plan plan = null;
 		private Scenario scenario;
 		private NetworkImpl network;
 		private int firstLegStartTime;

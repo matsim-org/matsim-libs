@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -75,7 +75,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 			if (!this.isInteger(p.getId().toString()) ||
 					Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.idExclusion)) continue;
 					
-			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
+			Plan plan = (Plan) p.getSelectedPlan();
 			
 			if (bestOrSelected.equals("best")) {
 				double bestPlanScore = -999.0;
@@ -88,7 +88,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 					}
 					cnt++;
 				}
-				plan = (PlanImpl) p.getPlans().get(bestIndex);	
+				plan = (Plan) p.getPlans().get(bestIndex);	
 				//log.info(plan.getScore() + "\t" + bestIndex + "\tperson " + p.getId());
 			}		
 			for (PlanElement pe : plan.getPlanElements()) {

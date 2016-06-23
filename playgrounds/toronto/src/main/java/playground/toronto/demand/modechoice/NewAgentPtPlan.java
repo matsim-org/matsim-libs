@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 /**
@@ -51,12 +51,12 @@ public class NewAgentPtPlan extends NewPopulation {
 	@Override
 	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
-			List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
+			List<Plan> copyPlans = new ArrayList<Plan>();
 			// copyPlans: the copy of the plans.
 			for (Plan pl : person.getPlans()) {
 				// set plan type for car, pt, walk
-				((PlanImpl) pl).setType(TransportMode.car);
-				PlanImpl ptPlan = PopulationUtils.createPlan(person);
+				((Plan) pl).setType(TransportMode.car);
+				Plan ptPlan = PopulationUtils.createPlan(person);
 				ptPlan.setType(TransportMode.pt);
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);
@@ -91,7 +91,7 @@ public class NewAgentPtPlan extends NewPopulation {
 				copyPlans.add(ptPlan);
 //				copyPlans.add(walkPlan);
 			}
-			for (PlanImpl copyPlan : copyPlans) {
+			for (Plan copyPlan : copyPlans) {
 				person.addPlan(copyPlan);
 			}
 		}

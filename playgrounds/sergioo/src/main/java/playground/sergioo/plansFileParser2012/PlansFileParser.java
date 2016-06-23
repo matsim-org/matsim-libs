@@ -8,11 +8,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,7 +38,7 @@ public class PlansFileParser {
 		for(double time = 0; time < totalTime; time+=binTime)
 			travelTimeBins[(int)Math.floor(time/binTime)][0] = time;
 		for(Person person:plans.getPersons().values()) {
-			PlanImpl plan = (PlanImpl)person.getSelectedPlan();
+			Plan plan = (Plan)person.getSelectedPlan();
 			for(Activity activity = PopulationUtils.getFirstActivity( plan );!activity.equals(PopulationUtils.getLastActivity(plan));) {
 				final Activity act = activity;
 				Leg leg = PopulationUtils.getNextLeg(plan, act);

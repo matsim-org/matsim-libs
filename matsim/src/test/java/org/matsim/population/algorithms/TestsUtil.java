@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -39,8 +39,8 @@ import org.matsim.facilities.ActivityFacility;
 @Ignore
 public class TestsUtil {
 
-	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
-		PlanImpl plan = PopulationUtils.createPlan(person);
+	static Plan createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
+		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
@@ -55,8 +55,8 @@ public class TestsUtil {
 		return plan;
 	}
 
-	static PlanImpl createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
-		PlanImpl plan = PopulationUtils.createPlan(person);
+	static Plan createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
+		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));

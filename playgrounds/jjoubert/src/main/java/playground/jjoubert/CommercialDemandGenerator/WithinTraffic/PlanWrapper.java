@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -63,12 +63,12 @@ public class PlanWrapper {
 	 */
 	public static List<Plan> wrapPlan(Plan plan, String timeWindow) {
 		List<Plan> list = new ArrayList<Plan>();
-		PlanImpl tmpPlan = PopulationUtils.createPlan();
+		Plan tmpPlan = PopulationUtils.createPlan();
 		PopulationUtils.copyFromTo(plan, tmpPlan);
 		
 		int dayCount = 1;
 		
-		PlanImpl segment = PopulationUtils.createPlan();
+		Plan segment = PopulationUtils.createPlan();
 		int index = 0;
 		while(index < tmpPlan.getPlanElements().size()){
 			PlanElement pe = tmpPlan.getPlanElements().get(index);
@@ -100,7 +100,7 @@ public class PlanWrapper {
 							end.setEndTime(Time.MIDNIGHT);
 							segment.addActivity(end);
 							
-							PlanImpl p = PopulationUtils.createPlan();
+							Plan p = PopulationUtils.createPlan();
 							PopulationUtils.copyFromTo(segment, p);
 							list.add(p);
 												
@@ -121,7 +121,7 @@ public class PlanWrapper {
 							act.setStartTime(act.getStartTime() - Time.MIDNIGHT*(dayCount-1));
 							act.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount-1));
 							segment.addActivity(act);
-							PlanImpl p = PopulationUtils.createPlan();
+							Plan p = PopulationUtils.createPlan();
 							PopulationUtils.copyFromTo(segment, p);
 							list.add(p);	
 							
@@ -155,7 +155,7 @@ public class PlanWrapper {
 					
 					/* Finish off the current segment. */
 					segment.addActivity(chopEnd);
-					PlanImpl p = PopulationUtils.createPlan();
+					Plan p = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(segment, p);
 					list.add(p);
 										

@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
@@ -44,7 +44,7 @@ public class TripPlanMutateTimeAllocationTest {
 	public void testRun() {
 		// setup population with one person
 		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity act = PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
 		act.setEndTime(8.0 * 3600);
 		plan.createAndAddLeg(TransportMode.transit_walk);

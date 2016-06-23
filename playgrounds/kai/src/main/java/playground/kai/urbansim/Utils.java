@@ -18,8 +18,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -150,7 +150,7 @@ public class Utils {
 	 * @param plan
 	 * @param homeCoord
 	 */
-	public static void makeHomePlan( PlanImpl plan, Coord homeCoord ) {
+	public static void makeHomePlan( Plan plan, Coord homeCoord ) {
 		final Coord coord = homeCoord;
 		PopulationUtils.createAndAddActivityFromCoord((String) ACT_HOME, coord, plan);
 	}
@@ -166,7 +166,7 @@ public class Utils {
 	 * @param plan
 	 * @param workCoord
 	 */
-	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord ) {
+	public static void completePlanToHwh ( Plan plan, Coord workCoord ) {
 		Activity act = PopulationUtils.getFirstActivity( plan );
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();

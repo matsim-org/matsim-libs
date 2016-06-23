@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 
 import java.util.Collections;
@@ -197,9 +197,9 @@ public abstract class Utils {
 		else {		// its a trip back home
 			// not the first home act!
 			final Activity act1 = act;
-			if (PopulationUtils.getPreviousLeg(((PlanImpl) plan), act1) != null) {
+			if (PopulationUtils.getPreviousLeg(((Plan) plan), act1) != null) {
 				final Activity act2 = act;
-				return getLongestActivityForRoundTrip((PlanImpl) plan, PopulationUtils.getPreviousActivity(((PlanImpl) plan), PopulationUtils.getPreviousLeg(((PlanImpl) plan), act2)));
+				return getLongestActivityForRoundTrip((Plan) plan, PopulationUtils.getPreviousActivity(((Plan) plan), PopulationUtils.getPreviousLeg(((Plan) plan), act2)));
 			}
 			else {
 				return "home";
@@ -207,7 +207,7 @@ public abstract class Utils {
 		}
 	}
 
-	private static String getLongestActivityForRoundTrip(final PlanImpl plan, Activity act) {
+	private static String getLongestActivityForRoundTrip(final Plan plan, Activity act) {
 		double maxActDur = - 1.0;
 
 		// set it to home in case of home-based round trips

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -42,7 +42,7 @@ import org.matsim.facilities.ActivityFacility;
 public class TripRouterTest {
 	@Test
 	public void testTripInsertion() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		plan.createAndAddActivity( "-4" );
 		plan.createAndAddLeg( "-3" );
 		plan.createAndAddActivity( "-2" );
@@ -86,7 +86,7 @@ public class TripRouterTest {
 
 	@Test
 	public void testTripInsertionIfActivitiesImplementEquals() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		plan.addActivity( new EqualsActivity( "-4" , Id.create( 1, Link.class ) ) );
 		plan.createAndAddLeg( "-3" );
 		plan.addActivity( new EqualsActivity( "-2" , Id.create( 1, Link.class ) ) );
@@ -134,7 +134,7 @@ public class TripRouterTest {
 	public void testReturnedOldTrip() throws Exception {
 		List<PlanElement> expected = new ArrayList<PlanElement>();
 
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		plan.createAndAddActivity( "-4" );
 		plan.createAndAddLeg( "-3" );
 		plan.createAndAddActivity( "-2" );

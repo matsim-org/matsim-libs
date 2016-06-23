@@ -34,8 +34,8 @@ import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -91,7 +91,7 @@ public class CoalitionSelectorTest {
 
 						Person person = PopulationUtils.getFactory().createPerson(Id.create("tintin", Person.class));
 						group.addPerson( person );
-						PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+						Plan plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 1d );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 5d );
@@ -145,7 +145,7 @@ public class CoalitionSelectorTest {
 
 						Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("tintin"));
 						group.addPerson( person );
-						PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+						Plan plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 1d );
 						jp1.put( person.getId() , plan );
 						plan = PersonUtils.createAndAddPlan(person, false);

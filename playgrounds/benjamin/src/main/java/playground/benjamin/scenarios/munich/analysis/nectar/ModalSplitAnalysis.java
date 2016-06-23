@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -118,7 +118,7 @@ public class ModalSplitAnalysis {
 		for(String mode : usedModes){
 			int noOfLegs = 0;
 			for(Person person : pop.getPersons().values()){
-				PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+				Plan plan = (Plan) person.getSelectedPlan();
 				List<PlanElement> planElements = plan.getPlanElements();
 				for(PlanElement pe : planElements){
 					if(pe instanceof Leg){
@@ -143,7 +143,7 @@ public class ModalSplitAnalysis {
 			int noOfLegs = 0;
 			double sumOfBeelineDistances = 0.0;
 			for(Person person : pop.getPersons().values()){
-				PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+				Plan plan = (Plan) person.getSelectedPlan();
 				List<PlanElement> planElements = plan.getPlanElements();
 				for(PlanElement pe : planElements){
 					if(pe instanceof Leg){
@@ -171,7 +171,7 @@ public class ModalSplitAnalysis {
 	private SortedSet<String> getUsedModes(Population pop) {
 		SortedSet<String> usedModes = new TreeSet<String>();
 		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			Plan plan = (Plan) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){

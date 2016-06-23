@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -105,7 +105,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
 			Person person = PopulationUtils.getFactory().createPerson(id);
-			PlanImpl plan = PopulationUtils.createPlan(person);
+			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId("first_act_d"+i, Id.create( "some_link" , Link.class ), plan).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
@@ -134,7 +134,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
 			Person person = PopulationUtils.getFactory().createPerson(id);
-			PlanImpl plan = PopulationUtils.createPlan(person);
+			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId("first_act_d"+i, Id.create( "some_link" , Link.class ), plan).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 
@@ -34,7 +34,7 @@ public class TransitActsRemoverTest extends TestCase {
 
 	
 	public void testNormalTransitPlan() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
 
@@ -82,14 +82,14 @@ public class TransitActsRemoverTest extends TestCase {
 	}
 	
 	public void testEmptyPlan() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		new TransitActsRemover().run(plan);
 		assertEquals(0, plan.getPlanElements().size());
 		// this mostly checks that there is no exception
 	}
 	
 	public void testPlanWithoutLegs() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
 		new TransitActsRemover().run(plan);
@@ -98,7 +98,7 @@ public class TransitActsRemoverTest extends TestCase {
 	}
 
 	public void testWalkOnlyPlan() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
@@ -109,7 +109,7 @@ public class TransitActsRemoverTest extends TestCase {
 	}
 	
 	public void testNoTransitActPlan() {
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Coord dummyCoord = new Coord((double) 0, (double) 0);
 		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
 		plan.addLeg(PopulationUtils.createLeg(TransportMode.car));

@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -95,21 +95,21 @@ public class ModeActivityDurationAnalyser {
 					try {
 						durTemp = DeprecatedStaticMethods.calculateSomeDuration(act);
 						if (act.getType().equalsIgnoreCase("h")) {
-							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
+							if (((Plan) p).getType().equals(TransportMode.car)) {
 								homeActivityDurationsCar += durTemp;
 								homeActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
+							else if (((Plan) p).getType().equals(TransportMode.pt)){
 								homeActivityDurationsNonCar += durTemp;
 								homeActivityNonCarCount++;
 							}
 						}
 						else if (act.getType().equalsIgnoreCase("w")) {
-							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
+							if (((Plan) p).getType().equals(TransportMode.car)) {
 								workActivityDurationsCar += durTemp;
 								workActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
+							else if (((Plan) p).getType().equals(TransportMode.pt)){
 								workActivityDurationsNonCar += durTemp;
 								workActivityNonCarCount++;
 							}

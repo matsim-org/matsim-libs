@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -148,7 +148,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 				//				long nanos = System.nanoTime();
 				final Leg leg1 = leg;
 				final Leg leg2 = leg;
-				dist = ktiPtRoute.calcAccessEgressDistance(PopulationUtils.getPreviousActivity(((PlanImpl) this.plan), leg2), PopulationUtils.getNextActivity(((PlanImpl) this.plan), leg1));
+				dist = ktiPtRoute.calcAccessEgressDistance(PopulationUtils.getPreviousActivity(((Plan) this.plan), leg2), PopulationUtils.getNextActivity(((Plan) this.plan), leg1));
 				//				nanos = System.nanoTime() - nanos;
 				//				nanoMsg += Long.toString(nanos) + "\t";
 

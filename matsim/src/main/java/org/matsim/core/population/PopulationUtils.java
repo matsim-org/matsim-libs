@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
@@ -677,14 +678,14 @@ public final class PopulationUtils {
 	
 	// --- plain factories: 
 
-	public static PlanImpl createPlan(Person person) {
+	public static Plan createPlan(Person person) {
 		Plan plan = getFactory().createPlan() ;
 		plan.setPerson(person);
-		return (PlanImpl) plan ;
+		return (Plan) plan ;
 	}
 
-	public static PlanImpl createPlan() {
-		return (PlanImpl) getFactory().createPlan() ;
+	public static Plan createPlan() {
+		return (Plan) getFactory().createPlan() ;
 	}
 
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
@@ -767,7 +768,7 @@ public final class PopulationUtils {
 				out.getPlanElements().add(createActivity((Activity) pe));
 			} else if (pe instanceof Leg) {
 				Leg l = (Leg) pe;
-				Leg l2 = ((PlanImpl)out).createAndAddLeg(l.getMode());
+				Leg l2 = ((Plan)out).createAndAddLeg(l.getMode());
 				copyFromTo(l, l2);
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");

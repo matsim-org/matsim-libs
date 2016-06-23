@@ -11,9 +11,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -83,7 +83,7 @@ public class ActivityDifferentiatorBalac {
 				if (person.getPlans().size() > 1) {
 					log.error("More than one plan for person: " + person.getId());
 				}
-				PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+				Plan selectedPlan = (Plan)person.getSelectedPlan();
 
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -218,7 +218,7 @@ public class ActivityDifferentiatorBalac {
 				if (pi.getPlans().size() > 1) {
 					log.error("More than one plan for person: " + pi.getId());
 				}
-				PlanImpl selectedPlan = (PlanImpl)pi.getSelectedPlan();
+				Plan selectedPlan = (Plan)pi.getSelectedPlan();
 				//Double duration = pi.getDesires().getActivityDuration("shop");
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j = j + 2) {

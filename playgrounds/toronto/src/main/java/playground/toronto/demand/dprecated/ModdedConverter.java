@@ -15,9 +15,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -150,7 +150,7 @@ public class ModdedConverter {
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
-						Leg leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
+						Leg leg = ((Plan) pl).createAndAddLeg(TransportMode.car);
 						leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 						Coord tmpCoord;
@@ -166,7 +166,7 @@ public class ModdedConverter {
 						}
 						this.tmpType = tabs[7];
 						final Coord coord = tmpCoord;
-						Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[4], coord, ((PlanImpl) pl));
+						Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[4], coord, ((Plan) pl));
 						act.setEndTime(convertTime(tabs[3]));
 						act.setMaximumDuration(dur);
 					} else {
@@ -178,7 +178,7 @@ public class ModdedConverter {
 							Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 							Plan tmpPl = p.getSelectedPlan();
 
-							Leg leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+							Leg leg = ((Plan) tmpPl).createAndAddLeg(TransportMode.car);
 							leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 							// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -195,11 +195,11 @@ public class ModdedConverter {
 								System.out.println(personId);
 							}
 							final Coord coord = tmpCoord2;
-							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((PlanImpl) tmpPl));
+							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((Plan) tmpPl));
 						}
 
 						Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
-						PlanImpl pl = PopulationUtils.createPlan(p);
+						Plan pl = PopulationUtils.createPlan(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);
 						this.tmpType = tabs[4];
@@ -247,7 +247,7 @@ public class ModdedConverter {
 			}
 		}else{
 			Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
-			PlanImpl tmpPl = (PlanImpl) p.getSelectedPlan();
+			Plan tmpPl = (Plan) p.getSelectedPlan();
 
 			Leg leg = tmpPl.createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));

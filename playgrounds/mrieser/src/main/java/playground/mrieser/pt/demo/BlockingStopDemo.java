@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -44,7 +45,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -212,7 +212,7 @@ public class BlockingStopDemo {
 		// bus-passengers line 1
 		for (int i = 1; i < nOfStops; i++) {
 			Person person = pb.createPerson(Id.create(Integer.toString(-i), Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
@@ -230,7 +230,7 @@ public class BlockingStopDemo {
 		// bus-passengers line 2
 		for (int i = 1; i < nOfStops; i++) {
 			Person person = pb.createPerson(Id.create(Integer.toString(-i-nOfStops), Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(nOfLinks+i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
@@ -258,7 +258,7 @@ public class BlockingStopDemo {
 		carRoute2.setLinkIds(Id.create(nOfLinks, Link.class), linkIds2, Id.create(2*nOfLinks-1, Link.class));
 		for (int i = 0; i < nOfCars; i++) {
 			Person person = pb.createPerson(Id.create(Integer.toString(i), Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1a = (Activity) pb.createActivityFromLinkId("home", Id.create(0, Link.class));
 			act1a.setEndTime(startTime + i*carsHeading);
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.car);
@@ -273,7 +273,7 @@ public class BlockingStopDemo {
 			plan.addActivity(act1b);
 
 			Person person2 = pb.createPerson(Id.create(Integer.toString(i+nOfCars), Person.class));
-			PlanImpl plan2 = (PlanImpl) pb.createPlan();
+			Plan plan2 = (Plan) pb.createPlan();
 			Activity act2a = (Activity) pb.createActivityFromLinkId("home", Id.create(nOfLinks, Link.class));
 			act2a.setEndTime(startTime + i*carsHeading);
 			Leg leg2 = (Leg) pb.createLeg(TransportMode.car);

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -70,7 +71,7 @@ import org.xml.sax.Attributes;
 	private final Population plans;
 	private final Network network;
 	private Person currperson = null;
-	private PlanImpl currplan = null;
+	private Plan currplan = null;
 	private Leg currleg = null;
 	private NetworkRoute currroute = null;
 

@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 /**
@@ -83,7 +83,7 @@ public class ChangeSingleLegModeTest {
 		module.prepareReplanning(null);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
 		Leg leg = plan.createAndAddLeg(TransportMode.pt);
 		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);
@@ -104,7 +104,7 @@ public class ChangeSingleLegModeTest {
 	private void runTest(final ChangeSingleLegMode module, final String[] possibleModes, final int nOfTries) {
 		module.prepareReplanning(null);
 
-		PlanImpl plan = PopulationUtils.createPlan(null);
+		Plan plan = PopulationUtils.createPlan(null);
 		PopulationUtils.createAndAddActivityFromCoord("home", new Coord((double) 0, (double) 0), plan);
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		PopulationUtils.createAndAddActivityFromCoord("work", new Coord((double) 0, (double) 0), plan);

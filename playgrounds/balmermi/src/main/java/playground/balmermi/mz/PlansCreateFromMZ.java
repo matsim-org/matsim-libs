@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -218,7 +219,7 @@ public class PlansCreateFromMZ {
 					Activity from_act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setMaximumDuration(from_act.getEndTime()-from_act.getStartTime());
-					Leg leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					Leg leg = ((Plan) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					final double arrTime = arrival;
@@ -229,7 +230,7 @@ public class PlansCreateFromMZ {
 					route.setTravelTime(leg.getTravelTime());
 					final String type1 = acttype;
 					final Coord coord = to;
-					Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord, ((PlanImpl) plan));
+					Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord, ((Plan) plan));
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
@@ -240,9 +241,9 @@ public class PlansCreateFromMZ {
 				}
 				else {
 					final Coord coord = from;
-					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord((String) HOME, coord, ((PlanImpl) plan));
+					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord((String) HOME, coord, ((Plan) plan));
 					homeAct.setEndTime(departure);
-					Leg leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					Leg leg = ((Plan) plan).createAndAddLeg(mode);
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					final double arrTime = arrival;
@@ -253,7 +254,7 @@ public class PlansCreateFromMZ {
 					route.setTravelTime(leg.getTravelTime());
 					final String type1 = acttype;
 					final Coord coord1 = to;
-					Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord1, ((PlanImpl) plan));
+					Activity act = PopulationUtils.createAndAddActivityFromCoord(type1, coord1, ((Plan) plan));
 					act.setStartTime(arrival);
 				}
 			}
@@ -285,7 +286,7 @@ public class PlansCreateFromMZ {
 	private final void setHomeLocations(final Population plans, final Map<Id<Person>,String> person_strings) {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			Activity home = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
+			Activity home = PopulationUtils.getFirstActivity( ((Plan) plan) );
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
 				Activity act = (Activity)plan.getPlanElements().get(i);
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
@@ -373,7 +374,7 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
-			PlanImpl plan2 = PopulationUtils.createPlan(p);
+			Plan plan2 = PopulationUtils.createPlan(p);
 			plan2.setScore(plan.getScore());
 			plan2.addActivity((Activity)plan.getPlanElements().get(0));
 

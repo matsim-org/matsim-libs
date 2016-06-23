@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -52,7 +52,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	public void testUndefinedScore() {
 		Person person;
 		PlanSelector<Plan, Person> selector = getPlanSelector();
-		PlanImpl plan;
+		Plan plan;
 
 		// test 1: exactly one plan, with undefined score
 		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -103,7 +103,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testNegativeScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
-		PlanImpl plan;
+		Plan plan;
 		// test with only one plan...
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -141,7 +141,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testZeroScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
-		PlanImpl plan;
+		Plan plan;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(0.0);

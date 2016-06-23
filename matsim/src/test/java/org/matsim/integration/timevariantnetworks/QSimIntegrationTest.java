@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -56,7 +57,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -302,7 +302,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i + (int) departureTime, Person.class));
-			PlanImpl plan1 = PersonUtils.createAndAddPlan(person, true);
+			Plan plan1 = PersonUtils.createAndAddPlan(person, true);
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId("h", depLink.getId(), plan1);
 			a1.setEndTime(departureTime);
 			Leg leg1 = plan1.createAndAddLeg(TransportMode.car);

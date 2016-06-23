@@ -25,8 +25,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.population.PlanImpl;
 
 /**
  * <b>Static</b> factory to create joint plans.

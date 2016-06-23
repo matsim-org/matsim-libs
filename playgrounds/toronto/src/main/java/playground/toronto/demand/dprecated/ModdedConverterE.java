@@ -15,9 +15,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -151,7 +151,7 @@ public class ModdedConverterE {
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
-						Leg leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
+						Leg leg = ((Plan) pl).createAndAddLeg(TransportMode.car);
 						leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 						Coord tmpCoord;
@@ -167,7 +167,7 @@ public class ModdedConverterE {
 						}
 						this.tmpType = tabs[7];
 						final Coord coord = tmpCoord;
-						Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[4], coord, ((PlanImpl) pl));
+						Activity act = PopulationUtils.createAndAddActivityFromCoord((String) tabs[4], coord, ((Plan) pl));
 						act.setEndTime(convertTime(tabs[3]));
 						act.setMaximumDuration(dur);
 					} else {
@@ -179,7 +179,7 @@ public class ModdedConverterE {
 							Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 							Plan tmpPl = p.getSelectedPlan();
 
-							Leg leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+							Leg leg = ((Plan) tmpPl).createAndAddLeg(TransportMode.car);
 							leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 							// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -196,12 +196,12 @@ public class ModdedConverterE {
 								System.out.println(this.tmpPersonId);
 							}
 							final Coord coord = tmpCoord2;
-							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((PlanImpl) tmpPl));
+							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((Plan) tmpPl));
 
 						}
 
 						Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
-						PlanImpl pl = PopulationUtils.createPlan(p);
+						Plan pl = PopulationUtils.createPlan(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);
 						this.tmpType = tabs[4];
@@ -253,7 +253,7 @@ public class ModdedConverterE {
 			Plan tmpPl = p.getSelectedPlan();
 
 
-			Leg leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+			Leg leg = ((Plan) tmpPl).createAndAddLeg(TransportMode.car);
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord2;
@@ -269,7 +269,7 @@ public class ModdedConverterE {
 				System.out.println(this.tmpPersonId);
 			}
 			final Coord coord = tmpCoord2;
-			Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((PlanImpl) tmpPl));
+			Activity lastAct = PopulationUtils.createAndAddActivityFromCoord((String) this.tmpTabs[7], coord, ((Plan) tmpPl));
 			System.out.println("# of chains that do not start at home: " + this.count1);
 			System.out.println("# of chains that do not end at home: " + this.count2);
 		}

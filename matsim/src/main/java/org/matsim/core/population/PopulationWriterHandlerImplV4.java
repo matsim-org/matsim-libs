@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -157,8 +158,8 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan instanceof PlanImpl){
-			PlanImpl p = (PlanImpl)plan;
+		if (plan instanceof Plan){
+			Plan p = (Plan)plan;
 			if ((p.getType() != null)) {
 				out.write(" type=\"");
 				out.write(p.getType());

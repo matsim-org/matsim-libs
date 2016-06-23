@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.Initializer;
 import org.matsim.contrib.locationchoice.timegeography.ManageSubchains;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -38,16 +38,16 @@ public class ManageSubchainsTest extends MatsimTestCase {
 		ManageSubchains manager = new ManageSubchains();
 
         Plan plan = initializer.getControler().getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
-		Activity act = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
+		Activity act = PopulationUtils.getFirstActivity( ((Plan) plan) );
 		final Activity act1 = act;
-		Leg leg = PopulationUtils.getNextLeg(((PlanImpl) plan), act1);
+		Leg leg = PopulationUtils.getNextLeg(((Plan) plan), act1);
 		manager.primaryActivityFound(act, leg);
 		assertEquals(act, manager.getSubChains().get(0).getFirstPrimAct());
 		final Leg leg1 = leg;
 
-		act = PopulationUtils.getNextActivity(((PlanImpl) plan), leg1);
+		act = PopulationUtils.getNextActivity(((Plan) plan), leg1);
 		final Activity act2 = act;
-		manager.secondaryActivityFound(act, PopulationUtils.getNextLeg(((PlanImpl) plan), act2));
+		manager.secondaryActivityFound(act, PopulationUtils.getNextLeg(((Plan) plan), act2));
 		assertEquals(act, manager.getSubChains().get(0).getSlActs().get(0));
 	}
 }

@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -133,7 +133,7 @@ public class AnalyzeMicrocensus {
 	
 	private void runAnalysisZH() {
 		for (Person p : this.scenarioZH.getPopulation().getPersons().values()) {
-			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
+			Plan plan = (Plan) p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity)pe;
@@ -153,7 +153,7 @@ public class AnalyzeMicrocensus {
 	
 	private void runAnalysisCH() {
 		for (Person p : this.scenarioCH.getPopulation().getPersons().values()) {
-			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
+			Plan plan = (Plan) p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity)pe;

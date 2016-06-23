@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
@@ -39,7 +39,7 @@ import java.util.List;
  * @author thibautd
  */
 public class TransitActRemoverTest {
-	private PlanImpl plan;
+	private Plan plan;
 	private double transitTravelTime;
 
 	@Before

@@ -33,8 +33,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -67,7 +67,7 @@ public class RandomSelectorsTest {
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("tintin", Person.class));
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 5d );
@@ -111,7 +111,7 @@ public class RandomSelectorsTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -189,7 +189,7 @@ public class RandomSelectorsTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);

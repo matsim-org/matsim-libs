@@ -41,10 +41,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -118,7 +118,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 							throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 						}
 						final int index = i;
-						PopulationUtils.removeActivity(((PlanImpl) selectedPlan), index); // also removes the following leg
+						PopulationUtils.removeActivity(((Plan) selectedPlan), index); // also removes the following leg
 						n -= 2;
 						i--;
 					}
@@ -248,7 +248,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
 				Integer noOfLegs = 0;
 				for(Person person : pop.getPersons().values()){
-					PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+					Plan plan = (Plan) person.getSelectedPlan();
 					List<PlanElement> planElements = plan.getPlanElements();
 					for(PlanElement pe : planElements){
 						if(pe instanceof Leg){
@@ -295,7 +295,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 	private double getLongestBeelineDistance(Population pop){
 		double longestBeelineDistance = 0.0;
 		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			Plan plan = (Plan) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){

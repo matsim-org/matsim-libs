@@ -11,11 +11,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -86,7 +86,7 @@ public class BBIextraDemand {
 
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = PopulationUtils.createPlan();
+					Plan plan = PopulationUtils.createPlan();
 					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
@@ -112,7 +112,7 @@ public class BBIextraDemand {
 
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = PopulationUtils.createPlan();
+					Plan plan = PopulationUtils.createPlan();
 					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
@@ -131,7 +131,7 @@ public class BBIextraDemand {
 
 					Person person = PopulationUtils.getFactory().createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = PopulationUtils.createPlan();
+					Plan plan = PopulationUtils.createPlan();
 					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);

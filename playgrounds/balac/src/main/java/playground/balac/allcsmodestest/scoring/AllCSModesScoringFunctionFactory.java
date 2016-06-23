@@ -3,8 +3,8 @@ package playground.balac.allcsmodestest.scoring;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -34,7 +34,7 @@ public class AllCSModesScoringFunctionFactory implements ScoringFunctionFactory 
 		  SumScoringFunction scoringFunctionSum = new SumScoringFunction();
 	    //this is the main difference, since we need a special scoring for carsharing legs
 		  scoringFunctionSum.addScoringFunction(
-	      new CarsharingWithTaxiLegScoringFunction((PlanImpl)person.getSelectedPlan(),
+	      new CarsharingWithTaxiLegScoringFunction((Plan)person.getSelectedPlan(),
 				  parametersForPerson.getScoringParameters( person ),
 	      this.config,
 	      network));

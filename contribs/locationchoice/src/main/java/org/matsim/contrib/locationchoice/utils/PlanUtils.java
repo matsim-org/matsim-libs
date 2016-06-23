@@ -28,22 +28,22 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.population.LCActivity;
 import org.matsim.contrib.locationchoice.population.LCLeg;
 import org.matsim.contrib.locationchoice.population.LCPlan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
 public class PlanUtils {
 	
 	public static void copyPlanFieldsToFrom(Plan planTarget, Plan planTemplate) {
-		if (planTarget instanceof PlanImpl) {
-			if (planTemplate instanceof PlanImpl) {
-				copyPlanFieldsToFrom((PlanImpl) planTarget, (PlanImpl) planTemplate);
+		if (planTarget instanceof Plan) {
+			if (planTemplate instanceof Plan) {
+				copyPlanFieldsToFrom1((Plan) planTarget, (Plan) planTemplate);
 				return;
 			} else if (planTemplate instanceof LCPlan) {
-				copyPlanFieldsToFrom((PlanImpl) planTarget, (LCPlan) planTemplate);
+				copyPlanFieldsToFrom((Plan) planTarget, (LCPlan) planTemplate);
 				return;
 			}
 		} else if (planTarget instanceof LCPlan) {
@@ -57,7 +57,7 @@ public class PlanUtils {
 				" and " + planTemplate.getClass().toString() + ". Aborting!");
 	}
 	
-	private static void copyPlanFieldsToFrom(PlanImpl planTarget, PlanImpl planTemplate) {
+	private static void copyPlanFieldsToFrom1(Plan planTarget, Plan planTemplate) {
 		planTarget.setScore(planTemplate.getScore());
 		
 		int actLegIndex = 0;
@@ -84,7 +84,7 @@ public class PlanUtils {
 		}
 	}
 
-	private static void copyPlanFieldsToFrom(PlanImpl planTarget, LCPlan planTemplate) {
+	private static void copyPlanFieldsToFrom(Plan planTarget, LCPlan planTemplate) {
 		planTarget.setScore(planTemplate.getScore());
 		
 		int actLegIndex = 0;
@@ -138,7 +138,7 @@ public class PlanUtils {
 	}
 		
 	public static void copyFrom(Plan srcPlan, Plan destPlan) {
-		if (destPlan instanceof PlanImpl) {
+		if (destPlan instanceof Plan) {
 			PopulationUtils.copyFromTo(srcPlan, destPlan);
 		} else if (destPlan instanceof LCPlan) {
 			if (srcPlan instanceof LCPlan) {
@@ -148,8 +148,8 @@ public class PlanUtils {
 	}
 	
 	public static Plan createCopy(Plan plan) {
-		if (plan instanceof PlanImpl) {
-			PlanImpl planTmp = PopulationUtils.createPlan();
+		if (plan instanceof Plan) {
+			Plan planTmp = PopulationUtils.createPlan();
 			PopulationUtils.copyFromTo(plan, planTmp);
 			return planTmp;			
 		} else if (plan instanceof LCPlan) {
@@ -159,32 +159,32 @@ public class PlanUtils {
 	}
 	
 	public static Leg getPreviousLeg(final Plan plan, final Activity activity) {
-		if (plan instanceof PlanImpl) {
-			return PopulationUtils.getPreviousLeg(((PlanImpl) plan), activity);
+		if (plan instanceof Plan) {
+			return PopulationUtils.getPreviousLeg(((Plan) plan), activity);
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getPreviousLeg((LCPlan) plan, (LCActivity) activity);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");
 	}
 	
 	public static Activity getPreviousActivity(final Plan plan, final Leg leg) {
-		if (plan instanceof PlanImpl) {
-			return PopulationUtils.getPreviousActivity(((PlanImpl) plan), leg) ;
+		if (plan instanceof Plan) {
+			return PopulationUtils.getPreviousActivity(((Plan) plan), leg) ;
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getPreviousActivity((LCPlan) plan,  (LCLeg) leg);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");
 	}
 	
 	public static Leg getNextLeg(final Plan plan, final Activity activity) {
-		if (plan instanceof PlanImpl) {
-			return PopulationUtils.getNextLeg(((PlanImpl) plan), activity) ;
+		if (plan instanceof Plan) {
+			return PopulationUtils.getNextLeg(((Plan) plan), activity) ;
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getNextLeg((LCPlan) plan, (LCActivity) activity);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");
 	}
 	
 	public static Activity getNextActivity(final Plan plan, final Leg leg) {
-		if (plan instanceof PlanImpl) {
-			return PopulationUtils.getNextActivity(((PlanImpl) plan), leg) ;
+		if (plan instanceof Plan) {
+			return PopulationUtils.getNextActivity(((Plan) plan), leg) ;
 		} else if (plan instanceof LCPlan) {
 			return LCPlan.getNextActivity((LCPlan) plan,  (LCLeg) leg);
 		} else throw new RuntimeException("Unexpected type of plan was found: " + plan.getClass().toString() + ". Aborting!");

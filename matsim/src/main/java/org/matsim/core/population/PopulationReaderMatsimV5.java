@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -94,7 +95,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final Population plans;
 
 	private Person currperson = null;
-	private PlanImpl currplan = null;
+	private Plan currplan = null;
 	private Activity curract = null;
 	private Leg currleg = null;
 	private Route currRoute = null;

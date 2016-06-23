@@ -38,8 +38,8 @@ import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -121,7 +121,7 @@ public class HighestWeightSelectorTest {
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("tintin", Person.class));
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		toBeSelectedIfForbid.add( plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -187,7 +187,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -277,7 +277,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -368,7 +368,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -463,7 +463,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -585,7 +585,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp.put( id , plan );
 
@@ -654,7 +654,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
 		toBeSelected.add( plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -765,7 +765,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp.put( id , plan );
 
@@ -830,7 +830,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( -1295836d );
 		jp.put( id , plan );
 
@@ -900,7 +900,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 0d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -989,7 +989,7 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10000d );
 		Plan p1 = plan;
 
@@ -1061,36 +1061,36 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		final PlanImpl p11 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p11 = PersonUtils.createAndAddPlan(person, false);
 		p11.setScore( 1000d );
-		final PlanImpl p12 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p12 = PersonUtils.createAndAddPlan(person, false);
 		p12.setScore( 1d );
 
 		id = Id.create( "milou" , Person.class );
 		final Id<Person> id2 = id;
 		person = PopulationUtils.getFactory().createPerson(id2);
 		group.addPerson( person );
-		final PlanImpl p21 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p21 = PersonUtils.createAndAddPlan(person, false);
 		p21.setScore( 1000d );
-		final PlanImpl p22 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p22 = PersonUtils.createAndAddPlan(person, false);
 		p22.setScore( 0d );
 
 		id = Id.create( "tim" , Person.class );
 		final Id<Person> id3 = id;
 		person = PopulationUtils.getFactory().createPerson(id3);
 		group.addPerson( person );
-		final PlanImpl p31 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p31 = PersonUtils.createAndAddPlan(person, false);
 		p31.setScore( 1000d );
-		final PlanImpl p32 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p32 = PersonUtils.createAndAddPlan(person, false);
 		p32.setScore( 1d );
 
 		id = Id.create( "struppy" , Person.class );
 		final Id<Person> id4 = id;
 		person = PopulationUtils.getFactory().createPerson(id4);
 		group.addPerson( person );
-		final PlanImpl p41 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p41 = PersonUtils.createAndAddPlan(person, false);
 		p41.setScore( 1000d );
-		final PlanImpl p42 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p42 = PersonUtils.createAndAddPlan(person, false);
 		p42.setScore( 0d );
 
 		final IncompatiblePlansIdentifierImpl<Clique> identifier = new IncompatiblePlansIdentifierImpl<>();
@@ -1140,10 +1140,10 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id1 = id;
 		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		final PlanImpl p11 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p11 = PersonUtils.createAndAddPlan(person, false);
 		p11.setScore( 1d );
 		jp1.put( id , p11 );
-		final PlanImpl p12 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p12 = PersonUtils.createAndAddPlan(person, false);
 		p12.setScore( 1d );
 		jp2.put( id , p12 );
 
@@ -1151,10 +1151,10 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id2 = id;
 		person = PopulationUtils.getFactory().createPerson(id2);
 		group.addPerson( person );
-		final PlanImpl p21 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p21 = PersonUtils.createAndAddPlan(person, false);
 		p21.setScore( 0d );
 		jp1.put( id , p21 );
-		final PlanImpl p22 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p22 = PersonUtils.createAndAddPlan(person, false);
 		p22.setScore( 10d );
 		jp2.put( id , p22 );
 
@@ -1162,10 +1162,10 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id3 = id;
 		person = PopulationUtils.getFactory().createPerson(id3);
 		group.addPerson( person );
-		final PlanImpl p31 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p31 = PersonUtils.createAndAddPlan(person, false);
 		p31.setScore( 1d );
 		jp3.put( id , p31 );
-		final PlanImpl p32 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p32 = PersonUtils.createAndAddPlan(person, false);
 		p32.setScore( 1d );
 		jp4.put( id , p32 );
 
@@ -1173,10 +1173,10 @@ public class HighestWeightSelectorTest {
 		final Id<Person> id4 = id;
 		person = PopulationUtils.getFactory().createPerson(id4);
 		group.addPerson( person );
-		final PlanImpl p41 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p41 = PersonUtils.createAndAddPlan(person, false);
 		p41.setScore( 0d );
 		jp3.put( id , p41 );
-		final PlanImpl p42 = PersonUtils.createAndAddPlan(person, false);
+		final Plan p42 = PersonUtils.createAndAddPlan(person, false);
 		p42.setScore( 1d );
 		jp4.put( id , p42 );
 

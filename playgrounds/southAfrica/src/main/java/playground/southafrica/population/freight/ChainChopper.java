@@ -35,10 +35,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -109,7 +109,7 @@ public class ChainChopper {
 
 		double cumTime = 0.0;
 		Coord lastLocation = null;
-		PlanImpl currentPlan = PopulationUtils.createPlan();
+		Plan currentPlan = PopulationUtils.createPlan();
 		for(int i=0; i<plan.getPlanElements().size(); i+=2){
 			Activity act = (Activity)plan.getPlanElements().get(i);
 			double startTime;
@@ -151,7 +151,7 @@ public class ChainChopper {
 					currentPlan.addLeg(leg);
 					Activity cutActivityEnd = PopulationUtils.createActivityFromCoord("chopEnd", cCut);
 					currentPlan.addActivity(cutActivityEnd);
-					PlanImpl segment = PopulationUtils.createPlan();
+					Plan segment = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 
@@ -173,7 +173,7 @@ public class ChainChopper {
 					currentPlan.addActivity(act);
 					
 					/* Add the final segment to the list. */
-					PlanImpl segment = PopulationUtils.createPlan();
+					Plan segment = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 					
@@ -192,7 +192,7 @@ public class ChainChopper {
 					endPortion.setStartTime(startTime);
 					currentPlan.addActivity(endPortion);
 					endPortion.setMaximumDuration(Time.UNDEFINED_TIME);
-					PlanImpl segment = PopulationUtils.createPlan();
+					Plan segment = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 
@@ -222,7 +222,7 @@ public class ChainChopper {
 			/* Add the remainder of the current plan to the list of segments. */
 			if(i == plan.getPlanElements().size()-1){
 				if(currentPlan.getPlanElements().size() >= 3){
-					PlanImpl segment = PopulationUtils.createPlan();
+					Plan segment = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 				}

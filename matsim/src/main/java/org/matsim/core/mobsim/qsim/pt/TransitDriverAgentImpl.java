@@ -53,7 +53,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	private static class PlanBuilder {
 
-		final PlanImpl plan = PopulationUtils.createPlan();
+		final Plan plan = PopulationUtils.createPlan();
 
 		final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
@@ -73,7 +73,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			plan.addActivity(activity);
 		}
 
-		public PlanImpl build() {
+		public Plan build() {
 			return plan;
 		}
 

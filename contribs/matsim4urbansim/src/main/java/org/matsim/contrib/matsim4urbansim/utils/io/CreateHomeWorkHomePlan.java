@@ -4,10 +4,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -25,7 +25,7 @@ public class CreateHomeWorkHomePlan {
 	 *
 	 * @author nagel
 	 */
-	public static void makeHomePlan( PlanImpl plan, Coord homeCoord, ActivityFacility homeLocation) {
+	public static void makeHomePlan( Plan plan, Coord homeCoord, ActivityFacility homeLocation) {
 		final Coord coord = homeCoord;
 		Activity act = PopulationUtils.createAndAddActivityFromCoord(InternalConstants.ACT_HOME, coord, plan) ;
 		act.setFacilityId( homeLocation.getId() );	// tnicolai: added facility id to compute zone2zone trips
@@ -40,7 +40,7 @@ public class CreateHomeWorkHomePlan {
 	 *
 	 * @author nagel
 	 */
-	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord, ActivityFacility jobLocation ) {
+	public static void completePlanToHwh ( Plan plan, Coord workCoord, ActivityFacility jobLocation ) {
 		
 		// complete the first activity (home) by setting end time. 
 		Activity act = (Activity)PopulationUtils.getFirstActivity( plan );

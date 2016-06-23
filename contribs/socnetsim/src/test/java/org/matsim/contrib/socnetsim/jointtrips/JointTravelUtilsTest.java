@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -67,7 +67,7 @@ public class JointTravelUtilsTest {
 
 		// plan 1
 		// just one passenger
-		PlanImpl plan = PopulationUtils.createPlan(driver);
+		Plan plan = PopulationUtils.createPlan(driver);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
@@ -128,7 +128,7 @@ public class JointTravelUtilsTest {
 		// plan 2
 		// two passenger, two ODs
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
-		PlanImpl plan = PopulationUtils.createPlan(driver);
+		Plan plan = PopulationUtils.createPlan(driver);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
@@ -220,7 +220,7 @@ public class JointTravelUtilsTest {
 
 		// plan 3
 		// two passenger, two ODs, two JT for one passenger
-		PlanImpl plan = PopulationUtils.createPlan(driver);
+		Plan plan = PopulationUtils.createPlan(driver);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
@@ -341,7 +341,7 @@ public class JointTravelUtilsTest {
 
 		// plan 4
 		// two passengers, "midle trip"
-		PlanImpl plan = PopulationUtils.createPlan(driver);
+		Plan plan = PopulationUtils.createPlan(driver);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, plan);
 		plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, plan);
@@ -436,7 +436,7 @@ public class JointTravelUtilsTest {
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final PlanImpl dPlan = PopulationUtils.createPlan(driver);
+		final Plan dPlan = PopulationUtils.createPlan(driver);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, dPlan);
@@ -459,7 +459,7 @@ public class JointTravelUtilsTest {
 
 		plans.put( driver.getId() , dPlan );
 
-		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
+		final Plan pPlan = PopulationUtils.createPlan(passenger1);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
@@ -526,7 +526,7 @@ public class JointTravelUtilsTest {
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final PlanImpl d1Plan = PopulationUtils.createPlan(driver1);
+		final Plan d1Plan = PopulationUtils.createPlan(driver1);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d1Plan);
 		d1Plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d1Plan);
@@ -540,7 +540,7 @@ public class JointTravelUtilsTest {
 
 		plans.put( driver1.getId() , d1Plan );
 
-		final PlanImpl d2Plan = PopulationUtils.createPlan(driver2);
+		final Plan d2Plan = PopulationUtils.createPlan(driver2);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d2Plan);
 		d2Plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d2Plan);
@@ -554,7 +554,7 @@ public class JointTravelUtilsTest {
 
 		plans.put( driver2.getId() , d2Plan );
 
-		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
+		final Plan pPlan = PopulationUtils.createPlan(passenger1);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
@@ -622,7 +622,7 @@ public class JointTravelUtilsTest {
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final PlanImpl d1Plan = PopulationUtils.createPlan(driver1);
+		final Plan d1Plan = PopulationUtils.createPlan(driver1);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d1Plan);
 		d1Plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d1Plan);
@@ -636,7 +636,7 @@ public class JointTravelUtilsTest {
 
 		plans.put( driver1.getId() , d1Plan );
 
-		final PlanImpl d2Plan = PopulationUtils.createPlan(driver2);
+		final Plan d2Plan = PopulationUtils.createPlan(driver2);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, d2Plan);
 		d2Plan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, d2Plan);
@@ -650,7 +650,7 @@ public class JointTravelUtilsTest {
 
 		plans.put( driver2.getId() , d2Plan );
 
-		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
+		final Plan pPlan = PopulationUtils.createPlan(passenger1);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, pPlan);
@@ -722,7 +722,7 @@ public class JointTravelUtilsTest {
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final PlanImpl dPlan = PopulationUtils.createPlan(driver);
+		final Plan dPlan = PopulationUtils.createPlan(driver);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, dPlan);
 		dPlan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link2, dPlan);
@@ -745,7 +745,7 @@ public class JointTravelUtilsTest {
 
 		plans.put( driver.getId() , dPlan );
 
-		final PlanImpl pPlan = PopulationUtils.createPlan(passenger1);
+		final Plan pPlan = PopulationUtils.createPlan(passenger1);
 		PopulationUtils.createAndAddActivityFromLinkId("home", link1, pPlan);
 		pPlan.createAndAddLeg( TransportMode.walk );
 		PopulationUtils.createAndAddActivityFromLinkId(JointActingTypes.INTERACTION, link3, pPlan);

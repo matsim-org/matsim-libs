@@ -28,13 +28,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -550,7 +550,7 @@ public class CreatePlansFromTrips {
 		
 		//Assign activities to nearest node.
 		for (Person P : scenario.getPopulation().getPersons().values()){
-			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
+			Plan plan = (Plan) P.getSelectedPlan();
 			
 			Activity a = (Activity) PopulationUtils.getFirstActivity( plan );
 			Link nearestLink = NetworkUtils.getNearestLink(network, a.getCoord());
@@ -588,7 +588,7 @@ public class CreatePlansFromTrips {
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
 			sortTrips(pTrips);
 			
-			PlanImpl p = PopulationUtils.createPlan();
+			Plan p = PopulationUtils.createPlan();
 			Trip T = null;
 			
 			HashMap<String, Coord> workplaceZoneMap = new HashMap<String, Coord>();

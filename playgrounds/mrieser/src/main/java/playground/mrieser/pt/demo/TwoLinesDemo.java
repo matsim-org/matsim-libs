@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -39,7 +40,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -226,7 +226,7 @@ public class TwoLinesDemo {
 
 		{ // person 1
 			Person person = pb.createPerson(Id.create(1, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.pt);
@@ -249,7 +249,7 @@ public class TwoLinesDemo {
 
 		{ // person 2
 			Person person = pb.createPerson(Id.create(2, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.pt);
@@ -272,7 +272,7 @@ public class TwoLinesDemo {
 
 		{ // person 3
 			Person person = pb.createPerson(Id.create(3, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.pt);

@@ -264,7 +264,7 @@ public class CreateNewZHScenario {
 						else if (cnt == plan.getPlanElements().size() - 1) {
 							// get end time of previous activity and set it as start time
 							final Activity act1 = act;
-							double previousEndTime = PopulationUtils.getPreviousActivity(((PlanImpl)plan), PopulationUtils.getPreviousLeg(((PlanImpl)plan), act1)).getEndTime();
+							double previousEndTime = PopulationUtils.getPreviousActivity(((Plan)plan), PopulationUtils.getPreviousLeg(((Plan)plan), act1)).getEndTime();
 							act.setStartTime(previousEndTime);
 						}						
 					}

@@ -23,7 +23,7 @@ package org.matsim.core.replanning.selectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
@@ -42,14 +42,14 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
-		PlanImpl plan1 = PopulationUtils.createPlan(person);
+		Plan plan1 = PopulationUtils.createPlan(person);
 		plan1.setScore(15.0);
-		PlanImpl plan2 = PopulationUtils.createPlan(person);
+		Plan plan2 = PopulationUtils.createPlan(person);
 		plan2.setScore(22.0);
-		PlanImpl plan3 = PopulationUtils.createPlan(person);
-		PlanImpl plan4 = PopulationUtils.createPlan(person);
+		Plan plan3 = PopulationUtils.createPlan(person);
+		Plan plan4 = PopulationUtils.createPlan(person);
 		plan4.setScore(1.0);
-		PlanImpl plan5 = PopulationUtils.createPlan(person);
+		Plan plan5 = PopulationUtils.createPlan(person);
 		plan5.setScore(18.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
@@ -90,16 +90,16 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		 */
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
-		PlanImpl plan1 = PopulationUtils.createPlan(person);
+		Plan plan1 = PopulationUtils.createPlan(person);
 		plan1.setScore(15.0);
-		PlanImpl plan2 = PopulationUtils.createPlan(person);
+		Plan plan2 = PopulationUtils.createPlan(person);
 		plan2.setScore(22.0);
-		PlanImpl plan3 = PopulationUtils.createPlan(person);
-		PlanImpl plan4 = PopulationUtils.createPlan(person);
+		Plan plan3 = PopulationUtils.createPlan(person);
+		Plan plan4 = PopulationUtils.createPlan(person);
 		plan4.setScore(1.0);
-		PlanImpl plan5 = PopulationUtils.createPlan(person);
+		Plan plan5 = PopulationUtils.createPlan(person);
 		plan5.setScore(18.0);
-		PlanImpl plan6 = PopulationUtils.createPlan(person);
+		Plan plan6 = PopulationUtils.createPlan(person);
 		plan6.setScore(21.0);
 
 		plan1.setType("type1");

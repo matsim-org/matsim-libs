@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
@@ -35,7 +36,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -122,7 +122,7 @@ public class ExternalModule implements PlanStrategyModule {
 		// I also need to memorize the plans which are passed here, because I am supposed to mutate them.
 		
 		final Person personWithOnlySelectedPlan = this.exportPopulation.getFactory().createPerson(plan.getPerson().getId());
-		final PlanImpl planForNewPerson = PopulationUtils.createPlan(personWithOnlySelectedPlan);
+		final Plan planForNewPerson = PopulationUtils.createPlan(personWithOnlySelectedPlan);
 		PopulationUtils.copyFromTo(plan, planForNewPerson);
 		personWithOnlySelectedPlan.addPlan(planForNewPerson);
 		this.exportPopulation.addPerson(personWithOnlySelectedPlan);

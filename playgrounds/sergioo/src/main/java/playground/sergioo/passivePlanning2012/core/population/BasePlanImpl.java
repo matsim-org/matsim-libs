@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -59,7 +59,7 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(PopulationUtils.getLastActivity(((PlanImpl)plan))))
+				else if(!planElement.equals(PopulationUtils.getLastActivity(((Plan)plan))))
 					throw new RuntimeException("Activity without time information");
 			}
 			else if(planElement instanceof Activity) {
@@ -71,7 +71,7 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(PopulationUtils.getLastActivity(((PlanImpl)plan))))
+				else if(!planElement.equals(PopulationUtils.getLastActivity(((Plan)plan))))
 					throw new RuntimeException("Activity without time information");
 			}
 			else {
@@ -132,7 +132,7 @@ public class BasePlanImpl implements BasePlan {
 		newPerson.setBasePlan(copyPlan);
 	}
 	public static void convertToBasePlan(BasePersonImpl newPerson, Plan plan) {
-		PlanImpl newPlan = PopulationUtils.createPlan(newPerson);
+		Plan newPlan = PopulationUtils.createPlan(newPerson);
 		EmptyTime time = null;
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Activity) {

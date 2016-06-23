@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -406,7 +407,7 @@ public class NmbmQTBuilder {
 					List<Tuple<Plan,Double>> closestPlans = getClosestPlans(homeCoord, qtMap.get(qtId), 20);
 					/* Randomly pick any of the closest plans. and make a COPY of it. */
 					Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
-					PlanImpl plan = PopulationUtils.createPlan();
+					Plan plan = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(randomTuple.getFirst(), plan);
 				
 					distanceList.add(randomTuple.getSecond());

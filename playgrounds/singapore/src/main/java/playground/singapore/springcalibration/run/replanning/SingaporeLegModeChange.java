@@ -32,11 +32,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
@@ -226,7 +226,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 			
 			int leg2RemoveIndex = plan.getPlanElements().indexOf(walk2taxiLeg);
 			final int index = leg2RemoveIndex;
-			PopulationUtils.removeLeg(((PlanImpl) plan), index);
+			PopulationUtils.removeLeg(((Plan) plan), index);
 		}
 	}
 	

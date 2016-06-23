@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -270,7 +270,7 @@ public class SurveyPlanPicker {
 
 				/* Randomly pick any of the closest plans, and make a COPY of it. */
 				Tuple<Plan, Double> randomTuple = closestPlans.get( RandomPermutation.getRandomPermutation(closestPlans.size())[0]-1 );
-				PlanImpl plan = PopulationUtils.createPlan();
+				Plan plan = PopulationUtils.createPlan();
 				PopulationUtils.copyFromTo(randomTuple.getFirst(), plan);
 			
 				distanceList.add(randomTuple.getSecond());

@@ -18,9 +18,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -130,7 +130,7 @@ public class CarTravelTimes {
 			
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(arr[0], Person.class));
 			
-			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
+			Plan plan = (Plan) sc.getPopulation().getFactory().createPlan();
 			Activity act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 			act.setCoord(coordStart);
 			//String[] arr2 = arr[4].split(":");

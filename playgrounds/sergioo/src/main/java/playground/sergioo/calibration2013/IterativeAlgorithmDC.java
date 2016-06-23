@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
@@ -21,7 +22,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -201,10 +201,10 @@ public class IterativeAlgorithmDC {
 					travelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
 					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario), travelTimes, factories);
 					module.prepareReplanning(context);
-					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
+					Collection<Plan> copiedPlans = new ArrayList<Plan>();
 					for(Person person:typePopulations.get(type)) {
 						Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
-						PlanImpl copyPlan = PopulationUtils.createPlan(copyPerson);
+						Plan copyPlan = PopulationUtils.createPlan(copyPerson);
 						PopulationUtils.copyFromTo(person.getSelectedPlan(), copyPlan);
 						copyPerson.addPlan(copyPlan);
 						transitActsRemover.run(copyPlan);
@@ -213,7 +213,7 @@ public class IterativeAlgorithmDC {
 					}
 					module.finishReplanning();
 					Map<String, List<Double>> distances = new HashMap<String, List<Double>>();
-					for(PlanImpl copyPlan:copiedPlans) {
+					for(Plan copyPlan:copiedPlans) {
 						Activity prevActivity = null;
 						String prevMode = null;
 						for(PlanElement planElement:copyPlan.getPlanElements())

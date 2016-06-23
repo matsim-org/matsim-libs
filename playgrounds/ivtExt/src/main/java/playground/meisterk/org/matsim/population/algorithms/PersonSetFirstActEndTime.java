@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -46,10 +46,10 @@ public class PersonSetFirstActEndTime extends AbstractPersonAlgorithm implements
 	}
 
 	public void run(Plan plan) {
-		Activity firstAct = PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
+		Activity firstAct = PopulationUtils.getFirstActivity( ((Plan) plan) );
 		firstAct.setEndTime(this.firstActEndTime);
 		final Activity act = firstAct;
-		Leg firstLeg = PopulationUtils.getNextLeg(((PlanImpl) plan), act);
+		Leg firstLeg = PopulationUtils.getNextLeg(((Plan) plan), act);
 		firstLeg.setDepartureTime(this.firstActEndTime);
 	}
 

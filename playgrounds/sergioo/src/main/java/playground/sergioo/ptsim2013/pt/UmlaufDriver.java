@@ -46,7 +46,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 	private static class PlanBuilder {
 
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 
 		String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
@@ -66,7 +66,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			plan.addActivity(activity);
 		}
 
-		public PlanImpl build() {
+		public Plan build() {
 			return plan;
 		}
 

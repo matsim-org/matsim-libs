@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -844,7 +844,7 @@ public class ParkControl {
 
 
         Person person = controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
-		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+		Plan plan = (Plan) person.getSelectedPlan();
 		double endTime=0;
 		int actCount = (Integer) person.getCustomAttributes().get("ActCounter");
 		Activity actFromCounter = (Activity) person.getSelectedPlan().getPlanElements().get((Integer) person.getCustomAttributes().get("ActCounter"));

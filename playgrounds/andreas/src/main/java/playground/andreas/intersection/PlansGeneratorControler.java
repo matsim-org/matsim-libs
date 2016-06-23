@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -161,7 +161,7 @@ public class PlansGeneratorControler {
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(String.valueOf(ii), Person.class));
-		PlanImpl plan = PopulationUtils.createPlan(p);
+		Plan plan = PopulationUtils.createPlan(p);
 		try {
 			Activity act1 = PopulationUtils.createAndAddActivityFromCoord((String) "h", new Coord(100., 100.), plan);
 			act1.setLinkId(fromLink.getId());

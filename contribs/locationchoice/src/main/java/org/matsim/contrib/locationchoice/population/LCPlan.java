@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -149,7 +149,7 @@ public class LCPlan implements Plan {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void copyFrom(PlanImpl srcPlan, LCPlan destPlan) {
+	public static void copyFrom1(Plan srcPlan, LCPlan destPlan) {
 		
 		int activityCount = 0;
 		int legCount = 0;
@@ -213,7 +213,7 @@ public class LCPlan implements Plan {
 	}
 	
 	public static void copyFrom(Plan srcPlan, LCPlan destPlan) {
-		if (srcPlan instanceof PlanImpl) copyFrom((PlanImpl) srcPlan, destPlan);
+		if (srcPlan instanceof Plan) copyFrom1((Plan) srcPlan, destPlan);
 		else if (srcPlan instanceof LCPlan) copyFrom((LCPlan) srcPlan, destPlan);
 		else throw new RuntimeException("Found unexpected source plan type: " + srcPlan.getClass().toString() + ". Aborting!");
 	}

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -47,11 +47,11 @@ public class PersonFacility2Link extends AbstractPersonAlgorithm implements Plan
 	}
 
 	public void run(final Plan plan) {
-		Activity act = (Activity) PopulationUtils.getFirstActivity( ((PlanImpl) plan) );
-		while (act != PopulationUtils.getLastActivity(((PlanImpl) plan))) {
+		Activity act = (Activity) PopulationUtils.getFirstActivity( ((Plan) plan) );
+		while (act != PopulationUtils.getLastActivity(((Plan) plan))) {
 			act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 			final Activity act1 = act;
-			act = (Activity) PopulationUtils.getNextActivity(((PlanImpl) plan), PopulationUtils.getNextLeg(((PlanImpl) plan), act1));
+			act = (Activity) PopulationUtils.getNextActivity(((Plan) plan), PopulationUtils.getNextLeg(((Plan) plan), act1));
 		}
 		act.setLinkId(((ActivityFacilityImpl) this.facilities.getFacilities().get(act.getFacilityId())).getLinkId());
 	}

@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -232,7 +233,7 @@ public class OptimalWalkPlanFinderTest {
 	private static class Fixture {
 		protected Config config = null;
 		private Person person = null;
-		private PlanImpl plan = null;
+		private Plan plan = null;
 		private Scenario scenario;
 		private NetworkImpl network;
 		private int firstLegStartTime;

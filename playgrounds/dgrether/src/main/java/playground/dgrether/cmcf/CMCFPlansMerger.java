@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,7 +74,7 @@ public class CMCFPlansMerger {
 			int legNumber = Integer.parseInt(idLegNumber[1]);
 			legNumber = (legNumber * 2) + 1;
 			Leg leg = (Leg) plan.getPlanElements().get(legNumber);
-			leg.setRoute(PopulationUtils.getNextLeg(((PlanImpl) person.getSelectedPlan()), PopulationUtils.getFirstActivity( ((PlanImpl) person.getSelectedPlan()) )).getRoute());
+			leg.setRoute(PopulationUtils.getNextLeg(((Plan) person.getSelectedPlan()), PopulationUtils.getFirstActivity( ((Plan) person.getSelectedPlan()) )).getRoute());
 		}
 
 		MatsimIo.writePlans(plans, net, outPlansFile);

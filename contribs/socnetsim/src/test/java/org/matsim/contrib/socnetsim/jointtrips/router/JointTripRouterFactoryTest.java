@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -49,7 +50,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
@@ -108,7 +108,7 @@ public class JointTripRouterFactoryTest {
 
 		// driver
 		Person pers = PopulationUtils.getFactory().createPerson(id);
-		PlanImpl plan = PopulationUtils.createPlan(pers);
+		Plan plan = PopulationUtils.createPlan(pers);
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );

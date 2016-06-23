@@ -14,8 +14,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -125,7 +125,7 @@ class PlanFindLegDistances {
 			
 			if (pax.getPlans().size() == 0)
 				continue;
-			PlanImpl plan = (PlanImpl) pax.getPlans().get(0);
+			Plan plan = (Plan) pax.getPlans().get(0);
 //			new TransitActsRemover().run(plan);
 			for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
 				Activity act = (Activity) plan.getPlanElements().get(i);

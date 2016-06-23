@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -161,7 +161,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 					population.addPerson(person) ;
 
-					PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+					Plan plan = PersonUtils.createAndAddPlan(person, true);
 					Utils.makeHomePlan(plan, homeCoord) ;
 
 					if ( ii<nWorkers ) {

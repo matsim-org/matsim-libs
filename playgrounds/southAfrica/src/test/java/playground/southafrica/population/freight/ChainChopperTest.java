@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -119,7 +119,7 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan1(){
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
@@ -148,7 +148,7 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan2(){
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
@@ -182,7 +182,7 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan3(){
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
 /**
@@ -74,7 +75,7 @@ public final class PersonImpl implements Person {
 		if (oldPlan == null) {
 			return null;
 		}
-		PlanImpl newPlan = PopulationUtils.createPlan(oldPlan.getPerson());
+		Plan newPlan = PopulationUtils.createPlan(oldPlan.getPerson());
 		PopulationUtils.copyFromTo(oldPlan, newPlan);
 		this.getPlans().add(newPlan);
 		this.setSelectedPlan(newPlan);
@@ -130,7 +131,7 @@ public final class PersonImpl implements Person {
 		
 		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
 		for ( Plan plan : this.plans ) {
-			if ( plan instanceof PlanImpl ) {
+			if ( plan instanceof Plan ) {
 //				((PlanImpl)plan).setLocked() ;
 				// does not really do that much since it only affects the initial plan(s). kai, dec'15
 			}

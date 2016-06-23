@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
@@ -53,7 +54,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
@@ -347,7 +347,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 
-		PlanImpl plan = (PlanImpl) population.getFactory().createPlan() ;
+		Plan plan = (Plan) population.getFactory().createPlan() ;
 		person.addPlan(plan) ;
 
 		{

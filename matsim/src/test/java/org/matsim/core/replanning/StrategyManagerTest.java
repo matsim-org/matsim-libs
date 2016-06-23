@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -205,7 +205,7 @@ public class StrategyManagerTest {
 
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
-		PlanImpl[] plans = new PlanImpl[10];
+		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
 		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plans[0] = PersonUtils.createAndAddPlan(person, false);
@@ -258,7 +258,7 @@ public class StrategyManagerTest {
 
 		// init Population
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		PlanImpl[] plans = new PlanImpl[7];
+		Plan[] plans = new Plan[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = PersonUtils.createAndAddPlan(p, false);
 			plans[i].setScore(Double.valueOf(i*10));
@@ -439,7 +439,7 @@ public class StrategyManagerTest {
 		public TestPlanSelector() {
 		}
 		@Override
-		public PlanImpl selectPlan(final HasPlansAndId<Plan, Person> person) {
+		public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 			throw new UnsupportedOperationException();
 		}
 

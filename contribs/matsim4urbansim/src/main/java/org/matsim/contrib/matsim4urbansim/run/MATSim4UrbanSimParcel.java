@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
@@ -68,7 +69,6 @@ import org.matsim.core.controler.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -321,9 +321,9 @@ class MATSim4UrbanSimParcel{
 							Leg leg = (Leg) pe ;
 							if ( leg.getMode().equals(TransportMode.pt) ) {
 								final Leg leg2 = leg;
-								Activity fromAct = PopulationUtils.getPreviousActivity(((PlanImpl)plan), leg2) ;
+								Activity fromAct = PopulationUtils.getPreviousActivity(((Plan)plan), leg2) ;
 								final Leg leg1 = leg;
-								Activity toAct = PopulationUtils.getNextActivity(((PlanImpl)plan), leg1) ;
+								Activity toAct = PopulationUtils.getNextActivity(((Plan)plan), leg1) ;
 								Route route = leg.getRoute() ;
 								route.setDistance( ptMatrix.getPtTravelDistance_meter(fromAct.getCoord(), toAct.getCoord()) ) ;
 							}

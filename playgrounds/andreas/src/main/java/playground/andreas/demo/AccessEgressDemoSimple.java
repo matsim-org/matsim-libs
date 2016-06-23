@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -48,7 +49,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -249,7 +249,7 @@ public class AccessEgressDemoSimple {
 		TransitRoute tRoute = tLine.getRoutes().get(Id.create("A", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopTrain; j++) {
 			Person person = pb.createPerson(Id.create("A - " + j, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalTrain);
 			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
@@ -269,7 +269,7 @@ public class AccessEgressDemoSimple {
 		tRoute = tLine.getRoutes().get(Id.create("B", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopBus; j++) {
 			Person person = pb.createPerson(Id.create("B - " + j, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
+			Plan plan = (Plan) pb.createPlan();
 			Activity act1 = (Activity) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalBus);
 			Leg leg = (Leg) pb.createLeg(TransportMode.pt);

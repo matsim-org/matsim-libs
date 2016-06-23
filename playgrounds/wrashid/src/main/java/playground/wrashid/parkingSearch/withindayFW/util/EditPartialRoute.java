@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -119,7 +119,7 @@ public class EditPartialRoute {
 			}
 
 			if (getRouteSize(oldRoute) == 0) {
-				PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
+				Plan newPlan = PopulationUtils.createPlan(plan.getPerson());
 				newPlan.addActivity(fromActivity);
 				newPlan.addLeg(leg);
 				newPlan.addActivity(toActivity);
@@ -138,7 +138,7 @@ public class EditPartialRoute {
 			}
 
 			if (getRouteSize(oldRoute) == 0) {
-				PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
+				Plan newPlan = PopulationUtils.createPlan(plan.getPerson());
 				newPlan.addActivity(fromActivity);
 				newPlan.addLeg(leg);
 				newPlan.addActivity(toActivity);
@@ -156,7 +156,7 @@ public class EditPartialRoute {
 			}
 
 		} else {
-			PlanImpl newPlan = PopulationUtils.createPlan(plan.getPerson());
+			Plan newPlan = PopulationUtils.createPlan(plan.getPerson());
 			newPlan.addActivity(fromActivity);
 			newPlan.addLeg(leg);
 			newPlan.addActivity(toActivity);
@@ -274,7 +274,7 @@ public class EditPartialRoute {
 
 	// TODO: perhaps reuse same dummy leg, etc. to make things more efficient?
 	private NetworkRoute getRoute(Link fromLink, Link toLink) {
-		PlanImpl newPlan = PopulationUtils.createPlan();
+		Plan newPlan = PopulationUtils.createPlan();
 		Activity fromActivity = PopulationUtils.createActivityFromLinkId("", fromLink.getId());
 		Activity toActivity = PopulationUtils.createActivityFromLinkId("", toLink.getId());
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);

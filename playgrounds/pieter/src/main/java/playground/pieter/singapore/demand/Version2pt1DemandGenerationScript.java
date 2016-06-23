@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
@@ -142,7 +143,7 @@ public class Version2pt1DemandGenerationScript {
 			person.getCustomAttributes().put("synth_hh_id",
 					pax.household.synthHouseholdId);
 			person.getCustomAttributes().put("occup", pax.occup);
-			PlanImpl plan = (PlanImpl) popFactory.createPlan();
+			Plan plan = (Plan) popFactory.createPlan();
 			// skip this guy if he doesn't have a chain
 			if (pax.chain.equals("NA"))
 				continue;

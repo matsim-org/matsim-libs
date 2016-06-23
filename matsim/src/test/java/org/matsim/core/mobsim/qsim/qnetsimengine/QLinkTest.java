@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -53,7 +54,6 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -140,7 +140,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(23, Person.class));
-		PlanImpl plan = PopulationUtils.createPlan();
+		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
@@ -387,7 +387,7 @@ public final class QLinkTest extends MatsimTestCase {
 	private static Person createPerson(Id<Person> personId, MutableScenario scenario, Link link1, Link link2) {
 		final Id<Person> id = personId;
 		Person p = PopulationUtils.getFactory().createPerson(id);
-		PlanImpl plan = PersonUtils.createAndAddPlan(p, true);
+		Plan plan = PersonUtils.createAndAddPlan(p, true);
 		PopulationUtils.createAndAddActivityFromLinkId("h", link1.getId(), plan);
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
 		NetworkRoute route = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, link1.getId(), link2.getId());
@@ -502,7 +502,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		for (int i = 0; i < 5; i++) {
 			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PopulationUtils.createPlan();
+			Plan plan = PopulationUtils.createPlan();
 			Activity act = PopulationUtils.createActivityFromLinkId("h", link1.getId());
 			act.setEndTime(7*3600);
 			plan.addActivity(act);

@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.misc.Time;
@@ -92,7 +92,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
 
 		// setup person
-		PlanImpl plan;
+		Plan plan;
 		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
@@ -171,7 +171,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
 
 		// setup person
-		PlanImpl plan;
+		Plan plan;
 		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely

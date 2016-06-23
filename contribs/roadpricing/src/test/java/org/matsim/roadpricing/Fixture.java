@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -39,7 +40,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -184,7 +184,7 @@ import junit.framework.TestCase;
 
 	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
 		PopulationUtils.createAndAddActivityFromLinkId("h", (Id<Link>) homeLinkId, plan).setEndTime(Time.parseTime(startTime));
 		Leg leg = plan.createAndAddLeg(TransportMode.car);
@@ -197,7 +197,7 @@ import junit.framework.TestCase;
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
-		PlanImpl plan = PopulationUtils.createPlan(person);
+		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
 		Activity act = PopulationUtils.createAndAddActivityFromLinkId("h", homeLink.getId(), plan);
 		act.setCoord(homeLink.getCoord());
