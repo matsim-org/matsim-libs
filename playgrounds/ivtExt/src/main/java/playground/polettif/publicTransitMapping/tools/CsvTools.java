@@ -68,8 +68,6 @@ public class CsvTools {
 
 	/**
 	 * Writes a list of csvLines to a file
-	 * @param csvLines
-	 * @param filename
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException
 	 */

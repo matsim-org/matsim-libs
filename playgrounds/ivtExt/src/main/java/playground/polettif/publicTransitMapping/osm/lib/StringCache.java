@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,23 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.osm.lib;
 
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
+import java.util.concurrent.ConcurrentHashMap;
 
-import java.util.SortedSet;
-
-public interface LinkCandidateCreator {
-	
-	void createLinkCandidates();
-
+/**
+ * A simple cache for strings to make sure we don't have multiple
+ * string objects with the same text in them, wasting memory.
+ * Note that the cache itself keeps regular references to the strings,
+ * so the memory is not freed if a String is not use anymore. Thus, the
+ * cache should only be used in limited areas, e.g. during parsing of 
+ * data, and be disposed afterwards. 
+ * 
+ * @author mrieser / Senozon AG
+ */
+/*package*/ class StringCache {
+	private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>(10000);
 	/**
-	 * Returns a list of link candidates for the given stop facility and schedule transport mode.
-	 * The list is ordered ascending by priority (distance, likelihood, etc.).
+	 * Returns the cached version of the given String. If the strings was
+	 * not yet in the cache, it is added and returned as well.
+	 *
+	 * @param string
+	 * @return cached version of string
 	 */
-	SortedSet<LinkCandidate> getLinkCandidates(TransitStopFacility transitStopFacility, String scheduleTransportMode);
-
-	boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode);
-
+	public static String get(final String string) {
+		String s = cache.putIfAbsent(string, string);
+		if (s == null) {
+			return string;
+		}
+		return s;
+	}
 }

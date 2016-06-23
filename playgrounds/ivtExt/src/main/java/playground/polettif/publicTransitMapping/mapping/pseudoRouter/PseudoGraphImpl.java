@@ -23,16 +23,11 @@ package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.*;
 
 /**
- * A pseudo graph with PseudoRouteStops as nodes  used to
- * calculate the best path and thus link sequence from the
- * first stop to the last stop of a transit route.
- * <p/>
- * The
- *
  * @author polettif
  */
 public class PseudoGraphImpl implements PseudoGraph {
@@ -54,9 +49,8 @@ public class PseudoGraphImpl implements PseudoGraph {
 
 	/**
 	 * Runs dijkstra using a specified source vertex
-	 * todo make private
 	 */
-	public void runDijkstra() {
+	private void runDijkstra() {
 		if(!graph.containsKey(SOURCE_ID)) {
 			System.err.printf("Graph doesn't contain dummy PseudoRouteStop \"%s\"\n", SOURCE_ID);
 			return;
@@ -149,48 +143,6 @@ public class PseudoGraphImpl implements PseudoGraph {
 		}
 		double weight = pathTravelCost + 0.5 * from.getLinkCandidate().getLinkTravelCost() + 0.5 * to.getLinkCandidate().getLinkTravelCost();
 		graph.get(from.getId()).getNeighbours().put(graph.get(to.getId()), weight);
-	}
-
-
-	/**
-	 * DEPRECATED
-	 */
-	@Deprecated
-	public void addSourceDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidateImpl> linkCandidates) {
-		for(LinkCandidateImpl lc : linkCandidates) {
-			addPath((PseudoRouteStopImpl) SOURCE_PSEUDO_STOP, new PseudoRouteStopImpl(order, routeStop, (LinkCandidate) lc), 1.0);
-		}
-	}
-
-	@Deprecated
-	public void addDestinationDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidateImpl> linkCandidates) {
-		for(LinkCandidateImpl lc : linkCandidates) {
-			addPath(new PseudoRouteStopImpl(order, routeStop, (LinkCandidate) lc), (PseudoRouteStopImpl) DESTINATION_PSEUDO_STOP, 1.0);
-		}
-	}
-
-	/**
-	 * Add a path between two pseudoStops
-	 */
-	@Deprecated
-	public void addPath(PseudoRouteStopImpl fromPseudoStopImpl, PseudoRouteStopImpl toPseudoStopImpl, double pathWeight) {
-		PseudoRouteStop fromPseudoStop = (PseudoRouteStop) fromPseudoStopImpl;
-		PseudoRouteStop toPseudoStop = (PseudoRouteStop) toPseudoStopImpl;
-
-		if(!graph.containsKey(fromPseudoStop.getId())) {
-			graph.put(fromPseudoStop.getId(), fromPseudoStop);
-		}
-		if(!graph.containsKey(toPseudoStop.getId())) {
-			graph.put(toPseudoStop.getId(), toPseudoStop);
-		}
-
-		double weight = pathWeight + 0.5 * fromPseudoStop.getLinkTravelCost() + 0.5 * toPseudoStop.getLinkTravelCost();
-		graph.get(fromPseudoStop.getId()).getNeighbours().put(graph.get(toPseudoStop.getId()), weight);
-	}
-
-	@Deprecated
-	public static PseudoRouteStopImpl createPseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidateImpl linkCandidate) {
-		return new PseudoRouteStopImpl(order, routeStop, linkCandidate);
 	}
 }
 

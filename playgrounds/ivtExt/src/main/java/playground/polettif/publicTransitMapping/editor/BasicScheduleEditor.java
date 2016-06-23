@@ -32,7 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
@@ -531,7 +531,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 	 */
 	private class ParentStops {
 
-		Map<String, ParentStopFacility> fac = new HashMap<>();
+		final Map<String, ParentStopFacility> fac = new HashMap<>();
 
 		public ParentStops() {
 			for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
@@ -562,11 +562,11 @@ public class BasicScheduleEditor implements ScheduleEditor {
 	 * not actual facilities in the schedule)
 	 */
 	private class ParentStopFacility {
-		String id;
-		String name;
-		Coord coord;
+		final String id;
+		final String name;
+		final Coord coord;
 
-		Map<Id<Link>, TransitStopFacility> children = new HashMap<>();
+		final Map<Id<Link>, TransitStopFacility> children = new HashMap<>();
 
 		public ParentStopFacility(String id, String name, Coord coord) {
 			this.id = id;
@@ -589,7 +589,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		/**
 		 * Adds a child stop facility for the given refLink, creates
 		 * a new one if needed.
-		 * @param refLinkId
+		 * @param refLinkId the id of the ref link
 		 * @return the childStopFacility
 		 */
 		public TransitStopFacility getChildStopFacility(Id<Link> refLinkId) {

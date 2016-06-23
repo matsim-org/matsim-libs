@@ -31,9 +31,6 @@ public class Frequency {
 	
 	//Methods
 	/**
-	 * @param startTime
-	 * @param endTime
-	 * @param secondsPerDeparture
 	 */
 	public Frequency(Date startTime, Date endTime, int secondsPerDeparture) {
 		super();

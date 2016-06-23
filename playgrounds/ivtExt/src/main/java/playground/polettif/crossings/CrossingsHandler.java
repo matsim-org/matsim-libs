@@ -36,6 +36,12 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import java.util.*;
 
 
+/**
+ * Handles when a train enters a rail link and stores the
+ * closing and reopening time of the crossing link.
+ *
+ * @author polettif
+ */
 public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	private static final Logger log = Logger.getLogger(CrossingsParser.class);
@@ -94,11 +100,6 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 			int id=0;
 			for(Crossing crossing : RailLink.getCrossings()) {
 				Id<Link> crossId = crossing.getRefLinkId();
-
-				// todo create method to get two closest link with identical distance
-				if(crossId == null) {
-					crossId = NetworkTools.findClosestLinks(network, crossing.getCoord(), 300, 2, 1, null, 400.0).get(0).getId();
-				}
 
 				// calculate time(coordinates of crossing, coordinates of fromNode, train speed, linkEnterTime)
 				// -> time(distance, train speed, linkEnterTime

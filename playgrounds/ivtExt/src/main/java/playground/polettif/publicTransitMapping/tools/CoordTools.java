@@ -70,8 +70,6 @@ public class CoordTools {
 	/**
 	 * calculates the azimuth difference of two links
 	 *
-	 * @param link1
-	 * @param link2
 	 * @return the difference in [rad]
 	 */
 	public static double getAzimuthDiff(Link link1, Link link2) {
@@ -98,9 +96,6 @@ public class CoordTools {
 
 	/**
 	 * Calculates the minimal distance between a stop facility and a link via {@link CoordUtils#distancePointLinesegment}
-	 * @param stopFacility
-	 * @param link
-	 * @return
 	 */
 	public static double distanceStopFacilityToLink(TransitStopFacility stopFacility, Link link) {
 		return CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), stopFacility.getCoord());
@@ -224,8 +219,9 @@ public class CoordTools {
 	 * [40] west->inside<br/>
 	 * [47] inside->west<br/>
 	 * [0] line does not cross any border
+	 *
+	 * @deprecated not used anywhere
 	 */
-	@Deprecated
 	public static int getBorderCrossType(Coord SWcut, Coord NEcut, Coord fromCoord, Coord toCoord) {
 		int fromSector = getAreaOfInterestSector(SWcut, NEcut, fromCoord);
 		int toSector = getAreaOfInterestSector(SWcut, NEcut, toCoord);
@@ -319,7 +315,6 @@ public class CoordTools {
 		return 0;
 	}
 
-	@Deprecated
 	private static int getAreaOfInterestSector(Coord SWcut, Coord NEcut, Coord c) {
 		int qSW = getCompassQuarter(SWcut, c);
 		int qNE = getCompassQuarter(NEcut, c);

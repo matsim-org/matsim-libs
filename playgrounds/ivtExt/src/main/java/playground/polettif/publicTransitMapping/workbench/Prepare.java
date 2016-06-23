@@ -20,7 +20,6 @@ package playground.polettif.publicTransitMapping.workbench;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -38,8 +37,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
@@ -76,8 +73,8 @@ public class Prepare {
 
 	public static void main(final String[] args) {
 
-		String inputNetwork = "../output/2016-06-15/ch_network.xml.gz";
-		String inputSchedule = "../output/2016-06-15/ch_schedule.xml.gz";
+		String inputNetwork = "../output/2016-06-23/ch_network.xml.gz";
+		String inputSchedule = "../output/2016-06-23/ch_schedule.xml.gz";
 		String inputVehicles = "../data/vehicles/ch_hafas_vehicles.xml.gz";
 		String inputPopulation;
 		String scenName;

@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,28 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.osm.lib.handler;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Node;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmNode;
 
 /**
- * todo javadoc
+ * @author mrieser / Senozon AG
  */
-public interface ArtificialLink {
+public interface OsmNodeHandler extends OsmHandler {
 
-	Id<Node> getToNodeId();
-
-	Id<Node> getFromNodeId();
-
-	Coord getFromNodeCoord();
-
-	Coord getToNodeCoord();
-
-	double getFreespeed();
-
-	double getLength();
-
-	boolean equals(Object obj);
+	void handleNode(final OsmNode node);
+	
 }

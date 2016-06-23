@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.osm.lib;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,10 +31,10 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.UncheckedIOException;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmNodeHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmRelationHandler;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmWayHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
+import playground.polettif.publicTransitMapping.osm.lib.handler.OsmWayHandler;
 
 /**
  * @author mrieser / Senozon AG

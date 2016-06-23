@@ -31,6 +31,7 @@ import org.matsim.core.router.util.*;
 
 import playground.michalm.ev.data.Charger;
 import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.data.EvrpVehicle.Ev;
 import playground.michalm.taxi.ev.ETaxiChargingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
@@ -55,7 +56,7 @@ public class ETaxiScheduler
         switch (currentTask.getTaxiTaskType()) {
             case EMPTY_DRIVE:
                 TaxiTask nextTask = TaxiSchedules.getNextTaxiTask(currentTask);
-                if (! (nextTask instanceof TaxiStayTask)) {
+                if (! (nextTask instanceof ETaxiChargingTask)) {
                     return super.countUnremovablePlannedTasks(schedule);
                 }
 
@@ -77,6 +78,7 @@ public class ETaxiScheduler
                 return super.countUnremovablePlannedTasks(schedule);
         }
     }
+
 
     // A vehicle doing 'charge' is not considered idle.
     // This is ensured by having at least one task (e.g. 'wait') following the 'charge'.
@@ -118,9 +120,11 @@ public class ETaxiScheduler
         divertOrAppendDrive(schedule, vrpPath);
 
         ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
+        Ev ev = vehicle.getEv();
         double chargingEndTime = vrpPath.getArrivalTime() + logic.estimateMaxWaitTimeOnArrival()
-                + logic.estimateChargeTime(vehicle.getEv());
-        schedule.addTask(new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger));
+                + logic.estimateChargeTime(ev);
+        schedule.addTask(
+                new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev));
 
         appendStayTask(schedule);
     }

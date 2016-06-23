@@ -36,9 +36,9 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser;
-import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
-import playground.polettif.publicTransitMapping.osm.core.TagFilter;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParserHandler;
+import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -345,7 +345,7 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 		if(highway != null) {
 			wayValues = this.highwayParams.get(highway);
 			if(wayValues == null) {
-				// check if bus route is on link todo bus lane conditions as param?
+				// check if bus route is on link
 				if(way.tags.containsKey(OsmTag.PSV)) {
 					busOnlyLink = true;
 					wayValues = highwayParams.get(OsmValue.UNCLASSIFIED);

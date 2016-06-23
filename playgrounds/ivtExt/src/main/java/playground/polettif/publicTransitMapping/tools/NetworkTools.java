@@ -41,8 +41,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.FastAStarRouter;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 
 import java.util.*;
 
@@ -230,7 +230,7 @@ public class NetworkTools {
 		dummyLink.setAllowedModes(transportModes);
 		dummyLink.setLength(5);
 		dummyLink.setFreespeed(freespeed);
-		dummyLink.setCapacity(9999); // todo param default values in config
+		dummyLink.setCapacity(9999);
 
 		if(!network.getNodes().containsKey(dummyNode.getId())) {
 			network.addNode(dummyNode);
@@ -242,7 +242,12 @@ public class NetworkTools {
 
 
 	/**
-	 * @return the filtered network, input network is not filtered!
+ 	 * Creates and returns a mode filtered network.
+	 * @param network the input network, is not modified
+	 * @param transportModes Links of the input network that share at least one network mode
+	 *                       with this set are added to the new network. The returned network
+	 *                       is empty if <tt>null</tt>.
+	 * @return the filtered new network
 	 */
 	public static Network filterNetworkByLinkMode(Network network, Set<String> transportModes) {
 		NetworkFilterManager filterManager = new NetworkFilterManager(network);

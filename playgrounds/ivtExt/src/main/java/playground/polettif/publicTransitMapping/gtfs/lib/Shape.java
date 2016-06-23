@@ -20,8 +20,6 @@
 
 package playground.polettif.publicTransitMapping.gtfs.lib;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -41,7 +39,6 @@ public class Shape {
 	 * The points of the shape
 	 */
 	private SortedMap<Integer,Coord> points;
-	private Coordinate[] coordinates;
 
 	//Methods
 	/**
@@ -68,7 +65,6 @@ public class Shape {
 
 	/**
 	 * Adds a new point
-	 * @param point
 	 */
 	public void addPoint(Coord point, int pos) {
 		points.put(pos,point);

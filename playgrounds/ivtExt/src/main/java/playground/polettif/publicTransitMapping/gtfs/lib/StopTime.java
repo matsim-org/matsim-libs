@@ -28,17 +28,11 @@ import java.util.Date;
 public class StopTime {
 	
 	//Attributes
-	private Integer sequencePosition;
-	private Date arrivalTime;
-	private Date departureTime;
+	private final Integer sequencePosition;
+	private final Date arrivalTime;
+	private final Date departureTime;
 	private String stopId;
 	
-	//Methods
-	/**
-	 * @param arrivalTime
-	 * @param departureTime
-	 * @param stopId
-	 */
 	public StopTime(Integer sequencePosition, Date arrivalTime, Date departureTime, String stopId) {
 		super();
 		this.sequencePosition = sequencePosition;
@@ -75,11 +69,4 @@ public class StopTime {
 		return stopId;
 	}
 
-	/**
-	 * @param stopId the stopId to set
-	 */
-	public void setStopId(String stopId) {
-		this.stopId = stopId;
-	}
-	
 }

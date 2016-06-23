@@ -439,7 +439,6 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.ROUTES.columns);
 
 		String[] line = reader.readNext();
-		int i = 0;
 		while(line != null) {
 			GTFSRoute newGtfsRoute = new GTFSRoute(line[col.get(GTFSDefinitions.ROUTE_ID)], line[col.get(GTFSDefinitions.ROUTE_SHORT_NAME)], GTFSDefinitions.RouteTypes.values()[Integer.parseInt(line[col.get(GTFSDefinitions.ROUTE_TYPE)])]);
 			gtfsRoutes.put(line[col.get(GTFSDefinitions.ROUTE_ID)], newGtfsRoute);

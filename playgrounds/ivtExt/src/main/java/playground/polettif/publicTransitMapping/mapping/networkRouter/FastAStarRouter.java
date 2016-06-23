@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.router;
+package playground.polettif.publicTransitMapping.mapping.networkRouter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,9 +30,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLink;
-import playground.polettif.publicTransitMapping.mapping.v2.ArtificialLinkImpl;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.HashMap;
@@ -62,6 +60,9 @@ public class FastAStarRouter implements Router {
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
 	}
 
+	/**
+	 * Filters the network with the given transport modes and creates a router with it
+	 */
 	public static Router createModeSeparatedRouter(Network network, Set<String> transportModes) {
 		Network filteredNetwork = NetworkTools.filterNetworkByLinkMode(network, transportModes);
 		return new FastAStarRouter(filteredNetwork);
@@ -75,7 +76,7 @@ public class FastAStarRouter implements Router {
 		if(fromNode != null && toNode != null) {
 			Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
 			if(!paths.containsKey(nodes)) {
-				paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
+					paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
 			}
 			return paths.get(nodes);
 		} else {
@@ -91,7 +92,7 @@ public class FastAStarRouter implements Router {
 	@Override
 	public double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop) {
 		double travelTime = (toStop.getArrivalOffset() - fromStop.getDepartureOffset());
-		double beelineDistance = CoordUtils.calcEuclideanDistance(fromStop.getStopFacility().getCoord(), fromStop.getStopFacility().getCoord());
+		double beelineDistance = CoordUtils.calcEuclideanDistance(fromStop.getStopFacility().getCoord(), toStop.getStopFacility().getCoord());
 
 		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 			return travelTime;
@@ -101,18 +102,25 @@ public class FastAStarRouter implements Router {
 	}
 
 	@Override
-	public ArtificialLink createArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-		double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
-		return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, 0.5, linkLength);
-		/*
-		double linkTravelCost = travelCost - 0.5*fromLinkCandidate.getLinkTravelCost() - 0.5*toLinkCandidate.getLinkTravelCost();
+	public double getArtificialLinkFreeSpeed(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		return 1;
+		/* Varying freespeeds do not work with maxAllowedTravelcost == 0
 		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 			double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
-			return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, linkLength / linkTravelCost, linkLength);
+			return linkLength / maxAllowedTravelCost;
 		} else {
-			return new ArtificialLinkImpl(fromLinkCandidate, toLinkCandidate, 0.5, travelCost);
+			return 1;
 		}
 		*/
+	}
+
+	@Override
+	public double getArtificialLinkLength(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
+		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
+			return CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
+		} else {
+			return maxAllowedTravelCost;
+		}
 	}
 
 	@Override

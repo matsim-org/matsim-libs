@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
+package playground.polettif.publicTransitMapping.mapping.linkCandidateCreation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,14 +28,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
 
 /**
- * A possible link for a stop facility. A LinkCandidate contains
- * theoretically a link and the parent stop facility. However, all
- * values besides Coord are stored as primitive/String since one might
- * be working with multiple mode separated networks.
- *
  * @author polettif
  */
-public class LinkCandidateV2 implements LinkCandidate {
+public class LinkCandidateImpl implements LinkCandidate {
 
 	private final String id;
 	private final Id<TransitStopFacility> parentStopFacilityId;
@@ -51,9 +46,9 @@ public class LinkCandidateV2 implements LinkCandidate {
 	private final Coord stopFacilityCoord;
 	private final Coord fromNodeCoord;
 	private final Coord toNodeCoord;
-	private boolean loopLink;
+	private final boolean loopLink;
 
-	public LinkCandidateV2(Link link, TransitStopFacility parentStopFacility, double linkTravelCost) {
+	public LinkCandidateImpl(Link link, TransitStopFacility parentStopFacility, double linkTravelCost) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
 		this.parentStopFacilityId = parentStopFacility.getId();
 		this.linkTravelCost = linkTravelCost;
@@ -73,7 +68,7 @@ public class LinkCandidateV2 implements LinkCandidate {
 		this.loopLink = link.getFromNode().getId().toString().equals(link.getToNode().getId().toString());
 	}
 
-	public LinkCandidateV2() {
+	public LinkCandidateImpl() {
 		this.id = "dummy";
 		this.parentStopFacilityId = null;
 		this.linkTravelCost = 0;
@@ -129,11 +124,6 @@ public class LinkCandidateV2 implements LinkCandidate {
 	}
 
 	@Override
-	public String getScheduleTransportMode() {
-		return null;
-	}
-
-	@Override
 	public double getPriority() {
 		return priority;
 	}
@@ -160,14 +150,21 @@ public class LinkCandidateV2 implements LinkCandidate {
 
 	@Override
 	public int compareTo(LinkCandidate other) {
-		if(other.getId().equals(this.id)) {
+		if(this.equals(other)) {
 			return 0;
 		}
-		int dCompare = Double.compare(stopFacilityDistance, other.getStopFacilityDistance());
-		if(dCompare == 0) {
-			return CoordTools.coordIsOnRightSideOfLine(stopFacilityCoord, fromNodeCoord, toNodeCoord) ? 1 : -1;
+
+		if(other instanceof LinkCandidateImpl) {
+			LinkCandidateImpl o = (LinkCandidateImpl) other;
+			int dCompare = Double.compare(stopFacilityDistance, o.getStopFacilityDistance());
+			if(dCompare == 0) {
+				return CoordTools.coordIsOnRightSideOfLine(stopFacilityCoord, fromNodeCoord, toNodeCoord) ? 1 : -1;
+			} else {
+				return dCompare;
+			}
 		} else {
-			return dCompare;
+			int dCompare = -Double.compare(priority, other.getPriority());
+			return dCompare == 0 ? 1 : dCompare;
 		}
 	}
 
@@ -185,7 +182,7 @@ public class LinkCandidateV2 implements LinkCandidate {
 		if(getClass() != obj.getClass())
 			return false;
 
-		LinkCandidateV2 other = (LinkCandidateV2) obj;
+		LinkCandidateImpl other = (LinkCandidateImpl) obj;
 		if(id == null) {
 			if(other.id != null)
 				return false;

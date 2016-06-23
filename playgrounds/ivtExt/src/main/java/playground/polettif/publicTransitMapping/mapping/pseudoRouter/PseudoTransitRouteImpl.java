@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,13 +16,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core.handler;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+
+import java.util.List;
 
 /**
- * Base interface of more specialized handlers for osm data entities.
- * 
- * @author mrieser / Senozon AG
+ * @author polettif
  */
-public interface OsmHandler {
+public class PseudoTransitRouteImpl implements PseudoTransitRoute {
 
+ 	private final Id<TransitLine> transitLineId;
+	private final List<PseudoRouteStop> pseudoRouteStops;
+	private final TransitRoute transitRoute;
+
+	public PseudoTransitRouteImpl(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoRouteStops) {
+		this.transitLineId = transitLine.getId();
+		this.transitRoute = transitRoute;
+		this.pseudoRouteStops = pseudoRouteStops;
+	}
+
+	public Id<TransitLine> getTransitLineId() {
+		return transitLineId;
+	}
+
+	public TransitRoute getTransitRoute() {
+		return transitRoute;
+	}
+
+	public List<PseudoRouteStop> getPseudoStops() {
+		return pseudoRouteStops;
+	}
 }

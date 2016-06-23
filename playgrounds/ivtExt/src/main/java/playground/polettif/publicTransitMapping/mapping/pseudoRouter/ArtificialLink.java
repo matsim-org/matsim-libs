@@ -20,45 +20,33 @@ package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.Set;
 
 /**
- * TODO doc
+ * Container class for artificial links created
+ * in PseudoRouting.
+ *
+ * @author polettif
  */
-public interface LinkCandidate extends Comparable<LinkCandidate> {
-
-	String getId();
-
-	Id<TransitStopFacility> getParentStopFacilityId();
-
-	Id<Link> getLinkId();
+public interface ArtificialLink {
 
 	Id<Node> getToNodeId();
 
 	Id<Node> getFromNodeId();
 
-	Coord getToNodeCoord();
-
 	Coord getFromNodeCoord();
 
-	double getStopFacilityDistance();
+	Coord getToNodeCoord();
 
-	double getLinkTravelCost();
+	double getFreespeed();
 
-	String getScheduleTransportMode();
+	double getLength();
 
-	/**
-	 * @return the link candidates priority compared to all other
-	 * link candidates for the same stop and transport mode. The priority
-	 * is scaled 0..1 (1 being high priority).
-	 */
-	double getPriority();
+	boolean equals(Object obj);
 
-	void setPriority(double priority);
+	double getCapacity();
 
-	int compareTo(LinkCandidate other);
-
-	boolean isLoopLink();
+	Set<String> getAllowedModes();
 }

@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.v2;
+package playground.polettif.publicTransitMapping.mapping.linkCandidateCreation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -28,9 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidate;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.LinkCandidateV2;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
@@ -40,15 +38,17 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 
 	protected static Logger log = Logger.getLogger(LinkCandidateCreatorStandard.class);
 
-	private static Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE+","+PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
+	private static final Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE+","+PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
 	private final Map<String, Router> modeSeparatedRouters;
 
-	private TransitSchedule schedule;
-	private Network network;
-	private PublicTransitMappingConfigGroup config;
+	private Map<String, PublicTransitMappingConfigGroup.LinkCandidateCreatorParams> lccParams;
 
-	private Map<String, Map<TransitStopFacility, SortedSet<LinkCandidate>>> linkCandidates = new HashMap<>();
-	private Set<Tuple<TransitStopFacility, String>> loopLinks = new HashSet<>();
+	private final TransitSchedule schedule;
+	private final Network network;
+	private final PublicTransitMappingConfigGroup config;
+
+	private final Map<String, Map<TransitStopFacility, SortedSet<LinkCandidate>>> linkCandidates = new HashMap<>();
+	private final Set<Tuple<TransitStopFacility, String>> loopLinks = new HashSet<>();
 
 	public LinkCandidateCreatorStandard(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config, Map<String, Router> modeSeparatedRouters) {
 		this.schedule = schedule;
@@ -60,10 +60,9 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	@Override
 	public void createLinkCandidates() {
 		log.info("   search radius: " + config.getNodeSearchRadius());
-		log.info("   max N closest links: " + config.getMaxNClosestLinks());
-		log.info("   max link candidate distance: " + config.getMaxLinkCandidateDistance());
-		log.info("   link distance tolerance: " + config.getLinkDistanceTolerance());
 		log.info("   Note: loop links for stop facilities are created if no link candidate can be found.");
+
+		lccParams = config.getLinkCandidateCreatorParams();
 
 		/**
 		 * get closest links for each stop facility (separated by mode)
@@ -72,6 +71,13 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				for(TransitRouteStop transitRouteStop : transitRoute.getStops()) {
 					String scheduleTransportMode = transitRoute.getTransportMode();
+
+					if(!lccParams.containsKey(scheduleTransportMode)) {
+						throw new IllegalArgumentException("No LinkCandidateCreatorParams defined for schedule mode " + scheduleTransportMode);
+					}
+
+					PublicTransitMappingConfigGroup.LinkCandidateCreatorParams param = lccParams.get(scheduleTransportMode);
+
 					Router modeRouter = modeSeparatedRouters.get(scheduleTransportMode);
 					TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
 
@@ -82,18 +88,19 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 						// if stop facilty already has a referenced link
 						if(stopFacility.getLinkId() != null) {
 							Link link = network.getLinks().get(stopFacility.getLinkId());
-							modeLinkCandidates.add(new LinkCandidateV2(link, stopFacility, modeRouter.getLinkTravelCost(link)));
+							modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility, modeRouter.getLinkTravelCost(link)));
+						// search for close links
 						} else {
 							List<Link> closestLinks;
-							if(config.getModeRoutingAssignment().get(scheduleTransportMode).contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+							if(param.useArtificialLoopLink()) {
 								closestLinks = new ArrayList<>();
 							} else {
-								// limits number of links, for all links within search radius
 								closestLinks  = NetworkTools.findClosestLinks(network,
 										stopFacility.getCoord(), config.getNodeSearchRadius(),
-										config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(),
-										config.getModeRoutingAssignment().get(scheduleTransportMode), config.getMaxLinkCandidateDistance());
+										param.getMaxNClosestLinks(), param.getLinkDistanceTolerance(),
+										param.getNetworkModes(), param.getMaxLinkCandidateDistance());
 							}
+
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
 								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), 20, loopLinkModes);
@@ -105,7 +112,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 							 * generate a LinkCandidate for each close link
 							 */
 							for(Link link : closestLinks) {
-								modeLinkCandidates.add(new LinkCandidateV2(link, stopFacility, modeRouter.getLinkTravelCost(link)));
+								modeLinkCandidates.add(new LinkCandidateImpl(link, stopFacility, modeRouter.getLinkTravelCost(link)));
 							}
 						}
 					}
@@ -126,33 +133,36 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	private void addManualLinkCandidates(Set<PublicTransitMappingConfigGroup.ManualLinkCandidates> manualLinkCandidatesSet) {
 		for(PublicTransitMappingConfigGroup.ManualLinkCandidates manualCandidates : manualLinkCandidatesSet) {
 
-			Set<String> modes = manualCandidates.getModes();
-			if(modes.size() == 0) {
-				modes = linkCandidates.keySet();
+			Set<String> scheduleModes = manualCandidates.getScheduleModes();
+			if(scheduleModes.size() == 0) {
+				scheduleModes = linkCandidates.keySet();
 			}
 
 			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
 			if(parentStopFacility == null) {
 				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
 			} else {
-				for(String mode : modes) {
-					Router modeRouter = modeSeparatedRouters.get(mode);
-					SortedSet<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new TreeSet<>() : MiscUtils.getSortedSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
+				for(String scheduleMode : scheduleModes) {
+					Router modeRouter = modeSeparatedRouters.get(scheduleMode);
+
+					PublicTransitMappingConfigGroup.LinkCandidateCreatorParams lccParams = config.getLinkCandidateCreatorParams().get(scheduleMode);
+
+					SortedSet<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new TreeSet<>() : MiscUtils.getSortedSet(parentStopFacility, MapUtils.getMap(scheduleMode, linkCandidates)));
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if(link == null) {
 							log.warn("link " + linkId + " not found in network.");
 						} else {
-							if(CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord()) > config.getMaxLinkCandidateDistance()) {
+							if(CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord()) > lccParams.getMaxLinkCandidateDistance()) {
 								log.warn("Distance from manual link candidate " + link.getId() + " to stop facility " +
-										manualCandidates.getStopFacilityIdStr() + " is more than " + config.getMaxLinkCandidateDistance() +
+										manualCandidates.getStopFacilityIdStr() + " is more than " + lccParams.getMaxLinkCandidateDistance() +
 										"("+CoordUtils.calcEuclideanDistance(link.getCoord(), parentStopFacility.getCoord())+")");
 								log.info("Manual link candidate will still be used");
 							}
-							lcSet.add(new LinkCandidateV2(link, parentStopFacility, modeRouter.getLinkTravelCost(link)));
+							lcSet.add(new LinkCandidateImpl(link, parentStopFacility, modeRouter.getLinkTravelCost(link)));
 						}
 					}
-					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);
+					MapUtils.getMap(scheduleMode, linkCandidates).put(parentStopFacility, lcSet);
 				}
 			}
 		}
@@ -168,5 +178,5 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	public boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode) {
 		return loopLinks.contains(new Tuple<>(stopFacility, transportMode));
 	}
-	
+
 }

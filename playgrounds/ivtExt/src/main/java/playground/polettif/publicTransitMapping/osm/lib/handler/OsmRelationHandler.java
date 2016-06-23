@@ -17,16 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core.handler;
+package playground.polettif.publicTransitMapping.osm.lib.handler;
 
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmWay;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser.OsmRelation;
 
 /**
  * @author mrieser / Senozon AG
  */
-public interface OsmWayHandler extends OsmHandler {
-	
-	void handleWay(final OsmWay way);
+public interface OsmRelationHandler extends OsmHandler {
+
+	void handleRelation(final OsmRelation relation);
 
 }

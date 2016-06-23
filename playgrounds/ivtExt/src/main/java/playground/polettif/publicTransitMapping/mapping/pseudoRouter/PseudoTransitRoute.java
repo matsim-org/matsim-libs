@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core.handler;
+package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmNode;
-import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+
+import java.util.List;
 
 /**
- * @author mrieser / Senozon AG
+ * A container class for pseudoRouteStop sequences. Used to store
+ * the original transit route and transit line.
+ *
+ * @author polettif
  */
-public interface OsmNodeHandler extends OsmHandler {
+public interface PseudoTransitRoute {
 
-	void handleNode(final OsmNode node);
-	
+	Id<TransitLine> getTransitLineId();
+
+	TransitRoute getTransitRoute();
+
+	List<PseudoRouteStop> getPseudoStops();
 }

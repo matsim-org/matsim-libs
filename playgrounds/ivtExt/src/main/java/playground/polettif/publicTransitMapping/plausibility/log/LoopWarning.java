@@ -34,8 +34,8 @@ import java.util.Map;
 
 public class LoopWarning extends AbstractPlausibilityWarning {
 
-	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
-	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
+	public static final Map<TransitLine, Integer> lineStat = new HashMap<>();
+	public static final Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
 	private Node node;
 

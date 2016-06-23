@@ -30,7 +30,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Stores the information which is requried during the computation of decongestion prices
- * Contains the input parameters, e.g. how often the interval-based output is written out, the number of iterations after which the price should be updated, ...
+ * Contains the input parameters, e.g. how often the interval-based output is written out, the number of iterations for which the price is kept constant, ...
  * 
  * @author ikaddoura
  */
