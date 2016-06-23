@@ -371,5 +371,41 @@ public class CalcLinkStats {
 		}
 		return volumes;
 	}
+	
+	/**
+	 * @param linkId
+	 * @return if no data is available, an array with length 0 is returned.
+	 * 
+	 * The method reflects the (wrong) logic of what is done when writing the output and should eventually be deleted or modified.
+	 * 
+	 */
+	@Deprecated
+	protected double[] getAvgTravelTimes(final Id<Link> linkId) {
+		LinkData data = this.linkData.get(linkId);
+		if (data == null) {
+			return new double[0];
+		}
+		if (this.count == 0) {
+			return new double[0];
+		}
+		double[] ttimesMin = new double[this.nofHours];
+		double[] ttimesSum = new double[this.nofHours];
+		double[] volumes = new double[this.nofHours];
+		
+		double[] avgTTimes = new double[this.nofHours];
+		
+		for (int i = 0; i < this.nofHours; i++) {
+			volumes[i] = (data.volumes[SUM][i]) / (this.count);
+			ttimesMin[i] = (data.ttimes[MIN][i]) / (this.count);
+			ttimesSum[i] = (data.ttimes[SUM][i]) / (this.count);
+
+			if (volumes[i] == 0.) {
+				avgTTimes[i] = ttimesMin[i];
+			} else {
+				avgTTimes[i] = ttimesSum[i] / volumes[i];
+			}
+		}
+		return avgTTimes;
+	}
 
 }
