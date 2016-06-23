@@ -30,7 +30,7 @@ import org.matsim.facilities.FacilitiesWriter;
  * @author dziemke
  */
 public class AccessibilityRunUtils {
-	public static final Logger log = Logger.getLogger(AccessibilityRunUtils.class);
+	public static final Logger LOG = Logger.getLogger(AccessibilityRunUtils.class);
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
@@ -68,6 +68,7 @@ public class AccessibilityRunUtils {
 				}
 			}
 		}
+		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
 	}
 
