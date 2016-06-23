@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -67,21 +68,21 @@ public class OptimalWalkPlanFinderTest {
 
 		Double bestScore = calcScore(f, optimalPlan);
 
-		((ActivityImpl) optimalPlan.getPlanElements().get(0)).setEndTime(8.5 * 3600 + 60);
+		((Activity) optimalPlan.getPlanElements().get(0)).setEndTime(8.5 * 3600 + 60);
 		((Leg) optimalPlan.getPlanElements().get(1)).setDepartureTime(((Leg) optimalPlan.getPlanElements().get(1)).getDepartureTime() + 60);
 		Leg r = ((Leg) optimalPlan.getPlanElements().get(1));
 		Leg r2 = ((Leg) optimalPlan.getPlanElements().get(1));
 		r2.setTravelTime( r.getDepartureTime() + r.getTravelTime() + 60 - r2.getDepartureTime() );
-		((ActivityImpl) optimalPlan.getPlanElements().get(2)).setStartTime(((ActivityImpl) optimalPlan.getPlanElements().get(2)).getStartTime() + 60);
+		((Activity) optimalPlan.getPlanElements().get(2)).setStartTime(((Activity) optimalPlan.getPlanElements().get(2)).getStartTime() + 60);
 
 		Double altScore1 =calcScore(f, optimalPlan);
 
-		((ActivityImpl) optimalPlan.getPlanElements().get(2)).setEndTime(18 * 3600 - 60);
-		((Leg) optimalPlan.getPlanElements().get(3)).setDepartureTime((((ActivityImpl) optimalPlan.getPlanElements().get(2))).getEndTime());
+		((Activity) optimalPlan.getPlanElements().get(2)).setEndTime(18 * 3600 - 60);
+		((Leg) optimalPlan.getPlanElements().get(3)).setDepartureTime((((Activity) optimalPlan.getPlanElements().get(2))).getEndTime());
 		Leg r3 = ((Leg) optimalPlan.getPlanElements().get(3));
 		r3.setTravelTime( ((Leg) optimalPlan.getPlanElements().get(3)).getDepartureTime() + ((Leg) optimalPlan.getPlanElements().get(3)).getTravelTime() - r3.getDepartureTime() );
 		Leg r1 = ((Leg) optimalPlan.getPlanElements().get(3));
-		((ActivityImpl) optimalPlan.getPlanElements().get(4)).setStartTime(r1.getDepartureTime() + r1.getTravelTime());
+		((Activity) optimalPlan.getPlanElements().get(4)).setStartTime(r1.getDepartureTime() + r1.getTravelTime());
 
 		Double altScore2 = calcScore(f, optimalPlan);
 
@@ -139,8 +140,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5 * 3600, ((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(), EPSILON);
-		assertEquals(18.0 * 3600, ((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(), EPSILON);
+		assertEquals(8.5 * 3600, ((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(), EPSILON);
+		assertEquals(18.0 * 3600, ((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(), EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -166,8 +167,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5*3600,((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
-		assertEquals(18.0*3600,((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
+		assertEquals(8.5*3600,((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
+		assertEquals(18.0*3600,((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -192,8 +193,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5*3600,((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
-		assertEquals((9*3600+9*(23/22)*3600),((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
+		assertEquals(8.5*3600,((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
+		assertEquals((9*3600+9*(23/22)*3600),((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -221,8 +222,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5*3600,((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
-		assertEquals(17*3600,((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
+		assertEquals(8.5*3600,((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
+		assertEquals(17*3600,((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}

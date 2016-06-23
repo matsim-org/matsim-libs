@@ -22,6 +22,7 @@ package playground.andreas.utils.pop;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -61,8 +62,8 @@ public class StripPersonPlan extends NewPopulation {
 		PersonUtils.setSex(person, null);
 		
 		for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
-			if (pE instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pE;
+			if (pE instanceof Activity) {
+				Activity act = (Activity) pE;
 				int x = (int) (act.getCoord().getX() / 100.0);
 				int y = (int) (act.getCoord().getY() / 100.0);
 				act.setCoord(new Coord(x * 100.0, y * 100.0));

@@ -27,10 +27,10 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
@@ -74,7 +74,7 @@ public class PlansScenarioCut {
 		for (Person p : persons.values()) {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				Coord c = act.getCoord();
 				if ((c.getX()<min.getX()) || (c.getX()>max.getX()) || (c.getY()<min.getY()) || (c.getY()>max.getY())) {
 					removeids.add(p.getId());

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -275,8 +275,8 @@ public class EditPartialRoute {
 	// TODO: perhaps reuse same dummy leg, etc. to make things more efficient?
 	private NetworkRoute getRoute(Link fromLink, Link toLink) {
 		PlanImpl newPlan = PopulationUtils.createPlan();
-		ActivityImpl fromActivity = PopulationUtils.createActivityFromLinkId("", fromLink.getId());
-		ActivityImpl toActivity = PopulationUtils.createActivityFromLinkId("", toLink.getId());
+		Activity fromActivity = PopulationUtils.createActivityFromLinkId("", fromLink.getId());
+		Activity toActivity = PopulationUtils.createActivityFromLinkId("", toLink.getId());
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		fromActivity.setEndTime(0);
 		toActivity.setEndTime(0);

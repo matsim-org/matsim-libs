@@ -25,6 +25,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +40,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -136,13 +136,13 @@ public class QSim2CASimConverter {
 					if (el instanceof Leg) {
 						((Leg) el).setMode("walkca");
 						((Leg) el).setRoute(null);
-					} else if (el instanceof ActivityImpl) {
+					} else if (el instanceof Activity) {
 
-						((ActivityImpl) el).setCoord(null);
+						((Activity) el).setCoord(null);
 						if (cnt == 0) {
-							((ActivityImpl) el).setType("pre-evac");
+							((Activity) el).setType("pre-evac");
 						} else {
-							((ActivityImpl) el).setType("post-evac");
+							((Activity) el).setType("post-evac");
 						}
 						cnt++;
 					}

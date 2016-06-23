@@ -51,6 +51,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -66,7 +67,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -196,7 +196,7 @@ public class ZHCutter {
 					activity.setMaximumDuration(oldActivity.getMaximumDuration());
 					activity.setStartTime(oldActivity.getStartTime());
 					if (oldActivity.getFacilityId() != null) {
-						final ActivityImpl activityImpl = (ActivityImpl) activity;
+						final Activity activityImpl = (Activity) activity;
 						activityImpl.setFacilityId(Id.create(oldActivity.getFacilityId().toString(), ActivityFacility.class));
 					}
 					newPlan.addActivity(activity);
@@ -379,8 +379,8 @@ public class ZHCutter {
 			if (p.getSelectedPlan() != null) {
 				actInArea = false; actNotInArea = false;
 				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						if (inArea(act.getCoord())) {
 							actInArea = true;
 						} else {
@@ -459,8 +459,8 @@ public class ZHCutter {
 		for (Person person : filteredAgents.values()) {
 			if (person.getSelectedPlan() != null) {
 				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						if (act.getFacilityId() != null && !filteredFacilities.getFacilities().containsKey(act.getFacilityId())) {
 							filteredFacilities.addActivityFacility(scenario.getActivityFacilities().getFacilities().get(act.getFacilityId()));
 						}

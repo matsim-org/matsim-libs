@@ -31,9 +31,9 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -215,9 +215,9 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 				distance );
 
 		for ( Activity act : activitiesToMutate ) {
-			((ActivityImpl) act).setFacilityId( fac.getId() );
-			((ActivityImpl) act).setLinkId( fac.getLinkId() );
-			((ActivityImpl) act).setCoord( fac.getCoord() );
+			((Activity) act).setFacilityId( fac.getId() );
+			((Activity) act).setLinkId( fac.getLinkId() );
+			((Activity) act).setCoord( fac.getCoord() );
 		}
 	}
 

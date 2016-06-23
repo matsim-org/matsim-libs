@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -69,7 +69,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 			PlanElement pe = planElements.get(i);
 			
 			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl) pe;
+				Activity act = (Activity) pe;
 
 				// handle first activity
 				if (i == 0) {

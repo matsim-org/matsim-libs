@@ -8,10 +8,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.MutableScenario;
@@ -87,7 +87,7 @@ public class ActivityDifferentiatorBalac {
 
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("s")) {
 						numberOfShopActs++;
 					}
@@ -222,7 +222,7 @@ public class ActivityDifferentiatorBalac {
 				//Double duration = pi.getDesires().getActivityDuration("shop");
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j = j + 2) {
-					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("s")) {
 						
 						double random = MatsimRandom.getRandom().nextDouble();
@@ -287,12 +287,12 @@ public class ActivityDifferentiatorBalac {
 			log.info("Share:\t"+ (100.0 * assignedNumberOf_GroceryActs / this.numberOfShopActs));
 		}
 
-		private void modifyDesires(ActivityImpl act, PersonImpl pi) {
+		private void modifyDesires(Activity act, PersonImpl pi) {
 			ModifyDesires desiresModificator = new ModifyDesires (act, pi);
 			desiresModificator.run();
 		}
 
-		private void assignFacility(Object[] facilities, ActivityImpl act) {
+		private void assignFacility(Object[] facilities, Activity act) {
 			
 			int rd = MatsimRandom.getRandom().nextInt(facilities.length);
 			ActivityFacility facility = ((ActivityFacility)facilities[rd]);

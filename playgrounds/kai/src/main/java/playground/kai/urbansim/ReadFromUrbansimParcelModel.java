@@ -18,12 +18,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -231,8 +231,8 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if work act has changed:
-					ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-					ActivityImpl newWorkAct = (ActivityImpl)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Activity oldWorkAct = (Activity) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Activity newWorkAct = (Activity)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
 					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
 						newPop.addPerson(newPerson) ;
 						break ;

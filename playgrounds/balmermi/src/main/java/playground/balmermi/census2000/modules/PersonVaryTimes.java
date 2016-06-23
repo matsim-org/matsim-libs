@@ -23,13 +23,13 @@ package playground.balmermi.census2000.modules;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -65,7 +65,7 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
 
 		// draw a new random number until the new end time >= 0.0
-		double first_end_time = ((ActivityImpl)acts_legs.get(0)).getEndTime();
+		double first_end_time = ((Activity)acts_legs.get(0)).getEndTime();
 		while (first_end_time+bias < 0.0) {
 			bias = MatsimRandom.getRandom().nextInt(3600)-1800.0;
 		}

@@ -20,12 +20,12 @@
 package playground.vsp.demandde.pendlermatrix;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.vsp.pipeline.PersonSink;
 import playground.vsp.pipeline.PersonSinkSource;
@@ -44,7 +44,7 @@ public class PersonDereferencerTask implements PersonSinkSource {
 		Plan plan = person.getPlans().get(0);
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
-				ActivityImpl activity = (ActivityImpl) planElement;
+				Activity activity = (Activity) planElement;
 				activity.setLinkId(null);
 			} else if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;

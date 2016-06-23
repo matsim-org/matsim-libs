@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -294,13 +295,13 @@ public class BlnPlansGenerator {
 				curPlan = curPerson.getSelectedPlan();
 			}
 
-			ActivityImpl lastAct = null;
+			Activity lastAct = null;
 
 			for (Iterator<String[]> iterator = curTripList.iterator(); iterator.hasNext();) {
 				String[] tripEntry = iterator.next();
 
 				// Read Activity from survey
-				ActivityImpl newAct = PopulationUtils.createActivityFromCoord(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
+				Activity newAct = PopulationUtils.createActivityFromCoord(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
 
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 

@@ -21,11 +21,11 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteUtils;
@@ -127,7 +127,7 @@ public class TransitRouterWrapper implements RoutingModule {
 				    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
 				    tRoute.setTravelTime(leg.getTravelTime());
 				    tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
-				    ActivityImpl act =
+				    Activity act =
 						    PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
 				    act.setMaximumDuration(0.0);
 				    trip.add(act);
@@ -142,7 +142,7 @@ public class TransitRouterWrapper implements RoutingModule {
 					    route.setTravelTime(leg.getTravelTime());
 					    leg.setRoute(route);
 				    }
-				    ActivityImpl act =
+				    Activity act =
 						    PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg.getRoute().getStartLinkId());
 				    act.setMaximumDuration(0.0);
 				    trip.add(act);

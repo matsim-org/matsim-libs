@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -59,7 +60,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -233,7 +233,7 @@ public class CarPassingBusTest {
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
 
-		ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", startLinkA.getId());
+		Activity act1 = (Activity) pb.createActivityFromLinkId("home", startLinkA.getId());
 		act1.setEndTime(7*3600. + 49.);
 		Leg leg = (Leg) pb.createLeg(TransportMode.car);
 
@@ -247,7 +247,7 @@ public class CarPassingBusTest {
 		networkRouteA.setLinkIds(startLinkA.getId(), linkListA, endLinkA.getId());
 		leg.setRoute(networkRouteA);
 
-		ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", endLinkA.getId());
+		Activity act2 = (Activity) pb.createActivityFromLinkId("work", endLinkA.getId());
 
 		population.addPerson(person);
 		person.addPlan(plan);

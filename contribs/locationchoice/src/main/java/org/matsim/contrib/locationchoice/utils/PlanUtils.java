@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,7 +31,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.population.LCActivity;
 import org.matsim.contrib.locationchoice.population.LCLeg;
 import org.matsim.contrib.locationchoice.population.LCPlan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -62,15 +62,15 @@ public class PlanUtils {
 		
 		int actLegIndex = 0;
 		for (PlanElement pe : planTarget.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl actTemplate = ((ActivityImpl) planTemplate.getPlanElements().get(actLegIndex));
-				((ActivityImpl) pe).setEndTime(actTemplate.getEndTime());
-				((ActivityImpl) pe).setCoord(actTemplate.getCoord());
-				((ActivityImpl) pe).setFacilityId(actTemplate.getFacilityId());
-				((ActivityImpl) pe).setLinkId(actTemplate.getLinkId());
-				((ActivityImpl) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((ActivityImpl) pe).setStartTime(actTemplate.getStartTime());
-				((ActivityImpl) pe).setType(actTemplate.getType());
+			if (pe instanceof Activity) {
+				Activity actTemplate = ((Activity) planTemplate.getPlanElements().get(actLegIndex));
+				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setCoord(actTemplate.getCoord());
+				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
+				((Activity) pe).setLinkId(actTemplate.getLinkId());
+				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
+				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
@@ -89,15 +89,15 @@ public class PlanUtils {
 		
 		int actLegIndex = 0;
 		for (PlanElement pe : planTarget.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
+			if (pe instanceof Activity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((ActivityImpl) pe).setEndTime(actTemplate.getEndTime());
-				((ActivityImpl) pe).setCoord(actTemplate.getCoord());
-				((ActivityImpl) pe).setFacilityId(actTemplate.getFacilityId());
-				((ActivityImpl) pe).setLinkId(actTemplate.getLinkId());
-				((ActivityImpl) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((ActivityImpl) pe).setStartTime(actTemplate.getStartTime());
-				((ActivityImpl) pe).setType(actTemplate.getType());
+				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setCoord(actTemplate.getCoord());
+				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
+				((Activity) pe).setLinkId(actTemplate.getLinkId());
+				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
+				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
@@ -201,24 +201,24 @@ public class PlanUtils {
 	}
 	
 	public static void setFacilityId(Activity activity, Id<ActivityFacility> facilityId) {
-		if (activity instanceof ActivityImpl) {
-			((ActivityImpl) activity).setFacilityId(facilityId);
+		if (activity instanceof Activity) {
+			((Activity) activity).setFacilityId(facilityId);
 		} else if (activity instanceof LCActivity) {
 			((LCActivity) activity).setFacilityId(facilityId);
 		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");
 	}
 	
 	public static void setCoord(Activity activity, Coord coord) {
-		if (activity instanceof ActivityImpl) {
-			((ActivityImpl) activity).setCoord(coord);
+		if (activity instanceof Activity) {
+			((Activity) activity).setCoord(coord);
 		} else if (activity instanceof LCActivity) {
 			((LCActivity) activity).setCoord(coord);
 		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");
 	}
 	
 	public static void setLinkId(Activity activity, Id<Link> linkId) {
-		if (activity instanceof ActivityImpl) {
-			((ActivityImpl) activity).setLinkId(linkId);
+		if (activity instanceof Activity) {
+			((Activity) activity).setLinkId(linkId);
 		} else if (activity instanceof LCActivity) {
 			((LCActivity) activity).setLinkId(linkId);
 		} else throw new RuntimeException("Unexpected type of activity was found: " + activity.getClass().toString() + ". Aborting!");

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,7 +40,6 @@ import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -102,7 +102,7 @@ public class SingleActLocationMutator extends LocationMutator {
 			return;
 		}
 
-		if (!this.modifyLocation((ActivityImpl) actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
+		if (!this.modifyLocation((Activity) actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
 			this.unsuccessfullLC++;
 			return;
 		}
@@ -115,7 +115,7 @@ public class SingleActLocationMutator extends LocationMutator {
 		return flexibleActivities;
 	}
 
-	protected final boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius) {
+	protected final boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius) {
 		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
 		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
 		ArrayList<ActivityFacility> facilitySet =

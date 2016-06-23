@@ -30,12 +30,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -177,8 +177,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 							ActivityFacility prevActivityFacility = facilities.get(previousActivity.getFacilityId());
 							ActivityFacility nextActivityFacility = facilities.get(nextActivity.getFacilityId());
 							
-							((ActivityImpl) previousActivity).setLinkId(prevActivityFacility.getLinkId());
-							((ActivityImpl) nextActivity).setLinkId(nextActivityFacility.getLinkId());
+							((Activity) previousActivity).setLinkId(prevActivityFacility.getLinkId());
+							((Activity) nextActivity).setLinkId(nextActivityFacility.getLinkId());
 						}
 						
 						synchronized(routingAlgorithm){

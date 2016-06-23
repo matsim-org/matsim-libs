@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriterHandler;
@@ -190,8 +190,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act instanceof ActivityImpl){
-			ActivityImpl a = (ActivityImpl)act;
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" max_dur=\"");
 				out.write(Time.writeTime(a.getMaximumDuration()));

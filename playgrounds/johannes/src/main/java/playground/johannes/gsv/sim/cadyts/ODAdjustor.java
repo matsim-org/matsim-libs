@@ -32,7 +32,6 @@ import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -282,7 +281,7 @@ public class ODAdjustor {
 		Plan plan = fromOD.getPlans().get(planIdx);
 		int legIdx = fromOD.getLegIndices().get(planIdx);
 		int actIdx = legIdx + 1;
-		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(actIdx);
+		Activity act = (Activity) plan.getPlanElements().get(actIdx);
 
 		if (!act.getType().equalsIgnoreCase(ActivityTypes.HOME)) {
 			List<ActivityFacility> zoneFacilities = facilities2Zones.get(toOD.getToId()).get(act.getType());

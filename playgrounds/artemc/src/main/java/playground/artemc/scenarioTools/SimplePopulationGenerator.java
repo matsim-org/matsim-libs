@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -98,9 +99,9 @@ public class SimplePopulationGenerator {
 			simplePopulationGenerator.createIncome(person);
 
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
-			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", workLocation);
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", homeLocation);
+			Activity actWork = (Activity) pf.createActivityFromCoord("work", workLocation);
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", homeLocation);
 			Leg leg = (Leg) pf.createLeg("pt");
 			actHome.setEndTime(3600.00*8.30 + generator.nextGaussian()*1800);
 			plan.addActivity(actHome);

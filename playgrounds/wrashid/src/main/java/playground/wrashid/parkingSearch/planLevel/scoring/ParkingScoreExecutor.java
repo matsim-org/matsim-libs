@@ -21,9 +21,9 @@ package playground.wrashid.parkingSearch.planLevel.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.GlobalRegistry;
@@ -47,10 +47,10 @@ public class ParkingScoreExecutor {
 				.values()) {
 			double score = 0.0;
 
-			LinkedList<ActivityImpl> parkingTargetActivities = ParkingGeneralLib
+			LinkedList<Activity> parkingTargetActivities = ParkingGeneralLib
 					.getParkingTargetActivities(person.getSelectedPlan());
 
-			for (ActivityImpl targetActivity : parkingTargetActivities) {
+			for (Activity targetActivity : parkingTargetActivities) {
 				Id<ActivityFacility> parkingFacilityId = ParkingGeneralLib.getArrivalParkingAct(
 						person.getSelectedPlan(), targetActivity)
 						.getFacilityId();

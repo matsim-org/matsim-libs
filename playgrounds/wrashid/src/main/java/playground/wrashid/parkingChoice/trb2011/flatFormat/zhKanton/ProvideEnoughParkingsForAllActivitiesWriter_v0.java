@@ -5,12 +5,12 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -52,8 +52,8 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl activity = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity activity = (Activity) pe;
 					Coord actCoord = activity.getCoord();
 					PParking closestParkingZHCity = parkingsQuadTreeZHCity.getClosest(actCoord.getX(), actCoord.getY());
 
@@ -89,8 +89,8 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 
 		for (Person person : population.getPersons().values()) {
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl activity = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity activity = (Activity) pe;
 
 					if (activity.getCoord().getX() < minX) {
 						minX = activity.getCoord().getX();
@@ -117,7 +117,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 		return quadTree;
 	}
 
-	private static void createPublicParkingAtActivityLocation(QuadTree<PParking> parkingsQuadTreeOutsideCityZH, ActivityImpl activity) {
+	private static void createPublicParkingAtActivityLocation(QuadTree<PParking> parkingsQuadTreeOutsideCityZH, Activity activity) {
 		PublicParking publicParking = new PublicParking(activity.getCoord());
 		publicParking.setCapacity(5000);
 		parkingsQuadTreeOutsideCityZH.put(activity.getCoord().getX(), activity.getCoord().getY(), publicParking);

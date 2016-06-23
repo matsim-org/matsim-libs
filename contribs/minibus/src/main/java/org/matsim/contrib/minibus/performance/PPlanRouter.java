@@ -21,7 +21,6 @@ package org.matsim.contrib.minibus.performance;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -154,7 +153,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
+			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				return endTime;

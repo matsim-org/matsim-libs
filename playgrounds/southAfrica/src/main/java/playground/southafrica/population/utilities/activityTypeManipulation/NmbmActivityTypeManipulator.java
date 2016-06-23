@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -14,7 +15,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -68,8 +68,8 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 	protected void adaptActivityTypes(Plan plan) {
 		for(int i = 0; i < plan.getPlanElements().size(); i++){
 			PlanElement pe = plan.getPlanElements().get(i);
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				double estimatedDuration = 0.0;
 
 				if(i == 0){
@@ -94,7 +94,7 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 						/* Since the method getStartTime is deprecated,
 						 * estimate the start time as the end time of the
 						 * previous activity plus the duration of the trip. */
-						double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
+						double previousEndTime = ((Activity)plan.getPlanElements().get(i-2)).getEndTime();
 						double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
 						estimatedDuration = Math.max(24*60*60, (previousEndTime + tripDuration) ) - (previousEndTime + tripDuration);
 						
@@ -116,7 +116,7 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 						 * previous activity plus the duration of the trip. 
 						 * 
 						 * This will only work with Persons (JWJ, June 2014)*/
-						double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
+						double previousEndTime = ((Activity)plan.getPlanElements().get(i-2)).getEndTime();
 						double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
 						estimatedDuration = act.getEndTime() - (previousEndTime + tripDuration);
 						

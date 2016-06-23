@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -188,7 +188,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				Coord egressActCoord = egressActLink.getToNode().getCoord() ;
 				Gbl.assertNotNull( egressActCoord );
 
-				final ActivityImpl interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
+				final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
 				result.add( interactionActivity ) ;
 				Logger.getLogger(this.getClass()).warn( interactionActivity );
 
@@ -204,8 +204,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return result ;
 	}
 
-	private ActivityImpl createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
-		ActivityImpl act = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, interactionCoord, interactionLink);
+	private Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, interactionCoord, interactionLink);
 		act.setMaximumDuration(0.0);
 		return act;
 	}

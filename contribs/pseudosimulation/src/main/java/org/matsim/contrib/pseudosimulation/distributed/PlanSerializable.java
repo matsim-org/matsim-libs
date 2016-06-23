@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -17,7 +18,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -121,7 +121,7 @@ class PlanSerializable implements Serializable {
         }
 
         public Activity getActivity() {
-            ActivityImpl activity = PopulationUtils.createActivityFromCoordAndLinkId(type, coord.getCoord(), linkIdString == null ? null : Id.createLinkId(linkIdString));
+            Activity activity = PopulationUtils.createActivityFromCoordAndLinkId(type, coord.getCoord(), linkIdString == null ? null : Id.createLinkId(linkIdString));
             activity.setEndTime(endTime);
             activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, ActivityFacility.class));
             activity.setMaximumDuration(maximumDuration);

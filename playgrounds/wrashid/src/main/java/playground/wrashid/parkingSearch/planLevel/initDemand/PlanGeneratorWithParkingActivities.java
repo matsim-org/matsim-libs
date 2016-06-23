@@ -25,7 +25,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
@@ -83,7 +82,7 @@ public class PlanGeneratorWithParkingActivities {
 	}
 
 	private void addWalkLegAndParkingAct(List<PlanElement> planElements, int index) {
-		addParkingAct(planElements, index, (ActivityImpl) planElements.get(index - 1));
+		addParkingAct(planElements, index, (Activity) planElements.get(index - 1));
 		addWalkLeg(planElements, index);
 	}
 
@@ -100,12 +99,12 @@ public class PlanGeneratorWithParkingActivities {
 	 * @param index
 	 * @param parkingFacility
 	 */
-	private void addParkingAct(List<PlanElement> planElements, int index, ActivityImpl relatedActivity) {
+	private void addParkingAct(List<PlanElement> planElements, int index, Activity relatedActivity) {
 		double parkingActivityDuration = 30; // in seconds
 
 		ActivityFacilityImpl parkingFacility = closestParkingMatrix.getClosestParkings(relatedActivity.getCoord(), 1, 1).get(0);
 
-		ActivityImpl newParkingActivity = PopulationUtils.createActivityFromCoord("parking", parkingFacility.getCoord());
+		Activity newParkingActivity = PopulationUtils.createActivityFromCoord("parking", parkingFacility.getCoord());
 		newParkingActivity.setFacilityId(parkingFacility.getId());
 		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, parkingFacility.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);
@@ -115,7 +114,7 @@ public class PlanGeneratorWithParkingActivities {
 
 	private void addParkingActAndWalkLeg(List<PlanElement> planElements, int index) {
 		addWalkLeg(planElements, index);
-		addParkingAct(planElements, index, (ActivityImpl) planElements.get(index + 1));
+		addParkingAct(planElements, index, (Activity) planElements.get(index + 1));
 	}
 
 	/**

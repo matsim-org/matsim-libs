@@ -23,6 +23,7 @@ package herbie.running.analysis.microcensus.planbased;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
@@ -30,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -136,11 +136,11 @@ public class AnalyzeMicrocensus {
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					ActivityImpl act = (ActivityImpl)pe;
+					Activity act = (Activity)pe;
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						final Activity act1 = act;
 						if (PopulationUtils.getPreviousLeg(plan, act1).getMode().equals(this.mode)) {
-							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
+							Activity previousAct = (Activity) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							zh_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						}
@@ -156,11 +156,11 @@ public class AnalyzeMicrocensus {
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					ActivityImpl act = (ActivityImpl)pe;
+					Activity act = (Activity)pe;
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						final Activity act3 = act;
 						if (PopulationUtils.getPreviousLeg(plan, act3).getMode().equals(this.mode)) {
-							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
+							Activity previousAct = (Activity) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
 							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							ch_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						

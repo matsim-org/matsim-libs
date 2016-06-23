@@ -21,10 +21,10 @@ package playground.johannes.coopsim.mental.planmod;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -70,7 +70,7 @@ public class ActivityFacilityMod implements PlanModifier {
 		Activity act = (Activity) plan.getPlanElements().get(planIndex);
 
 		Activity newAct = factory.createActivityFromLinkId(act.getType(), facility.getLinkId());
-		((ActivityImpl) newAct).setFacilityId(facility.getId());
+		((Activity) newAct).setFacilityId(facility.getId());
 
 		newAct.setEndTime(act.getEndTime());
 

@@ -21,6 +21,7 @@ package playground.dgrether.analysis.activity;
 import java.io.File;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -28,7 +29,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.MutableScenario;
@@ -90,8 +90,8 @@ public class ModeActivityDurationAnalyser {
 		for (Person pers : plans.getPersons().values()){
 			Plan p = pers.getSelectedPlan();
 			for (PlanElement pe : p.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					try {
 						durTemp = DeprecatedStaticMethods.calculateSomeDuration(act);
 						if (act.getType().equalsIgnoreCase("h")) {

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -40,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -282,12 +282,12 @@ public class ElFarolTrainScenario
 			Person p = popFac.createPerson(Id.create("Agent"+t, Person.class));
 			Plan plan = popFac.createPlan();
 
-			ActivityImpl homeAct = (ActivityImpl) popFac.createActivityFromCoord("home", new Coord(ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
+			Activity homeAct = (Activity) popFac.createActivityFromCoord("home", new Coord(ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
 			homeAct.setEndTime(workP[index].getOpeningTime() - longDist/speed - headWay);
 			plan.addActivity(homeAct);
 			plan.addLeg(popFac.createLeg(mode));
 
-			ActivityImpl workAct = (ActivityImpl) popFac.createActivityFromCoord("work"+index,
+			Activity workAct = (Activity) popFac.createActivityFromCoord("work"+index,
 					new Coord(longDist + boxSize + ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
 			workAct.setEndTime(workP[index].getEarliestEndTime());
 			plan.addActivity(workAct);

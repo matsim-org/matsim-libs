@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
@@ -192,7 +191,7 @@ public class ScheduleDelayCostWithCrowdingHandler implements ActivityStartEventH
 		Id<Person> perosnId = event.getPersonId();
 		Journey thisJourney = journeys.get(perosnId);
 		if(event.getActType().equals("work")){
-			ActivityImpl activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
+			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			activities.put(perosnId, activity);

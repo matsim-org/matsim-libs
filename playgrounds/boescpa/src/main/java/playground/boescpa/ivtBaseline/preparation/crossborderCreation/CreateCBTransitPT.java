@@ -22,8 +22,8 @@
 package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -79,7 +79,7 @@ public class CreateCBTransitPT extends CreateSingleTripPopulation {
 		Plan plan = PopulationUtils.createPlan();
 		double departureTime = getDepartureTime();
 
-		ActivityImpl actStart = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
+		Activity actStart = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -88,7 +88,7 @@ public class CreateCBTransitPT extends CreateSingleTripPopulation {
 
 		plan.addLeg(PopulationUtils.createLeg(mode));
 
-		ActivityImpl actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", destFacility.getCoord(), destFacility.getLinkId());
+		Activity actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", destFacility.getCoord(), destFacility.getLinkId());
 		actEnd.setFacilityId(destFacility.getId());
 		actEnd.setStartTime(departureTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);

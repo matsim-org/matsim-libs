@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,7 +38,6 @@ import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
@@ -469,10 +469,10 @@ public class ParkingManagerZH {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-							ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i - 3);
-							ActivityImpl prevParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i - 1);
-							ActivityImpl nextParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i + 1);
-							ActivityImpl nextNonParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i + 3);
+							Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(i - 3);
+							Activity prevParkingAct = (Activity) person.getSelectedPlan().getPlanElements().get(i - 1);
+							Activity nextParkingAct = (Activity) person.getSelectedPlan().getPlanElements().get(i + 1);
+							Activity nextNonParkingAct = (Activity) person.getSelectedPlan().getPlanElements().get(i + 3);
 
 							DebugLib.traceAgent(person.getId(), 19);
 

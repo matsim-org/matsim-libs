@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -46,7 +47,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -258,7 +258,7 @@ public class CapeTownScenarioCleaner {
 					}
 				} else if (pe instanceof Activity){
 					/* Transform the activity locations. */
-					ActivityImpl act = (ActivityImpl)pe;
+					Activity act = (Activity)pe;
 					Coord oldCoord = act.getCoord();
 					act.setCoord(ctPersons.transform(oldCoord));
 				}
@@ -300,7 +300,7 @@ public class CapeTownScenarioCleaner {
 					
 					/* Update the coordinate. */
 					Coord oldCoord = act.getCoord();
-					((ActivityImpl)act).setCoord(ctFreight.transform(oldCoord));
+					((Activity)act).setCoord(ctFreight.transform(oldCoord));
 					
 					/* Since chopStart and chopEnd activities will not have 
 					 * facility IDs, they need to be ignored in the next 

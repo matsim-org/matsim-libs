@@ -34,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -565,7 +564,7 @@ public class MainPPSimZurich30km {
 
 					if (leg.getMode().equalsIgnoreCase(TransportMode.car) && !nextAct.getType().equalsIgnoreCase("parking")) {
 
-						ActivityImpl parkingAct = PopulationUtils.createActivityFromCoordAndLinkId("parking", nextAct.getCoord(), nextAct.getLinkId());
+						Activity parkingAct = PopulationUtils.createActivityFromCoordAndLinkId("parking", nextAct.getCoord(), nextAct.getLinkId());
 						parkingAct.setEndTime(nextAct.getStartTime()); // replace
 																		// this
 																		// during
@@ -580,7 +579,7 @@ public class MainPPSimZurich30km {
 					}
 
 					if (leg.getMode().equalsIgnoreCase(TransportMode.car) && !prevAct.getType().equalsIgnoreCase("parking")) {
-						ActivityImpl parkingAct = PopulationUtils.createActivityFromCoordAndLinkId("parking", prevAct.getCoord(), prevAct.getLinkId());
+						Activity parkingAct = PopulationUtils.createActivityFromCoordAndLinkId("parking", prevAct.getCoord(), prevAct.getLinkId());
 						parkingAct.setEndTime(prevAct.getEndTime()); // replace
 																		// this
 																		// during
@@ -609,9 +608,9 @@ public class MainPPSimZurich30km {
 			int i = 0;
 			while (i < planElements.size()) {
 				if (planElements.get(i) instanceof Leg) {
-					ActivityImpl prevAct = (ActivityImpl) planElements.get(i - 1);
+					Activity prevAct = (Activity) planElements.get(i - 1);
 					Leg leg = (Leg) planElements.get(i);
-					ActivityImpl nextAct = (ActivityImpl) planElements.get(i + 1);
+					Activity nextAct = (Activity) planElements.get(i + 1);
 
 					if (leg.getMode().equalsIgnoreCase(TransportMode.walk) && prevAct.getType().equalsIgnoreCase("parking")) {
 						prevAct.setLinkId(nextAct.getLinkId());

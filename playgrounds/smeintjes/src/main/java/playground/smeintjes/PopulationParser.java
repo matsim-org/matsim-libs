@@ -21,11 +21,11 @@ import org.javatuples.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -388,7 +388,7 @@ public class PopulationParser {
 					for(int j = 0; j < planElements.size(); j++){
 						PlanElement planElement = planElements.get(j);
 						if(planElement instanceof Activity){
-							ActivityImpl activity = (ActivityImpl) planElement;
+							Activity activity = (Activity) planElement;
 							if (j == 0) {
 								
 								/*The first major activity: get chain start time,

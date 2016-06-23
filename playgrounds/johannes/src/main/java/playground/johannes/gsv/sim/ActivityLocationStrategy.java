@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
@@ -204,7 +203,7 @@ public class ActivityLocationStrategy implements PlanStrategy, IterationStartsLi
 			 */
 			int n = (int) Math.floor(plan.getPlanElements().size() / 2.0);
 			int idx = random.nextInt(n) * 2;
-			ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(idx);
+			Activity act = (Activity) plan.getPlanElements().get(idx);
 			/*
 			 * check if not blacklisted activity
 			 */
@@ -225,7 +224,7 @@ public class ActivityLocationStrategy implements PlanStrategy, IterationStartsLi
 				 * create copy of plan an set new references
 				 */
 				plan = person.createCopyOfSelectedPlanAndMakeSelected();
-				act = (ActivityImpl) plan.getPlanElements().get(idx);
+				act = (Activity) plan.getPlanElements().get(idx);
 
 				ActivityFacility current = facilities.getFacilities().get(act.getFacilityId());
 				/*

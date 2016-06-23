@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -79,7 +80,7 @@ public class PlanImplTest {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
+		Activity a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		final Leg leg = l;
 		final Activity act = a;
@@ -108,7 +109,7 @@ public class PlanImplTest {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
+		Activity a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		final Leg leg = l;
 		final Activity act = a;
@@ -137,7 +138,7 @@ public class PlanImplTest {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
+		Activity a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
 			final Leg leg = l;
@@ -163,7 +164,7 @@ public class PlanImplTest {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
+		Activity a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
 			final Leg leg = l;
@@ -190,7 +191,7 @@ public class PlanImplTest {
 		assertEquals(3, plan.getPlanElements().size());
 
 		// modification
-		ActivityImpl a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
+		Activity a = PopulationUtils.createActivityFromCoord("l", new Coord(200, 100));
 		Leg l = PopulationUtils.createLeg(TransportMode.car);
 		try {
 			final Leg leg = l;

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Tour.Start;
@@ -19,7 +20,6 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
 /*
@@ -59,7 +59,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 		Id<Person> agentId = planAgent.getCurrentPlan().getPerson().getId();
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
 		if (currentPlanElement instanceof Activity) {
-			ActivityImpl act = (ActivityImpl) currentPlanElement;
+			Activity act = (Activity) currentPlanElement;
 			if (encounteredActivities.contains(act)) {
 				return false;
 			}

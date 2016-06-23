@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -182,9 +182,9 @@ public class GenerateRandomPlansFromFacilities {
 			final String type,
 			final double endTime) {
 		final Activity act = factory.createActivityFromCoord( type , facility.getCoord() );
-		((ActivityImpl) act).setLinkId( facility.getLinkId() );
-		((ActivityImpl) act).setFacilityId( facility.getId() );
-		((ActivityImpl) act).setEndTime( endTime );
+		((Activity) act).setLinkId( facility.getLinkId() );
+		((Activity) act).setFacilityId( facility.getId() );
+		((Activity) act).setEndTime( endTime );
 		return act;
 	}
 

@@ -22,8 +22,8 @@
 package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -154,7 +154,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 			departureTime = returnTime - actDuration;
 		}*/
 
-		ActivityImpl actStart = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
+		Activity actStart = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -163,7 +163,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 
 		plan.addLeg(PopulationUtils.createLeg(mode));
 
-		ActivityImpl actSA = PopulationUtils.createActivityFromCoordAndLinkId(this.actTag, destFacility.getCoord(), destFacility.getLinkId());
+		Activity actSA = PopulationUtils.createActivityFromCoordAndLinkId(this.actTag, destFacility.getCoord(), destFacility.getLinkId());
 		actSA.setFacilityId(destFacility.getId());
 		actSA.setStartTime(departureTime);
 		actSA.setMaximumDuration(returnTime - departureTime);
@@ -172,7 +172,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 
 		plan.addLeg(PopulationUtils.createLeg(mode));
 
-		ActivityImpl actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
+		Activity actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());
 		actEnd.setStartTime(returnTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);

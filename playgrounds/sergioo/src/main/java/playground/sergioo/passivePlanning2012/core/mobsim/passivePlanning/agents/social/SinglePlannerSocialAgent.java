@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacility;
@@ -39,7 +39,7 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 			return null;
 		ActivityFacility facility = socialDecisionMaker.getScenario().getActivityFacilities().getFacilities().get(typeOfActivityFacility.getSecond());
 		Activity activity = PopulationUtils.createActivityFromLinkId(typeOfActivityFacility.getFirst(), facility.getLinkId());
-		((ActivityImpl)activity).setFacilityId(typeOfActivityFacility.getSecond());
+		((Activity)activity).setFacilityId(typeOfActivityFacility.getSecond());
 		List<? extends PlanElement> trip = socialDecisionMaker.decideModeRoute(startTime, startFacilityId, facility.getId(), tripRouter);
 		if(trip==null)
 			return null;

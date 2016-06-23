@@ -1,9 +1,9 @@
 package playground.wrashid.parkingChoice;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 
@@ -36,8 +36,8 @@ public class ParkingChoiceLib {
 
 	private static ActInfo getFirstActivityAfterIndex(Plan plan, int indexOfLastLeg) {
 		for (int i = indexOfLastLeg+1; i < plan.getPlanElements().size(); i++) {
-			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
+			if (plan.getPlanElements().get(i) instanceof Activity) {
+				Activity activity = (Activity) plan.getPlanElements().get(i);
 				
 				return new ActInfo(activity.getFacilityId(), activity.getType());
 			}

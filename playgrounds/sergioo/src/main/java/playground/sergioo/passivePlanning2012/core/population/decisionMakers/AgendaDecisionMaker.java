@@ -8,11 +8,11 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
@@ -134,7 +134,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 			for(SchedulingLink link:path)
 				if(link instanceof ActivitySchedulingLink) {
 					ActivitySchedulingLink activityLink = (ActivitySchedulingLink)link;
-					ActivityImpl activity = PopulationUtils.createActivityFromCoord(activityLink.getActivityType(), activityLink.getCoord());
+					Activity activity = PopulationUtils.createActivityFromCoord(activityLink.getActivityType(), activityLink.getCoord());
 					activity.setEndTime(((SchedulingNode)link.getToNode()).getTime());
 					activity.setLinkId(facilities.getFacilities().get(activityLink.getFacilityId()).getLinkId());
 					activity.setFacilityId(activityLink.getFacilityId());

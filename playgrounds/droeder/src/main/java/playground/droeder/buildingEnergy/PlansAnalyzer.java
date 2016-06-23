@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -94,9 +94,9 @@ final class PlansAnalyzer {
 			Activity a = (Activity) pe.get(0);
 			getAStats(a.getType()).add(a);
 			for(int i = 2; i < (pe.size() - 1); i += 2){
-				ActivityImpl start = (ActivityImpl) pe.get(i-2);
+				Activity start = (Activity) pe.get(i-2);
 				Leg leg = (Leg) pe.get(i-1);
-				ActivityImpl end= (ActivityImpl) pe.get(i);
+				Activity end= (Activity) pe.get(i);
 				getAStats(end.getType()).add(end);
 				getLStats(leg.getMode()).add(leg, start.getCoord(), end.getCoord());
 			}

@@ -22,11 +22,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -78,7 +78,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 		Id personId = aem.getPerson().getId();
 	
 		if (!startSearchTime.containsKey(personId)){
-			ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+			Activity nextNonParkingAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 			if (GeneralLib.equals(getCurrentLinkId(aem),nextNonParkingAct.getLinkId())){
 				startSearchTime.put(personId, aem.getMessageArrivalTime());
@@ -141,7 +141,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 		ParkingActivityAttributes paa = new ParkingActivityAttributes(aem.getPerson().getId());
 		paa.setFacilityId(closestFreeGarageParkingId);
 		
-		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+		Activity nextNonParkingAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
 		
 
@@ -162,13 +162,13 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 
 	public double getActivityDuration(AgentWithParking aem) {
 		double activityDuration;
-		ActivityImpl act;
+		Activity act;
 
 		int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
 		if (indexOfNextCarLeg != -1) {
-			act = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg - 3);
+			act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg - 3);
 		} else {
-			act = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(0);
+			act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(0);
 		}
 		activityDuration = GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime());
 
@@ -180,7 +180,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 	}
 
 	private double getTravelTimeFromActivityToGP(AgentWithParking aem) {
-		Id nextActLinkId = ((ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 3))
+		Id nextActLinkId = ((Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 3))
 				.getLinkId();
 		Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 

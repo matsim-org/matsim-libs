@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -204,8 +205,8 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act instanceof ActivityImpl){
-			ActivityImpl a = (ActivityImpl)act;
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" dur=\"");
 				out.write(Time.writeTime(a.getMaximumDuration()));

@@ -31,10 +31,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -125,9 +125,9 @@ public class LocationChoicePlanAlgorithm implements PlanAlgorithm {
 		/*
 		 * Replace LinkId, FacilityId and the Coordinate
 		 */
-		((ActivityImpl) shoppingActivity).setLinkId(newLinkId);
-		((ActivityImpl) shoppingActivity).setFacilityId(newLinkId);
-		((ActivityImpl) shoppingActivity).setCoord(facility.getCoord());
+		((Activity) shoppingActivity).setLinkId(newLinkId);
+		((Activity) shoppingActivity).setFacilityId(newLinkId);
+		((Activity) shoppingActivity).setCoord(facility.getCoord());
 	}
 	
 	private int selectZoneByProbability(Map<Integer, Double> probabilities) {

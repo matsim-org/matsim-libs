@@ -21,7 +21,6 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
@@ -181,7 +180,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
+			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				return endTime;

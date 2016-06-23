@@ -30,7 +30,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -200,7 +199,7 @@ public class Prepare {
 			for(Plan plan : plans) {
 				List<PlanElement> elements = plan.getPlanElements();
 				for(PlanElement e : elements) {
-					if(e instanceof ActivityImpl) {
+					if(e instanceof Activity) {
 						Activity activity = (Activity) e;
 						switch (activity.getType()) {
 							case "home" :

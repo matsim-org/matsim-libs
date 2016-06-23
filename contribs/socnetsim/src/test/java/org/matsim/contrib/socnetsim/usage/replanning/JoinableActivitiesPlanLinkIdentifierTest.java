@@ -23,11 +23,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -119,7 +119,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		final Person pers1 = factory.createPerson( personId );
 		final Plan plan1 = factory.createPlan();
 		pers1.addPlan( plan1 );
-		final ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
+		final Activity act1 = (Activity) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
 		act1.setFacilityId( facility );
 		plan1.addActivity( act1 );
 
@@ -369,7 +369,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		pers.addPlan( plan );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
 			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
 			act.setEndTime( start1 );
 			plan.addActivity( act );
@@ -378,7 +378,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
 			act.setFacilityId( facility1 );
 			act.setEndTime( end1 );
 			plan.addActivity( act );
@@ -387,7 +387,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
 			act.setFacilityId( facility2 );
 			act.setEndTime( end2 );
 			plan.addActivity( act );
@@ -397,7 +397,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
 			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
 			plan.addActivity( act );
 		}
@@ -416,7 +416,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		pers.addPlan( plan );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
 			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
 			act.setEndTime( start );
 			plan.addActivity( act );
@@ -425,7 +425,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( type , Id.create( "link" , Link.class ) );
 			act.setFacilityId( facility );
 			act.setEndTime( end );
 			plan.addActivity( act );
@@ -434,7 +434,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		plan.addLeg( PopulationUtils.createLeg("car") );
 
 		{
-			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
+			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
 			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
 			plan.addActivity( act );
 		}

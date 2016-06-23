@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -191,8 +192,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act instanceof ActivityImpl){
-			ActivityImpl a = (ActivityImpl)act;
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" max_dur=\"");
 				out.write(Time.writeTime(a.getMaximumDuration()));

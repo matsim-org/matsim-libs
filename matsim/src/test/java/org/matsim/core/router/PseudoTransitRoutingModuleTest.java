@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -54,9 +54,9 @@ public class PseudoTransitRoutingModuleTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
-		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
+		((Activity) fromAct).setLinkId(Id.create("1", Link.class));
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
-		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
+		((Activity) toAct).setLinkId(Id.create("3", Link.class));
 
 		double tt = new PseudoTransitRoutingModule(
 				"mode", f.s.getPopulation().getFactory(),

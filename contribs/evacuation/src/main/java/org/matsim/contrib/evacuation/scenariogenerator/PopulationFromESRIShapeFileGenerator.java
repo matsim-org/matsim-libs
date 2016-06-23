@@ -33,7 +33,6 @@ import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -170,7 +169,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
 			Link l = NetworkUtils.getNearestLink(net, c);
 			Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
-			((ActivityImpl)act).setCoord(c);
+			((Activity)act).setCoord(c);
 			double departureTime = getDepartureTime();
 			act.setEndTime(departureTime); 
 			// hier wird die Departure Time gesetzt
@@ -179,7 +178,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			plan.addLeg(leg);
 			Activity act2 = pb.createActivityFromLinkId("post-evac", this.safeLinkId);
 			act2.setEndTime(0);
-			((ActivityImpl)act2).setCoord(this.scenario.getNetwork().getLinks().get(this.safeLinkId).getCoord());
+			((Activity)act2).setCoord(this.scenario.getNetwork().getLinks().get(this.safeLinkId).getCoord());
 			plan.addActivity(act2);
 			plan.setScore(0.);
 			pers.addPlan(plan);

@@ -24,10 +24,10 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -89,7 +89,7 @@ public class ParkAgent extends RandomParkingSearch {
 
 	public void parkAgentStrategy(AgentWithParking aem, Id personId) {
 		random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
-		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+		Activity nextAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
 
 		if (!attributes.containsKey(personId)

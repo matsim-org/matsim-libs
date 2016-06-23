@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -58,14 +59,14 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	@Override
 	public Activity createActivityFromCoord(final String actType, final Coord coord) {
-        ActivityImpl act = new ActivityImpl(actType) ;
+        Activity act = new ActivityImpl(actType) ;
         act.setCoord(coord); 
         return act ;
 	}
 
 	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
-	        ActivityImpl act = new ActivityImpl(actType) ;
+	        Activity act = new ActivityImpl(actType) ;
 	        act.setLinkId(linkId);
 	        return act ;
 	}

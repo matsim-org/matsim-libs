@@ -16,9 +16,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -174,7 +174,7 @@ public class Utils {
 		plan.createAndAddLeg(TransportMode.car);
 		final Coord coord = workCoord;
 		act = PopulationUtils.createAndAddActivityFromCoord((String) ACT_WORK, coord, plan) ;
-		((ActivityImpl) act).setMaximumDuration( 8.*3600. ) ;
+		((Activity) act).setMaximumDuration( 8.*3600. ) ;
 
 		plan.createAndAddLeg(TransportMode.car) ;
 		final Coord coord1 = homeCoord;

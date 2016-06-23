@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -61,7 +62,7 @@ public class WeeklyPlans {
 				for(PlanElement planElement:plan.getPlanElements()) {
 					dailyPlanElements.add(planElement);
 					if(planElement instanceof Activity && ((Activity)planElement).getEndTime()>Time.MIDNIGHT) {
-						((ActivityImpl)planElement).setEndTime(Time.MIDNIGHT);	
+						((Activity)planElement).setEndTime(Time.MIDNIGHT);	
 						break;
 					}	
 				}
@@ -88,7 +89,7 @@ public class WeeklyPlans {
 			PlanElement planElementCopy;
 			if(planElement instanceof Activity) {
 				planElementCopy = PopulationUtils.createActivity((Activity)planElement);
-				((ActivityImpl)planElementCopy).setEndTime(dayPos*Time.MIDNIGHT+((Activity)planElement).getEndTime());
+				((Activity)planElementCopy).setEndTime(dayPos*Time.MIDNIGHT+((Activity)planElement).getEndTime());
 				PlanElement last = plan.getPlanElements().get(plan.getPlanElements().size()-1);
 				if(last instanceof Activity)
 					if(((Activity)planElement).getType().equals(((Activity)last).getType()) && ((Activity)planElement).getFacilityId().equals(((Activity)last).getFacilityId()))
@@ -119,14 +120,14 @@ public class WeeklyPlans {
 		} catch (NotStrictlyPositiveException e) {
 			e.printStackTrace();
 		}
-		((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
-		String typeLast = ((ActivityImpl)plan.getPlanElements().get(0)).getType();
-		Coord lastCoord = ((ActivityImpl)plan.getPlanElements().get(0)).getCoord();
-		Id<ActivityFacility> lastFacilityId = ((ActivityImpl)plan.getPlanElements().get(0)).getFacilityId();
+		((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
+		String typeLast = ((Activity)plan.getPlanElements().get(0)).getType();
+		Coord lastCoord = ((Activity)plan.getPlanElements().get(0)).getCoord();
+		Id<ActivityFacility> lastFacilityId = ((Activity)plan.getPlanElements().get(0)).getFacilityId();
 		Activity activity = null;
 		while(totalDurations<Time.MIDNIGHT-2*3600) {
-			String prevActivityType = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType();
-			Coord prevActivityCoord = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getCoord();
+			String prevActivityType = ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType();
+			Coord prevActivityCoord = ((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getCoord();
 			plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			String type = !prevActivityType.equals("home") && Math.random()<PROB_HOME?"home":getRandomActivityType(config.findParam("locationchoice", "flexible_types").split(","));
 			double duration;
@@ -139,26 +140,26 @@ public class WeeklyPlans {
 			totalDurations += duration;
 			if(type.equals("home")) {
 				activity = PopulationUtils.createActivityFromCoord(type, homeCoord);
-				((ActivityImpl)activity).setFacilityId(homeFacilityId);
+				((Activity)activity).setFacilityId(homeFacilityId);
 			}
 			else {
 				ActivityFacility facility = getRandomFacilityAndLinkId(type, prevActivityCoord);
 				activity = PopulationUtils.createActivityFromCoord(type, facility.getCoord());
-				((ActivityImpl)activity).setFacilityId(facility.getId());
+				((Activity)activity).setFacilityId(facility.getId());
 			}
-			((ActivityImpl)activity).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
+			((Activity)activity).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
 			plan.addActivity(activity);
 		}
 		if(activity==null || !activity.getType().equals(typeLast) || !activity.getFacilityId().equals(lastFacilityId)) {
 			if(totalDurations>=Time.MIDNIGHT) {
 				totalDurations = Time.MIDNIGHT;
-				((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations-1);
+				((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations-1);
 			}
 			plan.addLeg(PopulationUtils.createLeg(carAvailable?TransportMode.car:TransportMode.pt));
 			totalDurations = Time.MIDNIGHT;
 			activity = PopulationUtils.createActivityFromCoord(typeLast, lastCoord);
-			((ActivityImpl)activity).setFacilityId(lastFacilityId);
-			((ActivityImpl)activity).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
+			((Activity)activity).setFacilityId(lastFacilityId);
+			((Activity)activity).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
 			plan.addActivity(activity);
 		}
 	}

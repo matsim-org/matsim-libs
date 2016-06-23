@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -16,7 +17,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -45,7 +45,7 @@ public class HomeActivityEndCollector {
 		 try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(ENDTIMESFILE, false)))) {
 		   for (int i=0; i<leaveHomeTimes.size(); i++) {
 			   Person person = population.getPersons().get(personIDs.get(i));
-			   ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(0);
+			   Activity act = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 			   Coord homeCoord = act.getCoord();
 			   out.println(homeCoord.getX() + ";" + homeCoord.getY() + ";" + leaveHomeTimes.get(i));
 		   }

@@ -5,10 +5,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -847,8 +847,8 @@ public class ParkControl {
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		double endTime=0;
 		int actCount = (Integer) person.getCustomAttributes().get("ActCounter");
-		ActivityImpl actFromCounter = (ActivityImpl) person.getSelectedPlan().getPlanElements().get((Integer) person.getCustomAttributes().get("ActCounter"));
-		ActivityImpl activity = actFromCounter;
+		Activity actFromCounter = (Activity) person.getSelectedPlan().getPlanElements().get((Integer) person.getCustomAttributes().get("ActCounter"));
+		Activity activity = actFromCounter;
 		
 		//Aktuelle activity finden:
 		/*

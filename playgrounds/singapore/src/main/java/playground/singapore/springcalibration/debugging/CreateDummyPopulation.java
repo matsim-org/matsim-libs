@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -14,7 +15,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -68,7 +68,7 @@ public class CreateDummyPopulation {
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
 		
-		ActivityImpl homeAct0 = PopulationUtils.createActivityFromLinkId("home", Id.create("21016-21015", Link.class));
+		Activity homeAct0 = PopulationUtils.createActivityFromLinkId("home", Id.create("21016-21015", Link.class));
 		plan.addActivity(homeAct0);
 		homeAct0.setEndTime(6.0 * 3600.0);
 		homeAct0.setCoord(this.scenario.getNetwork().getLinks().get(Id.create("21016-21015", Link.class)).getCoord());
@@ -76,7 +76,7 @@ public class CreateDummyPopulation {
 		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
 		plan.addLeg(leg);
 		
-		ActivityImpl workAct = PopulationUtils.createActivityFromLinkId("work", Id.create("21010-24021", Link.class));
+		Activity workAct = PopulationUtils.createActivityFromLinkId("work", Id.create("21010-24021", Link.class));
 		plan.addActivity(workAct);
 		workAct.setEndTime(18.0 * 3600.0);
 		workAct.setCoord(this.scenario.getNetwork().getLinks().get(Id.create("21010-24021", Link.class)).getCoord());

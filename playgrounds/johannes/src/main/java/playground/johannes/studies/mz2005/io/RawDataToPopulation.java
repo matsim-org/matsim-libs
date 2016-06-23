@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -122,7 +123,7 @@ public class RawDataToPopulation {
 		/*
 		 * create the first home activity
 		 */
-		ActivityImpl act = PopulationUtils.createActivityFromCoord(ActivityType.home.name(), new Coord((double) 0, (double) 0));
+		Activity act = PopulationUtils.createActivityFromCoord(ActivityType.home.name(), new Coord((double) 0, (double) 0));
 		act.setStartTime(0);
 		act.setCoord(null);
 		plan.addActivity(act);
@@ -133,7 +134,7 @@ public class RawDataToPopulation {
 			/*
 			 * complete previous activity
 			 */
-			ActivityImpl previous = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+			Activity previous = (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 			previous.setEndTime(trip.startTime * 60);
 			if(trip.startCoord != null && previous.getCoord() == null)
 				previous.setCoord(new Coord(trip.startCoord[0], trip.startCoord[1]));
@@ -160,7 +161,7 @@ public class RawDataToPopulation {
 			/*
 			 * create next activity
 			 */
-			ActivityImpl next = PopulationUtils.createActivityFromCoord(activityType(trip.type, trip.leisureType), new Coord((double) 0, (double) 0));
+			Activity next = PopulationUtils.createActivityFromCoord(activityType(trip.type, trip.leisureType), new Coord((double) 0, (double) 0));
 			next.setStartTime(trip.endTime * 60);
 			next.setCoord(null);
 			if(trip.destCoord !=  null) {
@@ -176,7 +177,7 @@ public class RawDataToPopulation {
 		/*
 		 * if the last activity is not a home activity, add the home trip
 		 */
-		ActivityImpl previous = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		Activity previous = (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 		if(!previous.getType().equalsIgnoreCase(ActivityType.home.name())) {
 			previous.setEndTime(86399);
 			Leg leg = PopulationUtils.createLeg("undefined");

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -52,7 +53,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
@@ -214,7 +214,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
-		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
+		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 		//		assertTrue( !newWork.getFacilityId().equals(Id.create(1) ) ) ; // should be different from facility number 1 !!
@@ -360,7 +360,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		{
 			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getFacilities().get(facility1.getId()).getCoord() ) ;
 			act.setEndTime(workActEndTime);
-			((ActivityImpl)act).setFacilityId(facility1.getId());
+			((Activity)act).setFacilityId(facility1.getId());
 			plan.addActivity(act) ;
 		}
 		plan.createAndAddLeg(TransportMode.car);

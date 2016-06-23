@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -33,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -85,10 +85,10 @@ public class Main {
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		Coord fromCoord = new Coord(xFromAct, yFromAct);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", fromCoord);
-		((ActivityImpl) fromAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), fromCoord).getId());
+		((Activity) fromAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), fromCoord).getId());
 		Coord toCoord = new Coord(xToAct, yToAct);
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", toCoord);
-		((ActivityImpl) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
+		((Activity) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
 
 		for (int i = 0; i < 1000; i++) {
 			//double tt = new NetworkLegRouter(network, routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct,

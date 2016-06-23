@@ -2,8 +2,8 @@ package utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
@@ -214,10 +214,10 @@ public abstract class Utils {
 		String longestActivity = "home";
 
 		// home_pre <- ... act (== home)
-		ActivityImpl actTemp = (ActivityImpl) act;
+		Activity actTemp = (Activity) act;
 		while (actTemp != null && !actTemp.getType().startsWith("h")) {
 			final Activity act1 = actTemp;
-			actTemp = (ActivityImpl) PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, act1));
+			actTemp = (Activity) PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, act1));
 			if (actTemp.getMaximumDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
 				maxActDur = actTemp.getMaximumDuration();
 				longestActivity = actTemp.getType();

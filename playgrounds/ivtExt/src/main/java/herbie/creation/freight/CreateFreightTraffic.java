@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -307,7 +308,7 @@ public class CreateFreightTraffic {
 		ActivityFacility freightFacility = this.getRandomFacilityFromZone(destination);
 						
 		Plan plan = PopulationUtils.createPlan();
-		ActivityImpl actH = PopulationUtils.createActivityFromLinkId("freight", homeFacility.getLinkId());
+		Activity actH = PopulationUtils.createActivityFromLinkId("freight", homeFacility.getLinkId());
 		actH.setFacilityId(homeFacility.getId());
 		actH.setCoord(homeFacility.getCoord());
 		
@@ -317,7 +318,7 @@ public class CreateFreightTraffic {
 		plan.addActivity(actH);		
 		plan.addLeg(PopulationUtils.createLeg("car"));
 				
-		ActivityImpl actFreight = PopulationUtils.createActivityFromLinkId("freight", freightFacility.getLinkId());
+		Activity actFreight = PopulationUtils.createActivityFromLinkId("freight", freightFacility.getLinkId());
 		
 		actFreight.setStartTime(departureTime);
 		actFreight.setMaximumDuration(24.0 * 3600.0 - departureTime);
@@ -374,7 +375,7 @@ public class CreateFreightTraffic {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						
 						Id facilityID = act.getFacilityId();

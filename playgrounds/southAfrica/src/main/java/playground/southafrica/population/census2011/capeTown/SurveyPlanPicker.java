@@ -31,11 +31,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -277,8 +277,8 @@ public class SurveyPlanPicker {
 
 				/* Should have a plan now. Change its home locations. */
 				for(PlanElement pe : plan.getPlanElements()){
-					if(pe instanceof ActivityImpl){
-						ActivityImpl activity = (ActivityImpl) pe;
+					if(pe instanceof Activity){
+						Activity activity = (Activity) pe;
 						/* Set the home location */
 						if(activity.getType().equalsIgnoreCase("h")){
 							activity.setCoord(home);

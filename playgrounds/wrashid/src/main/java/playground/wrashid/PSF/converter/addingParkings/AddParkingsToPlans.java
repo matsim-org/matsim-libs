@@ -6,10 +6,10 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.MutableScenario;
@@ -53,8 +53,8 @@ public class AddParkingsToPlans {
 					// home-car-work =>
 					// home-walk-parkingDeparuture-car-parkingArrival-walk-work
 
-					ActivityImpl previousActivity = (ActivityImpl)planElements.get(i - 1);
-					ActivityImpl nextActivity = (ActivityImpl) planElements.get(i + 1);
+					Activity previousActivity = (Activity)planElements.get(i - 1);
+					Activity nextActivity = (Activity) planElements.get(i + 1);
 
 					// add leg from previous Activity to parking
 					newPlanElements.add(getParkingWalkLeg(scenario.getNetwork().getLinks().get(previousActivity.getLinkId())));
@@ -116,12 +116,12 @@ public class AddParkingsToPlans {
 	 * @param activityType
 	 * @return
 	 */
-	private static ActivityImpl getParkingFacility(ActivityImpl activity,
+	private static Activity getParkingFacility(Activity activity,
 			String activityType) {
 		double parkingActivityDuration = 10; // in seconds
 
 		// copy the activity
-		ActivityImpl parkingActivity = PopulationUtils.createActivity(activity);
+		Activity parkingActivity = PopulationUtils.createActivity(activity);
 
 		parkingActivity.setType(activityType);
 		parkingActivity.setMaximumDuration(parkingActivityDuration);

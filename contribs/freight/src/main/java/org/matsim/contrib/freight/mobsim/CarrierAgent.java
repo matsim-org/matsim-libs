@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +38,6 @@ import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -129,7 +129,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		public void handleEvent(ActivityEndEvent event) {
 			if (currentActivity == null) {
-				ActivityImpl firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
+				Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
 				currentActivity = firstActivity;
 			}
@@ -143,7 +143,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(ActivityStartEvent event) {
-			ActivityImpl activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
+			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			if(event.getActType().equals(FreightConstants.END)){

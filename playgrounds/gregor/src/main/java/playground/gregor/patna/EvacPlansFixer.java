@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -63,14 +63,14 @@ public class EvacPlansFixer {
 					break;
 				}
 				//and those who intend to start outside the network
-				ActivityImpl home = (ActivityImpl) pl.getPlanElements().get(0);
+				Activity home = (Activity) pl.getPlanElements().get(0);
 				if (sc.getNetwork().getLinks().get(home.getLinkId()) == null) { //link does not exist
 					walkers.add(p);
 					break;
 				}
 				
 				
-				ActivityImpl evac = (ActivityImpl) pl.getPlanElements().get(2); //3rd element evac activity
+				Activity evac = (Activity) pl.getPlanElements().get(2); //3rd element evac activity
 				evac.setCoord(null);
 				evac.setLinkId(Id.createLinkId("safeLink_Patna"));
 			}

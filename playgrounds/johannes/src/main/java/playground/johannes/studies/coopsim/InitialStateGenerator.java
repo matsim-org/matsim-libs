@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -55,15 +54,15 @@ public class InitialStateGenerator {
 			Plan plan = factory.createPlan();
 			
 			Activity home1 = factory.createActivityFromLinkId("home", homeFac.getLinkId());
-			((ActivityImpl)home1).setFacilityId(homeFac.getId());
+			((Activity)home1).setFacilityId(homeFac.getId());
 			home1.setEndTime(8*60*60);
 			
 			Activity home2 = factory.createActivityFromLinkId("idle", homeFac.getLinkId());
-			((ActivityImpl)home2).setFacilityId(homeFac.getId());
+			((Activity)home2).setFacilityId(homeFac.getId());
 			home2.setEndTime(16*60*60);
 			
 			Activity home3 = factory.createActivityFromLinkId("home", homeFac.getLinkId());
-			((ActivityImpl)home3).setFacilityId(homeFac.getId());
+			((Activity)home3).setFacilityId(homeFac.getId());
 			home3.setEndTime(24*60*60);
 			
 			Leg leg1 = factory.createLeg("car");

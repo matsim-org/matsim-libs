@@ -39,7 +39,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -261,7 +260,7 @@ public class ODBruteForceCalibrator {
 		Plan plan = fromOD.getPlans().get(planIdx);
 		int legIdx = fromOD.getLegIndices().get(planIdx);
 		int actIdx = legIdx + 1;
-		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(actIdx);
+		Activity act = (Activity) plan.getPlanElements().get(actIdx);
 
 		if (!act.getType().equalsIgnoreCase(ActivityTypes.HOME)) {
 			List<ActivityFacility> zoneFacilities = facilities2Zones.get(toOD.getToId()).get(act.getType());

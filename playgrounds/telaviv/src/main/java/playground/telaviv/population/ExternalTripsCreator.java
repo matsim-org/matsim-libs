@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -205,7 +206,7 @@ public class ExternalTripsCreator {
 		//Desires desires = person.createDesires("");
 		
 		Leg leg;
-		ActivityImpl activity;
+		Activity activity;
 		ActivityFacility activityFacility;
 
 		int originNode = externalTrip.originNodeId;
@@ -224,7 +225,7 @@ public class ExternalTripsCreator {
 		 * create car leg from origin zone to destination zone
 		 * create tta activity in destination zone 
 		 */
-		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("tta", originLinkId);
+		activity = (Activity) populationFactory.createActivityFromLinkId("tta", originLinkId);
 		activity.setStartTime(0.0);
 		activity.setMaximumDuration(departureTime);
 		activity.setEndTime(departureTime);
@@ -240,7 +241,7 @@ public class ExternalTripsCreator {
 		leg.setTravelTime( arrTime - leg.getDepartureTime() );
 		plan.addLeg(leg);
 		
-		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("tta", destinationLinkId);
+		activity = (Activity) populationFactory.createActivityFromLinkId("tta", destinationLinkId);
 		activity.setStartTime(departureTime);
 		activityFacility = getActivityFacilityByLinkId(destinationLinkId);
 		activity.setFacilityId(activityFacility.getId());

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -38,7 +39,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -227,15 +227,15 @@ public class TwoLinesDemo {
 		{ // person 1
 			Person person = pb.createPerson(Id.create(1, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
+			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
+			Activity act2 = (Activity) pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
 			act2.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg2 = (Leg) pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, tRoute2, stop6));
-			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
+			Activity act3 = (Activity) pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
 
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
@@ -250,15 +250,15 @@ public class TwoLinesDemo {
 		{ // person 2
 			Person person = pb.createPerson(Id.create(2, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
+			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
+			Activity act2 = (Activity) pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
 			act2.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg2 = (Leg) pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, tRoute2, stop6));
-			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
+			Activity act3 = (Activity) pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
 
 			plan.addActivity(act1);
 			plan.addLeg(leg1);
@@ -273,15 +273,15 @@ public class TwoLinesDemo {
 		{ // person 3
 			Person person = pb.createPerson(Id.create(3, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
+			Activity act1 = (Activity) pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg1 = (Leg) pb.createLeg(TransportMode.pt);
 			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop4));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
+			Activity act2 = (Activity) pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
 			act2.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg2 = (Leg) pb.createLeg(TransportMode.pt);
 			leg2.setRoute(new ExperimentalTransitRoute(stop4, tLine2, tRoute2, stop6));
-			ActivityImpl act3 = (ActivityImpl) pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
+			Activity act3 = (Activity) pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
 
 			plan.addActivity(act1);
 			plan.addLeg(leg1);

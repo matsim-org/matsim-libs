@@ -23,11 +23,11 @@ package playground.balmermi.influenza.modules;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonNoEducLessLeisure extends AbstractPersonAlgorithm {
@@ -68,10 +68,10 @@ public class PersonNoEducLessLeisure extends AbstractPersonAlgorithm {
 			Leg currLeg = (Leg)plan.getPlanElements().get(i);
 			currLeg.setRoute(null);
 		}
-		ActivityImpl homeAct = (ActivityImpl)plan.getPlanElements().get(0);
+		Activity homeAct = (Activity)plan.getPlanElements().get(0);
 		if (!homeAct.getType().equals("home")) { throw new RuntimeException("pid="+person.getId()+" first act is not home act!"); }
 		for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-			ActivityImpl currAct = (ActivityImpl)plan.getPlanElements().get(i);
+			Activity currAct = (Activity)plan.getPlanElements().get(i);
 			if (currAct.getType().startsWith("e")) {
 				currAct.setType("home");
 				currAct.setFacilityId(homeAct.getFacilityId());

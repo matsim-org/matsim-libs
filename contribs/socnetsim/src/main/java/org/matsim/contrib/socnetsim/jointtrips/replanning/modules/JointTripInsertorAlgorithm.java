@@ -31,11 +31,11 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -360,7 +360,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			double dur = (act instanceof Activity ? ((Activity) act).getMaximumDuration() : Time.UNDEFINED_TIME);
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				return endTime;

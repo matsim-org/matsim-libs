@@ -24,10 +24,10 @@ package playground.boescpa.ivtBaseline.preparation.freightCreation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -169,7 +169,7 @@ public class CreateFreightTraffic {
 		Plan plan = org.matsim.core.population.PopulationUtils.createPlan();
 		int departureTime = getDepartureTime();
 
-		ActivityImpl actStart = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());
+		Activity actStart = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());
 		actStart.setFacilityId(startFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -178,7 +178,7 @@ public class CreateFreightTraffic {
 
 		plan.addLeg(org.matsim.core.population.PopulationUtils.createLeg("car"));
 
-		ActivityImpl actEnd = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
+		Activity actEnd = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
 		actEnd.setFacilityId(endFacility.getId());
 		actEnd.setStartTime(departureTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);

@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -686,27 +687,27 @@ public final class PopulationUtils {
 		return (PlanImpl) getFactory().createPlan() ;
 	}
 
-	public static ActivityImpl createActivityFromLinkId(String type, Id<Link> linkId) {
-		return (ActivityImpl) getFactory().createActivityFromLinkId(type, linkId) ;
+	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
+		return (Activity) getFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
-	public static ActivityImpl createActivityFromCoord(String type, Coord coord) {
-		return (ActivityImpl) getFactory().createActivityFromCoord(type, coord) ;
+	public static Activity createActivityFromCoord(String type, Coord coord) {
+		return (Activity) getFactory().createActivityFromCoord(type, coord) ;
 	}
 
-	public static ActivityImpl createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
+	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
-		return (ActivityImpl) act ;
+		return (Activity) act ;
 	}
 	
 	public static Leg createLeg(String transportMode) {
-		return (Leg) getFactory().createLeg(transportMode) ;
+		return getFactory().createLeg(transportMode) ;
 	}
 
 	// --- copy factories:
 
-	public static ActivityImpl createActivity(Activity act) {
+	public static Activity createActivity(Activity act) {
 		// yyyy somehow combine this with copyFromTo method.
 		// Or maybe a clone method??
 		
@@ -721,7 +722,7 @@ public final class PopulationUtils {
 		newAct.setMaximumDuration(act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 		
-		return (ActivityImpl) newAct ;
+		return (Activity) newAct ;
 	}
 
 	/**
@@ -733,7 +734,7 @@ public final class PopulationUtils {
 		Leg newLeg = createLeg( leg.getMode() ) ;
 		newLeg.setDepartureTime(leg.getDepartureTime());
 		newLeg.setTravelTime(leg.getTravelTime());
-		Leg r = ((Leg)newLeg);
+		Leg r = (newLeg);
 		r.setTravelTime( leg.getDepartureTime() + leg.getTravelTime() - r.getDepartureTime() );
 		if (leg.getRoute() != null) {
 			leg.setRoute(leg.getRoute().clone());

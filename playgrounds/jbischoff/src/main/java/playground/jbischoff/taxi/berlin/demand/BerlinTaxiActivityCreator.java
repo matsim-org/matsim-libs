@@ -22,9 +22,9 @@ package playground.jbischoff.taxi.berlin.demand;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.*;
@@ -50,14 +50,14 @@ public class BerlinTaxiActivityCreator
             if (actType.equals("arrival")) {
                 link = network.getLinks().get(BerlinZoneUtils.TO_TXL_LINK_ID);
                 Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+                Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
                 return activity;
             }
             else {
                 link = network.getLinks().get(BerlinZoneUtils.FROM_TXL_LINK_ID);
                 Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+                Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
                 return activity;
 
@@ -67,14 +67,14 @@ public class BerlinTaxiActivityCreator
             if (actType.equals("arrival")) {
                 link = network.getLinks().get(BerlinZoneUtils.TO_SXF_LINK_ID);
                 Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+                Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
                 return activity;
             }
             else {
                 link = network.getLinks().get(BerlinZoneUtils.FROM_SXF_LINK_ID);
                 Coord coord = link.getCoord();
-                ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+                Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
                 return activity;
 
@@ -107,7 +107,7 @@ public class BerlinTaxiActivityCreator
         Coord coordt = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
         Link link = NetworkUtils.getNearestLink(network, coordt);
 
-        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coordt);
+        Activity activity = (Activity)pf.createActivityFromCoord(actType, coordt);
         activity.setLinkId(link.getId());
         return activity;
     }

@@ -28,13 +28,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -78,8 +78,8 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		 */
 		ActivityFacilitiesFactory ffactory = facilities.getFactory();
 		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) planElement;
+			if (planElement instanceof Activity) {
+				Activity activity = (Activity) planElement;
 				activity.setMaximumDuration(3600);
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 				activity.setFacilityId(Id.create(activity.getLinkId(), ActivityFacility.class));

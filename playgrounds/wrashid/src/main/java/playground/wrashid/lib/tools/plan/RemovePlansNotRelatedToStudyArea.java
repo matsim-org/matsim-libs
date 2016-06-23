@@ -5,6 +5,7 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -38,8 +39,8 @@ public class RemovePlansNotRelatedToStudyArea {
 			PersonUtils.removeUnselectedPlans(p);
 
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 
 					if (GeneralLib.getDistance(
 							network.getLinks().get(act.getLinkId()).getCoord(),

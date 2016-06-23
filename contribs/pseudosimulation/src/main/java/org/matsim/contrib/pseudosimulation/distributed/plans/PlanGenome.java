@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.misc.Time;
@@ -83,15 +82,15 @@ public class PlanGenome implements Plan {
     }
 
     @Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-    public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
-        ActivityImpl a = PopulationUtils.createActivityFromCoord(type, coord);
+    public final Activity createAndAddActivity(final String type, final Coord coord) {
+        Activity a = PopulationUtils.createActivityFromCoord(type, coord);
         getPlanElements().add(a);
         return a;
     }
 
     @Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-    public final ActivityImpl createAndAddActivity(final String type, final Id<Link> linkId) {
-        ActivityImpl a = PopulationUtils.createActivityFromLinkId(type, linkId);
+    public final Activity createAndAddActivity(final String type, final Id<Link> linkId) {
+        Activity a = PopulationUtils.createActivityFromLinkId(type, linkId);
         getPlanElements().add(a);
         return a;
     }

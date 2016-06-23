@@ -35,7 +35,7 @@ import org.matsim.facilities.ActivityFacility;
  * </ul>
  *
  */
-public final class ActivityImpl implements Activity {
+final class ActivityImpl implements Activity {
 	// Assume this as input to iterations.  Cases:
 	// Case (0): comes with coord and linkId.  No problem.
 	// Case (1): comes with linkId but w/o coord.  Coord is (presumably) set in prepareForIterations.

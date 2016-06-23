@@ -26,7 +26,6 @@ import org.matsim.contrib.util.random.*;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.util.RandomPointUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 
 import com.vividsolutions.jts.geom.*;
 
@@ -71,7 +70,7 @@ public class DefaultActivityCreator
         Coord coord = new Coord(p.getX(), p.getY());
         Link link = NetworkUtils.getNearestLink(network, coord);
 
-        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
+        Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
         activity.setLinkId(link.getId());
         return activity;
     }

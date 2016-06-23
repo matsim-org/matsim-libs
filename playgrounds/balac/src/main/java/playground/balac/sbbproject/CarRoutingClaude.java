@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -18,7 +19,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -125,7 +125,7 @@ public class CarRoutingClaude {
 			Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 			
 			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
-			ActivityImpl act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
+			Activity act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 			act.setCoord(coordStart);
 			//String[] arr2 = arr[4].split(":");
 			//double h = Double.parseDouble(arr2[0]);

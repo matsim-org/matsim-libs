@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -107,13 +107,13 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 	private final void normalizeTimes(final Plan p) {
 		if (p.getPlanElements().size() == 1) {
-			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(0);
+			Activity a = (Activity)p.getPlanElements().get(0);
 			a.setStartTime(0.0);
 			a.setMaximumDuration(Time.MIDNIGHT);
 			a.setEndTime(Time.MIDNIGHT);
 			return;
 		}
-		double home_dur = ((ActivityImpl)p.getPlanElements().get(0)).getEndTime();
+		double home_dur = ((Activity)p.getPlanElements().get(0)).getEndTime();
 		double othr_dur = 0.0;
 		for (int i=1; i<p.getPlanElements().size()-1; i=i++) {
 			PlanElement pe = p.getPlanElements().get(i);
@@ -122,7 +122,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 			}
 		}
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
-			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(p.getPlanElements().size()-1);
+			Activity a = (Activity)p.getPlanElements().get(p.getPlanElements().size()-1);
 			a.setMaximumDuration(Time.UNDEFINED_TIME);
 			a.setEndTime(Time.UNDEFINED_TIME);
 			return;
@@ -195,7 +195,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 		// draw a new random number until the new end time >= 0.0
 		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
-		double first_end_time = ((ActivityImpl)acts_legs.get(0)).getEndTime();
+		double first_end_time = ((Activity)acts_legs.get(0)).getEndTime();
 		while (first_end_time+bias < 0.0) { bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; }
 
 		for (int i=0; i<acts_legs.size(); i++) {

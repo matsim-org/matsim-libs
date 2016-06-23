@@ -171,7 +171,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						
 						BuildTrees util = new BuildTrees();
 						if (trees.get(act.getType()) == null) {
@@ -249,7 +249,7 @@ public class CreateNewZHScenario {
 				int cnt = 0;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						
 						// activity is not first or last activity
 						if (cnt > 0 && cnt < plan.getPlanElements().size() -1) {
@@ -282,7 +282,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						double duration = 12.0 * 3600.0;
 						if (!act.getType().equals("tta")) {

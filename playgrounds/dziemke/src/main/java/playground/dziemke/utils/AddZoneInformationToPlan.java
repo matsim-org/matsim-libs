@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -14,7 +15,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -101,7 +101,7 @@ public class AddZoneInformationToPlan {
 						
 						Point activityCoordAsPoint = geometryFactory.createPoint(new Coordinate(x,y));
 						
-						ActivityImpl modifiedActivity = PopulationUtils.createActivity(activity);
+						Activity modifiedActivity = PopulationUtils.createActivity(activity);
 						
 						for(Id<ActivityFacility> id : combinedFeatures.keySet()) {
 							SimpleFeature feature = combinedFeatures.get(id);

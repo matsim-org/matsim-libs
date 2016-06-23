@@ -7,13 +7,13 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -37,7 +37,7 @@ public class PlansGetActLocations {
                 for (int i = person.getPlans().size() - 1; i >= 0; i--) {
                     Plan plan = person.getPlans().get(i);
                     for (int j = 0; j < plan.getPlanElements().size(); j += 2) {
-                        ActivityImpl act = (ActivityImpl) plan
+                        Activity act = (Activity) plan
                                 .getPlanElements().get(j);
                         if (!act.getType().equals("home") && !act.getType().equals("pt interaction")) {
                             dba.executeUpdate(String

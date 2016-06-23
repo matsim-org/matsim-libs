@@ -29,12 +29,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -74,8 +74,8 @@ public class AgentId2PlannedDepartureTimeMap {
 				boolean firstActDone = false;
 				for (PlanElement pE : plan.getPlanElements()) {
 
-					if(pE instanceof ActivityImpl){
-						ActivityImpl act = (ActivityImpl) pE;
+					if(pE instanceof Activity){
+						Activity act = (Activity) pE;
 
 						if(!firstActDone){
 							runningTime = act.getEndTime();

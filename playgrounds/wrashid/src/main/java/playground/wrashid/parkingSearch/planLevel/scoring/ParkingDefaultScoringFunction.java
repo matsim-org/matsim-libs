@@ -1,9 +1,9 @@
 package playground.wrashid.parkingSearch.planLevel.scoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -24,7 +24,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 		this.incomeRelevantForParking=income;
 	}
 
-	public double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
+	public double getScore(Activity targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
 			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta, boolean forRanking) {
 		
 		
@@ -201,7 +201,7 @@ public class ParkingDefaultScoringFunction extends ParkingScoringFunction {
 	}
 
 	
-	private double getWalkingExplicitScorePart(ActivityImpl targetActivity, Id parkingFacilityId){
+	private double getWalkingExplicitScorePart(Activity targetActivity, Id parkingFacilityId){
 		double zeroValueForNormalization=0;
 		double oneValueForNormalization=maxWalkingDistance; // in meters
 		

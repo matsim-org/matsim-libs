@@ -25,8 +25,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
@@ -47,7 +47,7 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 		this.facilityToZoneIndexMap = facilityToZoneIndexMap;
 	}
 	
-	public double getZonalScore(PlanImpl plan, ActivityImpl act) {
+	public double getZonalScore(PlanImpl plan, Activity act) {
 		final Activity act1 = act;
 		Activity previousActivity = PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, act1));
 		int fromZoneIndex = this.getZoneIndex(previousActivity.getFacilityId());

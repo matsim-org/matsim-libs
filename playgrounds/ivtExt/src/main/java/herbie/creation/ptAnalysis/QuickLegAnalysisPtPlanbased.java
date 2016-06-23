@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -140,7 +139,7 @@ public class QuickLegAnalysisPtPlanbased {
 				
 				if(pE instanceof Activity){
 					
-					ActivityImpl act = (ActivityImpl) pE;
+					Activity act = (Activity) pE;
 					if(!act.getType().toString().equals("pt interaction")){
 						
 						Double actDuration = act.getEndTime() - act.getStartTime();

@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -149,15 +150,15 @@ public class Version2pt1DemandGenerationScript {
 			int actNumber = 1;
 			int chainLength = st.countTokens();
 			// need to refer to the previous act
-			ActivityImpl lastAct = null;
+			Activity lastAct = null;
 			double dayStartTime = getHomeDepartTime(pax, chainLength);
 			double dayEndTime = getDayEndTime(pax, chainLength);
 			double lastActEndTime = 0;
 			while (st.hasMoreElements()) {
 				String actType = st.nextToken();
-				ActivityImpl act = null;
+				Activity act = null;
 				if (actType.equals("h")) {
-					act = (ActivityImpl) popFactory.createActivityFromCoord(
+					act = (Activity) popFactory.createActivityFromCoord(
 							"home", null);
 					act.setFacilityId(Id.create(pax.household.homeFacilityId, ActivityFacility.class));
 					if (lastAct == null) {
@@ -170,7 +171,7 @@ public class Version2pt1DemandGenerationScript {
 					// no further elses; this is the last home act for the day
 				}
 				if (actType.equals("w")) {
-					act = (ActivityImpl) popFactory.createActivityFromCoord(
+					act = (Activity) popFactory.createActivityFromCoord(
 							pax.mainActType, null);
 					act.setFacilityId(Id.create(pax.mainActFacility, ActivityFacility.class));
 					if (pax.chainType.equals("workOnly")
@@ -184,7 +185,7 @@ public class Version2pt1DemandGenerationScript {
 				}
 				if (actType.equals("s")) {
 					if (pax.chainType.equals("schoolAfterWork")) {
-						act = (ActivityImpl) popFactory
+						act = (Activity) popFactory
 								.createActivityFromCoord("s_tertiary", null);
 						String destinationFacilityId = assignSchoolActivity(pax);
 						act.setFacilityId(Id.create(destinationFacilityId, ActivityFacility.class));
@@ -193,7 +194,7 @@ public class Version2pt1DemandGenerationScript {
 								Time.parseTime("02:00:00"), chainLength,
 								actNumber));
 					} else {
-						act = (ActivityImpl) popFactory
+						act = (Activity) popFactory
 								.createActivityFromCoord(pax.mainActType, null);
 						act.setFacilityId(Id.create(pax.mainActFacility, ActivityFacility.class));
 						// default duration of 4 hours' school
@@ -205,7 +206,7 @@ public class Version2pt1DemandGenerationScript {
 				}
 				if (actType.equals("b") || actType.equals("l")) {
 					actType = assignSecondaryActivityType(actType, pax);
-					act = (ActivityImpl) popFactory.createActivityFromCoord(
+					act = (Activity) popFactory.createActivityFromCoord(
 							actType, null);
 					String destinationFacilityId = assignSecondaryActivityLocation(
 							actType, pax, lastAct.getFacilityId());

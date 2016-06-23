@@ -25,12 +25,12 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -55,7 +55,7 @@ public class GetActStatisticsAtLinks {
 			
 			for (int i=0;i<planElements.size();i++){
 				PlanElement pe=planElements.get(i);
-				if (pe instanceof ActivityImpl){
+				if (pe instanceof Activity){
 					
 					String arrLegMode="";
 					String depLegMode="";
@@ -67,8 +67,8 @@ public class GetActStatisticsAtLinks {
 						depLegMode=((Leg) planElements.get(i+1)).getMode();
 					}
 					
-					Id<Link> linkId=((ActivityImpl) pe).getLinkId();
-					numberOfActivitiesAtLinks.incrementBy(linkId,arrLegMode  + "-" +  ((ActivityImpl) pe).getType() + "-" + depLegMode  , 1.0);
+					Id<Link> linkId=((Activity) pe).getLinkId();
+					numberOfActivitiesAtLinks.incrementBy(linkId,arrLegMode  + "-" +  ((Activity) pe).getType() + "-" + depLegMode  , 1.0);
 				}
 			}
 		}

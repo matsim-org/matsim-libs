@@ -3,10 +3,10 @@ package playground.vsp.demandde.pendlermatrix;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.vsp.pipeline.PersonSink;
 import playground.vsp.pipeline.PersonSinkSource;
@@ -34,9 +34,9 @@ public class PersonVerschmiererTask implements PersonSinkSource {
 		Plan plan = person.getPlans().get(0);
 		
 		List<PlanElement> planElements = plan.getPlanElements();
-		ActivityImpl home1 = (ActivityImpl) planElements.get(0);
-		ActivityImpl work = (ActivityImpl) planElements.get(2);
-		ActivityImpl home2 = (ActivityImpl) planElements.get(4);
+		Activity home1 = (Activity) planElements.get(0);
+		Activity work = (Activity) planElements.get(2);
+		Activity home2 = (Activity) planElements.get(4);
 		
 		Coord oldCoordHome = home1.getCoord();
 		Coord oldCoordWork = work.getCoord();

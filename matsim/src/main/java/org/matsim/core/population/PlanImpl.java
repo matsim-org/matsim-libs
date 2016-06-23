@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -51,8 +52,8 @@ public final class PlanImpl implements Plan {
 	private Customizable customizableDelegate;
 
 	@Override
-	public final ActivityImpl createAndAddActivity(final String type1) {
-		ActivityImpl a = new ActivityImpl(type1);
+	public final Activity createAndAddActivity(final String type1) {
+		Activity a = new ActivityImpl(type1);
 		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go through the factory.  kai, jun'16)
 
 		this.addActivity(a) ;

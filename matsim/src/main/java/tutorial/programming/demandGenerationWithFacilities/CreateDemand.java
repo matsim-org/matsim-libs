@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -232,7 +231,7 @@ class CreateDemand {
 		String firstType = "";
 		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				ActivityImpl activity = (ActivityImpl)pe;
+				Activity activity = (Activity)pe;
 				ActivityFacility facility;
 				
 				if (activity.getType().startsWith("h")) {

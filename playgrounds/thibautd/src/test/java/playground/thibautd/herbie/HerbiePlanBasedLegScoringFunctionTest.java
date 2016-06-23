@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,7 +46,6 @@ import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -106,7 +106,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 10 );
-		((ActivityImpl) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
 		Leg l = plan.createAndAddLeg( TransportMode.car );
 		NetworkRoute nRoute = new LinkNetworkRouteImpl( Id.create( 12 , Link.class ) , Id.create( 23 , Link.class ) );
 		l.setRoute( nRoute );
@@ -116,7 +116,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		act = plan.createAndAddActivity( "w" );
 		act.setStartTime( 104 );
 		act.setEndTime( 294 );
-		((ActivityImpl) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
 		l = plan.createAndAddLeg( TransportMode.car );
 		nRoute = new LinkNetworkRouteImpl( Id.create( 43 , Link.class ) , Id.create( 23 , Link.class ) );
 		nRoute.setLinkIds(
@@ -129,7 +129,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 		act = plan.createAndAddActivity( "h" );
 		act.setStartTime( 2000 );
-		((ActivityImpl) act).setFacilityId( Id.create( "h" , ActivityFacility.class) );
+		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class) );
 
 		return plan;
 	}
@@ -143,7 +143,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 10 );
-		((ActivityImpl) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
 		Leg l = plan.createAndAddLeg( TransportMode.pt );
 		ExperimentalTransitRoute tRoute =
 			new ExperimentalTransitRoute( new FakeFacility( 23 ) , null , null , new FakeFacility( 43 ) );
@@ -154,7 +154,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		plan.createAndAddActivity( "w" );
 		act.setStartTime( 100 );
 		act.setEndTime( 109 );
-		((ActivityImpl) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
 		l = plan.createAndAddLeg( TransportMode.pt );
 		tRoute =
 			new ExperimentalTransitRoute( new FakeFacility( 13 ) , null , null , new FakeFacility( 42 ) );
@@ -164,7 +164,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		
 		plan.createAndAddActivity( "h" );
 		act.setStartTime( 2000 );
-		((ActivityImpl) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
 
 		return plan;
 	}
@@ -178,7 +178,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 		Activity act = plan.createAndAddActivity( "h" );
 		act.setEndTime( 100 );
-		((ActivityImpl) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
 		Leg l = plan.createAndAddLeg( TransportMode.transit_walk );
 		Route route = new GenericRouteImpl( Id.create( 12 , Link.class ) , Id.create( 23 , Link.class ) );
 		l.setRoute( route );
@@ -206,7 +206,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		plan.createAndAddActivity( "w" );
 		act.setStartTime( 2000 );
 		act.setEndTime( 3000 );
-		((ActivityImpl) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
 		l = plan.createAndAddLeg( TransportMode.transit_walk );
 		l.setRoute( new GenericRouteImpl( Id.create( 34 , Link.class ) , Id.create( 43 , Link.class ) ) );
 		l.setDepartureTime( 1123 );
@@ -214,7 +214,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 		plan.createAndAddActivity( "h" );
 		act.setStartTime( 2000 );
-		((ActivityImpl) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
 
 		return plan;
 	}
@@ -230,7 +230,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 			Activity act = plan.createAndAddActivity( "w" );
 			act.setStartTime( 2000 );
 			act.setEndTime( 3000 );
-			((ActivityImpl) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
+			((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
 			Leg l = plan.createAndAddLeg( TransportMode.walk );
 			l.setRoute( new GenericRouteImpl( Id.create( 12 , Link.class ) , Id.create( 13 , Link.class ) ) );
 			l.setDepartureTime( 1123 );
@@ -238,7 +238,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		}
 		Activity act = plan.createAndAddActivity( "w" );
 		act.setStartTime( 2000 );
-		((ActivityImpl) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
+		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
 
 		return plan;
 	}
