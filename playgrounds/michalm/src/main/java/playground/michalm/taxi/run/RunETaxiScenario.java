@@ -70,6 +70,6 @@ public class RunETaxiScenario
     {
         String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
         //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
-        RunETaxiScenario.run(configFile, true);
+        RunETaxiScenario.run(configFile, false);
     }
 }

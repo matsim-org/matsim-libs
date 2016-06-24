@@ -21,7 +21,7 @@
 			<param name="nearestVehiclesLimit" value="99999" />
 			<param name="cellSize" value="1000" />
 
-			<param name="minRelativeSoc" value="0.9" />
+			<param name="minRelativeSoc" value="0.7" />
 			<param name="socCheckTimeStep" value="60" />
 		</parameterset>
 	</module>

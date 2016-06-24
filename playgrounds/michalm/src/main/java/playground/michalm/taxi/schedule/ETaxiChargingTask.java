@@ -81,6 +81,6 @@ public class ETaxiChargingTask
     @Override
     protected String commonToString()
     {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+        return "[CHARGING]" + super.commonToString();
     }
 }

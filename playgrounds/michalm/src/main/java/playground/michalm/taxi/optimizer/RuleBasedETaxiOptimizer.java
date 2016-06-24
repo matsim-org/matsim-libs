@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -59,6 +60,7 @@ public class RuleBasedETaxiOptimizer
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
     {
         if (e.getSimulationTime() % params.socCheckTimeStep == 0) {
+            System.err.println("===== socCheckTimeStep =====");
             chargeIdleUnderchargedVehicles(
                     Iterables.filter(idleTaxiRegistry.getVehicles(), this::isUndercharged));
         }
@@ -84,6 +86,10 @@ public class RuleBasedETaxiOptimizer
         super.nextTask(schedule);
 
         Vehicle veh = schedule.getVehicle();
+        if (schedule.getStatus() == ScheduleStatus.STARTED) {
+            System.err.println("===== nextTask: " + schedule.getCurrentTask());
+        }
+        
         if (optimContext.scheduler.isIdle(veh) && isUndercharged(veh)) {
             chargeIdleUnderchargedVehicles(Collections.singleton(veh));
         }
@@ -93,6 +99,7 @@ public class RuleBasedETaxiOptimizer
     private boolean isUndercharged(Vehicle v)
     {
         Battery b = ((EvrpVehicle)v).getEv().getBattery();
+        System.err.println("isUndercharged(): " + b.getSoc()); 
         return b.getSoc() < params.minRelativeSoc * b.getCapacity();
     }
 }
