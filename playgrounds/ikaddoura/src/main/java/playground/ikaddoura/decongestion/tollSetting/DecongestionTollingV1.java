@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion;
+package playground.ikaddoura.decongestion.tollSetting;
 
 import java.util.Map;
 
@@ -29,9 +29,14 @@ import org.matsim.api.core.v01.network.Link;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
- * Computes the initial tolls based on the average delay per link and time bin.
- * Increases the tolls applying the adjustment rate.
- * Setting tolls to zero if the average delay is zero.
+ * 
+ * Initial tolls
+ * ... are set based on the average delay per link and time bin (=d).
+ * 
+ * Tolls in all further iterations
+ * ... are recomputed
+ * - If d > threshold: Increase the previous toll by the adjustment rate.
+ * - If d <= threshold: Set the toll to zero.
  * 
  * @author ikaddoura
  */
@@ -57,7 +62,7 @@ public class DecongestionTollingV1 implements DecongestionTollSetting {
 
 				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);
 								
-				if (averageDelay <= this.congestionInfo.getTOLERATED_AVERAGE_DELAY_SEC()) {
+				if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
 					
 					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
 						this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().remove(intervalNr);
@@ -68,7 +73,7 @@ public class DecongestionTollingV1 implements DecongestionTollSetting {
 					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
 						
 						Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-						double updatedToll = time2toll.get(intervalNr) * (1. + this.congestionInfo.getTOLL_ADJUSTMENT_RATE());
+						double updatedToll = time2toll.get(intervalNr) * (1. + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT_RATE());
 						time2toll.put(intervalNr, updatedToll);
 											
 					} else {

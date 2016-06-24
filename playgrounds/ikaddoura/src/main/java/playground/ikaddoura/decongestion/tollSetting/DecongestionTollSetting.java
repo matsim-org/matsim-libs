@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion;
+package playground.ikaddoura.decongestion.tollSetting;
 
 /**
  * Computes the initial tolls per link and time bin and updates the tolls.

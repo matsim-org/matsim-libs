@@ -38,6 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV0;
 
 /**
  * Starts an interval-based decongestion pricing simulation run.
@@ -50,7 +51,7 @@ public class DecongestionRun {
 	private static final Logger log = Logger.getLogger(DecongestionRun.class);
 
 	private static String configFile;
-	private static String outputDirectory;
+	private static String outputBaseDirectory;
 	
 	public static void main(String[] args) throws IOException {
 		log.info("Starting simulation run with the following arguments:");
@@ -60,13 +61,12 @@ public class DecongestionRun {
 			configFile = args[0];		
 			log.info("config file: "+ configFile);
 			
-			outputDirectory = args[1];		
-			log.info("output directory: "+ outputDirectory);
+			outputBaseDirectory = args[1];		
+			log.info("output directory: "+ outputBaseDirectory);
 
 		} else {
 			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputDirectory = "../../../runs-svn/decongestion/output/decongestion_1000it_10_50_0.5/";
-//			outputDirectory = "../../../runs-svn/decongestion/output/baseCase_1000it/";
+			outputBaseDirectory = "../../../runs-svn/decongestion/output/decongestion_100it_V0_10it_timeBin10_0.0/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -77,15 +77,16 @@ public class DecongestionRun {
 	private void run() {
 
 		Config config = ConfigUtils.loadConfig(configFile);	
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controler().setOutputDirectory(outputBaseDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
 				
-		final DecongestionInfo info = new DecongestionInfo(scenario);
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 
 		// decongestion pricing
-		final DecongestionControlerListener decongestion = new DecongestionControlerListener(info);		
+		final DecongestionControlerListener decongestion = new DecongestionControlerListener(info, new DecongestionTollingV0(info));		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

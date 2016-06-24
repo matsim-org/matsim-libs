@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.decongestion;
+package playground.ikaddoura.decongestion.data;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,8 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
-
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
  * 
