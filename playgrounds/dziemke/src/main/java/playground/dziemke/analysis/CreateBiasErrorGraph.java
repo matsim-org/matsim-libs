@@ -1,4 +1,4 @@
-package playground.dziemke.utils;
+package playground.dziemke.analysis;
 
 import java.io.BufferedReader;
 import java.io.File;
