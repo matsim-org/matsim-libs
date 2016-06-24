@@ -57,7 +57,6 @@ public class RunTaxiScenario
 
     public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
     {
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new TaxiModule(taxiData));
         double expAveragingAlpha = 0.05;//from the AV flow paper 

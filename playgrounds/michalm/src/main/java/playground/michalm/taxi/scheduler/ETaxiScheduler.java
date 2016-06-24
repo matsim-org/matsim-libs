@@ -140,5 +140,7 @@ public class ETaxiScheduler
                 new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev));
 
         appendStayTask(schedule);
+        
+//        System.err.println(vehicle.getId() +" sent to charger " + charger.getId());
     }
 }

@@ -20,14 +20,12 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.taxi.benchmark.*;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
@@ -35,31 +33,41 @@ import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
 
 
-public class RunETaxiScenario
+/**
+ * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel
+ * times are deterministic. To simulate this property, we remove (1) all other traffic, and (2) link
+ * capacity constraints (e.g. by increasing the capacities by 100+ times), as a result all vehicles
+ * move with the free-flow speed (which is the effective speed).
+ * <p/>
+ * To model the impact of traffic, we can use a time-variant network, where we specify different
+ * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
+ * each time interval (usually 15 minutes).
+ */
+public class RunETaxiBenchmark
 {
-    public static void run(String configFile, boolean otfvis)
+    public static void run(String configFile, int runs)
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
-                new OTFVisConfigGroup(), new EvConfigGroup());
-        createControler(config, otfvis).run();
+                new EvConfigGroup());
+        createControler(config, runs).run();
     }
 
 
-    public static Controler createControler(Config config, boolean otfvis)
+    public static Controler createControler(Config config, int runs)
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         EvConfigGroup evCfg = EvConfigGroup.get(config);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
+        Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
+        final TaxiData taxiData = new TaxiData();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario, evData).parse(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);
 
-        Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
+        Controler controler = RunTaxiBenchmark.createControler(scenario, taxiData, runs);
         controler.addOverridingModule(new EvModule(evData));
         controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
 
@@ -77,8 +85,7 @@ public class RunETaxiScenario
 
     public static void main(String[] args)
     {
-        //String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
-        String configFile = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
-        RunETaxiScenario.run(configFile, false);
+        String configFile = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_benchmark_config.xml";
+        run(configFile, 1);
     }
 }

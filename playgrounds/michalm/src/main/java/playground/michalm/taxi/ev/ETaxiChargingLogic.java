@@ -102,8 +102,8 @@ public class ETaxiChargingLogic
 
     public double estimateChargeTime(ElectricVehicle vehicle)
     {
-        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
-        System.err.println("effectivePower = " + effectivePower);
+//        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
+//        System.err.println("effectivePower = " + effectivePower);
         return getEnergyToCharge(vehicle) / effectivePower;
     }
 
