@@ -16,12 +16,12 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 
 	VehicleWithBattery getVehicle();
 
-	ChargingEvent estimateEndChargingEvent(double time);
-
 	double getMaxChargingPowerInWatt();
 	double getActualChargingPowerInWatt();
 
 	double getEnergyDeliveredByTime(double time);
 
 	ChargingSite getChargingSite();
+
+	double estimateChargingSessionDuration();
 }
