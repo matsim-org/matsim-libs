@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A pseudo graph with PseudoRouteStops as nodes. Edges connect
- * two PseudoRouteStops. The graph is used to calculate the least
- * cost path on from a dummy source to a dummy destination. This
- * path contains the best fitting PseudoRouteStops.
+ * A pseudo graph with {@link PseudoRouteStop}s as nodes. Edges connect
+ * two PseudoRouteStops. The graph is used to calculate the least cost
+ * path on from a dummy source to a dummy destination. This least cost
+ * path contains the best suited PseudoRouteStops.
  *
  * @author polettif
  */

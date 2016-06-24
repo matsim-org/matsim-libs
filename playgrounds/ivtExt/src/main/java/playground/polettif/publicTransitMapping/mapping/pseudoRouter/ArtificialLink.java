@@ -21,12 +21,13 @@ package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+import playground.polettif.publicTransitMapping.mapping.PseudoRouting;
 
 import java.util.Set;
 
 /**
  * Container class for artificial links created
- * in PseudoRouting.
+ * in {@link PseudoRouting}.
  *
  * @author polettif
  */

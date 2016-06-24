@@ -25,15 +25,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.ControlerUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
- * Provides the contract for an multithread
- * implementation of public transit mapping.
+ * Provides the contract for an implementation
+ * of public transit mapping.
  *
  * Currently redirects to the only implementation
  * {@link PTMapperImpl}.

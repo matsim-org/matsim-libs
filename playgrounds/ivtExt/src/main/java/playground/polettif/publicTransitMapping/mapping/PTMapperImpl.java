@@ -27,9 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.ControlerUtils;
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -37,12 +34,11 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreatorStandard;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoScheduleImpl;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoScheduleImpl;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
-import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -51,10 +47,14 @@ import java.util.*;
 
 /**
  * References an unmapped transit schedule to a network. Combines
- * routing of transit routes and referencing stopFacilities. Additional
- * stop facilities are created if a stopFacility has more than one
- * plausible link. Artificial links are added to the network if no
- * route can be found.
+ * finding link sequences for TransitRoutes and referencing
+ * TransitStopFacilities to link. Calculates the least cost path
+ * from the transit route's first to its last stop with the constraint
+ * that the path must contain a link candidate of every stop.<p/>
+ *
+ * Additional stop facilities are created if a stop facility has more
+ * than one plausible link. Artificial links are added to the network
+ * if no path can be found.
  *
  * @author polettif
  */
@@ -339,7 +339,7 @@ public class PTMapperImpl extends PTMapper {
 						routeHasArtificialLink = true;
 					}
 				}
-				if(routeHasArtificialLink) {
+				if(!routeHasArtificialLink) {
 					withoutArtificialLinks++;
 				}
 			}
