@@ -33,9 +33,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -87,7 +84,7 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		if ( this.iterationCounter.getIteration() >= 11 ) {
-//			log.warn("NOT replanning"); 
+			log.warn("NOT replanning"); 
 			return ;
 		}
 		

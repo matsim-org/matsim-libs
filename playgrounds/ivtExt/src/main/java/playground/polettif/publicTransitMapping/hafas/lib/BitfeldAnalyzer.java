@@ -78,9 +78,6 @@ public class BitfeldAnalyzer {
 	 * Returns the 4-day bitfeld block that has the most F-values. The assumption is that this block is either a
 	 * Monday-Tuesday-Wednesday-Thursday or a Tuesday-Wednesday-Thursday-Friday block because all other blocks have
 	 * at least one Weekend-Day and therefore are less like to produce an F (an F means traveling at all four days).
-	 *
-	 * @param BITFELD
-	 * @return
 	 */
 	private static int find4DayBlockWithMostFVals(String FPLAN, String BITFELD) {
 		Map<Integer, Integer> departuresPerBitfeld = new HashMap<>();

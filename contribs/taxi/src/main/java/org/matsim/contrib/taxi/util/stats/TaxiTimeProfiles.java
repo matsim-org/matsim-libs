@@ -35,30 +35,26 @@ import com.google.common.collect.Iterables;
 
 public class TaxiTimeProfiles
 {
-    public static ProfileCalculator<Integer> createIdleVehicleCounter(final VrpData taxiData,
+    public static ProfileCalculator createIdleVehicleCounter(final VrpData taxiData,
             final TaxiScheduleInquiry scheduleInquiry)
     {
-        return new ProfileCalculator<Integer>() {
+        return new TimeProfiles.SingleValueProfileCalculator("Idle") {
             @Override
-            public Integer calcCurrentPoint()
+            public String calcValue()
             {
                 return Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                        TaxiSchedulerUtils.createIsIdle(scheduleInquiry)));
+                        TaxiSchedulerUtils.createIsIdle(scheduleInquiry))) + "";
             }
         };
     }
 
 
-    public static final String TAXI_TASK_TYPES_HEADER = TimeProfiles
-            .combineValues((Object[])TaxiTaskType.values());
-
-
-    public static ProfileCalculator<String> createCurrentTaxiTaskOfTypeCounter(
-            final VrpData taxiData)
+    public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final VrpData taxiData)
     {
-        return new ProfileCalculator<String>() {
+        String[] header = TimeProfiles.combineValues((Object[])TaxiTaskType.values());
+        return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String calcCurrentPoint()
+            public String[] calcValues()
             {
                 LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
 
@@ -70,25 +66,25 @@ public class TaxiTimeProfiles
                     }
                 }
 
-                String s = "";
+                String[] counts = new String[TaxiTaskType.values().length];
                 for (TaxiTaskType e : TaxiTaskType.values()) {
-                    s += counter.getLong(e) + "\t";
+                    counts[e.ordinal()] = counter.getLong(e) + "";
                 }
-                return s;
+                return counts;
             }
         };
     }
 
 
-    public static ProfileCalculator<Integer> createRequestsWithStatusCounter(
-            final TaxiData taxiData, final TaxiRequestStatus requestStatus)
+    public static ProfileCalculator createRequestsWithStatusCounter(final TaxiData taxiData,
+            final TaxiRequestStatus requestStatus)
     {
-        return new ProfileCalculator<Integer>() {
+        return new TimeProfiles.SingleValueProfileCalculator(requestStatus.name()) {
             @Override
-            public Integer calcCurrentPoint()
+            public String calcValue()
             {
                 return TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                        requestStatus);
+                        requestStatus) + "";
             }
         };
     }

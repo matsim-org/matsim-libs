@@ -23,15 +23,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.Map;
 
 /**
- * TODO doc
+ * A PseudoRouteStop is used as node in the PseudoGraph.
+ * <p/>
+ * LinkCandidates are made for each stop facility. Since one
+ * StopFacility might be accessed twice in the same TransitRoute,
+ * unique LinkCandidates for each TransitRouteStop are needed. This
+ * is achieved via this class.
+ *
+ * @author polettif
  */
 public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
 
 	Id<TransitStopFacility> getParentStopFacilityId();
+
+	LinkCandidate getLinkCandidate();
 
 	Coord getCoord();
 
@@ -46,8 +56,6 @@ public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparab
 	double getArrivalOffset();
 
 	double getDepartureOffset();
-
-	double getLinkTravelCost();
 
 	int compareTo(PseudoRouteStop other);
 
@@ -73,6 +81,5 @@ public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparab
 	 * Used for Dijkstra in {@link PseudoGraph}
 	 */
 	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
-
 
 }

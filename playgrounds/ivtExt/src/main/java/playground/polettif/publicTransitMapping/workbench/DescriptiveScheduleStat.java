@@ -1,6 +1,5 @@
 package playground.polettif.publicTransitMapping.workbench;
 
-import com.sun.media.jfxmedia.logging.Logger;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;

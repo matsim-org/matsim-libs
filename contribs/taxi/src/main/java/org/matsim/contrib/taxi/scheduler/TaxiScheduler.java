@@ -36,13 +36,14 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
+import org.matsim.core.utils.misc.Time;
 
 
 public class TaxiScheduler
     implements TaxiScheduleInquiry
 {
     private final TaxiData taxiData;
-    private final TaxiSchedulerParams params;
+    protected final TaxiSchedulerParams params;
     private final MobsimTimer timer;
 
     private final TravelTime travelTime;
@@ -391,75 +392,80 @@ public class TaxiScheduler
     }
 
 
-    private void updateTimelineImpl(Schedule<TaxiTask> schedule, double newTaskEndTime)
+    private void updateTimelineImpl(Schedule<TaxiTask> schedule, double newEndTime)
     {
         Task currentTask = schedule.getCurrentTask();
-        if (currentTask.getEndTime() == newTaskEndTime) {
+        if (currentTask.getEndTime() == newEndTime) {
             return;
         }
 
-        currentTask.setEndTime(newTaskEndTime);
+        currentTask.setEndTime(newEndTime);
 
         List<TaxiTask> tasks = schedule.getTasks();
         int startIdx = currentTask.getTaskIdx() + 1;
-        double t = newTaskEndTime;
+        double newBeginTime = newEndTime;
 
         for (int i = startIdx; i < tasks.size(); i++) {
             TaxiTask task = tasks.get(i);
+            double calcEndTime = calcNewEndTime(task, newBeginTime);
 
-            switch (task.getTaxiTaskType()) {
-                case STAY: {
-                    if (i == tasks.size() - 1) {// last task
-                        task.setBeginTime(t);
-                        //even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT 
-                        task.setEndTime(Math.max(t, schedule.getVehicle().getT1()));
+            if (calcEndTime == Time.UNDEFINED_TIME) {
+                schedule.removeTask(task);
+                i--;
+            }
+            else if (calcEndTime < newBeginTime) {//0 s is fine (e.g. last 'wait')
+                throw new IllegalStateException();
+            }
+            else {
+                task.setBeginTime(newBeginTime);
+                task.setEndTime(calcEndTime);
+                newBeginTime = calcEndTime;
+            }
+        }
+    }
+
+
+    protected double calcNewEndTime(TaxiTask task, double newBeginTime)
+    {
+        switch (task.getTaxiTaskType()) {
+            case STAY: {
+                if (Schedules.isLastTask(task)) {// last task
+                    //even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT 
+                    return Math.max(newBeginTime, task.getSchedule().getVehicle().getT1());
+                }
+                else {
+                    // if this is not the last task then some other task (e.g. DRIVE or PICKUP)
+                    // must have been added at time submissionTime <= t
+                    double oldEndTime = task.getEndTime();
+                    if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
+                        return Time.UNDEFINED_TIME;//remove the task
                     }
                     else {
-                        // if this is not the last task then some other task (e.g. DRIVE or PICKUP)
-                        // must have been added at time submissionTime <= t
-                        double endTime = task.getEndTime();
-                        if (endTime <= t) {// may happen if the previous task is delayed
-                            schedule.removeTask(task);
-                            i--;
-                        }
-                        else {
-                            task.setBeginTime(t);
-                            t = endTime;
-                        }
+                        return oldEndTime;
                     }
-
-                    break;
-                }
-
-                case EMPTY_DRIVE:
-                case OCCUPIED_DRIVE: {
-                    // cannot be shortened/lengthen, therefore must be moved forward/backward
-                    task.setBeginTime(t);
-                    VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task)
-                            .getPath();
-                    t += path.getTravelTime(); //TODO one may consider recalculation of SP!!!!
-                    task.setEndTime(t);
-
-                    break;
-                }
-
-                case PICKUP: {
-                    task.setBeginTime(t);// t == taxi's arrival time
-                    double t0 = ((TaxiPickupTask)task).getRequest().getT0();// t0 == passenger's departure time
-                    t = Math.max(t, t0) + params.pickupDuration; // the true pickup starts at max(t, t0)
-                    task.setEndTime(t);
-
-                    break;
-                }
-                case DROPOFF: {
-                    // cannot be shortened/lengthen, therefore must be moved forward/backward
-                    task.setBeginTime(t);
-                    t += params.dropoffDuration;
-                    task.setEndTime(t);
-
-                    break;
                 }
             }
+
+            case EMPTY_DRIVE:
+            case OCCUPIED_DRIVE: {
+                // cannot be shortened/lengthen, therefore must be moved forward/backward
+                VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task).getPath();
+                //TODO one may consider recalculation of SP!!!!
+                return newBeginTime + path.getTravelTime();
+            }
+
+            case PICKUP: {
+                double t0 = ((TaxiPickupTask)task).getRequest().getT0();// t0 == passenger's departure time
+                // the actual pickup starts at max(t, t0)
+                return Math.max(newBeginTime, t0) + params.pickupDuration;
+            }
+            case DROPOFF: {
+                // cannot be shortened/lengthen, therefore must be moved forward/backward
+                return newBeginTime + params.dropoffDuration;
+            }
+
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -523,7 +529,7 @@ public class TaxiScheduler
                             throw new RuntimeException("Currently won't happen");
                         }
 
-                        //diversion -- no STAY afterwards
+                        //if diversion -- no STAY afterwards
                         return;
 
                     default:
@@ -545,7 +551,7 @@ public class TaxiScheduler
     }
 
 
-    private Integer countUnremovablePlannedTasks(Schedule<TaxiTask> schedule)
+    protected Integer countUnremovablePlannedTasks(Schedule<TaxiTask> schedule)
     {
         TaxiTask currentTask = schedule.getCurrentTask();
         switch (currentTask.getTaxiTaskType()) {
@@ -579,21 +585,26 @@ public class TaxiScheduler
     }
 
 
-    private void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx)
+    protected void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx)
     {
         List<TaxiTask> tasks = schedule.getTasks();
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
             TaxiTask task = tasks.get(i);
             schedule.removeTask(task);
+            taskRemovedFromSchedule(schedule, task);
+        }
+    }
 
-            if (task instanceof TaxiTaskWithRequest) {
-                TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-                taskWithReq.removeFromRequest();
 
-                if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-                    removedRequests.add(taskWithReq.getRequest());
-                }
+    protected void taskRemovedFromSchedule(Schedule<TaxiTask> schedule, TaxiTask task)
+    {
+        if (task instanceof TaxiTaskWithRequest) {
+            TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
+            taskWithReq.removeFromRequest();
+
+            if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+                removedRequests.add(taskWithReq.getRequest());
             }
         }
     }

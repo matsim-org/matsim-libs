@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -179,6 +180,8 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 		// the above forces a copy, which I need later
 
 		// method 2:
+//		if ( true ) {
+//		if ( MatsimRandom.getRandom().nextDouble() < 0.2 ) {
 		if ( ttimeDetour < ttimeOrig ) {
 
 			final int idx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);

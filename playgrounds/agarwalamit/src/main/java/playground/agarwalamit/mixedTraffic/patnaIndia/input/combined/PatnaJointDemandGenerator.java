@@ -53,6 +53,7 @@ public class PatnaJointDemandGenerator {
 	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_plans_10pct.xml.gz"; //
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_vehicles_10pct.xml.gz";
+	private static final int CLONING_FACTOR = 10; 
 	private static Scenario sc;
 	
 	public static void main(String[] args) {
@@ -67,7 +68,7 @@ public class PatnaJointDemandGenerator {
 	
 	public void createAndWriteVehiclesFile(){
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(JOINT_PLANS_10PCT);
-		pvg.createVehicles(PatnaUtils.ALL_MODES);
+		pvg.createVehicles(PatnaUtils.ALL_MAIN_MODES);
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(JOINT_VEHICLES_10PCT);
 	}
 	
@@ -101,7 +102,7 @@ public class PatnaJointDemandGenerator {
 	}
 
 	private Population getUrbanPlans() {
-		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator(10);// 10% sample
+		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator(CLONING_FACTOR);// 10% sample
 		pudg.startProcessing();
 		return pudg.getPopulation();
 	}

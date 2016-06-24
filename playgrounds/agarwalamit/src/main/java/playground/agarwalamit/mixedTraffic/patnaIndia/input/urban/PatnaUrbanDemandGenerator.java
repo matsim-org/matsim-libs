@@ -53,6 +53,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
 import playground.agarwalamit.utils.GeometryUtils;
 /**
+ * The number of trips from trip diaries are 2% (not 1%).
  * @author amit
  */
 public class PatnaUrbanDemandGenerator {

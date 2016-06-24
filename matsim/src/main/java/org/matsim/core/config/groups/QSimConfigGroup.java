@@ -110,7 +110,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private boolean usingFastCapacityUpdate = false ;
 	// ---
 	private static final String VEHICLES_SOURCE = "vehiclesSource";
-	public static enum VehiclesSource { defaultVehicle, fromVehiclesData } ;
+	public static enum VehiclesSource { defaultVehicle, modeVehicleTypesFromVehiclesData, fromVehiclesData} ;
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
 	private static final String SEEP_MODE = "seepMode";

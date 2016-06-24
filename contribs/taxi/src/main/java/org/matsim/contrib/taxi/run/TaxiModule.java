@@ -39,7 +39,7 @@ public class TaxiModule
     private final VehicleType vehicleType;
 
 
-    public TaxiModule(TaxiData taxiData, TaxiConfigGroup taxiCfg)
+    public TaxiModule(TaxiData taxiData)
     {
         this(taxiData, VehicleUtils.getDefaultVehicleType());
     }

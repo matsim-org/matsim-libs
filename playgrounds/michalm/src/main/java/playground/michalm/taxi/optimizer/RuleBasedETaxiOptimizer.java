@@ -19,42 +19,65 @@
 
 package playground.michalm.taxi.optimizer;
 
+import java.util.Collections;
+
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
-import org.matsim.contrib.taxi.optimizer.rules.*;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
-import playground.michalm.ev.data.Battery;
+import com.google.common.collect.Iterables;
+
+import playground.michalm.ev.data.*;
 import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.schedule.ETaxiChargingTask;
+import playground.michalm.taxi.scheduler.ETaxiScheduler;
 
 
 public class RuleBasedETaxiOptimizer
     extends RuleBasedTaxiOptimizer
 {
-    private static final double MIN_RELATIVE_SOC = 0.3;
-    private static final int SOC_CHECK_TIME_STEP = 300; //5 min
+    //TODO MIN_RELATIVE_SOC should depend on the weather and time of day
+    private final RuleBasedETaxiOptimizerParams params;
+    private final EvData evData;
+    private final BestEDispatchFinder eDispatchFinder;
+    private final ETaxiScheduler eScheduler;
 
 
-    public RuleBasedETaxiOptimizer(TaxiOptimizerContext optimContext,
-            RuleBasedTaxiOptimizerParams params)
+    public RuleBasedETaxiOptimizer(ETaxiOptimizerContext optimContext,
+            RuleBasedETaxiOptimizerParams params)
     {
         super(optimContext, params);
+        this.params = params;
+        evData = optimContext.evData;
+        eScheduler = (ETaxiScheduler)optimContext.scheduler;
+        eDispatchFinder = new BestEDispatchFinder(dispatchFinder);
     }
 
 
     @Override
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
     {
-        if (e.getSimulationTime() % SOC_CHECK_TIME_STEP == 0) {
-            for (Vehicle v : idleTaxiRegistry.getVehicles()) {
-                if (isUndercharged(v)) {
-                    //TODO send to a charger
-                }
-            }
+        if (e.getSimulationTime() % params.socCheckTimeStep == 0) {
+            chargeIdleUnderchargedVehicles(
+                    Iterables.filter(idleTaxiRegistry.getVehicles(), this::isUndercharged));
         }
 
         super.notifyMobsimBeforeSimStep(e);
+    }
+
+
+    private void chargeIdleUnderchargedVehicles(Iterable<Vehicle> vehicles)
+    {
+        for (Vehicle v : vehicles) {
+            Dispatch<Charger> eDispatch = eDispatchFinder.findBestChargerForVehicle(v,
+                    evData.getChargers().values());
+
+            eScheduler.scheduleCharging((EvrpVehicle)v, eDispatch.destination, eDispatch.path);
+        }
     }
 
 
@@ -63,16 +86,23 @@ public class RuleBasedETaxiOptimizer
     {
         super.nextTask(schedule);
 
-        if (optimContext.scheduler.isIdle(schedule.getVehicle())
-                && isUndercharged(schedule.getVehicle())) {
-            //TODO send to a charger
+        Vehicle veh = schedule.getVehicle();
+        if (optimContext.scheduler.isIdle(veh) && isUndercharged(veh)) {
+            chargeIdleUnderchargedVehicles(Collections.singleton(veh));
         }
+    }
+    
+    
+    @Override
+    protected boolean isWaitStay(TaxiTask task)
+    {
+        return task.getTaxiTaskType() == TaxiTaskType.STAY && !(task instanceof ETaxiChargingTask);
     }
 
 
     private boolean isUndercharged(Vehicle v)
     {
         Battery b = ((EvrpVehicle)v).getEv().getBattery();
-        return b.getSoc() < MIN_RELATIVE_SOC * b.getCapacity();
+        return b.getSoc() < params.minRelativeSoc * b.getCapacity();
     }
 }

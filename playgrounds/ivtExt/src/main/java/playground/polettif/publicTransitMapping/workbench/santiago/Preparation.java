@@ -18,8 +18,6 @@
 
 package playground.polettif.publicTransitMapping.workbench.santiago;
 
-import playground.polettif.publicTransitMapping.mapping.PTMapperPseudoRouting;
-
 public class Preparation {
 
 	public static void main(String[] args) {
@@ -43,6 +41,6 @@ public class Preparation {
 //		PopulationUtils.readPopulation("input_original/plans_final.xml");
 //
 		// run PTMapper
-		PTMapperPseudoRouting.run("ptm/ptm_santiago.xml");
+//		PTMapperPseudoRouting.run("ptm/ptm_santiago.xml");
 	}
 }

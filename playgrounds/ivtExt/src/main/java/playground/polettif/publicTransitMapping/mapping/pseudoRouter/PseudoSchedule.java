@@ -26,16 +26,37 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * todo javadoc
+ * Container class to store PseudoRoutes. Provides a method to modify
+ * an input schedule by creating ChildStopFacilities.
+ *
+ * PseudoSchedule
+ * - PseudoTransitRoute
+ *   - List of PseudoRouteStops
+ *
+ * PseudoGraph
+ * - creates list of PseudoRouteStops
+ *
+ * @author polettif
  */
 public interface PseudoSchedule {
 
 	void addPseudoRoute(TransitLine transitLine, TransitRoute transitRoute, List<PseudoRouteStop> pseudoStopSequence);
 
-	Set<PseudoRoute> getPseudoRoutes();
+	Set<PseudoTransitRoute> getPseudoRoutes();
 
+	/**
+	 * Merges the other pseudo schedule into this pseudo schedule
+	 */
 	void mergePseudoSchedule(PseudoSchedule otherPseudoSchedule);
 
+	/**
+	 * Replaces the stop facilities in the given schedule based on
+	 * the PseudoRoutes of the PseudoSchedule. Every parent stop
+	 * facility in the schedule's routeProfiles is replaced with a
+	 * child stop facility.
+	 *
+	 * @param schedule where stop facilities should be replaced
+	 */
 	void createAndReplaceFacilities(TransitSchedule schedule);
 
 }

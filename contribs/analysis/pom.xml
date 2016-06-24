@@ -11,7 +11,7 @@
   <dependencies>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>accessibility</artifactId>
+  		<artifactId>roadpricing</artifactId>
   		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
   </dependencies>

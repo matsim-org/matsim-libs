@@ -18,7 +18,6 @@
 
 package playground.polettif.publicTransitMapping.plausibility.log;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;

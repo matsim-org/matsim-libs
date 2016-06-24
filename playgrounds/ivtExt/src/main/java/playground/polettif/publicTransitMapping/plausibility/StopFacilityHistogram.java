@@ -28,7 +28,6 @@ import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -83,7 +82,7 @@ public class StopFacilityHistogram {
 			stopStat.put(parentFacility, ++count);
 		}
 
-		histMap = MiscUtils.sortAscendingByValue(stopStat);
+		histMap = MiscUtils.sortMapAscendingByValue(stopStat);
 
 		hist = new double[histMap.size()];
 		int i=0;

@@ -19,19 +19,25 @@
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
- * TODO doc
+ * A pseudo graph with PseudoRouteStops as nodes. Edges connect
+ * two PseudoRouteStops. The graph is used to calculate the least
+ * cost path on from a dummy source to a dummy destination. This
+ * path contains the best fitting PseudoRouteStops.
+ *
+ * @author polettif
  */
 public interface PseudoGraph {
-
-	List<PseudoRouteStop> getLeastCostPath();
 
 	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
 
 	void addDummyEdges(List<TransitRouteStop> transitRouteStops, Collection<LinkCandidate> firstStopLinkCandidates, Collection<LinkCandidate> lastStopLinkCandidates);
+
+	List<PseudoRouteStop> getLeastCostStopSequence();
 
 }

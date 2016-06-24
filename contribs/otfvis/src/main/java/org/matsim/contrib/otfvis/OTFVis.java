@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.otfvis;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -28,9 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -139,30 +135,30 @@ public class OTFVis {
 		}
 	}
 
-	private static String chooseFile() {
-		JFileChooser fc = new JFileChooser();
-		fc.setFileFilter( new FileFilter() {
-			@Override public boolean accept( File f ) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
-			}
-			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
-		} );
-
-		fc.setFileFilter( new FileFilter() {
-			@Override public boolean accept( File f ) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
-			}
-			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
-		} );
-
-		int state = fc.showOpenDialog( null );
-		if ( state == JFileChooser.APPROVE_OPTION ) {
-			String filename = fc.getSelectedFile().getAbsolutePath();
-			return filename;
-		}
-		System.out.println( "No file selected." );
-		return null;
-	}
+//	private static String chooseFile() {
+//		JFileChooser fc = new JFileChooser();
+//		fc.setFileFilter( new FileFilter() {
+//			@Override public boolean accept( File f ) {
+//				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
+//			}
+//			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
+//		} );
+//
+//		fc.setFileFilter( new FileFilter() {
+//			@Override public boolean accept( File f ) {
+//				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
+//			}
+//			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
+//		} );
+//
+//		int state = fc.showOpenDialog( null );
+//		if ( state == JFileChooser.APPROVE_OPTION ) {
+//			String filename = fc.getSelectedFile().getAbsolutePath();
+//			return filename;
+//		}
+//		System.out.println( "No file selected." );
+//		return null;
+//	}
 
 	public static void playMVI(final String[] args) {
 		playMVI(args[0]);

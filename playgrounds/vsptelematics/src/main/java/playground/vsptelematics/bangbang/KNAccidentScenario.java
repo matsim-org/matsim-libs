@@ -125,11 +125,11 @@ public class KNAccidentScenario {
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 		}
 
-		StrategySettings stratSets = new StrategySettings() ;
-		//		stratSets.setStrategyName(DefaultSelector.KeepLastSelected.name());
-		stratSets.setStrategyName(KEEP_LAST_EXECUTED);
-		stratSets.setWeight(1.);
-		config.strategy().addStrategySettings(stratSets);
+//		StrategySettings stratSets = new StrategySettings() ;
+//		//		stratSets.setStrategyName(DefaultSelector.KeepLastSelected.name());
+//		stratSets.setStrategyName(KEEP_LAST_EXECUTED);
+//		stratSets.setWeight(1.);
+//		config.strategy().addStrategySettings(stratSets);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 		config.vspExperimental().setWritingOutputEvents(true);
@@ -173,16 +173,18 @@ public class KNAccidentScenario {
 //				
 //				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecuted.class) ;
 //
-//
-//				this.bind( MyIterationCounter.class ).asEagerSingleton();
-				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
+				this.bind( MyIterationCounter.class ).asEagerSingleton();
 
-				//				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
+				// ---
+				
+				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
+//				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
+				
+				// ---
 
 				this.addEventHandlerBinding().toInstance( travelTime ) ;
 				this.addMobsimListenerBinding().toInstance( travelTime );
-//				this.bind( TravelTime.class ).toInstance( travelTime );
-				this.bindNetworkTravelTime().toInstance( travelTime ) ;
+				this.bind( TravelTime.class ).toInstance( travelTime );
 			}
 		}) ;
 

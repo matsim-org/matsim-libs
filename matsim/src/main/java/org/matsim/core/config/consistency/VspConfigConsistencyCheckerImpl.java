@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -210,6 +211,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// qsim:
 		
+		// added jun'16
+		if ( config.qsim().getUsePersonIdForMissingVehicleId() ) {
+			log.log( lvl, "found usePersonIdForMissingVehicleId==true; this is only for backwards compatibility and should rather be set to false") ;
+		}
+		
 		// added feb'16
 		if ( !config.qsim().isUsingTravelTimeCheckInTeleportation() ) {
 			log.log( lvl, "found `qsim.usingTravelTimeCheckInTeleporation==false'; vsp should try out `true' and report." ) ;
@@ -287,6 +293,25 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
 				log.log( lvl, "</module>");
 			}
+		}
+		
+		// === interaction between config groups:
+		boolean containsModeChoice = false ;
+		for ( StrategySettings settings : config.strategy().getStrategySettings() ) {
+			if ( settings.getStrategyName().contains("Mode") ) {
+				containsModeChoice = true ;
+			}
+		}
+		
+		// added jun'16
+		if ( config.qsim().getVehiclesSource()==VehiclesSource.fromVehiclesData 
+				&& config.qsim().getUsePersonIdForMissingVehicleId() 
+				&& containsModeChoice 
+				&& config.qsim().getMainModes().size() > 1 ) 
+		{
+			problem = true ;
+			log.log( lvl, "You can't use more than one main (=vehicular) mode while using the agent ID as missing vehicle ID ... "
+					+ "because in this case the person can only have one vehicle and thus cannot switch to a different vehicle type." ) ;
 		}
 
 		// === zzz:

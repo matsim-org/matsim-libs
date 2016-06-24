@@ -91,16 +91,8 @@ public class Trip {
 	}
 
 	/**
-	 * @return the route
-	 */
-	public List<Link> getLinks() {
-		return links;
-	}
-
-	/**
 	 * Puts a new stopTime
 	 * @param stopSequencePosition which stop number in the stopSequence this stopTime is referencing
-	 * @param stopTime
 	 */
 	public void putStopTime(Integer stopSequencePosition, StopTime stopTime) {
 		stopTimes.put(stopSequencePosition, stopTime);
@@ -108,25 +100,9 @@ public class Trip {
 
 	/**
 	 * Adds a new frequency
-	 * @param frequency
 	 */
 	public void addFrequency(Frequency frequency) {
 		frequencies.add(frequency);
-	}
-
-	/**
-	 * @param route the route to set
-	 */
-	public void setRoute(List<Link> route) {
-		this.links = route;
-	}
-
-	/**
-	 * Adds a new link
-	 * @param link
-	 */
-	public void addLink(Link link) {
-		links.add(link);
 	}
 
 	/**

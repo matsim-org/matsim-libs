@@ -21,9 +21,7 @@ package playground.polettif.publicTransitMapping.workbench;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
 import java.util.Set;
 import java.util.stream.Collectors;
