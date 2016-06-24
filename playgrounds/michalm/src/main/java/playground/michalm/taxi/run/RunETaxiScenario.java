@@ -25,14 +25,14 @@ import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
-import playground.michalm.taxi.ev.ETaxiUtils;
+import playground.michalm.taxi.ev.*;
 
 
 public class RunETaxiScenario
@@ -62,6 +62,15 @@ public class RunETaxiScenario
         Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
         controler.addOverridingModule(new EvModule(evData));
         controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
+
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install()
+            {
+                addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+            }
+        });
+
         return controler;
     }
 

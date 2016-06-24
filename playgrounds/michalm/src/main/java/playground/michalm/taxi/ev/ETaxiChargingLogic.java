@@ -141,4 +141,22 @@ public class ETaxiChargingLogic
         }
         return energyToCharge;
     }
+
+
+    int getPluggedCount()
+    {
+        return pluggedVehicles.size();
+    }
+
+
+    int getQueuedCount()
+    {
+        return queuedVehicles.size();
+    }
+
+
+    int getDispatchedCount()
+    {
+        return dispatchedVehicles.size();
+    }
 }

@@ -17,28 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package playground.michalm.taxi.ev;
 
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
 import com.google.inject.*;
 
+import playground.michalm.ev.data.EvData;
 
-public class TaxiStatusTimeProfileCollectorProvider
+
+public class ETaxiTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
-    private final TaxiData taxiData;
+    private final EvData evData;
     private final MatsimServices matsimServices;
 
 
     @Inject
-    public TaxiStatusTimeProfileCollectorProvider(TaxiData taxiData, MatsimServices matsimServices)
+    public ETaxiTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
     {
-        this.taxiData = taxiData;
+        this.evData = evData;
         this.matsimServices = matsimServices;
     }
 
@@ -46,10 +47,7 @@ public class TaxiStatusTimeProfileCollectorProvider
     @Override
     public MobsimListener get()
     {
-        ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-                TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
-                TaxiTimeProfiles.createRequestsWithStatusCounter(taxiData,
-                        TaxiRequestStatus.UNPLANNED));
-        return new TimeProfileCollector(calc, 300, "taxi_status_time_profiles.txt", matsimServices);
+        ProfileCalculator calc = ETaxiChargerProfiles.createChargerCalculator(evData);
+        return new TimeProfileCollector(calc, 300, "etaxi_time_profiles.txt", matsimServices);
     }
 }

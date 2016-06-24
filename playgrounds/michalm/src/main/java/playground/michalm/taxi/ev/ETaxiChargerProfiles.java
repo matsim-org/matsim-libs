@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ev;
+package playground.michalm.taxi.ev;
 
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.util.stats.TimeProfiles;
 
 import playground.michalm.ev.data.*;
 
 
-public class EvTimeProfiles
+public class ETaxiChargerProfiles
 {
-    public static ProfileCalculator createDischargedVehiclesCounter(final EvData evData)
+    public static ProfileCalculator createChargerCalculator(final EvData evData)
     {
-        return new TimeProfiles.SingleValueProfileCalculator("discharged") {
+        String[] header = { "plugged", "queued", "dispatched" };
+        return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String calcValue()
+            public String[] calcValues()
             {
-                int count = 0;
-                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    if (ev.getBattery().getSoc() < 0) {
-                        count++;
-                    }
+                int plugged = 0;
+                int queued = 0;
+                int dispatched = 0;
+                for (Charger c : evData.getChargers().values()) {
+                    ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
+                    plugged += logic.getPluggedCount();
+                    queued += logic.getQueuedCount();
+                    dispatched += logic.getDispatchedCount();
                 }
-                return count + "";
-            }
-        };
-    }
 
-
-    public static ProfileCalculator createMeanSocCalculator(final EvData evData)
-    {
-        return new TimeProfiles.SingleValueProfileCalculator("meanSOC") {
-            @Override
-            public String calcValue()
-            {
-                Mean mean = new Mean();
-                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    mean.increment(ev.getBattery().getSoc());
-                }
-                return (mean.getResult() / UnitConversionRatios.J_PER_kWh) + "";//print out in [kWh]
+                return new String[] { plugged + "", queued + "", dispatched + "" };
             }
         };
     }
