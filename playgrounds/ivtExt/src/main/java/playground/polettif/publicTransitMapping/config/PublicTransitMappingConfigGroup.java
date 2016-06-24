@@ -110,6 +110,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		lccParamsBus.setNetworkModesStr("car,bus");
 		LinkCandidateCreatorParams lccParamsRail = new LinkCandidateCreatorParams("rail");
 		lccParamsRail.setNetworkModesStr("rail,light_rail");
+		lccParamsRail.setMaxNClosestLinks(20);
+		lccParamsRail.setMaxLinkCandidateDistance(150);
 		LinkCandidateCreatorParams lccParamsTram = new LinkCandidateCreatorParams("tram");
 		lccParamsTram.setUseArtificialLoopLink(true);
 		config.addParameterSet(lccParamsBus);
@@ -743,7 +745,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		private static final String STOP_FACILITY = "stopFacility";
 		private static final String REPLACE = "replace";
 
-		private Id<TransitStopFacility> stopFacilityId;
+		private Id<TransitStopFacility> stopFacilityId = null;
 		private Set<String> scheduleModes = new HashSet<>();
 		private Set<Id<Link>> linkIds = new HashSet<>();
 		private boolean replace = true;
@@ -764,7 +766,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		public Map<String, String> getComments() {
 			Map<String, String> map = super.getComments();
 			map.put(SCHEDULE_MODES,
-					"The schedule transport modes for which these link apply.");
+					"The schedule transport modes for which these link apply. All possible links are considered if empty.");
 			map.put(LINK_IDS,
 					"The links, comma separated");
 			map.put(REPLACE,
@@ -779,7 +781,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		 */
 		@StringGetter(STOP_FACILITY)
 		public String getStopFacilityIdStr() {
-			return stopFacilityId.toString();
+			return stopFacilityId != null ? stopFacilityId.toString() : "";
 		}
 		public Id<TransitStopFacility> getStopFacilityId() {
 			return stopFacilityId;

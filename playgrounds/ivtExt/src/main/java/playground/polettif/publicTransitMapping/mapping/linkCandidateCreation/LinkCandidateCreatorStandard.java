@@ -138,9 +138,9 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 				scheduleModes = linkCandidates.keySet();
 			}
 
-			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
-			if(parentStopFacility == null) {
-				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
+			TransitStopFacility parentStopFacility = manualCandidates.getStopFacilityId() != null ? schedule.getFacilities().get(manualCandidates.getStopFacilityId()) : null;
+			if(parentStopFacility == null && manualCandidates.getStopFacilityId() != null) {
+				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are for this facility are ignored.");
 			} else {
 				for(String scheduleMode : scheduleModes) {
 					Router modeRouter = modeSeparatedRouters.get(scheduleMode);
