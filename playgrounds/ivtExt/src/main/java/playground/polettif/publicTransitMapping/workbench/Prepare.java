@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -30,9 +31,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
@@ -78,6 +77,22 @@ public class Prepare {
 		String inputVehicles = "../data/vehicles/ch_hafas_vehicles.xml.gz";
 		String inputPopulation;
 		String scenName;
+
+		// Zurich 0.1%
+		scenName = "zurich_micro";
+		inputPopulation = "population/zh_1prct.xml.gz";
+
+		final Config micro = createConfig(scenName);
+		micro.qsim().setFlowCapFactor(1.0);
+
+		Prepare prepMicro = new Prepare(micro, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		prepMicro.removeInvalidLines();
+		prepMicro.cutSchedule();
+		prepMicro.population();
+		prepMicro.popSubset(10);
+		prepMicro.vehicles(1.0);
+		prepMicro.writeFiles(scenName);
+
 
 		// Switzerland 10%
 		scenName = "ch_ten";
@@ -218,6 +233,19 @@ public class Prepare {
 		}
 	}
 
+	private void popSubset(int divisor) {
+		Population newPop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		int i = 0;
+		for(Person person : new HashSet<>(population.getPersons().values())) {
+			if(i % divisor == 0) {
+				newPop.addPerson(person);
+			}
+			i++;
+		}
+		newPop.setName(population.getName());
+		population = newPop;
+	}
+
 	private void cutSchedule() {
 		Coord effretikon = new Coord(2693780.0, 1253409.0);
 		Coord zurichHB = new Coord(2682830.0, 1248125.0);
@@ -254,11 +282,21 @@ public class Prepare {
 		PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		workParams.setActivityType(WORK);
 		workParams.setTypicalDuration(Time.parseTime("08:00:00"));
+		workParams.setEarliestEndTime(Time.parseTime("06:00:00"));
+		workParams.setLatestStartTime(Time.parseTime("20:00:00"));
+		workParams.setMinimalDuration(Time.parseTime("04:00:00"));
 		PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		homeParams.setActivityType(HOME);
 		homeParams.setTypicalDuration(Time.parseTime("08:00:00"));
+		workParams.setEarliestEndTime(Time.parseTime("04:00:00"));
+		workParams.setLatestStartTime(Time.parseTime("24:00:00"));
+		workParams.setMinimalDuration(Time.parseTime("04:00:00"));
 		PlanCalcScoreConfigGroup.ActivityParams otherParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		otherParams.setActivityType(OTHER);
+		homeParams.setTypicalDuration(Time.parseTime("01:00:00"));
+		workParams.setEarliestEndTime(Time.parseTime("00:00:00"));
+		workParams.setLatestStartTime(Time.parseTime("24:00:00"));
+		workParams.setMinimalDuration(Time.parseTime("00:30:00"));
 		config.planCalcScore().addActivityParams(homeParams);
 		config.planCalcScore().addActivityParams(workParams);
 		config.planCalcScore().addActivityParams(otherParams);

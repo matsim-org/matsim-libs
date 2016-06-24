@@ -208,7 +208,12 @@ public class PTMapperImpl extends PTMapper {
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
 		 */
-		PTMapperUtils.pullChildStopFacilitiesTogether(this.schedule, this.network);
+		log.info("=============================");
+		log.info("Pulling child stop facilities...");
+		int nPulled = 1;
+		while(nPulled != 0) {
+			nPulled = PTMapperUtils.pullChildStopFacilitiesTogether(this.schedule, this.network);
+		}
 
 		/** [9]
 		 * After all lines are created, clean the schedule and network. Removing
@@ -242,8 +247,10 @@ public class PTMapperImpl extends PTMapper {
 	}
 
 	private void cleanScheduleAndNetwork() {
-		// changing the freespeed of the artificial links (value is used in simulations)
+		// might have been set higher during pseudo routing
 		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+
+		// changing the freespeed of the artificial links (value is used in simulations)
 		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
 
 		// Remove unnecessary parts of schedule
