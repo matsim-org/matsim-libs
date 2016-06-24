@@ -51,11 +51,11 @@ public class CalculateCompositeAccessibility {
 
 				if (!header[0].equals(Labels.X_COORDINATE)) { throw new RuntimeException("Column is not the expected one!"); }
 				if (!header[1].equals(Labels.Y_COORDINATE)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[2].equals(Labels.ACCESSIBILITY_BY_FREESPEED)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[3].equals(Labels.ACCESSIBILITY_BY_CAR)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[4].equals(Labels.ACCESSIBILITY_BY_BIKE)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[5].equals(Labels.ACCESSIBILITY_BY_WALK)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[6].equals(Labels.ACCESSIBILITY_BY_PT)) { throw new RuntimeException("Column is not the expected one!"); }
+				if (!header[2].equals(Modes4Accessibility.freeSpeed + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
+				if (!header[3].equals(Modes4Accessibility.car + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
+				if (!header[4].equals(Modes4Accessibility.bike + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
+				if (!header[5].equals(Modes4Accessibility.walk + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
+				if (!header[6].equals(Modes4Accessibility.pt + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
 				if (includeDensityLayer == true) {
 					if (!header[7].equals(Labels.POPULATION_DENSITIY)) { throw new RuntimeException("Column is not the expected one!"); }
 					if (!header[8].equals(Labels.POPULATION_DENSITIY)) { throw new RuntimeException("Column is not the expected one!"); }
@@ -178,11 +178,16 @@ public class CalculateCompositeAccessibility {
 		// write header
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
-		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
-		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
-		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
-		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
-		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
+//		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
+//		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
+//		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
+//		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
+//		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			writer.writeField(mode.toString() + "_accessibility");
+		}
+		
+		
 		if (includeDensityLayer) {
 			// TODO dont really know why this is always twice, but keep it for the moment
 			writer.writeField(Labels.POPULATION_DENSITIY);
