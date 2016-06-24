@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -330,15 +332,14 @@ public class PTMapperImpl extends PTMapper {
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				nRoutes++;
-
-				boolean noArtificial = true;
+				boolean routeHasArtificialLink = false;
 				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 				for(Id<Link> linkId : linkIds) {
-					if(!network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
-						noArtificial = false;
+					if(network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+						routeHasArtificialLink = true;
 					}
 				}
-				if(noArtificial) {
+				if(routeHasArtificialLink) {
 					withoutArtificialLinks++;
 				}
 			}

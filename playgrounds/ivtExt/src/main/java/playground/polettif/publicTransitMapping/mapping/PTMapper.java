@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -108,7 +109,7 @@ public abstract class PTMapper {
 	 * @param configPath the config file
 	 */
 	public PTMapper(String configPath) {
-		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup() ) ;
+		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup());
 		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
 		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
 		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
