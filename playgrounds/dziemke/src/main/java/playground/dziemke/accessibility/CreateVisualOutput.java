@@ -2,6 +2,7 @@ package playground.dziemke.accessibility;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -57,9 +58,9 @@ public class CreateVisualOutput {
 		
 		for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 
-			VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+			VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 					lowerBound, upperBound, range, symbolSize, populationThreshold);
-			VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+			VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 		}
 	}
 }

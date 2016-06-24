@@ -33,6 +33,7 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -156,9 +157,9 @@ public class AccessibilityComputationCottbus {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}
 			}  
 		}
