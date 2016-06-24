@@ -76,7 +76,7 @@ public class DecongestionRun {
 		Config config = ConfigUtils.loadConfig(configFile);	
 		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
 				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
-				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjRate" + decongestionSettings.getTOLL_ADJUSTMENT_RATE() + "/");
+				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() + "/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);

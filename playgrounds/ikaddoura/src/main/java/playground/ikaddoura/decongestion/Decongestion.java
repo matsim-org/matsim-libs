@@ -34,6 +34,7 @@ import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV0;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV2;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV3;
 
 /**
 * @author ikaddoura
@@ -68,7 +69,7 @@ public class Decongestion {
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V2)) {
 			tollSettingApproach = new DecongestionTollingV2(info);
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V3)) {
-			throw new RuntimeException("Not yet implemented. Aborting...");
+			tollSettingApproach = new DecongestionTollingV3(info);
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.NoPricing)) {
 			if (info.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() < info.getScenario().getConfig().controler().getLastIteration()) {
 				throw new RuntimeException("If you want to disable pricing, please set the update price interval to a larger number than the number of iterations. Aborting...");

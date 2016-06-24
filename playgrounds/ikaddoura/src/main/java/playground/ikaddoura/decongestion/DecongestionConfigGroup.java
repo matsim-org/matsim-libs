@@ -27,9 +27,9 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	private final TollingApproach TOLLING_APPROACH = TollingApproach.V0;
+	private final TollingApproach TOLLING_APPROACH = TollingApproach.V3;
 	private final int UPDATE_PRICE_INTERVAL = 10;
-	private final double TOLL_ADJUSTMENT_RATE = 0.;
+	private final double TOLL_ADJUSTMENT = 0.5;
 
 	private final int WRITE_OUTPUT_ITERATION = 10;
 	private final double TOLERATED_AVERAGE_DELAY_SEC = 1.;
@@ -51,8 +51,8 @@ public class DecongestionConfigGroup {
 		return TOLERATED_AVERAGE_DELAY_SEC;
 	}
 
-	public double getTOLL_ADJUSTMENT_RATE() {
-		return TOLL_ADJUSTMENT_RATE;
+	public double getTOLL_ADJUSTMENT() {
+		return TOLL_ADJUSTMENT;
 	}
 
 	public double getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() {
@@ -67,7 +67,7 @@ public class DecongestionConfigGroup {
 	public String toString() {
 		return "DecongestionConfigGroup [WRITE_OUTPUT_ITERATION=" + WRITE_OUTPUT_ITERATION + ", UPDATE_PRICE_INTERVAL="
 				+ UPDATE_PRICE_INTERVAL + ", TOLERATED_AVERAGE_DELAY_SEC=" + TOLERATED_AVERAGE_DELAY_SEC
-				+ ", TOLL_ADJUSTMENT_RATE=" + TOLL_ADJUSTMENT_RATE + ", FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT="
+				+ ", TOLL_ADJUSTMENT_FACTOR=" + TOLL_ADJUSTMENT + ", FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT="
 				+ FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT + ", TOLLING_APPROACH=" + TOLLING_APPROACH + "]";
 	}
 	
