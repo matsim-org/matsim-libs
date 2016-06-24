@@ -60,7 +60,8 @@ public class PseudoRoutingImpl implements PseudoRouting {
 	private final Map<String, Router> modeSeparatedRouters;
 	private final List<TransitLine> queue = new ArrayList<>();
 
-	private final Set<ArtificialLink> artificialLinks = new HashSet<>();
+	private final Set<ArtificialLink> necessaryArtificialLinks = new HashSet<>();
+	private final Map<Tuple<LinkCandidate, LinkCandidate>, ArtificialLink> allPossibleArtificialLinks = new HashMap<>();
 	private final Map<String, LeastCostPathCalculator.Path> localStoredPaths = new HashMap<>();
 
 	private final PseudoSchedule threadPseudoSchedule = new PseudoScheduleImpl();
@@ -144,10 +145,9 @@ public class PseudoRoutingImpl implements PseudoRouting {
 									}
 								}
 
-								// path is null if links are on separate networks
 								if(leastCostPath != null) {
 									pathCost = leastCostPath.travelCost;
-									// if both links are the same, cost should get higher
+									// if both link candidates are the same, cost should get higher
 									if(linkCandidateCurrent.getLinkId().equals(linkCandidateNext.getLinkId())) {
 										pathCost *= 4;
 									}
@@ -175,7 +175,7 @@ public class PseudoRoutingImpl implements PseudoRouting {
 								double freespeed = modeRouter.getArtificialLinkFreeSpeed(maxAllowedTravelCost, linkCandidateCurrent, linkCandidateNext);
 								double length = modeRouter.getArtificialLinkLength(maxAllowedTravelCost, linkCandidateCurrent, linkCandidateNext);
 								ArtificialLink artificialLink = new ArtificialLinkImpl(linkCandidateCurrent, linkCandidateNext, freespeed, length);
-								artificialLinks.add(artificialLink);
+								allPossibleArtificialLinks.put(new Tuple<>(linkCandidateCurrent, linkCandidateNext), artificialLink);
 
 								double artificialEdgeWeight = maxAllowedTravelCost - 0.5 * linkCandidateCurrent.getLinkTravelCost() - 0.5 * linkCandidateNext.getLinkTravelCost();
 
@@ -196,6 +196,7 @@ public class PseudoRoutingImpl implements PseudoRouting {
 				 * Find the least cost path i.e. the PseudoRouteStop sequence
 				 */
 				List<PseudoRouteStop> pseudoPath = pseudoGraph.getLeastCostStopSequence();
+				getNecessaryArtificialLinks(pseudoPath);
 
 				if(pseudoPath == null) {
 					log.warn("PseudoGraph has no path from SOURCE to DESTINATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
@@ -203,6 +204,18 @@ public class PseudoRoutingImpl implements PseudoRouting {
 					threadPseudoSchedule.addPseudoRoute(transitLine, transitRoute, pseudoPath);
 				}
 				increaseCounter();
+			}
+		}
+	}
+
+	/**
+	 * Gets the necessary artificial links from the least cost pseudoPath
+	 */
+	private void getNecessaryArtificialLinks(List<PseudoRouteStop> pseudoPath) {
+		for(int i=0; i < pseudoPath.size()-1; i++) {
+			ArtificialLink a = allPossibleArtificialLinks.get(new Tuple<>(pseudoPath.get(i).getLinkCandidate(), pseudoPath.get(i + 1).getLinkCandidate()));
+			if(a != null) {
+				necessaryArtificialLinks.add(a);
 			}
 		}
 	}
@@ -216,9 +229,7 @@ public class PseudoRoutingImpl implements PseudoRouting {
 	}
 
 	/**
-	 * Adds the artificial links to the network. Note: All possible artificial links are added to the
-	 * network, not only the ones actually needed by a PseudoPath. It is easier to add them and remove
-	 * unused links afterwards than to extract them from the PseudoPath (in the current implementation)
+	 * Adds the artificial links to the network.
 	 *
 	 * Not thread safe.
 	 */
@@ -229,7 +240,7 @@ public class PseudoRoutingImpl implements PseudoRouting {
 			existingLinks.put(new Tuple<>(l.getFromNode().getId(), l.getToNode().getId()), l);
 		}
 
-		for(ArtificialLink a : artificialLinks) {
+		for(ArtificialLink a : necessaryArtificialLinks) {
 			Tuple<Id<Node>, Id<Node>> key = new Tuple<>(a.getFromNodeId(), a.getToNodeId());
 
 			Link existingLink = existingLinks.get(key);

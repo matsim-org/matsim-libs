@@ -13,10 +13,24 @@ import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSched
  */
 public interface PseudoRouting extends Runnable {
 
+	/**
+	 * Adds a transit line to the queue that is processed in run()
+	 */
 	void addTransitLineToQueue(TransitLine transitLine);
 
+	/**
+	 * Executes the PseudoRouting algorithm
+	 */
+	void run();
+
+	/**
+	 * @return a PseudoSchedule that contains all PseudoRoute for the queued lines
+	 */
 	PseudoSchedule getPseudoSchedule();
 
+	/**
+	 * Adds the necessary artificial links to the network.
+	 */
 	void addArtificialLinks(Network network);
 
 }

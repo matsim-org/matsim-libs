@@ -45,7 +45,6 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -60,6 +59,7 @@ import java.util.*;
 public class PTMapperImpl extends PTMapper {
 
 	private final Map<String, Router> modeSeparatedRouters = new HashMap<>();
+	private final PseudoSchedule pseudoSchedule = new PseudoScheduleImpl();
 
 	public PTMapperImpl(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
 		super(config, schedule, network);
@@ -87,13 +87,11 @@ public class PTMapperImpl extends PTMapper {
 		 * Some schedule statistics
  		 */
 		Set<String> scheduleTransportModes = new HashSet<>();
-		Map<TransitLine, Integer> totalStopsPerTransitLine = new HashMap<>();
 		int nStopFacilities = schedule.getFacilities().size();
 		int nTransitRoutes = 0;
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				scheduleTransportModes.add(transitRoute.getTransportMode());
-				MapUtils.addToInteger(transitLine, totalStopsPerTransitLine, transitRoute.getStops().size(), transitRoute.getStops().size());
 				nTransitRoutes++;
 			}
 		}
@@ -103,8 +101,8 @@ public class PTMapperImpl extends PTMapper {
 		 * Create a separate network for all schedule modes and
 		 * initiate routers.
 		 */
-		log.info("===========================================");
-		log.info("Creating mode separated network and routers");
+		log.info("==============================================");
+		log.info("Creating mode separated network and routers...");
 		Map<String, Set<String>> modeRoutingAssignment = config.getModeRoutingAssignment();
 		FastAStarRouter.setTravelCostType(config.getTravelCostType());
 		for(String scheduleMode : scheduleTransportModes) {
@@ -131,24 +129,22 @@ public class PTMapperImpl extends PTMapper {
 		log.info("==================================");
 		log.info("Calculating pseudoTransitRoutes... ("+nTransitRoutes+" transit routes in "+schedule.getTransitLines().size()+" transit lines)");
 
-		final PseudoSchedule pseudoSchedule = new PseudoScheduleImpl();
-
 		// initiate pseudoRouting
 		int numThreads = config.getNumOfThreads() > 0 ? config.getNumOfThreads() : 1;
-		PseudoRouting[] pseudoRoutingThreads = new PseudoRouting[numThreads];
+		PseudoRouting[] pseudoRoutingRunnables = new PseudoRouting[numThreads];
 		for(int i = 0; i < numThreads; i++) {
-			pseudoRoutingThreads[i] = new PseudoRoutingImpl(config, modeSeparatedRouters, linkCandidates);
+			pseudoRoutingRunnables[i] = new PseudoRoutingImpl(config, modeSeparatedRouters, linkCandidates);
 		}
-		// spread transit lines on threads
+		// spread transit lines on runnables
 		int thr = 0;
-		for(TransitLine transitLine : new LinkedList<>(MiscUtils.sortDescendingByValue(totalStopsPerTransitLine).keySet())) {
-			pseudoRoutingThreads[thr++ % numThreads].addTransitLineToQueue(transitLine);
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			pseudoRoutingRunnables[thr++ % numThreads].addTransitLineToQueue(transitLine);
 		}
 
 		Thread[] threads = new Thread[numThreads];
 		// start pseudoRouting
 		for(int i = 0; i < numThreads; i++) {
-			threads[i] = new Thread(pseudoRoutingThreads[i]);
+			threads[i] = new Thread(pseudoRoutingRunnables[i]);
 			threads[i].start();
 		}
 		for(Thread thread : threads) {
@@ -166,7 +162,7 @@ public class PTMapperImpl extends PTMapper {
 		 */
 		log.info("=====================================");
 		log.info("Adding artificial links to network...");
-		for(PseudoRouting prt : pseudoRoutingThreads) {
+		for(PseudoRouting prt : pseudoRoutingRunnables) {
 			prt.addArtificialLinks(network);
 			pseudoSchedule.mergePseudoSchedule(prt.getPseudoSchedule());
 		}
@@ -208,7 +204,7 @@ public class PTMapperImpl extends PTMapper {
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
 		 */
-		log.info("=============================");
+		log.info("================================");
 		log.info("Pulling child stop facilities...");
 		int nPulled = 1;
 		while(nPulled != 0) {
@@ -234,6 +230,8 @@ public class PTMapperImpl extends PTMapper {
 		/** [11]
 		 * Write output files if defined in config
 		 */
+		log.info("=======================================");
+		log.info("Writing schedule and network to file...");
 		writeOutputFiles();
 
 		log.info("==================================================");
@@ -271,7 +269,6 @@ public class PTMapperImpl extends PTMapper {
 	 */
 	private void writeOutputFiles() {
 		if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
-			log.info("Writing schedule and network to file...");
 			try {
 				ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
 				NetworkTools.writeNetwork(network, config.getOutputNetworkFile());

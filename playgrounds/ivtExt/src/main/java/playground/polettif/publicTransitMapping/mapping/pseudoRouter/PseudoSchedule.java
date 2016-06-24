@@ -44,8 +44,19 @@ public interface PseudoSchedule {
 
 	Set<PseudoTransitRoute> getPseudoRoutes();
 
+	/**
+	 * Merges the other pseudo schedule into this pseudo schedule
+	 */
 	void mergePseudoSchedule(PseudoSchedule otherPseudoSchedule);
 
+	/**
+	 * Replaces the stop facilities in the given schedule based on
+	 * the PseudoRoutes of the PseudoSchedule. Every parent stop
+	 * facility in the schedule's routeProfiles is replaced with a
+	 * child stop facility.
+	 *
+	 * @param schedule where stop facilities should be replaced
+	 */
 	void createAndReplaceFacilities(TransitSchedule schedule);
 
 }
