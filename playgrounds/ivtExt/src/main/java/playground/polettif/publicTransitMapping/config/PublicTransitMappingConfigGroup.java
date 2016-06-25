@@ -81,7 +81,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private String manualLinkCandidateCsvFile = null;
 	private String prefixArtificial = "pt_";
 	private int numOfThreads = 2;
-	private double nodeSearchRadius = 300;
+	private double nodeSearchRadius = 500;
 	private boolean removeNotUsedStopFacilities = true;
 	private boolean combinePtModes = false;
 	private boolean addPtMode = true;
@@ -110,9 +110,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		lccParamsBus.setNetworkModesStr("car,bus");
 		LinkCandidateCreatorParams lccParamsRail = new LinkCandidateCreatorParams("rail");
 		lccParamsRail.setNetworkModesStr("rail,light_rail");
+		lccParamsRail.setMaxNClosestLinks(20);
+		lccParamsRail.setMaxLinkCandidateDistance(150);
 		LinkCandidateCreatorParams lccParamsTram = new LinkCandidateCreatorParams("tram");
 		lccParamsTram.setUseArtificialLoopLink(true);
-
 		config.addParameterSet(lccParamsBus);
 		config.addParameterSet(lccParamsRail);
 		config.addParameterSet(lccParamsTram);
@@ -124,23 +125,23 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		config.addParameterSet(mraBus);
 		config.addParameterSet(mraRail);
 
+		config.addParameterSet(new ManualLinkCandidates());
+
 		return config;
 	}
 
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(ModeRoutingAssignment.SET_NAME,
-				"testest");
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 						"\t\tlisted in this set (typically only car). Separated by comma.");
 		map.put(COMBINE_PT_MODES,
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
-						"\t\tshould be replaced with pt (true) or not. Default: false");
+						"\t\tshould be replaced with pt (true) or not. Default: "+combinePtModes);
 		map.put(ADD_PT_MODE,
 				"The mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
-						"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: true");
+						"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: "+addPtMode);
 		map.put(TRAVEL_COST_TYPE,
 				"Defines which link attribute should be used for routing. Possible values \""+ TravelCostType.linkLength+"\" (default) \n" +
 						"\t\tand \""+ TravelCostType.travelTime+"\".");
@@ -744,7 +745,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		private static final String STOP_FACILITY = "stopFacility";
 		private static final String REPLACE = "replace";
 
-		private Id<TransitStopFacility> stopFacilityId;
+		private Id<TransitStopFacility> stopFacilityId = null;
 		private Set<String> scheduleModes = new HashSet<>();
 		private Set<Id<Link>> linkIds = new HashSet<>();
 		private boolean replace = true;
@@ -761,12 +762,26 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 			this.replace = true;
 		}
 
+		@Override
+		public Map<String, String> getComments() {
+			Map<String, String> map = super.getComments();
+			map.put(SCHEDULE_MODES,
+					"The schedule transport modes for which these link apply. All possible links are considered if empty.");
+			map.put(LINK_IDS,
+					"The links, comma separated");
+			map.put(REPLACE,
+					"If true, the link candidates found by the the link candidate creator are replaced with the links\n" +
+					"\t\t\tdefined here. If false, the manual links are added to the set.");
+			return map;
+		}
+
+
 		/**
 		 * stop facility id
 		 */
 		@StringGetter(STOP_FACILITY)
 		public String getStopFacilityIdStr() {
-			return stopFacilityId.toString();
+			return stopFacilityId != null ? stopFacilityId.toString() : "";
 		}
 		public Id<TransitStopFacility> getStopFacilityId() {
 			return stopFacilityId;

@@ -31,8 +31,8 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
- * Provides the contract for an multithread
- * implementation of public transit mapping.
+ * Provides the contract for an implementation
+ * of public transit mapping.
  *
  * Currently redirects to the only implementation
  * {@link PTMapperImpl}.
@@ -108,7 +108,7 @@ public abstract class PTMapper {
 	 * @param configPath the config file
 	 */
 	public PTMapper(String configPath) {
-		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup() ) ;
+		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup());
 		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
 		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
 		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());

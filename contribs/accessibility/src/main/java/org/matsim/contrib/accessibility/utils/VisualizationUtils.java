@@ -85,19 +85,7 @@ public class VisualizationUtils {
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
 		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
 				range, symbolSize);
-		if (mode.equals(Modes4Accessibility.freeSpeed)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.car)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_CAR); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.bike)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_BIKE); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.walk)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_WALK); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.pt)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_PT); // choose column/header to visualize
-		} else {
-			throw new RuntimeException("Other modes not yet considered!");
-		}
+			renderer.setRenderingAttribute(mode.toString() + "_accessibility");
 		writer.addLayer(accessibilityLayer);
 
 		// write the project file

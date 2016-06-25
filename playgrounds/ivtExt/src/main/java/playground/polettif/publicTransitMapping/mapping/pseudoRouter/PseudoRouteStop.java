@@ -22,13 +22,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.Map;
 
 /**
- * A PseudoRouteStop is used as node in the PseudoGraph.
+ * A PseudoRouteStop is used as node in the PseudoGraph. It is a container
+ * for a {@link TransitRouteStop} with a {@link LinkCandidate}
  * <p/>
  * LinkCandidates are made for each stop facility. Since one
  * StopFacility might be accessed twice in the same TransitRoute,
@@ -62,7 +64,9 @@ public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparab
 	Id<Link> getLinkId();
 
 	/**
-	 * Used for Dijkstra in {@link PseudoGraph}
+	 * Used for Dijkstra in {@link PseudoGraph}. Returns a map
+	 * with neighboring PseudoRouteStops and the travel cost to
+	 * reach them.
 	 */
 	Map<PseudoRouteStop, Double> getNeighbours();
 	/**

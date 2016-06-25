@@ -26,15 +26,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Container class to store PseudoRoutes. Provides a method to modify
- * an input schedule by creating ChildStopFacilities.
+ * Container to store multiple {@link PseudoTransitRoute}. Provides a
+ * method to modify an input schedule by creating child StopFacilities.
+ * <p/>
  *
- * PseudoSchedule
- * - PseudoTransitRoute
- *   - List of PseudoRouteStops
+ * <ul><li>PseudoSchedule</li>
+ *     <ul><li>{@link PseudoTransitRoute}</li>
+ *         <ul><li>List of {@link PseudoRouteStop}</li>
+ *         </ul>
+ *     </ul>
+ * </ul>
+ * <p/>
  *
- * PseudoGraph
- * - creates list of PseudoRouteStops
+ * {@link PseudoGraph} uses PseudoRouteStops as nodes and is used to calculate
+ * the best sequence of PseudoRouteStops for a route.
  *
  * @author polettif
  */
@@ -44,8 +49,19 @@ public interface PseudoSchedule {
 
 	Set<PseudoTransitRoute> getPseudoRoutes();
 
+	/**
+	 * Merges the other pseudo schedule into this pseudo schedule
+	 */
 	void mergePseudoSchedule(PseudoSchedule otherPseudoSchedule);
 
+	/**
+	 * Replaces the stop facilities in the given schedule based on
+	 * the PseudoRoutes of the PseudoSchedule. Every parent stop
+	 * facility in the schedule's routeProfiles is replaced with a
+	 * child stop facility.
+	 *
+	 * @param schedule where stop facilities should be replaced
+	 */
 	void createAndReplaceFacilities(TransitSchedule schedule);
 
 }

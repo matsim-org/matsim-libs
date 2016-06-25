@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dziemke.utils;
+package playground.dziemke.accessibility.input;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
@@ -44,8 +43,8 @@ import org.matsim.facilities.FacilitiesWriter;
 /**
  * @author dziemke
  */
-public class CreateFacilitiiesFileFromCSVFile {
-	private final static Logger LOG = Logger.getLogger(CreateFacilitiiesFileFromCSVFile.class);
+public class CreateFacilitiiesFileFromKODI {
+	private final static Logger LOG = Logger.getLogger(CreateFacilitiiesFileFromKODI.class);
 
 	public static void main(String[] args) {
 //		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/Public_Primary_School_listed_by_2007.csv";
@@ -63,7 +62,7 @@ public class CreateFacilitiiesFileFromCSVFile {
 		// Option 1: Get input data from URL
 		try {
 			BufferedReader reader = getBufferedReaderFromCsvUrl(csvUrl);
-			ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(reader, facilitiesFileDescription,
+			ActivityFacilities activityFacilities = createActivityFaciltiesFromBufferedReader(reader, facilitiesFileDescription,
 																					headOfCoordColumn, ct, separator);
 			writeFacilitiesFile(activityFacilities, facilitiesFile);
 		} catch (IOException e) {
@@ -85,7 +84,7 @@ public class CreateFacilitiiesFileFromCSVFile {
 		return new URL(url).openStream();
 	}
 
-	public static ActivityFacilities createActivityFaciltiesFromFile(BufferedReader bufferedReader, String facilitiesFileDescription,
+	public static ActivityFacilities createActivityFaciltiesFromBufferedReader(BufferedReader bufferedReader, String facilitiesFileDescription,
 			String headOfCoordColumn, CoordinateTransformation ct, String separator) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(facilitiesFileDescription);
 		int lineCount = 0;
@@ -113,14 +112,14 @@ public class CreateFacilitiiesFileFromCSVFile {
 		return activityFacilities;
 	}
 
-	public static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName,
-																	 String facilitiesFileDescription,
-																	 String headOfCoordColumn,
-																	 CoordinateTransformation ct,
-																	 String separator) {
-		BufferedReader bufferedReader = IOUtils.getBufferedReader(csvFileName);
-		return createActivityFaciltiesFromFile(bufferedReader, facilitiesFileDescription, headOfCoordColumn, ct, separator);
-	}
+//	public static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName,
+//																	 String facilitiesFileDescription,
+//																	 String headOfCoordColumn,
+//																	 CoordinateTransformation ct,
+//																	 String separator) {
+//		BufferedReader bufferedReader = IOUtils.getBufferedReader(csvFileName);
+//		return createActivityFaciltiesFromFile(bufferedReader, facilitiesFileDescription, headOfCoordColumn, ct, separator);
+//	}
 
 	private static Map<String,Integer> createColumnHeadsMap(String headLine, String separator) {
 		String[] header = headLine.split(separator);

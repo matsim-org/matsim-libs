@@ -31,8 +31,26 @@ public class MiscUtils {
 	private MiscUtils() {}
 
 	/**
-	 * @return true, if two sets (e.g. scheduleTransportModes and
-	 * networkTransportModes) have at least one identical entry.
+	 * @return true if two sets have at least one identical entry.
+	 */
+	public static <E> boolean setsShareMinOneEntry(Set<E> set1, Set<E> set2) {
+		if(set1 == null || set2 == null) {
+			return false;
+		} else {
+			for(E entry1 : set1) {
+				for(E entry2 : set2) {
+					if(entry1.equals(entry2)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * @return true if two sets (e.g. scheduleTransportModes and
+	 * networkTransportModes) have at least one identical entry (ignores case).
 	 */
 	public static boolean setsShareMinOneStringEntry(Set<String> set1, Set<String> set2) {
 		if(set1 == null || set2 == null) {
@@ -50,7 +68,7 @@ public class MiscUtils {
 	}
 
 	/**
-	 * @return a set with entries present in both sets.
+	 * @return a set with entries present in both sets (ignores case)
 	 */
 	public static Set<String> getSharedSetStringEntries(Set<String> set1, Set<String> set2) {
 		Set<String> shared = new HashSet<>();
@@ -58,24 +76,6 @@ public class MiscUtils {
 			shared.addAll(set2.stream().filter(entry1::equalsIgnoreCase).map(entry2 -> entry1).collect(Collectors.toList()));
 		}
 		return shared;
-	}
-
-	/**
-	 * @return true, if two sets have at least one identical entry.
-	 */
-	public static <E> boolean setsShareMinOneEntry(Set<E> set1, Set<E> set2) {
-		if(set1 == null || set2 == null) {
-			return false;
-		} else {
-			for(E entry1 : set1) {
-				for(E entry2 : set2) {
-					if(entry1.equals(entry2)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class MiscUtils {
 	 * @param unsortMap the unsortedMap
 	 * @return the sorted map
 	 */
-	public static <K, V extends Comparable<V>> Map<K, V> sortAscendingByValue(Map<K, V> unsortMap) {
+	public static <K, V extends Comparable<V>> Map<K, V> sortMapAscendingByValue(Map<K, V> unsortMap) {
 		// Convert Map to List
 		List<Map.Entry<K, V>> list = new LinkedList<>(unsortMap.entrySet());
 
@@ -159,7 +159,7 @@ public class MiscUtils {
 	 * @param unsortMap the unsortedMap
 	 * @return the sorted map
 	 */
-	public static <K, V extends Comparable<V>> Map<K, V> sortDescendingByValue(Map<K, V> unsortMap) {
+	public static <K, V extends Comparable<V>> Map<K, V> sortMapDescendingByValue(Map<K, V> unsortMap) {
 		// Convert Map to List
 		List<Map.Entry<K, V>> list = new LinkedList<>(unsortMap.entrySet());
 
@@ -175,7 +175,7 @@ public class MiscUtils {
 	}
 
 	/**
-	 * Checks whether list1 is a subset of list2. Returns false
+	 * Returns true when list1 is a subset of list2. Returns false
 	 * if list1 is greater than list 2. Returns true if the reversed
 	 * list1 is a subset of list2
 	 */

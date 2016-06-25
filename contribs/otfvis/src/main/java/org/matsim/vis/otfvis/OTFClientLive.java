@@ -61,12 +61,22 @@ public class OTFClientLive {
 				}
 
 				OTFConnectionManager connectionManager = new OTFConnectionManager();
+
 				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+				// I think that this essentially just connects the quad tree ... so that not all links are used, but only those
+				// that are seen. kai, jun'16
+				
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 				connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 				
+				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
+				// I think that this only works if at least one corresponding OTFDataWriter is added via OnTheFlyServer.addAdditionalElement(...).
+				
+				// Can we say something like
+				//     connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.WriteToProtocolBuffers.class);
+				// ???  But why would we set this on the client side?  Maybe the client has to tell the server what to send?  kai, jun'16
+
 				if (config.transit().isUseTransit()) {
 					connectionManager.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
 					connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);

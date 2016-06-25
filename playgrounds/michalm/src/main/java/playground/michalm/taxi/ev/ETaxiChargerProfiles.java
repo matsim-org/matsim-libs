@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2016 by the members listed in the COPYING,        *
@@ -16,28 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
+package playground.michalm.taxi.ev;
 
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.taxi.util.stats.TimeProfiles;
 
-import java.util.Collection;
-import java.util.List;
+import playground.michalm.ev.data.*;
 
-/**
- * A pseudo graph with {@link PseudoRouteStop}s as nodes. Edges connect
- * two PseudoRouteStops. The graph is used to calculate the least cost
- * path on from a dummy source to a dummy destination. This least cost
- * path contains the best suited PseudoRouteStops.
- *
- * @author polettif
- */
-public interface PseudoGraph {
 
-	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
+public class ETaxiChargerProfiles
+{
+    public static ProfileCalculator createChargerCalculator(final EvData evData)
+    {
+        String[] header = { "plugged", "queued", "dispatched" };
+        return new TimeProfiles.MultiValueProfileCalculator(header) {
+            @Override
+            public String[] calcValues()
+            {
+                int plugged = 0;
+                int queued = 0;
+                int dispatched = 0;
+                for (Charger c : evData.getChargers().values()) {
+                    ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
+                    plugged += logic.getPluggedCount();
+                    queued += logic.getQueuedCount();
+                    dispatched += logic.getDispatchedCount();
+                }
 
-	void addDummyEdges(List<TransitRouteStop> transitRouteStops, Collection<LinkCandidate> firstStopLinkCandidates, Collection<LinkCandidate> lastStopLinkCandidates);
-
-	List<PseudoRouteStop> getLeastCostStopSequence();
-
+                return new String[] { plugged + "", queued + "", dispatched + "" };
+            }
+        };
+    }
 }

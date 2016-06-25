@@ -23,15 +23,17 @@ import java.util.Collections;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.schedule.ETaxiChargingTask;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
 
 
@@ -60,7 +62,6 @@ public class RuleBasedETaxiOptimizer
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
     {
         if (e.getSimulationTime() % params.socCheckTimeStep == 0) {
-            System.err.println("===== socCheckTimeStep =====");
             chargeIdleUnderchargedVehicles(
                     Iterables.filter(idleTaxiRegistry.getVehicles(), this::isUndercharged));
         }
@@ -74,7 +75,7 @@ public class RuleBasedETaxiOptimizer
         for (Vehicle v : vehicles) {
             Dispatch<Charger> eDispatch = eDispatchFinder.findBestChargerForVehicle(v,
                     evData.getChargers().values());
-            
+
             eScheduler.scheduleCharging((EvrpVehicle)v, eDispatch.destination, eDispatch.path);
         }
     }
@@ -86,20 +87,22 @@ public class RuleBasedETaxiOptimizer
         super.nextTask(schedule);
 
         Vehicle veh = schedule.getVehicle();
-        if (schedule.getStatus() == ScheduleStatus.STARTED) {
-            System.err.println("===== nextTask: " + schedule.getCurrentTask());
-        }
-        
         if (optimContext.scheduler.isIdle(veh) && isUndercharged(veh)) {
             chargeIdleUnderchargedVehicles(Collections.singleton(veh));
         }
+    }
+    
+    
+    @Override
+    protected boolean isWaitStay(TaxiTask task)
+    {
+        return task.getTaxiTaskType() == TaxiTaskType.STAY && !(task instanceof ETaxiChargingTask);
     }
 
 
     private boolean isUndercharged(Vehicle v)
     {
         Battery b = ((EvrpVehicle)v).getEv().getBattery();
-        System.err.println("isUndercharged(): " + b.getSoc()); 
         return b.getSoc() < params.minRelativeSoc * b.getCapacity();
     }
 }

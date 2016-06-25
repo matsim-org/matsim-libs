@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dziemke.utils;
+package playground.dziemke.accessibility.input;
 
 import java.util.Collection;
 

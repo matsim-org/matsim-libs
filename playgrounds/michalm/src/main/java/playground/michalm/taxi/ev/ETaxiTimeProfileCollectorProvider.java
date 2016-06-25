@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2016 by the members listed in the COPYING,        *
@@ -16,28 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
+package playground.michalm.taxi.ev;
 
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
+import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import java.util.Collection;
-import java.util.List;
+import com.google.inject.*;
 
-/**
- * A pseudo graph with {@link PseudoRouteStop}s as nodes. Edges connect
- * two PseudoRouteStops. The graph is used to calculate the least cost
- * path on from a dummy source to a dummy destination. This least cost
- * path contains the best suited PseudoRouteStops.
- *
- * @author polettif
- */
-public interface PseudoGraph {
+import playground.michalm.ev.data.EvData;
 
-	void addEdge(int orderOfFirstStop, TransitRouteStop fromTransitRouteStop, LinkCandidate fromLinkCandidate, TransitRouteStop toTransitRouteStop, LinkCandidate toLinkCandidate, double pathTravelCost);
 
-	void addDummyEdges(List<TransitRouteStop> transitRouteStops, Collection<LinkCandidate> firstStopLinkCandidates, Collection<LinkCandidate> lastStopLinkCandidates);
+public class ETaxiTimeProfileCollectorProvider
+    implements Provider<MobsimListener>
+{
+    private final EvData evData;
+    private final MatsimServices matsimServices;
 
-	List<PseudoRouteStop> getLeastCostStopSequence();
 
+    @Inject
+    public ETaxiTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
+    {
+        this.evData = evData;
+        this.matsimServices = matsimServices;
+    }
+
+
+    @Override
+    public MobsimListener get()
+    {
+        ProfileCalculator calc = ETaxiChargerProfiles.createChargerCalculator(evData);
+        return new TimeProfileCollector(calc, 300, "etaxi_time_profiles.txt", matsimServices);
+    }
 }
