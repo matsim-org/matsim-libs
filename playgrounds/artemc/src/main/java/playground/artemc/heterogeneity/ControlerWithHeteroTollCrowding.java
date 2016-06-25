@@ -28,10 +28,12 @@ import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBased
 import playground.artemc.heterogeneity.routing.TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrapper;
 import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.heterogeneity.scoring.HeterogeneousScoringFunctionModule;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
+import tutorial.programming.individualizedScoringParameters.ExampleIndividualizedScoringFunctionModule;
 
 import java.io.File;
 import java.util.HashSet;
@@ -100,6 +102,8 @@ public class ControlerWithHeteroTollCrowding {
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());
 
+
+
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
 //			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
@@ -123,9 +127,12 @@ public class ControlerWithHeteroTollCrowding {
 		}
 
 		//Scoring
-		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory customScoringFunctionFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork());
-		customScoringFunctionFactory.setSimulationType(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostType"));
-        controler.setScoringFunctionFactory(customScoringFunctionFactory);
+//		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory customScoringFunctionFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork());
+//		customScoringFunctionFactory.setSimulationType(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostType"));
+//
+//        controler.setScoringFunctionFactory(customScoringFunctionFactory);
+
+		controler.addOverridingModule( new HeterogeneousScoringFunctionModule());
 
 		//Routing PT
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));

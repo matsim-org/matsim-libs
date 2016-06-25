@@ -22,6 +22,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.analysis.AnalysisCrowdingControlerListener;
+import playground.artemc.annealing.AnnealingConfigGroup;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.crowding.CrowdednessObserver;
 import playground.artemc.crowding.internalization.InternalizationPtControlerListener;
@@ -32,10 +33,7 @@ import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.heterogeneity.eventsBasedPTRouter.TransitRouterEventsAndHeterogeneityBasedWSModule;
 import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory;
 import playground.artemc.heterogeneity.routing.TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrapper;
-import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousCrowdingScoreAnalyzer;
-import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
-import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisAndCrowdingFactory;
-import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.heterogeneity.scoring.*;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
@@ -60,7 +58,7 @@ public class ControlerWithHeteroTollCrowdingComfort {
 	private static CrowdednessObserver observer;
 	private static ScoreTracker scoreTracker;
 	private static ScoreListener scoreListener;
-	private static int numberOfIterations = 1000;
+	private static int numberOfIterations = 5;
 
 	private static boolean internalizationOfComfortDisutility = false;
 
@@ -122,7 +120,7 @@ public class ControlerWithHeteroTollCrowdingComfort {
 		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostType", simulationType);
 
 		log.info("Adding Simple Annealer...");
-		controler.addControlerListener(new SimpleAnnealer());
+		controler.addControlerListener(new SimpleAnnealer(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams()));
 
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
@@ -146,17 +144,20 @@ public class ControlerWithHeteroTollCrowdingComfort {
 				}});
 		}
 
+
 		//CrowdednessObserver observer = new CrowdednessObserver(scenario, controler.getEvents(), new StochasticRule());
 		observer = new CrowdednessObserver(scenario, controler.getEvents(), new SimpleRule());
 		controler.getEvents().addHandler(observer);
 		scoreTracker = new ScoreTracker();
 		scoreListener = new ScoreListener(scoreTracker);
 
+
 		//Scoring
-		HeterogeneousCharyparNagelScoringFunctionForAnalysisAndCrowdingFactory customScoringFunctionFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisAndCrowdingFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork(), controler.getEvents(), scoreTracker, controler.getScenario(), internalizationOfComfortDisutility);
+/*		HeterogeneousCharyparNagelScoringFunctionForAnalysisAndCrowdingFactory customScoringFunctionFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisAndCrowdingFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork(), controler.getEvents(), scoreTracker, controler.getScenario(), internalizationOfComfortDisutility);
 		customScoringFunctionFactory.setSimulationType(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostType"));
 		controler.setScoringFunctionFactory(customScoringFunctionFactory);
-
+*/
+		controler.addOverridingModule(new HeterogeneousScoringFunctionModule());
 
 		//Routing PT
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
@@ -170,7 +171,8 @@ public class ControlerWithHeteroTollCrowdingComfort {
 			controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		}else
 		{
-			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+//			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		}
 
 		//Sun's Dwell Time model
@@ -186,14 +188,17 @@ public class ControlerWithHeteroTollCrowdingComfort {
 			}
 		});
 
+
+
 		// Kaddoura's externalities
 		controler.addControlerListener(new InternalizationPtControlerListener( (MutableScenario) controler.getScenario(), scoreTracker));
 
+/*
 		// Additional analysis
 		AnalysisCrowdingControlerListener analysisControlerListener = new AnalysisCrowdingControlerListener((MutableScenario) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
 		controler.addControlerListener(new DisaggregatedHeterogeneousCrowdingScoreAnalyzer((MutableScenario) controler.getScenario(), analysisControlerListener.getTripAnalysisHandler()));
-
+*/
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
@@ -207,7 +212,7 @@ public class ControlerWithHeteroTollCrowdingComfort {
 
 	private static Scenario initScenario() {
 
-		Config config = ConfigUtils.loadConfig(input+"config.xml", new HeterogeneityConfigGroup(), new RoadPricingConfigGroup());
+		Config config = ConfigUtils.loadConfig(input+"config.xml", new HeterogeneityConfigGroup(), new RoadPricingConfigGroup(), new AnnealingConfigGroup());
 
 		config.network().setInputFile(input+"network.xml");
 		boolean isPopulationZipped = new File(input+"population.xml.gz").isFile();
@@ -230,6 +235,7 @@ public class ControlerWithHeteroTollCrowdingComfort {
 		if(output!=null){
 			config.controler().setOutputDirectory(output);
 		}
+
 
 		//Roadpricing module config
 		ConfigUtils.addOrGetModule(config,
