@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.filter;
+package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.VehicleData;
-import org.matsim.contrib.util.PartialSort;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
 
-public class KStraightLineNearestVehicleDepartureFilter
+public class LinkProviders
 {
-    private final int k;
-
-
-    public KStraightLineNearestVehicleDepartureFilter(int k)
-    {
-        this.k = k;
-    }
-
-
-    public Iterable<VehicleData.Entry> filterVehiclesForRequest(
-            Iterable<VehicleData.Entry> vehicles, TaxiRequest request)
-    {
-        Link toLink = request.getFromLink();
-        PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
-
-        for (VehicleData.Entry veh : vehicles) {
-            double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.link, toLink);
-            nearestVehicleSort.add(veh, squaredDistance);
+    public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
+        public Link getLink(TaxiRequest req)
+        {
+            return req.getFromLink();
         }
+    };
 
-        return nearestVehicleSort.retriveKSmallestElements();
+    public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = new LinkProvider<VehicleData.Entry>() {
+        public Link getLink(VehicleData.Entry veh)
+        {
+            return veh.link;
+        }
+    };
+
+
+    public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
+            final TaxiScheduleInquiry scheduleInquiry)
+    {
+        return new LinkProvider<Vehicle>() {
+            public Link getLink(Vehicle veh)
+            {
+                return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
+            }
+        };
     }
 }

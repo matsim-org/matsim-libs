@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.filter;
+package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.PartialSort;
-import org.matsim.contrib.util.distance.DistanceUtils;
 
 
-public class KStraightLineNearestVehicleFilter
+public interface LinkProvider<T>
 {
-    private final TaxiScheduleInquiry scheduleInquiry;
-    private final int k;
-
-
-    public KStraightLineNearestVehicleFilter(TaxiScheduleInquiry scheduleInquiry, int k)
-    {
-        this.scheduleInquiry = scheduleInquiry;
-        this.k = k;
-    }
-
-
-    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
-            TaxiRequest request)
-    {
-        Link toLink = request.getFromLink();
-        PartialSort<Vehicle> nearestVehicleSort = new PartialSort<Vehicle>(k);
-
-        for (Vehicle veh : vehicles) {
-            Link fromLink = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
-            double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
-            nearestVehicleSort.add(veh, squaredDistance);
-        }
-
-        return nearestVehicleSort.retriveKSmallestElements();
-    }
+    Link getLink(T object);
 }

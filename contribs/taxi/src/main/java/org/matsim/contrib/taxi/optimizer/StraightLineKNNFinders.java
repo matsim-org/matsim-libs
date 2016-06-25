@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.filter;
+package org.matsim.contrib.taxi.optimizer;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.PartialSort;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.taxi.optimizer.*;
 
 
-public class KStraightLineNearestRequestFilter
+/**
+ * kNN - k Nearest Neighbours
+ */
+public class StraightLineKNNFinders
 {
-    private final TaxiScheduleInquiry scheduleInquiry;
-    private final int k;
-
-
-    public KStraightLineNearestRequestFilter(TaxiScheduleInquiry scheduleInquiry, int k)
+    public static StraightLineKNNFinder<VehicleData.Entry, TaxiRequest> createTaxiRequestFinder(
+            int k)
     {
-        this.scheduleInquiry = scheduleInquiry;
-        this.k = k;
+        return new StraightLineKNNFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK,
+                LinkProviders.REQUEST_TO_FROM_LINK);
     }
 
 
-    public List<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
-            Vehicle vehicle)
+    public static StraightLineKNNFinder<TaxiRequest, VehicleData.Entry> createVehicleDepartureFinder(
+            int k)
     {
-        Link fromLink = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(vehicle).link;
-        PartialSort<TaxiRequest> nearestRequestSort = new PartialSort<TaxiRequest>(k);
-
-        for (TaxiRequest req : requests) {
-            Link toLink = req.getFromLink();
-            double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
-            nearestRequestSort.add(req, squaredDistance);
-        }
-
-        return nearestRequestSort.retriveKSmallestElements();
+        return new StraightLineKNNFinder<>(k, LinkProviders.REQUEST_TO_FROM_LINK,
+                LinkProviders.VEHICLE_ENTRY_TO_LINK);
     }
 }

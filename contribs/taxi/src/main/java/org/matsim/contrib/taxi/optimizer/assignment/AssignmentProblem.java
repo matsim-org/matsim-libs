@@ -28,8 +28,7 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.optimizer.filter.*;
-import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -44,8 +43,8 @@ public class AssignmentProblem
     private final MultiNodeDijkstra router;
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
-    private final KStraightLineNearestRequestFilter requestFilter;
-    private final KStraightLineNearestVehicleDepartureFilter vehicleFilter;
+    private final StraightLineKNNFinder<VehicleData.Entry, TaxiRequest> requestFinder;
+    private final StraightLineKNNFinder<TaxiRequest, VehicleData.Entry> vehicleFinder;
 
     private VehicleData vData;
     private AssignmentRequestData rData;
@@ -60,10 +59,10 @@ public class AssignmentProblem
         this.router = router;
         this.backwardRouter = backwardRouter;
 
-        this.requestFilter = new KStraightLineNearestRequestFilter(optimContext.scheduler,
-                params.nearestRequestsLimit);
-        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(
-                params.nearestVehiclesLimit);
+        this.requestFinder = StraightLineKNNFinders
+                .createTaxiRequestFinder(params.nearestRequestsLimit);
+        this.vehicleFinder = StraightLineKNNFinders
+                .createVehicleDepartureFinder(params.nearestVehiclesLimit);
     }
 
 
@@ -145,8 +144,8 @@ public class AssignmentProblem
             Map<Id<Node>, InitialNode> reqInitialNodes = new HashMap<>();
             Map<Id<Node>, Path> pathsToReqNodes = new HashMap<>();
 
-            Iterable<TaxiRequest> filteredReqs = requestFilter
-                    .filterRequestsForVehicle(rData.requests, departure.vehicle);
+            List<TaxiRequest> filteredReqs = requestFinder.findNearest(departure,
+                    rData.requests);
 
             for (TaxiRequest req : filteredReqs) {
                 int r = rData.reqIdx.get(req.getId());
@@ -206,8 +205,7 @@ public class AssignmentProblem
             Map<Id<Node>, InitialNode> vehInitialNodes = new HashMap<>();
             Map<Id<Node>, Path> pathsFromVehNodes = new HashMap<>();
 
-            Iterable<VehicleData.Entry> filteredVehs = vehicleFilter
-                    .filterVehiclesForRequest(vData.entries, req);
+            List<VehicleData.Entry> filteredVehs = vehicleFinder.findNearest(req, vData.entries);
 
             for (VehicleData.Entry departure : filteredVehs) {
                 int v = departure.idx;

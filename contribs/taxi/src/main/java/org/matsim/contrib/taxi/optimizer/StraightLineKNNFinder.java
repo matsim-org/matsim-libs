@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package org.matsim.contrib.taxi.optimizer;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import java.util.List;
 
-import playground.michalm.ev.data.Charger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.util.PartialSort;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
 
-public class BestEDispatchFinder
+public class StraightLineKNNFinder<T, N>
 {
-    private static final LinkProvider<Charger> CHARGER_TO_LINK = (charger) -> charger.getLink();
+    private final int k;
+    private final LinkProvider<T> objectToLink;
+    private final LinkProvider<N> neighbourToLink;
 
-    private final BestDispatchFinder dispatchFinder;
 
-
-    public BestEDispatchFinder(BestDispatchFinder dispatchFinder)
+    public StraightLineKNNFinder(int k, LinkProvider<T> objectToLink,
+            LinkProvider<N> neighbourToLink)
     {
-        this.dispatchFinder = dispatchFinder;
+        this.k = k;
+        this.objectToLink = objectToLink;
+        this.neighbourToLink = neighbourToLink;
     }
 
 
-    public Dispatch<Charger> findBestChargerForVehicle(Vehicle veh, Iterable<Charger> chargers)
+    public List<N> findNearest(T obj, Iterable<N> neighbours)
     {
-        return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);
+        Coord objectCoord = objectToLink.getLink(obj).getCoord();
+        PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
+
+        for (N n : neighbours) {
+            Coord nCoord = neighbourToLink.getLink(n).getCoord();
+            nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
+        }
+
+        return nearestRequestSort.retriveKSmallestElements();
     }
 }
