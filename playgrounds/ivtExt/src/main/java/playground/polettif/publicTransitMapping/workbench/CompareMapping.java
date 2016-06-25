@@ -29,6 +29,7 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+//import playground.polettif.boescpa.converters.osm.ptMapping.PTMapperOnlyBusses;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -47,10 +48,21 @@ public class CompareMapping {
 		String networkFile = "data/network/mm/zurich_detail.xml.gz";
 		String output = args[0];
 
+		/**
+		 * Stop Histogram hafas
+		 */
+//		TransitSchedule mappedHafas = ScheduleTools.readTransitSchedule("output/2016-06-24/ch_schedule.xml.gz");
+//		StopFacilityHistogram hafasHist = new StopFacilityHistogram(mappedHafas);
+//		hafasHist.createCsv(output+"hafas_stopFacilities.csv");
 
-		// gtfs 2 matsim
-		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, unmappedMTS, null, output+"gtfs.shp");
+		/**
+		 * Convert GTFS to unmapped schedule
+		 */
+// 		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, unmappedMTS, null, output+"gtfs.shp");
 
+		/**
+		 * Run PTMapper
+		 */
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(unmappedMTS);
 		Network network = NetworkTools.readNetwork(networkFile);
 
@@ -67,15 +79,15 @@ public class CompareMapping {
 
 		// ptm
 		PublicTransitMappingConfigGroup ptmConfig = PublicTransitMappingConfigGroup.createDefaultConfig();
-
 		ptmConfig.setTravelCostType(PublicTransitMappingConfigGroup.TravelCostType.travelTime);
-
 		PublicTransitMappingConfigGroup.LinkCandidateCreatorParams lccParamBus = new PublicTransitMappingConfigGroup.LinkCandidateCreatorParams("bus");
-		lccParamBus.setMaxNClosestLinks(6);
-		lccParamBus.setLinkDistanceTolerance(1.1);
-		lccParamBus.setMaxLinkCandidateDistance(80);
+		lccParamBus.setNetworkModesStr("car,bus");
+		lccParamBus.setMaxNClosestLinks(4);
+		lccParamBus.setLinkDistanceTolerance(1.5);
+		lccParamBus.setMaxLinkCandidateDistance(40);
 		ptmConfig.addParameterSet(lccParamBus);
 		ptmConfig.setNumOfThreads(4);
+		ptmConfig.setMaxTravelCostFactor(8);
 
 
 		PublicTransitMappingConfigGroup.ModeRoutingAssignment mra = new PublicTransitMappingConfigGroup.ModeRoutingAssignment("bus");
@@ -94,10 +106,18 @@ public class CompareMapping {
 		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
 		histogram.createCsv(output+"gtfs_stopFacilities.csv");
 
-		// check and shapefile
-//		PlausibilityCheck check = new PlausibilityCheck(schedule, network, ct);
-//		check.runCheck();
-//		check.writeCsv(output+"allPlausibilityWarnings.csv");
-//		check.writeResultShapeFiles(output);
+		/**
+		 * boescpa
+		 */
+//		TransitSchedule schedule2 = ScheduleTools.readTransitSchedule(filteredUnmappedMTS);
+//		Network network2 = NetworkTools.readNetwork(networkFile);
+//
+//		PTMapperOnlyBusses boescpa = new PTMapperOnlyBusses(schedule2);
+//		boescpa.routePTLines(network2);
+//
+//		ScheduleTools.writeTransitSchedule(schedule2, output+"boescpa/boescpa_schedule.xml.gz");
+//		NetworkTools.writeNetwork(network2, output+"boescpa/boescpa_network.xml.gz");
+//		ScheduleShapeFileWriter.run(schedule2, network2, ct, output+"boescpa/");
+
 	}
 }

@@ -26,7 +26,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import playground.polettif.publicTransitMapping.tools.CoordTools;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
 public class PTMapperUtils {
 
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
-	private static final String suffixChildStopFacilities = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES;
-	private static final String suffixChildStopFacilitiesRegex = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
+	private static final String suffixChildStopFacilities = PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES;
+	private static final String suffixChildStopFacilitiesRegex = PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
 
 	/**
 	 * @return the linkIds of the links in path

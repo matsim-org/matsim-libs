@@ -32,6 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreatorStandard;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.FastAStarRouter;
@@ -186,7 +187,7 @@ public class PTMapperImpl extends PTMapper {
 		log.info("Initiating final routers to map transit routes with referenced facilities to the network...");
 		Map<String, Router> finalRouters = new HashMap<>();
 		for(String scheduleMode : scheduleTransportModes) {
-			Set<String> routingTransportModes = new HashSet<>(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
+			Set<String> routingTransportModes = new HashSet<>(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE_AS_SET);
 			if(modeRoutingAssignment.get(scheduleMode) != null) routingTransportModes.addAll(modeRoutingAssignment.get(scheduleMode));
 			log.info("Initiating network and router for schedule mode \"" +scheduleMode+"\", network modes " + routingTransportModes);
 
@@ -248,7 +249,7 @@ public class PTMapperImpl extends PTMapper {
 
 	private void cleanScheduleAndNetwork() {
 		// might have been set higher during pseudo routing
-		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		NetworkTools.resetLinkLength(network, PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE);
 
 		// changing the freespeed of the artificial links (value is used in simulations)
 		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
@@ -323,7 +324,7 @@ public class PTMapperImpl extends PTMapper {
 	private void printStatistics(int inputNStopFacilities) {
 		int nArtificialLinks = 0;
 		for(Link l : network.getLinks().values()) {
-			if(l.getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+			if(l.getAllowedModes().contains(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE)) {
 				nArtificialLinks++;
 			}
 		}
@@ -335,7 +336,7 @@ public class PTMapperImpl extends PTMapper {
 				boolean routeHasArtificialLink = false;
 				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 				for(Id<Link> linkId : linkIds) {
-					if(network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+					if(network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE)) {
 						routeHasArtificialLink = true;
 					}
 				}

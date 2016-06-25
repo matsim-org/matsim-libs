@@ -35,7 +35,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 
@@ -408,7 +408,7 @@ public class ScheduleTools {
 	 * child stop facility suffix ".link:"
 	 */
 	public static String getParentId(String stopFacilityId) {
-		String[] childStopSplit = stopFacilityId.split(PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX);
+		String[] childStopSplit = stopFacilityId.split(PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES_REGEX);
 		return childStopSplit[0];
 	}
 }

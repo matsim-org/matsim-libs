@@ -21,7 +21,7 @@ package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.Set;
@@ -38,7 +38,7 @@ public class ArtificialLinkImpl implements ArtificialLink {
 	private final double freespeed;
 	private final double linkLength;
 	private final double capacity = 9999;
-	private final Set<String> transportModes = PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET;
+	private final Set<String> transportModes = PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE_AS_SET;
 
 	public ArtificialLinkImpl(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate, double freespeed, double linklength) {
 		this.fromNodeId = fromLinkCandidate.getToNodeId();

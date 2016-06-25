@@ -28,6 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -41,7 +42,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 
 	protected static Logger log = Logger.getLogger(LinkCandidateCreatorStandard.class);
 
-	private static final Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE+","+PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
+	private static final Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE+","+ PublicTransitMappingStrings.STOP_FACILITY_LOOP_LINK);
 	private final Map<String, Router> modeSeparatedRouters;
 
 	private Map<String, PublicTransitMappingConfigGroup.LinkCandidateCreatorParams> lccParams;
