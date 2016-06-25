@@ -25,8 +25,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import java.util.List;
 
 /**
- * A container class for pseudoRouteStop sequences. Used to store
- * the original transit route and transit line.
+ * A container class for a {@link PseudoRouteStop} sequence. It is
+ * used to store the original transit route and transit line to
+ * recreate a TransitSchedule from PseudoTransitRoutes.
  *
  * @author polettif
  */
@@ -36,5 +37,9 @@ public interface PseudoTransitRoute {
 
 	TransitRoute getTransitRoute();
 
+	/**
+	 * @return The Sequence of PseudoRouteStops i.e. the sequence of
+	 * link candidates that are used by this PseudoTransitRoute
+	 */
 	List<PseudoRouteStop> getPseudoStops();
 }

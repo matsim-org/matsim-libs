@@ -19,11 +19,25 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -33,9 +47,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import javax.inject.Inject;
-import java.util.*;
+import org.matsim.vehicles.Vehicles;
 
 public final class PopulationAgentSource implements AgentSource {
 	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
@@ -49,15 +61,37 @@ public final class PopulationAgentSource implements AgentSource {
 
 	@Inject
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
+		Vehicles vehicles = qsim.getScenario().getVehicles() ;
+		QSimConfigGroup qsimConfig = qsim.getScenario().getConfig().qsim() ;
+		
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
-		for (String mode : mainModes) {
-			// initialize each mode with default vehicle type:
-			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+		switch ( qsimConfig.getVehiclesSource() ) {
+		case defaultVehicle:
+			for (String mode : mainModes) {
+				// initialize each mode with default vehicle type:
+				modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+			}
+			break;
+		case fromVehiclesData:
+			// don't do anything
+			break;
+		case modeVehicleTypesFromVehiclesData:
+			for (String mode : mainModes) {
+				VehicleType vehicleType = vehicles.getVehicleTypes().get( Id.create(mode, VehicleType.class) ) ;
+				modeVehicleTypes.put(mode, vehicleType );
+			}
+			break;
+		default:
+			break;
+		
 		}
+		
+		
+		
 	}
 
 	@Override
@@ -94,6 +128,7 @@ public final class PopulationAgentSource implements AgentSource {
 						Vehicle vehicle = null ;
 						switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
 						case defaultVehicle:
+						case modeVehicleTypesFromVehiclesData:
 							vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
 							break;
 						case fromVehiclesData:

@@ -35,8 +35,16 @@ public class ETaxiAtChargerActivity
     private final ETaxiChargingTask chargingTask;
     private final MobsimTimer timer;
 
-    private boolean chargingEnded = false;
-    private double endTime;
+    private double endTime = END_ACTIVITY_LATER;
+
+
+    private enum State
+    {
+        init, queued, plugged, unplugged
+    };
+
+
+    private State state = State.init;
 
 
     public ETaxiAtChargerActivity(ETaxiChargingTask chargingTask, MobsimTimer timer)
@@ -44,12 +52,31 @@ public class ETaxiAtChargerActivity
         super(STAY_AT_CHARGER_ACTIVITY_TYPE);
         this.chargingTask = chargingTask;
         this.timer = timer;
-
-        onActivityStart();
     }
 
 
-    private void onActivityStart()
+    @Override
+    public void doSimStep(double now)
+    {
+        switch (state) {
+            case queued:
+            case plugged:
+                if (endTime <= now) {
+                    endTime = now + 1;
+                }
+                return;
+
+            case init:
+                initialize();
+                return;
+
+            default:
+                return;
+        }
+    }
+
+
+    private void initialize()
     {
         ETaxiChargingLogic logic = chargingTask.getLogic();
         Ev ev = chargingTask.getEv();
@@ -58,16 +85,7 @@ public class ETaxiAtChargerActivity
         logic.addVehicle(ev);
         endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTimeOnArrival()
                 + logic.estimateChargeTime(ev);
-
-    }
-
-
-    @Override
-    public void doSimStep(double now)
-    {
-        if (!chargingEnded && endTime <= now) {
-            endTime = now + 1;
-        }
+        state = State.queued;
     }
 
 
@@ -82,12 +100,13 @@ public class ETaxiAtChargerActivity
     {
         endTime = timer.getTimeOfDay()
                 + chargingTask.getLogic().estimateChargeTime(chargingTask.getEv());
+        state = State.plugged;
     }
 
 
     public void notifyChargingEnded()
     {
-        chargingEnded = true;
         endTime = timer.getTimeOfDay();
+        state = State.unplugged;
     }
 }

@@ -87,10 +87,10 @@ public class PTMapperUtils {
 	 * than its referenced link. If so, the child stop facility is replaced with the one closer
 	 * to the facility coordinates. Transit routes with loop route profiles (i.e. a stop is accessed
 	 * twice in a stop sequence) are ignored.
+	 * @return the number of child stop facilities pulled
 	 */
-	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
+	public static int pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
 		int nPulled = 0;
-		log.info("Pulling child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				boolean hasStopLoop = ScheduleTools.routeHasStopSequenceLoop(transitRoute);
@@ -150,8 +150,7 @@ public class PTMapperUtils {
 				}
 			}
 		}
-
-		log.info("... "+ nPulled + " child facilities pulled");
+		return nPulled;
 	}
 
 

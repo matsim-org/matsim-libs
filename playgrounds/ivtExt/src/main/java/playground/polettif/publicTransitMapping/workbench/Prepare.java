@@ -18,27 +18,11 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-import static org.matsim.contrib.accessibility.FacilityTypes.HOME;
-import static org.matsim.contrib.accessibility.FacilityTypes.OTHER;
-import static org.matsim.contrib.accessibility.FacilityTypes.WORK;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,8 +31,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
@@ -58,10 +41,18 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;
-
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.matsim.contrib.accessibility.FacilityTypes.*;
 
 /**
  * workbench class to do some scenario preparation
@@ -81,11 +72,27 @@ public class Prepare {
 
 	public static void main(final String[] args) {
 
-		String inputNetwork = "../output/2016-06-23/ch_network.xml.gz";
-		String inputSchedule = "../output/2016-06-23/ch_schedule.xml.gz";
+		String inputNetwork = "../output/2016-06-24/ch_network.xml.gz";
+		String inputSchedule = "../output/2016-06-24/ch_schedule.xml.gz";
 		String inputVehicles = "../data/vehicles/ch_hafas_vehicles.xml.gz";
 		String inputPopulation;
 		String scenName;
+
+		// Zurich 0.1%
+		scenName = "zurich_micro";
+		inputPopulation = "population/zh_1prct.xml.gz";
+
+		final Config micro = createConfig(scenName);
+		micro.qsim().setFlowCapFactor(1.0);
+
+		Prepare prepMicro = new Prepare(micro, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		prepMicro.removeInvalidLines();
+		prepMicro.cutSchedule();
+		prepMicro.population();
+		prepMicro.popSubset(10);
+		prepMicro.vehicles(1.0);
+		prepMicro.writeFiles(scenName);
+
 
 		// Switzerland 10%
 		scenName = "ch_ten";
@@ -161,7 +168,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new MatsimPopulationReader(sc);
+		PopulationReader reader = new PopulationReaderMatsimV5(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -174,7 +181,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new MatsimPopulationReader(sc);
+		PopulationReader reader = new PopulationReaderMatsimV5(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -208,7 +215,7 @@ public class Prepare {
 			for(Plan plan : plans) {
 				List<PlanElement> elements = plan.getPlanElements();
 				for(PlanElement e : elements) {
-					if(e instanceof Activity) {
+					if(e instanceof ActivityImpl) {
 						Activity activity = (Activity) e;
 						switch (activity.getType()) {
 							case "home" :
@@ -224,6 +231,19 @@ public class Prepare {
 				}
 			}
 		}
+	}
+
+	private void popSubset(int divisor) {
+		Population newPop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		int i = 0;
+		for(Person person : new HashSet<>(population.getPersons().values())) {
+			if(i % divisor == 0) {
+				newPop.addPerson(person);
+			}
+			i++;
+		}
+		newPop.setName(population.getName());
+		population = newPop;
 	}
 
 	private void cutSchedule() {
@@ -262,11 +282,21 @@ public class Prepare {
 		PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		workParams.setActivityType(WORK);
 		workParams.setTypicalDuration(Time.parseTime("08:00:00"));
+		workParams.setEarliestEndTime(Time.parseTime("06:00:00"));
+		workParams.setLatestStartTime(Time.parseTime("20:00:00"));
+		workParams.setMinimalDuration(Time.parseTime("04:00:00"));
 		PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		homeParams.setActivityType(HOME);
 		homeParams.setTypicalDuration(Time.parseTime("08:00:00"));
+		workParams.setEarliestEndTime(Time.parseTime("04:00:00"));
+		workParams.setLatestStartTime(Time.parseTime("24:00:00"));
+		workParams.setMinimalDuration(Time.parseTime("04:00:00"));
 		PlanCalcScoreConfigGroup.ActivityParams otherParams = new PlanCalcScoreConfigGroup.ActivityParams();
 		otherParams.setActivityType(OTHER);
+		homeParams.setTypicalDuration(Time.parseTime("01:00:00"));
+		workParams.setEarliestEndTime(Time.parseTime("00:00:00"));
+		workParams.setLatestStartTime(Time.parseTime("24:00:00"));
+		workParams.setMinimalDuration(Time.parseTime("00:30:00"));
 		config.planCalcScore().addActivityParams(homeParams);
 		config.planCalcScore().addActivityParams(workParams);
 		config.planCalcScore().addActivityParams(otherParams);
@@ -299,44 +329,6 @@ public class Prepare {
 
 	private void removeInvalidLines() {
 		ScheduleCleaner.removeInvalidTransitRoutes(TransitScheduleValidator.validateAll(schedule, network), schedule);
-
-/*
-		Set<String> set = new HashSet<>();
-
-		// copy/paste
-
-		set.add("AB-_line21");
-		set.add("AB-_line21");
-		set.add("PAG_line581");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line2");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("RVB_line4");
-		set.add("SBG_line7312");
-		set.add("SBG_line7312");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("VBZ_line303");
-		set.add("FAR_line2");
-		set.add("PAG_line581");
-
-
-		for(String e : set) {
-			TransitLine tl = schedule.getTransitLines().get(Id.create(e, TransitLine.class));
-			if(tl != null) schedule.removeTransitLine(tl);
-		}
-*/
-
-//		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04121_042", TransitRoute.class));
-//		ScheduleCleaner.removeRoute(schedule, Id.create("AB-_line21", TransitLine.class), Id.create("04051_003", TransitRoute.class));
-//		ScheduleCleaner.removeRoute(schedule, Id.create("PAG_line581", TransitLine.class), Id.create("00012_012", TransitRoute.class));
-//		ScheduleCleaner.removeRoute(schedule, Id.create("TL_line16", TransitLine.class), Id.create("06154_001", TransitRoute.class));
 	}
 
 

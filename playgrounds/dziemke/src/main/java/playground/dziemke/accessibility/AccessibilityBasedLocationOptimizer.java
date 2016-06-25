@@ -186,14 +186,9 @@ public class AccessibilityBasedLocationOptimizer {
 
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
-		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
-		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
-		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
-		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
-		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
-		// yyyyyy the above needs to be replaced by a loop over Modes4Accessibility.values() . kai/mz, jul'15
-
-
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			writer.writeField(mode.toString() + "_accessibility");
+		}
 		writer.writeNewLine();
 
 

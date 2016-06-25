@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.integration.daily.accessibility;
+package org.matsim.contrib.accessibility.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
@@ -32,10 +32,9 @@ import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRende
 import org.matsim.core.utils.misc.ExeRunner;
 
 /**
- * @author nagel
- *
+ * @author nagel, dziemke
  */
-class VisualizationUtils {
+public class VisualizationUtils {
 	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
@@ -86,19 +85,7 @@ class VisualizationUtils {
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
 		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
 				range, symbolSize);
-		if (mode.equals(Modes4Accessibility.freeSpeed)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.car)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_CAR); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.bike)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_BIKE); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.walk)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_WALK); // choose column/header to visualize
-		} else if (mode.equals(Modes4Accessibility.pt)) {
-			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_PT); // choose column/header to visualize
-		} else {
-			throw new RuntimeException("Other modes not yet considered!");
-		}
+			renderer.setRenderingAttribute(mode.toString() + "_accessibility");
 		writer.addLayer(accessibilityLayer);
 
 		// write the project file
@@ -115,10 +102,8 @@ class VisualizationUtils {
 	 * @param osName
 	 */
 	public static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
-
-		//TODO adapt this method so that maps for different modes are created.
-
-		// if OS is Windows --- example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
+		// if OS is Windows
+		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
 		if ( osName.contains("Win") || osName.contains("win")) {
 			// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
 			// This needs to be done manually. It does not seem to be set automatically when installing QGis
@@ -130,7 +115,8 @@ class VisualizationUtils {
 
 			ExeRunner.run(cmd, stdoutFileName, timeout);
 
-		// if OS is Macintosh --- example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
+			// if OS is Macintosh
+			// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
 			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
 					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
@@ -141,14 +127,14 @@ class VisualizationUtils {
 
 			ExeRunner.run(cmd, stdoutFileName, timeout);
 
-		// if OS is Linux --- example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
-		//} else if ( osName.contains("Lin") || osName.contains("lin") ) {
-		// TODO for linux
+			// if OS is Linux
+			// example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
+			//} else if ( osName.contains("Lin") || osName.contains("lin") ) {
+			// TODO for linux
 
-		// if OS is other
+			// if OS is other
 		} else {
-			log.error("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
+			log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
 		}
 	}
-
 }

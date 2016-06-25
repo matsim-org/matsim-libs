@@ -25,12 +25,15 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.schedule.ETaxiChargingTask;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
 
 
@@ -72,7 +75,7 @@ public class RuleBasedETaxiOptimizer
         for (Vehicle v : vehicles) {
             Dispatch<Charger> eDispatch = eDispatchFinder.findBestChargerForVehicle(v,
                     evData.getChargers().values());
-            
+
             eScheduler.scheduleCharging((EvrpVehicle)v, eDispatch.destination, eDispatch.path);
         }
     }
@@ -87,6 +90,13 @@ public class RuleBasedETaxiOptimizer
         if (optimContext.scheduler.isIdle(veh) && isUndercharged(veh)) {
             chargeIdleUnderchargedVehicles(Collections.singleton(veh));
         }
+    }
+    
+    
+    @Override
+    protected boolean isWaitStay(TaxiTask task)
+    {
+        return task.getTaxiTaskType() == TaxiTaskType.STAY && !(task instanceof ETaxiChargingTask);
     }
 
 

@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
@@ -31,8 +33,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationKiberaTest.class ) ;
 
-//	private static final Double cellSize = 25.;
-	private static final Double cellSize = 100.;
+	private static final Double cellSize = 10.;
+//	private static final Double cellSize = 100.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -58,8 +60,8 @@ public class AccessibilityComputationKiberaTest {
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		String name = "ke_kibera_" + cellSize.toString().split("\\.")[0];
 		
-		Double lowerBound = -3.5;
-		Double upperBound = 5.5;
+		Double lowerBound = 0.;
+		Double upperBound = 3.5;
 		Integer range = 9; // in the current implementation, this need always be 9
 		int symbolSize = 110;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
@@ -101,12 +103,16 @@ public class AccessibilityComputationKiberaTest {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
-		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		double xMin = boundingBox.getXMin();
-		double xMax = boundingBox.getXMax();
-		double yMin = boundingBox.getYMin();
-		double yMax = boundingBox.getYMax();
-		double[] mapViewExtent = {xMin, yMin, xMax, yMax};
+		final BoundingBox boundingBox = BoundingBox.createBoundingBox(251000, 9853000, 256000, 9857000);
+//		final BoundingBox boundingBox = BoundingBox.createBoundingBox(250500, 9852500, 256500, 9857500);
+//		final BoundingBox boundingBox = BoundingBox.createBoundingBox(250000, 9852000, 257000, 9858000);
+//		final BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
+//		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+//		double xMin = boundingBox.getXMin();
+//		double xMax = boundingBox.getXMax();
+//		double yMin = boundingBox.getYMin();
+//		double yMax = boundingBox.getYMax();
+//		double[] mapViewExtent = {xMin, yMin, xMax, yMax};
 
 		
 		// no pt block
@@ -117,10 +123,9 @@ public class AccessibilityComputationKiberaTest {
 
 		// collect activity types
 		List<String> activityTypes = new LinkedList<>();
-//		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
-//		log.warn( "found activity types: " + activityTypes );
-		activityTypes.add("drinking_water");
-		activityTypes.add("toilet");
+//		activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+		activityTypes.add(FacilityTypes.DRINKING_WATER);
+//		activityTypes.add(FacilityTypes.TOILETS);
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
@@ -145,9 +150,9 @@ public class AccessibilityComputationKiberaTest {
 
 
 		if (createQGisOutput == true) {
-			String workingDirectory =  config.controler().getOutputDirectory();
 			String osName = System.getProperty("os.name");
-
+			String workingDirectory =  config.controler().getOutputDirectory();
+			double[] mapViewExtent = {boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax()};
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 

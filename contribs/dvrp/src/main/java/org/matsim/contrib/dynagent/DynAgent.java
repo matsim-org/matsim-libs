@@ -104,7 +104,6 @@ public final class DynAgent
     {
         events.processEvent(
                 new ActivityEndEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
-
         computeNextAction(dynActivity, now);
     }
 
@@ -113,7 +112,6 @@ public final class DynAgent
     public void endLegAndComputeNextState(double now)
     {
         events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));
-
         computeNextAction(dynLeg, now);
     }
 

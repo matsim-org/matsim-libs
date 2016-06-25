@@ -95,8 +95,8 @@ public class PatnaUrbanDemandGenerator {
 	}
 
 	public void writePlans(final String outputDir){
-		new PopulationWriter(scenario.getPopulation()).write(outputDir+"/initial_urban_plans_"+2*cloningFactor+"pct.xml.gz");
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputDir+"/initial_urban_persionAttributes_"+2*cloningFactor+"pct.xml.gz");
+		new PopulationWriter(scenario.getPopulation()).write(outputDir+"/initial_urban_plans_"+cloningFactor+"pct.xml.gz");
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputDir+"/initial_urban_persionAttributes_"+cloningFactor+"pct.xml.gz");
 		LOG.info("Writing Plan and person attributes files are finished.");
 	}
 

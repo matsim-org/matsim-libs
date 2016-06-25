@@ -47,6 +47,19 @@ public class ETaxiScheduler
     }
 
 
+    @Override
+    protected double calcNewEndTime(TaxiTask task, double newBeginTime)
+    {
+        if (task instanceof ETaxiChargingTask) {
+            double duration = task.getEndTime() - task.getBeginTime();
+            return newBeginTime + duration;
+        }
+        else {
+            return super.calcNewEndTime(task, newBeginTime);
+        }
+    }
+
+
     // Drives-to-chargers can be diverted if diversion is on.
     // Otherwise, we do not remove stays-at-chargers from schedules.
     @Override
@@ -127,5 +140,7 @@ public class ETaxiScheduler
                 new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev));
 
         appendStayTask(schedule);
+        
+//        System.err.println(vehicle.getId() +" sent to charger " + charger.getId());
     }
 }

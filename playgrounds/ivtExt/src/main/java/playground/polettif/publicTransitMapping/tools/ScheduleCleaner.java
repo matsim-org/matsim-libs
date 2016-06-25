@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
@@ -450,14 +451,15 @@ public class ScheduleCleaner {
 	 */
 	@Deprecated
 	public static void removeInvalidTransitRoutes(TransitScheduleValidator.ValidationResult result, TransitSchedule schedule) {
+		Set<Tuple<Id<TransitLine>, Id<TransitRoute>>> toRemove = new HashSet<>();
 		for(String error : result.getErrors()) {
 			String[] lineSplit = error.split(", route ");
 			String tranistLineId = lineSplit[0].substring(13);
 
 			String transitRouteId;
-			if(lineSplit[1].contains				(" contains a link that is not part of the network")) {
+			if(lineSplit[1].contains(" contains a link that is not part of the network")) {
 				transitRouteId = lineSplit[1].split	(" contains a link that is not part of the network")[0];
-			} else 	if(lineSplit[1].contains		(" has inconsistent network route")) {
+			} else if(lineSplit[1].contains			(" has inconsistent network route")) {
 				transitRouteId = lineSplit[1].split	(" has inconsistent network route")[0];
 			} else if(lineSplit[1].contains			(" has no network route")) {
 				transitRouteId = lineSplit[1].split	(" has no network route")[0];
@@ -472,12 +474,13 @@ public class ScheduleCleaner {
 			} else if(lineSplit[1].contains			(": The ")) {
 				transitRouteId = lineSplit[1].split	(": The ")[0];
 			} else {
-				throw new IllegalArgumentException("Error String from ValidationResult not recognised! ("+error+")");
+				throw new IllegalArgumentException("Error String from ValidationResult not recognised! (" + error + ")");
 			}
+			toRemove.add(new Tuple<>(Id.create(tranistLineId, TransitLine.class), Id.create(transitRouteId, TransitRoute.class)));
+		}
 
-			if(transitRouteId != null) {
-				ScheduleCleaner.removeRoute(schedule, Id.create(tranistLineId, TransitLine.class), Id.create(transitRouteId, TransitRoute.class));
-			}
+		for(Tuple<Id<TransitLine>, Id<TransitRoute>> t : toRemove) {
+			ScheduleCleaner.removeRoute(schedule, t.getFirst(), t.getSecond());
 		}
 	}
 }

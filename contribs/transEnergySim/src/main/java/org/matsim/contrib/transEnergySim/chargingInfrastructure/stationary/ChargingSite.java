@@ -44,6 +44,8 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 
 	abstract void addNearbyLink(Link link);
 	abstract Collection<Link> getNearbyLinks();
+	abstract Link getNearestLink();
+	abstract void setNearestLink(Link link);
 
 	
 }

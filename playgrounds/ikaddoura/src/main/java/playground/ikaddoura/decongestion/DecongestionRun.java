@@ -30,14 +30,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 
 /**
  * Starts an interval-based decongestion pricing simulation run.
@@ -50,7 +46,7 @@ public class DecongestionRun {
 	private static final Logger log = Logger.getLogger(DecongestionRun.class);
 
 	private static String configFile;
-	private static String outputDirectory;
+	private static String outputBaseDirectory;
 	
 	public static void main(String[] args) throws IOException {
 		log.info("Starting simulation run with the following arguments:");
@@ -60,13 +56,12 @@ public class DecongestionRun {
 			configFile = args[0];		
 			log.info("config file: "+ configFile);
 			
-			outputDirectory = args[1];		
-			log.info("output directory: "+ outputDirectory);
+			outputBaseDirectory = args[1];		
+			log.info("output directory: "+ outputBaseDirectory);
 
 		} else {
 			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputDirectory = "../../../runs-svn/decongestion/output/decongestion_1000it_10_50_0.5/";
-//			outputDirectory = "../../../runs-svn/decongestion/output/baseCase_1000it/";
+			outputBaseDirectory = "../../../runs-svn/decongestion/output/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -76,35 +71,17 @@ public class DecongestionRun {
 
 	private void run() {
 
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		
 		Config config = ConfigUtils.loadConfig(configFile);	
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
+				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
+				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() + "/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
 				
-		final DecongestionInfo info = new DecongestionInfo(scenario);
-
-		// decongestion pricing
-		final DecongestionControlerListener decongestion = new DecongestionControlerListener(info);		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addControlerListenerBinding().toInstance(decongestion);
-			}
-		});
-		
-		// toll-adjusted routing
-		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory(info, config.planCalcScore());
-		travelDisutilityFactory.setSigma(0.);
-		controler.addOverridingModule(new AbstractModule(){
-			@Override
-			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
-			}
-		}); 
-				
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		controler.run();
+		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+		Decongestion decongestion = new Decongestion(info);
+		decongestion.run();
 		
 		log.info("Analyzing the final iteration...");
 		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());

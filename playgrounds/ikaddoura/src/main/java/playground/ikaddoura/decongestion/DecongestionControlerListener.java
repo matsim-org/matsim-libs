@@ -30,7 +30,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -44,11 +43,14 @@ import org.matsim.core.utils.charts.XYLineChart;
 
 import com.google.inject.Inject;
 
+import playground.ikaddoura.decongestion.data.CongestionInfoWriter;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
 
 
 /**
@@ -79,23 +81,23 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	private final SortedMap<Integer, Double> iteration2userBenefits = new TreeMap<>();
 	
 	private final DecongestionInfo congestionInfo;
-	private final DecongestionTollComputation tollComputation;
+	private final DecongestionTollSetting tollComputation;
 	
 	private IntervalBasedTolling intervalBasedTolling;
 	private DelayAnalysis delayComputation;
-
-	@Inject
-	public DecongestionControlerListener(Scenario scenario){
-		this.congestionInfo = new DecongestionInfo(scenario);
-		this.tollComputation = new DecongestionTollComputation(congestionInfo);
-	}
 	
 	@Inject
 	public DecongestionControlerListener(DecongestionInfo congestionInfo){
 		this.congestionInfo = congestionInfo;
-		this.tollComputation = new DecongestionTollComputation(congestionInfo);
+		this.tollComputation = new DecongestionTollingV1(congestionInfo);
 	}
 	
+	@Inject
+	public DecongestionControlerListener(DecongestionInfo congestionInfo, DecongestionTollSetting decongestionTollSettingImpl) {
+		this.congestionInfo = congestionInfo;
+		this.tollComputation = decongestionTollSettingImpl;
+	}
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
@@ -112,24 +114,24 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
-		if (event.getIteration() % this.congestionInfo.getWRITE_OUTPUT_ITERATION() == 0. || event.getIteration() % this.congestionInfo.getUPDATE_PRICE_INTERVAL() == 0.) {
+		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0. || event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() == 0.) {
 			computeDelays(event);
 		}
 		
 		if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
 			// skip first iteration
 		
-		} else if (event.getIteration() % this.congestionInfo.getUPDATE_PRICE_INTERVAL() == 0.) {			
+		} else if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() == 0.) {			
 			
 			int totalNumberOfIterations = this.congestionInfo.getScenario().getConfig().controler().getLastIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
-			if (event.getIteration() < this.congestionInfo.getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
+			if (event.getIteration() < this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
 				
 				log.info("+++ Iteration " + event.getIteration() + ". Update tolls per link and time bin.");
 				tollComputation.updateTolls();
 			}
 		}
 		
-		if (event.getIteration() % this.congestionInfo.getWRITE_OUTPUT_ITERATION() == 0.) {
+		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0.) {
 			CongestionInfoWriter.writeCongestionInfoTimeInterval(congestionInfo, this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/");
 		}
 	}
