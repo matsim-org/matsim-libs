@@ -26,14 +26,14 @@ import org.matsim.contrib.locationchoice.router.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.core.router.*;
-import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.core.router.util.*;
 
 
 public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final AssignmentTaxiOptimizerParams params;
-    private final MultiNodeDijkstra router;
+    private final FastMultiNodeDijkstra router;
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
 
@@ -41,18 +41,24 @@ public class AssignmentTaxiOptimizer
             AssignmentTaxiOptimizerParams params)
     {
         super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
-
         this.params = params;
 
-        router = new MultiNodeDijkstra(optimContext.network, optimContext.travelDisutility,
-                optimContext.travelTime, true);
-
+        //TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
+        //PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
+        //preProcessDijkstra.run(optimContext.network);
+        PreProcessDijkstra preProcessDijkstra = null;
         FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-        RoutingNetwork routingNetwork = new InverseArrayRoutingNetworkFactory(null)
+
+        RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
                 .createRoutingNetwork(optimContext.network);
-        backwardRouter = new BackwardFastMultiNodeDijkstra(routingNetwork,
-                optimContext.travelDisutility, optimContext.travelTime, null, fastRouterFactory,
-                true);
+        router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
+                optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
+
+        RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(
+                preProcessDijkstra).createRoutingNetwork(optimContext.network);
+        backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,
+                optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
+                fastRouterFactory, true);
     }
 
 

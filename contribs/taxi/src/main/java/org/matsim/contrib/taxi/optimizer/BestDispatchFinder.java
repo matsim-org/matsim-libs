@@ -10,6 +10,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.*;
+import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
@@ -52,8 +53,16 @@ public class BestDispatchFinder
         this.scheduleInquiry = optimContext.scheduler;
         this.expectedNeighbourhoodSize = expectedNeighbourhoodSize;
 
-        router = new MultiNodeDijkstra(optimContext.network, optimContext.travelDisutility,
-                optimContext.travelTime, false);
+        //TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
+        //PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
+        //preProcessDijkstra.run(optimContext.network);
+        PreProcessDijkstra preProcessDijkstra = null;
+        FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+
+        RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
+                .createRoutingNetwork(optimContext.network);
+        router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
+                optimContext.travelTime, preProcessDijkstra, fastRouterFactory, false);
     }
 
 
