@@ -47,14 +47,14 @@ import org.matsim.core.scenario.CustomizableUtils;
 
 	private Customizable customizableDelegate;
 
-	@Override
-	public final Activity createAndAddActivity(final String type1) {
-		Activity a = new ActivityImpl(type1);
-		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go through the factory.  kai, jun'16)
-
-		this.addActivity(a) ;
-		return a;
-	}
+//	@Override
+//	public final Activity createAndAddActivity(final String type1) {
+//		Activity a = new ActivityImpl(type1);
+//		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go through the factory.  kai, jun'16)
+//
+//		this.addActivity(a) ;
+//		return a;
+//	}
 
 	
 
@@ -62,13 +62,13 @@ import org.matsim.core.scenario.CustomizableUtils;
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
-	public Leg createAndAddLeg(final String mode) {
-		verifyCreateLeg();
-		Leg leg = new LegImpl( mode ) ;
-		getPlanElements().add(leg);
-		return leg;
-	}
+//	@Override
+//	public Leg createAndAddLeg(final String mode) {
+//		verifyCreateLeg();
+//		Leg leg = new LegImpl( mode ) ;
+//		getPlanElements().add(leg);
+//		return leg;
+//	}
 
 	private final void verifyCreateLeg() throws IllegalStateException {
 		if (getPlanElements().size() == 0) {

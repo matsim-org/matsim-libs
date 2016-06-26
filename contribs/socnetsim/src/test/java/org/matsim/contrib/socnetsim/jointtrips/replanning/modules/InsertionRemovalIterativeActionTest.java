@@ -286,13 +286,13 @@ public class InsertionRemovalIterativeActionTest {
 			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class )).setEndTime( 10 );
-			plan.createAndAddLeg( TransportMode.car );
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 			final Id<Link> linkId = puLink;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId).setMaximumDuration( 0 );
-			Leg driverLeg1 = plan.createAndAddLeg( JointActingTypes.DRIVER );
+			Leg driverLeg1 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 			final Id<Link> linkId1 = doLink;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId1).setMaximumDuration( 0 );
-			plan.createAndAddLeg( TransportMode.car );
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_d"+i, Id.create( "nowhere" , Link.class ));
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
@@ -301,13 +301,13 @@ public class InsertionRemovalIterativeActionTest {
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class )).setEndTime( 10 );
-			plan.createAndAddLeg( TransportMode.walk );
+			PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 			final Id<Link> linkId2 = puLink;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId2).setMaximumDuration( 0 );
-			Leg passengerLeg1 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
+			Leg passengerLeg1 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.PASSENGER );
 			final Id<Link> linkId3 = doLink;
 			PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId3).setMaximumDuration( 0 );
-			plan.createAndAddLeg( TransportMode.walk );
+			PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_p"+i, Id.create( "space" , Link.class ));
 
 			DriverRoute driverRoute = new DriverRoute( puLink , doLink );
@@ -337,7 +337,7 @@ public class InsertionRemovalIterativeActionTest {
 			Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class ));
 			act.setEndTime( 10 );
 			act.setCoord( coord1 );
-			plan.createAndAddLeg( TransportMode.car );
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_d"+i, Id.create( "nowhere" , Link.class ));
 			act.setCoord( coord2 );
 
@@ -349,7 +349,7 @@ public class InsertionRemovalIterativeActionTest {
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class ));
 			act.setEndTime( 10 );
 			act.setCoord( coord1 );
-			plan.createAndAddLeg( TransportMode.walk );
+			PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "second_act_p"+i, Id.create( "space" , Link.class ));
 			act.setCoord( coord2 );
 		}

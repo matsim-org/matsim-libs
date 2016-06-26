@@ -73,7 +73,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", Id.create("1", Link.class));
 		a1.setEndTime(3600);
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", Id.create("20", Link.class));
 
 		// write person to file

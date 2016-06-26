@@ -401,9 +401,9 @@ public class EditRoutesTest extends MatsimTestCase {
 		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
 		Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
-		((Plan) plan).createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );
 		Activity activityW1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "w", Id.create("l3", Link.class));
-		((Plan) plan).createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );
 		Activity activityH2 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
 		
 		/*

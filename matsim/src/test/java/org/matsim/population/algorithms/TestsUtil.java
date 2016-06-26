@@ -45,11 +45,11 @@ public class TestsUtil {
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
 			Activity act;
-			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+			act = PopulationUtils.createAndAddActivity(plan, "actAtFacility" + locationIdSequence[aa]);
 			act.setFacilityId(location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(mode);
+				PopulationUtils.createAndAddLeg( plan, mode );
 			}
 		}
 		return plan;
@@ -64,7 +64,7 @@ public class TestsUtil {
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "actOnLink" + locationIdSequence[aa], (Id<Link>) location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(mode);
+				PopulationUtils.createAndAddLeg( plan, mode );
 			}
 		}
 		return plan;

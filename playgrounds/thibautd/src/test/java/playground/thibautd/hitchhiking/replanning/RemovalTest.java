@@ -61,7 +61,7 @@ public class RemovalTest {
 		plans.add( plan );
 		final Id<Link> linkId = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId).setEndTime( 1 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId1 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId1);
 
@@ -69,7 +69,7 @@ public class RemovalTest {
 		plans.add( plan );
 		final Id<Link> linkId2 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId2).setEndTime( 1 );
-		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.DRIVER_MODE );
 		final Id<Link> linkId3 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId3);
 
@@ -77,10 +77,10 @@ public class RemovalTest {
 		plans.add( plan );
 		final Id<Link> linkId4 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId4).setEndTime( 1 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId5 = link2;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "w", linkId5).setEndTime( 2 );
-		plan.createAndAddLeg( TransportMode.pt );
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		final Id<Link> linkId6 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId6);
 
@@ -88,10 +88,10 @@ public class RemovalTest {
 		plans.add( plan );
 		final Id<Link> linkId7 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId7).setEndTime( 1 );
-		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.DRIVER_MODE );
 		final Id<Link> linkId8 = link2;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "w", linkId8).setEndTime( 2 );
-		plan.createAndAddLeg( TransportMode.car );
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 		final Id<Link> linkId9 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId9);
 
@@ -99,16 +99,16 @@ public class RemovalTest {
 		plans.add( plan );
 		final Id<Link> linkId10 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId10).setEndTime( 1 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId11 = link2;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "w", linkId11).setEndTime( 2 );
-		plan.createAndAddLeg( TransportMode.pt );
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		final Id<Link> linkId12 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId12).setEndTime( 3 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId13 = link2;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "w", linkId13).setEndTime( 4 );
-		plan.createAndAddLeg( TransportMode.pt );
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		final Id<Link> linkId14 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId14);
 
@@ -116,16 +116,16 @@ public class RemovalTest {
 		plans.add( plan );
 		final Id<Link> linkId15 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId15).setEndTime( 1 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId16 = link2;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "w", linkId16).setEndTime( 2 );
-		plan.createAndAddLeg( TransportMode.pt );
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		final Id<Link> linkId17 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId17).setEndTime( 3 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId18 = link2;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "w", linkId18).setEndTime( 4 );
-		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
+		PopulationUtils.createAndAddLeg( plan, (String) HitchHikingConstants.PASSENGER_MODE );
 		final Id<Link> linkId19 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId19);
 	}

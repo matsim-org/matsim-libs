@@ -35,17 +35,17 @@ import org.matsim.core.api.internal.MatsimPopulationObject;
  */
 public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
 	
-	public List<PlanElement> getPlanElements();
+	public abstract List<PlanElement> getPlanElements();
 
-	public void addLeg(final Leg leg);
+	public abstract void addLeg(final Leg leg);
 
-	public void addActivity(final Activity act);
+	public abstract void addActivity(final Activity act);
 
-    public String getType();
+    public abstract String getType();
 
-    public void setType(final String type);
+    public abstract void setType(final String type);
 
-	public Person getPerson();
+	public abstract Person getPerson();
 
 	/**
 	 * Sets the reference to the person.
@@ -53,10 +53,6 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
 	 * sure that the bidirectional reference is set correctly if
 	 * you are using this method!.
 	 */
-	public void setPerson(Person person);
-
-	Leg createAndAddLeg(String mode);
-
-	Activity createAndAddActivity(String type);
+	public abstract void setPerson(Person person);
 
 }

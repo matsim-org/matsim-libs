@@ -656,7 +656,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Plan plan1 = PersonUtils.createAndAddPlan(person1, true);
 		Activity act1a = PopulationUtils.createAndAddActivityFromLinkId(plan1, (String) "home", (Id<Link>) null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
-		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
+		Leg leg1 = PopulationUtils.createAndAddLeg( plan1, (String) TransportMode.car );//, 7*3600, 100, 7*3600+100);
 		leg1.setDepartureTime(f.secondLegStartTime);
 		leg1.setTravelTime(f.secondLegTravelTime);
 		Route route2 = new GenericRouteImpl(null, null);
@@ -792,7 +792,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			Activity firstActivity = PopulationUtils.createAndAddActivityFromLinkId(this.plan, (String) "h", link1.getId());
 			firstActivity.setEndTime(firstLegStartTime);
 
-			Leg leg = this.plan.createAndAddLeg(TransportMode.car);
+			Leg leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.car );
 			leg.setDepartureTime(firstLegStartTime);
 			leg.setTravelTime(firstLegTravelTime);
 			NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
@@ -805,7 +805,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			Activity secondActivity = PopulationUtils.createAndAddActivityFromLinkId(this.plan, (String) "w", link3.getId());
 			secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
 			secondActivity.setEndTime(secondLegStartTime);
-			leg = this.plan.createAndAddLeg(TransportMode.pt);
+			leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.pt );
 			leg.setDepartureTime(secondLegStartTime);
 			leg.setTravelTime(secondLegTravelTime);
 			Route route2 = new GenericRouteImpl(link3.getId(), link5.getId());
@@ -816,7 +816,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			Activity thirdActivity = PopulationUtils.createAndAddActivityFromLinkId(this.plan, (String) "w", link5.getId());
 			thirdActivity.setStartTime(secondLegStartTime + secondLegTravelTime);
 			thirdActivity.setEndTime(thirdLegStartTime);
-			leg = this.plan.createAndAddLeg(TransportMode.walk);
+			leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.walk );
 			leg.setDepartureTime(thirdLegStartTime);
 			leg.setTravelTime(thirdLegTravelTime);
 			Route route3 = new GenericRouteImpl(link5.getId(), link7.getId());
@@ -827,7 +827,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			Activity fourthActivity = PopulationUtils.createAndAddActivityFromLinkId(this.plan, (String) "w", link7.getId());
 			fourthActivity.setStartTime(thirdLegStartTime + thirdLegTravelTime);
 			fourthActivity.setEndTime(fourthLegStartTime);
-			leg = this.plan.createAndAddLeg(TransportMode.bike);
+			leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.bike );
 			leg.setDepartureTime(fourthLegStartTime);
 			leg.setTravelTime(fourthLegTravelTime);
 			Route route4 = new GenericRouteImpl(link7.getId(), link9.getId());

@@ -56,7 +56,7 @@ public class CreateHomeWorkHomePlan {
 		Id homeId = act.getFacilityId();
 		
 		// set Leg
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		final Coord coord = workCoord;
 		
 		// set second activity (work)
@@ -66,7 +66,7 @@ public class CreateHomeWorkHomePlan {
 		act.setEndTime( hmDpTime + 9.*3600. ) ; // avoid durations except when short (e.g. plugging in hybrid veh).  kai, may'13
 		
 		// set Leg
-		plan.createAndAddLeg(TransportMode.car) ;
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		final Coord coord1 = homeCoord;
 		
 		// set last activity (=first activity) and complete home-work-home plan.

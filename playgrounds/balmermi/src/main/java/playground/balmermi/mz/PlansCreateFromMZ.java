@@ -219,7 +219,7 @@ public class PlansCreateFromMZ {
 					Activity from_act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setMaximumDuration(from_act.getEndTime()-from_act.getStartTime());
-					Leg leg = ((Plan) plan).createAndAddLeg(mode);
+					Leg leg = PopulationUtils.createAndAddLeg( ((Plan) plan), (String) mode );
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					final double arrTime = arrival;
@@ -243,7 +243,7 @@ public class PlansCreateFromMZ {
 					final Coord coord = from;
 					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, coord);
 					homeAct.setEndTime(departure);
-					Leg leg = ((Plan) plan).createAndAddLeg(mode);
+					Leg leg = PopulationUtils.createAndAddLeg( ((Plan) plan), (String) mode );
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
 					final double arrTime = arrival;

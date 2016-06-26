@@ -87,7 +87,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 500));
 		act.setLinkId(link.getId());
 

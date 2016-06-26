@@ -168,7 +168,7 @@ public class PlansGeneratorControler {
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
-			plan.createAndAddLeg(TransportMode.car);
+			PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 			Activity act2 = PopulationUtils.createAndAddActivityFromCoord(plan, (String) "h", new Coord(200., 200.));
 			act2.setLinkId(toLink.getId());
 			act2.setStartTime(8 * 60 * 60);

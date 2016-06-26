@@ -272,7 +272,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createAndAddLeg(mode.intern());
+		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, (String) mode.intern() );
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
 		Leg r = this.currleg;

@@ -305,7 +305,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			Plan plan1 = PersonUtils.createAndAddPlan(person, true);
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan1, "h", depLink.getId());
 			a1.setEndTime(departureTime);
-			Leg leg1 = plan1.createAndAddLeg(TransportMode.car);
+			Leg leg1 = PopulationUtils.createAndAddLeg( plan1, TransportMode.car );
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
 			NetworkRoute route = new LinkNetworkRouteImpl(depLink.getId(), destLink.getId());

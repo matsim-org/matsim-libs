@@ -334,7 +334,7 @@ import org.xml.sax.Attributes;
 		if (mode.equals("undef")) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createAndAddLeg(mode.intern());
+		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
 //		LegImpl r = this.currleg;

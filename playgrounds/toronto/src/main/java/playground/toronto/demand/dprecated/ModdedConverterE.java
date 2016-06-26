@@ -151,7 +151,7 @@ public class ModdedConverterE {
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
-						Leg leg = ((Plan) pl).createAndAddLeg(TransportMode.car);
+						Leg leg = PopulationUtils.createAndAddLeg( ((Plan) pl), (String) TransportMode.car );
 						leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 						Coord tmpCoord;
@@ -179,7 +179,7 @@ public class ModdedConverterE {
 							Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 							Plan tmpPl = p.getSelectedPlan();
 
-							Leg leg = ((Plan) tmpPl).createAndAddLeg(TransportMode.car);
+							Leg leg = PopulationUtils.createAndAddLeg( ((Plan) tmpPl), (String) TransportMode.car );
 							leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 							// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -253,7 +253,7 @@ public class ModdedConverterE {
 			Plan tmpPl = p.getSelectedPlan();
 
 
-			Leg leg = ((Plan) tmpPl).createAndAddLeg(TransportMode.car);
+			Leg leg = PopulationUtils.createAndAddLeg( ((Plan) tmpPl), (String) TransportMode.car );
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord2;

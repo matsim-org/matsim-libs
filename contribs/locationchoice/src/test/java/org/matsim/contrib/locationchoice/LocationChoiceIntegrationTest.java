@@ -54,6 +54,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
@@ -363,7 +364,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			((Activity)act).setFacilityId(facility1.getId());
 			plan.addActivity(act) ;
 		}
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		{
 			//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 			//		act.setLinkId(link.getId());

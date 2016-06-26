@@ -104,20 +104,20 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//desires.putActivityDuration( "w" , 12 * 3600 );
 		Plan plan = PopulationUtils.createPlan(person);
 
-		Activity act = plan.createAndAddActivity( "h" );
+		Activity act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setEndTime( 10 );
 		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
-		Leg l = plan.createAndAddLeg( TransportMode.car );
+		Leg l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 		NetworkRoute nRoute = new LinkNetworkRouteImpl( Id.create( 12 , Link.class ) , Id.create( 23 , Link.class ) );
 		l.setRoute( nRoute );
 		l.setDepartureTime( 123 );
 		l.setTravelTime( 456 );
 
-		act = plan.createAndAddActivity( "w" );
+		act = PopulationUtils.createAndAddActivity(plan, (String) "w");
 		act.setStartTime( 104 );
 		act.setEndTime( 294 );
 		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
-		l = plan.createAndAddLeg( TransportMode.car );
+		l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 		nRoute = new LinkNetworkRouteImpl( Id.create( 43 , Link.class ) , Id.create( 23 , Link.class ) );
 		nRoute.setLinkIds(
 				Id.create( 43 , Link.class ) ,
@@ -127,7 +127,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		l.setDepartureTime( 123 );
 		l.setTravelTime( 456 );
 
-		act = plan.createAndAddActivity( "h" );
+		act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setStartTime( 2000 );
 		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class) );
 
@@ -141,28 +141,28 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		//desires.putActivityDuration( "w" , 12 * 3600 );
 		Plan plan = PopulationUtils.createPlan(person);
 
-		Activity act = plan.createAndAddActivity( "h" );
+		Activity act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setEndTime( 10 );
 		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
-		Leg l = plan.createAndAddLeg( TransportMode.pt );
+		Leg l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		ExperimentalTransitRoute tRoute =
 			new ExperimentalTransitRoute( new FakeFacility( 23 ) , null , null , new FakeFacility( 43 ) );
 		l.setRoute( tRoute );
 		l.setDepartureTime( 1123 );
 		l.setTravelTime( 3456 );
 
-		plan.createAndAddActivity( "w" );
+		PopulationUtils.createAndAddActivity(plan, (String) "w");
 		act.setStartTime( 100 );
 		act.setEndTime( 109 );
 		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
-		l = plan.createAndAddLeg( TransportMode.pt );
+		l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		tRoute =
 			new ExperimentalTransitRoute( new FakeFacility( 13 ) , null , null , new FakeFacility( 42 ) );
 		l.setRoute( tRoute );
 		l.setDepartureTime( 1123 );
 		l.setTravelTime( 3456 );
 		
-		plan.createAndAddActivity( "h" );
+		PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setStartTime( 2000 );
 		((Activity) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
 
@@ -176,43 +176,43 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 //		desires.putActivityDuration( "w" , 12 * 3600 );
 		Plan plan = PopulationUtils.createPlan(person);
 
-		Activity act = plan.createAndAddActivity( "h" );
+		Activity act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setEndTime( 100 );
 		((Activity) act).setFacilityId( Id.create( "h", ActivityFacility.class ) );
-		Leg l = plan.createAndAddLeg( TransportMode.transit_walk );
+		Leg l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.transit_walk );
 		Route route = new GenericRouteImpl( Id.create( 12 , Link.class ) , Id.create( 23 , Link.class ) );
 		l.setRoute( route );
 		l.setDepartureTime( 123 );
 		l.setTravelTime( 456 );
 
-		act = plan.createAndAddActivity( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		act = PopulationUtils.createAndAddActivity(plan, (String) PtConstants.TRANSIT_ACTIVITY_TYPE);
 		act.setStartTime( 0 );
 		act.setEndTime( 0 );
-		l = plan.createAndAddLeg( TransportMode.pt );
+		l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		ExperimentalTransitRoute tRoute =
 			new ExperimentalTransitRoute( new FakeFacility( 23 ) , null , null , new FakeFacility( 43 ) );
 		l.setRoute( tRoute );
 		l.setDepartureTime( 1123 );
 		l.setTravelTime( 3456 );
 
-		plan.createAndAddActivity( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		PopulationUtils.createAndAddActivity(plan, (String) PtConstants.TRANSIT_ACTIVITY_TYPE);
 		act.setStartTime( 0 );
 		act.setEndTime( 0 );
-		l = plan.createAndAddLeg( TransportMode.transit_walk );
+		l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.transit_walk );
 		l.setRoute( new GenericRouteImpl( Id.create( 23 , Link.class ) , Id.create( 43 , Link.class ) ) );
 		l.setDepartureTime( 1123 );
 		l.setTravelTime( 3456 );
 
-		plan.createAndAddActivity( "w" );
+		PopulationUtils.createAndAddActivity(plan, (String) "w");
 		act.setStartTime( 2000 );
 		act.setEndTime( 3000 );
 		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
-		l = plan.createAndAddLeg( TransportMode.transit_walk );
+		l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.transit_walk );
 		l.setRoute( new GenericRouteImpl( Id.create( 34 , Link.class ) , Id.create( 43 , Link.class ) ) );
 		l.setDepartureTime( 1123 );
 		l.setTravelTime( 346 );
 
-		plan.createAndAddActivity( "h" );
+		PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setStartTime( 2000 );
 		((Activity) act).setFacilityId( Id.create( "h" , ActivityFacility.class ) );
 
@@ -227,16 +227,16 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		Plan plan = PopulationUtils.createPlan(person);
 
 		for (double tt=60; tt <= 2*3600; tt *= 1.5) {
-			Activity act = plan.createAndAddActivity( "w" );
+			Activity act = PopulationUtils.createAndAddActivity(plan, (String) "w");
 			act.setStartTime( 2000 );
 			act.setEndTime( 3000 );
 			((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
-			Leg l = plan.createAndAddLeg( TransportMode.walk );
+			Leg l = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 			l.setRoute( new GenericRouteImpl( Id.create( 12 , Link.class ) , Id.create( 13 , Link.class ) ) );
 			l.setDepartureTime( 1123 );
 			l.setTravelTime( tt );
 		}
-		Activity act = plan.createAndAddActivity( "w" );
+		Activity act = PopulationUtils.createAndAddActivity(plan, (String) "w");
 		act.setStartTime( 2000 );
 		((Activity) act).setFacilityId( Id.create( "w" , ActivityFacility.class ) );
 

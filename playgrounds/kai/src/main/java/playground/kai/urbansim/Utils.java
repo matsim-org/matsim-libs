@@ -171,12 +171,12 @@ public class Utils {
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 		final Coord coord = workCoord;
 		act = PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_WORK, coord) ;
 		((Activity) act).setMaximumDuration( 8.*3600. ) ;
 
-		plan.createAndAddLeg(TransportMode.car) ;
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 		final Coord coord1 = homeCoord;
 		PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_HOME, coord1);
 	}

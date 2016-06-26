@@ -148,18 +148,6 @@ public class RoutingUtils {
 		public Double getScore() {
 			throw new UnsupportedOperationException();
 		}
-
-		@Override
-		public Leg createAndAddLeg(String mode) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		public Activity createAndAddActivity(String type) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
 	}
 }
 

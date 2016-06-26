@@ -211,7 +211,7 @@ public class RunInternalizationTest {
 			home.setEndTime(6 * 3600);
 			home.setCoord(new Coord(0.0, 0.0));
 			
-			plan.createAndAddLeg(TransportMode.walk);
+			PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 			
 			Activity home2 = PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "home", Id.create("11", Link.class));
 			home2.setCoord(new Coord(0.0, 0.0));

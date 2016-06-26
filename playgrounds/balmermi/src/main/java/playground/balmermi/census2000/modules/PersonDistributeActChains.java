@@ -235,7 +235,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setMaximumDuration(dur);
-					Leg l = plan.createAndAddLeg("undefined");
+					Leg l = PopulationUtils.createAndAddLeg( plan, (String) "undefined" );
 					final double arrTime = end_time;
 					l.setTravelTime( arrTime - l.getDepartureTime() );
 					l.setTravelTime(0);

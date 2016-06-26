@@ -297,15 +297,5 @@ public class BasePlanImpl implements BasePlan {
 			getPlanElements().remove(index); // leg
 		}
 	}
-	@Override
-	public Leg createAndAddLeg(String mode) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-	@Override
-	public Activity createAndAddActivity(String type) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
 
 }

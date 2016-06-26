@@ -70,7 +70,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Activity act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link0.getId());
 		act1.setEndTime(8.0*3600);
 
-		Leg leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 

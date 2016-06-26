@@ -49,46 +49,46 @@ public class TransitActRemoverTest {
 		double now = 0;
 		transitTravelTime = 0;
 
-		Activity act = plan.createAndAddActivity( "h" );
+		Activity act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		now += 234;
 		act.setEndTime( now );
 
-		Leg leg = plan.createAndAddLeg( TransportMode.walk );
+		Leg leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 		leg.setDepartureTime( now );
 		double tt = 945;
 		leg.setTravelTime( tt );
 		transitTravelTime += tt;
 		now += tt;
 
-		act = plan.createAndAddActivity( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		act = PopulationUtils.createAndAddActivity(plan, (String) PtConstants.TRANSIT_ACTIVITY_TYPE);
 		act.setStartTime( now );
 		tt = 2435;
 		now += tt;
 		transitTravelTime += tt;
 		act.setEndTime( now );
 
-		leg = plan.createAndAddLeg( TransportMode.pt );
+		leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		leg.setDepartureTime( now );
 		tt = 503;
 		leg.setTravelTime( tt );
 		transitTravelTime += tt;
 		now += tt;
 
-		act = plan.createAndAddActivity( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		act = PopulationUtils.createAndAddActivity(plan, (String) PtConstants.TRANSIT_ACTIVITY_TYPE);
 		act.setStartTime( now );
 		tt = 235;
 		now += tt;
 		transitTravelTime += tt;
 		act.setEndTime( now );
 
-		leg = plan.createAndAddLeg( TransportMode.walk );
+		leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 		leg.setDepartureTime( now );
 		tt = 4509;
 		leg.setTravelTime( tt );
 		transitTravelTime += tt;
 		now += tt;
 
-		act = plan.createAndAddActivity( "h" );
+		act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setStartTime( now );
 	}
 

@@ -93,7 +93,7 @@ public class Counts2Plans {
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "start", this.transitSchedule.getFacilities().get(from).getLinkId());
 			a.setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
 
-			((Plan) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
+			PopulationUtils.createAndAddLeg( ((Plan) person.getSelectedPlan()), (String) TransportMode.pt );
 			PopulationUtils.getFirstActivity( ((Plan) person.getSelectedPlan()) ).setEndTime(time);
 
 			a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "finish", this.transitSchedule.getFacilities().get(to).getLinkId());
@@ -153,7 +153,7 @@ public class Counts2Plans {
 								Activity a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
 								a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 								//								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.access.getCount(stopID).getCoord());
-								((Plan) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
+								PopulationUtils.createAndAddLeg( ((Plan) person.getSelectedPlan()), (String) TransportMode.pt );
 
 								// Verlegen der Nachfrage auf die Zeit des OEV-Angebots. Dieses geht von 3:30 bis 27:30 Uhr.
 								if(hour < 4){

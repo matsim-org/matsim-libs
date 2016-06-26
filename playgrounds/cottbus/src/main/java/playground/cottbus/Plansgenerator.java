@@ -345,7 +345,7 @@ public class Plansgenerator {
 			a.setLinkId(start.getId());
 			a.setEndTime(homeEndtime);
 			//leg to work
-			Leg leg = plan.createAndAddLeg(TransportMode.car);
+			Leg leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 			NetworkRoute route = new LinkNetworkRouteImpl(start.getId(), target.getId());
 			route.setLinkIds(start.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE))), target.getId());
 			leg.setRoute(route);

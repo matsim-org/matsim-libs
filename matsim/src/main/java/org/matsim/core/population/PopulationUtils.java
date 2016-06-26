@@ -335,19 +335,6 @@ public final class PopulationUtils {
 		public void setScore(Double score) {
 			throw new UnsupportedOperationException() ;
 		}
-
-		@Override
-		public Leg createAndAddLeg(String mode) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		public Activity createAndAddActivity(String type) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
 	}
 
 	/**
@@ -740,6 +727,35 @@ public final class PopulationUtils {
 		return newLeg ;
 	}
 	
+	// createAndAdd methods:
+		
+	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
+		Activity act = getFactory().createActivityFromCoord(type, coord) ;
+		plan.addActivity(act);
+		act.setCoord(coord);
+		return act ;
+	}
+	public static Activity createAndAddActivityFromLinkId( Plan plan, String type, Id<Link> linkId ) {
+		Activity act = getFactory().createActivityFromLinkId(type, linkId) ;
+		plan.addActivity(act);
+		act.setLinkId(linkId);
+		return act ;
+	}
+
+	public static Leg createAndAddLeg(Plan plan, String mode) {
+		Leg leg = getFactory().createLeg(mode) ;
+		plan.addLeg( leg );
+		return leg ;
+	}
+
+	public static Activity createAndAddActivity(Plan plan, String type) {
+		Activity act = new ActivityImpl( type ) ;
+		// (can't do this from the factory since factory method only exists with coord or with linkId. kai, jun'16)
+		plan.addActivity(act);
+		return act ;
+	}
+	
+
 	// --- static copy methods:
 
 	/** loads a copy of an existing plan, but keeps the person reference
@@ -765,7 +781,7 @@ public final class PopulationUtils {
 				out.getPlanElements().add(createActivity((Activity) pe));
 			} else if (pe instanceof Leg) {
 				Leg l = (Leg) pe;
-				Leg l2 = out.createAndAddLeg(l.getMode());
+				Leg l2 = PopulationUtils.createAndAddLeg( out, l.getMode() );
 				copyFromTo(l, l2);
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
@@ -780,6 +796,8 @@ public final class PopulationUtils {
 			out.setRoute(in.getRoute().clone());
 		}
 	}
+	
+	// --- positional methods:
 
 	public static Activity getFirstActivity(Plan plan) {
 		return (Activity) plan.getPlanElements().get(0);
@@ -899,15 +917,4 @@ public final class PopulationUtils {
 		plan.getPlanElements().add(pos, act);
 		plan.getPlanElements().add(pos, leg);
 	}
-	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
-		Activity act = plan.createAndAddActivity(type) ;
-		act.setCoord(coord);
-		return act ;
-	}
-	public static Activity createAndAddActivityFromLinkId( Plan plan, String type, Id<Link> linkId ) {
-		Activity act = plan.createAndAddActivity(type) ;
-		act.setLinkId(linkId);
-		return act ;
-	}
-	
 }

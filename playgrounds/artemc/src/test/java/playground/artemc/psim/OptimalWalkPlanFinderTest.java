@@ -298,7 +298,7 @@ public class OptimalWalkPlanFinderTest {
 			Activity firstActivity = PopulationUtils.createAndAddActivityFromCoord(this.plan, (String) "home", coord);
 			firstActivity.setEndTime(firstLegStartTime);
 
-			Leg leg = this.plan.createAndAddLeg(TransportMode.walk);
+			Leg leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.walk );
 			leg.setDepartureTime(firstLegStartTime);
 			leg.setTravelTime(firstLegTravelTime);
 			Route route1 = new GenericRouteImpl(link1.getId(), link1.getId());
@@ -311,7 +311,7 @@ public class OptimalWalkPlanFinderTest {
 			secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
 			secondActivity.setEndTime(secondLegStartTime);
 
-			leg = this.plan.createAndAddLeg(TransportMode.walk);
+			leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.walk );
 			leg.setDepartureTime(secondLegStartTime);
 			leg.setTravelTime(secondLegTravelTime);
 			Route route2 = new GenericRouteImpl(link1.getId(), link1.getId());

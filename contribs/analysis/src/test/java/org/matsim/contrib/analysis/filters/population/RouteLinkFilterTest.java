@@ -78,7 +78,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a.setEndTime(7.0 * 3600);
-		leg = plan.createAndAddLeg(TransportMode.car);
+		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
@@ -89,7 +89,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
-		leg = plan.createAndAddLeg(TransportMode.car);
+		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
@@ -100,7 +100,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a3 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
-		leg = plan.createAndAddLeg(TransportMode.car);
+		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("5 14"), link20.getId());
 		leg.setRoute(route);

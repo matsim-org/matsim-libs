@@ -85,7 +85,7 @@ public class ChangeLegModeTest {
 		PersonUtils.setCarAvail(person, "never");
 		Plan plan = PopulationUtils.createPlan(person);
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
-		Leg leg = plan.createAndAddLeg(TransportMode.pt);
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 
 		HashMap<String, Integer> counter = new HashMap<String, Integer>();
@@ -106,7 +106,7 @@ public class ChangeLegModeTest {
 
 		Plan plan = PopulationUtils.createPlan(null);
 		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
-		Leg leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 
 		HashMap<String, Integer> counter = new HashMap<String, Integer>();

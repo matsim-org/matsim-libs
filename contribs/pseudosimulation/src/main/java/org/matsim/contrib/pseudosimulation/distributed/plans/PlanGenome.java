@@ -377,9 +377,4 @@ public class PlanGenome implements Plan {
     public void resetScoreComponents() {
         this.scoreComponents = new ArrayList<>();
     }
-@Override
-public Activity createAndAddActivity(String type) {
-	// TODO Auto-generated method stub
-	throw new RuntimeException("not implemented") ;
-}
 }
