@@ -19,43 +19,59 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import java.util.*;
+
+import org.matsim.api.core.v01.*;
 
 
-class AssignmentRequestData
-    extends AssignmentDestinationData<TaxiRequest, Request>
+//TODO consider <D> instead of <D extends Identifiable<I>, I> to make it more general 
+public class AssignmentDestinationData<D extends Identifiable<I>, I>
 {
-    private int urgentReqCount = 0;
-    private final double currTime;
-    private final double maxT0;
+    private final List<D> destinations = new ArrayList<>();
+    private final Map<Id<I>, Integer> destIdx = new HashMap<>();
+    private int size;
 
 
-    AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon)
+    public void init(SortedSet<D> candidateDestinations)
     {
-        currTime = optimContext.timer.getTimeOfDay();
-        maxT0 = currTime + planningHorizon;
+        int idx = 0;
+        for (D d : candidateDestinations) {
+            if (doIncludeDestination(d)) {
+                destinations.add(d);
+                destIdx.put(d.getId(), idx++);
+            }
+        }
+
+        size = destinations.size();
     }
 
 
-    @Override
-    protected boolean doIncludeDestination(TaxiRequest req)
+    protected boolean doIncludeDestination(D destination)
     {
-        double t0 = req.getT0();
-        if (t0 > maxT0) {
-            return false;
-        }
-
-        if (t0 <= currTime) {
-            urgentReqCount++;
-        }
         return true;
     }
 
 
-    public int getUrgentReqCount()
+    public int getSize()
     {
-        return urgentReqCount;
+        return size;
+    }
+
+
+    public D getDestination(int idx)
+    {
+        return destinations.get(idx);
+    }
+
+
+    public List<D> getDestinations()
+    {
+        return destinations;
+    }
+
+
+    public int getIdx(D destination)
+    {
+        return destIdx.get(destination.getId());
     }
 }

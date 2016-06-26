@@ -40,7 +40,7 @@ public class AssignmentProblem
     private final TaxiOptimizerContext optimContext;
     private final AssignmentTaxiOptimizerParams params;
 
-    private final MultiNodeDijkstra router;
+    private final FastMultiNodeDijkstra router;
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
     private final StraightLineKNNFinder<VehicleData.Entry, TaxiRequest> requestFinder;
@@ -51,7 +51,7 @@ public class AssignmentProblem
 
 
     public AssignmentProblem(TaxiOptimizerContext optimContext,
-            AssignmentTaxiOptimizerParams params, MultiNodeDijkstra router,
+            AssignmentTaxiOptimizerParams params, FastMultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter)
     {
         this.optimContext = optimContext;
@@ -69,7 +69,7 @@ public class AssignmentProblem
     public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
         if (initDataAndCheckIfSchedulingRequired(unplannedRequests)) {
-            RequestPathData[][] pathDataMatrix = createPathDataMatrix();
+            PathData[][] pathDataMatrix = createPathDataMatrix();
             double[][] costMatrix = createCostMatrix(pathDataMatrix);
             int[] assignments = new HungarianAlgorithm(costMatrix).execute();
             scheduleRequests(assignments, pathDataMatrix, unplannedRequests);
@@ -79,15 +79,16 @@ public class AssignmentProblem
 
     private boolean initDataAndCheckIfSchedulingRequired(SortedSet<TaxiRequest> unplannedRequests)
     {
-        rData = new AssignmentRequestData(optimContext, unplannedRequests, 0);//only immediate reqs
-        if (rData.dimension == 0) {
+        rData = new AssignmentRequestData(optimContext, 0);//only immediate reqs
+        rData.init(unplannedRequests);
+        if (rData.getSize() == 0) {
             return false;
         }
 
         int idleVehs = Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
                 TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
 
-        if (idleVehs < rData.urgentReqCount) {
+        if (idleVehs < rData.getUrgentReqCount()) {
             vData = new VehicleData(optimContext, params.vehPlanningHorizonUndersupply);
         }
         else {
@@ -98,7 +99,7 @@ public class AssignmentProblem
     }
 
 
-    private static class RequestPathData
+    private static class PathData
     {
         private Node node;//destination
         private double delay;//at the first and last links
@@ -110,12 +111,12 @@ public class AssignmentProblem
     private static int calcPathsForRequestsCount = 0;
 
 
-    private RequestPathData[][] createPathDataMatrix()
+    private PathData[][] createPathDataMatrix()
     {
-        RequestPathData[][] pathDataMatrix = (RequestPathData[][])Array
-                .newInstance(RequestPathData.class, vData.dimension, rData.dimension);
+        PathData[][] pathDataMatrix = (PathData[][])Array
+                .newInstance(PathData.class, vData.dimension, rData.getSize());
 
-        if (rData.dimension > vData.dimension) {
+        if (rData.getSize() > vData.dimension) {
             calcPathsForVehicles(pathDataMatrix);
             calcPathsForVehiclesCount++;
         }
@@ -127,7 +128,7 @@ public class AssignmentProblem
         if ( (calcPathsForRequestsCount + calcPathsForVehiclesCount) % 100 == 0) {
             System.err.println("PathsForRequests = " + calcPathsForRequestsCount
                     + " PathsForVehicles = " + calcPathsForVehiclesCount);
-            System.err.println("reqs = " + rData.dimension + " vehs = " + vData.dimension
+            System.err.println("reqs = " + rData.getSize() + " vehs = " + vData.dimension
                     + " idleVehs = " + vData.idleCount);
         }
 
@@ -135,7 +136,7 @@ public class AssignmentProblem
     }
 
 
-    private void calcPathsForVehicles(RequestPathData[][] pathDataMatrix)
+    private void calcPathsForVehicles(PathData[][] pathDataMatrix)
     {
         for (int v = 0; v < vData.dimension; v++) {
             VehicleData.Entry departure = vData.entries.get(v);
@@ -145,11 +146,11 @@ public class AssignmentProblem
             Map<Id<Node>, Path> pathsToReqNodes = new HashMap<>();
 
             List<TaxiRequest> filteredReqs = requestFinder.findNearest(departure,
-                    rData.requests);
+                    rData.getDestinations());
 
             for (TaxiRequest req : filteredReqs) {
-                int r = rData.reqIdx.get(req.getId());
-                RequestPathData pathData = pathDataMatrix[v][r] = new RequestPathData();
+                int r = rData.getIdx(req);
+                PathData pathData = pathDataMatrix[v][r] = new PathData();
                 Link reqLink = req.getFromLink();
 
                 if (departure.link == reqLink) {
@@ -184,8 +185,8 @@ public class AssignmentProblem
             }
 
             for (TaxiRequest req : filteredReqs) {
-                int r = rData.reqIdx.get(req.getId());
-                RequestPathData pathData = pathDataMatrix[v][r];
+                int r = rData.getIdx(req);
+                PathData pathData = pathDataMatrix[v][r];
                 pathData.path = pathsToReqNodes.get(pathData.node.getId());
             }
         }
@@ -193,12 +194,12 @@ public class AssignmentProblem
 
 
     //TODO does not support adv reqs
-    private void calcPathsForRequests(RequestPathData[][] pathDataMatrix)
+    private void calcPathsForRequests(PathData[][] pathDataMatrix)
     {
         double currTime = optimContext.timer.getTimeOfDay();
 
-        for (int r = 0; r < rData.dimension; r++) {
-            TaxiRequest req = rData.requests.get(r);
+        for (int r = 0; r < rData.getSize(); r++) {
+            TaxiRequest req = rData.getDestination(r);
             Link toLink = req.getFromLink();
             Node toNode = toLink.getFromNode();
 
@@ -209,7 +210,7 @@ public class AssignmentProblem
 
             for (VehicleData.Entry departure : filteredVehs) {
                 int v = departure.idx;
-                RequestPathData pathData = pathDataMatrix[v][r] = new RequestPathData();
+                PathData pathData = pathDataMatrix[v][r] = new PathData();
 
                 if (departure.link == toLink) {
                     //hack: we are basically there (on the same link), so let's pretend vehNode == toNode
@@ -244,7 +245,7 @@ public class AssignmentProblem
 
             for (VehicleData.Entry departure : filteredVehs) {
                 int v = departure.idx;
-                RequestPathData pathData = pathDataMatrix[v][r];
+                PathData pathData = pathDataMatrix[v][r];
                 pathData.path = pathsFromVehNodes.get(pathData.node.getId());
             }
         }
@@ -268,15 +269,15 @@ public class AssignmentProblem
     };
 
 
-    private double[][] createCostMatrix(RequestPathData[][] pathDataMatrix)
+    private double[][] createCostMatrix(PathData[][] pathDataMatrix)
     {
         Mode currentMode = getCurrentMode();
-        double[][] costMatrix = new double[vData.dimension][rData.dimension];
+        double[][] costMatrix = new double[vData.dimension][rData.getSize()];
 
         for (int v = 0; v < vData.dimension; v++) {
             VehicleData.Entry departure = vData.entries.get(v);
-            for (int r = 0; r < rData.dimension; r++) {
-                costMatrix[v][r] = calcCost(departure, rData.requests.get(r), pathDataMatrix[v][r],
+            for (int r = 0; r < rData.getSize(); r++) {
+                costMatrix[v][r] = calcCost(departure, rData.getDestination(r), pathDataMatrix[v][r],
                         currentMode);
             }
         }
@@ -286,7 +287,7 @@ public class AssignmentProblem
 
 
     private double calcCost(VehicleData.Entry departure, TaxiRequest request,
-            RequestPathData pathData, Mode currentMode)
+            PathData pathData, Mode currentMode)
     {
         double travelTime = pathData == null ? //
                 params.nullPathCost : // no path (too far away)
@@ -320,26 +321,26 @@ public class AssignmentProblem
             return params.mode;
         }
         else {
-            return rData.urgentReqCount > vData.idleCount ? Mode.PICKUP_TIME : //we have too few vehicles
+            return rData.getUrgentReqCount() > vData.idleCount ? Mode.PICKUP_TIME : //we have too few vehicles
                     Mode.ARRIVAL_TIME; //we have too many vehicles
         }
     }
 
 
-    private void scheduleRequests(int[] assignments, RequestPathData[][] pathDataMatrix,
+    private void scheduleRequests(int[] assignments, PathData[][] pathDataMatrix,
             SortedSet<TaxiRequest> unplannedRequests)
     {
         for (int v = 0; v < assignments.length; v++) {
             int r = assignments[v];
 
             if (r == -1 || //no request assigned
-                    r >= rData.dimension) {// non-existing (dummy) request assigned
+                    r >= rData.getSize()) {// non-existing (dummy) request assigned
                 continue;
             }
 
             VehicleData.Entry departure = vData.entries.get(v);
-            TaxiRequest req = rData.requests.get(r);
-            RequestPathData pathData = pathDataMatrix[v][r];
+            TaxiRequest req = rData.getDestination(r);
+            PathData pathData = pathDataMatrix[v][r];
 
             VrpPathWithTravelData vrpPath = pathData == null ? //
                     VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time,
