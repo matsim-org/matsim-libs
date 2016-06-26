@@ -168,7 +168,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		PopulationReader reader = new MatsimPopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -181,7 +181,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new PopulationReaderMatsimV5(sc);
+		PopulationReader reader = new MatsimPopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -215,7 +215,7 @@ public class Prepare {
 			for(Plan plan : plans) {
 				List<PlanElement> elements = plan.getPlanElements();
 				for(PlanElement e : elements) {
-					if(e instanceof ActivityImpl) {
+					if(e instanceof Activity) {
 						Activity activity = (Activity) e;
 						switch (activity.getType()) {
 							case "home" :
