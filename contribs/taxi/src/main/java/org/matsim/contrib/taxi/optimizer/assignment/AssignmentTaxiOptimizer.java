@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.locationchoice.router.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 
@@ -64,7 +65,12 @@ public class AssignmentTaxiOptimizer
 
     protected void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimContext, params, router, backwardRouter)
-                .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
+        List<Dispatch<TaxiRequest>> dispatches = new AssignmentProblem(optimContext, params, router,
+                backwardRouter).findAssignments((SortedSet<TaxiRequest>)unplannedRequests);
+
+        for (Dispatch<TaxiRequest> d : dispatches) {
+            optimContext.scheduler.scheduleRequest(d.vehicle, d.destination, d.path);
+            unplannedRequests.remove(d.destination);
+        }
     }
 }

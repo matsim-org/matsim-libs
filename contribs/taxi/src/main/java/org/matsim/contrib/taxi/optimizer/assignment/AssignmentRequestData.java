@@ -19,13 +19,12 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 
 
 class AssignmentRequestData
-    extends AssignmentDestinationData<TaxiRequest, Request>
+    extends AssignmentDestinationData<TaxiRequest>
 {
     private int urgentReqCount = 0;
     private final double currTime;
@@ -40,17 +39,17 @@ class AssignmentRequestData
 
 
     @Override
-    protected boolean doIncludeDestination(TaxiRequest req)
+    protected DestEntry<TaxiRequest> createEntry(int idx, TaxiRequest candidateDest)
     {
-        double t0 = req.getT0();
+        double t0 = candidateDest.getT0();
         if (t0 > maxT0) {
-            return false;
+            return null;
         }
 
         if (t0 <= currTime) {
             urgentReqCount++;
         }
-        return true;
+        return new DestEntry<TaxiRequest>(idx, candidateDest, candidateDest.getFromLink(), t0);
     }
 
 

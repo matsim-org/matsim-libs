@@ -21,57 +21,62 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 
 
-//TODO consider <D> instead of <D extends Identifiable<I>, I> to make it more general 
-public class AssignmentDestinationData<D extends Identifiable<I>, I>
+public abstract class AssignmentDestinationData<D>
 {
-    private final List<D> destinations = new ArrayList<>();
-    private final Map<Id<I>, Integer> destIdx = new HashMap<>();
-    private int size;
+    public static class DestEntry<D>
+    {
+        public final int idx;
+        public final D destination;
+        public final Link link;
+        public final double time;
+
+
+        public DestEntry(int idx, D destination, Link link, double time)
+        {
+            this.idx = idx;
+            this.destination = destination;
+            this.link = link;
+            this.time = time;
+        }
+    }
+
+
+    private final List<DestEntry<D>> entries = new ArrayList<>();
 
 
     public void init(SortedSet<D> candidateDestinations)
     {
         int idx = 0;
         for (D d : candidateDestinations) {
-            if (doIncludeDestination(d)) {
-                destinations.add(d);
-                destIdx.put(d.getId(), idx++);
+            DestEntry<D> e = createEntry(idx, d);
+            if (e != null) {
+                entries.add(e);
+                idx++;
             }
         }
-
-        size = destinations.size();
     }
 
 
-    protected boolean doIncludeDestination(D destination)
-    {
-        return true;
-    }
+    protected abstract DestEntry<D> createEntry(int idx, D candidateDest);
 
 
     public int getSize()
     {
-        return size;
+        return entries.size();
     }
 
 
-    public D getDestination(int idx)
+    public DestEntry<D> getEntry(int idx)
     {
-        return destinations.get(idx);
+        return entries.get(idx);
     }
 
 
-    public List<D> getDestinations()
+    public List<DestEntry<D>> getEntries()
     {
-        return destinations;
-    }
-
-
-    public int getIdx(D destination)
-    {
-        return destIdx.get(destination.getId());
+        return entries;
     }
 }

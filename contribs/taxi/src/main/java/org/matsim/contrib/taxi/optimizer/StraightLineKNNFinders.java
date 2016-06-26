@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 
 
 /**
@@ -28,18 +28,18 @@ import org.matsim.contrib.taxi.optimizer.*;
  */
 public class StraightLineKNNFinders
 {
-    public static StraightLineKNNFinder<VehicleData.Entry, TaxiRequest> createTaxiRequestFinder(
+    public static StraightLineKNNFinder<VehicleData.Entry, DestEntry<TaxiRequest>> createTaxiRequestFinder(
             int k)
     {
         return new StraightLineKNNFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK,
-                LinkProviders.REQUEST_TO_FROM_LINK);
+                LinkProviders.REQUEST_ENTRY_TO_LINK);
     }
 
 
-    public static StraightLineKNNFinder<TaxiRequest, VehicleData.Entry> createVehicleDepartureFinder(
+    public static StraightLineKNNFinder<DestEntry<TaxiRequest>, VehicleData.Entry> createVehicleDepartureFinder(
             int k)
     {
-        return new StraightLineKNNFinder<>(k, LinkProviders.REQUEST_TO_FROM_LINK,
+        return new StraightLineKNNFinder<>(k, LinkProviders.REQUEST_ENTRY_TO_LINK,
                 LinkProviders.VEHICLE_ENTRY_TO_LINK);
     }
 }
