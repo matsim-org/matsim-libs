@@ -483,6 +483,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		switch( this.vehiclesSource ) {
 		case defaultVehicle:
 			return true ;
+		case modeVehicleTypesFromVehiclesData:
 		case fromVehiclesData:
 			return false ;
 		default:
