@@ -28,7 +28,7 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerTy
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 
 
-public class RuleBasedTaxiOptimizerTest
+public class RuleBasedTaxiOptimizerIT
 {
     @Test
     public void testRuleBased()

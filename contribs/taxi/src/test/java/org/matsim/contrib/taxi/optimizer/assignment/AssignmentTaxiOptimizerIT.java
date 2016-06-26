@@ -29,7 +29,7 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerTy
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentProblem.Mode;
 
 
-public class AssignmentTaxiOptimizerTest
+public class AssignmentTaxiOptimizerIT
 {
     @Test
     public void testAssignment()
