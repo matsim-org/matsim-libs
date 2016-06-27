@@ -3,13 +3,13 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.obj.list.ListElementMarkForRemoval;
@@ -65,12 +65,12 @@ public class ParkingOccupancyMaintainer {
 		return parkingRelatedWalkDistance;
 	}
 
-	public LinkedList<ActivityImpl> getActivitiesWithParkingConstraintViolations(Plan plan) {
+	public LinkedList<Activity> getActivitiesWithParkingConstraintViolations(Plan plan) {
 		Id<Person> personId = plan.getPerson().getId();
 		LinkedList<Id<ActivityFacility>> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(plan);
 		// this list is initialized with all parking target activities and later
 		// filtered
-		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingGeneralLib
+		LinkedList<Activity> targetActivitiesWithParkingCapacityViolations = ParkingGeneralLib
 				.getParkingTargetActivities(plan);
 
 		// System.out.println(personId);

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -107,10 +109,10 @@ public class PlanGenerator {
 			PersonUtils.setEmployed(person, true);
 
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
-			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actWork = (Activity) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
 
-			LegImpl leg = (LegImpl) pf.createLeg(mode);
+			Leg leg = (Leg) pf.createLeg(mode);
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*7.5 + generator.nextGaussian()*900.0);
 			plan.addActivity(actHome);
@@ -121,7 +123,7 @@ public class PlanGenerator {
 			plan.addActivity(actWork);
 			plan.addLeg(leg);
 
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			actHome2.setFacilityId(homeFacilityId);
 			plan.addActivity(actHome2);		
 
@@ -164,11 +166,11 @@ public class PlanGenerator {
 			PersonUtils.setEmployed(person, false);
 
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
-			ActivityImpl actSecondary = (ActivityImpl) pf.createActivityFromCoord("secondary", facilities.get(secondaryFacilityId).getCoord());
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actSecondary = (Activity) pf.createActivityFromCoord("secondary", facilities.get(secondaryFacilityId).getCoord());
 
 			
-			LegImpl leg = (LegImpl) pf.createLeg(mode);
+			Leg leg = (Leg) pf.createLeg(mode);
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*7.75 + generator.nextDouble()*3600.0*12);
 			plan.addActivity(actHome);
@@ -179,7 +181,7 @@ public class PlanGenerator {
 			plan.addActivity(actSecondary);
 			plan.addLeg(leg);
 
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			actHome2.setFacilityId(homeFacilityId);
 			plan.addActivity(actHome2);		
 

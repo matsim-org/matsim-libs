@@ -27,10 +27,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -49,7 +51,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class PopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader {
+ class PopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader {
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";
@@ -79,7 +81,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final static String ATTR_LEG_MODE = "mode";
 	private final static String ATTR_LEG_DEPTIME = "dep_time";
 	private final static String ATTR_LEG_TRAVTIME = "trav_time";
-	private final static String ATTR_LEG_ARRTIME = "arr_time";
+//	private final static String ATTR_LEG_ARRTIME = "arr_time";
 	private static final String ATTR_ROUTE_STARTLINK = "start_link";
 	private static final String ATTR_ROUTE_ENDLINK = "end_link";
 
@@ -93,13 +95,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final Population plans;
 
 	private Person currperson = null;
-	private PlanImpl currplan = null;
-	private ActivityImpl curract = null;
-	private LegImpl currleg = null;
+	private Plan currplan = null;
+	private Activity curract = null;
+	private Leg currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	public PopulationReaderMatsimV5(final Scenario scenario) {
 		this( new IdentityTransformation() , scenario );
@@ -170,7 +172,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		Integer age = null ;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = PopulationUtils.createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
 		PersonUtils.setAge(this.currperson, age);
 		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
@@ -214,14 +216,15 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startAct(final Attributes atts) {
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
+			final Id<Link> linkId1 = linkId;
+			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				final Coord coord = parseCoord( atts );
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			final Coord coord = parseCoord( atts );
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), coord);
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
@@ -315,10 +318,12 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createAndAddLeg(mode.intern());
+		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
-		this.currleg.setArrivalTime(Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)));
+//		LegImpl r = this.currleg;
+//		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 	}
 
 	private void startRoute(final Attributes atts) {
@@ -337,7 +342,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			}
 		}
 		
-		RouteFactoryImpl factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactory();
+		RouteFactoriesRegister factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactoriesRegister();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
 		
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(

@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.Facility;
@@ -54,7 +53,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
-	private final Person dummyPerson = PopulationUtils.createPerson(Id.create(1, Person.class));
+	private final Person dummyPerson = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	// as long as all instance variables are final, the "resetCaches" method can remain empty.  kai, oct'10
 
 	/**
@@ -66,7 +65,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	 */
 	public FakeAgent(final TransitStopFacility enterStop, final TransitStopFacility exitStop) {
 		this.exitStop = exitStop;
-		this.dummyLeg = new LegImpl(TransportMode.pt);
+		this.dummyLeg = PopulationUtils.createLeg(TransportMode.pt);
 		if ((enterStop != null) && (exitStop != null)) {
 			Route route = new ExperimentalTransitRoute(enterStop, null, null, exitStop);
 			route.setStartLinkId(enterStop.getLinkId());

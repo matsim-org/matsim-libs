@@ -16,10 +16,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -149,8 +150,9 @@ public class Utils {
 	 * @param plan
 	 * @param homeCoord
 	 */
-	public static void makeHomePlan( PlanImpl plan, Coord homeCoord ) {
-		plan.createAndAddActivity(ACT_HOME, homeCoord) ;
+	public static void makeHomePlan( Plan plan, Coord homeCoord ) {
+		final Coord coord = homeCoord;
+		PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_HOME, coord);
 	}
 
 	public static void makeHomePlan( PopulationFactory pb, Plan plan, Coord homeCoord ) {
@@ -164,17 +166,19 @@ public class Utils {
 	 * @param plan
 	 * @param workCoord
 	 */
-	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord ) {
-		Activity act = plan.getFirstActivity();
+	public static void completePlanToHwh ( Plan plan, Coord workCoord ) {
+		Activity act = PopulationUtils.getFirstActivity( plan );
 		act.setEndTime( 7.*3600. ) ;
 		Coord homeCoord = act.getCoord();
 
-		plan.createAndAddLeg(TransportMode.car);
-		act = plan.createAndAddActivity(ACT_WORK, workCoord ) ;
-		((ActivityImpl) act).setMaximumDuration( 8.*3600. ) ;
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
+		final Coord coord = workCoord;
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_WORK, coord) ;
+		((Activity) act).setMaximumDuration( 8.*3600. ) ;
 
-		plan.createAndAddLeg(TransportMode.car) ;
-		plan.createAndAddActivity(ACT_HOME, homeCoord ) ;
+		PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
+		final Coord coord1 = homeCoord;
+		PopulationUtils.createAndAddActivityFromCoord(plan, (String) ACT_HOME, coord1);
 	}
 
 }

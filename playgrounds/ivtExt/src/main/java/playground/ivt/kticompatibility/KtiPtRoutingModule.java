@@ -28,8 +28,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -90,7 +89,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 					stop1.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg1 = distanceLeg1 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
 
-		final Leg walk1 = new LegImpl( TransportMode.transit_walk );
+		final Leg walk1 = PopulationUtils.createLeg(TransportMode.transit_walk);
 		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , linkStartPt.getId() );
 		walk1.setTravelTime( travelTimeLeg1 );
 		route1.setTravelTime( travelTimeLeg1 );
@@ -169,7 +168,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 	private static Activity createInteraction(
 			final Coord coord,
 			final Id link) {
-		final Activity act = new ActivityImpl( PtConstants.TRANSIT_ACTIVITY_TYPE , coord , link );
+		final Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, coord, link);
 		act.setMaximumDuration( 0 );
 		return act;
 	}

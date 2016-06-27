@@ -3,10 +3,12 @@ package org.matsim.contrib.matsim4urbansim.utils.io;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
 
@@ -23,8 +25,9 @@ public class CreateHomeWorkHomePlan {
 	 *
 	 * @author nagel
 	 */
-	public static void makeHomePlan( PlanImpl plan, Coord homeCoord, ActivityFacility homeLocation) {
-		ActivityImpl act = plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord) ;
+	public static void makeHomePlan( Plan plan, Coord homeCoord, ActivityFacility homeLocation) {
+		final Coord coord = homeCoord;
+		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, InternalConstants.ACT_HOME, coord) ;
 		act.setFacilityId( homeLocation.getId() );	// tnicolai: added facility id to compute zone2zone trips
 	}
 
@@ -37,10 +40,10 @@ public class CreateHomeWorkHomePlan {
 	 *
 	 * @author nagel
 	 */
-	public static void completePlanToHwh ( PlanImpl plan, Coord workCoord, ActivityFacility jobLocation ) {
+	public static void completePlanToHwh ( Plan plan, Coord workCoord, ActivityFacility jobLocation ) {
 		
 		// complete the first activity (home) by setting end time. 
-		ActivityImpl act = (ActivityImpl)plan.getFirstActivity();
+		Activity act = (Activity)PopulationUtils.getFirstActivity( plan );
 
 		final double hmDpTime = (6.+2.*MatsimRandom.getRandom().nextDouble())*3600.;
 		act.setEndTime( hmDpTime ) ;
@@ -53,20 +56,22 @@ public class CreateHomeWorkHomePlan {
 		Id homeId = act.getFacilityId();
 		
 		// set Leg
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		final Coord coord = workCoord;
 		
 		// set second activity (work)
-		act = plan.createAndAddActivity( InternalConstants.ACT_WORK, workCoord );
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, InternalConstants.ACT_WORK, coord);
 		act.setFacilityId( jobLocation.getId() );
 //		act.setMaximumDuration( 8.*3600. ) ; // tnicolai: make configurable: actType1.setTypicalDuration(8*60*60);
 		act.setEndTime( hmDpTime + 9.*3600. ) ; // avoid durations except when short (e.g. plugging in hybrid veh).  kai, may'13
 		
 		// set Leg
-		plan.createAndAddLeg(TransportMode.car) ;
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		final Coord coord1 = homeCoord;
 		
 		// set last activity (=first activity) and complete home-work-home plan.
-		plan.createAndAddActivity( InternalConstants.ACT_HOME, homeCoord );
-		act = (ActivityImpl)plan.getLastActivity();
+		PopulationUtils.createAndAddActivityFromCoord(plan, InternalConstants.ACT_HOME, coord1);
+		act = (Activity)PopulationUtils.getLastActivity(plan);
 		act.setFacilityId( homeId );
 	}
 

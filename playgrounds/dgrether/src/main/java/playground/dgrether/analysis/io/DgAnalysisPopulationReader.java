@@ -31,12 +31,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -90,7 +91,7 @@ public class DgAnalysisPopulationReader {
 			}
 			
 			plan = population.getPersons().get(id).getSelectedPlan();
-			act = ((PlanImpl) plan).getFirstActivity();
+			act = PopulationUtils.getFirstActivity( ((Plan) plan) );
 
 			DgPersonData personData;
 			personData = analysisPopulation.getPersonData().get(id);

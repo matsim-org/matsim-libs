@@ -4,9 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunction;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -45,7 +45,7 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 		addScoringFunction(person.getId(), scoringFunctionSum, new CharyparNagelMoneyScoring(
 				parameters.getScoringParameters( person ) ) );
 		
-		addScoringFunction(person.getId(), scoringFunctionSum, new FreeFloatingLegScoringFunction( (PlanImpl) person.getSelectedPlan(),
+		addScoringFunction(person.getId(), scoringFunctionSum, new FreeFloatingLegScoringFunction( (Plan) person.getSelectedPlan(),
 				  parameters.getScoringParameters( person ),
 				  this.scenario.getConfig(),
 				  this.scenario.getNetwork()));

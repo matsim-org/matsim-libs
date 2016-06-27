@@ -2,10 +2,10 @@ package playground.vsp.demandde.pendlermatrix;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -32,7 +32,7 @@ public class PersonGeoTransformatorTask implements PersonSinkSource {
 		Plan plan = person.getPlans().get(0);
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
-				ActivityImpl activity = (ActivityImpl) planElement;
+				Activity activity = (Activity) planElement;
 				Coord oldCoord = activity.getCoord();
 				Coord newCoord = transformation.transform(oldCoord);
 				activity.setCoord(newCoord);

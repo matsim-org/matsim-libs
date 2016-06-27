@@ -25,8 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
-
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.population.PlanWithCachedJointPlan;

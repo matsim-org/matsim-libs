@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -51,7 +52,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		Person person = pb.createPerson(Id.create(1, Person.class));
-		PlanImpl plan = (PlanImpl) pb.createPlan();
+		Plan plan = (Plan) pb.createPlan();
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
 		Leg leg = pb.createLeg("undefined");

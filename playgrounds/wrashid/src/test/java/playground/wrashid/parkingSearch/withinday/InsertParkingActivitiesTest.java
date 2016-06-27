@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,7 +51,6 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -93,33 +93,33 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		Plan plan = factory.createPlan();
 		person.addPlan(plan);
 
-		ActivityImpl activity;
+		Activity activity;
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("work", Id.create("l4", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("work", Id.create("l4", Link.class));
 		activity.setFacilityId(Id.create("f4", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.walk));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("shopping", Id.create("l5", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("shopping", Id.create("l5", Link.class));
 		activity.setFacilityId(Id.create("f5", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.pt));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
 
@@ -127,8 +127,8 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		 * Set activity durations and coordinates
 		 */
 		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof ActivityImpl) {
-				activity = (ActivityImpl) planElement;
+			if (planElement instanceof Activity) {
+				activity = (Activity) planElement;
 				activity.setMaximumDuration(3600);
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 			}

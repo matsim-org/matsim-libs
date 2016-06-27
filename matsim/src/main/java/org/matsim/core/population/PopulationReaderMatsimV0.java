@@ -30,7 +30,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -69,8 +71,8 @@ import org.xml.sax.Attributes;
 	private final Population plans;
 	private final Network network;
 	private Person currperson = null;
-	private PlanImpl currplan = null;
-	private LegImpl currleg = null;
+	private Plan currplan = null;
+	private Leg currleg = null;
 	private NetworkRoute currroute = null;
 
 	private Activity prevAct = null;
@@ -171,17 +173,18 @@ import org.xml.sax.Attributes;
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
 
-		ActivityImpl act;
+		Activity act;
 		if (atts.getValue("link") != null) {
 			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
-			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
+			final Id<Link> linkId1 = linkId;
+			act = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue("type"), linkId1);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 				final Coord coord = parseCoord( atts );
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 			final Coord coord = parseCoord( atts );
-			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
+			act = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
 		}
@@ -205,10 +208,12 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startLeg(final Attributes atts) {
-		this.currleg = this.currplan.createAndAddLeg(atts.getValue("mode").toLowerCase(Locale.ROOT).intern());
+		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, atts.getValue("mode").toLowerCase(Locale.ROOT).intern() );
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
-		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
+//		LegImpl r = this.currleg;
+//		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 	}
 
 	private void startRoute() {

@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -61,7 +60,7 @@ public class MergingTest {
 		List<Plan> plans = new ArrayList<Plan>();
 
 		for (int i=0; i<20; i++) {
-			plans.add( new PlanImpl(PopulationUtils.createPerson(Id.create(i, Person.class))) );
+			plans.add( PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class))) );
 		}
 
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
@@ -75,9 +74,10 @@ public class MergingTest {
 			final Map<Id<Person>, Plan> indivPlans = new HashMap< >();
 			for (int j=0; j<1000; j+=100) {
 				Id<Person> id = Id.create( i + j , Person.class );
+				final Id<Person> id1 = id;
 				indivPlans.put(
 						id,
-						new PlanImpl(PopulationUtils.createPerson(id)) );
+						PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(id1)) );
 			}
 			plans.add( jointPlans.getFactory().createJointPlan( indivPlans ) );
 		}

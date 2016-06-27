@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -42,7 +42,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactoriesRegister routeFactory;
 
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
@@ -52,7 +52,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 	 public TeleportationRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
-			final RouteFactoryImpl routeFactory,
+			final RouteFactoriesRegister routeFactory,
 			final double networkTravelSpeed,
 			final double beelineDistanceFactor) {
 		this.routeFactory = routeFactory;
@@ -107,7 +107,8 @@ public class TeleportationRoutingModule implements RoutingModule {
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		Leg r = ((Leg) leg);
+		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 

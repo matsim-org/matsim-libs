@@ -42,12 +42,12 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -193,7 +193,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 		
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl)pf).getRouteFactory() ;
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl)pf).getRouteFactoriesRegister() ;
 
 		// === walk leg: ===
 
@@ -272,7 +272,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 		
 		routeStart.setDistance(CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getCoord()) * beelineFactor);	
 
-		final Leg legWalkStart = new LegImpl( "walk_ow_sb" );
+		final Leg legWalkStart = PopulationUtils.createLeg("walk_ow_sb");
 		legWalkStart.setRoute(routeStart);
 
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
@@ -311,12 +311,12 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 			}
 		}
 
-		Leg carLeg = new LegImpl("onewaycarsharing");
+		Leg carLeg = PopulationUtils.createLeg("onewaycarsharing");
 
 		carLeg.setTravelTime( travelTime );
 
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
-		LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, startStationOW.getLinkId(), endStationOW.getLinkId());
+		LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, startStationOW.getLinkId(), endStationOW.getLinkId());
 
 		routeCar.setLinkIds( startStationOW.getLinkId(), ids, endStationOW.getLinkId());
 		routeCar.setTravelTime( travelTime);
@@ -331,7 +331,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 
 		//adding eggress walk leg
 
-		final Leg legWalkEnd = new LegImpl( "walk_ow_sb" );
+		final Leg legWalkEnd = PopulationUtils.createLeg("walk_ow_sb");
 		GenericRouteImpl routeEnd = new GenericRouteImpl(endStationOW.getLinkId(),
 				route.getEndLinkId());
 
@@ -387,12 +387,12 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 					}
 				}
 
-				Leg carLeg = new LegImpl("twowaycarsharing");
+				Leg carLeg = PopulationUtils.createLeg("twowaycarsharing");
 
 				carLeg.setTravelTime( travelTime );
 
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
-				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(),
+				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 
 				routeCar.setLinkIds( this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(), ids, 
@@ -429,12 +429,12 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 					}
 				}
 
-				Leg carLeg = new LegImpl("twowaycarsharing");
+				Leg carLeg = PopulationUtils.createLeg("twowaycarsharing");
 
 				carLeg.setTravelTime( travelTime );
 
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
-				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(),
+				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(),
 						this.pickupStations.get(this.pickupStations.size() - 1).getLinkId());
 
 				routeCar.setLinkIds( this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getId(), ids, 
@@ -447,7 +447,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 				carLeg.setRoute(routeCar);
 				trip.add(carLeg);
 
-				final Leg legWalkEnd = new LegImpl( "walk_rb" );
+				final Leg legWalkEnd = PopulationUtils.createLeg("walk_rb");
 				//TODO: get start link from the station
 				GenericRouteImpl routeEnd = new GenericRouteImpl(null,
 						route.getEndLinkId());
@@ -472,7 +472,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 				//log.info("Person with an id: "   + basicAgentDelegate.getPerson().getId()
 				//		+ " does not have a tw car.");
 
-				final Leg legWalkEnd = new LegImpl( "walk_rb" );
+				final Leg legWalkEnd = PopulationUtils.createLeg("walk_rb");
 
 				TwoWayCarsharingStation pickUpStation = this.findClosestAvailableTWCar(route.getStartLinkId());
 
@@ -518,12 +518,12 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 					}
 				}
 
-				Leg carLeg = new LegImpl("twowaycarsharing");
+				Leg carLeg = PopulationUtils.createLeg("twowaycarsharing");
 
 				carLeg.setTravelTime( travelTime );
 
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
-				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, pickUpStation.getLinkId(),
+				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, pickUpStation.getLinkId(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 
 				routeCar.setLinkIds( pickUpStation.getLinkId(), ids, 
@@ -543,7 +543,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 
 				//log.info("Two way carsharing trip is assigned to a leg between the same locations!");
 
-				final Leg legWalkStart = new LegImpl( "walk_rb" );
+				final Leg legWalkStart = PopulationUtils.createLeg("walk_rb");
 
 				TwoWayCarsharingStation pickUpStation = this.findClosestAvailableTWCar(route.getStartLinkId());
 
@@ -589,12 +589,12 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 					}
 				}
 
-				Leg carLeg = new LegImpl("twowaycarsharing");
+				Leg carLeg = PopulationUtils.createLeg("twowaycarsharing");
 
 				carLeg.setTravelTime( travelTime );
 
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
-				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, pickUpStation.getLinkId(),
+				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, pickUpStation.getLinkId(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 
 				routeCar.setLinkIds( pickUpStation.getLinkId(), ids, 
@@ -609,7 +609,7 @@ public class ParkSearchAndCarsharingPersonDriverAgentImpl implements MobsimDrive
 				carLeg.setRoute(routeCar);
 				trip.add(carLeg);
 
-				final Leg legWalkEnd = new LegImpl( "walk_rb" );
+				final Leg legWalkEnd = PopulationUtils.createLeg("walk_rb");
 
 				GenericRouteImpl routeWalkEnd = new GenericRouteImpl(pickUpStation.getLinkId(),
 						route.getEndLinkId());

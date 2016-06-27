@@ -31,12 +31,12 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 /**
  * @author mrieser / senozon
  */
-public class RouteFactoryImpl {
+public class RouteFactoriesRegister {
 	private final Map<Class<? extends Route>, RouteFactory> routeFactories = new HashMap<>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 	private final Map<String, Class<? extends Route>> type2class = new HashMap<>();
 
-	public RouteFactoryImpl() {
+	public RouteFactoriesRegister() {
 		this.setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
 		this.setRouteFactory(ExperimentalTransitRoute.class, new ExperimentalTransitRouteFactory());
 	}

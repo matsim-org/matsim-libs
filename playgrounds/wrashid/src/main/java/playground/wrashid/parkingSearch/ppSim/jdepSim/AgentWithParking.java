@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
@@ -53,7 +53,7 @@ public class AgentWithParking extends AgentEventMessage {
 	public AgentWithParking(Person person) {
 		this.setPerson(person);
 		this.setPlanElementIndex(0);
-		ActivityImpl ai = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Activity ai = (Activity) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		setMessageArrivalTime(ai.getEndTime());
 	}
 
@@ -63,7 +63,7 @@ public class AgentWithParking extends AgentEventMessage {
 
 	@Override
 	public void processEvent() {
-		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl) {
+		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof Activity) {
 			Activity act = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 			Leg nextLeg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 1);
 
@@ -158,7 +158,7 @@ public class AgentWithParking extends AgentEventMessage {
 	// link
 	// TODO: resolve in future implementation
 	public boolean isLastLinkOfRouteInvalidLinkForParking() {
-		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 
 		boolean isInvalidLink = false;
@@ -172,7 +172,7 @@ public class AgentWithParking extends AgentEventMessage {
 	public Id getInvalidLinkForParking() {
 		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
 		if (nextCarLegIndex != -1) {
-			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements()
+			Activity nextActAfterNextCarLeg = (Activity) getPerson().getSelectedPlan().getPlanElements()
 					.get(nextCarLegIndex + 1);
 			return nextActAfterNextCarLeg.getLinkId();
 		} else {
@@ -184,15 +184,15 @@ public class AgentWithParking extends AgentEventMessage {
 		boolean isInvalidLink = false;
 		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
 		if (nextCarLegIndex != -1) {
-			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements()
+			Activity nextActAfterNextCarLeg = (Activity) getPerson().getSelectedPlan().getPlanElements()
 					.get(nextCarLegIndex + 3);
 			isInvalidLink = GeneralLib.equals(linkId, nextActAfterNextCarLeg.getLinkId());
 		}
 		return isInvalidLink;
 	}
 
-	public ActivityImpl getCurrentActivity() {
-		return (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+	public Activity getCurrentActivity() {
+		return (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 	}
 
 	public Link getCurrentLink() {
@@ -201,7 +201,7 @@ public class AgentWithParking extends AgentEventMessage {
 	}
 
 	public Id getCurrentLinkId() {
-		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 
 		if (getCurrentLinkIndex() == -1) {
@@ -212,7 +212,7 @@ public class AgentWithParking extends AgentEventMessage {
 	}
 
 	public Link getNextLink() {
-		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		Id nextLinkId;
 		if (!endOfLegReached()) {
@@ -224,7 +224,7 @@ public class AgentWithParking extends AgentEventMessage {
 	}
 
 	public boolean endOfLegReached() {
-		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		return getCurrentLinkIndex() == linkIds.size() - 1;
 	}

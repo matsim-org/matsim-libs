@@ -30,15 +30,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,16 +47,16 @@ public class PseudoTransitRoutingModuleTest {
 	@Test
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactoriesRegister();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Leg leg = new LegImpl(TransportMode.pt);
-		Activity fromAct = new ActivityImpl("h", new Coord(0, 0));
-		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord(0, 3000));
-		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
+		((Activity) fromAct).setLinkId(Id.create("1", Link.class));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
+		((Activity) toAct).setLinkId(Id.create("3", Link.class));
 
 		double tt = new PseudoTransitRoutingModule(
 				"mode", f.s.getPopulation().getFactory(),

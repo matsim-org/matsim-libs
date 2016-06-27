@@ -20,19 +20,27 @@
 
 package playground.thibautd.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -40,13 +48,6 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -156,7 +157,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	private void doTest(NetworkImpl network,
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
-		PlanImpl plan = createPlan(network, facString);
+		Plan plan = createPlan(network, facString);
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours(plan, false);
 		StringBuilder builder = new StringBuilder();
 		List<Integer> actualSubtourIndexation = toList(testee.getSubtourIndexation());
@@ -183,7 +184,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	private void doTest(ActivityFacilities facilities, 
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
-		PlanImpl plan = createPlan(facilities, facString);
+		Plan plan = createPlan(facilities, facString);
 		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours(plan, true);
 		StringBuilder builder = new StringBuilder();
 		List<Integer> actualSubtourIndexation = toList(testee.getSubtourIndexation());
@@ -207,13 +208,13 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		}
 	}
 
-	private PlanImpl createPlan(NetworkImpl network, String facString) {
-		Person person = PopulationUtils.createPerson(Id.create("1000", Person.class));
+	private Plan createPlan(NetworkImpl network, String facString) {
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		return createPlanFromLinks(network, person, TransportMode.car, facString);
 	}
 
-	private PlanImpl createPlan(ActivityFacilities facilities, String facString) {
-		Person person = PopulationUtils.createPerson(Id.create("1000", Person.class));
+	private Plan createPlan(ActivityFacilities facilities, String facString) {
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		return createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, TransportMode.car, facString);
 	}
 
@@ -226,32 +227,32 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		return l;
 	}
 
-	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+	static Plan createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
+		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
-			ActivityImpl act;
-			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+			Activity act;
+			act = PopulationUtils.createAndAddActivity(plan, (String) ("actAtFacility" + locationIdSequence[aa]));
 			act.setFacilityId(location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(mode);
+				PopulationUtils.createAndAddLeg( plan, (String) mode );
 			}
 		}
 		return plan;
 	}
 
-	static PlanImpl createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+	static Plan createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
+		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
-			ActivityImpl act;
-			act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
+			Activity act;
+			act = PopulationUtils.createAndAddActivityFromLinkId(plan, (String) ("actOnLink" + locationIdSequence[aa]), (Id<Link>) location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(mode);
+				PopulationUtils.createAndAddLeg( plan, (String) mode );
 			}
 		}
 		return plan;

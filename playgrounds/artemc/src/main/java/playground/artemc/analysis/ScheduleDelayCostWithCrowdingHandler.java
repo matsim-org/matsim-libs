@@ -11,8 +11,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
@@ -102,7 +101,7 @@ public class ScheduleDelayCostWithCrowdingHandler implements ActivityStartEventH
 		if(!personId.toString().startsWith("pt")){
 
 			//Create new leg for the person
-			journeys.get(personId).currentLeg = new LegImpl(event.getLegMode());
+			journeys.get(personId).currentLeg = PopulationUtils.createLeg(event.getLegMode());
 			journeys.get(personId).currentLeg.setDepartureTime(event.getTime());
 
 			if(!journeys.get(personId).mode.equals(TransportMode.pt)){
@@ -192,7 +191,7 @@ public class ScheduleDelayCostWithCrowdingHandler implements ActivityStartEventH
 		Id<Person> perosnId = event.getPersonId();
 		Journey thisJourney = journeys.get(perosnId);
 		if(event.getActType().equals("work")){
-			ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
+			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			activities.put(perosnId, activity);

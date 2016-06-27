@@ -21,10 +21,10 @@
 
 package playground.boescpa.ivtBaseline.preparation;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import playground.boescpa.lib.tools.PopulationUtils;
 
@@ -56,14 +56,14 @@ public class TransferLocationChoices {
 			List<PlanElement> planNew = popWhichWillBeUpdated.getPersons().get(personOld.getId()).getSelectedPlan().getPlanElements();
 			int j = 0;
 			for (PlanElement planElementOld : planOld) {
-				if (planElementOld instanceof ActivityImpl) {
-					ActivityImpl actOld = (ActivityImpl) planElementOld;
+				if (planElementOld instanceof Activity) {
+					Activity actOld = (Activity) planElementOld;
 					if (!actOld.getType().equals("pt interaction")) {
-						ActivityImpl actNew = (ActivityImpl) planNew.get(j);
+						Activity actNew = (Activity) planNew.get(j);
 						actNew.setFacilityId(actOld.getFacilityId());
 						actNew.setCoord(actOld.getCoord());
 						j += 2;
-						while (j < planNew.size() && ((ActivityImpl) planNew.get(j)).getType().equals("pt interaction")) {
+						while (j < planNew.size() && ((Activity) planNew.get(j)).getType().equals("pt interaction")) {
 							j += 2;
 						}
 					}

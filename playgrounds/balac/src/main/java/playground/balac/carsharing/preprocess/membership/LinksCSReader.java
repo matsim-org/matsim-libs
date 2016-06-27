@@ -14,8 +14,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -164,7 +165,7 @@ public class LinksCSReader
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
     QuadTree<Person> personQuadTree = new QuadTree<>(minx, miny, maxx, maxy);
     for (Person p : this.scenario.getPopulation().getPersons().values()) {
-      Coord c = ((ActivityFacility)this.scenario.getActivityFacilities().getFacilities().get(((PlanImpl)p.getSelectedPlan()).getFirstActivity().getFacilityId())).getCoord();
+      Coord c = ((ActivityFacility)this.scenario.getActivityFacilities().getFacilities().get(PopulationUtils.getFirstActivity( ((Plan)p.getSelectedPlan()) ).getFacilityId())).getCoord();
       personQuadTree.put(c.getX(), c.getY(), p);
     }
     log.info("PersonQuadTree has been created");

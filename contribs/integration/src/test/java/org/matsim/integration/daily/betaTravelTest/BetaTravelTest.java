@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -56,7 +57,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -486,8 +486,10 @@ public class BetaTravelTest extends MatsimTestCase {
 						now += leg.getTravelTime();
 					}
 					// set planned arrival time accordingly
-					if (pe instanceof LegImpl) {
-						((LegImpl) leg).setArrivalTime(now);
+					if (pe instanceof Leg) {
+						final double arrTime = now;
+						Leg r = ((Leg) leg);
+						r.setTravelTime( arrTime - r.getDepartureTime() );
 					}
 
 				}

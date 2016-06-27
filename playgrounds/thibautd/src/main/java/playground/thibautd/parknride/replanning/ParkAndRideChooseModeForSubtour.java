@@ -23,12 +23,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
@@ -153,16 +153,16 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		int subStartIndex = plan.getPlanElements().indexOf( choosenSubtour.get( 0 ) );
 
 		choosenSubtour.remove( 1 );
-		choosenSubtour.add( 1 , new LegImpl( TransportMode.pt ) );
+		choosenSubtour.add( 1 , PopulationUtils.createLeg(TransportMode.pt) );
 		choosenSubtour.add( 1 , plan.getPlanElements().get( subStartIndex + 2 ) );
-		choosenSubtour.add( 1 , new LegImpl( TransportMode.car ) );
+		choosenSubtour.add( 1 , PopulationUtils.createLeg(TransportMode.car) );
 
 
 		int subEndIndex = plan.getPlanElements().indexOf( choosenSubtour.get( choosenSubtour.size() - 1 ) );
 		choosenSubtour.remove( choosenSubtour.size() - 2 );
-		choosenSubtour.add( choosenSubtour.size() - 1 , new LegImpl( TransportMode.pt ) );
+		choosenSubtour.add( choosenSubtour.size() - 1 , PopulationUtils.createLeg(TransportMode.pt) );
 		choosenSubtour.add( choosenSubtour.size() - 1 , plan.getPlanElements().get( subEndIndex - 2 ) );
-		choosenSubtour.add( choosenSubtour.size() - 1 , new LegImpl( TransportMode.car ) );
+		choosenSubtour.add( choosenSubtour.size() - 1 , PopulationUtils.createLeg(TransportMode.car) );
 	}
 
 	private static boolean containsFlaggedPnrTrip(final List<PlanElement> structure) {
@@ -479,7 +479,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 						Activity currentAct = (Activity) pe;
 						double currentEnd = currentAct.getEndTime();
 						double currentStart = currentAct.getStartTime();
-						double dur = (currentAct instanceof ActivityImpl ? ((ActivityImpl) currentAct).getMaximumDuration() : Time.UNDEFINED_TIME);
+						double dur = (currentAct instanceof Activity ? ((Activity) currentAct).getMaximumDuration() : Time.UNDEFINED_TIME);
 						if (currentEnd != Time.UNDEFINED_TIME && currentEnd > startTime) {
 							// use fromcurrentAct.currentEnd as time for routing
 							startTime = currentEnd;

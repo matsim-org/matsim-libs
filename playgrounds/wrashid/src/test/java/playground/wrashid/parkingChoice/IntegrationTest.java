@@ -3,6 +3,7 @@ package playground.wrashid.parkingChoice;
 import junit.framework.TestCase;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -10,7 +11,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.population.LegImpl;
+
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
@@ -65,8 +66,8 @@ public class IntegrationTest  extends TestCase {
 	
 	private boolean isPlanCarTripFree(Plan plan){
 		for (PlanElement pe:plan.getPlanElements()){
-			if (pe instanceof LegImpl){
-				LegImpl leg=(LegImpl) pe;
+			if (pe instanceof Leg){
+				Leg leg=(Leg) pe;
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					return false;
 				}

@@ -22,12 +22,13 @@ package playground.telaviv.locationchoice.matsimdc;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
 
 import java.util.Map;
@@ -52,7 +53,7 @@ public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice
 		super.finish();	
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof Activity && dcContext.getFlexibleTypes().contains(((Activity) pe).getType())) {				
-				this.score += destinationChoiceScoring.getZonalScore((PlanImpl)plan, (ActivityImpl)pe);
+				this.score += destinationChoiceScoring.getZonalScore((Plan)plan, (Activity)pe);
 			}
 		}
 	}

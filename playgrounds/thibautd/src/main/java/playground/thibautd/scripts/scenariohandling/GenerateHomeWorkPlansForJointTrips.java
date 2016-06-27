@@ -97,7 +97,7 @@ public class GenerateHomeWorkPlansForJointTrips {
 			final boolean isDriver = i % 2 == 0;
 			final String mode = isDriver ? TransportMode.car : TransportMode.pt;
 
-			Person person = PopulationUtils.createPerson(ids.next());
+			Person person = PopulationUtils.getFactory().createPerson(ids.next());
 			if (!isDriver) PersonUtils.setCarAvail(person, "never");
 			persons.add( person );
 

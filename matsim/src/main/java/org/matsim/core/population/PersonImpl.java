@@ -74,8 +74,8 @@ public final class PersonImpl implements Person {
 		if (oldPlan == null) {
 			return null;
 		}
-		PlanImpl newPlan = new PlanImpl(oldPlan.getPerson());
-		newPlan.copyFrom(oldPlan);
+		Plan newPlan = PopulationUtils.createPlan(oldPlan.getPerson());
+		PopulationUtils.copyFromTo(oldPlan, newPlan);
 		this.getPlans().add(newPlan);
 		this.setSelectedPlan(newPlan);
 		return newPlan;
@@ -129,12 +129,10 @@ public final class PersonImpl implements Person {
 		this.locked = true ;
 		
 		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
-		for ( Plan plan : this.plans ) {
-			if ( plan instanceof PlanImpl ) {
+//		for ( Plan plan : this.plans ) {
 //				((PlanImpl)plan).setLocked() ;
 				// does not really do that much since it only affects the initial plan(s). kai, dec'15
-			}
-		}
+//		}
 	}
 	private void testForLocked() {
 		if ( this.locked ) {

@@ -23,9 +23,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -59,9 +60,9 @@ public class CMCFFirstActPlansMerger {
 		Population plans = MatsimIo.loadPlans(plansFile, net);
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
-			Leg l = ((PlanImpl) pl).getNextLeg(((PlanImpl) pl).getFirstActivity());
+			Leg l = PopulationUtils.getNextLeg(((Plan) pl), PopulationUtils.getFirstActivity( ((Plan) pl) ));
 			Plan plcmcf = plansCmcf.getPersons().get(p.getId()).getSelectedPlan();
-			Leg lcmcf = ((PlanImpl) plcmcf).getNextLeg(((PlanImpl) plcmcf).getFirstActivity());
+			Leg lcmcf = PopulationUtils.getNextLeg(((Plan) plcmcf), PopulationUtils.getFirstActivity( ((Plan) plcmcf) ));
 			l.setRoute(lcmcf.getRoute());
 		}
 		MatsimIo.writePlans(plans, net, outPlansFile);

@@ -2,9 +2,10 @@ package utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -195,8 +196,10 @@ public abstract class Utils {
 		}
 		else {		// its a trip back home
 			// not the first home act!
-			if (((PlanImpl) plan).getPreviousLeg(act) != null) {
-				return getLongestActivityForRoundTrip((PlanImpl) plan, ((PlanImpl) plan).getPreviousActivity(((PlanImpl) plan).getPreviousLeg(act)));
+			final Activity act1 = act;
+			if (PopulationUtils.getPreviousLeg(((Plan) plan), act1) != null) {
+				final Activity act2 = act;
+				return getLongestActivityForRoundTrip((Plan) plan, PopulationUtils.getPreviousActivity(((Plan) plan), PopulationUtils.getPreviousLeg(((Plan) plan), act2)));
 			}
 			else {
 				return "home";
@@ -204,16 +207,17 @@ public abstract class Utils {
 		}
 	}
 
-	private static String getLongestActivityForRoundTrip(final PlanImpl plan, Activity act) {
+	private static String getLongestActivityForRoundTrip(final Plan plan, Activity act) {
 		double maxActDur = - 1.0;
 
 		// set it to home in case of home-based round trips
 		String longestActivity = "home";
 
 		// home_pre <- ... act (== home)
-		ActivityImpl actTemp = (ActivityImpl) act;
+		Activity actTemp = (Activity) act;
 		while (actTemp != null && !actTemp.getType().startsWith("h")) {
-			actTemp = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(actTemp));
+			final Activity act1 = actTemp;
+			actTemp = (Activity) PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, act1));
 			if (actTemp.getMaximumDuration() > maxActDur && !actTemp.getType().startsWith("h")) {
 				maxActDur = actTemp.getMaximumDuration();
 				longestActivity = actTemp.getType();

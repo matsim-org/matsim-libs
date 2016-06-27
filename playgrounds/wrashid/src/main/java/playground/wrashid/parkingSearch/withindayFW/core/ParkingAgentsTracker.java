@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -51,7 +52,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
@@ -223,7 +223,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			for (int i = 0; i < executedPlan.getPlanElements().size(); i++) {
 				Id personId = agent.getPerson().getId();
 				if (!firstParkingActivityPlanElemIndex.containsKey(personId)) {
-					if (executedPlan.getPlanElements().get(i) instanceof ActivityImpl) {
+					if (executedPlan.getPlanElements().get(i) instanceof Activity) {
 						Activity act = (Activity) executedPlan.getPlanElements().get(i);
 						if (act.getType().equalsIgnoreCase("parking")) {
 							firstParkingActivityPlanElemIndex.put(personId, i);
@@ -236,7 +236,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			for (int i = executedPlan.getPlanElements().size() - 1; i >= 0; i--) {
 				Id personId = agent.getPerson().getId();
 				if (!lastParkingActivityPlanElemIndex.containsKey(personId)) {
-					if (executedPlan.getPlanElements().get(i) instanceof ActivityImpl) {
+					if (executedPlan.getPlanElements().get(i) instanceof Activity) {
 						Activity act = (Activity) executedPlan.getPlanElements().get(i);
 						if (act.getType().equalsIgnoreCase("parking")) {
 							lastParkingActivityPlanElemIndex.put(personId, i);
@@ -433,7 +433,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private Link getNextActivityLink(Id personId) {
 		Integer currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agents.get(personId));
 
-		ActivityImpl act=(ActivityImpl) agents.get(personId).getCurrentPlan().getPlanElements().get(currentPlanElementIndex+1);
+		Activity act=(Activity) agents.get(personId).getCurrentPlan().getPlanElements().get(currentPlanElementIndex+1);
 		
 		Id actLinkId=act.getLinkId();
 		Link actLink = scenario.getNetwork().getLinks().get(actLinkId);

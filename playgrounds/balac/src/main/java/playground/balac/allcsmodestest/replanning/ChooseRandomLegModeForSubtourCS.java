@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
@@ -313,14 +313,14 @@ public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
 					TripRouter.insertTrip(
 						plan,
 						trip.getOriginActivity(),
-						Collections.singletonList( new LegImpl( "pt" ) ),
+						Collections.singletonList( PopulationUtils.createLeg("pt") ),
 						trip.getDestinationActivity());
 				}
 				else {
 					TripRouter.insertTrip(
 							plan,
 							trip.getOriginActivity(),
-							Collections.singletonList( new LegImpl( "walk" ) ),
+							Collections.singletonList( PopulationUtils.createLeg("walk") ),
 							trip.getDestinationActivity());
 				}
 			}
@@ -332,7 +332,7 @@ public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
 				TripRouter.insertTrip(
 						plan,
 						trip.getOriginActivity(),
-						Collections.singletonList( new LegImpl( whatToDo.newTransportMode ) ),
+						Collections.singletonList( PopulationUtils.createLeg(whatToDo.newTransportMode) ),
 						trip.getDestinationActivity());
 			}
 		}

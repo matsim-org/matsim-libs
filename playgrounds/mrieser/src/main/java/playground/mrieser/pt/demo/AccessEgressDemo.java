@@ -28,7 +28,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -40,9 +43,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -169,12 +169,12 @@ public class AccessEgressDemo {
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
 				Person person = pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
-				PlanImpl plan = (PlanImpl) pb.createPlan();
-				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", stop.getLinkId());
+				Plan plan = (Plan) pb.createPlan();
+				Activity act1 = (Activity) pb.createActivityFromLinkId("home", stop.getLinkId());
 				act1.setEndTime(departureTime + j * agentInterval);
-				LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
+				Leg leg = (Leg) pb.createLeg(TransportMode.pt);
 				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, tRoute, lastStop));
-				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", Id.create(nOfLinks - 1, Link.class));
+				Activity act2 = (Activity) pb.createActivityFromLinkId("work", Id.create(nOfLinks - 1, Link.class));
 
 				population.addPerson(person);
 				person.addPlan(plan);

@@ -3,7 +3,8 @@ package playground.balac.carsharing.utils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -33,7 +34,7 @@ public class MembershipUtils {
 	    minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
 	    QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
 	    for (Person p : scenario.getPopulation().getPersons().values()) {
-	      Coord c = ((ActivityFacility)scenario.getActivityFacilities().getFacilities().get(((PlanImpl)p.getSelectedPlan()).getFirstActivity().getFacilityId())).getCoord();
+	      Coord c = ((ActivityFacility)scenario.getActivityFacilities().getFacilities().get(PopulationUtils.getFirstActivity( ((Plan)p.getSelectedPlan()) ).getFacilityId())).getCoord();
 	      personQuadTree.put(c.getX(), c.getY(), p);
 	    }
 	    log.info("PersonQuadTree has been created");

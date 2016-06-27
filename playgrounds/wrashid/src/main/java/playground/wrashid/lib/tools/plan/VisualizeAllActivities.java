@@ -3,10 +3,10 @@ package playground.wrashid.lib.tools.plan;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -31,10 +31,10 @@ public class VisualizeAllActivities {
 				continue;
 			}
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
+				if (pe instanceof Activity) {
 					//TODO: selection of single agent does not work -> find out why...
 					//if (person.getId().equals(new IdImpl("7507711"))) {						
-						ActivityImpl activity = (ActivityImpl) pe;
+						Activity activity = (Activity) pe;
 						basicPointVisualizer.addPointCoordinate(activity.getCoord(), "act=" + activity.getType() + ";agentId="
 								+ person.getId(), Color.GREEN);
 					//}

@@ -5,11 +5,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.MutableScenario;
 
 public class PlanGeneratorWithParkingActivitiesTest extends TestCase{
@@ -35,9 +35,9 @@ public class PlanGeneratorWithParkingActivitiesTest extends TestCase{
 		// assert, that plan elements switch between act and leg.
 		for (int i=0;i<planElements.size();i++){
 			if (i % 2==0){
-				assertTrue(planElements.get(i) instanceof ActivityImpl);
+				assertTrue(planElements.get(i) instanceof Activity);
 			} else {
-				assertTrue(planElements.get(i) instanceof LegImpl);
+				assertTrue(planElements.get(i) instanceof Leg);
 			}
 		}
 	}

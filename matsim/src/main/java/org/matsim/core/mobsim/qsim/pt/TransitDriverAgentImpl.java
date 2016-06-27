@@ -53,7 +53,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	private static class PlanBuilder {
 
-		final PlanImpl plan = new PlanImpl();
+		final Plan plan = PopulationUtils.createPlan();
 
 		final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
@@ -63,17 +63,17 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 				lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
 				assert lastActivity.getLinkId().equals(networkRoute.getStartLinkId());
 			} else {
-				lastActivity = new ActivityImpl(activityType, networkRoute.getStartLinkId());
+				lastActivity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getStartLinkId());
 				plan.addActivity(lastActivity);
 			}
-			Leg leg = new LegImpl(transportMode);
+			Leg leg = PopulationUtils.createLeg(transportMode);
 			leg.setRoute(networkRoute);
 			plan.addLeg(leg);
-			Activity activity = new ActivityImpl(activityType, networkRoute.getEndLinkId());
+			Activity activity = PopulationUtils.createActivityFromLinkId(activityType, networkRoute.getEndLinkId());
 			plan.addActivity(activity);
 		}
 
-		public PlanImpl build() {
+		public Plan build() {
 			return plan;
 		}
 
@@ -99,7 +99,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		this.scenario = ((QSim) internalInterface.getMobsim()).getScenario() ;
 		// (yy AbstractTransitDriverAgent already keeps both of them. kai, dec'15)
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
-		Person driverPerson = PopulationUtils.createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		Person driverPerson = PopulationUtils.getFactory().createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
 			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()), transportMode);

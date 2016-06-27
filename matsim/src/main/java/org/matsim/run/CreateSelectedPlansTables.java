@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -190,8 +191,8 @@ public class CreateSelectedPlansTables {
 				out.write("\t");
 
 				Plan selectedPlan = person.getSelectedPlan();
-				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
-				Activity firstActivity = selectedPlanImpl.getFirstActivity();
+				Plan selectedPlanImpl = (Plan) selectedPlan;
+				Activity firstActivity = PopulationUtils.getFirstActivity( selectedPlanImpl );
 				Coord c = null;
 				String link_id = "-";
 				

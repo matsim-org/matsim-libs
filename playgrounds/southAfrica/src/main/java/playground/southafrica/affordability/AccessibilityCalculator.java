@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -28,7 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.AStarEuclidean;
@@ -476,7 +476,7 @@ public class AccessibilityCalculator {
 					index++;
 				}
 				if(person != null){
-					Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();					
+					Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();					
 					bw.write(String.format("%s,%.0f,%.0f,%.2f\n", householdId, homeCoord.getX(), homeCoord.getY(), householdAverage));
 				} else{
 					LOG.warn("Couldn't find any members for household " + householdId + " - household is ignored.");
@@ -517,7 +517,7 @@ public class AccessibilityCalculator {
 		int oldValue = numberInClasses.get(accessibilityClass);
 		numberInClasses.set(accessibilityClass, oldValue+1);
 		
-		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((Activity)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 
 		/*--- Mobility ---*/
 		double tt_work;
@@ -614,7 +614,7 @@ public class AccessibilityCalculator {
 		}
 		
 
-		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((Activity)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 
 		double score = 0.0;
 		
@@ -644,8 +644,8 @@ public class AccessibilityCalculator {
 		double time = 0.0;
 		for(int i = 0; i < person.getSelectedPlan().getPlanElements().size()-1; i++){
 			PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(i+1);
 				String chosenMode = leg.getMode();
 				if(chosenMode.equalsIgnoreCase("car")){
@@ -683,7 +683,7 @@ public class AccessibilityCalculator {
 	
 	
 	private double getAvailableFacilityScore(Person person){
-		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((Activity)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		
 		Collection<ActivityFacility> facilities = facilityQT.getDisk(homeCoord.getX(), homeCoord.getY(), 1000);
 		if(facilities.size() <= 5){
@@ -709,16 +709,16 @@ public class AccessibilityCalculator {
 	
 	
 	private boolean hasClosePrimaryActivity(Plan plan){
-		Coord homeCoord = ((ActivityImpl)plan.getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((Activity)plan.getPlanElements().get(0)).getCoord();
 		Node homeNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(homeCoord);
 		
-		ActivityImpl primary = null;
-		ActivityImpl secondary = null;
+		Activity primary = null;
+		Activity secondary = null;
 		int index = 0;
 		while(primary == null && index < plan.getPlanElements().size()){
 			PlanElement pe = plan.getPlanElements().get(index);
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				if(act.getType().contains("w") || act.getType().contains("e1")){
 					primary = act;
 				} else if(act.getType().contains("s") ){
@@ -830,8 +830,8 @@ public class AccessibilityCalculator {
 		
 		Coord coord = null;
 		for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				if(act.getType().contains("w")){
 					coord = act.getCoord();
 				}
@@ -845,7 +845,7 @@ public class AccessibilityCalculator {
 			workAtHomeCounter++;
 		} else{
 			/* Using the A*-Euclidean router. */
-			Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+			Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 			Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
 			if(toNode != null){
@@ -884,13 +884,13 @@ public class AccessibilityCalculator {
 		Double time = 0.0;
 		String educationType = null;
 		
-		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Coord coord = null;
 		double maxDistance = Double.NEGATIVE_INFINITY;
 		
 		for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				if(act.getType().contains("e")){
 					Coord thisCoord = act.getCoord();
 					double distance = CoordUtils.calcEuclideanDistance(homeCoord, thisCoord);
@@ -955,7 +955,7 @@ public class AccessibilityCalculator {
 	 * @see {@link #setupRouterForWalking(PreProcessLandmarks)}
 	 */
 	private double getTravelTimeToHealthcare(Person person){
-		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
 		ActivityFacility healthCareFacility = healthcareQT.getClosest(homeCoord.getX(), homeCoord.getY());
@@ -985,7 +985,7 @@ public class AccessibilityCalculator {
 //				+ "actually returns the same result as getTravelTimeToHealthcare(...).  kai/dz, mar'15") ;
 //		System.exit(-1);
 		
-		final Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		final Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
 		/* New code. ====================== */
@@ -1083,8 +1083,8 @@ public class AccessibilityCalculator {
 	private boolean activityChainContainsWork(Plan plan){
 		boolean hasWork = false;
 		for(PlanElement pe : plan.getPlanElements()){
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				if(act.getType().contains("w")){
 					hasWork = true;
 				}
@@ -1097,8 +1097,8 @@ public class AccessibilityCalculator {
 	private boolean activityChainContainsEducation(Plan plan){
 		boolean hasEducation = false;
 		for(PlanElement pe : plan.getPlanElements()){
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				if(act.getType().equalsIgnoreCase("e1") || act.getType().equalsIgnoreCase("e2")){
 					hasEducation = true;
 				}
@@ -1112,8 +1112,8 @@ public class AccessibilityCalculator {
 	private boolean activityChainContainsDroppingScholar(Plan plan){
 		boolean accompanyingScholar = false;
 		for(PlanElement pe : plan.getPlanElements()){
-			if(pe instanceof ActivityImpl){
-				ActivityImpl act = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity act = (Activity) pe;
 				if(act.getType().equalsIgnoreCase("e3")){
 					accompanyingScholar = true;
 				}

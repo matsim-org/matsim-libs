@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 
 import com.vividsolutions.jts.geom.Envelope;
 /**
@@ -89,7 +89,7 @@ public class DgAnalysisPopulation {
 	public int calculateNumberOfCarPlans(String runId) {
 		int carplans = 0;
 		for (DgPersonData d : table.values()) {
-			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(TransportMode.car)){
+			if (((Plan) d.getPlanData().get(runId).getPlan()).getType().equals(TransportMode.car)){
 				carplans++;
 			}
 		}

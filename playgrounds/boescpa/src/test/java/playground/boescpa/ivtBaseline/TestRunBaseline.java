@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
@@ -34,7 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -132,8 +132,8 @@ public class TestRunBaseline {
 			if (person.getSelectedPlan() != null) {
 				List<PlanElement> plan = person.getSelectedPlan().getPlanElements();
 				for (PlanElement planElement : plan) {
-					if (planElement instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) planElement;
+					if (planElement instanceof Activity) {
+						Activity act = (Activity) planElement;
 						if (!facilities.containsKey(act.getCoord())) {
 							ActivityFacility activityFacility =
 									activityFacilities.getFactory().createActivityFacility(Id.create(facilityId++, ActivityFacility.class), act.getCoord());

@@ -3,6 +3,8 @@ package playground.artemc.scenarioTools;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -332,9 +334,9 @@ public class PopulationGenerator {
 			person.getCustomAttributes().put("household_income", facilityIncomeMap.get(homeFacilityId));
 			
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
-			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
-			LegImpl leg = (LegImpl) pf.createLeg("car");
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actWork = (Activity) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
+			Leg leg = (Leg) pf.createLeg("car");
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*8.5);
 			plan.addActivity(actHome);
@@ -345,7 +347,7 @@ public class PopulationGenerator {
 			plan.addActivity(actWork);
 			plan.addLeg(leg);
 			
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			plan.addActivity(actHome2);		
 			
 			person.addPlan(plan);

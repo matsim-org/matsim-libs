@@ -5,11 +5,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -843,11 +844,11 @@ public class ParkControl {
 
 
         Person person = controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
-		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+		Plan plan = (Plan) person.getSelectedPlan();
 		double endTime=0;
 		int actCount = (Integer) person.getCustomAttributes().get("ActCounter");
-		ActivityImpl actFromCounter = (ActivityImpl) person.getSelectedPlan().getPlanElements().get((Integer) person.getCustomAttributes().get("ActCounter"));
-		ActivityImpl activity = actFromCounter;
+		Activity actFromCounter = (Activity) person.getSelectedPlan().getPlanElements().get((Integer) person.getCustomAttributes().get("ActCounter"));
+		Activity activity = actFromCounter;
 		
 		//Aktuelle activity finden:
 		/*
@@ -889,8 +890,8 @@ public class ParkControl {
 		
 		
 		//Pruefen ob letzte am Tag:
-		if(activity.equals(plan.getLastActivity())){
-			endTime = plan.getFirstActivity().getEndTime();
+		if(activity.equals(PopulationUtils.getLastActivity(plan))){
+			endTime = PopulationUtils.getFirstActivity( plan ).getEndTime();
 			double [] returnValue = {24*3600-event.getTime()+endTime, 0}; //Letzte activity >> Parkdauer laenger als Rest der Iteration
 			return returnValue;
 		}
@@ -901,16 +902,19 @@ public class ParkControl {
 		boolean foundNextCarLeg = false;
 		Leg nextCarLeg=null;
 		while (foundNextCarLeg == false){
-			Leg leg = plan.getNextLeg(activity);
+			final Activity act1 = activity;
+			Leg leg = PopulationUtils.getNextLeg(plan, act1);
 			if(leg.getMode().equalsIgnoreCase("car")){
 				//endTime = leg.getDepartureTime(); //!!!!!!! MatSim provides a wrong time !!!
 				endTime=activity.getEndTime();
 				nextCarLeg=leg;
 				foundNextCarLeg=true;
 			}else{
-				Activity act = plan.getNextActivity(leg);
+				final Leg leg1 = leg;
+				Activity act = PopulationUtils.getNextActivity(plan, leg1);
 				if(act==null){return null;}
-				leg=plan.getNextLeg(act);
+				final Activity act2 = act;
+				leg=PopulationUtils.getNextLeg(plan, act2);
 				if(leg==null){
 					System.out.println("F E H L E R letzte activity nicht identifiziert");
 					System.out.println("Person: "+person.getId().toString()+" count: "+actCount);
@@ -926,12 +930,14 @@ public class ParkControl {
 		restOfDayDistance+=nextCarLeg.getRoute().getDistance();
 		boolean goOn = true;
 		while(goOn){
-			Activity act = plan.getNextActivity(nextCarLeg);
+			final Leg leg = nextCarLeg;
+			Activity act = PopulationUtils.getNextActivity(plan, leg);
 			if(act==null){
 				goOn=false;
 				break;
 			}
-			nextCarLeg=plan.getNextLeg(act);
+			final Activity act1 = act;
+			nextCarLeg=PopulationUtils.getNextLeg(plan, act1);
 			if(nextCarLeg==null){
 				break;
 			}

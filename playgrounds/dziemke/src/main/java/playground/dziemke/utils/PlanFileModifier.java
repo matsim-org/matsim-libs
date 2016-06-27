@@ -13,8 +13,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -64,7 +63,7 @@ public class PlanFileModifier {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(INPUT_PLANS_FILE);
 		Population population = scenario.getPopulation();
 		
@@ -103,7 +102,7 @@ public class PlanFileModifier {
 						int numberOfPlanElements = plan.getPlanElements().size();
 						for (int j=0; j < numberOfPlanElements; j++) {
 							if (plan.getPlanElements().get(j) instanceof Leg) {
-								LegImpl leg = (LegImpl) plan.getPlanElements().get(j);
+								Leg leg = (Leg) plan.getPlanElements().get(j);
 								if (!leg.getMode().equals("car")) {
 									considerPerson = false;
 								}

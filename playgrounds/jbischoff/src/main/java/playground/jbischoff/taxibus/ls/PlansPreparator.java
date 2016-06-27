@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -96,7 +96,7 @@ public class PlansPreparator {
 						if (possibletbleg.getMode().equals(TransportMode.pt)) {
 							possibletbleg.setRoute(null);
 							possibletbleg.setMode(TaxibusUtils.TAXIBUS_MODE);
-							ActivityImpl interactionAct = (ActivityImpl) pop2.getFactory().createActivityFromLinkId("taxibus interaction",
+							Activity interactionAct = (Activity) pop2.getFactory().createActivityFromLinkId("taxibus interaction",
 									interactionLinkId);
 							interactionAct.setMaximumDuration(120);
 							interactionAct.setCoord(new Coord(454101.0123827555,5735442.673285995));
@@ -109,7 +109,7 @@ public class PlansPreparator {
 						
 						if (possibletbleg.getMode().equals(TransportMode.pt)) {
 							possibletbleg.setRoute(null);
-							ActivityImpl interactionAct = (ActivityImpl) pop2.getFactory().createActivityFromLinkId("taxibus interaction",
+							Activity interactionAct = (Activity) pop2.getFactory().createActivityFromLinkId("taxibus interaction",
 									interactionLinkBackId);
 							interactionAct.setCoord(new Coord(454101.0123827555,5735442.673285995));
 							interactionAct.setMaximumDuration(120);

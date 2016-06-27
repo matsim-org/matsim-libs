@@ -20,10 +20,10 @@
 
 package org.matsim.api.core.v01.population;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.core.api.internal.MatsimPopulationObject;
-
-import java.util.List;
 
 /**
  * A plan contains the intention of an agent.  In consequence, all information is <i>expected</i>.  For example,
@@ -35,17 +35,17 @@ import java.util.List;
  */
 public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
 	
-	public List<PlanElement> getPlanElements();
+	public abstract List<PlanElement> getPlanElements();
 
-	public void addLeg(final Leg leg);
+	public abstract void addLeg(final Leg leg);
 
-	public void addActivity(final Activity act);
+	public abstract void addActivity(final Activity act);
 
-    public String getType();
+    public abstract String getType();
 
-    public void setType(final String type);
+    public abstract void setType(final String type);
 
-	public Person getPerson();
+	public abstract Person getPerson();
 
 	/**
 	 * Sets the reference to the person.
@@ -53,6 +53,6 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
 	 * sure that the bidirectional reference is set correctly if
 	 * you are using this method!.
 	 */
-	public void setPerson(Person person);
+	public abstract void setPerson(Person person);
 
 }

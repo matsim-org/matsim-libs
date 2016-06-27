@@ -11,16 +11,17 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -123,8 +124,8 @@ public class CarRoutingClaude {
 			
 			Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 			
-			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
-			ActivityImpl act = new ActivityImpl("home", lStart.getId());
+			Plan plan = (Plan) sc.getPopulation().getFactory().createPlan();
+			Activity act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 			act.setCoord(coordStart);
 			//String[] arr2 = arr[4].split(":");
 			//double h = Double.parseDouble(arr2[0]);
@@ -136,16 +137,16 @@ public class CarRoutingClaude {
 			act.setEndTime(60.0 * m);
 			plan.addActivity(act);
 			
-			LegImpl leg = new LegImpl("car");
+			Leg leg = PopulationUtils.createLeg("car");
 			plan.addLeg(leg);
 			
-			act = new ActivityImpl("leisure", lEnd.getId());
+			act = PopulationUtils.createActivityFromLinkId("leisure", lEnd.getId());
 			act.setCoord(coordEnd);
 			act.setEndTime(48800);
 			plan.addActivity(act);
-			leg = new LegImpl("car");
+			leg = PopulationUtils.createLeg("car");
 			plan.addLeg(leg);
-			act = new ActivityImpl("home", lStart.getId());
+			act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 			act.setCoord(coordStart);
 			plan.addActivity(act);
 			person.addPlan(plan);

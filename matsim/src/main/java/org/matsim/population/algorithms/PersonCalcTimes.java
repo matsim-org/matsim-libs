@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -65,7 +65,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 			Plan plan = plans.get(i);
 
 			Activity act = null;
-			LegImpl leg = null;
+			Leg leg = null;
 			int cnt = 0;
 			int max = plan.getPlanElements().size();
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -78,7 +78,7 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 						act.setStartTime(0);
 						act.setMaximumDuration(act.getEndTime());
 					} else if (cnt == max) {
-						double time = leg.getArrivalTime();
+						double time = leg.getDepartureTime() + leg.getTravelTime();
 						act.setStartTime(time);
 						if (time < 24*3600) {
 							time = 24*3600;
@@ -87,19 +87,19 @@ public class PersonCalcTimes extends AbstractPersonAlgorithm {
 						act.setMaximumDuration(time - act.getStartTime());
 					}
 					else {
-						act.setStartTime(leg.getArrivalTime());
+						act.setStartTime(leg.getDepartureTime() + leg.getTravelTime());
 						act.setEndTime(act.getStartTime()+act.getMaximumDuration());
 					}
 				}
 				if (pe instanceof Leg) {
-					leg = (LegImpl) pe;
+					leg = (Leg) pe;
 
 					leg.setDepartureTime(act.getEndTime());
 					double ttime = leg.getTravelTime();
 					if (ttime == Time.UNDEFINED_TIME) {
 						ttime = 0;
 					}
-					leg.setArrivalTime(leg.getDepartureTime() + ttime);
+					leg.setTravelTime( leg.getDepartureTime() + ttime - leg.getDepartureTime() );
 				}
 			}
 		}

@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -181,7 +181,7 @@ public class JointPlanRouterTest {
 								final Facility toFacility,
 								final double departureTime,
 								final Person person) {
-							return Arrays.asList( new LegImpl( TransportMode.car ) );
+							return Arrays.asList( PopulationUtils.createLeg(TransportMode.car) );
 						}
 
 						@Override

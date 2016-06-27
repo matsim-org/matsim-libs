@@ -22,11 +22,11 @@ package playground.thibautd.parknride.replanning;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -149,9 +149,9 @@ public class FacilityChanger {
 	private static void updateFacility(
 			final Activity act,
 			final ParkAndRideFacility newFac) {
-		((ActivityImpl) act).setFacilityId( newFac.getId() );
-		((ActivityImpl) act).setLinkId( newFac.getLinkId() );
-		((ActivityImpl) act).setCoord( newFac.getCoord() );
+		((Activity) act).setFacilityId( newFac.getId() );
+		((Activity) act).setLinkId( newFac.getLinkId() );
+		((Activity) act).setCoord( newFac.getCoord() );
 	}
 
 	private static ParkAndRideFacility chooseFac(

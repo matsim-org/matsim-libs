@@ -44,7 +44,7 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testBestPlan() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan;
 		PersonUtils.createAndAddPlan(person, false);
 		plan = PersonUtils.createAndAddPlan(person, false);

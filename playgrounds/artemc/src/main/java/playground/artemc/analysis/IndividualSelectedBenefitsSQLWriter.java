@@ -1,17 +1,5 @@
 package playground.artemc.analysis;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import playground.artemc.analysis.postgresql.PostgresType;
-import playground.artemc.analysis.postgresql.PostgresqlCSVWriter;
-import playground.artemc.analysis.postgresql.PostgresqlColumnDefinition;
-import playground.artemc.utils.DataBaseAdmin;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,6 +9,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import playground.artemc.analysis.postgresql.PostgresType;
+import playground.artemc.analysis.postgresql.PostgresqlCSVWriter;
+import playground.artemc.analysis.postgresql.PostgresqlColumnDefinition;
+import playground.artemc.utils.DataBaseAdmin;
 
 /**
  * Created by artemc on 11/3/15.
@@ -50,7 +50,7 @@ public class IndividualSelectedBenefitsSQLWriter {
 				populationFile = file.getAbsolutePath() + "/output_plans.xml.gz";
 				populationAttributesFile = file.getAbsolutePath() + "/output_personAttributes.xml.gz";
 
-				new PopulationReaderMatsimV5(scenario).readFile(populationFile);
+				new MatsimPopulationReader(scenario).readFile(populationFile);
 				System.out.println("   Population size: " + scenario.getPopulation().getPersons().size());
 
 				new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(populationAttributesFile);

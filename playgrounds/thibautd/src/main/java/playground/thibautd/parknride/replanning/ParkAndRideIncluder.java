@@ -22,10 +22,11 @@ package playground.thibautd.parknride.replanning;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -93,11 +94,8 @@ public class ParkAndRideIncluder {
 			final String firstMode,
 			final String lastMode) {
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		ActivityImpl change =
-			new ActivityImpl(
-					ParkAndRideConstants.PARKING_ACT,
-					fac.getCoord(),
-					fac.getLinkId());
+		Activity change =
+			PopulationUtils.createActivityFromCoordAndLinkId(ParkAndRideConstants.PARKING_ACT, fac.getCoord(), fac.getLinkId());
 		change.setFacilityId( fac.getId() );
 		change.setMaximumDuration( 0 );
 

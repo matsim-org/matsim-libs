@@ -4,9 +4,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
@@ -20,8 +22,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -111,11 +111,11 @@ public class GeneticAlgorithmDC {
 		private void calculateScore(final Scenario scenario) {
 			module.prepareReplanning(null);
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
-			Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
+			Collection<Plan> copiedPlans = new ArrayList<Plan>();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = PopulationUtils.createPerson(person.getId());
-				PlanImpl copyPlan = new PlanImpl(copyPerson);
-				copyPlan.copyFrom(person.getSelectedPlan());
+				Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
+				Plan copyPlan = PopulationUtils.createPlan(copyPerson);
+				PopulationUtils.copyFromTo(person.getSelectedPlan(), copyPlan);
 				copyPerson.addPlan(copyPlan);
 				transitActsRemover.run(copyPlan);
 				module.handlePlan(copyPlan);
@@ -125,7 +125,7 @@ public class GeneticAlgorithmDC {
 			double sumDistances=0;
 			int numSec = 0;
 			Map<String, Map<String, List<Double>>> distances = new HashMap<String, Map<String,List<Double>>>();
-			for(PlanImpl copyPlan:copiedPlans) {
+			for(Plan copyPlan:copiedPlans) {
 				Activity prevActivity = null;
 				String prevMode = null;
 				for(PlanElement planElement:copyPlan.getPlanElements())
@@ -280,7 +280,7 @@ public class GeneticAlgorithmDC {
 		for(Person person:scenario.getPopulation().getPersons().values())
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
 				if(planElement instanceof Activity)
-					((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
+					((Activity)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((Activity)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAlgorithm(Algotype.valueOf("bestResponse"));

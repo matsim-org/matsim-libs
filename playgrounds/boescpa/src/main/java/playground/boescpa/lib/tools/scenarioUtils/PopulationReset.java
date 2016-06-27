@@ -143,7 +143,7 @@ public class PopulationReset {
 					activity.setMaximumDuration(oldActivity.getMaximumDuration());
 					activity.setStartTime(oldActivity.getStartTime());
 					if (oldActivity.getFacilityId() != null) {
-						final ActivityImpl activityImpl = (ActivityImpl) activity;
+						final Activity activityImpl = (Activity) activity;
 						activityImpl.setFacilityId(Id.create(oldActivity.getFacilityId().toString(), ActivityFacility.class));
 					}
 					plan.addActivity(activity);

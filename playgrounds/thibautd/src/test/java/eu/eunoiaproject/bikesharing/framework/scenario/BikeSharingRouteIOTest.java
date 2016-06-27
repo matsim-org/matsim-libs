@@ -33,10 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -158,18 +155,18 @@ public class BikeSharingRouteIOTest {
 	}
 
 	private Person wrapInPlan( final BikeSharingRoute outRoute ) {
-		final Person person = PopulationUtils.createPerson(Id.createPersonId("p"));
+		final Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p"));
 
-		final Plan plan = new PlanImpl( person );
+		final Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );
 
-		plan.addActivity( new ActivityImpl( "stuff" ,  outRoute.getStartLinkId() ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("stuff", outRoute.getStartLinkId()) );
 
-		final Leg leg = new LegImpl( BikeSharingConstants.MODE );
+		final Leg leg = PopulationUtils.createLeg(BikeSharingConstants.MODE);
 		leg.setRoute( outRoute );
 		plan.addLeg( leg );
 
-		plan.addActivity( new ActivityImpl( "stuff" ,  outRoute.getEndLinkId() ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("stuff", outRoute.getEndLinkId()) );
 
 		return person;
 	}

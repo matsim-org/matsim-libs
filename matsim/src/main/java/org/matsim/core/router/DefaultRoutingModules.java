@@ -45,14 +45,14 @@ public final class DefaultRoutingModules {
 				routeAlgo,
 				params.getTeleportedModeFreespeedFactor(),
 				params.getBeelineDistanceFactor(),
-				((PopulationFactoryImpl) popFac).getRouteFactory() ) ;
+				((PopulationFactoryImpl) popFac).getRouteFactoriesRegister() ) ;
 	}
 
 	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
 				popFac,
-				((PopulationFactoryImpl) popFac).getRouteFactory(),
+				((PopulationFactoryImpl) popFac).getRouteFactoriesRegister(),
 				params.getTeleportedModeSpeed(),
                 params.getBeelineDistanceFactor() );
 	}
@@ -66,7 +66,7 @@ public final class DefaultRoutingModules {
 				popFact,
 				net,
 				routeAlgo,
-				((PopulationFactoryImpl) popFact).getRouteFactory() );
+				((PopulationFactoryImpl) popFact).getRouteFactoriesRegister() );
 	}
 	
 	public static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net, 
@@ -76,7 +76,7 @@ public final class DefaultRoutingModules {
 				popFact,
 				net,
 				routeAlgo,
-				((PopulationFactoryImpl) popFact).getRouteFactory(), calcRouteConfig );
+				((PopulationFactoryImpl) popFact).getRouteFactoriesRegister(), calcRouteConfig );
 	}
 
 }

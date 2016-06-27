@@ -59,6 +59,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
@@ -753,9 +754,9 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		Person newPerson = PopulationUtils.createPerson(person.getId());
-		PlanImpl newPlan = new PlanImpl();
-		newPlan.copyFrom(person.getSelectedPlan());
+		Person newPerson = PopulationUtils.getFactory().createPerson(person.getId());
+		Plan newPlan = PopulationUtils.createPlan();
+		PopulationUtils.copyFromTo(person.getSelectedPlan(), newPlan);
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);

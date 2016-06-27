@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -85,7 +85,7 @@ public class PopulationUtils {
 					PlanElement pe = selectedPlan.getPlanElements().get(i);
 					if(pe instanceof Activity){
 						double duration = 0.0;
-						ActivityImpl act = (ActivityImpl) pe;
+						Activity act = (Activity) pe;
 						if(i == 0){
 							/* It is the first (home) activity. */
 							duration = act.getEndTime();

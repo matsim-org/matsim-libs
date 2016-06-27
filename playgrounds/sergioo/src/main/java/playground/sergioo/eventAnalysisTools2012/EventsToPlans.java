@@ -9,7 +9,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
@@ -32,7 +31,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 	public EventsToPlans(Scenario scenario) {
 		this.scenario = scenario;
 		for (Person person : scenario.getPopulation().getPersons().values())
-			this.agentRecords.put(person.getId(), new PlanImpl());
+			this.agentRecords.put(person.getId(), PopulationUtils.createPlan());
 	}
 
 	@Override

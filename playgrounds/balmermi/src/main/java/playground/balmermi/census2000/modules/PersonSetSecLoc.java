@@ -24,12 +24,12 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -256,8 +256,8 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		Coord prim_coord = null;
 		Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				if (H.equals(act.getType())) {
 					if (act.getCoord() == null) { throw new RuntimeException("Person id=" + person.getId() + " has no home coord!"); }
 					if (act.getCoord().equals(ZERO)) { throw new RuntimeException("Person id=" + person.getId() + " has a ZERO home coord!"); }
@@ -273,8 +273,8 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 			Zone z = p.getHousehold().getMunicipality().getZone();
 			double radius = 0.5*Math.sqrt((z.getMax().getX()-z.getMin().getX())*(z.getMax().getY()-z.getMin().getY()));
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 						ActivityFacilityImpl f = this.getFacility(home_coord,radius,act.getType());
 						act.setCoord(f.getCoord());
@@ -299,8 +299,8 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 			Coord coord1 = new Coord(home_coord.getX() + dx, home_coord.getY() + dy);
 			Coord coord2 = new Coord(prim_coord.getX() - dx, prim_coord.getY() + dy);
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					if ((act.getCoord() == null) || (act.getCoord().equals(ZERO))) {
 						ActivityFacilityImpl f = this.getFacility(coord1,coord2,radius,act.getType());
 						act.setCoord(f.getCoord());

@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -105,8 +105,8 @@ public class GfipWinnersAndLosersAnalysis {
 				bw.write(String.format("%s,%s,%.2f,%.2f,%.6f,%.6f,%.2f,%.2f\n", 
 						id.toString(), 
 						classId, 
-						((PlanImpl)sc1.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
-						((PlanImpl)sc2.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
+						((Plan)sc1.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
+						((Plan)sc2.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
 						cLong, cLat, cX, cY));
 			}
 			

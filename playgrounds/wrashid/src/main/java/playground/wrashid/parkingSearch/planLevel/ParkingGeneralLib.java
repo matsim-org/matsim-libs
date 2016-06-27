@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
@@ -33,14 +33,14 @@ public class ParkingGeneralLib {
 		List<PlanElement> pe = plan.getPlanElements();
 
 		for (int i = 0; i < pe.size(); i++) {
-			if (pe.get(i) instanceof ActivityImpl) {
-				ActivityImpl parkingActivity = (ActivityImpl) pe.get(i);
+			if (pe.get(i) instanceof Activity) {
+				Activity parkingActivity = (Activity) pe.get(i);
 				if (parkingActivity.getType().equalsIgnoreCase("parking")) {
 					Coord coordParking=facilities.getFacilities().get(parkingActivity.getFacilityId()).getCoord();
 					Leg nextLeg = (Leg) pe.get(i + 1);
 					Leg prevLeg = (Leg) pe.get(i - 1);
 					if (nextLeg.getMode().equalsIgnoreCase("walk")) {
-						ActivityImpl nextAct = (ActivityImpl) pe.get(i+2);
+						Activity nextAct = (Activity) pe.get(i+2);
 						
 						if (nextAct.getFacilityId()!=null){
 							Coord nextActFacilityCoord=facilities.getFacilities().get(nextAct.getFacilityId()).getCoord();
@@ -52,7 +52,7 @@ public class ParkingGeneralLib {
 						numberOfLegs++;
 					}
 					if (prevLeg.getMode().equalsIgnoreCase("walk")) {
-						ActivityImpl prevAct = (ActivityImpl) pe.get(i-2);
+						Activity prevAct = (Activity) pe.get(i-2);
 						
 						if (prevAct.getFacilityId()!=null){
 							Coord prevActFacilityCoord=facilities.getFacilities().get(prevAct.getFacilityId()).getCoord();
@@ -81,8 +81,8 @@ public class ParkingGeneralLib {
 	public static Id<ActivityFacility> getFirstParkingFacilityId(Plan plan) {
 
 		for (int i = 0; i < plan.getPlanElements().size(); i++) {
-			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
+			if (plan.getPlanElements().get(i) instanceof Activity) {
+				Activity activity = (Activity) plan.getPlanElements().get(i);
 
 				if (activity.getType().equalsIgnoreCase("parking")) {
 					return activity.getFacilityId();
@@ -108,8 +108,8 @@ public class ParkingGeneralLib {
 		// after which there is
 		// a parking activity).
 		for (int i = 0; i < plan.getPlanElements().size(); i++) {
-			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
+			if (plan.getPlanElements().get(i) instanceof Activity) {
+				Activity activity = (Activity) plan.getPlanElements().get(i);
 
 				if (activity.getType().equalsIgnoreCase("parking")) {
 					Leg leg = (Leg) plan.getPlanElements().get(i - 1);
@@ -143,12 +143,12 @@ public class ParkingGeneralLib {
 	 * @param plan
 	 * @return
 	 */
-	public static LinkedList<ActivityImpl> getParkingTargetActivities(Plan plan) {
-		LinkedList<ActivityImpl> list = new LinkedList<ActivityImpl>();
+	public static LinkedList<Activity> getParkingTargetActivities(Plan plan) {
+		LinkedList<Activity> list = new LinkedList<Activity>();
 
 		for (int i = 0; i < plan.getPlanElements().size(); i++) {
-			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
+			if (plan.getPlanElements().get(i) instanceof Activity) {
+				Activity activity = (Activity) plan.getPlanElements().get(i);
 
 				if (activity.getType().equalsIgnoreCase("parking")) {
 					Leg leg = (Leg) plan.getPlanElements().get(i - 1);
@@ -156,7 +156,7 @@ public class ParkingGeneralLib {
 					if (leg.getMode().equalsIgnoreCase("car")) {
 						// parking arrival pattern recognized.
 
-						ActivityImpl targetActivity = (ActivityImpl) plan.getPlanElements().get(i + 2);
+						Activity targetActivity = (Activity) plan.getPlanElements().get(i + 2);
 						list.add(targetActivity);
 					}
 				}
@@ -174,9 +174,9 @@ public class ParkingGeneralLib {
 	 * @param activity
 	 * @return
 	 */
-	public static ParkingTimeInfo getParkingTimeInfo(Plan plan, ActivityImpl activity, ParkingArrivalDepartureLog parkingArrivalDepartureLog) {
-		ActivityImpl arrivalParkingAct = getArrivalParkingAct(plan, activity);
-		ActivityImpl departureParkingAct = getDepartureParkingAct(plan, activity);
+	public static ParkingTimeInfo getParkingTimeInfo(Plan plan, Activity activity, ParkingArrivalDepartureLog parkingArrivalDepartureLog) {
+		Activity arrivalParkingAct = getArrivalParkingAct(plan, activity);
+		Activity departureParkingAct = getDepartureParkingAct(plan, activity);
 
 		int parkingArrivalIndex=getParkingArrivalIndex(plan,arrivalParkingAct);
 		
@@ -189,22 +189,22 @@ public class ParkingGeneralLib {
 		return parkingTimeInfo;
 	}
 
-	public static ActivityImpl getDepartureParkingAct(Plan plan, ActivityImpl activity) {
+	public static Activity getDepartureParkingAct(Plan plan, Activity activity) {
 		List<PlanElement> pe = plan.getPlanElements();
 		int indexOfDepartingParkingAct = getDepartureParkingActIndex(plan, activity);
 
-		ActivityImpl departureParkingAct = (ActivityImpl) pe.get(indexOfDepartingParkingAct);
+		Activity departureParkingAct = (Activity) pe.get(indexOfDepartingParkingAct);
 		return departureParkingAct;
 	}
 
-	public static int getDepartureParkingActIndex(Plan plan, ActivityImpl activity) {
+	public static int getDepartureParkingActIndex(Plan plan, Activity activity) {
 		List<PlanElement> pe = plan.getPlanElements();
 		int activityIndex = pe.indexOf(activity);
 		int indexOfDepartingParkingAct = -1;
 
 		for (int i = activityIndex; i < pe.size(); i++) {
-			if (pe.get(i) instanceof ActivityImpl) {
-				ActivityImpl parkingAct = (ActivityImpl) plan.getPlanElements().get(i);
+			if (pe.get(i) instanceof Activity) {
+				Activity parkingAct = (Activity) plan.getPlanElements().get(i);
 				if (parkingAct.getType().equalsIgnoreCase("parking")) {
 					indexOfDepartingParkingAct = i;
 					break;
@@ -215,8 +215,8 @@ public class ParkingGeneralLib {
 		// if home parking
 		if (indexOfDepartingParkingAct == -1) {
 			for (int i = 0; i < pe.size(); i++) {
-				if (pe.get(i) instanceof ActivityImpl) {
-					ActivityImpl parkingAct = (ActivityImpl) plan.getPlanElements().get(i);
+				if (pe.get(i) instanceof Activity) {
+					Activity parkingAct = (Activity) plan.getPlanElements().get(i);
 					if (parkingAct.getType().equalsIgnoreCase("parking")) {
 						indexOfDepartingParkingAct = i;
 						break;
@@ -237,22 +237,22 @@ public class ParkingGeneralLib {
 	 * 
 	 * @return
 	 */
-	public static ActivityImpl getArrivalParkingAct(Plan plan, ActivityImpl activity) {
+	public static Activity getArrivalParkingAct(Plan plan, Activity activity) {
 		List<PlanElement> pe = plan.getPlanElements();
 		int indexOfArrivalParkingAct = getArrivalParkingActIndex(plan, activity);
 
-		ActivityImpl arrivalParkingAct = (ActivityImpl) pe.get(indexOfArrivalParkingAct);
+		Activity arrivalParkingAct = (Activity) pe.get(indexOfArrivalParkingAct);
 		return arrivalParkingAct;
 	}
 
-	public static int getArrivalParkingActIndex(Plan plan, ActivityImpl activity) {
+	public static int getArrivalParkingActIndex(Plan plan, Activity activity) {
 		List<PlanElement> pe = plan.getPlanElements();
 		int activityIndex = pe.indexOf(activity);
 		int indexOfArrivalParkingAct = -1;
 
 		for (int i = activityIndex; 0 < i; i--) {
-			if (pe.get(i) instanceof ActivityImpl) {
-				ActivityImpl parkingAct = (ActivityImpl) plan.getPlanElements().get(i);
+			if (pe.get(i) instanceof Activity) {
+				Activity parkingAct = (Activity) plan.getPlanElements().get(i);
 				if (parkingAct.getType().equalsIgnoreCase("parking")) {
 					indexOfArrivalParkingAct = i;
 					break;
@@ -275,14 +275,14 @@ public class ParkingGeneralLib {
 	 * @param parkingArrivalAct
 	 * @return
 	 */
-	public static int getParkingArrivalIndex(Plan plan, ActivityImpl parkingArrivalAct) {
+	public static int getParkingArrivalIndex(Plan plan, Activity parkingArrivalAct) {
 		List<PlanElement> pe = plan.getPlanElements();
 		int parkingPlanElementIndex = pe.indexOf(parkingArrivalAct);
 		int index = -1;
 
 		for (int i = 0; i <= parkingPlanElementIndex; i++) {
-			if (pe.get(i) instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) plan.getPlanElements().get(i);
+			if (pe.get(i) instanceof Activity) {
+				Activity activity = (Activity) plan.getPlanElements().get(i);
 
 				if (activity.getType().equalsIgnoreCase("parking")) {
 					Leg leg = (Leg) plan.getPlanElements().get(i - 1);

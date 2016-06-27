@@ -32,9 +32,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -43,22 +42,22 @@ import org.matsim.facilities.ActivityFacility;
 public class TripRouterTest {
 	@Test
 	public void testTripInsertion() {
-		PlanImpl plan = new PlanImpl();
-		plan.createAndAddActivity( "-4" );
-		plan.createAndAddLeg( "-3" );
-		plan.createAndAddActivity( "-2" );
-		plan.createAndAddLeg( "-1" );
-		Activity o = plan.createAndAddActivity( "1" );
-		Activity d = plan.createAndAddActivity( "5" );
-		plan.createAndAddLeg( "6" );
-		plan.createAndAddActivity( "7" );
-		plan.createAndAddLeg( "8" );
-		plan.createAndAddActivity( "9" );
+		Plan plan = PopulationUtils.createPlan();
+		PopulationUtils.createAndAddActivity(plan, "-4");
+		PopulationUtils.createAndAddLeg( plan, "-3" );
+		PopulationUtils.createAndAddActivity(plan, "-2");
+		PopulationUtils.createAndAddLeg( plan, "-1" );
+		Activity o = PopulationUtils.createAndAddActivity(plan, "1");
+		Activity d = PopulationUtils.createAndAddActivity(plan, "5");
+		PopulationUtils.createAndAddLeg( plan, "6" );
+		PopulationUtils.createAndAddActivity(plan, "7");
+		PopulationUtils.createAndAddLeg( plan, "8" );
+		PopulationUtils.createAndAddActivity(plan, "9");
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
-		trip.add( new LegImpl( "4" ) );
+		trip.add( PopulationUtils.createLeg("2") );
+		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
+		trip.add( PopulationUtils.createLeg("4") );
 
 		TripRouter.insertTrip( plan , o , trip , d );
 
@@ -87,24 +86,24 @@ public class TripRouterTest {
 
 	@Test
 	public void testTripInsertionIfActivitiesImplementEquals() {
-		PlanImpl plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		plan.addActivity( new EqualsActivity( "-4" , Id.create( 1, Link.class ) ) );
-		plan.createAndAddLeg( "-3" );
+		PopulationUtils.createAndAddLeg( plan, "-3" );
 		plan.addActivity( new EqualsActivity( "-2" , Id.create( 1, Link.class ) ) );
-		plan.createAndAddLeg( "-1" );
+		PopulationUtils.createAndAddLeg( plan, "-1" );
 		Activity o = new EqualsActivity( "1" , Id.create( 1, Link.class ) );
 		plan.addActivity( o );
 		Activity d = new EqualsActivity( "5" , Id.create( 1, Link.class ) );
 		plan.addActivity( d );
-		plan.createAndAddLeg( "6" );
+		PopulationUtils.createAndAddLeg( plan, "6" );
 		plan.addActivity( new EqualsActivity( "7" , Id.create( 1, Link.class ) ) );
-		plan.createAndAddLeg( "8" );
+		PopulationUtils.createAndAddLeg( plan, "8" );
 		plan.addActivity( new EqualsActivity( "9" , Id.create( 1, Link.class ) ) );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
-		trip.add( new LegImpl( "4" ) );
+		trip.add( PopulationUtils.createLeg("2") );
+		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
+		trip.add( PopulationUtils.createLeg("4") );
 
 		TripRouter.insertTrip( plan , o , trip , d );
 
@@ -135,27 +134,27 @@ public class TripRouterTest {
 	public void testReturnedOldTrip() throws Exception {
 		List<PlanElement> expected = new ArrayList<PlanElement>();
 
-		PlanImpl plan = new PlanImpl();
-		plan.createAndAddActivity( "-4" );
-		plan.createAndAddLeg( "-3" );
-		plan.createAndAddActivity( "-2" );
-		plan.createAndAddLeg( "-1" );
-		Activity o = plan.createAndAddActivity( "1" );
-		expected.add( plan.createAndAddLeg( "some mode" ) );
-		expected.add( plan.createAndAddActivity( "stage" ) );
-		expected.add( plan.createAndAddLeg( "some other mode" ) );
-		expected.add( plan.createAndAddActivity( "another stage" ) );
-		expected.add( plan.createAndAddLeg( "yet  another mode" ) );
-		Activity d = plan.createAndAddActivity( "5" );
-		plan.createAndAddLeg( "6" );
-		plan.createAndAddActivity( "7" );
-		plan.createAndAddLeg( "8" );
-		plan.createAndAddActivity( "9" );
+		Plan plan = PopulationUtils.createPlan();
+		PopulationUtils.createAndAddActivity(plan, "-4");
+		PopulationUtils.createAndAddLeg( plan, "-3" );
+		PopulationUtils.createAndAddActivity(plan, "-2");
+		PopulationUtils.createAndAddLeg( plan, "-1" );
+		Activity o = PopulationUtils.createAndAddActivity(plan, "1");
+		expected.add( PopulationUtils.createAndAddLeg( plan, "some mode" ) );
+		expected.add( PopulationUtils.createAndAddActivity(plan, "stage") );
+		expected.add( PopulationUtils.createAndAddLeg( plan, "some other mode" ) );
+		expected.add( PopulationUtils.createAndAddActivity(plan, "another stage") );
+		expected.add( PopulationUtils.createAndAddLeg( plan, "yet  another mode" ) );
+		Activity d = PopulationUtils.createAndAddActivity(plan, "5");
+		PopulationUtils.createAndAddLeg( plan, "6" );
+		PopulationUtils.createAndAddActivity(plan, "7");
+		PopulationUtils.createAndAddLeg( plan, "8" );
+		PopulationUtils.createAndAddActivity(plan, "9");
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
-		trip.add( new LegImpl( "4" ) );
+		trip.add( PopulationUtils.createLeg("2") );
+		trip.add( PopulationUtils.createActivityFromLinkId("3", Id.create( "coucou", Link.class )) );
+		trip.add( PopulationUtils.createLeg("4") );
 
 		assertEquals(
 				"wrong old trip",
@@ -210,7 +209,7 @@ public class TripRouterTest {
 			return this.delegate.getFacilityId();
 		}
 		public EqualsActivity(final String type, final Id<Link> link) {
-			delegate = new ActivityImpl( type, link ) ;
+			delegate = PopulationUtils.createActivityFromLinkId(type, link) ;
 		}
 		@Override
 		public int hashCode() {
@@ -227,6 +226,11 @@ public class TripRouterTest {
 		}
 		@Override
 		public void setFacilityId(Id<ActivityFacility> id) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		public void setCoord(Coord coord) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}

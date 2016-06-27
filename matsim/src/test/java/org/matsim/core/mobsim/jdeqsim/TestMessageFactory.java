@@ -77,7 +77,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
-		Person person= PopulationUtils.createPerson(Id.create("abc", Person.class));
+		Person person= PopulationUtils.getFactory().createPerson(Id.create("abc", Person.class));
 		Vehicle vehicle=new Vehicle(scheduler, person, PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
@@ -100,7 +100,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.GC_ALL_MESSAGES();
 		JDEQSimConfigGroup.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
-		Person person= PopulationUtils.createPerson(Id.create("abc", Person.class));
+		Person person= PopulationUtils.getFactory().createPerson(Id.create("abc", Person.class));
 		Vehicle vehicle=new Vehicle(scheduler, person, PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);

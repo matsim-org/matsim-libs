@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +34,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
@@ -41,8 +50,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
@@ -53,10 +60,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import com.google.inject.Provider;
+import com.google.inject.name.Names;
 
 /**
  * @author thibautd
@@ -99,46 +104,56 @@ public class JointTripRouterFactoryTest {
 		Population pop = sc.getPopulation();
 		Id<Person> driverId = Id.create( "driver" , Person.class );
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
+		final Id<Person> id = driverId;
 
 		// driver
-		Person pers = PopulationUtils.createPerson(driverId);
-		PlanImpl plan = new PlanImpl( pers );
+		Person pers = PopulationUtils.getFactory().createPerson(id);
+		Plan plan = PopulationUtils.createPlan(pers);
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
+		final Id<Link> linkId = link1;
 
-		plan.createAndAddActivity( "home" , link1 ).setEndTime( 32454 );
-		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 ).setMaximumDuration( 0 );
-		Leg dLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
-		plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 ).setMaximumDuration( 0 );
-		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "home" , link3 );
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId).setEndTime( 32454 );
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		final Id<Link> linkId1 = link1;
+		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId1).setMaximumDuration( 0 );
+		Leg dLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
+		final Id<Link> linkId2 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId2).setMaximumDuration( 0 );
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		final Id<Link> linkId3 = link3;
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId3);
 
 		DriverRoute dRoute = new DriverRoute( link1 , link3 );
 		dRoute.addPassenger( passengerId );
 		dLeg.setRoute( dRoute );
+		final Id<Person> id1 = passengerId;
 
 		// passenger
-		pers = PopulationUtils.createPerson(passengerId);
-		plan = new PlanImpl( pers );
+		pers = PopulationUtils.getFactory().createPerson(id1);
+		plan = PopulationUtils.createPlan(pers);
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
 		pop.addPerson( pers );
+		final Id<Link> linkId4 = link1;
 
-		ActivityImpl a = plan.createAndAddActivity( "home" , link1 );
+		Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId4);
 		a.setEndTime( 1246534 );
 		a.setCoord(new Coord((double) 0, (double) 1));
-		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 );
+		PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		final Id<Link> linkId5 = link1;
+		a = PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId5);
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 2));
-		Leg pLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 );
+		Leg pLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.PASSENGER );
+		final Id<Link> linkId6 = link3;
+		a = PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, linkId6);
 		a.setMaximumDuration( 0 );
 		a.setCoord(new Coord((double) 0, (double) 3));
-		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivity( "home" , link3 );
+		PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		final Id<Link> linkId7 = link3;
+		a = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", linkId7);
 		a.setCoord(new Coord((double) 0, (double) 4));
 
 		PassengerRoute pRoute = new PassengerRoute( link1 , link3 );

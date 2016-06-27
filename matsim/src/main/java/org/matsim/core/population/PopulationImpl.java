@@ -48,7 +48,6 @@ public final class PopulationImpl implements Population {
 	private boolean isStreaming = false;
 	
 	private String name ;
-	private boolean locked = false ;
 
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
 	// Use LinkedHashMaps to store persons in the population which allows much faster lookups. 
@@ -198,7 +197,6 @@ public final class PopulationImpl implements Population {
 	}
 
 	public final void setLocked() {
-		this.locked = true ;
 		for ( Person person : this.persons.values() ) {
 			if ( person instanceof PersonImpl ) {
 				((PersonImpl)person).setLocked() ;

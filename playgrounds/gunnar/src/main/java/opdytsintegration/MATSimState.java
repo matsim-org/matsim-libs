@@ -10,8 +10,9 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
@@ -91,8 +92,8 @@ public class MATSimState implements SimulatorState {
 			final List<? extends Plan> fromPlanList) {
 		final List<Plan> toPlanList = new ArrayList<>(fromPlanList.size());
 		for (Plan fromPlan : fromPlanList) {
-			final PlanImpl toPlan = new PlanImpl(fromPlan.getPerson());
-			toPlan.copyFrom(fromPlan);
+			final Plan toPlan = PopulationUtils.createPlan(fromPlan.getPerson());
+			PopulationUtils.copyFromTo(fromPlan, toPlan);
 			toPlanList.add(toPlan);
 		}
 		return toPlanList;

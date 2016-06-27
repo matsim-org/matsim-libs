@@ -27,6 +27,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -35,7 +36,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
@@ -71,7 +71,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		Leg leg = this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
 
 		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-		ActivityImpl activity = (ActivityImpl) this.withinDayAgentUtils.getModifiablePlan(withinDayAgent).getPlanElements().get(currentPlanElementIndex + 1);
+		Activity activity = (Activity) this.withinDayAgentUtils.getModifiablePlan(withinDayAgent).getPlanElements().get(currentPlanElementIndex + 1);
 		Id linkId = withinDayAgent.getCurrentLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 
@@ -153,8 +153,8 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 				 */
 				for (int i = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2; i < plan.getPlanElements().size(); i++) {
 					PlanElement planElement = plan.getPlanElements().get(i);
-					if (planElement instanceof ActivityImpl) {
-						ActivityImpl a = (ActivityImpl) planElement;
+					if (planElement instanceof Activity) {
+						Activity a = (Activity) planElement;
 						if (a.getType().equals("parking")) {
 							a.setCoord(facility.getCoord());
 							a.setLinkId(linkId);

@@ -8,12 +8,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -108,8 +108,8 @@ public class PopulationAnalysis {
 		for (Person p : population.getPersons().values()) {
 			List<PlanElement> e = p.getSelectedPlan().getPlanElements();
 			for (int i=2; i<e.size(); i=i+2) {
-				ActivityImpl a = (ActivityImpl)e.get(i);
-				LegImpl l = (LegImpl)e.get(i-1);
+				Activity a = (Activity)e.get(i);
+				Leg l = (Leg)e.get(i-1);
 				int col = -1;
 				int row = -1;
 				if (a.getType().startsWith("h")) { col = 0; }

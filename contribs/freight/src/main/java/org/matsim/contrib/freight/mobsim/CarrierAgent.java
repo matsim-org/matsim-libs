@@ -21,6 +21,8 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
@@ -36,9 +38,6 @@ import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -66,7 +65,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	 */
 	class CarrierDriverAgent {
 
-		private LegImpl currentLeg;
+		private Leg currentLeg;
 
 		private Activity currentActivity;
 
@@ -89,8 +88,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		 * @param event
 		 */
 		public void handleEvent(PersonArrivalEvent event) {
-			currentLeg.setArrivalTime(event.getTime());
-			double travelTime = currentLeg.getArrivalTime() - currentLeg.getDepartureTime();
+			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime() );
+			double travelTime = currentLeg.getDepartureTime() + currentLeg.getTravelTime() - currentLeg.getDepartureTime();
 			currentLeg.setTravelTime(travelTime);
 			if (currentRoute.size() > 1) {
 				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
@@ -114,7 +113,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(PersonDepartureEvent event) {
-			LegImpl leg = new LegImpl(event.getLegMode());
+			Leg leg = PopulationUtils.createLeg(event.getLegMode());
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
 			currentRoute = new ArrayList<Id<Link>>();
@@ -130,7 +129,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		public void handleEvent(ActivityEndEvent event) {
 			if (currentActivity == null) {
-				ActivityImpl firstActivity = new ActivityImpl(event.getActType(), event.getLinkId());
+				Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
 				currentActivity = firstActivity;
 			}
@@ -144,7 +143,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(ActivityStartEvent event) {
-			ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId()); 
+			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			if(event.getActType().equals(FreightConstants.END)){
@@ -254,8 +253,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour);
-			Plan plan = new PlanImpl();
-			Activity startActivity = new ActivityImpl(FreightConstants.START,scheduledTour.getVehicle().getLocation());
+			Plan plan = PopulationUtils.createPlan();
+			Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START, scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
@@ -263,21 +262,21 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
 					Route route = tourLeg.getRoute();
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
-					LegImpl leg = new LegImpl(TransportMode.car);
+					Leg leg = PopulationUtils.createLeg(TransportMode.car);
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());
-					leg.setArrivalTime(tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime());
+					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime() );
 					plan.addLeg(leg);
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
-					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());					
+					Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());					
 					double duration = act.getDuration() ;
 					tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
 					plan.addActivity(tourElementActivity);
 				}
 			}
-			Activity endActivity = new ActivityImpl(FreightConstants.END,scheduledTour.getVehicle().getLocation());
+			Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END, scheduledTour.getVehicle().getLocation());
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
@@ -306,7 +305,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Person createDriverPerson(Id<Person> driverId) {
-		Person person = PopulationUtils.createPerson(driverId);
+		final Id<Person> id = driverId;
+		Person person = PopulationUtils.getFactory().createPerson(id);
 		return person;
 	}
 

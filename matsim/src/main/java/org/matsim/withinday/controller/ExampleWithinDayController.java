@@ -34,7 +34,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -154,7 +154,7 @@ public final class ExampleWithinDayController implements StartupListener {
 	}
 	
 	private void initReplanners() {
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactory() ;
+		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactoriesRegister() ;
 		Network network = this.scenario.getNetwork() ;
 		
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;

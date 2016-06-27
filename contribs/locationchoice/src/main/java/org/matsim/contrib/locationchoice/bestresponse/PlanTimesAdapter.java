@@ -32,7 +32,7 @@ import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -283,7 +283,7 @@ public class PlanTimesAdapter {
 				this.network.getLinks().get( toAct.getLinkId() ),
 				this.beelineDistanceFactors.get( PlansCalcRouteConfigGroup.UNDEFINED ),
 				speed );
-		final Leg l = new LegImpl( mode );
+		final Leg l = PopulationUtils.createLeg(mode);
 		l.setRoute( pathCosts.getRoute() );
 		l.setTravelTime( pathCosts.getRoute().getTravelTime() );
 		l.setDepartureTime( fromAct.getEndTime() );

@@ -67,7 +67,7 @@ public class PlansCreatePopulation {
 		while (pid_it.hasNext()) {
 			Integer pid = pid_it.next();
 			playground.balmermi.census2000.data.MyPerson p = this.persons.getPersons().get(pid);
-			Person person = PopulationUtils.createPerson(Id.create(pid.toString(), Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(pid.toString(), Person.class));
 			PersonUtils.setSex(person, p.getSex());
 			PersonUtils.setAge(person, p.getAge());
 			PersonUtils.setLicence(person, p.getLicense());

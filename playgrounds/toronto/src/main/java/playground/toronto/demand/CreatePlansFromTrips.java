@@ -1,5 +1,22 @@
 package playground.toronto.demand;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Random;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
@@ -7,28 +24,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+
 import playground.balmermi.world.WorldUtils;
 import playground.balmermi.world.Zone;
 import playground.balmermi.world.ZoneLayer;
 import playground.toronto.demand.util.TableReader;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * <p>A new class for creating MATSim plans from a record of trips,
@@ -239,7 +256,8 @@ public class CreatePlansFromTrips {
 			Person P;
 
 			if (!scenario.getPopulation().getPersons().containsKey(pid)) {
-				P = PopulationUtils.createPerson(pid);
+				final Id<Person> id = pid;
+				P = PopulationUtils.getFactory().createPerson(id);
 				scenario.getPopulation().addPerson(P);
 				personHouseholdMap.put(pid, tr.current().get("hhid"));
 								
@@ -452,8 +470,9 @@ public class CreatePlansFromTrips {
 					
 					//Create the new person
 					Id newPid = Id.create(newHhId + "-" + pid.toString().split("-")[1], Person.class); //Assumes that person Ids are formatted as "[hhid]-[person#]"
-					personHouseholdMap.put(newPid, newHhId); //Map the new person to the new household
-					Person P = PopulationUtils.createPerson(newPid);
+					personHouseholdMap.put(newPid, newHhId);
+					final Id<Person> id = newPid; //Map the new person to the new household
+					Person P = PopulationUtils.getFactory().createPerson(id);
 					scenario.getPopulation().addPerson(P);
 					personsAdded++;
 					
@@ -531,9 +550,9 @@ public class CreatePlansFromTrips {
 		
 		//Assign activities to nearest node.
 		for (Person P : scenario.getPopulation().getPersons().values()){
-			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
+			Plan plan = (Plan) P.getSelectedPlan();
 			
-			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
+			Activity a = (Activity) PopulationUtils.getFirstActivity( plan );
 			Link nearestLink = NetworkUtils.getNearestLink(network, a.getCoord());
 			
 			a.setLinkId(nearestLink.getId());
@@ -569,7 +588,7 @@ public class CreatePlansFromTrips {
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
 			sortTrips(pTrips);
 			
-			PlanImpl p = new PlanImpl();
+			Plan p = PopulationUtils.createPlan();
 			Trip T = null;
 			
 			HashMap<String, Coord> workplaceZoneMap = new HashMap<String, Coord>();
@@ -607,12 +626,14 @@ public class CreatePlansFromTrips {
 				}else{
 					c = getRandomCoordInZone(Id.create(T.zone_o, Zone.class));
 				}
+				final String type1 = act_o;
+				final Coord coord = c;
 				
-				ActivityImpl act = p.createAndAddActivity(act_o, c);
+				Activity act = PopulationUtils.createAndAddActivityFromCoord(p, type1, coord);
 				act.setEndTime(convertTime(T.start_time)); //We only know when an activity episode ends! We don't know when it starts (or how long it is) because we have no information about travel time.
 				
 				int type;
-				LegImpl leg = null;
+				Leg leg = null;
 				try {
 					type = Integer.parseInt(T.type);
 				} catch (NumberFormatException e) {
@@ -622,11 +643,11 @@ public class CreatePlansFromTrips {
 				}
 				if(type == 0){
 					//pure-auto trips
-					leg = new LegImpl(TransportMode.car);
+					leg = PopulationUtils.createLeg(TransportMode.car);
 					
 				}else if (type == 1){
 					//pure-transit trips
-					leg = new LegImpl(TransportMode.pt);
+					leg = PopulationUtils.createLeg(TransportMode.pt);
 					
 				}else if (type == 2){
 					//auto-access/auto-egress transit (ie, to GO/subway)
@@ -671,7 +692,7 @@ public class CreatePlansFromTrips {
 				c = getRandomCoordInZone(Id.create(T.zone_d, Zone.class));
 			}
 			
-			p.addActivity(new ActivityImpl(act_d, c));
+			p.addActivity(PopulationUtils.createActivityFromCoord(act_d, c));
 			
 			if (!skipPerson) {
 				Person q = P;
@@ -796,8 +817,9 @@ public class CreatePlansFromTrips {
 			Id oId = e.getKey();
 			Id nId = scrambler[e.getValue()];
 			
-			Person op = this.scenario.getPopulation().getPersons().remove(oId); //Removed from the population
-			Person np = PopulationUtils.createPerson(nId);
+			Person op = this.scenario.getPopulation().getPersons().remove(oId);
+			final Id<Person> id = nId; //Removed from the population
+			Person np = PopulationUtils.getFactory().createPerson(id);
 			np.addPlan(op.getSelectedPlan());
 			
 			this.scenario.getPopulation().addPerson(np);

@@ -3,8 +3,8 @@ package playground.balac.freefloating.scoring;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -39,7 +39,7 @@ public class FreeFloatingScoringFunctionFactory implements ScoringFunctionFactor
 
 		  final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 		  scoringFunctionAccumulator.addScoringFunction(
-	      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(),
+	      new FreeFloatingLegScoringFunction((Plan)person.getSelectedPlan(),
 				  params,
 				  this.config,
 				  network));

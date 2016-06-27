@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -51,7 +51,7 @@ public class AgentEventMessage extends Message {
 	public AgentEventMessage(Person person) {
 		this.setPerson(person);
 		this.setPlanElementIndex(0);
-		ActivityImpl ai = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Activity ai = (Activity) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		setMessageArrivalTime(ai.getEndTime());
 		messageQueue.schedule(this);
 	}
@@ -62,7 +62,7 @@ public class AgentEventMessage extends Message {
 
 	@Override
 	public void processEvent() {
-		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl) {
+		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof Activity) {
 			handleActivityEndEvent();
 		} else {
 			handleLeg();
@@ -72,9 +72,9 @@ public class AgentEventMessage extends Message {
 	protected void handleLeg() {
 		Event event = null;
 
-		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
-		ActivityImpl prevAct = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() - 1);
-		ActivityImpl nextAct = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 1);
+		Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		Activity prevAct = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() - 1);
+		Activity nextAct = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 1);
 
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 
@@ -111,13 +111,13 @@ public class AgentEventMessage extends Message {
 		}
 	}
 
-	public void processEndOfLegCarMode(Leg leg, ActivityImpl nextAct) {
+	public void processEndOfLegCarMode(Leg leg, Activity nextAct) {
 		processEndOfLegCarMode_processEvents(leg, nextAct);
 
 		processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
 	}
 
-	public void processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(ActivityImpl nextAct) {
+	public void processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(Activity nextAct) {
 		// TODO: probably this function is not needed: if we have car leg, it is
 		// always followed
 		// by car parking activity...
@@ -138,7 +138,7 @@ public class AgentEventMessage extends Message {
 		return isLastActivity;
 	}
 
-	public void processEndOfLegCarMode_processEvents(Leg leg, ActivityImpl nextAct) {
+	public void processEndOfLegCarMode_processEvents(Leg leg, Activity nextAct) {
 		Event event;
 
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
@@ -166,7 +166,7 @@ public class AgentEventMessage extends Message {
 		eventsManager.processEvent(event);
 	}
 
-	protected void processEndOfLegNonCarMode(Leg leg, ActivityImpl nextAct) {
+	protected void processEndOfLegNonCarMode(Leg leg, Activity nextAct) {
 		Event event;
 		event = new PersonArrivalEvent(getMessageArrivalTime(), getPerson().getId(), nextAct.getLinkId(), leg.getMode());
 		eventsManager.processEvent(event);
@@ -189,7 +189,7 @@ public class AgentEventMessage extends Message {
 	protected void handleActivityEndEvent() {
 		Event event = null;
 		Id personId = getPerson().getId();
-		ActivityImpl curAct = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(this.getPlanElementIndex());
+		Activity curAct = (Activity) getPerson().getSelectedPlan().getPlanElements().get(this.getPlanElementIndex());
 
 		// process first activity
 		event = new ActivityEndEvent(getMessageArrivalTime(), personId, curAct.getLinkId(), curAct.getFacilityId(),
@@ -197,7 +197,7 @@ public class AgentEventMessage extends Message {
 		eventsManager.processEvent(event);
 
 		int nextLegIndex = this.getPlanElementIndex() + 1;
-		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
+		Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
 
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 		//	AgentWithParking.parkingManager.unParkAgentVehicle(getPerson().getId());
@@ -205,7 +205,7 @@ public class AgentEventMessage extends Message {
 			event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), leg.getMode());
 			eventsManager.processEvent(event);
 
-			ActivityImpl nextAct = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 2);
+			Activity nextAct = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 2);
 			boolean departureAndArrivalOnSameLink = curAct.getLinkId().toString().equalsIgnoreCase(nextAct.getLinkId().toString());
 			if (departureAndArrivalOnSameLink) {
 				
@@ -214,7 +214,7 @@ public class AgentEventMessage extends Message {
 				
 				setPlanElementIndex(getPlanElementIndex() + 1);
 				setPlanElementIndex(getPlanElementIndex() + 1);
-				ActivityImpl act = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+				Activity act = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 
 				event = new PersonArrivalEvent(getMessageArrivalTime(), getPerson().getId(), act.getLinkId(), leg.getMode());
 				eventsManager.processEvent(event);
@@ -307,7 +307,7 @@ public class AgentEventMessage extends Message {
 
 		int i = planElementIndex + 1;
 		while (i < planElements.size()) {
-			if (planElements.get(i) instanceof LegImpl) {
+			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return i;
@@ -326,7 +326,7 @@ public class AgentEventMessage extends Message {
 
 		int i = planElementIndex;
 		while (i > 0) {
-			if (planElements.get(i) instanceof LegImpl) {
+			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return i;
@@ -344,7 +344,7 @@ public class AgentEventMessage extends Message {
 
 		int i =  planElements.size()-1;
 		while (i > 0) {
-			if (planElements.get(i) instanceof LegImpl) {
+			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return i;
@@ -361,7 +361,7 @@ public class AgentEventMessage extends Message {
 
 		int i = 0;
 		while (i < planElements.size()) {
-			if (planElements.get(i) instanceof LegImpl) {
+			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return i;

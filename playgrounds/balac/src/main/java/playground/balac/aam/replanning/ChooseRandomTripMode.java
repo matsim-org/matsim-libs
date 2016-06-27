@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -54,7 +54,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 		TripRouter.insertTrip(
 				plan,
 				trip.getOriginActivity(),
-				Collections.singletonList( new LegImpl( "movingpathways" ) ),
+				Collections.singletonList( PopulationUtils.createLeg("movingpathways") ),
 				trip.getDestinationActivity());
 		
 	

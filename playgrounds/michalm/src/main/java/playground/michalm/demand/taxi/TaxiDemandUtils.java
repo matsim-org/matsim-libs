@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 
@@ -37,11 +36,11 @@ public class TaxiDemandUtils
         for (Person p : scenario.getPopulation().getPersons().values()) {
             List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
 
-            ActivityImpl fromActivity = (ActivityImpl)planElements.get(0);
+            Activity fromActivity = (Activity)planElements.get(0);
             Link fromLink = NetworkUtils.getNearestLink(network, fromActivity.getCoord());
             fromActivity.setLinkId(fromLink.getId());
 
-            ActivityImpl toActivity = (ActivityImpl)planElements.get(2);
+            Activity toActivity = (Activity)planElements.get(2);
             Link toLink = NetworkUtils.getNearestLink(network, toActivity.getCoord());
             toActivity.setLinkId(toLink.getId());
 

@@ -29,8 +29,8 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -57,7 +57,7 @@ public class ModalShareFromPlans implements ModalShare{
 	public void run() {
 		// first store used modes 
 		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			Plan plan = (Plan) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
@@ -73,7 +73,7 @@ public class ModalShareFromPlans implements ModalShare{
 		for(String mode : mode2numberOflegs.keySet()){
 			int noOfLegs = 0;
 			for(Person person : pop.getPersons().values()){
-				PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+				Plan plan = (Plan) person.getSelectedPlan();
 				List<PlanElement> planElements = plan.getPlanElements();
 				for(PlanElement pe : planElements){
 					if(pe instanceof Leg){

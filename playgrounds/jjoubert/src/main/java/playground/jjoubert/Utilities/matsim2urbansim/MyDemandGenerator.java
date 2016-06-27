@@ -115,10 +115,10 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					Person agent = PopulationUtils.createPerson(Id.create(agentId, Person.class));
+					Person agent = PopulationUtils.getFactory().createPerson(Id.create(agentId, Person.class));
 					PersonUtils.setEmployed(agent, true);
 
-					Plan plan = new PlanImpl(agent);
+					Plan plan = PopulationUtils.createPlan(agent);
 					
 					/*
 					 * Generate the start-of-day home activity. Some criteria:
@@ -133,7 +133,7 @@ public class MyDemandGenerator {
 					Point pHome = homeZone.getInteriorPoint();
 					Coord cHome = new Coord(pHome.getX(), pHome.getY());
 					Link lHome = NetworkUtils.getNearestRightEntryLink(ni, cHome);
-					Activity homeStart = new ActivityImpl("home", cHome, lHome.getId());
+					Activity homeStart = PopulationUtils.createActivityFromCoordAndLinkId("home", cHome, lHome.getId());
 					homeStart.setStartTime(0);
 					homeStart.setEndTime(21595 + Math.random()*10.0);
 					
@@ -150,11 +150,11 @@ public class MyDemandGenerator {
 					Leg toHome = null;
 					int carOwner = Integer.parseInt(entry[3]);
 					if(carOwner == 1){
-						fromHome = new LegImpl(TransportMode.car);
-						toHome = new LegImpl(TransportMode.car);
+						fromHome = PopulationUtils.createLeg(TransportMode.car);
+						toHome = PopulationUtils.createLeg(TransportMode.car);
 					} else{
-						fromHome = new LegImpl(TransportMode.pt);
-						toHome = new LegImpl(TransportMode.pt);
+						fromHome = PopulationUtils.createLeg(TransportMode.pt);
+						toHome = PopulationUtils.createLeg(TransportMode.pt);
 					}
 					
 					
@@ -168,7 +168,7 @@ public class MyDemandGenerator {
 					Point pWork = workZone.getInteriorPoint();
 					Coord cWork = new Coord(pWork.getX(), pWork.getY());
 					Link lWork = NetworkUtils.getNearestRightEntryLink(ni, cWork);
-					Activity work = new ActivityImpl("work", cWork, lWork.getId());
+					Activity work = PopulationUtils.createActivityFromCoordAndLinkId("work", cWork, lWork.getId());
 					work.setStartTime(25200);
 					work.setEndTime(work.getStartTime() + 32400);
 					
@@ -176,7 +176,7 @@ public class MyDemandGenerator {
 					/*
 					 * Generate the end-of-day home activity.
 					 */
-					Activity homeEnd = new ActivityImpl("home", cHome, lHome.getId());
+					Activity homeEnd = PopulationUtils.createActivityFromCoordAndLinkId("home", cHome, lHome.getId());
 					homeEnd.setStartTime(work.getEndTime()+1800);
 					homeEnd.setEndTime(86399);
 					

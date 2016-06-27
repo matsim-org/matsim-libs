@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.*;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -75,7 +74,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 						new MapUtils.Factory<Plan>() {
 							@Override
 							public Plan create() {
-								return new PlanImpl(PopulationUtils.createPerson(event.getAgentId()));
+								return PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(event.getAgentId()));
 							}
 						});
 		plan.addActivity( event.getActivity());
@@ -92,7 +91,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 						new MapUtils.Factory<Plan>() {
 							@Override
 							public Plan create() {
-								return new PlanImpl(PopulationUtils.createPerson(event.getAgentId()));
+								return PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(event.getAgentId()));
 							}
 						});
 		plan.addLeg( event.getLeg() );

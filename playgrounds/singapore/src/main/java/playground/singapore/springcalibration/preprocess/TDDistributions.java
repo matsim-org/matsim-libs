@@ -18,8 +18,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -154,7 +155,7 @@ public class TDDistributions {
 				double endTime = ((Activity) pe).getEndTime();
 				
 				if (index > 0) {
-					Leg previousLeg = ((PlanImpl)plan).getPreviousLeg((Activity)pe);
+					Leg previousLeg = PopulationUtils.getPreviousLeg(((Plan)plan), (Activity)pe);
 					String mode = previousLeg.getMode();			
 					double travelTime = (startTime - prevendTime) / 60.0; // in minutes				
 					double travelDistance = CoordUtils.calcEuclideanDistance(coords, prevcoords) / 1000.0; // in km
