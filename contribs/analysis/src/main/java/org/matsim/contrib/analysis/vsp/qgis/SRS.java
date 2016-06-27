@@ -59,7 +59,7 @@ public class SRS{
 
 			// TODO the following is a quick fixing to make ESPG:21037 useable; right now I don't
 			// see, however, why we need this class instead of just using the coordinate systems from MGC
-			case "EPSG:21037b": //TODO
+			case "EPSG:21037":
 
 				return new SRS("+proj=utm +zone=37 +south +ellps=clrk80 +units=m +no_defs",
 						"21037", "21037", "EPSG:21037", "Arc 1960 / UTM zone 3Ss", "", "");
