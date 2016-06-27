@@ -8,17 +8,29 @@
   <groupId>playground</groupId>
   <artifactId>vspshk</artifactId>
   <name>vspshk</name>
+	<repositories>
+		<repository>
+			<id>geotoolkit</id>
+			<name>Geotoolkit.org project</name>
+			<url>http://maven.geotoolkit.org</url>
+		</repository>
+	</repositories>
   <dependencies>
+	  <dependency>
+		  <groupId>org.osgeo</groupId>
+		  <artifactId>proj4j</artifactId>
+		  <version>0.1.0</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>org.opengis.wrapper</groupId>
+		  <artifactId>geoapi-proj4</artifactId>
+		  <version>3.1-SNAPSHOT</version>
+	  </dependency>
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>mzilske</artifactId>
   		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
-  	<!-- <dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>dziemke</artifactId>
-  		<version>0.9.0-SNAPSHOT</version>
-  	</dependency> -->
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>dgrether</artifactId>
