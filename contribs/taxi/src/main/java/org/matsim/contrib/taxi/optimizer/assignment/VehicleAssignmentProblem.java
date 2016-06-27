@@ -36,31 +36,40 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.common.collect.Maps;
 
 
-public abstract class AbstractAssignmentProblem<D>
+public class VehicleAssignmentProblem<D>
 {
-    protected static class PathData
+    public static interface AssignmentCost<D>
+    {
+        double calc(VehicleData.Entry departure, DestEntry<D> dest, PathData pathData);
+    }
+
+
+    public static class PathData
     {
         protected Node node;//destination
-        protected double delay;//at the first and last links
+        protected double delay;//at both the first and last link
         protected Path path;//shortest path
     }
 
 
-    protected VehicleData vData;
-    protected AssignmentDestinationData<D> dData;
-
-    protected final FastMultiNodeDijkstra router;
+    private final TravelTime travelTime;
+    private final FastMultiNodeDijkstra router;
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
     private final StraightLineKNNFinder<VehicleData.Entry, DestEntry<D>> destinationFinder;
     private final StraightLineKNNFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder;
 
+    private AssignmentCost<D> assignmentCost;
+    private VehicleData vData;
+    private AssignmentDestinationData<D> dData;
 
-    public AbstractAssignmentProblem(FastMultiNodeDijkstra router,
+
+    public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter,
             StraightLineKNNFinder<VehicleData.Entry, DestEntry<D>> destinationFinder,
             StraightLineKNNFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder)
     {
+        this.travelTime = travelTime;
         this.router = router;
         this.backwardRouter = backwardRouter;
         this.destinationFinder = destinationFinder;
@@ -68,11 +77,25 @@ public abstract class AbstractAssignmentProblem<D>
     }
 
 
+    public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,
+            AssignmentCost<D> assignmentCost)
+    {
+        this.vData = vData;
+        this.dData = dData;
+        this.assignmentCost = assignmentCost;
+
+        PathData[][] pathDataMatrix = createPathDataMatrix();
+        double[][] costMatrix = createCostMatrix(pathDataMatrix);
+        int[] assignments = new HungarianAlgorithm(costMatrix).execute();
+        return createDispatches(assignments, pathDataMatrix, travelTime);
+    }
+
+
     private static int calcPathsForVehiclesCount = 0;
     private static int calcPathsForDestinationsCount = 0;
 
 
-    protected PathData[][] createPathDataMatrix()
+    private PathData[][] createPathDataMatrix()
     {
         PathData[][] pathDataMatrix = (PathData[][])Array.newInstance(PathData.class,
                 vData.dimension, dData.getSize());
@@ -217,7 +240,7 @@ public abstract class AbstractAssignmentProblem<D>
     }
 
 
-    protected double[][] createCostMatrix(PathData[][] pathDataMatrix)
+    private double[][] createCostMatrix(PathData[][] pathDataMatrix)
     {
 
         double[][] costMatrix = new double[vData.dimension][dData.getSize()];
@@ -225,7 +248,8 @@ public abstract class AbstractAssignmentProblem<D>
         for (int v = 0; v < vData.dimension; v++) {
             VehicleData.Entry departure = vData.entries.get(v);
             for (int r = 0; r < dData.getSize(); r++) {
-                costMatrix[v][r] = calcCost(departure, dData.getEntry(r), pathDataMatrix[v][r]);
+                costMatrix[v][r] = assignmentCost.calc(departure, dData.getEntry(r),
+                        pathDataMatrix[v][r]);
             }
         }
 
@@ -233,11 +257,7 @@ public abstract class AbstractAssignmentProblem<D>
     }
 
 
-    protected abstract double calcCost(VehicleData.Entry departure, DestEntry<D> dest,
-            PathData pathData);
-
-
-    protected List<Dispatch<D>> createDispatches(int[] assignments, PathData[][] pathDataMatrix,
+    private List<Dispatch<D>> createDispatches(int[] assignments, PathData[][] pathDataMatrix,
             TravelTime travelTime)
     {
         List<Dispatch<D>> dispatches = new ArrayList<>(Math.min(vData.dimension, dData.getSize()));

@@ -26,16 +26,20 @@ import org.matsim.contrib.locationchoice.router.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
+
+import com.google.common.collect.Iterables;
 
 
 public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final AssignmentTaxiOptimizerParams params;
-    private final FastMultiNodeDijkstra router;
-    private final BackwardFastMultiNodeDijkstra backwardRouter;
+    private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
+    private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
 
     public AssignmentTaxiOptimizer(TaxiOptimizerContext optimContext,
@@ -52,25 +56,62 @@ public class AssignmentTaxiOptimizer
 
         RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
                 .createRoutingNetwork(optimContext.network);
-        router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
-                optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
+        FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork,
+                optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
+                fastRouterFactory, true);
 
         RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(
                 preProcessDijkstra).createRoutingNetwork(optimContext.network);
-        backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,
-                optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
-                fastRouterFactory, true);
+        BackwardFastMultiNodeDijkstra backwardRouter = new BackwardFastMultiNodeDijkstra(
+                inverseRoutingNetwork, optimContext.travelDisutility, optimContext.travelTime,
+                preProcessDijkstra, fastRouterFactory, true);
+
+        assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
+                backwardRouter,
+                StraightLineKNNFinders.createTaxiRequestFinder(params.nearestRequestsLimit),
+                StraightLineKNNFinders.createVehicleDepartureFinder(params.nearestVehiclesLimit));
+
+        assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
     }
 
 
     protected void scheduleUnplannedRequests()
     {
-        List<Dispatch<TaxiRequest>> dispatches = new AssignmentProblem(optimContext, params, router,
-                backwardRouter).findAssignments((SortedSet<TaxiRequest>)unplannedRequests);
-
-        for (Dispatch<TaxiRequest> d : dispatches) {
-            optimContext.scheduler.scheduleRequest(d.vehicle, d.destination, d.path);
-            unplannedRequests.remove(d.destination);
+        AssignmentRequestData rData = initRequestData();
+        if (rData.getSize() == 0) {
+            return;
         }
+
+        VehicleData vData = initVehicleData(rData);
+        if (vData.dimension == 0) {
+            return;
+        }
+
+        AssignmentCost<TaxiRequest> cost = assignmentCostProvider.getCost(rData, vData);
+        List<Dispatch<TaxiRequest>> assignments = assignmentProblem.findAssignments(vData, rData,
+                cost);
+
+        for (Dispatch<TaxiRequest> a : assignments) {
+            optimContext.scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
+            unplannedRequests.remove(a.destination);
+        }
+    }
+
+
+    private AssignmentRequestData initRequestData()
+    {
+        AssignmentRequestData rData = new AssignmentRequestData(optimContext, 0);//only immediate reqs
+        rData.init((SortedSet<TaxiRequest>)unplannedRequests);
+        return rData;
+    }
+
+
+    private VehicleData initVehicleData(AssignmentRequestData rData)
+    {
+        int idleVehs = Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+        double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
+                params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
+        return new VehicleData(optimContext, vehPlanningHorizon);
     }
 }
