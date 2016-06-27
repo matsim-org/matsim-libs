@@ -26,7 +26,7 @@ import org.matsim.contrib.taxi.data.TaxiData;
 
 import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.ev.data.*;
-import playground.michalm.ev.discharging.EnergyConsumptions;
+import playground.michalm.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
 import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
 
@@ -35,9 +35,7 @@ public class ETaxiUtils
 {
     public static void initEvData(TaxiData taxiData, EvData evData)
     {
-        // TODO variable AUX -- depends on weather etc...
-        // TODO add the Leaf's consumption model for driving 
-        double driveRate = 15. * UnitConversionRatios.J_m_PER_kWh_100km; //15 kWh/100km == 150 Wh/km
+        // TODO variable AUX and charging speeds -- depend on weather etc...
         double auxPower = 1. * UnitConversionRatios.W_PER_kW; //1 kW
         double chargingSpeedFactor = 1.; //full speed
 
@@ -47,8 +45,7 @@ public class ETaxiUtils
 
         for (Vehicle v : taxiData.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
-            ev.setDriveEnergyConsumption((link, travelTime) -> EnergyConsumptions
-                    .consumeFixedDriveEnergy(ev, driveRate, link));
+            ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption(ev));
             ev.setAuxEnergyConsumption(
                     (period) -> consumeFixedAuxEnergyWhenScheduleStarted(ev, v, auxPower, period));
             evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
