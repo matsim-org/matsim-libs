@@ -45,10 +45,8 @@ public class RunTaxiBenchmark
 {
     public static void run(String configFile, int runs)
     {
-        final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-        Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
         createControler(config, runs).run();
-
     }
 
 
@@ -61,11 +59,17 @@ public class RunTaxiBenchmark
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        return createControler(scenario, taxiData, runs);
+    }
 
-        config.controler().setLastIteration(runs - 1);
+
+    public static Controler createControler(Scenario scenario, TaxiData taxiData, int runs)
+    {
+        scenario.getConfig().controler().setLastIteration(runs - 1);
+        
         Controler controler = new Controler(scenario);
         controler.setModules(new TaxiBenchmarkControlerModule());
-        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
+        controler.addOverridingModule(new TaxiModule(taxiData));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         controler.addOverridingModule(new AbstractModule() {
@@ -80,7 +84,7 @@ public class RunTaxiBenchmark
     }
 
 
-    static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
+    public static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
     {
         Scenario scenario = new ScenarioBuilder(config).build();
 

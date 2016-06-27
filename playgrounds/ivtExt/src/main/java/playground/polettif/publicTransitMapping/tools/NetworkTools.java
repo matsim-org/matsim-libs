@@ -41,8 +41,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
-import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.FastAStarRouter;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 
 import java.util.*;
 
@@ -230,7 +230,7 @@ public class NetworkTools {
 		dummyLink.setAllowedModes(transportModes);
 		dummyLink.setLength(5);
 		dummyLink.setFreespeed(freespeed);
-		dummyLink.setCapacity(9999); // todo param default values in config
+		dummyLink.setCapacity(9999);
 
 		if(!network.getNodes().containsKey(dummyNode.getId())) {
 			network.addNode(dummyNode);
@@ -242,7 +242,12 @@ public class NetworkTools {
 
 
 	/**
-	 * @return the filtered network, input network is not filtered!
+ 	 * Creates and returns a mode filtered network.
+	 * @param network the input network, is not modified
+	 * @param transportModes Links of the input network that share at least one network mode
+	 *                       with this set are added to the new network. The returned network
+	 *                       is empty if <tt>null</tt>.
+	 * @return the filtered new network
 	 */
 	public static Network filterNetworkByLinkMode(Network network, Set<String> transportModes) {
 		NetworkFilterManager filterManager = new NetworkFilterManager(network);
@@ -281,22 +286,7 @@ public class NetworkTools {
 	 * @return true if the coordinate is on the right hand side of the link (or on the link).
 	 */
 	public static boolean coordIsOnRightSideOfLink(Coord coord, Link link) {
-		double azLink = CoordTools.getAzimuth(link.getFromNode().getCoord(), link.getToNode().getCoord());
-		double azToCoord = CoordTools.getAzimuth(link.getFromNode().getCoord(), coord);
-
-		double diff = azToCoord-azLink;
-
-		if(diff == 0 || azToCoord-Math.PI == azLink) {
-			return true;
-		} else if(diff > 0 && diff < Math.PI) {
-			return true;
-		} else if(diff > 0 && diff > Math.PI) {
-			return false;
-		} else if(diff < 0 && diff < -Math.PI){
-			return true;
-		} else {
-			return false;
-		}
+		return CoordTools.coordIsOnRightSideOfLine(coord, link.getFromNode().getCoord(), link.getToNode().getCoord());
 	}
 
 	/**
@@ -576,7 +566,7 @@ public class NetworkTools {
 		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
 		for(Set<String> networkModes : modeAssignments.values()) {
 			if(!modeDependentRouters.containsKey(networkModes)) {
-				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
+				modeDependentRouters.put(networkModes, FastAStarRouter.createModeSeparatedRouter(network, networkModes));
 			}
 		}
 

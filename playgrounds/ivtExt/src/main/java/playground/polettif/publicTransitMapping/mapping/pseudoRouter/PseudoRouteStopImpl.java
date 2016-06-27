@@ -23,27 +23,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateImpl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A RouteStop used in the pseudoGraph.
- * <p/>
- * Link Candidates are made for each stop facility. Since one
- * stop facility might be accessed twice in the same transitRoute,
- * unique Link Candidates for each TransitRouteStop are needed. This
- * is achieved via this class.
- *
  * @author polettif
  */
 public class PseudoRouteStopImpl implements PseudoRouteStop {
 
-	private static PublicTransitMappingConfigGroup config;
-
 	// dijkstra
 	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
+	private final LinkCandidate linkCandidate;
 	public double travelCostToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
 	public PseudoRouteStop previous = null;
 
@@ -66,18 +59,9 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 	private final Id<TransitStopFacility> parentStopFacilityId;
 	private final double stopFacilityDistance;
 
-	public static void setConfig(PublicTransitMappingConfigGroup configGroup) {
-		config = configGroup;
-	}
-
-	PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidateImpl linkCandidate) {
-		this(order, routeStop, (LinkCandidate) linkCandidate);
-	}
-
 	/**
-	 * Constructor. All primitive values are stored
-	 * as well to make access easier during
-	 * stop facility replacement.
+	 * Constructor. All primitive attribute values of the transitRouteStop are stored
+	 * to make access easier during stop facility replacement.
 	 */
 	/*package*/ PseudoRouteStopImpl(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
@@ -99,6 +83,7 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 		// link value
 		this.linkTravelCost = linkCandidate.getLinkTravelCost();
+		this.linkCandidate = linkCandidate;
 	}
 
 	/**
@@ -132,7 +117,31 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 		// link value
 		this.linkTravelCost = 0.0;
+		this.linkCandidate = new LinkCandidateImpl();
 	}
+
+
+	@Override
+	public double getTravelCostToSource() {
+		return travelCostToSource;
+	}
+	@Override
+	public void setTravelCostToSource(double cost) {
+		this.travelCostToSource = cost;
+	}
+	@Override
+	public PseudoRouteStop getClosestPrecedingRouteStop() {
+		return previous;
+	}
+	@Override
+	public void setClosestPrecedingRouteSTop(PseudoRouteStop stop) {
+		this.previous = stop;
+	}
+	@Override
+	public Map<PseudoRouteStop, Double> getNeighbours() {
+		return neighbours;
+	}
+
 
 	@Override
 	public Id<PseudoRouteStop> getId() {
@@ -141,10 +150,11 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 
 	@Override
 	public int compareTo(PseudoRouteStop other) {
-		if(other.getId().equals(this.id)) {
+		if(this.equals(other)) {
 			return 0;
 		}
-		return Double.compare(travelCostToSource, other.getTravelCostToSource());
+		int dCompare = Double.compare(travelCostToSource, other.getTravelCostToSource());
+		return (dCompare == 0 ? 1 : dCompare);
 	}
 
 	@Override
@@ -152,44 +162,17 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 		return linkId;
 	}
 
+	@Override
 	public double getDepartureOffset() {
 		return departureOffset;
 	}
 
 	@Override
-	public double getLinkTravelCost() {
-		return linkTravelCost;
-	}
-
-	@Override
-	public Map<PseudoRouteStop, Double> getNeighbours() {
-		return neighbours;
-	}
-
-	@Override
-	public double getTravelCostToSource() {
-		return travelCostToSource;
-	}
-
-	@Override
-	public void setTravelCostToSource(double cost) {
-		this.travelCostToSource = cost;
-	}
-
-	@Override
-	public PseudoRouteStop getClosestPrecedingRouteStop() {
-		return previous;
-	}
-
-	@Override
-	public void setClosestPrecedingRouteSTop(PseudoRouteStop stop) {
-		this.previous = stop;
-	}
-
 	public double getArrivalOffset() {
 		return arrivalOffset;
 	}
 
+	@Override
 	public boolean awaitsDepartureTime() {
 		return awaitDepartureTime;
 	}
@@ -199,18 +182,27 @@ public class PseudoRouteStopImpl implements PseudoRouteStop {
 		return parentStopFacilityId;
 	}
 
+	@Override
+	public LinkCandidate getLinkCandidate() {
+		return linkCandidate;
+	}
+
+	@Override
 	public Coord getCoord() {
 		return coord;
 	}
 
+	@Override
 	public boolean isBlockingLane() {
 		return isBlockingLane;
 	}
 
+	@Override
 	public String getFacilityName() {
 		return facilityName;
 	}
 
+	@Override
 	public String getStopPostAreaId() {
 		return stopPostAreaId;
 	}

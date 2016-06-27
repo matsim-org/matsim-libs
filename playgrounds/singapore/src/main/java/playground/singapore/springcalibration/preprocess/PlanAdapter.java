@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -36,7 +37,8 @@ public class PlanAdapter {
 	
 	private void adapt(Population population) {
 		for (Person p : population.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
+			
+			Plan plan = new BestPlanSelector<Plan, Person>().selectPlan(p);
 			plan.setScore(null);
 			
 			for (PlanElement pe : plan.getPlanElements()){	

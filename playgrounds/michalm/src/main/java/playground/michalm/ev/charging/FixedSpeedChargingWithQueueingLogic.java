@@ -35,14 +35,12 @@ public class FixedSpeedChargingWithQueueingLogic
     protected final Charger charger;
     protected final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles;
     protected final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-    protected final Iterable<ElectricVehicle> allVehicles;
 
 
     public FixedSpeedChargingWithQueueingLogic(Charger charger)
     {
         this.charger = charger;
-        pluggedVehicles = Maps.newHashMapWithExpectedSize(charger.getCapacity());
-        allVehicles = Iterables.concat(pluggedVehicles.values(), queuedVehicles);
+        pluggedVehicles = Maps.newHashMapWithExpectedSize(charger.getPlugs());
         charger.setLogic(this);
     }
 
@@ -50,10 +48,23 @@ public class FixedSpeedChargingWithQueueingLogic
     @Override
     public void chargeVehicles(double chargePeriod)
     {
-        for (ElectricVehicle ev : pluggedVehicles.values()) {
-            //we charge around 4% of SOC per minute, so when updating SOC every 10 seconds,
-            //SOC will never reach 81% 
+        Iterator<ElectricVehicle> evIter = pluggedVehicles.values().iterator();
+        while (evIter.hasNext()) {
+            ElectricVehicle ev = evIter.next();
+            //with fast charging, we charge around 4% of SOC per minute,
+            //so when updating SOC every 10 seconds, SOC increases by less then 1% 
             chargeVehicle(ev, chargePeriod);
+
+            if (doStopCharging(ev)) {
+                evIter.remove();
+                notifyChargingEnded(ev);
+            }
+        }
+
+        int fromQueuedToPluggedCount = Math.min(queuedVehicles.size(),
+                charger.getPlugs() - pluggedVehicles.size());
+        for (int i = 0; i < fromQueuedToPluggedCount; i++) {
+            plugVehicle(queuedVehicles.poll());
         }
     }
 
@@ -67,10 +78,17 @@ public class FixedSpeedChargingWithQueueingLogic
     }
 
 
+    protected boolean doStopCharging(ElectricVehicle ev)
+    {
+        Battery b = ev.getBattery();
+        return b.getSoc() >= b.getCapacity();
+    }
+
+
     @Override
     public void addVehicle(ElectricVehicle vehicle)
     {
-        if (pluggedVehicles.size() < charger.getCapacity()) {
+        if (pluggedVehicles.size() < charger.getPlugs()) {
             plugVehicle(vehicle);
         }
         else {
@@ -96,17 +114,10 @@ public class FixedSpeedChargingWithQueueingLogic
     }
 
 
-    protected void plugVehicle(ElectricVehicle vehicle)
+    private void plugVehicle(ElectricVehicle vehicle)
     {
         pluggedVehicles.put(vehicle.getId(), vehicle);
         notifyChargingStarted(vehicle);
-    }
-
-
-    protected void unplugVehicle(ElectricVehicle vehicle)
-    {
-        pluggedVehicles.remove(vehicle.getId());
-        notifyChargingEnded(vehicle);
     }
 
 
@@ -121,9 +132,9 @@ public class FixedSpeedChargingWithQueueingLogic
 
 
     @Override
-    public boolean isPlugged(ElectricVehicle ev)
+    public boolean isPlugged(ElectricVehicle vehicle)
     {
-        return pluggedVehicles.containsKey(ev.getId());
+        return pluggedVehicles.containsKey(vehicle.getId());
     }
 
 

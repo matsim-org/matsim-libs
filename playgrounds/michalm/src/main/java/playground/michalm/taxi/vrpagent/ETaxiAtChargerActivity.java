@@ -22,9 +22,8 @@ package playground.michalm.taxi.vrpagent;
 import org.matsim.contrib.dynagent.AbstractDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
-import playground.michalm.taxi.ev.ETaxiChargingWithQueueingLogic;
+import playground.michalm.taxi.ev.ETaxiChargingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
 
@@ -33,32 +32,60 @@ public class ETaxiAtChargerActivity
 {
     public static final String STAY_AT_CHARGER_ACTIVITY_TYPE = "ETaxiStayAtCharger";
 
-    private final Ev ev;
-    private final ETaxiChargingWithQueueingLogic logic;
+    private final ETaxiChargingTask chargingTask;
     private final MobsimTimer timer;
-    private boolean chargingEnded = false;
 
-    private double endTime;
+    private double endTime = END_ACTIVITY_LATER;
+
+
+    private enum State
+    {
+        init, queued, plugged, unplugged
+    };
+
+
+    private State state = State.init;
 
 
     public ETaxiAtChargerActivity(ETaxiChargingTask chargingTask, MobsimTimer timer)
     {
         super(STAY_AT_CHARGER_ACTIVITY_TYPE);
+        this.chargingTask = chargingTask;
         this.timer = timer;
-        ev = ((EvrpVehicle)chargingTask.getSchedule().getVehicle()).getEv();
-        logic = (ETaxiChargingWithQueueingLogic)chargingTask.getCharger().getLogic();
-
-        logic.addVehicle(ev);
-        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTime() + logic.estimateChargeTime(ev);
     }
 
 
     @Override
     public void doSimStep(double now)
     {
-        if (!chargingEnded && endTime <= now) {
-            endTime = now + 1;
+        switch (state) {
+            case queued:
+            case plugged:
+                if (endTime <= now) {
+                    endTime = now + 1;
+                }
+                return;
+
+            case init:
+                initialize();
+                return;
+
+            default:
+                return;
         }
+    }
+
+
+    private void initialize()
+    {
+        ETaxiChargingLogic logic = chargingTask.getLogic();
+        Ev ev = chargingTask.getEv();
+
+        logic.removeDispatchedVehicle(ev);
+        logic.addVehicle(ev);
+        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTimeOnArrival()
+                + logic.estimateChargeTime(ev);
+        state = State.queued;
     }
 
 
@@ -71,13 +98,15 @@ public class ETaxiAtChargerActivity
 
     public void notifyChargingStarted()
     {
-        endTime = timer.getTimeOfDay() + logic.estimateChargeTime(ev);
+        endTime = timer.getTimeOfDay()
+                + chargingTask.getLogic().estimateChargeTime(chargingTask.getEv());
+        state = State.plugged;
     }
 
 
     public void notifyChargingEnded()
     {
-        chargingEnded = true;
         endTime = timer.getTimeOfDay();
+        state = State.unplugged;
     }
 }

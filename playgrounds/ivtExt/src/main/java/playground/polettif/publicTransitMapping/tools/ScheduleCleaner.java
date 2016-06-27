@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
@@ -222,7 +223,8 @@ public class ScheduleCleaner {
 	}
 
 	/**
-	 *
+	 * Combines transit routes with identical stop sequences. Only routes within
+	 * a transit line are combined.
 	 */
 	public static void combineIdenticalTransitRoutes(TransitSchedule schedule) {
 		log.info("Combining TransitRoutes with identical stop sequence...");
@@ -270,20 +272,15 @@ public class ScheduleCleaner {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			// Collect all route profiles
 			final Map<String, List<TransitRoute>> routeProfiles = new HashMap<>();
-			for(TransitRoute route : line.getRoutes().values()) {
-				totalNumberOfDepartures += route.getDepartures().size();
-				totalNumberOfStops += route.getDepartures().size() * route.getStops().size();
-				String routeProfile = route.getStops().get(0).getStopFacility().getId().toString();
-				for(int i = 1; i < route.getStops().size(); i++) {
+			for(TransitRoute transitRoute : line.getRoutes().values()) {
+				totalNumberOfDepartures += transitRoute.getDepartures().size();
+				totalNumberOfStops += transitRoute.getDepartures().size() * transitRoute.getStops().size();
+				String routeProfile = transitRoute.getStops().get(0).getStopFacility().getId().toString();
+				for(int i = 1; i < transitRoute.getStops().size(); i++) {
 					//routeProfile = routeProfile + "-" + route.getStops().get(i).toString() + ":" + route.getStops().get(i).getDepartureOffset();
-					routeProfile = routeProfile + "-" + route.getStops().get(i).getStopFacility().getId().toString();
+					routeProfile = routeProfile + "-" + transitRoute.getStops().get(i).getStopFacility().getId().toString();
 				}
-				List<TransitRoute> profiles = routeProfiles.get(routeProfile);
-				if(profiles == null) {
-					profiles = new ArrayList<>();
-					routeProfiles.put(routeProfile, profiles);
-				}
-				profiles.add(route);
+				MapUtils.getList(routeProfile, routeProfiles).add(transitRoute);
 			}
 			// Check profiles and if the same, add latter to former.
 			for(List<TransitRoute> routesToUnite : routeProfiles.values()) {
@@ -352,7 +349,7 @@ public class ScheduleCleaner {
 
 	/**
 	 * Replaces all schedule transport modes (i.e. bus or rail)
-	 * with <tt>mode</tt> (normally pt).
+	 * with <tt>mode</tt>.
 	 */
 	public static void replaceScheduleModes(TransitSchedule schedule, String mode) {
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
@@ -372,7 +369,7 @@ public class ScheduleCleaner {
 	}
 
 	/**
-	 * cuts the schedule
+	 * cuts the schedule. All routes that pass stops within radius of center are kept
 	 */
 	public static void cutSchedule(TransitSchedule schedule, Coord center, double radius) {
 		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
@@ -384,6 +381,10 @@ public class ScheduleCleaner {
 		cutSchedule(schedule, stopsInArea);
 	}
 
+	/**
+	 * Cuts the schedule. All routes that pass stops northeast of SWcorner
+	 * and southwest of NEcorner (i.e. within the box) are kept
+	 */
 	public static void cutSchedule(TransitSchedule schedule, Coord SWcorner, Coord NEcorner) {
 		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
 		for (TransitStopFacility stopFacility : schedule.getFacilities().values()) {
@@ -432,7 +433,7 @@ public class ScheduleCleaner {
 	}
 
 	/**
-	 * Removes all transit routes using the given mode from the schedule
+	 * Removes all transit routes using one of the given modes from the schedule
 	 */
 	public static void removeTransitRouteByMode(TransitSchedule schedule, Set<String> modesToRemove) {
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
@@ -450,14 +451,15 @@ public class ScheduleCleaner {
 	 */
 	@Deprecated
 	public static void removeInvalidTransitRoutes(TransitScheduleValidator.ValidationResult result, TransitSchedule schedule) {
+		Set<Tuple<Id<TransitLine>, Id<TransitRoute>>> toRemove = new HashSet<>();
 		for(String error : result.getErrors()) {
 			String[] lineSplit = error.split(", route ");
 			String tranistLineId = lineSplit[0].substring(13);
 
-			String transitRouteId = null;
-			if(lineSplit[1].contains				(" contains a link that is not part of the network")) {
+			String transitRouteId;
+			if(lineSplit[1].contains(" contains a link that is not part of the network")) {
 				transitRouteId = lineSplit[1].split	(" contains a link that is not part of the network")[0];
-			} else 	if(lineSplit[1].contains		(" has inconsistent network route")) {
+			} else if(lineSplit[1].contains			(" has inconsistent network route")) {
 				transitRouteId = lineSplit[1].split	(" has inconsistent network route")[0];
 			} else if(lineSplit[1].contains			(" has no network route")) {
 				transitRouteId = lineSplit[1].split	(" has no network route")[0];
@@ -472,12 +474,13 @@ public class ScheduleCleaner {
 			} else if(lineSplit[1].contains			(": The ")) {
 				transitRouteId = lineSplit[1].split	(": The ")[0];
 			} else {
-				throw new IllegalArgumentException("Error String from ValidationResult not recognised! ("+error+")");
+				throw new IllegalArgumentException("Error String from ValidationResult not recognised! (" + error + ")");
 			}
+			toRemove.add(new Tuple<>(Id.create(tranistLineId, TransitLine.class), Id.create(transitRouteId, TransitRoute.class)));
+		}
 
-			if(transitRouteId != null) {
-				ScheduleCleaner.removeRoute(schedule, Id.create(tranistLineId, TransitLine.class), Id.create(transitRouteId, TransitRoute.class));
-			}
+		for(Tuple<Id<TransitLine>, Id<TransitRoute>> t : toRemove) {
+			ScheduleCleaner.removeRoute(schedule, t.getFirst(), t.getSecond());
 		}
 	}
 }

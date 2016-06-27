@@ -30,28 +30,32 @@ public class ExtractDebugSchedule {
 	 * to a new file.
 	 * @param args [0] schedule file
 	 *             [1] transit route id
-	 *             [2] output debug schedule file
+	 *             [2] transit line id
+	 *             [3] output debug schedule file
 	 */
 	public static void main(final String[] args) {
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
 		TransitSchedule debug = ScheduleTools.createSchedule();
 
 		for(TransitLine tl : schedule.getTransitLines().values()) {
-			for(TransitRoute tr : tl.getRoutes().values()) {
-				if(tr.getId().toString().equals(args[1])) {
-					TransitLine line = debug.getFactory().createTransitLine(tl.getId());
-					line.addRoute(tr);
+			if(tl.getId().toString().equals(args[1])) {
+				for(TransitRoute tr : tl.getRoutes().values()) {
+					if(tr.getId().toString().equals(args[2])) {
+						TransitLine line = debug.getFactory().createTransitLine(tl.getId());
+						line.addRoute(tr);
 
-					debug.addTransitLine(line);
+						debug.addTransitLine(line);
 
-					for(TransitRouteStop rs : tr.getStops()) {
-						debug.addStopFacility(rs.getStopFacility());
+						for(TransitRouteStop rs : tr.getStops()) {
+							if(!debug.getFacilities().containsKey(rs.getStopFacility().getId())) {
+								debug.addStopFacility(rs.getStopFacility());
+							}
+						}
 					}
 				}
 			}
 		}
-
-		ScheduleTools.writeTransitSchedule(debug, args[2]);
+		ScheduleTools.writeTransitSchedule(debug, args[3]);
 	}
-	
+
 }

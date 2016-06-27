@@ -11,6 +11,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -138,10 +139,10 @@ public class AccessibilityComputationNMBWorkEquiv {
 			String actSpecificWorkingDirectory =  workingDirectory + typeWEQ + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
-				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+//				VisualizationUtils.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+				VisualizationUtils.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 						lowerBound, upperBound, range, symbolSize, populationThreshold);
-				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 //		}
 	}

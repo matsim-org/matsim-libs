@@ -44,15 +44,12 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.*;
-import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuthDiff;
 import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
@@ -63,7 +60,7 @@ import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTr
  */
 public class PlausibilityCheck {
 
-	protected static Logger log = Logger.getLogger(PlausibilityCheck.class);
+	protected static final Logger log = Logger.getLogger(PlausibilityCheck.class);
 
 	public static final String CsvSeparator = ";";
 
@@ -73,10 +70,10 @@ public class PlausibilityCheck {
 	public static final String LOOP_WARNING = "LoopWarning";
 	public static final String DIRECTION_CHANGE_WARNING = "DirectionChangeWarning";
 
-	private Set<PlausibilityWarning> allWarnings = new HashSet<>();
-	private Map<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> warningsSchedule = new HashMap<>();
-	private Map<List<Id<Link>>, Set<PlausibilityWarning>> warningsLinkIds = new HashMap<>();
-	private Map<Id<Link>, Set<PlausibilityWarning>> warningsLinks = new HashMap<>();
+	private final Set<PlausibilityWarning> allWarnings = new HashSet<>();
+	private final Map<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> warningsSchedule = new HashMap<>();
+	private final Map<List<Id<Link>>, Set<PlausibilityWarning>> warningsLinkIds = new HashMap<>();
+	private final Map<Id<Link>, Set<PlausibilityWarning>> warningsLinks = new HashMap<>();
 
 	private Map<String, Double> thresholds;
 
@@ -256,7 +253,7 @@ public class PlausibilityCheck {
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
 				.addAttribute("diff [s]", Double.class)
-				.addAttribute("diff [ratio]", Double.class)
+				.addAttribute("diff [%]", Double.class)
 				.addAttribute("expected", Double.class)
 				.addAttribute("actual", Double.class)
 				.create();

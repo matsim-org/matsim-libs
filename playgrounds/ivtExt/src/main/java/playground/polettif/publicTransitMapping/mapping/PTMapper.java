@@ -31,11 +31,11 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
- * Provides the contract for an multithread
- * implementation of public transit mapping.
+ * Provides the contract for an implementation
+ * of public transit mapping.
  *
  * Currently redirects to the only implementation
- * {@link PTMapperPseudoRouting}.
+ * {@link PTMapperImpl}.
  *
  * @author polettif
  */
@@ -59,7 +59,7 @@ public abstract class PTMapper {
 		if(args.length == 1) {
 			run(args[0]);
 		} else {
-			throw new IllegalArgumentException("Incorrect number of arguments: [0] config file");
+			throw new IllegalArgumentException("Incorrect number of arguments: [0] Public Transit Mapping config file");
 		}
 	}
 
@@ -72,23 +72,11 @@ public abstract class PTMapper {
 	 * @param configFile the PublicTransitMapping config file
 	 */
 	public static void run(String configFile) {
-		new PTMapperPseudoRouting(configFile).run();
+		new PTMapperImpl(configFile).run();
 	}
 
 	public static void run(PublicTransitMappingConfigGroup ptmConfig, TransitSchedule schedule, Network network) {
-		new PTMapperPseudoRouting(ptmConfig, schedule, network).run();
-	}
-
-	/**
-	 * If the config has schedule and network files defined, they are loaded.
-	 * <p/>
-	 *
-	 * @param config the config
-	 */
-	public PTMapper(PublicTransitMappingConfigGroup config) {
-		this.config = config;
-		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
-		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
+		new PTMapperImpl(ptmConfig, schedule, network).run();
 	}
 
 	/**
@@ -120,7 +108,7 @@ public abstract class PTMapper {
 	 * @param configPath the config file
 	 */
 	public PTMapper(String configPath) {
-		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup() ) ;
+		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup());
 		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
 		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
 		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());

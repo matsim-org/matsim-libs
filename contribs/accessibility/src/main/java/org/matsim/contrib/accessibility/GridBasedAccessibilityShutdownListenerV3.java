@@ -8,18 +8,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -28,16 +22,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
-import javax.inject.Inject;
 
 /**
  * improvements sep'11:
@@ -294,14 +278,9 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
 		writer.writeField(Labels.TIME);
-		
-		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
-		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
-		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
-		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
-		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
-		// yyyyyy the above needs to be replaced by a loop over Modes4Accessibility.values() . kai/mz, jul'15
-		
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			writer.writeField(mode.toString() + "_accessibility");
+		}
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeNewLine();

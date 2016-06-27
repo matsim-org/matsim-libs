@@ -22,16 +22,28 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 import java.util.Map;
 
 /**
- * TODO doc
+ * A PseudoRouteStop is used as node in the PseudoGraph. It is a container
+ * for a {@link TransitRouteStop} with a {@link LinkCandidate}
+ * <p/>
+ * LinkCandidates are made for each stop facility. Since one
+ * StopFacility might be accessed twice in the same TransitRoute,
+ * unique LinkCandidates for each TransitRouteStop are needed. This
+ * is achieved via this class.
+ *
+ * @author polettif
  */
 public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparable<PseudoRouteStop> {
 
 	Id<TransitStopFacility> getParentStopFacilityId();
+
+	LinkCandidate getLinkCandidate();
 
 	Coord getCoord();
 
@@ -47,17 +59,31 @@ public interface PseudoRouteStop extends Identifiable<PseudoRouteStop>, Comparab
 
 	double getDepartureOffset();
 
-	double getLinkTravelCost();
-
-	Map<PseudoRouteStop, Double> getNeighbours();
-
-	double getTravelCostToSource();
-	void setTravelCostToSource(double alternateDist);
-
-	PseudoRouteStop getClosestPrecedingRouteStop();
-	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
-
 	int compareTo(PseudoRouteStop other);
 
 	Id<Link> getLinkId();
+
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}. Returns a map
+	 * with neighboring PseudoRouteStops and the travel cost to
+	 * reach them.
+	 */
+	Map<PseudoRouteStop, Double> getNeighbours();
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	double getTravelCostToSource();
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	void setTravelCostToSource(double alternateDist);
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	PseudoRouteStop getClosestPrecedingRouteStop();
+	/**
+	 * Used for Dijkstra in {@link PseudoGraph}
+	 */
+	void setClosestPrecedingRouteSTop(PseudoRouteStop stop);
+
 }

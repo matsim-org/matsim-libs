@@ -26,7 +26,7 @@ import java.util.*;
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentProblem.Mode;
+import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 
 
 public class AssignmentTaxiOptimizerTest

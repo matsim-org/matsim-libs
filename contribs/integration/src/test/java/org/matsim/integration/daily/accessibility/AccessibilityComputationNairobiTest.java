@@ -23,33 +23,47 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
 
+import com.google.inject.Inject;
+
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
 
-	private static final Double cellSize = 200.;
+	private static final Double cellSize = 2000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -81,7 +95,7 @@ public class AccessibilityComputationNairobiTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
+		final BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
 		
 		// QGis Parameters
 		boolean createQGisOutput = true;
@@ -89,7 +103,7 @@ public class AccessibilityComputationNairobiTest {
 		Double lowerBound = 2.;
 		Double upperBound = 7.25;
 		Integer range = 9; // in the current implementation, this need always be 9
-		int symbolSize = 210;
+		int symbolSize = 2010;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
 		// config and scenario
@@ -149,9 +163,64 @@ public class AccessibilityComputationNairobiTest {
 		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
 
-		final Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new AccessibilityComputationTestModuleCustomBoundary(
-				activityTypes, networkDensityFacilities, crs, name, cellSize, boundingBox));
+		final Controler controler = new Controler(scenario);
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// Loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each
+				for ( final String actType : activityTypes ) {
+					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+						@Inject Scenario scenario;
+						@Inject Map<String, TravelTime> travelTimes;
+						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+
+						@Override
+						public ControlerListener get() {
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario, ConfigUtils.addOrGetModule((Config) config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize));
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories, boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+//							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+
+//							listener.addAdditionalFacilityData(homes) ;
+//							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+							listener.writeToSubdirectoryWithName(actType);
+							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+							return listener;
+						}
+					});
+				}
+				
+				
+				
+				// old code that was in a module
+//				for (final String activityType : activityTypes) {
+//					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+//						@Inject Scenario scenario;
+//						@Inject(optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
+//						@Inject Map<String, TravelTime> travelTimes;
+//						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+//						@Override
+//						public ControlerListener get() {
+//							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+//							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize));
+//							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType), ptMatrix, getConfig(), scenario, travelTimes, travelDisutilityFactories, boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
+//							listener.addAdditionalFacilityData(networkDensityFacilities);
+//							listener.writeToSubdirectoryWithName(activityType);
+//							// for push to geoserver
+//							accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
+//							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+//							return listener;
+//						}
+//					});
+//				}
+			}
+		});
+
 		controler.run();
 
 		

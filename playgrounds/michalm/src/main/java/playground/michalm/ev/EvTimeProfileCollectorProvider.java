@@ -47,12 +47,9 @@ public class EvTimeProfileCollectorProvider
     @Override
     public MobsimListener get()
     {
-        ProfileCalculator<String> calc = TimeProfiles.combineProfileCalculators(
+        ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
                 EvTimeProfiles.createMeanSocCalculator(evData),
                 EvTimeProfiles.createDischargedVehiclesCounter(evData));
-
-        return new TimeProfileCollector<>(calc, 300,
-                TimeProfiles.combineValues("meanSOC", "discharged"), //
-                "ev_time_profiles.txt", matsimServices);
+        return new TimeProfileCollector(calc, 300, "ev_time_profiles.txt", matsimServices);
     }
 }

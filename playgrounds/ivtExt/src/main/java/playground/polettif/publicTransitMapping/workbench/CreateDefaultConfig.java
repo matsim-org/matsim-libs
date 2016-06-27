@@ -40,7 +40,7 @@ public class CreateDefaultConfig {
 	public static void main(final String[] args) {
 		Config config = ConfigUtils.createConfig();
 
-		ConfigUtils.addOrGetModule(config, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class);
+		config.addModule(PublicTransitMappingConfigGroup.createDefaultConfig());
 
 		Set<String> toRemove = config.getModules().keySet().stream().filter(module -> !module.equals(PublicTransitMappingConfigGroup.GROUP_NAME)).collect(Collectors.toSet());
 		toRemove.forEach(config::removeModule);

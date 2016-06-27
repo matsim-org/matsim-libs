@@ -10,9 +10,8 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.*;
+import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-
-import com.google.common.base.Function;
 
 
 public class BestDispatchFinder
@@ -32,13 +31,6 @@ public class BestDispatchFinder
         }
     }
 
-
-    private static final Function<TaxiRequest, Link> REQUEST_TO_LINK = new Function<TaxiRequest, Link>() {
-        public Link apply(TaxiRequest req)
-        {
-            return req.getFromLink();
-        }
-    };
 
     //typically we search through the 20-40 nearest requests/vehicles
     private static final int DEFAULT_EXPECTED_NEIGHBOURHOOD_SIZE = 40;
@@ -61,8 +53,16 @@ public class BestDispatchFinder
         this.scheduleInquiry = optimContext.scheduler;
         this.expectedNeighbourhoodSize = expectedNeighbourhoodSize;
 
-        router = new MultiNodeDijkstra(optimContext.network, optimContext.travelDisutility,
-                optimContext.travelTime, false);
+        //TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
+        //PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
+        //preProcessDijkstra.run(optimContext.network);
+        PreProcessDijkstra preProcessDijkstra = null;
+        FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+
+        RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
+                .createRoutingNetwork(optimContext.network);
+        router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
+                optimContext.travelTime, preProcessDijkstra, fastRouterFactory, false);
     }
 
 
@@ -71,15 +71,15 @@ public class BestDispatchFinder
     public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req,
             Iterable<? extends Vehicle> vehicles)
     {
-        return findBestVehicle(req, vehicles, REQUEST_TO_LINK);
+        return findBestVehicle(req, vehicles, LinkProviders.REQUEST_TO_FROM_LINK);
     }
 
 
     public <D> Dispatch<D> findBestVehicle(D destination, Iterable<? extends Vehicle> vehicles,
-            Function<D, Link> destinationToLink)
+            LinkProvider<D> destinationToLink)
     {
         double currTime = optimContext.timer.getTimeOfDay();
-        Link toLink = destinationToLink.apply(destination);
+        Link toLink = destinationToLink.getLink(destination);
         Node toNode = toLink.getFromNode();
 
         Map<Id<Node>, Vehicle> nodeToVehicle = new HashMap<>(expectedNeighbourhoodSize);
@@ -136,12 +136,12 @@ public class BestDispatchFinder
     public Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh,
             Iterable<TaxiRequest> unplannedRequests)
     {
-        return findBestDestination(veh, unplannedRequests, REQUEST_TO_LINK);
+        return findBestDestination(veh, unplannedRequests, LinkProviders.REQUEST_TO_FROM_LINK);
     }
 
 
     public <D> Dispatch<D> findBestDestination(Vehicle veh, Iterable<D> destinations,
-            Function<D, Link> destinationToLink)
+            LinkProvider<D> destinationToLink)
     {
         LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
         Node fromNode = departure.link.getToNode();
@@ -149,7 +149,7 @@ public class BestDispatchFinder
         Map<Id<Node>, D> nodeToDestination = new HashMap<>(expectedNeighbourhoodSize);
         Map<Id<Node>, InitialNode> initialNodes = new HashMap<>(expectedNeighbourhoodSize);
         for (D loc : destinations) {
-            Link link = destinationToLink.apply(loc);
+            Link link = destinationToLink.getLink(loc);
 
             if (departure.link == link) {
                 VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, link,
@@ -182,7 +182,7 @@ public class BestDispatchFinder
         Node toNode = path.nodes.get(path.nodes.size() - 1);
         D bestDestination = nodeToDestination.get(toNode.getId());
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link,
-                destinationToLink.apply(bestDestination), departure.time, path,
+                destinationToLink.getLink(bestDestination), departure.time, path,
                 optimContext.travelTime);
         return new Dispatch<>(veh, bestDestination, vrpPath);
     }

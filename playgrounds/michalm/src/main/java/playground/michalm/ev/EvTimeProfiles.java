@@ -21,17 +21,18 @@ package playground.michalm.ev;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.taxi.util.stats.TimeProfiles;
 
 import playground.michalm.ev.data.*;
 
 
 public class EvTimeProfiles
 {
-    public static ProfileCalculator<Integer> createDischargedVehiclesCounter(final EvData evData)
+    public static ProfileCalculator createDischargedVehiclesCounter(final EvData evData)
     {
-        return new ProfileCalculator<Integer>() {
+        return new TimeProfiles.SingleValueProfileCalculator("discharged") {
             @Override
-            public Integer calcCurrentPoint()
+            public String calcValue()
             {
                 int count = 0;
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
@@ -39,23 +40,23 @@ public class EvTimeProfiles
                         count++;
                     }
                 }
-                return count;
+                return count + "";
             }
         };
     }
 
 
-    public static ProfileCalculator<Double> createMeanSocCalculator(final EvData evData)
+    public static ProfileCalculator createMeanSocCalculator(final EvData evData)
     {
-        return new ProfileCalculator<Double>() {
+        return new TimeProfiles.SingleValueProfileCalculator("meanSOC") {
             @Override
-            public Double calcCurrentPoint()
+            public String calcValue()
             {
                 Mean mean = new Mean();
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
                     mean.increment(ev.getBattery().getSoc());
                 }
-                return mean.getResult() / UnitConversionRatios.J_PER_kWh;//print out in [kWh]
+                return (mean.getResult() / UnitConversionRatios.J_PER_kWh) + "";//print out in [kWh]
             }
         };
     }

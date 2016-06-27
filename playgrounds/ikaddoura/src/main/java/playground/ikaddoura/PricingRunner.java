@@ -59,9 +59,9 @@ public class PricingRunner {
 
 	private static final Logger log = Logger.getLogger(PricingRunner.class);
 
-	private static final String configFile = "../../../runs-svn/vickreyPricing/input/config_vickrey.xml";
-	private static final String outputBaseDirectory = "../../../runs-svn/vickreyPricing/output_vickrey/";
-	private static final PricingApproach pricingApproach = PricingApproach.V10;
+	private static final String configFile = "../../../runs-svn/vickreyPricing/input/config_vickrey_B.xml";
+	private static final String outputBaseDirectory = "../../../runs-svn/vickreyPricing/output_vickrey_B/";
+	private static final PricingApproach pricingApproach = PricingApproach.IntervalBasedMarginalCostPricing;
 	
 	private enum PricingApproach {
         NoPricing, IntervalBasedMarginalCostPricing, IntervalBasedAverageCostPricing, V3, V9, V10

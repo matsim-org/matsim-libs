@@ -14,6 +14,7 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -194,9 +195,9 @@ public class AccessibilityComputationBerlin {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
 					}
-					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}
 			}  
 		}

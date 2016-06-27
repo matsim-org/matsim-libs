@@ -39,47 +39,47 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 public class PatnaVehiclesGenerator {
-	
+
 	private Scenario scenario ;
 	private Vehicles vehicles;
-	
+
 	/**
 	 * @param plansFile is required to get vehicles for each agent type in population.
 	 */
 	public PatnaVehiclesGenerator(final String plansFile) {
 		this.scenario = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 	}
-	
+
 	public void createVehicles (final Collection <String> modes) {
 
- 		vehicles = VehicleUtils.createVehiclesContainer();
+		vehicles = VehicleUtils.createVehiclesContainer();
 
-		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
-		
+		Map<String, VehicleType> modeTypes = new HashMap<String, VehicleType>();
+
 		for (String vehicleType : modes) {
 			VehicleType veh = VehicleUtils.getFactory().createVehicleType(Id.create(vehicleType,VehicleType.class));
 			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed( vehicleType.split("_")[0] ) );// this should not harm other use cases.
 			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU( vehicleType.split("_")[0] ) );
-			
-			modesType.put(vehicleType, veh);
+
+			modeTypes.put(vehicleType, veh);
 			vehicles.addVehicleType(veh);
 		}
-		
+
 		for(Person p : scenario.getPopulation().getPersons().values()){
 			for(PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				if(pe instanceof Leg ){
 					String travelMode =  ((Leg) pe).getMode();
-					if( ! modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define "+ travelMode+ " vehicle Type.");	
-
-					VehicleType vType = modesType.get(travelMode);
-					Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);
-					vehicles.addVehicle(veh);
-					break;//this is necessary only if a person has same travel mode in all trips.
+					if( modeTypes.containsKey(travelMode) ){
+						VehicleType vType = modeTypes.get(travelMode);
+						Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);
+						vehicles.addVehicle(veh);
+						break;
+					}
 				}
 			}
 		}
 	}
-	
+
 	public Vehicles getPatnaVehicles(){
 		return vehicles;
 	}

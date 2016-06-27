@@ -14,17 +14,23 @@
 		<param name="detailedStats" value="true" />
 
 		<parameterset type="optimizer">
-			<param name="type" value="RULE_BASED" />
+			<param name="type" value="E_RULE_BASED" />
 			<param name="id" value="example" />
 			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
 			<param name="nearestRequestsLimit" value="99999" />
 			<param name="nearestVehiclesLimit" value="99999" />
 			<param name="cellSize" value="1000" />
+
+			<param name="minRelativeSoc" value="0.7" />
+			<param name="socCheckTimeStep" value="60" />
 		</parameterset>
 	</module>
-	
-	
+
+
 	<module name="ev">
+		<param name="chargeTimeStep" value="5" />
+		<param name="auxDischargeTimeStep" value="60" />
+
 		<param name="chargersFile" value="src/main/resources/one_etaxi/one_etaxi_chargers.xml" />
 		<param name="timeProfiles" value="true" />
 	</module>
@@ -44,7 +50,7 @@
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
 		<param name="snapshotStyle" value="queue" />
 	</module>
-	
+
 	<module name="otfvis">
 		<param name="coloringScheme" value="taxicab" />
 		<param name="drawNonMovingItems" value="true" />
@@ -63,8 +69,8 @@
 	</module>
 
 	<module name="strategy">
-		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background,
-		i.e. not to change their behavior -->
+		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background, i.e. not 
+			to change their behavior -->
 		<param name="maxAgentPlanMemorySize" value="1" />
 		<param name="ModuleProbability_1" value="1.0" />
 		<param name="Module_1" value="BestScore" />
