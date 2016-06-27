@@ -72,7 +72,7 @@ public class OTPMatrixRouter {
 	/**
      * creates a directory if it doesen't exist jet
      *
-     * @param outputDir
+     * @param outputDir the directory to check
      */
     private static void mkdir(String outputDir) {
         if (new File(outputDir).mkdir()) {
