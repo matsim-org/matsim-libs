@@ -27,7 +27,8 @@ import playground.michalm.ev.data.ElectricVehicle;
 /**
  * Parametrised for the Nissan Leaf. All values in SI units.
  * <p/>
- * TODO add reference to the paper (once published).
+ * TODO add reference to the paper (once published). Add (dis-)charging efficiency relative to SOC,
+ * temperature, etc...
  */
 public class OhdeSlaskiDriveEnergyConsumption
     implements DriveEnergyConsumption

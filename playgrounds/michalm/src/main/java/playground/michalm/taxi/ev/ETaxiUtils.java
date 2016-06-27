@@ -36,7 +36,7 @@ public class ETaxiUtils
     public static void initEvData(TaxiData taxiData, EvData evData)
     {
         // TODO variable AUX and charging speeds -- depend on weather etc...
-        double auxPower = 1. * UnitConversionRatios.W_PER_kW; //1 kW
+        double auxPower = 0.5 * UnitConversionRatios.W_PER_kW; //0.5 kW
         double chargingSpeedFactor = 1.; //full speed
 
         for (Charger c : evData.getChargers().values()) {
