@@ -58,17 +58,18 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class PatnaExternalDemandGenerator {
 	private static final Logger LOG = Logger.getLogger(PatnaExternalDemandGenerator.class);
 	private Scenario scenario;
-	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
+	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/counts/externalDemandInputFiles/";
 	private Random random = MatsimRandom.getRandom();
-	private final String networkFile = "../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz";
+	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz";
 	public static void main(String[] args) {
 		new PatnaExternalDemandGenerator().run();
 	}
 
 	private void run(){
+		String outPlansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonDemand_10pct.xml.gz";
 		scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		createDemandForAllStations();
-		new PopulationWriter(scenario.getPopulation()).write("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct_2.xml.gz");
+		new PopulationWriter(scenario.getPopulation()).write(outPlansFile);
 		System.out.println("Number of persons in the population are "+scenario.getPopulation().getPersons().size());
 	}
 
@@ -140,14 +141,13 @@ public class PatnaExternalDemandGenerator {
 						zonalActs.add(act);
 					}
 
-
 					// fix activity duration such that, all plans are differntiated based on ONLY zonal activity locations.
 					double firstActEndTime = (timebin-1)*3600. + random.nextDouble()*3600.;
 					double secondActEndTime = firstActEndTime + 5*3600. + random.nextDouble() * 3. *3600.;
 
 					if((secondActEndTime > 21*3600. && secondActEndTime <24*3600.)  ) {
 						if ( countingStationNumber.equals("OC3") ) {
-							secondActEndTime = secondActEndTime - (1*3600.+random.nextDouble()* 3 *3600.); //preponding departure time of higher counts aroung mid night
+							secondActEndTime = secondActEndTime - (1*3600.+random.nextDouble()* 3 *3600.); //preponing departure time of higher counts around mid night
 						} else if ( countingStationNumber.equals("OC6")){
 //							secondActEndTime = secondActEndTime - (3*3600+random.nextDouble()*4*3600);
 							secondActEndTime = 9*3600.+random.nextDouble()*6*3600.; 
@@ -225,7 +225,7 @@ public class PatnaExternalDemandGenerator {
 				double throughTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
 
 				// the through traffic share is increased by 10% because total persons generated were about 10% short. This is not uniform for all counting stations.
-				throughTrafficShare = 1.1 * throughTrafficShare;
+				throughTrafficShare = 1.0 * throughTrafficShare;
 
 				double personCount = Math.round( timebin2mode2count.get(timebin).get(mode) * throughTrafficShare * OuterCordonUtils.SAMPLE_SIZE );
 
@@ -336,16 +336,16 @@ public class PatnaExternalDemandGenerator {
 				}
 				Map<String, Double> mode2Count = new HashMap<>();
 				String parts[]	= line.split("\t");
-				double timebin = Double.valueOf(parts[0]);
-				double carCount = Double.valueOf(parts[1]);
-				double motorbikeCount = Double.valueOf(parts[2]);
-				double truckCount = Double.valueOf(parts[3]);
-				double bikeCount = Double.valueOf(parts[4]);
+				double timebin = Double.valueOf(parts[0]); //time bin
+				double carCount = Double.valueOf(parts[1]); // car
+				double motorbikeCount = Double.valueOf(parts[2]); //2w
+				double truckCount = Double.valueOf(parts[3]); //truck
+				double bikeCount = Double.valueOf(parts[4]); //bike
 
-				mode2Count.put("car", carCount);
-				mode2Count.put("motorbike", motorbikeCount);
-				mode2Count.put("truck", truckCount);
-				mode2Count.put("bike", bikeCount);
+				mode2Count.put("car_ext", carCount);
+				mode2Count.put("motorbike_ext", motorbikeCount);
+				mode2Count.put("truck_ext", truckCount);
+				mode2Count.put("bike_ext", bikeCount);
 				time2mode2count.put(timebin, mode2Count);
 				line=reader.readLine();
 			}

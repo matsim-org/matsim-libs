@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -58,7 +57,7 @@ public class PatnaNetworkGenerator {
 	public static void main(String[] args) throws IOException  {  
 		PatnaNetworkGenerator png =  new PatnaNetworkGenerator();
 		png.startProcessingFile();
-		String outNetwork = "../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz";
+		String outNetwork = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz";
 		new NetworkWriter(png.getPatnaNetwork()).write(outNetwork);
 		LOG.info("The network file is written to - "+ outNetwork);
 	}
@@ -67,7 +66,7 @@ public class PatnaNetworkGenerator {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
 
-		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/networkInputTransCad.csv" ;
+		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/network/networkInputTransCad.csv" ;
 
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();       
 		tabularFileParserConfig.setFileName(inputFileNetwork);
@@ -142,9 +141,10 @@ public class PatnaNetworkGenerator {
 				double linkLength = 1000 * Double.parseDouble(lengthInKm);
 				double capacity = getCapacityOfLink(widthOfRoad);
 
-				Set<String> allowedModes ;
-				if (capacity <= 500.0) allowedModes = new HashSet<>(Arrays.asList("car","bike","motorbike","car_ext","motorbike_ext","bike_ext")); 
-				else allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
+				Set<String> allowedModes ; //AA_TODO : fix this
+//				if (capacity <= 500.0) allowedModes = new HashSet<>(Arrays.asList("car","bike","motorbike","car_ext","motorbike_ext","bike_ext")); 
+//				else
+					allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
 				
 				link1.setFreespeed(freeSpeedInMPS);
 				link1.setCapacity(capacity);
@@ -166,15 +166,9 @@ public class PatnaNetworkGenerator {
 		tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
 		new NetworkCleaner().run(network);
 
-		LOG.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
+		LOG.info("Number of links in the network are "+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
 
 		NetworkSimplifier simplifier = new NetworkSimplifier();
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-
-		nodeTypesToMerge.add(Integer.valueOf(4));
-		nodeTypesToMerge.add(Integer.valueOf(5));
-
-		simplifier.setNodesToMerge(nodeTypesToMerge);
 		simplifier.run(network);
 
 		// manual cleaning (filtering) of the network.
