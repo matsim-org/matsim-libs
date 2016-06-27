@@ -55,26 +55,26 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		Plan plan;
 
 		// test 1: exactly one plan, with undefined score
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.createAndAddPlan(person, false);
 		assertNotNull(selector.selectPlan(person));
 
 		// test 2: one plan with undefined score, one with defined score. The one with undefined comes first.
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.createAndAddPlan(person, false);
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(10.0);
 		assertNotNull(selector.selectPlan(person));
 
 		// test 3: one plan with undefined score, one with defined score. The one with undefined comes last.
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(10.0);
 		PersonUtils.createAndAddPlan(person, false);
 		assertNotNull(selector.selectPlan(person));
 
 		// test 4: one plan with undefined score, two with defined score.
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(10.0);
 		PersonUtils.createAndAddPlan(person, false);
@@ -91,7 +91,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNoPlans() {
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		assertNull(getPlanSelector().selectPlan(person));
 	}
 
@@ -105,13 +105,13 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
 		// test with only one plan...
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(-10.0);
 		assertNotNull(selector.selectPlan(person));
 
 		// ... test with multiple plans that all have negative score
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(-10.0);
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -119,7 +119,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		assertNotNull(selector.selectPlan(person));
 
 		// ... and test with multiple plans where the sum of all scores stays negative
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(-10.0);
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -129,7 +129,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 		assertNotNull(selector.selectPlan(person));
 
 		// test with only one plan, but with NEGATIVE_INFINITY...
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(Double.NEGATIVE_INFINITY);
 		assertNotNull(selector.selectPlan(person));
@@ -142,7 +142,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	public void testZeroScore() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
 		Plan plan;
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore(0.0);
 		assertNotNull(selector.selectPlan(person));

@@ -108,7 +108,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicle(f.basicVehicle);
 
-		Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create("1", Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		p.addPlan(PopulationUtils.createPlan());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		
@@ -139,7 +139,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(23, Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(23, Person.class));
 		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
@@ -202,7 +202,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(42, Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
 		p.addPlan(PopulationUtils.createPlan());
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
@@ -238,7 +238,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		Person pers = PopulationUtils.getDefaultFactory().createPerson(Id.create(80, Person.class));
+		Person pers = PopulationUtils.getFactory().createPerson(Id.create(80, Person.class));
 		Plan plan = PopulationUtils.createPlan();
 		pers.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
@@ -386,7 +386,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 	private static Person createPerson(Id<Person> personId, MutableScenario scenario, Link link1, Link link2) {
 		final Id<Person> id = personId;
-		Person p = PopulationUtils.getDefaultFactory().createPerson(id);
+		Person p = PopulationUtils.getFactory().createPerson(id);
 		Plan plan = PersonUtils.createAndAddPlan(p, true);
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
@@ -472,7 +472,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 	private Person createPerson2(Id<Person> personId, Fixture f) {
 		final Id<Person> id = personId;
-		Person p = PopulationUtils.getDefaultFactory().createPerson(id);
+		Person p = PopulationUtils.getFactory().createPerson(id);
 		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
@@ -501,7 +501,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node2, node2, 2 * 7.5, 7.5, 3600.0, 1.0);
 
 		for (int i = 0; i < 5; i++) {
-			Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PopulationUtils.createPlan();
 			Activity act = PopulationUtils.createActivityFromLinkId("h", link1.getId());
 			act.setEndTime(7*3600);

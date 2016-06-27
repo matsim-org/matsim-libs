@@ -199,7 +199,7 @@ public class PlansCreateFromMZ {
 				Person person = plans.getPersons().get(pid);
 				if (person == null) {
 					final Id<Person> id = pid;
-					person = PopulationUtils.getDefaultFactory().createPerson(id);
+					person = PopulationUtils.getFactory().createPerson(id);
 					plans.addPerson(person);
 					PersonUtils.setAge(person, age);
 					PersonUtils.setLicence(person, licence);

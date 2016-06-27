@@ -24,7 +24,7 @@ public class BasePersonImpl implements BasePerson {
 	//Constructors
 	public BasePersonImpl(Id<Person> id) {
 		final Id<Person> id1 = id;
-		delegate = PopulationUtils.getDefaultFactory().createPerson(id1) ;
+		delegate = PopulationUtils.getFactory().createPerson(id1) ;
 	}
 
 	//Static methods

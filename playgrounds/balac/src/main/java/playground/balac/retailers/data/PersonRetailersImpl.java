@@ -27,7 +27,7 @@ public class PersonRetailersImpl implements Person
 
   public PersonRetailersImpl(PersonImpl p)
   {
-	  delegate = PopulationUtils.getDefaultFactory().createPerson(p.getId());
+	  delegate = PopulationUtils.getFactory().createPerson(p.getId());
     this.plans = p.getPlans();
     addPlan(p.getSelectedPlan());
     setSelectedPlan(p.getSelectedPlan());

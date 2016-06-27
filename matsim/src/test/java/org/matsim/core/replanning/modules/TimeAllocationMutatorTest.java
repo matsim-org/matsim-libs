@@ -98,7 +98,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1", Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			plan = PersonUtils.createAndAddPlan(person, true);
 			act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 			act1.setEndTime(4*3600);
@@ -177,7 +177,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1", Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			plan = PersonUtils.createAndAddPlan(person, true);
 			act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 			act1.setEndTime(4*3600);

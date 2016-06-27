@@ -198,7 +198,7 @@ public class ModdedConverter {
 							Activity lastAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) tmpPl), (String) this.tmpTabs[7], coord);
 						}
 
-						Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(personId, Person.class));
+						Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
 						Plan pl = PopulationUtils.createPlan(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);

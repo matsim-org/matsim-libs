@@ -43,7 +43,7 @@ public class TeleportationRoutingModuleTest {
 	public void testRouteLeg() {
 		PopulationFactory populationFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 		RouteFactoriesRegister routeFactory = new RouteFactoriesRegister();
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 0));

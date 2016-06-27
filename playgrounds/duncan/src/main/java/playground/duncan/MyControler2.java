@@ -97,7 +97,7 @@ public class MyControler2 {
 				Id<Person> id = Id.create( popCnt , Person.class) ;
 				popCnt++ ;
 				final Id<Person> id1 = id;
-				Person newPerson = PopulationUtils.getDefaultFactory().createPerson(id1);
+				Person newPerson = PopulationUtils.getFactory().createPerson(id1);
 				population.addPerson( newPerson ) ;
 				Plan plan = PersonUtils.createAndAddPlan(newPerson, true);
 				playground.kai.urbansim.Utils.makeHomePlan(plan, coord) ;

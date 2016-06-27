@@ -160,7 +160,7 @@ public class PlansGeneratorControler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
-		Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(String.valueOf(ii), Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(String.valueOf(ii), Person.class));
 		Plan plan = PopulationUtils.createPlan(p);
 		try {
 			Activity act1 = PopulationUtils.createAndAddActivityFromCoord(plan, (String) "h", new Coord(100., 100.));

@@ -203,7 +203,7 @@ public class IterativeAlgorithmDC {
 					module.prepareReplanning(context);
 					Collection<Plan> copiedPlans = new ArrayList<Plan>();
 					for(Person person:typePopulations.get(type)) {
-						Person copyPerson = PopulationUtils.getDefaultFactory().createPerson(person.getId());
+						Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
 						Plan copyPlan = PopulationUtils.createPlan(copyPerson);
 						PopulationUtils.copyFromTo(person.getSelectedPlan(), copyPlan);
 						copyPerson.addPlan(copyPlan);

@@ -51,7 +51,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 		Id<Person> id = Id.create( 1 , Person.class );
 		{
 			final Id<Person> id1 = id;
-			final Person person = PopulationUtils.getDefaultFactory().createPerson(id1);
+			final Person person = PopulationUtils.getFactory().createPerson(id1);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -70,7 +70,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 		id = Id.create( 2 , Person.class );
 		{
 			final Id<Person> id1 = id;
-			final Person person = PopulationUtils.getDefaultFactory().createPerson(id1);
+			final Person person = PopulationUtils.getFactory().createPerson(id1);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -89,7 +89,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 		id = Id.create( 3 , Person.class );
 		{
 			final Id<Person> id1 = id;
-			final Person person = PopulationUtils.getDefaultFactory().createPerson(id1);
+			final Person person = PopulationUtils.getFactory().createPerson(id1);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );

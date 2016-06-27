@@ -72,7 +72,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 		int currentId = 0;
 		for (int j=0; j < nMembers; j++) {
 			final Id<Person> id = Id.create( currentId++ , Person.class );
-			final Person person = PopulationUtils.getDefaultFactory().createPerson(id);
+			final Person person = PopulationUtils.getFactory().createPerson(id);
 
 			final Plan plan = PopulationUtils.createPlan(person);
 			fillPlan( plan , random );

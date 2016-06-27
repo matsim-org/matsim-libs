@@ -43,7 +43,7 @@ public class TripPlanMutateTimeAllocationTest {
 	@Test
 	public void testRun() {
 		// setup population with one person
-		PersonImpl person = (PersonImpl) PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		act.setEndTime(8.0 * 3600);

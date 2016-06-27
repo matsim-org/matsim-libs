@@ -204,7 +204,7 @@ public class RunInternalizationTest {
 	private void createPassiveAgents() {
 		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
-			Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			
 			Activity home = PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "home", Id.create("11", Link.class));

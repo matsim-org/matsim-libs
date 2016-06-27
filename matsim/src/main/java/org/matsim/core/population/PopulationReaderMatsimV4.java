@@ -195,7 +195,7 @@ import org.xml.sax.Attributes;
 //		int age = Integer.MIN_VALUE;
 		Integer age = null;
 		if (ageString != null) age = Integer.parseInt(ageString);
-		this.currperson = PopulationUtils.getDefaultFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
+		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
 		PersonUtils.setAge(this.currperson, age);
 		PersonUtils.setLicence(this.currperson, atts.getValue("license"));

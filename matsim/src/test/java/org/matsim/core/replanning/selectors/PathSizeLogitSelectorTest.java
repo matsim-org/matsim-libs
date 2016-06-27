@@ -89,7 +89,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
 		// test with only one plan...
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan(person);
 		Activity a = PopulationUtils.createActivityFromLinkId("h", l6.getId());
 		Activity b = PopulationUtils.createActivityFromLinkId("w", l7.getId());
@@ -160,7 +160,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 
 		// test with only one plan, but with NEGATIVE_INFINITY...
-		person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		p1 = PopulationUtils.createPlan(person);
 		a = PopulationUtils.createActivityFromLinkId("h", l6.getId());
 		b = PopulationUtils.createActivityFromLinkId("w", l7.getId());
@@ -191,7 +191,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Link l6 = network.getLinks().get(Id.create("6", Link.class));
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan(person);
 		Activity a = PopulationUtils.createActivityFromLinkId("h", l6.getId());
 		Activity b = PopulationUtils.createActivityFromLinkId("w", l7.getId());
@@ -226,7 +226,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Link l6 = network.getLinks().get(Id.create("6", Link.class));
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan p1 = PopulationUtils.createPlan(person);
 		Activity a = PopulationUtils.createActivityFromLinkId("h", l6.getId());
 		Activity b = PopulationUtils.createActivityFromLinkId("w", l7.getId());

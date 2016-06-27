@@ -282,7 +282,7 @@ public class InsertionRemovalIterativeActionTest {
 		for (int i=0; i < N_COUPLES; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
-			Person person = PopulationUtils.getDefaultFactory().createPerson(id);
+			Person person = PopulationUtils.getFactory().createPerson(id);
 			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class )).setEndTime( 10 );
@@ -297,7 +297,7 @@ public class InsertionRemovalIterativeActionTest {
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
-			person = PopulationUtils.getDefaultFactory().createPerson(id1);
+			person = PopulationUtils.getFactory().createPerson(id1);
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class )).setEndTime( 10 );
@@ -331,7 +331,7 @@ public class InsertionRemovalIterativeActionTest {
 		for (int i=0; i < N_COUPLES; i++) {
 			Id driverId1 = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId1;
-			Person person = PopulationUtils.getDefaultFactory().createPerson(id);
+			Person person = PopulationUtils.getFactory().createPerson(id);
 			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId1 , plan );
 			Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class ));
@@ -343,7 +343,7 @@ public class InsertionRemovalIterativeActionTest {
 
 			Id passengerId1 = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId1;
-			person = PopulationUtils.getDefaultFactory().createPerson(id1);
+			person = PopulationUtils.getFactory().createPerson(id1);
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId1 , plan );
 			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class ));

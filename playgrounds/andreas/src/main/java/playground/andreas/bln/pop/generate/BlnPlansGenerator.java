@@ -96,7 +96,7 @@ public class BlnPlansGenerator {
 //			log.info("Start generating persons...");
 		for (String[] data : personData) {
 
-			Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(data[0], Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(data[0], Person.class));
 			personList.put(person.getId(), person);
 
 			// approximation: yearOfSurvey - yearOfBirth

@@ -74,7 +74,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 						new MapUtils.Factory<Plan>() {
 							@Override
 							public Plan create() {
-								return PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(event.getAgentId()));
+								return PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(event.getAgentId()));
 							}
 						});
 		plan.addActivity( event.getActivity());
@@ -91,7 +91,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 						new MapUtils.Factory<Plan>() {
 							@Override
 							public Plan create() {
-								return PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(event.getAgentId()));
+								return PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(event.getAgentId()));
 							}
 						});
 		plan.addLeg( event.getLeg() );

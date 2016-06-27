@@ -66,7 +66,7 @@ public class InvertertedNetworkLegRouterTest {
 		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		Activity fromAct = PopulationUtils.createActivityFromLinkId("h", Id.create("12", Link.class));
 		Activity toAct = PopulationUtils.createActivityFromLinkId("h", Id.create("78", Link.class));

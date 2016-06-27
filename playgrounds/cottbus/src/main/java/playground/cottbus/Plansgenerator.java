@@ -336,7 +336,7 @@ public class Plansgenerator {
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
 			homeEndtime = START_TIME;
 
-			Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PopulationUtils.createPlan(p);
 			p.addPlan(plan);
 			//home

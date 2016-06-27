@@ -139,7 +139,7 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PopulationUtils.getDefaultFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(PopulationUtils.createPlan());
@@ -154,7 +154,7 @@ public class Fcd {
 				
 			} else {
 				// different one, new person
-				currentPerson = PopulationUtils.getDefaultFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(PopulationUtils.createPlan());
@@ -207,7 +207,7 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PopulationUtils.getDefaultFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(PopulationUtils.createPlan());
@@ -224,7 +224,7 @@ public class Fcd {
 				
 			} else {
 				// different one, new person
-				currentPerson = PopulationUtils.getDefaultFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(PopulationUtils.createPlan());

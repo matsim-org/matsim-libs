@@ -81,7 +81,7 @@ public class Main {
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, freespeed, freespeed);
 
 		
-		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		Coord fromCoord = new Coord(xFromAct, yFromAct);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", fromCoord);

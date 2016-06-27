@@ -657,7 +657,7 @@ public final class PopulationUtils {
 		}
 		return false;
 	}
-	public static PopulationFactory getDefaultFactory() {
+	public static PopulationFactory getFactory() {
 		// to make this private, would have to get rid of things like getFactory().createPerson(..) .
 		// But I am not sure if this really makes a lot of sense, because this static default factory is easier to change into
 		// pop.getFactory() than anothing else.  kai, jun'16
@@ -673,43 +673,43 @@ public final class PopulationUtils {
 	// --- plain factories: 
 
 	public static Plan createPlan(Person person) {
-		Plan plan = getDefaultFactory().createPlan() ;
+		Plan plan = getFactory().createPlan() ;
 		plan.setPerson(person);
 		return plan ;
 	}
 
 	public static Plan createPlan() {
-		return getDefaultFactory().createPlan() ;
+		return getFactory().createPlan() ;
 	}
 
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
-		return getDefaultFactory().createActivityFromLinkId(type, linkId) ;
+		return getFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
 	public static Activity createActivityFromCoord(String type, Coord coord) {
-		return getDefaultFactory().createActivityFromCoord(type, coord) ;
+		return getFactory().createActivityFromCoord(type, coord) ;
 	}
 
 	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
-		Activity act = getDefaultFactory().createActivityFromCoord(type, coord) ;
+		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
 		return act ;
 	}
 	
 	public static Leg createLeg(String transportMode) {
-		return getDefaultFactory().createLeg(transportMode) ;
+		return getFactory().createLeg(transportMode) ;
 	}
 
 	// createAndAdd methods:
 	
 	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
-		Activity act = getDefaultFactory().createActivityFromCoord(type, coord) ;
+		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		plan.addActivity(act);
 		act.setCoord(coord);
 		return act ;
 	}
 	public static Activity createAndAddActivityFromLinkId( Plan plan, String type, Id<Link> linkId ) {
-		Activity act = getDefaultFactory().createActivityFromLinkId(type, linkId) ;
+		Activity act = getFactory().createActivityFromLinkId(type, linkId) ;
 		plan.addActivity(act);
 		act.setLinkId(linkId);
 		return act ;
@@ -717,7 +717,7 @@ public final class PopulationUtils {
 
 	public static Leg createAndAddLeg(Plan plan, String mode) {
 		verifyCreateLeg( plan ) ;
-		Leg leg = getDefaultFactory().createLeg(mode) ;
+		Leg leg = getFactory().createLeg(mode) ;
 		plan.addLeg( leg );
 		return leg ;
 	}
@@ -781,7 +781,7 @@ public final class PopulationUtils {
 	// --- copy factories:
 
 	public static Activity createActivity(Activity act) {
-		Activity newAct = getDefaultFactory().createActivityFromLinkId(act.getType(), act.getLinkId()) ;
+		Activity newAct = getFactory().createActivityFromLinkId(act.getType(), act.getLinkId()) ;
 		
 		copyFromTo(act, newAct);
 		// (this ends up setting type and linkId again)
@@ -817,13 +817,13 @@ public final class PopulationUtils {
 		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 	}
 	public static Activity getNextActivity( Plan plan, Leg leg ) {
-		int index = getActLegIndex(leg,plan);
+		int index = getActLegIndex(plan,leg);
 		if (index != -1) {
 			return (Activity) plan.getPlanElements().get(index+1);
 		}
 		return null;
 	}
-	public static int getActLegIndex( PlanElement pe , Plan plan ) {
+	public static int getActLegIndex( Plan plan , PlanElement pe ) {
 		if ((pe instanceof Leg) || (pe instanceof Activity)) {
 			for (int i = 0; i < plan.getPlanElements().size(); i++) {
 				if (plan.getPlanElements().get(i).equals(pe)) {
@@ -835,21 +835,21 @@ public final class PopulationUtils {
 		throw new IllegalArgumentException("Method call only valid with a Leg or Act instance as parameter!");
 	}
 	public static Leg getNextLeg( Plan plan, Activity act ) {
-		int index = PopulationUtils.getActLegIndex(act, plan);
+		int index = PopulationUtils.getActLegIndex(plan, act);
 		if ((index < plan.getPlanElements().size() - 1) && (index != -1)) {
 			return (Leg) plan.getPlanElements().get(index+1);
 		}
 		return null;
 	}
 	public static Activity getPreviousActivity( Plan plan, Leg leg ) {
-		int index = PopulationUtils.getActLegIndex(leg, plan);
+		int index = PopulationUtils.getActLegIndex(plan, leg);
 		if (index != -1) {
 			return (Activity) plan.getPlanElements().get(index-1);
 		}
 		return null;
 	}
 	public static Leg getPreviousLeg( Plan plan, Activity act ) {
-		int index = PopulationUtils.getActLegIndex(act, plan);
+		int index = PopulationUtils.getActLegIndex(plan, act);
 		if (index != -1) {
 			return (Leg) plan.getPlanElements().get(index-1);
 		}

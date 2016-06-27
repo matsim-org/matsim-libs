@@ -60,7 +60,7 @@ public class MergingTest {
 		List<Plan> plans = new ArrayList<Plan>();
 
 		for (int i=0; i<20; i++) {
-			plans.add( PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class))) );
+			plans.add( PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class))) );
 		}
 
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
@@ -77,7 +77,7 @@ public class MergingTest {
 				final Id<Person> id1 = id;
 				indivPlans.put(
 						id,
-						PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(id1)) );
+						PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(id1)) );
 			}
 			plans.add( jointPlans.getFactory().createJointPlan( indivPlans ) );
 		}

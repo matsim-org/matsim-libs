@@ -160,7 +160,7 @@ public class ReadFromUrbansimParcelModel {
 
 				Id<Person> personId = Id.create( parts[idxFromKey.get("person_id")], Person.class ) ;
 				final Id<Person> id = personId;
-				Person newPerson = PopulationUtils.getDefaultFactory().createPerson(id);
+				Person newPerson = PopulationUtils.getFactory().createPerson(id);
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;

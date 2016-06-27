@@ -85,8 +85,8 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createSimplisticFixture() {
-		Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Schumacher"));
-		Person passenger = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Asterix"));
+		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Schumacher"));
+		Person passenger = PopulationUtils.getFactory().createPerson(Id.createPersonId("Asterix"));
 
 		Id<Link> link1 = Id.createLinkId( 1 );
 		Id<Link> link2 = Id.createLinkId( 2 );
@@ -158,9 +158,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixture() {
-		Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Alonso"));
-		Person passenger1 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Boule"));
-		Person passenger2 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Bill"));
+		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alonso"));
+		Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Boule"));
+		Person passenger2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Bill"));
 
 		Id<Link> link1 = Id.create( 1 , Link.class );
 		Id<Link> link2 = Id.create( 2 , Link.class );
@@ -255,9 +255,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixtureWithInternOverlap() {
-		Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Prost"));
-		Person passenger1 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Joe"));
-		Person passenger2 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Avrell"));
+		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Prost"));
+		Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Joe"));
+		Person passenger2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Avrell"));
 
 		Id<Link> link1 = Id.create( 1 , Link.class );
 		Id<Link> link2 = Id.create( 2 , Link.class );
@@ -369,9 +369,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixtureWithExternOverlap() {
-		Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Kowalski"));
-		Person passenger1 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Pif"));
-		Person passenger2 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Paf"));
+		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Kowalski"));
+		Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Pif"));
+		Person passenger2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Paf"));
 
 		Id<Link> link1 = Id.create( 1 , Link.class );
 		Id<Link> link2 = Id.create( 2 , Link.class );
@@ -483,8 +483,8 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createMultiDriverStageFixture() {
-		final Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Schumacher"));
-		final Person passenger = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Asterix"));
+		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Schumacher"));
+		final Person passenger = PopulationUtils.getFactory().createPerson(Id.createPersonId("Asterix"));
 		final String stageType = "drinkACoffee";
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
@@ -554,8 +554,8 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createMultiPassengerStageFixture() {
-		final Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Schumacher"));
-		final Person passenger = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Asterix"));
+		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Schumacher"));
+		final Person passenger = PopulationUtils.getFactory().createPerson(Id.createPersonId("Asterix"));
 		final String stageType = "drinkACoffee";
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
@@ -625,9 +625,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveFirstFixture() {
-		final Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Alonso"));
-		final Person passenger1 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Boule"));
-		final Person passenger2 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Bill"));
+		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alonso"));
+		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Boule"));
+		final Person passenger2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Bill"));
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -714,9 +714,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveSecondFixture() {
-		final Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Alonso"));
-		final Person passenger1 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Boule"));
-		final Person passenger2 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Bill"));
+		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alonso"));
+		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Boule"));
+		final Person passenger2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Bill"));
 
 		final Id link1 = Id.createLinkId( 1 );
 		final Id link2 = Id.createLinkId( 2 );
@@ -804,9 +804,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoDriversFixture(final boolean removeFirst) {
-		final Person driver1 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Alonso"));
-		final Person driver2 = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Schumacher"));
-		final Person passenger = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("Rantanplan"));
+		final Person driver1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alonso"));
+		final Person driver2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Schumacher"));
+		final Person passenger = PopulationUtils.getFactory().createPerson(Id.createPersonId("Rantanplan"));
 
 		final Id link1 = Id.createLinkId( 1 );
 		final Id link2 = Id.createLinkId( 2 );
