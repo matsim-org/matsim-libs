@@ -248,7 +248,7 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 		/**
 		 * Removes stops that are not accessed by any route
 		 */
-		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+//		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
 		/**
 		 * Create default vehicles.

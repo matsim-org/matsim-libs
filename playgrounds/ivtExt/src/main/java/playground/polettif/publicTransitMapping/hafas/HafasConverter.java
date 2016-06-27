@@ -46,7 +46,7 @@ import java.util.Set;
 /**
  * Implementation of Hafas2MATSimTransitSchedule.
  *
- * @author boescpa
+ * @author polettif
  */
 public class HafasConverter extends Hafas2TransitSchedule {
 
