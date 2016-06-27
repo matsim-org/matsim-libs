@@ -12,11 +12,6 @@ public class SRS{
 	private String projectionacronym;
 	private String ellipsoidacronym;
 
-	public static void main(String[] args) {
-		SRS srs = SRS.createSpatialRefSys("EPSG:21037");
-		System.out.println("srs = " + srs);
-	}
-
 	private SRS(String proj4, String srsid, String srid, String authid, String description, String projectionacronym, String ellipsoidacronym){
 		this.proj4 = proj4;
 		this.srsid = srsid;
