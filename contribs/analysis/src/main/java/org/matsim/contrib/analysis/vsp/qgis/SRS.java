@@ -1,7 +1,6 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class SRS{
 
@@ -128,11 +127,11 @@ public class SRS{
 		return (new org.osgeo.proj4j.CRSFactory()).createFromName(srs).getProjection().getEllipsoid().getName();
 	}
 
-	private String getProj4() {
+	public String getProj4() {
 		return proj4;
 	}
 
-	private String getSrsid() {
+	public String getSrsid() {
 		return srsid;
 	}
 
