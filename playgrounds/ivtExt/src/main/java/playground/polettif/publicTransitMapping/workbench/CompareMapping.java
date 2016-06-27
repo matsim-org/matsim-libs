@@ -21,19 +21,24 @@ package playground.polettif.publicTransitMapping.workbench;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.boescpa.converters.osm.ptMapping.PTMapperOnlyBusses;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.gtfs.Gtfs2TransitSchedule;
 import playground.polettif.publicTransitMapping.mapping.PTMapperImpl;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
-import playground.polettif.publicTransitMapping.tools.*;
-import playground.polettif.boescpa.converters.osm.ptMapping.PTMapperOnlyBusses;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
+import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CompareMapping {
 
@@ -46,7 +51,6 @@ public class CompareMapping {
 		String fullUnmappedMTS = "data/mts/fromGtfs/zvv_"+serviceParam+".xml.gz";
 		String singleUnmappedMTS = "data/mts/fromGtfs/zvv_"+serviceParam+"_bus.xml.gz";
 		String combinedUnmappedMTS = "data/mts/fromGtfs/zvv_"+serviceParam+"_bus_combined.xml.gz";
-		String debug = "data/mts/fromGtfs/debug.xml.gz";
 
 		String detailNetworkFile = "data/network/mm/zurich_detail.xml.gz";
 		String combinedNetworkFile = "data/network/mm/zurich.xml.gz";
@@ -62,7 +66,7 @@ public class CompareMapping {
 		/**
 		 * Convert GTFS to unmapped schedule
 		 */
-// 		Gtfs2TransitSchedule.run(inputGtfs, Gtfs2TransitSchedule.ServiceParam.dayWithMostServices.toString(), ct, fullUnmappedMTS, null, output+"gtfs.shp");
+ 		Gtfs2TransitSchedule.run(inputGtfs, serviceParam, ct, fullUnmappedMTS, null, args[1]);
 
 		// single
 		TransitSchedule s = ScheduleTools.readTransitSchedule(fullUnmappedMTS);
@@ -86,14 +90,14 @@ public class CompareMapping {
 		/**
 		 * Run PTMapper
 		 */
-		runPolettif(output+"single/", singleUnmappedMTS, detailNetworkFile, 4, 40);
-		runPolettif(output+"combined/", combinedUnmappedMTS, combinedNetworkFile, 20, 80);
+		runPolettif(output+"single/", singleUnmappedMTS, detailNetworkFile, 6, 40);
+		runPolettif(output+"combined/", combinedUnmappedMTS, detailNetworkFile, 15, 80);
 
 		/**
 		 * boescpa
 		 */
 		runBoesch(output+"boesch/single/", singleUnmappedMTS, detailNetworkFile);
-		runBoesch(output+"boesch/combined/", combinedUnmappedMTS, combinedNetworkFile);
+		runBoesch(output+"boesch/combined/", combinedUnmappedMTS, detailNetworkFile);
 	}
 
 	private static void runBoesch(String output, String scheduleFile, String networkFile) {
