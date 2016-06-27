@@ -49,9 +49,8 @@ public class VehicleData
     }
 
 
-    public final List<Entry> entries = new ArrayList<>();
-    public final int idleCount;
-    public final int dimension;
+    private final List<Entry> entries = new ArrayList<>();
+    private final int idleCount;
 
 
     public VehicleData(TaxiOptimizerContext optimContext)
@@ -85,6 +84,29 @@ public class VehicleData
         }
 
         idleCount = idleCounter;
-        dimension = entries.size();
+    }
+
+
+    public int getSize()
+    {
+        return entries.size();
+    }
+
+
+    public Entry getEntry(int idx)
+    {
+        return entries.get(idx);
+    }
+
+
+    public List<Entry> getEntries()
+    {
+        return entries;
+    }
+
+
+    public int getIdleCount()
+    {
+        return idleCount;
     }
 }

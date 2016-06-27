@@ -59,8 +59,7 @@ public class TaxiStats
     public double getFleetEmptyDriveRatio()
     {
         double empty = taskTimeSumsByType.get(TaxiTaskType.EMPTY_DRIVE).doubleValue();
-        double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE)
-                .doubleValue();
+        double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
         return empty / (empty + occupied);
     }
 

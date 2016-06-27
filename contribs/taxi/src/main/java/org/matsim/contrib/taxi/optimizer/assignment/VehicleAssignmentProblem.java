@@ -56,8 +56,8 @@ public class VehicleAssignmentProblem<D>
     private final FastMultiNodeDijkstra router;
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
-    private final StraightLineKNNFinder<VehicleData.Entry, DestEntry<D>> destinationFinder;
-    private final StraightLineKNNFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder;
+    private final StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> destinationFinder;
+    private final StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder;
 
     private AssignmentCost<D> assignmentCost;
     private VehicleData vData;
@@ -66,8 +66,8 @@ public class VehicleAssignmentProblem<D>
 
     public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter,
-            StraightLineKNNFinder<VehicleData.Entry, DestEntry<D>> destinationFinder,
-            StraightLineKNNFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder)
+            StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> destinationFinder,
+            StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder)
     {
         this.travelTime = travelTime;
         this.router = router;
@@ -98,9 +98,9 @@ public class VehicleAssignmentProblem<D>
     private PathData[][] createPathDataMatrix()
     {
         PathData[][] pathDataMatrix = (PathData[][])Array.newInstance(PathData.class,
-                vData.dimension, dData.getSize());
+                vData.getSize(), dData.getSize());
 
-        if (dData.getSize() > vData.dimension) {
+        if (dData.getSize() > vData.getSize()) {
             calcPathsForVehicles(pathDataMatrix);
             calcPathsForVehiclesCount++;
         }
@@ -112,8 +112,8 @@ public class VehicleAssignmentProblem<D>
         if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
             System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
                     + " PathsForVehicles = " + calcPathsForVehiclesCount);
-            System.err.println("dests = " + dData.getSize() + " vehs = " + vData.dimension
-                    + " idleVehs = " + vData.idleCount);
+            System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
+                    + " idleVehs = " + vData.getIdleCount());
         }
 
         return pathDataMatrix;
@@ -122,8 +122,8 @@ public class VehicleAssignmentProblem<D>
 
     private void calcPathsForVehicles(PathData[][] pathDataMatrix)
     {
-        for (int v = 0; v < vData.dimension; v++) {
-            VehicleData.Entry departure = vData.entries.get(v);
+        for (int v = 0; v < vData.getSize(); v++) {
+            VehicleData.Entry departure = vData.getEntry(v);
             Node fromNode = departure.link.getToNode();
 
             //TODO this kNN is slow
@@ -188,7 +188,8 @@ public class VehicleAssignmentProblem<D>
             Node toNode = dest.link.getFromNode();
 
             //TODO this kNN is slow
-            List<VehicleData.Entry> filteredVehs = vehicleFinder.findNearest(dest, vData.entries);
+            List<VehicleData.Entry> filteredVehs = vehicleFinder.findNearest(dest,
+                    vData.getEntries());
 
             Map<Id<Node>, InitialNode> vehInitialNodes = Maps
                     .newHashMapWithExpectedSize(filteredVehs.size());
@@ -243,10 +244,10 @@ public class VehicleAssignmentProblem<D>
     private double[][] createCostMatrix(PathData[][] pathDataMatrix)
     {
 
-        double[][] costMatrix = new double[vData.dimension][dData.getSize()];
+        double[][] costMatrix = new double[vData.getSize()][dData.getSize()];
 
-        for (int v = 0; v < vData.dimension; v++) {
-            VehicleData.Entry departure = vData.entries.get(v);
+        for (int v = 0; v < vData.getSize(); v++) {
+            VehicleData.Entry departure = vData.getEntry(v);
             for (int r = 0; r < dData.getSize(); r++) {
                 costMatrix[v][r] = assignmentCost.calc(departure, dData.getEntry(r),
                         pathDataMatrix[v][r]);
@@ -260,7 +261,7 @@ public class VehicleAssignmentProblem<D>
     private List<Dispatch<D>> createDispatches(int[] assignments, PathData[][] pathDataMatrix,
             TravelTime travelTime)
     {
-        List<Dispatch<D>> dispatches = new ArrayList<>(Math.min(vData.dimension, dData.getSize()));
+        List<Dispatch<D>> dispatches = new ArrayList<>(Math.min(vData.getSize(), dData.getSize()));
         for (int v = 0; v < assignments.length; v++) {
             int d = assignments[v];
             if (d == -1 || //no request assigned
@@ -268,7 +269,7 @@ public class VehicleAssignmentProblem<D>
                 continue;
             }
 
-            VehicleData.Entry departure = vData.entries.get(v);
+            VehicleData.Entry departure = vData.getEntry(v);
             DestEntry<D> dest = dData.getEntry(d);
             PathData pathData = pathDataMatrix[v][d];
 

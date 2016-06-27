@@ -42,11 +42,11 @@ public class OuterCordonCountsGenerator {
 
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_out = new HashMap<>();
-	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
+	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/counts/externalDemandInputFiles/";
 
 	public static void main(String[] args) {
 
-		String outCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/input/"+"/outerCordonCounts_10pct_OC1Excluded.xml.gz";
+		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+"/outerCordonCounts_10pct_OC1Excluded.xml.gz";
 
 		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
 	

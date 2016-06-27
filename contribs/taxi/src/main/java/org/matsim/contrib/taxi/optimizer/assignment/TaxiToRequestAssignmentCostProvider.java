@@ -89,7 +89,7 @@ public class TaxiToRequestAssignmentCostProvider
             return params.mode;
         }
         else {
-            return rData.getUrgentReqCount() > vData.idleCount ? Mode.PICKUP_TIME : //we have too few vehicles
+            return rData.getUrgentReqCount() > vData.getIdleCount() ? Mode.PICKUP_TIME : //we have too few vehicles
                     Mode.ARRIVAL_TIME; //we have too many vehicles
         }
     }

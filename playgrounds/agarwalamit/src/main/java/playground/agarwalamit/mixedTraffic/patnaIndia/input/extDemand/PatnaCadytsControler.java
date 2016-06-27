@@ -20,6 +20,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
 import javax.inject.Inject;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -41,6 +42,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -53,6 +55,7 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -64,13 +67,13 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 public class PatnaCadytsControler {
 
-	private static String plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz";
+	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonDemand_10pct.xml.gz";
 	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
 	
 	public static void main(String[] args) {
-		String patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/patnaVehicles_outerCordon.xml.gz";
+		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonVehicles_10pct.xml.gz";
 		
 		if( STABILITY_CHECK_AFTER_CADYTS) {
 			String inPlans = outputDir+"/output_plans.xml.gz";	
@@ -81,7 +84,7 @@ public class PatnaCadytsControler {
 			spf.writePlans(plansFile);
 			
 			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_ctd/";
-			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/patnaVehicles_outerCordon_ctd.xml.gz";
+			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
 		
 		PatnaCadytsControler pcc = new PatnaCadytsControler();
@@ -94,21 +97,31 @@ public class PatnaCadytsControler {
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-		final Controler controler = new Controler(config);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike_ext", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
-				addTravelTimeBinding("motorbike").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
-				addTravelTimeBinding("truck").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("truck").to(carTravelDisutilityFactoryKey());
+				
+				addTravelTimeBinding("car_ext").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("car_ext").to(carTravelDisutilityFactoryKey());
+				
+				addTravelTimeBinding("motorbike_ext").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("motorbike_ext").to(carTravelDisutilityFactoryKey());
+				
+				// due to speed difference of bike and truck, using configured free speed travel time, builder should also use this.
+				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
+				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
+				
+				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
+				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
 			}
 		});
 
@@ -153,7 +166,7 @@ public class PatnaCadytsControler {
 		config.global().setCoordinateSystem(PatnaUtils.EPSG);
 
 		config.plans().setInputFile(plansFile);
-		config.network().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
+		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz");
 
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
@@ -161,9 +174,9 @@ public class PatnaCadytsControler {
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts_10pct_OC1Excluded.xml.gz");
+		config.counts().setCountsFileName(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+"/outerCordonCounts_10pct_OC1Excluded.xml.gz");
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
@@ -172,7 +185,7 @@ public class PatnaCadytsControler {
 		config.controler().setLastIteration(100);
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWritePlansInterval(100);
-		config.controler().setWriteEventsInterval(2);
+		config.controler().setWriteEventsInterval(50);
 
 		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
@@ -212,22 +225,22 @@ public class PatnaCadytsControler {
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
 
-		ModeParams car = new ModeParams("car");
+		ModeParams car = new ModeParams("car_ext");
 		car.setConstant(0.0);
 		car.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(car);
 
-		ModeParams bike = new ModeParams("bike");
+		ModeParams bike = new ModeParams("bike_ext");
 		bike.setConstant(0.0);
 		bike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(bike);
 
-		ModeParams motorbike = new ModeParams("motorbike");
+		ModeParams motorbike = new ModeParams("motorbike_ext");
 		motorbike.setConstant(0.0);
 		motorbike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(motorbike);
 
-		ModeParams truck = new ModeParams("truck");//ZZ_TODO : should I calibrate asc for truck??
+		ModeParams truck = new ModeParams("truck_ext");
 		truck.setConstant(0.0);
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.fifo;
+package org.matsim.contrib.taxi.optimizer;
 
-import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.util.PartialSort;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
 
-public class FifoTaxiOptimizerParams
-    extends AbstractTaxiOptimizerParams
+public class StraightLineKnnFinder<T, N>
 {
-    public FifoTaxiOptimizerParams(Configuration optimizerConfig)
+    private final int k;
+    private final LinkProvider<T> objectToLink;
+    private final LinkProvider<N> neighbourToLink;
+
+
+    public StraightLineKnnFinder(int k, LinkProvider<T> objectToLink,
+            LinkProvider<N> neighbourToLink)
     {
-        super(optimizerConfig);
+        this.k = k;
+        this.objectToLink = objectToLink;
+        this.neighbourToLink = neighbourToLink;
+    }
+
+
+    public List<N> findNearest(T obj, Iterable<N> neighbours)
+    {
+        Coord objectCoord = objectToLink.getLink(obj).getCoord();
+        PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
+
+        for (N n : neighbours) {
+            Coord nCoord = neighbourToLink.getLink(n).getCoord();
+            nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
+        }
+
+        return nearestRequestSort.retriveKSmallestElements();
     }
 }

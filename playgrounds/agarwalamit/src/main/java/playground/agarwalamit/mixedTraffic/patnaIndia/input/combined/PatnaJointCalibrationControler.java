@@ -47,6 +47,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -92,6 +93,7 @@ public class PatnaJointCalibrationControler {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -103,7 +105,10 @@ public class PatnaJointCalibrationControler {
 				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
 
-				for(String mode : Arrays.asList("car_ext","motorbike_ext","truck_ext","truck","motorbike")){
+				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
+				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
+				
+				for(String mode : Arrays.asList("car_ext","motorbike_ext","motorbike")){
 					addTravelTimeBinding(mode).to(networkTravelTime());
 					addTravelDisutilityFactoryBinding(mode).to(carTravelDisutilityFactoryKey());					
 				}

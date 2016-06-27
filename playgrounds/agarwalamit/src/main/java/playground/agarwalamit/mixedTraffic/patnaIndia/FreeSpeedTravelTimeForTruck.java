@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.agarwalamit.mixedTraffic.patnaIndia;
 
-package org.matsim.contrib.taxi.optimizer;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 /**
- * kNN - k Nearest Neighbours
+ * @author amit
  */
-public class StraightLineKNNFinders
-{
-    public static StraightLineKNNFinder<VehicleData.Entry, DestEntry<TaxiRequest>> createTaxiRequestFinder(
-            int k)
-    {
-        return new StraightLineKNNFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK,
-                LinkProviders.REQUEST_ENTRY_TO_LINK);
-    }
 
+public class FreeSpeedTravelTimeForTruck implements TravelTime {
 
-    public static StraightLineKNNFinder<DestEntry<TaxiRequest>, VehicleData.Entry> createVehicleDepartureFinder(
-            int k)
-    {
-        return new StraightLineKNNFinder<>(k, LinkProviders.REQUEST_ENTRY_TO_LINK,
-                LinkProviders.VEHICLE_ENTRY_TO_LINK);
-    }
+		@Override
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return link.getLength() / Math.min( MixedTrafficVehiclesUtils.getSpeed("truck"), link.getFreespeed(time) );
+		}
 }

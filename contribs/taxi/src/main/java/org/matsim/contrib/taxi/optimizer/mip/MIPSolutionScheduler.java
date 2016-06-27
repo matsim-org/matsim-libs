@@ -30,7 +30,7 @@ class MIPSolutionScheduler
         this.optimContext = optimContext;
         this.rData = rData;
         this.vData = vData;
-        this.m = vData.dimension;
+        this.m = vData.getSize();
         this.n = rData.dimension;
 
         router = new DijkstraWithThinPath(optimContext.network, optimContext.travelDisutility,
@@ -43,7 +43,7 @@ class MIPSolutionScheduler
         this.solution = solution;
 
         for (int k = 0; k < m; k++) {
-            currentVeh = vData.entries.get(k).vehicle;
+            currentVeh = vData.getEntry(k).vehicle;
             appendSubsequentRequestsToCurrentVehicle(k);
         }
     }

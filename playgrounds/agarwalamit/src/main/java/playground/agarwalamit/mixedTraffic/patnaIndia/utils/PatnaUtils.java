@@ -46,7 +46,7 @@ public final class PatnaUtils {
 	public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, PatnaUtils.EPSG);
 
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
-	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";
+	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/others/wardFile/Wards.shp";
 
 	public static final String INCOME_ATTRIBUTE = "monthlyIncome";
 	public static final String TRANSPORT_COST_ATTRIBUTE = "dailyTransportCost";
@@ -59,9 +59,10 @@ public final class PatnaUtils {
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
 
-	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
+	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car_ext","motorbike_ext","bike_ext","truck_ext");
 
-	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck_ext","car_ext","motorbike_ext","bike_ext");
+	public static final Collection <String> ALL_MAIN_MODES =  Arrays.asList("car","motorbike","bike","car_ext","motorbike_ext","bike_ext","truck_ext");
+//			
 	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
 	
 

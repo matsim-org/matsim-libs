@@ -103,8 +103,7 @@ public class ScheduleReconstructor
     public static TaxiData reconstructFromFile(Network network, String eventsFile)
     {
         EventsManager eventsManager = EventsUtils.createEventsManager();
-        ScheduleReconstructor reconstructor = new ScheduleReconstructor(network,
-                eventsManager);
+        ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
         return reconstructor.getTaxiData();
     }

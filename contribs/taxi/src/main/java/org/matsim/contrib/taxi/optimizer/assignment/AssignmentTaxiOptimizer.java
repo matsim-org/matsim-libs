@@ -68,8 +68,8 @@ public class AssignmentTaxiOptimizer
 
         assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
                 backwardRouter,
-                StraightLineKNNFinders.createTaxiRequestFinder(params.nearestRequestsLimit),
-                StraightLineKNNFinders.createVehicleDepartureFinder(params.nearestVehiclesLimit));
+                StraightLineKnnFinders.createTaxiRequestFinder(params.nearestRequestsLimit),
+                StraightLineKnnFinders.createVehicleDepartureFinder(params.nearestVehiclesLimit));
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
     }
@@ -83,7 +83,7 @@ public class AssignmentTaxiOptimizer
         }
 
         VehicleData vData = initVehicleData(rData);
-        if (vData.dimension == 0) {
+        if (vData.getSize() == 0) {
             return;
         }
 

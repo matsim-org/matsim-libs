@@ -50,9 +50,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class PatnaJointDemandGenerator {
 
 	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_ctd/output_plans.xml.gz"; // calibrated from cadyts.
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_vehicles_10pct.xml.gz";
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_vehicles_10pct.xml.gz";
 	private static final int CLONING_FACTOR = 10; 
 	private static Scenario sc;
 	
@@ -61,7 +61,6 @@ public class PatnaJointDemandGenerator {
 		pjdg.combinedPlans();
 		pjdg.createSubpopulationAttributes();
 		new PopulationWriter(sc.getPopulation()).write(JOINT_PLANS_10PCT);
-		sc.getPopulation().getPersonAttributes().getAttribute("nonSlum_15", PatnaUtils.SUBPOP_ATTRIBUTE);
 		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
 		pjdg.createAndWriteVehiclesFile();
 	}
@@ -95,7 +94,6 @@ public class PatnaJointDemandGenerator {
 					popUrban.getPersonAttributes().getAttribute(p.getId().toString(), PatnaUtils.TRANSPORT_COST_ATTRIBUTE));
 		}
 
-
 		for(Person p : popExtDemand.getPersons().values()){
 			sc.getPopulation().addPerson(p);
 		}	
@@ -107,7 +105,7 @@ public class PatnaJointDemandGenerator {
 		return pudg.getPopulation();
 	}
 
-	private Population getExternalPlans(){ // take only selected plans, add 'ext' suffix to leg mode so that mode choice is enabled for sub population.
+	private Population getExternalPlans(){ // take only selected plans, add 'ext' suffix to leg mode (if does not exists) so that mode choice is enabled for sub population.
 		Population popIn = LoadMyScenarios.loadScenarioFromPlans(EXT_PLANS).getPopulation();
 
 		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -124,7 +122,8 @@ public class PatnaJointDemandGenerator {
 			for(PlanElement pe : pes){
 				if(pe instanceof Leg) {
 					String mode = ((Leg) pe).getMode();
-					planOut.addLeg(pf.createLeg(mode.concat("_ext")));
+					mode = mode.contains("ext") ? mode : mode.concat("_ext");
+					planOut.addLeg(pf.createLeg(mode));
 				} else {
 					planOut.addActivity((Activity)pe);
 				}
