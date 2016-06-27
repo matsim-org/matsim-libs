@@ -7,12 +7,13 @@ package org.matsim.vis.snapshotwriters;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
 
 /**
  * @author nagel
  *
  */
-public interface VisMobsim {
+public interface VisMobsim extends ObservableMobsim {
 
 	VisNetwork getVisNetwork();
 

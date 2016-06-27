@@ -56,11 +56,11 @@ public final class OTFFileReader implements OTFServer {
 
 	private File sourceZipFile = null;
 
-	private byte[] actBuffer = null;
+	private byte[] currentBuffer = null;
 
 	private double nextTime = -1;
 
-	private TreeMap<Double, Long> timesteps = new TreeMap<Double, Long>();
+	private final TreeMap<Double, Long> timesteps = new TreeMap<>();
 
 	private OTFVisConfigGroup otfVisConfig;
 
@@ -79,10 +79,6 @@ public final class OTFFileReader implements OTFServer {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private void setDelayParameterIfZero(OTFVisConfigGroup cfg) {
-		cfg.setDelay_ms(cfg.getDelay_ms() == 0 ? 30 : cfg.getDelay_ms());
 	}
 
 	private void scanZIPFile(ZipFile zipFile) {
@@ -121,42 +117,37 @@ public final class OTFFileReader implements OTFServer {
 	@Override
 	public OTFServerQuadTree getQuad(final OTFConnectionManager connect) {
 		log.info("reading quad from file...");
-		OTFServerQuadTree quad = readQuad();
-		return quad;
+		return readQuad();
 	}
 
 	private OTFServerQuadTree readQuad() {
-		OTFServerQuadTree quad = null;
 		try {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry quadEntry = zipFile.getEntry("quad.bin");
 			BufferedInputStream is = new BufferedInputStream(zipFile.getInputStream(quadEntry));
-			quad = (OTFServerQuadTree) new ObjectInputStream(is).readObject();
+			OTFServerQuadTree quad = (OTFServerQuadTree) new ObjectInputStream(is).readObject();
 			log.debug("Read OTFServerQuadI from file, type: " + quad.getClass().getName());
 			zipFile.close();
 			return quad;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
 	public byte[] getQuadConstStateBuffer() {
-		byte[] buffer = null;
 		try {
 			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
 			ZipEntry entry = zipFile.getEntry("const.bin");
-			buffer = new byte[(int) entry.getSize()];
+			byte[] buffer = new byte[(int) entry.getSize()];
 			DataInputStream inFile = new DataInputStream(zipFile.getInputStream(entry));
 			readStateBuffer(inFile, buffer);
 			inFile.close();
 			zipFile.close();
+			return buffer;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		return buffer;
 	}
 
 	@Override
@@ -164,16 +155,16 @@ public final class OTFFileReader implements OTFServer {
 		if (bounds == null) {
 			log.warn("Bounds are ignored but set! [[I don't understand what this means here.  kai, feb'11]]");
 		}
-		if (this.actBuffer == null) {
+		if (this.currentBuffer == null) {
 			byte[] buffer = null;
 			try {
 				buffer = readTimeStep(this.nextTime);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			this.actBuffer = buffer;
+			this.currentBuffer = buffer;
 		}
-		return this.actBuffer;
+		return this.currentBuffer;
 	}
 
 	private byte[] readTimeStep(final double time_s) throws IOException {
@@ -188,11 +179,9 @@ public final class OTFFileReader implements OTFServer {
 	}
 
 	private void readStateBuffer(DataInputStream inputFile, final byte[] result) {
-		int size = 0;
-
 		try {
 			double timenextTime = inputFile.readDouble();
-			size = inputFile.readInt();
+			int size = inputFile.readInt();
 			int offset = 0;
 			int remain = size;
 			int read = 0;
@@ -203,41 +192,25 @@ public final class OTFFileReader implements OTFServer {
 			}
 
 			if (offset != size) {
-				throw new IOException("READ SIZE did not fit! File corrupted! in second " + timenextTime);
+				throw new RuntimeException("READ SIZE did not fit! File corrupted! in second " + timenextTime);
 			}
 
 		} catch (IOException e) {
-			System.out.println(e.toString());
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
-		double lastTime = -1;
-		double foundTime = -1;
-		for (Double timestep : this.timesteps.keySet()) {
-			if (timestep == time) {
-				foundTime = time;
-				break;
-			} else if (searchDirection == TimePreference.EARLIER) {
-				if (timestep >= time) {
-					// take next lesser time than requested, if not exacty
-					// the same
-					foundTime = lastTime;
-					break;
-				}
-			} else if (timestep >= time) {
-				foundTime = timestep; // the exact time or one biggers
-				break;
-			}
-			lastTime = timestep;
+	public void requestNewTime(final int time) {
+		Double ceil = timesteps.ceilingKey((double) time);
+		if (ceil != null) {
+			this.nextTime = ceil;
+		} else if (!timesteps.isEmpty()) {
+			this.nextTime = timesteps.lastKey();
+		} else {
+			this.nextTime = -1;
 		}
-		if (foundTime == -1)
-			return false;
-
-		this.nextTime = foundTime;
-		this.actBuffer = null;
-		return true;
+		this.currentBuffer = null;
 	}
 
 	@Override
@@ -248,6 +221,11 @@ public final class OTFFileReader implements OTFServer {
 	@Override
 	public void setShowNonMovingItems(boolean showNonMovingItems) {
 		OTFLinkAgentsHandler.showParked = showNonMovingItems;
+	}
+
+	@Override
+	public boolean isFinished() {
+		return getLocalTime() >= timesteps.lastKey();
 	}
 
 	@Override
@@ -273,8 +251,7 @@ public final class OTFFileReader implements OTFServer {
 	private OTFVisConfigGroup tryToReadSettingsFromFileNextToMovie() {
 		log.debug("Looking for settings in: " + this.fileName);
 		SettingsSaver saver = new SettingsSaver(this.fileName);
-		OTFVisConfigGroup settingsFromFile = saver.tryToReadSettingsFile();
-		return settingsFromFile;
+		return saver.tryToReadSettingsFile();
 	}
 
 }

@@ -33,33 +33,31 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
  * exchange are bundled in this interface.
  *
  * @author dstrippgen
- *
  */
 public interface OTFServer {
 
-//	public enum TimePreference{EARLIER, LATER, RESTART}
-	public enum TimePreference{EARLIER, LATER }
+	void requestNewTime(int time);
 
-	public boolean requestNewTime(int time, TimePreference searchDirection);
+	OTFServerQuadTree getQuad(OTFConnectionManager connect);
 
-	public OTFServerQuadTree getQuad(OTFConnectionManager connect);
+	byte[] getQuadConstStateBuffer();
 
-	public byte[] getQuadConstStateBuffer();
+	byte[] getQuadDynStateBuffer(QuadTree.Rect bounds);
 
-	public byte[] getQuadDynStateBuffer(QuadTree.Rect bounds);
-
-	public int getLocalTime();
+	int getLocalTime();
 
 	/**
-	 * @return (I think) information if the server is "live" (i.e. has user control) or not.  kai, feb'11
+	 * @return If the server is "live" (i.e. has user control) or not.
 	 */
-	public boolean isLive();
+	boolean isLive();
 
-	public Collection<Double> getTimeSteps();
+	Collection<Double> getTimeSteps();
 
-	public void setShowNonMovingItems(boolean showNonMovingItems);
-	
-	public OTFVisConfigGroup getOTFVisConfig();
+	void setShowNonMovingItems(boolean showNonMovingItems);
+
+	boolean isFinished();
+
+	OTFVisConfigGroup getOTFVisConfig();
 
 }
 

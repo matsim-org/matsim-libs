@@ -47,9 +47,6 @@ public final class OTFClientControl {
   
   public void setOTFVisConfig(OTFVisConfigGroup conf) {
     this.config = conf;
-    if (this.mainDrawer != null) {
-      this.mainDrawer.redraw();
-    }
   }
   
   public OTFVisConfigGroup getOTFVisConfig() {

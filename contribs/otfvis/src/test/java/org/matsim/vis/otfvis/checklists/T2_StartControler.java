@@ -29,16 +29,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
  */
 public class T2_StartControler {
 
-	private static final String config = "./test/input/org/matsim/vis/otfvis/checklists/config.xml";
 	private static final String config2 = "./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml";
 	
 	public static void main(String[] args) {
-		Controler con = new Controler(config);
-		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		con.addOverridingModule(new OTFVisFileWriterModule());
-		con.run();
-		System.out.println("\n Queue-Sim is done. Output:" + con.getConfig().controler().getOutputDirectory());
-		con = new Controler(config2);
+		Controler con = new Controler(config2);
 		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		con.addOverridingModule(new OTFVisFileWriterModule());
 		con.run();
