@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
 import static org.junit.Assert.assertNotNull;
@@ -32,10 +50,13 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
 
+/**
+ * @author dziemke
+ */
 public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
-	private static final Double cellSize = 1000.;
+	private static final Double cellSize = 500.;
 //	private static final double time = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -68,18 +89,18 @@ public class AccessibilityComputationNMBTest {
 		String layerName = "za_nmb_" + cellSize.toString().split("\\.")[0];
 		
 		//QGis
-//		boolean createQGisOutput = false;
-//		boolean includeDensityLayer = true;
-//		Double lowerBound = 2.;
-//		Double upperBound = 5.5;
-//		Integer range = 9;
-//		int symbolSize = 1010;
-//		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-//		
-//		/* Extent of the network are (as they can looked up by using the bounding box):
-//		/* minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
-//		/* Choose map view a bit bigger */
-//		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
+		boolean createQGisOutput = true;
+		boolean includeDensityLayer = true;
+		Double lowerBound = -3.5;
+		Double upperBound = 3.5;
+		Integer range = 9; // in the current implementation, this must always be 9
+		int symbolSize = 525;
+		int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
+
+		/* Extent of the network are (as they can looked up by using the bounding box):
+		/* minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496 */
+//		double[] mapViewExtent = {100000,-3720000,180000,-3675000}; // choose map view a bit bigger
+		double[] mapViewExtent = {115000,-3718000,161000,-3679000};
 
 		// Config and scenario
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
@@ -97,25 +118,15 @@ public class AccessibilityComputationNMBTest {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
-		{
-			StrategySettings stratSets = new StrategySettings();
-			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-			stratSets.setWeight(1.);
-			config.strategy().addStrategySettings(stratSets);
-		}
+		StrategySettings stratSets = new StrategySettings();
+		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+		stratSets.setWeight(1.);
+		config.strategy().addStrategySettings(stratSets);
 		
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-//		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.paratransit, true);
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 		// yy For a test, "abort" may be too strict.  kai, may'16
-
-		Scenario scenario = ScenarioUtils.loadScenario( config );
 		
 		// matrix-based pt
 		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
@@ -164,6 +175,18 @@ public class AccessibilityComputationNMBTest {
 		// collect homes
 		String activityFacilityType = "h";
 		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+		
+		
+		
+		
+		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+//		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.paratransit, true);
+		
 
 
 //		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
