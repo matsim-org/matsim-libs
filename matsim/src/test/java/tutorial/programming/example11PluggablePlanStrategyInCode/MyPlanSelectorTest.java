@@ -13,7 +13,7 @@ public class MyPlanSelectorTest {
 	public final void selectPlanTest()
 	{
 		//set up 
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 		Plan plan0 = PopulationUtils.createPlan(person);
 		Plan plan1 = PopulationUtils.createPlan(person);
 		person.addPlan(plan0);

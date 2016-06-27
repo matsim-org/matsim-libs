@@ -50,7 +50,7 @@ public class CreateHubPassengers {
 	
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		Plan plan = p.getSelectedPlan();
-		Person newPerson = PopulationUtils.getFactory().createPerson(p.getId());
+		Person newPerson = PopulationUtils.getDefaultFactory().createPerson(p.getId());
 		newPerson.addPlan(plan);
 		newpop.addPerson(newPerson);
 		if (p.getId().toString().startsWith("BS_WB")){

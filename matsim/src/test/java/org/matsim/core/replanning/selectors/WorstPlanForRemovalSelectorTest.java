@@ -40,7 +40,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testRemoveWorstPlans_nullType() {
 		PlanSelector<Plan, Person> selector = getPlanSelector();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 
 		Plan plan1 = PopulationUtils.createPlan(person);
 		plan1.setScore(15.0);
@@ -88,7 +88,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		 * plan4: b,  1.0
 		 * plan3: a, null
 		 */
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 
 		Plan plan1 = PopulationUtils.createPlan(person);
 		plan1.setScore(15.0);

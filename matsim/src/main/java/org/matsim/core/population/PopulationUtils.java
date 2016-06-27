@@ -53,8 +53,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -657,7 +657,11 @@ public final class PopulationUtils {
 		}
 		return false;
 	}
-	public static PopulationFactory getFactory() {
+	public static PopulationFactory getDefaultFactory() {
+		// to make this private, would have to get rid of things like getFactory().createPerson(..) .
+		// But I am not sure if this really makes a lot of sense, because this static default factory is easier to change into
+		// pop.getFactory() than anothing else.  kai, jun'16
+		
 //		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
 //		return scenario.getPopulation().getFactory() ;
 		// the above is too slow. kai, jun'16
@@ -669,74 +673,43 @@ public final class PopulationUtils {
 	// --- plain factories: 
 
 	public static Plan createPlan(Person person) {
-		Plan plan = getFactory().createPlan() ;
+		Plan plan = getDefaultFactory().createPlan() ;
 		plan.setPerson(person);
 		return plan ;
 	}
 
 	public static Plan createPlan() {
-		return getFactory().createPlan() ;
+		return getDefaultFactory().createPlan() ;
 	}
 
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
-		return getFactory().createActivityFromLinkId(type, linkId) ;
+		return getDefaultFactory().createActivityFromLinkId(type, linkId) ;
 	}
 
 	public static Activity createActivityFromCoord(String type, Coord coord) {
-		return getFactory().createActivityFromCoord(type, coord) ;
+		return getDefaultFactory().createActivityFromCoord(type, coord) ;
 	}
 
 	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
-		Activity act = getFactory().createActivityFromCoord(type, coord) ;
+		Activity act = getDefaultFactory().createActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
 		return act ;
 	}
 	
 	public static Leg createLeg(String transportMode) {
-		return getFactory().createLeg(transportMode) ;
+		return getDefaultFactory().createLeg(transportMode) ;
 	}
 
-	// --- copy factories:
-
-	public static Activity createActivity(Activity act) {
-		// yyyy somehow combine this with copyFromTo method.
-		// Or maybe a clone method??
-		
-		
-		// Act coord could be null according to first c'tor!
-		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
-
-		Activity newAct = createActivityFromCoordAndLinkId(act.getType(),coord,act.getLinkId()) ;
-		
-		newAct.setStartTime(act.getStartTime());
-		newAct.setEndTime(act.getEndTime());
-		newAct.setMaximumDuration(act.getMaximumDuration());
-		newAct.setFacilityId(act.getFacilityId());
-		
-		return newAct ;
-	}
-
-	/**
-	 * Makes a deep copy of this leg, however only when the Leg has a route which is
-	 * instance of Route or BasicRoute. Other route instances are not considered.
-	 * @param leg
-	 */
-	public static Leg createLeg(Leg leg) {
-		Leg newLeg = createLeg( leg.getMode() ) ;
-		copyFromTo( leg, newLeg ) ;
-		return newLeg ;
-	}
-	
 	// createAndAdd methods:
-		
+	
 	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
-		Activity act = getFactory().createActivityFromCoord(type, coord) ;
+		Activity act = getDefaultFactory().createActivityFromCoord(type, coord) ;
 		plan.addActivity(act);
 		act.setCoord(coord);
 		return act ;
 	}
 	public static Activity createAndAddActivityFromLinkId( Plan plan, String type, Id<Link> linkId ) {
-		Activity act = getFactory().createActivityFromLinkId(type, linkId) ;
+		Activity act = getDefaultFactory().createActivityFromLinkId(type, linkId) ;
 		plan.addActivity(act);
 		act.setLinkId(linkId);
 		return act ;
@@ -744,7 +717,7 @@ public final class PopulationUtils {
 
 	public static Leg createAndAddLeg(Plan plan, String mode) {
 		verifyCreateLeg( plan ) ;
-		Leg leg = getFactory().createLeg(mode) ;
+		Leg leg = getDefaultFactory().createLeg(mode) ;
 		plan.addLeg( leg );
 		return leg ;
 	}
@@ -765,30 +738,19 @@ public final class PopulationUtils {
 	// --- static copy methods:
 
 	/** loads a copy of an existing plan, but keeps the person reference
-	 * <p/>
-	 * Design comments:<ul>
-	 * <li> In my intuition, this is really a terrible method: (1) Plan is a data object, not a behavioral object, and thus it should be accessed
-	 * from static, interface-based methods only.
-	 * (2) It is not clear about the fact if it is doing a deep or a shallow copy.  The only excuse is that this is one of the oldest parts of
-	 * matsim.  kai, jan'13
-	 * </ul>
-	 * (This may be resolved now.  kai, jun'16)
 	 * 
 	 * @param in a plan who's data will be loaded into this plan
 	 * @param out 
 	 **/
 	public static void copyFromTo(final Plan in, Plan out) {
-	  out.getPlanElements().clear();
+		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
 		for (PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity) {
-				//no need to cast to ActivityImpl here
 				out.getPlanElements().add(createActivity((Activity) pe));
 			} else if (pe instanceof Leg) {
-				Leg l = (Leg) pe;
-				Leg l2 = PopulationUtils.createAndAddLeg( out, l.getMode() );
-				copyFromTo(l, l2);
+				out.getPlanElements().add( createLeg( (Leg) pe ) ) ;
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
 			}
@@ -796,11 +758,54 @@ public final class PopulationUtils {
 	}
 
 	public static void copyFromTo(Leg in, Leg out) {
+		out.setMode( in.getMode() );
 		out.setDepartureTime(in.getDepartureTime());
 		out.setTravelTime(in.getTravelTime());
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
+	}
+	
+	public static void copyFromTo(Activity act, Activity newAct) {
+		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
+		// (we don't want to copy the coord ref, but rather the contents!)
+		newAct.setCoord(coord);
+		newAct.setType( act.getType() );
+		newAct.setLinkId(act.getLinkId());
+		newAct.setStartTime(act.getStartTime());
+		newAct.setEndTime(act.getEndTime());
+		newAct.setMaximumDuration(act.getMaximumDuration());
+		newAct.setFacilityId(act.getFacilityId());
+	}
+	
+	// --- copy factories:
+
+	public static Activity createActivity(Activity act) {
+		Activity newAct = getDefaultFactory().createActivityFromLinkId(act.getType(), act.getLinkId()) ;
+		
+		copyFromTo(act, newAct);
+		// (this ends up setting type and linkId again)
+		
+		return newAct ;
+	}
+
+
+	/**
+	 * Makes a deep copy of this leg, however only when the Leg has a route which is
+	 * instance of Route or BasicRoute. Other route instances are not considered. 
+	 * </p>
+	 * <ul>
+	 * <li> Is the statement about the route still correct?  kai, jun'16
+	 * </ul>
+	 * @param leg
+	 */
+	public static Leg createLeg(Leg leg) {
+		Leg newLeg = createLeg( leg.getMode() ) ;
+
+		copyFromTo( leg, newLeg ) ;
+		// (this ends up setting mode again)
+
+		return newLeg ;
 	}
 	
 	// --- positional methods:
@@ -850,6 +855,8 @@ public final class PopulationUtils {
 		}
 		return null;
 	}
+	
+	// --- remove methods:
 
 	/**
 	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,
@@ -903,6 +910,9 @@ public final class PopulationUtils {
 			}
 		}
 	}
+	
+	// --- insert method(s):
+	
 	/**
 	 * Inserts a leg and a following act at position <code>pos</code> into the plan.
 	 * @param pos the position where to insert the leg-act-combo. acts and legs are both counted from the beginning starting at 0.

@@ -195,7 +195,7 @@ public class MembershipAssigner
         log.error("More than one plan for person: " + pi.getId());
       }
       if (PersonUtils.getLicense(pi).equalsIgnoreCase("yes")) {
-        Person personWithLicense = PopulationUtils.getFactory().createPerson(pi.getId());
+        Person personWithLicense = PopulationUtils.getDefaultFactory().createPerson(pi.getId());
         PersonUtils.setAge(personWithLicense, PersonUtils.getAge(pi));
         personWithLicense.addPlan(pi.getSelectedPlan());
         PersonUtils.setCarAvail(personWithLicense, PersonUtils.getCarAvail(pi));

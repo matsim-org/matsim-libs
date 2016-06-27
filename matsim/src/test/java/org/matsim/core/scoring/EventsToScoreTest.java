@@ -47,7 +47,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	public void testAddMoney() {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsManager events = EventsUtils.createEventsManager();
@@ -70,7 +70,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		Plan plan = PopulationUtils.createPlan() ;
 		person.addPlan(plan);

@@ -68,7 +68,7 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1", Person.class));
 		population.addPerson(person);
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", Id.create("1", Link.class));

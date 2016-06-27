@@ -107,7 +107,7 @@ public class JointTripRouterFactoryTest {
 		final Id<Person> id = driverId;
 
 		// driver
-		Person pers = PopulationUtils.getFactory().createPerson(id);
+		Person pers = PopulationUtils.getDefaultFactory().createPerson(id);
 		Plan plan = PopulationUtils.createPlan(pers);
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -131,7 +131,7 @@ public class JointTripRouterFactoryTest {
 		final Id<Person> id1 = passengerId;
 
 		// passenger
-		pers = PopulationUtils.getFactory().createPerson(id1);
+		pers = PopulationUtils.getDefaultFactory().createPerson(id1);
 		plan = PopulationUtils.createPlan(pers);
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );

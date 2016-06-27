@@ -46,7 +46,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * Test that each of a person's plans is randomly selected.
 	 */
 	public void testRandom() {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
 		Plan plan2 = PersonUtils.createAndAddPlan(person, false);
 		plan2.setScore(10.0);

@@ -206,7 +206,7 @@ public class GroupPlanStrategyTest {
 			final Map<Id<Person>, Plan> jointPlan) {
 		Id<Person> id = Id.createPersonId( count );
 		final Id<Person> id1 = id;
-		Person person = PopulationUtils.getFactory().createPerson(id1);
+		Person person = PopulationUtils.getDefaultFactory().createPerson(id1);
 		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );

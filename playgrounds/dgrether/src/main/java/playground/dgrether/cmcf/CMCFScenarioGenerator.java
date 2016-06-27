@@ -169,7 +169,7 @@ public class CMCFScenarioGenerator {
 		Link l6 = this.network.getLinks().get(Id.create(6, Link.class));
 
 		for (int i = 1; i <= 3600; i++) {
-			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PopulationUtils.createPlan(p);
 			p.addPlan(plan);
 			//home

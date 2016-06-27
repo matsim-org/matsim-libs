@@ -98,7 +98,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getCarPlan() {
-		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.getDefaultFactory().createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -135,7 +135,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanNoTransfer() {
-		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.getDefaultFactory().createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -170,7 +170,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanTransfer() {
-		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.getDefaultFactory().createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 //		desires.putActivityDuration( "h" , 12 * 3600 );
 //		desires.putActivityDuration( "w" , 12 * 3600 );
@@ -220,7 +220,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getWalkPlan() {
-		PersonImpl person = (PersonImpl) PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.getDefaultFactory().createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );

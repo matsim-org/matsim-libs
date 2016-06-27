@@ -105,7 +105,7 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.create( i , Person.class );
-			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 			final Plan plan = PopulationUtils.createPlan(person);
 			plans.add( plan );
 
@@ -135,7 +135,7 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.createPersonId( i );
-			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 			final Plan plan = PopulationUtils.createPlan(person);
 			jointPlan.put( id , plan );
 
@@ -167,7 +167,7 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.createPersonId( i );
-			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 			final Plan plan = PopulationUtils.createPlan(person);
 			if ( random.nextDouble() < 0.2 ) {
 				plans.add( plan );
@@ -214,7 +214,7 @@ public class RecomposeJointPlanAlgorithmTest {
 		Plan lastPlan = null;
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.create( i , Person.class );
-			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 			final Plan plan = PopulationUtils.createPlan(person);
 			if ( random.nextDouble() < 0.2 ) {
 				plans.add( plan );

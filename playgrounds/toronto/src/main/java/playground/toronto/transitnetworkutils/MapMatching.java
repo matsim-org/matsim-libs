@@ -175,7 +175,7 @@ public class MapMatching {
 						continue;
 					}
 					
-					Person person = PopulationUtils.getFactory().createPerson(Id.create("transit driver", Person.class));
+					Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("transit driver", Person.class));
 					VehicleImpl veh = new VehicleImpl(Id.create("test vehicle", Vehicle.class), new VehicleTypeImpl(Id.create("no type", VehicleType.class)));
 					
 					P = pather.calcLeastCostPath(fromNode, toNode, 0F, person, veh);

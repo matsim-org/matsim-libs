@@ -209,12 +209,12 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	private Plan createPlan(NetworkImpl network, String facString) {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1000", Person.class));
 		return createPlanFromLinks(network, person, TransportMode.car, facString);
 	}
 
 	private Plan createPlan(ActivityFacilities facilities, String facString) {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1000", Person.class));
 		return createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, TransportMode.car, facString);
 	}
 

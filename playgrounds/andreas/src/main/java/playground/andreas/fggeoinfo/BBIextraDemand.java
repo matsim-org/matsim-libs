@@ -84,7 +84,7 @@ public class BBIextraDemand {
 				// create agents heading for BBI
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor; i++) {
 
-					Person person = PopulationUtils.getFactory().createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					Plan plan = PopulationUtils.createPlan();
 					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
@@ -110,7 +110,7 @@ public class BBIextraDemand {
 				// create agents heading for TXL
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * demandBox.getShareTXL(); i++) {
 
-					Person person = PopulationUtils.getFactory().createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					Plan plan = PopulationUtils.createPlan();
 					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
@@ -129,7 +129,7 @@ public class BBIextraDemand {
 				// create agents heading for SXF
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * (1 - demandBox.getShareTXL()); i++) {
 
-					Person person = PopulationUtils.getFactory().createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					Plan plan = PopulationUtils.createPlan();
 					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());

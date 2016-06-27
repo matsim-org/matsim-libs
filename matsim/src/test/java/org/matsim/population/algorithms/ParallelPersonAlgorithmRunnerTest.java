@@ -68,7 +68,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class));
 			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
@@ -93,7 +93,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population population = scenario.getPopulation();
 			for (int i = 0; i < 10; i++) {
-				Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+				Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(i, Person.class));
 				population.addPerson(person);
 			}
 			ParallelPersonAlgorithmRunner.run(population, 2, new AbstractPersonAlgorithm() {

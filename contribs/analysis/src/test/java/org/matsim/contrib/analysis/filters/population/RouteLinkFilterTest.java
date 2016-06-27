@@ -74,7 +74,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Leg leg;
 		NetworkRoute route;
 
-		person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+		person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a.setEndTime(7.0 * 3600);
@@ -85,7 +85,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
 		population.addPerson(person);
 
-		person = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
+		person = PopulationUtils.getDefaultFactory().createPerson(Id.create("2", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
@@ -96,7 +96,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
 		population.addPerson(person);
 
-		person = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
+		person = PopulationUtils.getDefaultFactory().createPerson(Id.create("3", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a3 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);

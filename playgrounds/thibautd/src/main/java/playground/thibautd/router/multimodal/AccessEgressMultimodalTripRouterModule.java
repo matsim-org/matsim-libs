@@ -126,7 +126,7 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 										travelTime);
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
-						private final Person dummy = PopulationUtils.getFactory().createPerson(Id.create("dummy", Person.class));
+						private final Person dummy = PopulationUtils.getDefaultFactory().createPerson(Id.create("dummy", Person.class));
 						@Override
 						public double getLinkTravelDisutility(
 								final Link link,

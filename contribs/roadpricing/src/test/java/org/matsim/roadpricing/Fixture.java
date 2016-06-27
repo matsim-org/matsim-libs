@@ -183,7 +183,7 @@ import junit.framework.TestCase;
 	}
 
 	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(personId, Person.class));
 		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "h", (Id<Link>) homeLinkId).setEndTime(Time.parseTime(startTime));
@@ -196,7 +196,7 @@ import junit.framework.TestCase;
 	}
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(personId, Person.class));
 		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
 		Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", homeLink.getId());

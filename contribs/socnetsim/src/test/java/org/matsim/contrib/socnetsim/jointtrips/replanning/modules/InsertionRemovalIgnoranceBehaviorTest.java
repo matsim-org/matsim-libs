@@ -104,7 +104,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 		for (int i=0; i < 100; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
-			Person person = PopulationUtils.getFactory().createPerson(id);
+			Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class )).setEndTime( 10 );
@@ -113,7 +113,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
-			person = PopulationUtils.getFactory().createPerson(id1);
+			person = PopulationUtils.getDefaultFactory().createPerson(id1);
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class )).setEndTime( 10 );
@@ -133,7 +133,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 		for (int i=0; i < 100; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
 			final Id<Person> id = driverId;
-			Person person = PopulationUtils.getFactory().createPerson(id);
+			Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 			Plan plan = PopulationUtils.createPlan(person);
 			individualPlans.put( driverId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_d"+i, Id.create( "some_link" , Link.class )).setEndTime( 10 );
@@ -148,7 +148,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
 			final Id<Person> id1 = passengerId;
-			person = PopulationUtils.getFactory().createPerson(id1);
+			person = PopulationUtils.getDefaultFactory().createPerson(id1);
 			plan = PopulationUtils.createPlan(person);
 			individualPlans.put( passengerId , plan );
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "first_act_p"+i, Id.create( "earth" , Link.class )).setEndTime( 10 );

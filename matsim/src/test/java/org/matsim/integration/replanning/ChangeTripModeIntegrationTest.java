@@ -81,7 +81,7 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));

@@ -57,7 +57,7 @@ public class RemovalTest {
 		Id<Link> link1 = Id.create( "link1" , Link.class );
 		Id<Link> link2 = Id.create( "link2" , Link.class );
 
-		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one passenger trip", Person.class)));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create("one passenger trip", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId).setEndTime( 1 );
@@ -65,7 +65,7 @@ public class RemovalTest {
 		final Id<Link> linkId1 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId1);
 
-		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one driver trip", Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create("one driver trip", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId2 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId2).setEndTime( 1 );
@@ -73,7 +73,7 @@ public class RemovalTest {
 		final Id<Link> linkId3 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId3);
 
-		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one tour with one passenger trip", Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create("one tour with one passenger trip", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId4 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId4).setEndTime( 1 );
@@ -84,7 +84,7 @@ public class RemovalTest {
 		final Id<Link> linkId6 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId6);
 
-		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("one tour with one driver trip", Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create("one tour with one driver trip", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId7 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId7).setEndTime( 1 );
@@ -95,7 +95,7 @@ public class RemovalTest {
 		final Id<Link> linkId9 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId9);
 
-		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("two tours with one passenger trip each", Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create("two tours with one passenger trip each", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId10 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId10).setEndTime( 1 );
@@ -112,7 +112,7 @@ public class RemovalTest {
 		final Id<Link> linkId14 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId14);
 
-		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("two tours with one and two passenger trips", Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create("two tours with one and two passenger trips", Person.class)));
 		plans.add( plan );
 		final Id<Link> linkId15 = link1;
 		PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "h", linkId15).setEndTime( 1 );

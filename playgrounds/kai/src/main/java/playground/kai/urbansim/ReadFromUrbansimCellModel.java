@@ -152,7 +152,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				for ( int ii=0 ; ii<nPersons ; ii++ ) {
 					Id<Person> personId = Id.create( personCnt, Person.class ) ;
 					final Id<Person> id = personId;
-					Person person = PopulationUtils.getFactory().createPerson(id);
+					Person person = PopulationUtils.getDefaultFactory().createPerson(id);
 					personCnt++ ;
 					if ( personCnt > 10 ) {
 						log.error( "hack" ) ;

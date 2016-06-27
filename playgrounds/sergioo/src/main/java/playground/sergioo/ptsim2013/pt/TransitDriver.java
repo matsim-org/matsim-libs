@@ -53,7 +53,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, 
 			final TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
 		super(internalInterface, agentTracker);
-		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
+		Person driver = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
 		Plan plan = PopulationUtils.createPlan();
 		Leg leg = PopulationUtils.createLeg(TransportMode.car);

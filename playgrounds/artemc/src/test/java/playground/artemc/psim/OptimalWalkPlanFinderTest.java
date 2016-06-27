@@ -288,7 +288,7 @@ public class OptimalWalkPlanFinderTest {
 
 			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 25, 3600, 1);
 
-			this.person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+			this.person = PopulationUtils.getDefaultFactory().createPerson(Id.create("1", Person.class));
 			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			Coord homeLocation = new Coord(0.0, 1.0);

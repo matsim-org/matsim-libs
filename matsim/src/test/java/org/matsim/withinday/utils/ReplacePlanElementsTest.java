@@ -85,7 +85,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private Plan createSamplePlan() {
-		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getDefaultFactory().createPerson(Id.create(1, Person.class)));
 		
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		PopulationUtils.createAndAddLeg( plan, TransportMode.car );

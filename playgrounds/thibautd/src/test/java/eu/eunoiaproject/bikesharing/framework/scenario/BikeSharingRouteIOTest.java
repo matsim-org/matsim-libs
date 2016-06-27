@@ -155,7 +155,7 @@ public class BikeSharingRouteIOTest {
 	}
 
 	private Person wrapInPlan( final BikeSharingRoute outRoute ) {
-		final Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("p"));
+		final Person person = PopulationUtils.getDefaultFactory().createPerson(Id.createPersonId("p"));
 
 		final Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan( plan );

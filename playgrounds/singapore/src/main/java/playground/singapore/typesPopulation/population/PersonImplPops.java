@@ -43,16 +43,16 @@ public class PersonImplPops implements Person {
 
 	public PersonImplPops(Id id) {
 		final Id<Person> id1 = id;
-		delegate = PopulationUtils.getFactory().createPerson(id1);
+		delegate = PopulationUtils.getDefaultFactory().createPerson(id1);
 		this.populationId = Id.create(DEFAULT_POP,Population.class);
 	}
 	public PersonImplPops(Id id, Id<Population> populationId) {
 		final Id<Person> id1 = id;
-		delegate = PopulationUtils.getFactory().createPerson(id1);
+		delegate = PopulationUtils.getDefaultFactory().createPerson(id1);
 		this.populationId = populationId==null?Id.create(DEFAULT_POP,Population.class):populationId;
 	}
 	public PersonImplPops(Person person, Id populationId) {
-		delegate = PopulationUtils.getFactory().createPerson(person.getId());
+		delegate = PopulationUtils.getDefaultFactory().createPerson(person.getId());
 		PersonUtils.setAge(this, PersonUtils.getAge(person));
 		PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(person));
 		PersonUtils.setEmployed(this, PersonUtils.isEmployed(person));
