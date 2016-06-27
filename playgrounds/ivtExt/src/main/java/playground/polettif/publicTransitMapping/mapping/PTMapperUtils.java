@@ -99,7 +99,6 @@ public class PTMapperUtils {
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 
 					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
-//					stopsIterator.next(); // first stop is ignored
 
 					List<Id<Link>> linkIdList = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
@@ -113,11 +112,15 @@ public class PTMapperUtils {
 							linkIdList.add(0, closerLinkBefore);
 							nPulled++;
 						}
-						currentStop = stopsIterator.next();
 					}
+						currentStop = stopsIterator.next();
 
 					// optimize referenced links between start and end
 					for(int i = 1; i < linkList.size()-1; i++) {
+
+						if(linkList.get(i).toString().equals("114813")) {
+							log.debug("");
+						}
 
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 							Set<Link> testSet = new HashSet<>();
