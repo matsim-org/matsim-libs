@@ -29,11 +29,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 
-import playground.dziemke.accessibility.AccessibilityComputationNMBNew;
 import playground.dziemke.utils.LogToOutputSaver;
 
 public class AccessibilityComputationCottbus {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
+	public static final Logger log = Logger.getLogger(AccessibilityComputationCottbus.class);
 	
 	private static final double cellSize = 100.;
 	
