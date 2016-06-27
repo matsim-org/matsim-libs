@@ -141,7 +141,7 @@ public class TaxiStatsCalculator
             if (hourlySums[hour] == null) {
                 hourlySums[hour] = new LongEnumAdder<>(TaxiTaskType.class);
             }
-            hourlySums[hour].add(task.getTaxiTaskType(), (long)(toTime - fromTime));
+            hourlySums[hour].add(task.getTaxiTaskType(), (long) (toTime - fromTime));
         }
     }
 

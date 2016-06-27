@@ -25,6 +25,7 @@ import java.util.*;
 
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 
 

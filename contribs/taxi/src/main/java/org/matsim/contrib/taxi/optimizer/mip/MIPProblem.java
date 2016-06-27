@@ -127,7 +127,7 @@ public class MIPProblem
     private boolean initDataAndCheckIfSchedulingRequired()
     {
         vData = new VehicleData(optimContext);
-        if (vData.dimension == 0) {
+        if (vData.getSize() == 0) {
             return false;
         }
 
@@ -179,7 +179,7 @@ public class MIPProblem
             }
 
             int n = rData.dimension;
-            int m = vData.dimension;
+            int m = vData.getSize();
 
             boolean[][] x = new boolean[m + n][m + n];
             for (int u = 0; u < m + n; u++) {
@@ -215,7 +215,7 @@ public class MIPProblem
 
     private int getPlanningHorizon()
     {
-        return vData.dimension * MODE.reqsPerVeh;
+        return vData.getSize() * MODE.reqsPerVeh;
     }
 
 

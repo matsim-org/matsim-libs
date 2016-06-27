@@ -62,11 +62,12 @@ public class TaxiRequest
     private TaxiDropoffTask dropoffTask;
 
 
-    public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
-            double t0, double submissionTime)
+    public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double t0,
+            double submissionTime)
     {
         this(id, passenger, fromLink, null, t0, submissionTime);
     }
+
 
     public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
             double t0, double submissionTime)
@@ -152,7 +153,7 @@ public class TaxiRequest
                 if (pickupTask.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
                     return TaxiRequestStatus.PLANNED;
                 }
-                
+
                 TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
                 if (currentTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE && //
                         pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,27 +19,39 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.util.PartialSort;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
 
-/**
- * kNN - k Nearest Neighbours
- */
-public class StraightLineKNNFinders
+public class StraightLineKnnFinder<T, N>
 {
-    public static StraightLineKNNFinder<VehicleData.Entry, DestEntry<TaxiRequest>> createTaxiRequestFinder(
-            int k)
+    private final int k;
+    private final LinkProvider<T> objectToLink;
+    private final LinkProvider<N> neighbourToLink;
+
+
+    public StraightLineKnnFinder(int k, LinkProvider<T> objectToLink,
+            LinkProvider<N> neighbourToLink)
     {
-        return new StraightLineKNNFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK,
-                LinkProviders.REQUEST_ENTRY_TO_LINK);
+        this.k = k;
+        this.objectToLink = objectToLink;
+        this.neighbourToLink = neighbourToLink;
     }
 
 
-    public static StraightLineKNNFinder<DestEntry<TaxiRequest>, VehicleData.Entry> createVehicleDepartureFinder(
-            int k)
+    public List<N> findNearest(T obj, Iterable<N> neighbours)
     {
-        return new StraightLineKNNFinder<>(k, LinkProviders.REQUEST_ENTRY_TO_LINK,
-                LinkProviders.VEHICLE_ENTRY_TO_LINK);
+        Coord objectCoord = objectToLink.getLink(obj).getCoord();
+        PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
+
+        for (N n : neighbours) {
+            Coord nCoord = neighbourToLink.getLink(n).getCoord();
+            nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
+        }
+
+        return nearestRequestSort.retriveKSmallestElements();
     }
 }

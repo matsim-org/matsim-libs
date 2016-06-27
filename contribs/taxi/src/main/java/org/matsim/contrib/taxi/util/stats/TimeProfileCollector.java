@@ -47,8 +47,8 @@ public class TimeProfileCollector
     private final MatsimServices matsimServices;
 
 
-    public TimeProfileCollector(ProfileCalculator calculator, int interval,
-            String outputFile, MatsimServices matsimServices)
+    public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
+            MatsimServices matsimServices)
     {
         this.calculator = calculator;
         this.interval = interval;
