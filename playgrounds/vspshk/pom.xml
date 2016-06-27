@@ -17,11 +17,6 @@
 	</repositories>
   <dependencies>
 	  <dependency>
-		  <groupId>org.osgeo</groupId>
-		  <artifactId>proj4j</artifactId>
-		  <version>0.1.0</version>
-	  </dependency>
-	  <dependency>
 		  <groupId>org.opengis.wrapper</groupId>
 		  <artifactId>geoapi-proj4</artifactId>
 		  <version>3.1-SNAPSHOT</version>
