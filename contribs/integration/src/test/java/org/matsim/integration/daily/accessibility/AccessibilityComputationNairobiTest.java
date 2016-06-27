@@ -230,7 +230,6 @@ public class AccessibilityComputationNairobiTest {
 			String workingDirectory = config.controler().getOutputDirectory();
 			double[] mapViewExtent = {boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax()};
 
-
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
