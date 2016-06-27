@@ -35,6 +35,7 @@ import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV0;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV2;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV3;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV4;
 
 /**
 * @author ikaddoura
@@ -44,13 +45,16 @@ public class Decongestion {
 	private static final Logger log = Logger.getLogger(Decongestion.class);
 
 	private final DecongestionInfo info;
+	private final Controler controler;
 	
 	public Decongestion(DecongestionInfo info) {
 		this.info = info;
+		this.controler = new Controler(info.getScenario());
+		prepare();
 	}
 
-	public void run() {
-
+	private void prepare() {
+		
 		try {
 			OutputDirectoryLogging.initLoggingWithOutputDirectory(info.getScenario().getConfig().controler().getOutputDirectory());
 		} catch (IOException e1) {
@@ -70,6 +74,8 @@ public class Decongestion {
 			tollSettingApproach = new DecongestionTollingV2(info);
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V3)) {
 			tollSettingApproach = new DecongestionTollingV3(info);
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V4)) {
+			tollSettingApproach = new DecongestionTollingV4(info);
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.NoPricing)) {
 			if (info.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() < info.getScenario().getConfig().controler().getLastIteration()) {
 				throw new RuntimeException("If you want to disable pricing, please set the update price interval to a larger number than the number of iterations. Aborting...");
@@ -80,8 +86,6 @@ public class Decongestion {
 			throw new RuntimeException("Unknown decongestion toll setting approach. Aborting...");
 		}
 		
-		Controler controler = new Controler(info.getScenario());
-
 		// decongestion pricing
 		final DecongestionControlerListener decongestion = new DecongestionControlerListener(info, tollSettingApproach);		
 		controler.addOverridingModule(new AbstractModule() {
@@ -100,9 +104,15 @@ public class Decongestion {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
 			}
 		});		
-				
+	}
+
+	public void run() {		
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
+	}
+
+	public Controler getControler() {
+		return controler;
 	}
 
 }

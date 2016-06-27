@@ -64,7 +64,6 @@ import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
  * All relevant parameters are specified in {@link DecongestionInfo}.
  * 
  * Ideas to try out:
- * - Only increase the toll if the average delay has increased.
  * - Disable innovative strategies for the final x iterations.
  * 
  * @author ikaddoura
