@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -36,11 +35,8 @@ import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -52,17 +48,18 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
  * @author dziemke
  */
 public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
-	private static final Double cellSize = 2000.;
+	private static final Double cellSize = 500.;
 //	private static final double time = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
@@ -83,7 +80,7 @@ public class AccessibilityComputationNMBTest {
 
 		// Parameters
 		String crs = TransformationFactory.WGS84_SA_Albers;
-		String layerName = "za_nmb_" + cellSize.toString().split("\\.")[0];
+		String name = "za_nmb_" + cellSize.toString().split("\\.")[0];
 		
 		//QGis
 		boolean createQGisOutput = true;
@@ -91,9 +88,10 @@ public class AccessibilityComputationNMBTest {
 		Double lowerBound = -3.5;
 		Double upperBound = 3.5;
 		Integer range = 9; // in the current implementation, this must always be 9
-		int symbolSize = 2010;
+		int symbolSize = 510;
 		int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
-		final BoundingBox boundingBox = BoundingBox.createBoundingBox(115000,-3718000,161000,-3679000);
+//		final BoundingBox boundingBox = BoundingBox.createBoundingBox(115000,-3718000,161000,-3679000);
+		Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
 
 		// Config and scenario
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
@@ -102,6 +100,12 @@ public class AccessibilityComputationNMBTest {
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
+		
+		// Switch computation on for all modes		
+		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
+		}
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 
@@ -125,34 +129,7 @@ public class AccessibilityComputationNMBTest {
 		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
 		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
 
-		// plansClacRoute parameters
-//		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
-
-		// If no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
-		// teleported mode speed for pt also required, see PtMatrix:120
-//      ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
-//      ptParameters.setTeleportedModeSpeed(50./3.6);
-//      plansCalcRoute.addModeRoutingParams(ptParameters);
-
-		// by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
-		// the walk and bike parameters are needed, however. This is why they have to be set here again
-        
-		// Teleported mode speed for walking also required, see PtMatrix:141
-//		ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
-//		walkParameters.setTeleportedModeSpeed(3./3.6);
-//		plansCalcRoute.addModeRoutingParams(walkParameters );
-
-		// Teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
-//		ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
-//		bikeParameters.setTeleportedModeSpeed(15./3.6);
-//		plansCalcRoute.addModeRoutingParams(bikeParameters );
-		
-		// Pt matrix
-//      BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
-
 		assertNotNull(config);
-
 		
 		// Collect activity types
 //		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
@@ -166,15 +143,10 @@ public class AccessibilityComputationNMBTest {
 		String activityFacilityType = "h";
 		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 		
-		// Switch computation on for all modes		
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
-		}
-		
+		// Controller
 		Controler controler = new Controler(scenario) ;
 	
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, homes, crs, layerName, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, homes, crs, name, cellSize));
 		controler.addOverridingModule(new MatrixBasedPtModule());
 		
 		controler.run();
@@ -183,7 +155,7 @@ public class AccessibilityComputationNMBTest {
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
-			double[] mapViewExtent = {boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax()};
+			double[] mapViewExtent = {envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
 			
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";

@@ -7,6 +7,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.osgeo.proj4j.CRSFactory;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class TestCoordinateTransformation {
 
 	public static void main(String[] args) {
@@ -63,6 +65,16 @@ public class TestCoordinateTransformation {
 		System.out.println("parameter string " + crs2.getParameterString());
 		
 		System.out.println("balabbfsbfsbfsb");
+		
+		
+		System.out.println("###########################################################################");
+		
+		Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
+		
+		System.out.println(envelope.getMinX());
+		System.out.println(envelope.getMaxX());
+		System.out.println(envelope.getMinY());
+		System.out.println(envelope.getMaxY());
 		
 	
 	}
