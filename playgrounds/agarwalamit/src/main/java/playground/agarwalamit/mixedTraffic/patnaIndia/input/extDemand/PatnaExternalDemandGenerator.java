@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -116,7 +115,7 @@ public class PatnaExternalDemandGenerator {
 
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, "In");
 		Link originActLink = getLinkFromOuterCordonKey(countingStationNumber, true);
-		Link destinationActLink = NetworkUtils.getConnectingLink(originActLink.getToNode(), originActLink.getFromNode()); 
+		Link destinationActLink = getLinkFromOuterCordonKey(countingStationNumber, false); 
 
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
