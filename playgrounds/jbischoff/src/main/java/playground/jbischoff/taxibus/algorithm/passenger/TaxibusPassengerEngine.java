@@ -65,6 +65,9 @@ public class TaxibusPassengerEngine
         //optimizer should ignore rejected requests
         
         if (rejected) {
+        	agent.setStateToAbort(now);
+            Logger.getLogger(getClass())
+            .error(agent.getId().toString() + " is aborted, no Taxibus was found");
             if (abortWarn < 10)
                 Logger.getLogger(getClass())
                         .error(agent.getId().toString() + " is aborted, no Taxibus was found");
