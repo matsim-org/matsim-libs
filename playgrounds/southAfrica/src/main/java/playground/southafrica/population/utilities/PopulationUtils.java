@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -85,7 +85,7 @@ public class PopulationUtils {
 					PlanElement pe = selectedPlan.getPlanElements().get(i);
 					if(pe instanceof Activity){
 						double duration = 0.0;
-						Activity act = (Activity) pe;
+						ActivityImpl act = (ActivityImpl) pe;
 						if(i == 0){
 							/* It is the first (home) activity. */
 							duration = act.getEndTime();
@@ -305,38 +305,105 @@ public class PopulationUtils {
 		LOG.info("--------------------------------------------");
 	}
 	
-	private static void printModeStatistics(String population){
-		LOG.info("Parsing different modes observed in population...");
+	
+	/**
+	 * Identify all the activity chain types, as well as the number of 
+	 * occurrences of each type.
+	 * @param population
+	 */
+	public static void idActivityChainTypes(String population, String filename){
+		LOG.info("Checking for activity chain types...");
+
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
 		pr.readFile(population);
 		
 		Map<String, Integer> map = new TreeMap<>();
-		Counter counter = new Counter(" person # ");
-		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
-			Plan plan = sc.getPopulation().getPersons().get(id).getSelectedPlan();
-			if(plan != null){
-				for(PlanElement pe : plan.getPlanElements()){
-					if(pe instanceof Leg){
-						Leg leg = (Leg) pe;
-						if(!map.containsKey(leg.getMode())){
-							map.put(leg.getMode(), new Integer(1));
-						} else{
-							map.put(leg.getMode(), map.get(leg.getMode()) + 1 );
-						}
-					}
+		for(Id<Person> pid : sc.getPopulation().getPersons().keySet()){
+			Plan plan = sc.getPopulation().getPersons().get(pid).getSelectedPlan();
+			String chain = "";
+			for(PlanElement pe : plan.getPlanElements()){
+				if(pe instanceof Activity){
+					chain += ((Activity)pe).getType();
+				} else{
+					chain += "-";
 				}
 			}
-			counter.incCounter();
+			if(map.containsKey(chain)){
+				int oldValue = map.get(chain);
+				map.put(chain, oldValue + 1);
+			} else{
+				map.put(chain, 1);
+			}
 		}
-		counter.printCounter();
 		
-		LOG.info("Done parsing modes.");
-		LOG.info("--------------------------------------------");
-		for(String mode : map.keySet()){
-			LOG.info(String.format("%12s: %d", mode, map.get(mode)));
+		/* Write to file. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try{
+			bw.write("chain,occurrences");
+			bw.newLine();
+			for(String s : map.keySet()){
+				bw.write(String.format("%s,%d\n", s, map.get(s)));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
 		}
-		LOG.info("--------------------------------------------");
+		LOG.info("Done");
+	}
+	
+	/**
+	 * Report the number of activity chains, i.e. plans, and trips that have
+	 * mode `ride`.
+	 * 
+	 * @param population
+	 */
+	public static void printNumberOfRideStatistics(String population){
+		LOG.info("Checking for mode 'ride'...");
+		
+		int rideChains = 0;
+		int chains = 0;
+		int rideTrips = 0;
+		int trips = 0;
+
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		pr.readFile(population);
+		
+		for(Id<Person> pid : sc.getPopulation().getPersons().keySet()){
+			Plan plan = sc.getPopulation().getPersons().get(pid).getSelectedPlan();
+			
+			boolean chainHasRide = false;
+			
+			for(PlanElement pe : plan.getPlanElements()){
+				if(pe instanceof Leg){
+					Leg leg = (Leg)pe;
+					if(leg.getMode().equalsIgnoreCase("ride")){
+						rideTrips++;
+						chainHasRide = true;
+					}
+					trips++;
+				}
+			}
+			chains++;
+			if(chainHasRide){
+				rideChains++;
+			}
+		}
+		LOG.info("Done");
+		LOG.info("----------------------------------------------");
+		LOG.info("    Total number of trips: " + trips);
+		LOG.info("   Trips with mode 'ride': " + rideTrips);
+		LOG.info("   Total number of chains: " + chains);
+		LOG.info("  Chains with mode 'ride': " + rideChains);
+		LOG.info("----------------------------------------------");
 	}
 	
 	
@@ -364,7 +431,10 @@ public class PopulationUtils {
 			printNumberOfAgentTypes(args[1]);
 			break;
 		case 6:
-			printModeStatistics(args[1]);
+			idActivityChainTypes(args[1], args[2]);
+			break;
+		case 7:
+			printNumberOfRideStatistics(args[1]);
 			break;
 		default:
 			LOG.warn("Cannot print any statistics for option `" + option + "'");
