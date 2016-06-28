@@ -19,6 +19,7 @@
 
 package org.matsim.core.router;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,8 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import junit.framework.Assert;
 
 /**
  * @author mrieser
@@ -51,8 +50,7 @@ public class TeleportationRoutingModuleTest {
 		TeleportationRoutingModule router =
 				new TeleportationRoutingModule(
 						"mode",
-						populationFactory,
-						routeFactory, 10.0, 1.0);
+						populationFactory, 10.0, 1.0);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assert.assertEquals(100.0, tt, 10e-7);
 		Assert.assertEquals(100.0, leg.getTravelTime(), 10e-7);
@@ -62,7 +60,6 @@ public class TeleportationRoutingModuleTest {
 				new TeleportationRoutingModule(
 						"mode",
 						populationFactory,
-						routeFactory,
 						20.0,
 						1.0);
 		tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
@@ -76,7 +73,6 @@ public class TeleportationRoutingModuleTest {
                 new TeleportationRoutingModule(
 						"mode",
 						populationFactory,
-						routeFactory,
 						10.0,
 						manhattanBeelineDistanceFactor);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);

@@ -26,13 +26,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -53,7 +51,6 @@ public final class NetworkRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final RouteFactoriesRegister routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
 
@@ -61,11 +58,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final String mode,
 			final PopulationFactory populationFactory,
 			final Network network,
-			final LeastCostPathCalculator routeAlgo,
-			final RouteFactoriesRegister routeFactory) {
+			final LeastCostPathCalculator routeAlgo) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
-		this.routeFactory = routeFactory;
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 	}
@@ -76,7 +71,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final Facility<?> toFacility,
 			final double departureTime,
 			final Person person) {
-		Leg newLeg = populationFactory.createLeg( mode );
+		Leg newLeg = this.populationFactory.createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 		
 		Gbl.assertNotNull(fromFacility);
@@ -112,7 +107,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 	@Override
 	public String toString() {
-		return "[NetworkRoutingModule: mode="+mode+"]";
+		return "[NetworkRoutingModule: mode="+this.mode+"]";
 	}
 
 	private double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
@@ -127,7 +122,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			// (a "true" route)
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 			route.setTravelCost(path.travelCost);
@@ -137,7 +132,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
@@ -147,7 +142,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		if ( leg instanceof Leg ) {
-			Leg r = ((Leg) leg);
+			Leg r = (leg);
 			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
 			// (not in interface!)
 		}
