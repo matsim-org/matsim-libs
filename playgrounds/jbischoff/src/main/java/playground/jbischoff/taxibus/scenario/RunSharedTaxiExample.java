@@ -27,8 +27,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Binder;
-
 import playground.jbischoff.taxibus.analysis.SharedTaxiContolerListener;
 import playground.jbischoff.taxibus.analysis.SharedTaxiTripAnalyzer;
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;

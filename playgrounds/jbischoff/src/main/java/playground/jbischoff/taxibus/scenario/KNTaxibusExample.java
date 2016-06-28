@@ -39,6 +39,9 @@ import playground.jbischoff.taxibus.scenario.analysis.quick.TraveltimeAndDistanc
  *
  */
 public class KNTaxibusExample {
+	
+//	also try RunTaxibusExample
+//	also try RunSharedTaxiExample
 
 	public static void main(String[] args) {
 
