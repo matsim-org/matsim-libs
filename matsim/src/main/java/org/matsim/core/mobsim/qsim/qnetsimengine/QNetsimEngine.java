@@ -48,6 +48,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -492,7 +493,8 @@ public class QNetsimEngine implements MobsimEngine {
 				 * If the QLink contains agents that end their activity in the first time
 				 * step, the link should be activated.
 				 */
-				if (linksToActivateInitially.remove(qLink)) {
+				if (linksToActivateInitially.remove(qLink) 
+						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
 					this.engines.get(i).registerLinkAsActive(qLink);
 				}
 

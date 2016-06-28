@@ -20,6 +20,7 @@
 package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -42,7 +43,7 @@ public class KNTaxibusExample {
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -59,6 +60,8 @@ public class KNTaxibusExample {
 				addEventHandlerBinding().toInstance(ttEventHandler);
 			}
 		});
+		
+		controler.addOverridingModule( new OTFVisLiveModule() );
 		
 		controler.run();
 		taxibusTravelTimesAnalyzer.printOutput();

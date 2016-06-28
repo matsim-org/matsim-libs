@@ -51,11 +51,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
+	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
 	private static final String USE_DEFAULT_VEHICLES = "useDefaultVehicles";
 
 	public static enum TrafficDynamics { queue, withHoles } ;
 	
 	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;
+	public static enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime } ;
 
 	private static final String NODE_OFFSET = "nodeOffset";
 
@@ -71,8 +73,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private boolean usePersonIdForMissingVehicleId = true;
 	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
+	
 	private StarttimeInterpretation simStarttimeInterpretation = StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd;
-
+	
 	// ---
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
 	public static enum VehicleBehavior { teleport, wait, exception } ;
@@ -119,6 +122,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private String seepMode = "bike";
 	private boolean isSeepModeStorageFree = false;
 	private boolean isRestrictingSeepage = true;
+
+	private EndtimeInterpretation simEndtimeInterpretation;
 	// ---
 	
 	public QSimConfigGroup() {
@@ -398,6 +403,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	@StringSetter(SIM_STARTTIME_INTERPRETATION)
 	public void setSimStarttimeInterpretation(StarttimeInterpretation str) {
 		this.simStarttimeInterpretation = str;
+	}
+
+	@StringGetter(SIM_ENDTIME_INTERPRETATION)
+	public EndtimeInterpretation getSimEndtimeInterpretation() {
+		return simEndtimeInterpretation;
+	}
+
+	@StringSetter(SIM_ENDTIME_INTERPRETATION)
+	public void setSimEndtimeInterpretation(EndtimeInterpretation str) {
+		this.simEndtimeInterpretation = str;
 	}
 
 	@StringSetter(VEHICLE_BEHAVIOR)

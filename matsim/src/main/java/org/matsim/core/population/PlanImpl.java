@@ -46,6 +46,8 @@ import org.matsim.core.scenario.CustomizableUtils;
 	private final static Logger log = Logger.getLogger(Plan.class);
 
 	private Customizable customizableDelegate;
+	
+	/* package */ PlanImpl() {}
 
 //	@Override
 //	public final Activity createAndAddActivity(final String type1) {
@@ -70,11 +72,11 @@ import org.matsim.core.scenario.CustomizableUtils;
 //		return leg;
 //	}
 
-	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
-		if (plan.getPlanElements().size() == 0) {
-			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
-		}
-	}
+//	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
+//		if (plan.getPlanElements().size() == 0) {
+//			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
+//		}
+//	}
 
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
