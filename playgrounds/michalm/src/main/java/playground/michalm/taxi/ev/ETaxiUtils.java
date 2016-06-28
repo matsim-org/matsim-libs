@@ -24,9 +24,8 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.TaxiData;
 
-import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.ev.data.*;
-import playground.michalm.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
+import playground.michalm.ev.discharging.*;
 import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
 
@@ -35,19 +34,18 @@ public class ETaxiUtils
 {
     public static void initEvData(TaxiData taxiData, EvData evData)
     {
-        // TODO variable AUX and charging speeds -- depend on weather etc...
-        double auxPower = 0.5 * UnitConversionRatios.W_PER_kW; //0.5 kW
+        int temperature = 20; // aux power about 1 kW at 20oC
         double chargingSpeedFactor = 1.; //full speed
 
         for (Charger c : evData.getChargers().values()) {
-            new ETaxiChargingLogic(c, chargingSpeedFactor, auxPower);
+            new ETaxiChargingLogic(c, chargingSpeedFactor);
         }
 
         for (Vehicle v : taxiData.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
             ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption(ev));
-            ev.setAuxEnergyConsumption(
-                    (period) -> consumeFixedAuxEnergyWhenScheduleStarted(ev, v, auxPower, period));
+            ev.setAuxEnergyConsumption(OhdeSlaskiAuxEnergyConsumption
+                    .createConsumptionForFixedTemperature(ev, temperature));
             evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
         }
     }

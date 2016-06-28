@@ -49,7 +49,6 @@ public class OhdeSlaskiDriveEnergyConsumption
     private static final int maxAvgSpeed = 40;
     private static final int speedStepsPerUnit = 10;
     private static final double zeroSpeed = 0.01;
-
     private static final double[] power;
 
     static {
@@ -63,7 +62,7 @@ public class OhdeSlaskiDriveEnergyConsumption
 
 
     //v - avg speed [m/s]
-    //power - avg power [watt]
+    //power - avg power [W]
     private static double calcPower(double v)
     {
         return v * (ft * m_s * g + fa * v * v + cb * (a1 * Math.log(v) + a2) * m_s) / spr;

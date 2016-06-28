@@ -41,10 +41,10 @@ public class ETaxiChargingLogic
     private final double effectivePower;
 
 
-    public ETaxiChargingLogic(Charger charger, double chargingSpeedFactor, double auxPower)
+    public ETaxiChargingLogic(Charger charger, double chargingSpeedFactor)
     {
         super(charger);
-        effectivePower = charger.getPower() * chargingSpeedFactor - auxPower;
+        effectivePower = charger.getPower() * chargingSpeedFactor;
     }
 
 
