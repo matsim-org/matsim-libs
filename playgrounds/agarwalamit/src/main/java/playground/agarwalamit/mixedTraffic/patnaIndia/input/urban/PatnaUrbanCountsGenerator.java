@@ -43,8 +43,8 @@ public class PatnaUrbanCountsGenerator {
 	
 	public static void main(String[] args) {
 	
-		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/innerCordon.txt";
-		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/urbanCounts.xml.gz";
+		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/counts/innerCordon_excl_rckw_osmNetwork.txt";
+		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/urbanCounts_excl_rckw_osmNetwork.xml.gz";
 		
 		PatnaUrbanCountsGenerator pcg = new PatnaUrbanCountsGenerator();
 		pcg.readFileAndStoreCountInfo(innerCordonFile);

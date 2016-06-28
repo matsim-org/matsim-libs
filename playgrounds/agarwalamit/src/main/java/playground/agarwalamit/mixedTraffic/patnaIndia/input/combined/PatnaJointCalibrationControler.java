@@ -61,13 +61,13 @@ public class PatnaJointCalibrationControler {
 	private final static double SAMPLE_SIZE = 0.10;
 	private final static String subPopAttributeName = "userGroup";
 
-	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz"; //
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_counts.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_vehicles_10pct.xml.gz";
+	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz"; //
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_counts.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_vehicles_10pct.xml.gz";
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c3/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxxx/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -81,10 +81,10 @@ public class PatnaJointCalibrationControler {
 			config = pjc.createBasicConfigSettings();
 			
 			config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
-			config.planCalcScore().getOrCreateModeParams("bike").setConstant(12.);
-			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(9.);
-			config.planCalcScore().getOrCreateModeParams("pt").setConstant(-15.);
-			config.planCalcScore().getOrCreateModeParams("walk").setConstant(-11.);
+			config.planCalcScore().getOrCreateModeParams("bike").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("pt").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("walk").setConstant(0.);
 		}
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -163,7 +163,7 @@ public class PatnaJointCalibrationControler {
 		config.plans().setSubpopulationAttributeName(subPopAttributeName);
 		config.plans().setInputPersonAttributeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
 
-		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
 
 		config.controler().setFirstIteration(0);
