@@ -166,7 +166,7 @@ public class PatnaCadytsControler {
 		config.global().setCoordinateSystem(PatnaUtils.EPSG);
 
 		config.plans().setInputFile(plansFile);
-		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz");
+		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz");
 
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
