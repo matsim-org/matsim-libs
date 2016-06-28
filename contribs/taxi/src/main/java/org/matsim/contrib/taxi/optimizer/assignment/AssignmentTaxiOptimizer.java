@@ -77,7 +77,8 @@ public class AssignmentTaxiOptimizer
 
     protected void scheduleUnplannedRequests()
     {
-        AssignmentRequestData rData = initRequestData();
+        //advance request not considered => horizon==0 
+        AssignmentRequestData rData = new AssignmentRequestData(optimContext, 0, unplannedRequests);
         if (rData.getSize() == 0) {
             return;
         }
@@ -95,14 +96,6 @@ public class AssignmentTaxiOptimizer
             optimContext.scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
             unplannedRequests.remove(a.destination);
         }
-    }
-
-
-    private AssignmentRequestData initRequestData()
-    {
-        AssignmentRequestData rData = new AssignmentRequestData(optimContext, 0);//only immediate reqs
-        rData.init((SortedSet<TaxiRequest>)unplannedRequests);
-        return rData;
     }
 
 

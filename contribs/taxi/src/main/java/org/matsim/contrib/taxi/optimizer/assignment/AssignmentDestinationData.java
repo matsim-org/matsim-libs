@@ -44,23 +44,7 @@ public abstract class AssignmentDestinationData<D>
     }
 
 
-    private final List<DestEntry<D>> entries = new ArrayList<>();
-
-
-    public void init(SortedSet<D> candidateDestinations)
-    {
-        int idx = 0;
-        for (D d : candidateDestinations) {
-            DestEntry<D> e = createEntry(idx, d);
-            if (e != null) {
-                entries.add(e);
-                idx++;
-            }
-        }
-    }
-
-
-    protected abstract DestEntry<D> createEntry(int idx, D candidateDest);
+    protected final List<DestEntry<D>> entries = new ArrayList<>();
 
 
     public int getSize()

@@ -31,25 +31,29 @@ class AssignmentRequestData
     private final double maxT0;
 
 
-    AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon)
+    AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon,
+            Iterable<TaxiRequest> unplannedRequests)
     {
         currTime = optimContext.timer.getTimeOfDay();
         maxT0 = currTime + planningHorizon;
+        init(unplannedRequests);
     }
 
 
-    @Override
-    protected DestEntry<TaxiRequest> createEntry(int idx, TaxiRequest candidateDest)
+    private void init(Iterable<TaxiRequest> unplannedRequests)
     {
-        double t0 = candidateDest.getT0();
-        if (t0 > maxT0) {
-            return null;
-        }
+        int idx = 0;
+        for (TaxiRequest r : unplannedRequests) {
+            double t0 = r.getT0();
+            if (t0 > maxT0) {//beyond the planning horizon
+                continue;
+            }
 
-        if (t0 <= currTime) {
-            urgentReqCount++;
+            if (t0 <= currTime) {
+                urgentReqCount++;
+            }
+            entries.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), t0));
         }
-        return new DestEntry<TaxiRequest>(idx, candidateDest, candidateDest.getFromLink(), t0);
     }
 
 

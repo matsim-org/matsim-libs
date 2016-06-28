@@ -124,12 +124,12 @@ public class ETaxiChargingLogic
 
 
     //does not include further demand (AUX for queued vehs; AUX+driving for dispatched vehs)
-    public double estimateAssignedWorkloadPerCharger()
+    public double estimateAssignedWorkload()
     {
         double total = sumEnergyToCharge(pluggedVehicles.values())
                 + sumEnergyToCharge(queuedVehicles)
                 + sumEnergyToCharge(dispatchedVehicles.values());
-        return total / effectivePower / charger.getPlugs();
+        return total / effectivePower;
     }
 
 
@@ -143,19 +143,19 @@ public class ETaxiChargingLogic
     }
 
 
-    int getPluggedCount()
+    public int getPluggedCount()
     {
         return pluggedVehicles.size();
     }
 
 
-    int getQueuedCount()
+    public int getQueuedCount()
     {
         return queuedVehicles.size();
     }
 
 
-    int getDispatchedCount()
+    public int getDispatchedCount()
     {
         return dispatchedVehicles.size();
     }
