@@ -21,6 +21,8 @@ package org.matsim.contrib.minibus.performance;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -28,8 +30,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.List;
 

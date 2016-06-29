@@ -33,10 +33,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 

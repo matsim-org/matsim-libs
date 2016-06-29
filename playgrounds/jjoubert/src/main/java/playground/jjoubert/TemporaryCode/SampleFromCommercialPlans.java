@@ -36,8 +36,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.XY2Links;
 
 public class SampleFromCommercialPlans {
 	private static Logger log = Logger.getLogger(SampleFromCommercialPlans.class);

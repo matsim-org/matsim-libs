@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.population.algorithms.XY2Links;
 
 import playground.jjoubert.Utilities.roadpricing.MyDemandMatrix;
 

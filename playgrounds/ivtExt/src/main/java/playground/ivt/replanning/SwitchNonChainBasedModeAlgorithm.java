@@ -21,14 +21,14 @@ package playground.ivt.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
-import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.*;
 

@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationReaderTask implements PersonSource, Runnable {
 

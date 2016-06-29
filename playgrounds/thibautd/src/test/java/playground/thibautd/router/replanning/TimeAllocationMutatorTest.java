@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
-import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
-import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 

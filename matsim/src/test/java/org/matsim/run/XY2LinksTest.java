@@ -45,7 +45,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.XY2Links} functions properly, e.g. really
- * writes out modified plans. It does <em>not</em> test that {@link org.matsim.population.algorithms.XY2Links}
+ * writes out modified plans. It does <em>not</em> test that {@link org.matsim.core.population.algorithms.XY2Links}
  * works correctly, e.g. that it assigns the right links.
  *
  * @author mrieser

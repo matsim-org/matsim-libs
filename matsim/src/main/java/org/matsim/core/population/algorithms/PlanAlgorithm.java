@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonRemoveLinkAndRoute.java
+ * PlanAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.core.population.algorithms;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 
-public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
-
-	@Override
-	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
-			run(plan);
-		}
-	}
-
-	@Override
-	public void run(final Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				((Activity) pe).setLinkId(null);
-			} else if (pe instanceof Leg) {
-				((Leg) pe).setRoute(null);
-			}
-		}
-	}
+public interface PlanAlgorithm {
+	public abstract void run(Plan plan);
 }

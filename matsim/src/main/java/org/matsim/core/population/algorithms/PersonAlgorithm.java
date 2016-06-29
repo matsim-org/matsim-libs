@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.core.population.algorithms;
 
 import org.matsim.api.core.v01.population.Person;
 

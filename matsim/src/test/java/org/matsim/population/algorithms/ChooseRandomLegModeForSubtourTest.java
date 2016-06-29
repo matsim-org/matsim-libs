@@ -50,6 +50,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripStructureUtils;

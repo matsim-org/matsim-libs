@@ -39,10 +39,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of

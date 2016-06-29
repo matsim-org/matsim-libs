@@ -12,9 +12,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class SocialNetworkCreator implements PersonAlgorithm {
 	private static Map<Id<ActivityFacility>, Set<Id<Person>>> map = new HashMap<Id<ActivityFacility>, Set<Id<Person>>>();

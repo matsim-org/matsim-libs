@@ -26,11 +26,11 @@ import javax.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
-import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Changes the transportation mode of all legs of one randomly chosen subtour in a plan to a randomly chosen

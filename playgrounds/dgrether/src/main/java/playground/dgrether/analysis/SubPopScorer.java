@@ -36,10 +36,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 
 import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.events.filters.PersonEventFilter;

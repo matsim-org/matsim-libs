@@ -21,7 +21,7 @@
 package org.matsim.contrib.analysis.filters.population;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
 

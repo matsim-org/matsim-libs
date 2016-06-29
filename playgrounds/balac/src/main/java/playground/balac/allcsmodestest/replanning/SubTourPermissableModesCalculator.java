@@ -6,7 +6,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 
 public class SubTourPermissableModesCalculator implements PermissibleModesCalculator{
 

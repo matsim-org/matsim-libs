@@ -1,5 +1,5 @@
 /**
- * Contains different routing algorithms and {@linkplain org.matsim.population.algorithms.PlanAlgorithm PlanAlgorithms}
+ * Contains different routing algorithms and {@linkplain org.matsim.core.population.algorithms.PlanAlgorithm PlanAlgorithms}
  * to use the routing algorithms on plans.
  * <br>
  * The routing algorithms, responsible for finding the least-cost-path between two nodes in the network, all
@@ -34,7 +34,7 @@
  * <br>
  * It moreover provides access to a {@link org.matsim.core.router.StageActivityTypes} instance allowing
  * to identify all possible stage activities, for all modes.
- * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.population.algorithms.PlanAlgorithm} to
+ * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.core.population.algorithms.PlanAlgorithm} to
  * route all trips in a plan.
  * </ul>
  *

@@ -31,10 +31,10 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 import playground.balac.retailers.IO.FileRetailerReader;
 import playground.balac.retailers.IO.LinksRetailerReaderV2;

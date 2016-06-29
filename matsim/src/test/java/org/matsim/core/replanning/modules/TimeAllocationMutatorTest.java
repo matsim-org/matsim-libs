@@ -33,12 +33,12 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
+import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
-import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
-import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestCase;
 

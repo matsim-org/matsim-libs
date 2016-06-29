@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlanAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.core.population.algorithms;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
 
-public interface PlanAlgorithm {
-	public abstract void run(Plan plan);
+/**
+ * @author dgrether
+ */
+public class PlanCollectFromAlgorithm implements PlanAlgorithm {
+
+	private Set<Plan> plans;
+
+	public PlanCollectFromAlgorithm() {
+		this.plans = new HashSet<Plan>();
+	}
+
+	/**
+	 * Just collects all plans in a set.
+	 * @see org.matsim.core.population.algorithms.PlanAlgorithm#run(org.matsim.core.population.PlanImpl)
+	 */
+	@Override
+	public void run(Plan plan) {
+		this.plans.add(plan);
+	}
+
+	public Set<Plan> getPlans() {
+		return this.plans;
+	}
+
 }

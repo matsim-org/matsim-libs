@@ -21,7 +21,7 @@
 package playground.sergioo.replaceExpBeta2013;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 /**
  * @author sergioo
