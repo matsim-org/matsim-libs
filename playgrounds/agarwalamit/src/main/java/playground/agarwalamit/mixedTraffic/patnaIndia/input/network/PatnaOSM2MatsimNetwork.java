@@ -111,6 +111,14 @@ public class PatnaOSM2MatsimNetwork {
 			l.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		}
 		
+		//delete some links towards danapur, which are not present in the network from transcad data and heavily distort the nearby counting station.
+		
+		network.removeLink(Id.createLinkId("262-590"));
+		network.removeLink(Id.createLinkId("589-261"));
+		
+		network.removeLink(Id.createLinkId("7316"));
+		network.removeLink(Id.createLinkId("7315"));
+		
 		//finally write it again
 		new NetworkWriter(scenario.getNetwork()).write(out_osmNetworkFile);
 	}
