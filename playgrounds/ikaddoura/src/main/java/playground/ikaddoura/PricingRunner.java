@@ -65,6 +65,7 @@ public class PricingRunner {
 
 	private static String configFile = "../../../runs-svn/vickreyPricing/input/config_vickrey_B.xml";
 	private static String outputBaseDirectory = "../../../runs-svn/vickreyPricing/output_vickrey_B/";
+	
 	private static PricingApproach pricingApproach = PricingApproach.IntervalBasedMaximumDelayPricing;
 	
 	private enum PricingApproach {
@@ -84,35 +85,35 @@ public class PricingRunner {
 			log.info("config file: "+ configFile);
 			
 			String pricingApproachString = args[2];
-			if (pricingApproachString.equals(PricingApproach.NoPricing.toString())) {
+			if (pricingApproachString.equals(PricingApproach.NoPricing)) {
 				pricingApproach = PricingApproach.NoPricing;
-			} else if (pricingApproachString.equals(PricingApproach.V3.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.V3)) {
 				pricingApproach = PricingApproach.V3;
-			} else if (pricingApproachString.equals(PricingApproach.V7.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.V7)) {
 				pricingApproach = PricingApproach.V7;
-			} else if (pricingApproachString.equals(PricingApproach.V8.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.V8)) {
 				pricingApproach = PricingApproach.V8;
-			} else if (pricingApproachString.equals(PricingApproach.V9.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.V9)) {
 				pricingApproach = PricingApproach.V9;
-			} else if (pricingApproachString.equals(PricingApproach.V10.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.V10)) {
 				pricingApproach = PricingApproach.V10;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionNoPricing.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionNoPricing)) {
 				pricingApproach = PricingApproach.DecongestionNoPricing;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV0a.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV0a)) {
 				pricingApproach = PricingApproach.DecongestionV0a;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV0b.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV0b)) {
 				pricingApproach = PricingApproach.DecongestionV0b;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV1a.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV1a)) {
 				pricingApproach = PricingApproach.DecongestionV1a;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV1b.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV1b)) {
 				pricingApproach = PricingApproach.DecongestionV1b;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV2a.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV2a)) {
 				pricingApproach = PricingApproach.DecongestionV2a;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV2b.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV2b)) {
 				pricingApproach = PricingApproach.DecongestionV2b;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV4a.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV4a)) {
 				pricingApproach = PricingApproach.DecongestionV4a;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV4b.toString())) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV4b)) {
 				pricingApproach = PricingApproach.DecongestionV4b;
 			} else {
 				throw new RuntimeException("Unknown pricing approach: " + pricingApproachString);
