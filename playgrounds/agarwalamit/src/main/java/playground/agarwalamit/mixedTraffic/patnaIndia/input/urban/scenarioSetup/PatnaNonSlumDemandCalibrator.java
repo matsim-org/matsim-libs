@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup.PatnaCalibrationUtils.PatnaDemandLabels;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
 import playground.agarwalamit.utils.RandomNumberUtils;
 
@@ -80,7 +81,7 @@ public class PatnaNonSlumDemandCalibrator {
 	}
 
 	public static void main(String[] args) {
-		String outputFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
+		String outputFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
 		new PatnaNonSlumDemandCalibrator().processForZone27To42(outputFile);
 	}
 
@@ -114,8 +115,8 @@ public class PatnaNonSlumDemandCalibrator {
 			SortedMap<String, Double> groupNumbers = new TreeMap<>();
 			groupNumbers.put("car", 1.);
 			groupNumbers.put("motorbike", 9.);
-			groupNumbers.put("bike", 30.);
-			groupNumbers.put("pt", 37.);
+			groupNumbers.put("bike", 23.); //groupNumbers.put("bike", 30.);
+			groupNumbers.put("pt", 44.); //groupNumbers.put("pt", 37.);
 			groupNumbers.put("walk", 22.);
 			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBE_PLANS ) );
 		}
@@ -123,8 +124,8 @@ public class PatnaNonSlumDemandCalibrator {
 			SortedMap<String, Double> groupNumbers = new TreeMap<>();
 			groupNumbers.put("car", 10.);
 			groupNumbers.put("motorbike", 28.);
-			groupNumbers.put("bike", 34.);
-			groupNumbers.put("pt", 8.);
+			groupNumbers.put("bike", 33.); //groupNumbers.put("bike", 34.);
+			groupNumbers.put("pt", 9.); //groupNumbers.put("pt", 8.);
 			groupNumbers.put("walk", 20.);
 			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBS_PLANS ) );
 		}
@@ -132,8 +133,8 @@ public class PatnaNonSlumDemandCalibrator {
 			SortedMap<String, Double> groupNumbers = new TreeMap<>();
 			groupNumbers.put("car", 3.);
 			groupNumbers.put("motorbike", 12.);
-			groupNumbers.put("bike", 24.);
-			groupNumbers.put("pt", 34.);
+			groupNumbers.put("bike", 20.); //groupNumbers.put("bike", 24.);
+			groupNumbers.put("pt", 38.); // groupNumbers.put("pt", 34.);
 			groupNumbers.put("walk", 27.);
 			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBO_PLANS ) );
 		}

@@ -49,13 +49,13 @@ public class PatnaCalibrationUtils {
 		case "2":	// Mini Bus
 		case "5":	// Motor driven 3W
 		case "7" :	// train
+		case "9" :	//CycleRickshaw
 			travelMode = "pt";	break;								
 		case "3":	
 			travelMode = "car";	break;
 		case "4":	// all 2 W motorized 
 			travelMode = "motorbike";	break;							
 		case "6" :	//bicycle
-		case "9" :	//CycleRickshaw
 			travelMode = "bike";	break;						
 		case "8" : 
 			travelMode = "walk";	break;
