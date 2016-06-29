@@ -10,6 +10,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -30,7 +31,7 @@ public class AddPrefixToPersonId extends NewPopulation {
 
 	@Override
 	public void run(Person person) {
-        ((PersonImpl) person).setId(Id.create(this.preFix + person.getId().toString(), Person.class));
+        PopulationUtils.changePersonId( ((PersonImpl) person), Id.create(this.preFix + person.getId().toString(), Person.class) ) ;
         this.popWriter.writePerson(person);
 	}
 

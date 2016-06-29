@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -94,7 +95,7 @@ public class DuplicatePersons {
 				for ( int i=0; i < rate; i++ ) {
 					final String currId = id +"-"+ i;
 					cloneIds.add( currId );
-					((PersonImpl) person).setId( Id.createPersonId( currId ) );
+					PopulationUtils.changePersonId( ((PersonImpl) person), Id.createPersonId( currId ) ) ;
 					writer.writePerson( person );
 				}
 			}

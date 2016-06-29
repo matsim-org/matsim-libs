@@ -933,4 +933,12 @@ public final class PopulationUtils {
 		plan.getPlanElements().add(pos, act);
 		plan.getPlanElements().add(pos, leg);
 	}
+
+		public static void changePersonId( Person person, Id<Person> id ) {
+			if ( person instanceof PersonImpl ) {
+				((PersonImpl) person).changeId(id);
+			} else {
+				throw new RuntimeException("wrong implementation of interface Person") ;
+			}
+		}
 }

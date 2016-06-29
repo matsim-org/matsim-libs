@@ -303,6 +303,12 @@ import org.xml.sax.helpers.AttributesImpl;
 		public void addPerson(Person p) {
 			throw new RuntimeException("Calls to this method are not expected to happen...");
 		}
+
+		@Override
+		public Person removePerson(Id<Person> personId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 	
 	public abstract static class Tag {

@@ -94,7 +94,7 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
 					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
-                    ((PersonImpl) person).setId(Id.create(person.getId().toString() + "_source-target", Person.class));
+                    PopulationUtils.changePersonId( ((PersonImpl) person), Id.create(person.getId().toString() + "_source-target", Person.class) ) ;
                 }
 			}
 		}

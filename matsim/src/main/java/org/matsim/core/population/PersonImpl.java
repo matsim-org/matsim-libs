@@ -24,16 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
+import org.matsim.core.scenario.Lockable;
 /**
  * Default implementation of {@link Person} interface.
  */
-public final class PersonImpl implements Person {
+public final class PersonImpl implements Person, Lockable {
 
 	private List<Plan> plans = new ArrayList<Plan>(6);
 	private Id<Person> id;
@@ -86,11 +89,17 @@ public final class PersonImpl implements Person {
 		return this.id;
 	}
 
-	public void setId(final Id<Person> id) {
-		// Not on interface. Only to be used for demand generation.
-		// yyyy This method is dangerous, since it allows to change the ID of the person while it remains under the old ID in the map.
-		// I think that it can be removed once the copy stuff is sorted out.  kai, may'16
-		testForLocked() ;
+	/* deliberately package */ void changeId(final Id<Person> id) {
+		// This is deliberately non-public and not on the interface, since the ID should not be changed after the
+		// person is inserted into the population map (since the ID is the map key).  
+		// However, there are some situations where changing the ID makes sense while the person is outside
+		// the population ...  kai, jun'16
+		try {
+			testForLocked() ;
+		} catch ( Exception ee ) {
+			Logger.getLogger(getClass()).warn("cannot change oerson id while in population.  remove the person, change Id, re-add.");
+			throw ee ;
+		}
 		this.id = id;
 	}
 
@@ -125,15 +134,11 @@ public final class PersonImpl implements Person {
 		return this.customizableDelegate.getCustomAttributes();
 	}
 
-	final void setLocked() {
+	@Override
+	public final void setLocked() {
 		this.locked = true ;
-		
-		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
-//		for ( Plan plan : this.plans ) {
-//				((PlanImpl)plan).setLocked() ;
-				// does not really do that much since it only affects the initial plan(s). kai, dec'15
-//		}
 	}
+
 	private void testForLocked() {
 		if ( this.locked ) {
 			throw new RuntimeException("too late to do this") ;

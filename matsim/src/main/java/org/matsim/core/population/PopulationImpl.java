@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -80,6 +81,9 @@ public final class PopulationImpl implements Population {
 		if (this.getPersons().containsKey(p.getId())) {
 			throw new IllegalArgumentException("Person with id = " + p.getId() + " already exists.");
 		}
+		if ( p instanceof Lockable ) {
+			((Lockable) p).setLocked();
+		}
 
 		// show counter
 		this.counter++;
@@ -107,6 +111,11 @@ public final class PopulationImpl implements Population {
 			// remove again as we are streaming
 			this.getPersons().remove(p.getId());
 		}
+	}
+	
+	@Override
+	public Person removePerson( Id<Person> personId ) {
+		return this.persons.remove(personId) ;
 	}
 
 	//////////////////////////////////////////////////////////////////////

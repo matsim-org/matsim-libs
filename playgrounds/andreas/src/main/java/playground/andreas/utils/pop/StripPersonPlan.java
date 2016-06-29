@@ -54,7 +54,7 @@ public class StripPersonPlan extends NewPopulation {
 
 		this.personshandled++;
 
-		person.setId(Id.create("p" + personshandled, Person.class));
+		PopulationUtils.changePersonId( person, Id.create("p" + personshandled, Person.class) ) ;
 		PersonUtils.setAge(person, Integer.MIN_VALUE);
 		PersonUtils.setCarAvail(person, null);
 		PersonUtils.setEmployed(person, (Boolean) null);
