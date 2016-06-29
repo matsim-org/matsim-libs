@@ -65,7 +65,6 @@ public class PricingRunner {
 
 	private static String configFile = "../../../runs-svn/vickreyPricing/input/config_vickrey_B.xml";
 	private static String outputBaseDirectory = "../../../runs-svn/vickreyPricing/output_vickrey_B/";
-	
 	private static PricingApproach pricingApproach = PricingApproach.IntervalBasedMaximumDelayPricing;
 	
 	private enum PricingApproach {
