@@ -32,7 +32,7 @@ public class OhdeSlaskiAuxEnergyConsumption
 
 
     private static final double a = 1.3;//[W]
-    private static final double b = 63.4;//[W]
+    private static final double b = -63.4;//[W]
     private static final double c = 1748.1;//[W]
 
     //precomputed values
