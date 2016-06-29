@@ -38,6 +38,8 @@ public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final AssignmentTaxiOptimizerParams params;
+    protected final FastMultiNodeDijkstra router;
+    protected final BackwardFastMultiNodeDijkstra backwardRouter;
     private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
     private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
@@ -56,25 +58,25 @@ public class AssignmentTaxiOptimizer
 
         RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
                 .createRoutingNetwork(optimContext.network);
-        FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork,
-                optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
-                fastRouterFactory, true);
+        router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
+                optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
 
         RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(
                 preProcessDijkstra).createRoutingNetwork(optimContext.network);
-        BackwardFastMultiNodeDijkstra backwardRouter = new BackwardFastMultiNodeDijkstra(
-                inverseRoutingNetwork, optimContext.travelDisutility, optimContext.travelTime,
-                preProcessDijkstra, fastRouterFactory, true);
+        backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,
+                optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
+                fastRouterFactory, true);
 
         assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
                 backwardRouter,
-                StraightLineKnnFinders.createTaxiRequestFinder(params.nearestRequestsLimit),
+                StraightLineKnnFinders.createRequestEntryFinder(params.nearestRequestsLimit),
                 StraightLineKnnFinders.createVehicleDepartureFinder(params.nearestVehiclesLimit));
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
     }
 
 
+    @Override
     protected void scheduleUnplannedRequests()
     {
         //advance request not considered => horizon==0 

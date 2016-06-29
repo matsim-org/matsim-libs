@@ -65,6 +65,13 @@ public class VehicleAssignmentProblem<D>
 
 
     public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
+            BackwardFastMultiNodeDijkstra backwardRouter)
+    {
+        this(travelTime, router, backwardRouter, null, null);
+    }
+
+
+    public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter,
             StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> destinationFinder,
             StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder)
@@ -127,8 +134,8 @@ public class VehicleAssignmentProblem<D>
             Node fromNode = departure.link.getToNode();
 
             //TODO this kNN is slow
-            List<DestEntry<D>> filteredDests = destinationFinder.findNearest(departure,
-                    dData.getEntries());
+            List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
+                    : destinationFinder.findNearest(departure, dData.getEntries());
 
             Map<Id<Node>, InitialNode> destInitialNodes = Maps
                     .newHashMapWithExpectedSize(filteredDests.size());
@@ -188,8 +195,8 @@ public class VehicleAssignmentProblem<D>
             Node toNode = dest.link.getFromNode();
 
             //TODO this kNN is slow
-            List<VehicleData.Entry> filteredVehs = vehicleFinder.findNearest(dest,
-                    vData.getEntries());
+            List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
+                    : vehicleFinder.findNearest(dest, vData.getEntries());
 
             Map<Id<Node>, InitialNode> vehInitialNodes = Maps
                     .newHashMapWithExpectedSize(filteredVehs.size());

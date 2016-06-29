@@ -28,7 +28,7 @@ import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.De
  */
 public class StraightLineKnnFinders
 {
-    public static StraightLineKnnFinder<VehicleData.Entry, DestEntry<TaxiRequest>> createTaxiRequestFinder(
+    public static StraightLineKnnFinder<VehicleData.Entry, DestEntry<TaxiRequest>> createRequestEntryFinder(
             int k)
     {
         return new StraightLineKnnFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK,
