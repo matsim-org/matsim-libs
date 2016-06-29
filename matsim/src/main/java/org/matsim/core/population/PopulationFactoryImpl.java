@@ -84,7 +84,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	 */
 	@Override
 	public <R extends Route> R createRoute(final Class<R> routeType, final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return this.routeFactory.createRoute(routeType, startLinkId, endLinkId);
+		return this.getRouteFactoriesRegister().createRoute(routeType, startLinkId, endLinkId);
 	}
 
 	/**
