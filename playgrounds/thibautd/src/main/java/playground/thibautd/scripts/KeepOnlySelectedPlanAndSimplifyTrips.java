@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -76,7 +76,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 			@Override
 			public void run(final Person person) {
 				if ( atts.getAttribute( person.getId().toString() , "subpopulation" ) != null ) return;
-				PersonUtils.removeUnselectedPlans(((PersonImpl) person));
+				PersonUtils.removeUnselectedPlans(((Person) person));
 				trips2legs.run( person.getSelectedPlan() );
 
 				for ( PlanElement pe : person.getSelectedPlan().getPlanElements() ) {

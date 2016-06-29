@@ -14,11 +14,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -67,7 +67,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
     findScenarioShops(this.controlerFacilities.getFacilities().values());
     Gbl.printMemoryUsage();
     for (Person pi : this.persons.values()) {
-      PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl) pi);
+      PersonRetailersImpl pr = new PersonRetailersImpl((Person) pi);
       this.retailersPersons.put(pr.getId(), pr);
     }
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));

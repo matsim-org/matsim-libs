@@ -7,10 +7,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vbmh.util.ReadParkhistory;
@@ -132,7 +132,7 @@ public class histReaderTest {
 			evControl.startUp("input/SF_PLUS/generalinput/evs.xml", null);
 			Population population = scenario.getPopulation();
 			for (Person person : population.getPersons().values()) {
-				PersonImpl personImpl = (PersonImpl) person;
+				Person personImpl = (Person) person;
 				Activity firstAct = (Activity) person.getSelectedPlan()
 						.getPlanElements().get(0);
 				Leg firstLeg = (Leg) person.getSelectedPlan()

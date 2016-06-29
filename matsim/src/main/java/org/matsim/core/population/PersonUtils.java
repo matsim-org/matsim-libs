@@ -14,7 +14,7 @@ public class PersonUtils {
 	public static final String EMPLOYED = "employed";
 	public static final String AGE = "age";
 	private static final String TRAVELCARDS = "travelcards";
-	private final static Logger log = Logger.getLogger(PersonImpl.class);
+	private final static Logger log = Logger.getLogger(Person.class);
 
 	@Deprecated // use methods of interface Person
 	public static Plan createAndAddPlan(Person person, final boolean selected) {

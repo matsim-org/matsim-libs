@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -50,7 +51,7 @@ public class StripPersonPlan extends NewPopulation {
 	@Override
 	public void run(Person pp) {
 
-		PersonImpl person = (PersonImpl) pp;
+		Person person = (Person) pp;
 
 		this.personshandled++;
 

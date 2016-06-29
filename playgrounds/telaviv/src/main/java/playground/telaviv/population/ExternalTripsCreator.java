@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
@@ -158,7 +159,7 @@ public class ExternalTripsCreator {
 						
 			for (int i = 0; i < numOfTrips; i++) {
 				Id<Person> id = Id.create("tta_" + type + "_" + String.valueOf(counter.getCounter()), Person.class);
-				PersonImpl person = (PersonImpl)populationFactory.createPerson(id);
+				Person person = (Person)populationFactory.createPerson(id);
 				
 				setBasicParameters(person);		
 				
@@ -196,7 +197,7 @@ public class ExternalTripsCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public void createAndAddInitialPlan(PersonImpl person, ExternalTrip externalTrip, 
+	public void createAndAddInitialPlan(Person person, ExternalTrip externalTrip, 
 			DepartureTimeCalculator departureTimeCalculator) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		

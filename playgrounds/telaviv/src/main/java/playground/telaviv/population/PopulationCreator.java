@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
@@ -175,7 +176,7 @@ public class PopulationCreator {
 			Id<Person> id = Id.create(String.valueOf(entry.getKey()), Person.class);
 			ParsedPerson emme2Person = entry.getValue();
 
-			PersonImpl person = (PersonImpl) populationFactory.createPerson(id);
+			Person person = (Person) populationFactory.createPerson(id);
 			
 			setBasicParameters(person, emme2Person);
 
@@ -273,7 +274,7 @@ public class PopulationCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	private boolean createAndAddInitialPlan(PersonImpl person, ParsedPerson emme2Person, Scenario scenario,
+	private boolean createAndAddInitialPlan(Person person, ParsedPerson emme2Person, Scenario scenario,
 			Map<Integer, List<ActivityFacility>> facilitiesToZoneMap, Map<Integer, Emme2Zone> zonalAttributes) {
 		if ( true ) throw new RuntimeException( "desires do not exist anymore. Please find a way to do another way or contact the core team." );
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();

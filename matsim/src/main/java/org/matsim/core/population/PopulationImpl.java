@@ -207,8 +207,8 @@ public final class PopulationImpl implements Population {
 
 	public final void setLocked() {
 		for ( Person person : this.persons.values() ) {
-			if ( person instanceof PersonImpl ) {
-				((PersonImpl)person).setLocked() ;
+			if ( person instanceof Lockable ) {
+				((Lockable)person).setLocked() ;
 			}
 		}
 	}

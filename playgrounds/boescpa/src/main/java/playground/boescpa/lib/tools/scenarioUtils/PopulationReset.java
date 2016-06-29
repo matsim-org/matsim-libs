@@ -102,9 +102,9 @@ public class PopulationReset {
 		abstract Person resetPerson(final Person oldPerson);
 
 		Person copyPerson(Person oldPerson) {
-			final PersonImpl oldPersonImpl = (PersonImpl) oldPerson;
+			final Person oldPersonImpl = (Person) oldPerson;
 			final Person person = popFactory.createPerson(Id.create(oldPerson.getId().toString(), Person.class));
-			final PersonImpl personImpl = (PersonImpl) person;
+			final Person personImpl = (Person) person;
 
 			PersonUtils.setSex(personImpl, PersonUtils.getSex(oldPersonImpl));
 			PersonUtils.setAge(personImpl, PersonUtils.getAge(oldPersonImpl));

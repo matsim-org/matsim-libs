@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -257,7 +257,7 @@ public class WalkTravelTime implements TravelTime {
 		}
 		scatterFactor = scatterSpeed / weidmannReferenceWalkSpeed;
 		
-		if (person instanceof PersonImpl) {
+		if (person instanceof Person) {
 			Person p = person;
 			
 			// get gender factor

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +35,7 @@ import org.matsim.core.scenario.Lockable;
 /**
  * Default implementation of {@link Person} interface.
  */
-public final class PersonImpl implements Person, Lockable {
+final class PersonImpl implements Person, Lockable {
 
 	private List<Plan> plans = new ArrayList<Plan>(6);
 	private Id<Person> id;

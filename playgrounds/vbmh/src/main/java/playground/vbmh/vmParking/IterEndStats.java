@@ -5,10 +5,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 
 import playground.vbmh.util.CSVWriter;
@@ -96,7 +96,7 @@ public class IterEndStats {
 
 
         for (Person person : controler.getScenario().getPopulation().getPersons().values()){
-			PersonImpl personImpl = (PersonImpl) person;
+			Person personImpl = (Person) person;
 			double soc;
 			boolean notParked=false;
 			boolean parkedAtHome=false;

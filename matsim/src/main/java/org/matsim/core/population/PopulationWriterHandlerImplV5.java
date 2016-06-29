@@ -26,12 +26,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -43,6 +41,7 @@ import org.matsim.core.utils.misc.Time;
  * @author balmermi
  */
 /*package*/ class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( PopulationWriterHandlerImplV5.class );
 
 	private final CoordinateTransformation coordinateTransformation;
@@ -101,11 +100,11 @@ import org.matsim.core.utils.misc.Time;
 		out.write("</population>\n");
 	}
 
-	private void startPerson(final Person p, final BufferedWriter out) throws IOException {
+	private static void startPerson(final Person p, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
 		out.write(p.getId().toString());
 		out.write("\"");
-		if (p instanceof PersonImpl){
+		if (p instanceof Person){
 			Person person = p;
 			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");
@@ -136,11 +135,11 @@ import org.matsim.core.utils.misc.Time;
 		out.write(">\n");
 	}
 
-	private void endPerson(final BufferedWriter out) throws IOException {
+	private static void endPerson(final BufferedWriter out) throws IOException {
 		out.write("\t</person>\n\n");
 	}
 
-	private void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+	private static void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null) {
 			out.write(" score=\"");
@@ -162,7 +161,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write(">\n");
 	}
 
-	private void endPlan(final BufferedWriter out) throws IOException {
+	private static void endPlan(final BufferedWriter out) throws IOException {
 		out.write("\t\t</plan>\n\n");
 	}
 

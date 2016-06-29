@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 
 import playground.balac.retailers.RetailersLocationListener;
@@ -25,7 +25,7 @@ public class PersonRetailersImpl implements Person
   private double globalShopsUtility = 0.0D;
   private List<? extends Plan> plans = null;
 
-  public PersonRetailersImpl(PersonImpl p)
+  public PersonRetailersImpl(Person p)
   {
 	  delegate = PopulationUtils.getFactory().createPerson(p.getId());
     this.plans = p.getPlans();

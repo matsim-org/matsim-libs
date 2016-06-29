@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -124,7 +124,7 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
 		out.write("\t<person id=\"");
 		out.write(p.getId().toString());
 		out.write("\"");
-		if (p instanceof PersonImpl){
+		if (p instanceof Person){
 			Person person = p;
 			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");

@@ -2,6 +2,7 @@ package playground.balac.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
@@ -25,10 +26,10 @@ public class ScalingThePopulation {
 		for (int i = 1; i < size; i++) {
 			if (i % 2 == 0) {
 				
-				PersonImpl p = (PersonImpl)scenario.getPopulation().getFactory().createPerson(Id.create(((Person)arr[i]).getId().toString() + j, Person.class));
+				Person p = (Person)scenario.getPopulation().getFactory().createPerson(Id.create(((Person)arr[i]).getId().toString() + j, Person.class));
 				p.addPlan(((Person)arr[i]).getSelectedPlan());
 			
-				PersonImpl originalPerson = (PersonImpl)((Person)arr[i]);
+				Person originalPerson = (Person)((Person)arr[i]);
 				
 				PersonUtils.setAge(p, PersonUtils.getAge(originalPerson));
 				PersonUtils.setCarAvail(p, PersonUtils.getCarAvail(originalPerson));

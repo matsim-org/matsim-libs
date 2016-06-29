@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -222,7 +222,7 @@ public class VMScenarioTool {
 	static void move(Id facId){
 		Id<ActivityFacility> newFacId = Id.create(facId.toString()+"_B", ActivityFacility.class);
 		for (Person person : homes.get(facId)){
-			PersonImpl personImpl = (PersonImpl) person;
+			Person personImpl = (Person) person;
 			for(PlanElement planElement : personImpl.getSelectedPlan().getPlanElements()){
 				if(planElement.getClass().equals(Activity.class)){
 					System.out.println("Activity gefunden");

@@ -89,7 +89,7 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 		out.write("\t<person id=\"");
 		out.write(p.getId().toString());
 		out.write("\"");
-		if (p instanceof PersonImpl){
+		if (p instanceof Person){
 			Person person = p;
 			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");

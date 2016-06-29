@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -95,7 +95,7 @@ public class DuplicatePersons {
 				for ( int i=0; i < rate; i++ ) {
 					final String currId = id +"-"+ i;
 					cloneIds.add( currId );
-					PopulationUtils.changePersonId( ((PersonImpl) person), Id.createPersonId( currId ) ) ;
+					PopulationUtils.changePersonId( ((Person) person), Id.createPersonId( currId ) ) ;
 					writer.writePerson( person );
 				}
 			}

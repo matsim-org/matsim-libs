@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -162,7 +162,7 @@ public class PopulationMerger {
 		Id<Person> id = person.getId();
 		Id<Person> newId = Id.create("gv_" + id.toString(), Person.class);
 		final Id<Person> id1 = newId;
-        PopulationUtils.changePersonId( ((PersonImpl) person), id1 ) ;
+        PopulationUtils.changePersonId( ((Person) person), id1 ) ;
 
     }
 
@@ -170,7 +170,7 @@ public class PopulationMerger {
 		Id<Person> id = person.getId();
 		Id<Person> newId = Id.create("pv_" + id.toString(), Person.class);
 		final Id<Person> id1 = newId;
-        PopulationUtils.changePersonId( ((PersonImpl) person), id1 ) ;
+        PopulationUtils.changePersonId( ((Person) person), id1 ) ;
 
     }
 

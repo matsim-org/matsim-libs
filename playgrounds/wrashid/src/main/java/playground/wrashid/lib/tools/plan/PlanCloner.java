@@ -3,8 +3,8 @@ package playground.wrashid.lib.tools.plan;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 
 
@@ -34,7 +34,7 @@ public class PlanCloner {
 		
 		for (int i=1;i<=numberOfClones;i++){
 			Person person=GeneralLib.copyPerson(selectedPersonForCloning);
-            PopulationUtils.changePersonId( ((PersonImpl) person), Id.create(i, Person.class) ) ;
+            PopulationUtils.changePersonId( ((Person) person), Id.create(i, Person.class) ) ;
             scenario.getPopulation().addPerson(person);
 		}
 		
