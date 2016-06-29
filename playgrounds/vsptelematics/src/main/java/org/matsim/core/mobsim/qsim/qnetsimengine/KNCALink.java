@@ -19,6 +19,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -464,6 +466,10 @@ public class KNCALink {
 
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Collection<String> sf = new ArrayList<>() ;
+		sf.add("otfvis") ;
+		config.controler().setSnapshotFormat(sf);
+		config.controler().setWriteSnapshotsInterval(1);
 		
 		config.qsim().setStartTime(0);
 		config.qsim().setSimStarttimeInterpretation( StarttimeInterpretation.onlyUseStarttime );
@@ -471,6 +477,8 @@ public class KNCALink {
 		config.qsim().setSimEndtimeInterpretation( EndtimeInterpretation.onlyUseEndtime );
 		
 		config.qsim().setNumberOfThreads(1);
+		
+		config.qsim().setSnapshotPeriod(1);
 		
 		OTFVisConfigGroup otfconf = ConfigUtils.addOrGetModule(config,  OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 		otfconf.setColoringScheme( ColoringScheme.byId );
@@ -503,6 +511,7 @@ public class KNCALink {
 		});
 
 		controler.addOverridingModule( new OTFVisLiveModule() ) ;
+		controler.addOverridingModule( new OTFVisFileWriterModule() ) ;
 
 		controler.run();
 	}
