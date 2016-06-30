@@ -49,9 +49,9 @@ public class IncidentWithinDayReplanning {
 
 // ############################################################################################################################################
 
-	private static final String baseCaseOutputDirectory = "../../../runs-svn/incidents/output/baseCase/";
-	private static final String withinDayReplanningOutputDirectory = "../../../runs-svn/incidents/output/2016-03-15_withinDayReplanning/";
-	private static final String networkChangeEventsFile = "../../../runs-svn/incidents/input/networkChangeEvents_2016-03-15.xml.gz";
+	private static String baseCaseOutputDirectory = "../../../runs-svn/incidents/output/baseCase/";
+	private static String withinDayReplanningOutputDirectory = "../../../runs-svn/incidents/output/2016-03-15_withinDayReplanning/";
+	private static String networkChangeEventsFile = "../../../runs-svn/incidents/input/networkChangeEvents_2016-03-15.xml.gz";
 	
 	private static final boolean reducePopulationToAffectedAgents = false;
 		
@@ -61,6 +61,24 @@ public class IncidentWithinDayReplanning {
 	
 	public static void main(String[] args) {
 		
+		if (args.length > 0) {
+			
+			baseCaseOutputDirectory = args[0];		
+			log.info("base case output directory: "+ baseCaseOutputDirectory);
+
+			withinDayReplanningOutputDirectory = args[1];		
+			log.info("within-day replanning output directory: "+ withinDayReplanningOutputDirectory);
+
+			networkChangeEventsFile = args[2];		
+			log.info("network change events file: "+ networkChangeEventsFile);
+			
+		}
+		
+		IncidentWithinDayReplanning incidentWithinDayReplanning = new IncidentWithinDayReplanning();
+		incidentWithinDayReplanning.run();
+	}
+
+	private void run() {
 		OutputDirectoryLogging.catchLogEntries();
 		try {
 			OutputDirectoryLogging.initLoggingWithOutputDirectory(withinDayReplanningOutputDirectory);
@@ -68,8 +86,7 @@ public class IncidentWithinDayReplanning {
 			e1.printStackTrace();
 		}
 		
-//		final Config config = ConfigUtils.loadConfig(baseCaseOutputDirectory + "output_config.xml.gz");
-		final Config config = ConfigUtils.loadConfig(baseCaseOutputDirectory + "output_config_updated.xml");
+		final Config config = ConfigUtils.loadConfig(baseCaseOutputDirectory + "output_config.xml.gz");
 		
 		// consider the network change events
 		config.network().setInputFile(baseCaseOutputDirectory + "output_network.xml.gz");
