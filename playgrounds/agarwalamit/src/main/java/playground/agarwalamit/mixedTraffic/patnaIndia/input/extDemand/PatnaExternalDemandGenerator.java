@@ -286,17 +286,9 @@ public class PatnaExternalDemandGenerator {
 			case "OC2": link = "OC2_in"; break;
 			case "OC3": link = "476810000-475210000-477510000"; break;
 			case "OC4": link = "OC4_in"; break;
-			case "OC5": link = "9427"; break;
-			case "OC6": link = "2060"; break;
-			case "OC7": link = "741"; break;
-//			following is useful only if network is created using transcad data. Amit June 2016 
-//			case "OC1": link = "1386010000-1385710000-1385110000-1380010000"; break;
-//			case "OC2": link = "OC2_in"; break;
-//			case "OC3": link = "476810000-475210000-477510000"; break;
-//			case "OC4": link = "OC4_in"; break;
-//			case "OC5": link = "OC5_in"; break;
-//			case "OC6": link = "919-828-1033-1022-1035-101710000-1053-106110000-106010000-1058-69210000-146010000"; break;
-//			case "OC7": link = "1973-2158-215210000-2163-2169"; break;
+			case "OC5": link = "OC5_in"; break;
+			case "OC6": link = "919-828-1033-1022-1035-101710000-1053-106110000-106010000-1058-69210000-146010000"; break;
+			case "OC7": link = "1973-2158-215210000-2163-2169"; break;
 			default : throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 			}
 		} else {
@@ -313,17 +305,9 @@ public class PatnaExternalDemandGenerator {
 			case "OC2": link = "OC2_out"; break;
 			case "OC3": link = "4775-4752-4768"; break;
 			case "OC4": link = "OC4_out"; break;
-			case "OC5": link = "9428"; break;
-			case "OC6": link = "2059"; break;
-			case "OC7": link = "740"; break;
-//			following is useful only if network is created using transcad data. Amit June 2016 
-//			case "OC1": link = "13800-13851-13857-13860"; break;
-//			case "OC2": link = "OC2_out"; break;
-//			case "OC3": link = "4775-4752-4768"; break;
-//			case "OC4": link = "OC4_out"; break;
-//			case "OC5": link = "OC5_out"; break;
-//			case "OC6": link = "1460-692-105810000-1060-1061-105310000-1017-103510000-102210000-103310000-82810000-91910000"; break;
-//			case "OC7": link = "216910000-216310000-2152-215810000-197310000"; break;
+			case "OC5": link = "OC5_out"; break;
+			case "OC6": link = "1460-692-105810000-1060-1061-105310000-1017-103510000-102210000-103310000-82810000-91910000"; break;
+			case "OC7": link = "216910000-216310000-2152-215810000-197310000"; break;
 			default : throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 			}
 		}
