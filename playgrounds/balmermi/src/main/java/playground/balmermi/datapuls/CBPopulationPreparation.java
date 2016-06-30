@@ -26,6 +26,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -73,7 +74,7 @@ public class CBPopulationPreparation {
 
 		System.out.println("stream population...");
 		plansReader.readFile(args[0].trim());
-		population.printPlansCount();
+		PopulationUtils.printPlansCount(population) ;
 		plansWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (stream population)");

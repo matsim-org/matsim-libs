@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -49,7 +50,7 @@ public class BlurPlanTimes {
 		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		PopulationUtils.printPlansCount(population) ;
 		pw.closeStreaming();
 		System.out.println("done.");
 	}
@@ -71,7 +72,7 @@ public class BlurPlanTimes {
 		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		PopulationUtils.printPlansCount(population) ;
 		pw.closeStreaming();
 		System.out.println("done.");
 	}
@@ -94,7 +95,7 @@ public class BlurPlanTimes {
 		pw.startStreaming(outputPlansFile);
 		population.addAlgorithm(pw);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		PopulationUtils.printPlansCount(population) ;
 		pw.closeStreaming();
 		System.out.println("done.");
 	}

@@ -31,6 +31,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -117,7 +118,7 @@ public class XY2Links {
 		plans.addAlgorithm(new org.matsim.core.population.algorithms.XY2Links(scenario));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 
 		System.out.println("done.");

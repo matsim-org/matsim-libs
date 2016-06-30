@@ -7,6 +7,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +35,7 @@ public class FilterActsPerShape {
 		PopulationReader plansReader = new MatsimPopulationReader(sc);		
 		log.info("Reading plans file from " + plansFile);
 		plansReader.readFile(plansFile);
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		log.info(wHSC.toString());
 		wHSC.toFile(filename);		
 		log.info("Finished");

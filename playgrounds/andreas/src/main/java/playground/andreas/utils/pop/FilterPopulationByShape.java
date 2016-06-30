@@ -40,6 +40,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -118,7 +119,7 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		Gbl.printMemoryUsage();
 		
 		popReader.readFile(popInFile);
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		popWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		Gbl.printElapsedTime();

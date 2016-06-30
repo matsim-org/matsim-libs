@@ -30,6 +30,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -72,7 +73,7 @@ public class InitTimesVariation {
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 		System.out.println("  done.");
 

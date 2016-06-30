@@ -30,6 +30,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -210,7 +211,7 @@ public class ScenarioLoaderImpl {
 			new MatsimPopulationReader(this.scenario).parse(populationFileName);
 			
 			if (this.scenario.getPopulation() instanceof StreamingPopulation) {
-				((StreamingPopulation)this.scenario.getPopulation()).printPlansCount();
+				PopulationUtils.printPlansCount(((StreamingPopulation)this.scenario.getPopulation())) ;
 			}
 		}
 		else {

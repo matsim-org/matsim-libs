@@ -27,6 +27,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -87,7 +88,7 @@ public class GenerateDemand {
 		System.out.println("Reading, processing and writing plans...");
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 		System.out.println("Reading, processing and writing plans...done.");
 

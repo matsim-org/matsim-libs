@@ -39,6 +39,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -132,7 +133,7 @@ public class DilutedZurichFilter {
 		System.out.println("  reading, processing, writing plans...");
 		pop_reader.readFile(config.plans().getInputFile());
 		pop_writer.closeStreaming();
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		System.out.println("    => filtered persons: " + filter.getCount());
 		System.out.println("  done.");
 

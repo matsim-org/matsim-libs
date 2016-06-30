@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -146,7 +147,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			analysis.readGemeindegrenzen("/Users/cello/Desktop/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp");
 			pImpl.addAlgorithm(analysis);
 			new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
-			pImpl.printPlansCount();
+			PopulationUtils.printPlansCount(pImpl) ;
 			infoFile.close();
 			log.info("done");
 		} catch (IOException e) {

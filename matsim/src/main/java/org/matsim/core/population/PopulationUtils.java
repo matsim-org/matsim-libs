@@ -116,6 +116,22 @@ public final class PopulationUtils {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
+		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+	}
+	
+	public static StreamingPopulation createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
+		RouteFactoriesRegister routeFactory = new RouteFactoriesRegister();
+		String networkRouteType = plansConfigGroup.getNetworkRouteType();
+		RouteFactory factory;
+		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+			factory = new LinkNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new CompressedNetworkRouteFactory(network);
+		} else {
+			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+		}
+		routeFactory.setRouteFactory(NetworkRoute.class, factory);
 		return new StreamingPopulation(new PopulationFactoryImpl(routeFactory));
 	}
 
@@ -940,5 +956,9 @@ public final class PopulationUtils {
 			} else {
 				throw new RuntimeException("wrong implementation of interface Person") ;
 			}
+		}
+
+		public static void printPlansCount( Population population ) {
+			log.info(" person # " + population.getPersons().size() );
 		}
 }

@@ -37,6 +37,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PlansFilterByLegMode;
 import org.matsim.core.population.algorithms.PlansFilterByLegMode.FilterType;
@@ -107,7 +108,7 @@ public class PlansPrepare {
 
 		writer.closeStreaming();
 
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		log.info("persons in output: " + filter.getCount());
 	}
 
@@ -124,7 +125,7 @@ public class PlansPrepare {
 		log.info("  output-file: " + toFile);
 		log.info("  sample-size: " + percentage);
 		plansReader.readFile(fromFile);
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		plansWriter.closeStreaming();
 	}
 

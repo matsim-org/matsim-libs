@@ -29,6 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -150,7 +151,7 @@ public class InitDemandCreation {
 		System.out.println("  reading, processing, writing plans...");
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 		System.out.println("  done.");
 

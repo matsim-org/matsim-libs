@@ -46,6 +46,7 @@ import org.matsim.vehicles.Vehicles;
  * @author mrieser
  */
 public final class MutableScenario implements Scenario, Lockable {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(MutableScenario.class);
 
 	private boolean locked = false ;

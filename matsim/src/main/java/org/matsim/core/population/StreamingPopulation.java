@@ -135,13 +135,6 @@ public final class StreamingPopulation implements Population {
 
 	
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
-	public void printPlansCount() {
-		log.info(" person # " + this.getPersons().size());
-	}
-
 	@Override
 	public final String toString() {
 		return "[name=" + this.getName() + "]" +

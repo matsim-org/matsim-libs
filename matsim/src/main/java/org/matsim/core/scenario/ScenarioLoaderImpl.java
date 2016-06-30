@@ -19,18 +19,20 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import com.google.inject.Inject;
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -42,9 +44,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -206,7 +206,7 @@ class ScenarioLoaderImpl {
 			}
 
 			if (this.scenario.getPopulation() instanceof StreamingPopulation) {
-				((StreamingPopulation)this.scenario.getPopulation()).printPlansCount();
+				PopulationUtils.printPlansCount(((StreamingPopulation)this.scenario.getPopulation())) ;
 			}
 		}
 		else {

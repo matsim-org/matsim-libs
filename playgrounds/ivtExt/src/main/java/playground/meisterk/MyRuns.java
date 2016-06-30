@@ -39,6 +39,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -473,7 +474,7 @@ public class MyRuns {
 		}
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(inputFilename);
-		population.printPlansCount();
+		PopulationUtils.printPlansCount(population) ;
 		System.out.println("  done.");
 
 		return population;
@@ -516,7 +517,7 @@ public class MyRuns {
 		matsimAgentPopulation.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
-		matsimAgentPopulation.printPlansCount();
+		PopulationUtils.printPlansCount(matsimAgentPopulation) ;
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();
 		MyRuns.writeAnArray(numDeps, "output/deptimes.txt");
 		int[][] numArrs = ((PersonAnalyseTimesByActivityType) pa).getNumArrs();

@@ -40,6 +40,7 @@ import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -174,7 +175,7 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 
 		log.info("Start reading population...");
 		popReader.readFile(popFilename);
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		log.info("...done.");
 		Gbl.printMemoryUsage();
 		Gbl.printElapsedTime();

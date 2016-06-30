@@ -34,6 +34,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -123,7 +124,7 @@ public class IIDMAssign2Network {
 		System.out.println("  reading, processing, writing plans...");
 		pop.addAlgorithm(pop_writer);
 		pop_reader.readFile(config.plans().getInputFile());
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		pop_writer.closeStreaming();
 		System.out.println("  done.");
 

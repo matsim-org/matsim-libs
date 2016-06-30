@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -99,7 +100,7 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 		pImpl.setIsStreaming(true);
 		pImpl.addAlgorithm(new TransportModeAnalysis(infoFile));
 		new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
-		pImpl.printPlansCount();
+		PopulationUtils.printPlansCount(pImpl) ;
 		infoFile.close();
 		log.info("done");
 	}

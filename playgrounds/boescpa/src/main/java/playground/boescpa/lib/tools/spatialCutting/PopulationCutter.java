@@ -35,6 +35,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -111,7 +112,7 @@ public class PopulationCutter {
         log.info(" Reading, processing, writing plans...");
         pop_reader.readFile(populationInputFile);
         pop_writer.closeStreaming();
-        population.printPlansCount();
+        PopulationUtils.printPlansCount(population) ;
         log.info(" Filtered persons: " + filter.getCount());
     }
 }

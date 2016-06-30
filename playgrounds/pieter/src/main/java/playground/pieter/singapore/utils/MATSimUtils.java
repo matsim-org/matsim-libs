@@ -46,6 +46,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -114,7 +115,7 @@ public class MATSimUtils {
 		final StreamingPopulation plans = (StreamingPopulation) scenario.getPopulation();
 
 
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 
 		System.out.println("done.");
 	}
@@ -160,7 +161,7 @@ public class MATSimUtils {
 		plansWriter.startStreaming(this.outPlansFile);
 		PlansFilterNoRoute pf = new PlansFilterNoRoute();
 		pf.run(plans) ;
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 
 		System.out.println("done.");

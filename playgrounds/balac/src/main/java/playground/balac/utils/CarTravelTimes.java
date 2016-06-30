@@ -191,7 +191,7 @@ public class CarTravelTimes {
 		}
 		outLink.flush();
 		outLink.close();
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 
 		System.out.println("done.");

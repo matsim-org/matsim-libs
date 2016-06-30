@@ -188,7 +188,7 @@ public class CarRoutingClaude {
 		}
 		outLink.flush();
 		outLink.close();
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();
 
 		System.out.println("done.");
