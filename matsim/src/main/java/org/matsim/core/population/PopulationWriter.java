@@ -227,17 +227,17 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 		this.close();
 	}
 
-	public void writeFileV0(final String filename) {
+	public void writeV0(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV0( coordinateTransformation , this.network);
 		write(filename);
 	}
 
-	public void writeFileV4(final String filename) {
+	public void writeV4(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV4( coordinateTransformation , this.network );
 		write(filename);
 	}
 
-	public void writeFileV5(final String filename) {
+	public void writeV5(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
 		write(filename);
 	}

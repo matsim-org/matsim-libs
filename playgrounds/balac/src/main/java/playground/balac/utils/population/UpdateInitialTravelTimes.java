@@ -57,7 +57,7 @@ public class UpdateInitialTravelTimes {
 		}
 		
 		new PopulationWriter(scenario.getPopulation(),
-				scenario.getNetwork()).writeFileV4("C:/Users/balacm/Documents/InducedDemand/plans_0.1perc_fixedtt_50perc.xml.gz");		
+				scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/InducedDemand/plans_0.1perc_fixedtt_50perc.xml.gz");		
 
 		
 	}

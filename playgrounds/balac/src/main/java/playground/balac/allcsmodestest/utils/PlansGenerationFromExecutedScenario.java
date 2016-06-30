@@ -38,7 +38,7 @@ public class PlansGenerationFromExecutedScenario {
 			
 		}
 		
-		new PopulationWriter(scenario2.getPopulation(), scenario2.getNetwork()).writeFileV4("./population_withsubpop.xml.gz");
+		new PopulationWriter(scenario2.getPopulation(), scenario2.getNetwork()).writeV4("./population_withsubpop.xml.gz");
 		
 		
 	}

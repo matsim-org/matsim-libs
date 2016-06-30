@@ -45,7 +45,7 @@ public class PopulationReprojectionIOTest {
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
 		new MatsimPopulationReader(scenario).readFile(BASE_FILE);
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV0(testFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV0(testFile);
 
 		testConversionAtInput(testFile);
 	}
@@ -59,7 +59,7 @@ public class PopulationReprojectionIOTest {
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
 		new MatsimPopulationReader(scenario).readFile(BASE_FILE);
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(testFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(testFile);
 
 		testConversionAtInput(testFile);
 	}
@@ -73,7 +73,7 @@ public class PopulationReprojectionIOTest {
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
 		new MatsimPopulationReader(scenario).readFile(BASE_FILE);
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV5(testFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(testFile);
 
 		testConversionAtInput(testFile);
 	}
@@ -92,7 +92,7 @@ public class PopulationReprojectionIOTest {
 		new PopulationWriter(
 				new Transformation(),
 				originalScenario.getPopulation(),
-				originalScenario.getNetwork()).writeFileV4( testFile );
+				originalScenario.getNetwork()).writeV4( testFile );
 
 		// read converted population
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -117,7 +117,7 @@ public class PopulationReprojectionIOTest {
 		new PopulationWriter(
 				new Transformation(),
 				originalScenario.getPopulation(),
-				originalScenario.getNetwork()).writeFileV5( testFile );
+				originalScenario.getNetwork()).writeV5( testFile );
 
 		// read converted population
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

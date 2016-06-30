@@ -66,7 +66,7 @@ public class PlanExpander {
 
 		// use V4 Format which also includes desires
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(),
-				1.0).writeFileV4(outputPlansFile);
+				1.0).writeV4(outputPlansFile);
 
 	}
 

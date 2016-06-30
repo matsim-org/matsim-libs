@@ -85,7 +85,7 @@ public class AnalyseAgentsInArea {
 			}
 		}
 		
-		new PopulationWriter(scenario2.getPopulation()).writeFileV4("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans.xml.gz");
+		new PopulationWriter(scenario2.getPopulation()).writeV4("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans.xml.gz");
 	}
 
 }

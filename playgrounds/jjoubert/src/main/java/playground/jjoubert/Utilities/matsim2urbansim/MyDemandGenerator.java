@@ -199,7 +199,7 @@ public class MyDemandGenerator {
 		log.info("Total number of agents created: " + p.getPersons().size());
 				
 		PopulationWriter pw = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		pw.writeFileV4(outputFile.getAbsolutePath());
+		pw.writeV4(outputFile.getAbsolutePath());
 		
 		SelectedPlans2ESRIShape sh = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), MGC.getCRS("WGS84_SA_Albers"), outputFile.getParent());
 		String outputFolder = outputFile.getParentFile().getAbsolutePath();

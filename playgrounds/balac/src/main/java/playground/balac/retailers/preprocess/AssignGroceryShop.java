@@ -107,7 +107,7 @@ public class AssignGroceryShop {
 
 	private void writePlans() {
 		
-		new PopulationWriter(this.plans, this.network).writeFileV4(this.outpath + "plans0.xml");
+		new PopulationWriter(this.plans, this.network).writeV4(this.outpath + "plans0.xml");
 	}
 	
 	private void writeFacilities () {

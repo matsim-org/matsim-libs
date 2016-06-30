@@ -77,7 +77,7 @@ public class MembershipMain
   private void writePlans()
   {
 	  //new PopulationWriter(this.plans, this.network).writeFileV4("C:/Users/balacm/Desktop/" + "plansCarSharing_greaterzurich_2x_cars.xml.gz");
-	 new PopulationWriter(this.plans, this.network).writeFileV4("/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/FreeFloatingTransportation2014/" + "plansCarSharing_25%_cars.xml.gz");
+	 new PopulationWriter(this.plans, this.network).writeV4("/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/FreeFloatingTransportation2014/" + "plansCarSharing_25%_cars.xml.gz");
 	  
   }
 }

@@ -42,7 +42,7 @@ public class Create1percentPopulation {
 			}
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("C:/Users/balacm/Documents/InducedDemand/plans_1perc.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/InducedDemand/plans_1perc.xml.gz");		
 		
 	}
 	

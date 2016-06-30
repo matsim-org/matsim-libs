@@ -197,7 +197,7 @@ public class PopulationCreator {
 		log.info("done.");
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(basePath + outputFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(basePath + outputFile);
 		log.info("done.");
 	}
 	

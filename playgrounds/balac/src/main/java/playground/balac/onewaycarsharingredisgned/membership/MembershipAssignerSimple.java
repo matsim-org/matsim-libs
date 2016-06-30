@@ -134,7 +134,7 @@ final private int numMembers = 20850;
 			bla.putAttribute(p.getId().toString(), "OW_CARD", "true");
 			
 		}
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV5(args[3] + "/plans_100perc_noride.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(args[3] + "/plans_100perc_noride.xml.gz");		
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
 		betaWriter.writeFile(args[3] + "/desires_ow_memb_100perc.xml.gz");
 		

@@ -49,7 +49,7 @@ public class UpdatePopulationForNewScoring {
 			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_10perc_fixedtt_2.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(args[2] + "/plans_10perc_fixedtt_2.xml.gz");		
 
 		
 	}

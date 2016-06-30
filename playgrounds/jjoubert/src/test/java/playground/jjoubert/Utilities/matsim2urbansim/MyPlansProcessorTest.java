@@ -218,7 +218,7 @@ public class MyPlansProcessorTest{
 		p.addPerson(p2);
 
 		PopulationWriter pw = new PopulationWriter(p, n);
-		pw.writeFileV4(utils.getOutputDirectory() + "/populationTest.xml");
+		pw.writeV4(utils.getOutputDirectory() + "/populationTest.xml");
 		//=====================================================================
 		log.info("Wrote population.");
 

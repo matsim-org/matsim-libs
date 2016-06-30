@@ -769,7 +769,7 @@ public class PTRoutingFrequencyV2 {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()
 //				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
 		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
-        ).writeFileV4("./plans_pt_trips_"+args[0]+".xml.gz");
+        ).writeV4("./plans_pt_trips_"+args[0]+".xml.gz");
 
 
 }

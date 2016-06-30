@@ -130,7 +130,7 @@ public class IatbrPlanBuilder {
 		 * This is necessary since the controller will later read in this file 
 		 * when executing. */		
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
-		pw.writeFileV5(sc.getConfig().plans().getInputFile());
+		pw.writeV5(sc.getConfig().plans().getInputFile());
 		
 		
 		/* Try location choice */

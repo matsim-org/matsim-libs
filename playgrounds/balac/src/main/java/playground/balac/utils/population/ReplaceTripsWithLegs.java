@@ -52,7 +52,7 @@ public class ReplaceTripsWithLegs {
 
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_1perc_legs.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(args[2] + "/plans_1perc_legs.xml.gz");		
 		
 	}
 }

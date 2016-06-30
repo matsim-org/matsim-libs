@@ -133,7 +133,7 @@ public class ExternalTripsCreator {
 		counter.printCounter();
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).writeFileV4(outPlansFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).writeV4(outPlansFile);
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(this.outAttributesFile);
 		log.info("done.");
 	}

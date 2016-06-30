@@ -49,7 +49,7 @@ public class ScalingThePopulation {
 			}			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/population_150%.xml");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(outputFilePath + "/population_150%.xml");		
 		
 	}
 	

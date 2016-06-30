@@ -39,7 +39,7 @@ public class SubpopulationMembers {
 			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_only_rt_members_" + args[3] + ".xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4("./plans_only_rt_members_" + args[3] + ".xml.gz");		
 		
 	//	ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
 	//	betaWriter.writeFile("./personAttrSubpop.xml.gz");

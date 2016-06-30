@@ -570,6 +570,6 @@ private static Provider<TransitRouter> transitRouterFactory;
     outLinkF.close();
 
     new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())
-      .writeFileV4("./plans_pt_trips_" + args[0] + ".xml.gz");
+      .writeV4("./plans_pt_trips_" + args[0] + ".xml.gz");
   }
 }

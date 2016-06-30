@@ -34,7 +34,7 @@ public class DistributePrivateCarsAmongMembers {
 		}
 		
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_memb_fixedPrivateCars.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(args[2] + "/plans_memb_fixedPrivateCars.xml.gz");		
 
 		
 		
