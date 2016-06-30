@@ -62,27 +62,27 @@ public class OuterCordonUtils {
 		 */
 		//translating links from transcad data to osm data
 		// x=fatua
-//		OC1_P2X ("1097"), 
-//		OC1_X2P ("1096"),
-//		// x=fatua
-//		OC2_P2X ("2890"),
-//		OC2_X2P ("2891"),
-//		// x=Punpun
-//		OC3_P2X ("1332"),
-//		OC3_X2P ("1333"),
-//		// x= Muzafarpur
-//		OC4_P2X ("gangaSetuLink_1"),
-//		OC4_X2P ("gangaSetuLink_2"),
-//		// x= danapur
-//		OC5_P2X ("1616-2068-9430"),
-//		OC5_X2P ("9429-2067-1615"),
-//		//x = fatua; fatua to noera (Patna)
-//		OC6_X2P ("2058"),
-//		//x = fatua; noera to fatua
-//		OC6_P2X ("2057"),
-//		// x= danapur
-//		OC7_P2X ("738"),
-//		OC7_X2P ("739");
+		OC1_P2X ("1097"), 
+		OC1_X2P ("1096"),
+		// x=fatua
+		OC2_P2X ("2890"),
+		OC2_X2P ("2891"),
+		// x=Punpun
+		OC3_P2X ("1332"),
+		OC3_X2P ("1333"),
+		// x= Muzafarpur
+		OC4_P2X ("gangaSetuLink_1"),
+		OC4_X2P ("gangaSetuLink_2"),
+		// x= danapur
+		OC5_P2X ("1616-2068-9430"),
+		OC5_X2P ("9429-2067-1615"),
+		//x = fatua; fatua to noera (Patna)
+		OC6_X2P ("2058"),
+		//x = fatua; noera to fatua
+		OC6_P2X ("2057"),
+		// x= danapur
+		OC7_P2X ("738"),
+		OC7_X2P ("739");
 		// following links are used if network is created from transcad data Amit June 2016
 		//		// x=fatua
 				OC1_P2X ("13878-13876"), 
