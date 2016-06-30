@@ -29,13 +29,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-/**
- * Root class of the population description (previously also called "plans file")
- */
 public final class StreamingPopulation implements Population {
 	// more than 500 compile errors if one makes this non-public. kai, feb'14
 
@@ -52,10 +48,6 @@ public final class StreamingPopulation implements Population {
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
 
-	private int counter;
-
-	private int nextMsg;
-
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
@@ -70,31 +62,17 @@ public final class StreamingPopulation implements Population {
 
 	@Override
 	public final void addPerson(final Person p) {
-		// validation
-		if (this.getPersons().containsKey(p.getId())) {
-			throw new IllegalArgumentException("Person with id = " + p.getId() + " already exists.");
-		}
-		if ( p instanceof Lockable ) {
-			((Lockable) p).setLocked();
-		}
-
-		// show counter
-		this.counter++;
-		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 2;
-			printPlansCount();
-		}
-
+		
 		if (!this.isStreaming) {
 			// streaming is off, just add the person to our list
-			this.addPerson(p);
+			delegate.addPerson(p);
 		} else {
 			// streaming is on, run algorithm on the person and write it to file.
 
 			/* Add Person to map, for algorithms might reference to the person
 			 * with "agent = population.getPersons().get(personId);"
 			 * remove it after running the algorithms! */
-			this.addPerson(p);
+			delegate.addPerson(p);
 
 			// run algos
 			for (PersonAlgorithm algo : this.personAlgos) {
@@ -102,8 +80,9 @@ public final class StreamingPopulation implements Population {
 			}
 
 			// remove again as we are streaming
-			this.removePerson(p.getId());
+			delegate.removePerson(p.getId());
 		}
+		
 	}
 	
 	
@@ -160,7 +139,7 @@ public final class StreamingPopulation implements Population {
 	// print methods
 	//////////////////////////////////////////////////////////////////////
 	public void printPlansCount() {
-		log.info(" person # " + this.counter);
+		log.info(" person # " + this.getPersons().size());
 	}
 
 	@Override

@@ -40,8 +40,8 @@ class PopulationImpl implements Population, Lockable {
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
 	private final PopulationFactory populationFactory;
 	private final ObjectAttributes personAttributes = new ObjectAttributes();
-	protected long counter = 0;
-	protected long nextMsg = 1;
+	private long counter = 0;
+	private long nextMsg = 1;
 
 	PopulationImpl(PopulationFactory populationFactory2) {
 		this.populationFactory = populationFactory2 ;
@@ -64,6 +64,7 @@ class PopulationImpl implements Population, Lockable {
 			printPlansCount();
 		}
 
+		this.persons.put( p.getId(), p ) ;
 	}
 
 	@Override
