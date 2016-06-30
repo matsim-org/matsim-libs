@@ -19,17 +19,18 @@
  * *********************************************************************** */
 package org.matsim.core.population;
 
-import com.google.inject.Inject;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.utils.misc.Time;
+
+import com.google.inject.Inject;
 
 /**
  * @author nagel
@@ -81,7 +82,7 @@ class VspPlansCleaner implements BeforeMobsimListener {
 					Leg leg = (Leg) pe ;
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
 						leg.setDepartureTime(Time.UNDEFINED_TIME) ;
-						Leg r = ((Leg)leg); // given by activity end time; everything else confuses
+						Leg r = (leg); // given by activity end time; everything else confuses
 						r.setTravelTime( Time.UNDEFINED_TIME - r.getDepartureTime() );
 						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015
 					}

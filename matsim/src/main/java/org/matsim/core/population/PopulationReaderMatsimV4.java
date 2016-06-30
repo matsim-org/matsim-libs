@@ -223,9 +223,7 @@ import org.xml.sax.Attributes;
 		String y = atts.getValue("y");
 		String freq = atts.getValue("freq");
 		String iP = atts.getValue("isPrimary");
-		boolean isPrimary = false;
 		if ("yes".equals(iP)) {
-			isPrimary = true;
 		}
 
 		if (type != null) {

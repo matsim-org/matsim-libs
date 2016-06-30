@@ -142,8 +142,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" link=\"" + act.getLinkId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act instanceof Activity){
-			Activity a = (Activity)act;
+		if (act != null){
+			Activity a = act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME)
 				out.write(" dur=\"" + Time.writeTime(a.getMaximumDuration()) + "\"");
 		}

@@ -41,8 +41,8 @@ public abstract class AbstractPopulationWriterHandler implements PopulationWrite
 	@Override
 	public final void writePerson(final Person person, final BufferedWriter writer) throws IOException {
 		this.startPerson(person, writer);
-		if (person instanceof Person) {
-			Person p = (Person)person;
+		if (person != null) {
+			Person p = person;
 			// travelcards
 			if (PersonUtils.getTravelcards(p) != null) {
 				for (String t : PersonUtils.getTravelcards(p)) {

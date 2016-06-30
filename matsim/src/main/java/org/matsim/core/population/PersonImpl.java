@@ -88,7 +88,7 @@ final class PersonImpl implements Person, Lockable {
 		return this.id;
 	}
 
-	/* deliberately package */ void changeId(final Id<Person> id) {
+	/* deliberately package */ void changeId(final Id<Person> newId) {
 		// This is deliberately non-public and not on the interface, since the ID should not be changed after the
 		// person is inserted into the population map (since the ID is the map key).  
 		// However, there are some situations where changing the ID makes sense while the person is outside
@@ -99,7 +99,7 @@ final class PersonImpl implements Person, Lockable {
 			Logger.getLogger(getClass()).warn("cannot change oerson id while in population.  remove the person, change Id, re-add.");
 			throw ee ;
 		}
-		this.id = id;
+		this.id = newId;
 	}
 
 	@Override

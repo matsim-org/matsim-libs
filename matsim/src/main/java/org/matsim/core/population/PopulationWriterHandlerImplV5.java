@@ -67,9 +67,9 @@ import org.matsim.core.utils.misc.Time;
 
 	@Override
 	public void writePerson(final Person person, final BufferedWriter out) throws IOException {
-		this.startPerson(person, out);
+		PopulationWriterHandlerImplV5.startPerson(person, out);
 		for (Plan plan : person.getPlans()) {
-			this.startPlan(plan, out);
+			PopulationWriterHandlerImplV5.startPlan(plan, out);
 			// act/leg
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -78,19 +78,19 @@ import org.matsim.core.utils.misc.Time;
 				}
 				else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					this.startLeg(leg, out);
+					PopulationWriterHandlerImplV5.startLeg(leg, out);
 					// route
 					Route route = leg.getRoute();
 					if (route != null) {
-						this.startRoute(route, out);
-						this.endRoute(out);
+						PopulationWriterHandlerImplV5.startRoute(route, out);
+						PopulationWriterHandlerImplV5.endRoute(out);
 					}
-					this.endLeg(out);
+					PopulationWriterHandlerImplV5.endLeg(out);
 				}
 			}
-			this.endPlan(out);
+			PopulationWriterHandlerImplV5.endPlan(out);
 		}
-		this.endPerson(out);
+		PopulationWriterHandlerImplV5.endPerson(out);
 		this.writeSeparator(out);
 		out.flush();
 	}
@@ -104,7 +104,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t<person id=\"");
 		out.write(p.getId().toString());
 		out.write("\"");
-		if (p instanceof Person){
+		if (p != null){
 			Person person = p;
 			if (PersonUtils.getSex(person) != null) {
 				out.write(" sex=\"");
@@ -150,8 +150,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan instanceof Plan){
-			Plan p = (Plan)plan;
+		if (plan != null){
+			Plan p = plan;
 			if ((p.getType() != null)) {
 				out.write(" type=\"");
 				out.write(p.getType());
@@ -192,8 +192,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act instanceof Activity){
-			Activity a = (Activity)act;
+		if (act != null){
+			Activity a = act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" max_dur=\"");
 				out.write(Time.writeTime(a.getMaximumDuration()));
@@ -208,7 +208,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write(" />\n");
 	}
 
-	private void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+	private static void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode());
 		out.write("\"");
@@ -235,11 +235,11 @@ import org.matsim.core.utils.misc.Time;
 		out.write(">\n");
 	}
 
-	private void endLeg(final BufferedWriter out) throws IOException {
+	private static void endLeg(final BufferedWriter out) throws IOException {
 		out.write("\t\t\t</leg>\n");
 	}
 
-	private void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	private static void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
 		out.write(route.getRouteType());
@@ -263,7 +263,7 @@ import org.matsim.core.utils.misc.Time;
 		}
 	}
 
-	private void endRoute(final BufferedWriter out) throws IOException {
+	private static void endRoute(final BufferedWriter out) throws IOException {
 		out.write("</route>\n");
 	}
 
