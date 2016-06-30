@@ -26,7 +26,7 @@ private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 			this.myGraphGrid = TriGraphConstructor.constructGridGraph(path);
 			LOG.info("Grid Graph created");
 			assocList = TriGraphConstructor.layerNavabi(path,myGraphNavabi,myGraphGrid);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraphNavabi(path, assocList,fullPathSize, segSize, segPathLength );
+			TriGraphConstructor.constructGhostGraphNavabi(path, assocList,fullPathSize, segSize, segPathLength );
 			LOG.info("The ghost lives");
 		}else{
 			this.myGraphNavabi = TriGraphConstructor.constructNavabiGraph(path);
@@ -34,7 +34,7 @@ private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 			this.myGraphGrid = TriGraphConstructor.constructGridGraphSim(path,SimDim);
 			LOG.info("Grid Graph created");
 			assocList = TriGraphConstructor.layerNavabiSim(path);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraphNavabi(path, assocList,fullPathSize , segSize,segPathLength);
+			TriGraphConstructor.constructGhostGraphNavabi(path, assocList,fullPathSize , segSize,segPathLength);
 			LOG.info("The ghost lives");	
 		}
 		
@@ -44,8 +44,8 @@ private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 	public void runThisSpecificExperiment(){
 		LinkedList<NmvLink> linkListGrid = new LinkedList<NmvLink>(myGraphGrid.getEdges());
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
-		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
-		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
+//		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
+//		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
 		LinkedList<NmvLink> linkListNavabi = new LinkedList<NmvLink>(myGraphNavabi.getEdges());
 		ArrayList<NmvNode> nodeListNavabi = new ArrayList<NmvNode>(myGraphNavabi.getVertices());
 		String shortFile=path+"NavabiShortPathStat.csv";
@@ -73,19 +73,19 @@ private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 		String Ghostpath=path+"GhostGraph";
 		
 		//Centrality scores
-		
-		JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
-		JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
-		JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
-		JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
-
-		//Clustering
-		JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
-		JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
-		JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
-
-		//Graph distance
-		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
+//		
+//		JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
+//		JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
+//		JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
+//		JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
+//
+//		//Clustering
+//		JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
+//		JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
+//		JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
+//
+//		//Graph distance
+//		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
 		
 	}
 	

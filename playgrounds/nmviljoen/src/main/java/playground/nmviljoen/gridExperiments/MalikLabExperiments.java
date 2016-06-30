@@ -26,7 +26,7 @@ public class MalikLabExperiments {
 				this.myGraphGrid = TriGraphConstructor.constructGridGraph(path);
 				LOG.info("Grid Graph created");
 				assocList = TriGraphConstructor.layerMalik(path,myGraphMalik,myGraphGrid);
-				this.myGraphGhost = TriGraphConstructor.constructGhostGraphMalik(path, assocList,fullPathSize, segSize, segPathLength );
+				TriGraphConstructor.constructGhostGraphMalik(path, assocList,fullPathSize, segSize, segPathLength );
 				LOG.info("The ghost lives");
 			}else{
 				this.myGraphMalik = TriGraphConstructor.constructMalikGraph(path);
@@ -34,7 +34,7 @@ public class MalikLabExperiments {
 				this.myGraphGrid = TriGraphConstructor.constructGridGraphSim(path,SimDim);
 				LOG.info("Grid Graph created");
 				assocList = TriGraphConstructor.layerMalikSim(path);
-				this.myGraphGhost = TriGraphConstructor.constructGhostGraphMalik(path, assocList,fullPathSize , segSize,segPathLength);
+				TriGraphConstructor.constructGhostGraphMalik(path, assocList,fullPathSize , segSize,segPathLength);
 				LOG.info("The ghost lives");	
 			}
 			
@@ -44,8 +44,8 @@ public class MalikLabExperiments {
 		public void runThisSpecificExperiment(){
 			LinkedList<NmvLink> linkListGrid = new LinkedList<NmvLink>(myGraphGrid.getEdges());
 			ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
-			LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
-			ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
+//			LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
+//			ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
 			LinkedList<NmvLink> linkListMalik = new LinkedList<NmvLink>(myGraphMalik.getEdges());
 			ArrayList<NmvNode> nodeListMalik = new ArrayList<NmvNode>(myGraphMalik.getVertices());
 
@@ -75,19 +75,19 @@ public class MalikLabExperiments {
 			
 			//Centrality scores
 			
-			JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
-			JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
-			JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
-			JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
-
-			//Clustering
-			JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
-			JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
-			JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
-
-			//Graph distance
-			JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
-			
+//			JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
+//			JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
+//			JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
+//			JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
+//
+//			//Clustering
+//			JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
+//			JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
+//			JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
+//
+//			//Graph distance
+//			JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
+//			
 		}
 		
 		public static void main(String[] args) throws FileNotFoundException{
@@ -104,7 +104,7 @@ public class MalikLabExperiments {
 				String path = args[0];
 				String sim =args[1];
 				if(ModeSwitch==0){
-					path = path+y+"/";
+					path = path+y+"/"+"Base_"+y+"/";
 				}else{
 					path = path+y+"/"+sim+y+"/";
 				}
