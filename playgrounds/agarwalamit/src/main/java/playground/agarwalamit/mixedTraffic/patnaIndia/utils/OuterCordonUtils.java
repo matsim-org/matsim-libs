@@ -77,9 +77,9 @@ public class OuterCordonUtils {
 		OC5_P2X ("1616-2068-9430"),
 		OC5_X2P ("9429-2067-1615"),
 		//x = fatua; fatua to noera (Patna)
-		OC6_X2P ("2060"),
+		OC6_X2P ("2058"),
 		//x = fatua; noera to fatua
-		OC6_P2X ("2059"),
+		OC6_P2X ("2057"),
 		// x= danapur
 		OC7_P2X ("738"),
 		OC7_X2P ("739");

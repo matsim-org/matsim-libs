@@ -83,7 +83,7 @@ public class PatnaCadytsControler {
 			spf.run(inPlans);
 			spf.writePlans(plansFile);
 			
-			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_ctd/";
+			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_ctd/";
 			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
 		

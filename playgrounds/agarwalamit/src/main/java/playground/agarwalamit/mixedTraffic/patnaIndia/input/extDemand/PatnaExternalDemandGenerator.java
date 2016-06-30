@@ -279,7 +279,7 @@ public class PatnaExternalDemandGenerator {
 			case "OC3": link = "1207-999-1335"; break;
 			case "OC4": link = "OC4_in"; break;
 			case "OC5": link = "9427"; break;
-			case "OC6": link = "6766"; break;
+			case "OC6": link = "2060"; break;
 			case "OC7": link = "741"; break;
 //			following is useful only if network is created using transcad data. Amit June 2016 
 //			case "OC1": link = "1386010000-1385710000-1385110000-1380010000"; break;
@@ -298,7 +298,7 @@ public class PatnaExternalDemandGenerator {
 			case "OC3": link = "1334-998-1206"; break;
 			case "OC4": link = "OC4_out"; break;
 			case "OC5": link = "9428"; break;
-			case "OC6": link = "6767"; break;
+			case "OC6": link = "2059"; break;
 			case "OC7": link = "740"; break;
 //			following is useful only if network is created using transcad data. Amit June 2016 
 //			case "OC1": link = "13800-13851-13857-13860"; break;

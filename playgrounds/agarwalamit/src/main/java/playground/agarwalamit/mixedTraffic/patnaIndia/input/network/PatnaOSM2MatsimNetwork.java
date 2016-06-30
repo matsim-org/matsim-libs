@@ -57,6 +57,11 @@ public class PatnaOSM2MatsimNetwork {
 		reader.setHighwayDefaults(2, "trunk",         2,  80.0/3.6, 1.0, 1500); // it looks that each direction has 2 lanes
 		reader.setHighwayDefaults(2, "primary",       2,  60.0/3.6, 1.0, 1500);
 		
+		reader.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  400);// reducing capacities
+		reader.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  400);
+		reader.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  300);
+		reader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  300);
+		
 		reader.parse(osmNetworkFile);
 		
 		NetworkSimplifier simplifier = new NetworkSimplifier();
