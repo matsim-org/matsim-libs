@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
+import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
@@ -53,6 +54,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	private boolean isBEV = true; //TODO set this based on vehicle type
 	private Double maxDischargingPowerInKW, maxLevel2ChargingPowerInKW, maxLevel3ChargingPowerInKW;
 	private HashSet<ChargingPlugType> compatiblePlugTypes;
+	private VehicleAgent agent;
 
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
@@ -78,7 +80,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	 * @param energyChargeInJoule
 	 * @return 
 	 */
-	public double chargeVehicle(double energyChargeInJoule) {
+	public double addEnergyToVehicleBattery(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
 			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
@@ -164,6 +166,13 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 
 	public double getRequiredEnergyInJoulesToDriveDistance(double routeDistanceInMeters) {
 		return routeDistanceInMeters * this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
+	}
+	
+	public void setVehicleAgent(VehicleAgent agent){
+		this.agent = agent;
+	}
+	public VehicleAgent getVehicleAgent(){
+		return this.agent;
 	}
 
 }

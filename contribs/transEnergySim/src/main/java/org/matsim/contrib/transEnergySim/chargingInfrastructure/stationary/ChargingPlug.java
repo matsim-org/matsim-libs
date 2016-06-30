@@ -11,8 +11,8 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	ChargingPlugStatus getChargingPlugStatus();
 	ChargingPlugType getChargingPlugType();
 	
-	void plugVehicle(VehicleWithBattery vehicle, double time);
-	void unPlugVehicle(VehicleWithBattery vehicle, double time);
+	void plugVehicle(VehicleWithBattery vehicle);
+	void unPlugVehicle(VehicleWithBattery vehicle);
 
 	VehicleWithBattery getVehicle();
 
@@ -24,4 +24,8 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	ChargingSite getChargingSite();
 
 	double estimateChargingSessionDuration();
+	
+	void handleBeginChargeEvent();
+
+	void handleEndChargingSession();
 }

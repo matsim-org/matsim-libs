@@ -171,7 +171,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 		}
 
 		if (energyToChargeInJoules > 0) {
-			vehicleWithBattery.chargeVehicle(energyToChargeInJoules);
+			vehicleWithBattery.addEnergyToVehicleBattery(energyToChargeInJoules);
 			
 			if (loggingEnabled) {
 				Id<ActivityFacility> facilityId = firstFacilityIdAfterCarArrival.get(personId);
