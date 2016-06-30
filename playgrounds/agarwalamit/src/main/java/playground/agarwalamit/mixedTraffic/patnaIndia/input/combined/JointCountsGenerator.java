@@ -32,9 +32,9 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class JointCountsGenerator {
 	
-	private static final String urbanCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/urbanCounts_excl_rckw_osmNetwork.xml.gz";
-	private static final String externalCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonCounts_10pct_OC1Excluded.xml.gz";
-	private static final String jointCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_counts_osmNetwork.xml.gz";
+	private static final String urbanCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/urbanCounts_excl_rckw_shpNetwork.xml.gz";
+	private static final String externalCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/outerCordonCounts_10pct_OC1Excluded.xml.gz";
+	private static final String jointCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_counts_osmNetwork.xml.gz";
 	
 	public static void main(String[] args) {
 

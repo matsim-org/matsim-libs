@@ -76,7 +76,7 @@ public class PatnaUrbanDemandGenerator {
 	public static void main (String []args) {
 		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator();
 		pudg.startProcessing();
-		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/");
+		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/");
 	}
 
 	public void startProcessing() {
