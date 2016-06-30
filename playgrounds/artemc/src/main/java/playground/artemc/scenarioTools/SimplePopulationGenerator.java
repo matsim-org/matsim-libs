@@ -49,7 +49,7 @@ public class SimplePopulationGenerator {
 		SimplePopulationGenerator simplePopulationGenerator = new SimplePopulationGenerator();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		population.setIsStreaming(true);
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());

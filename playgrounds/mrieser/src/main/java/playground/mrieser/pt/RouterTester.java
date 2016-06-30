@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +70,7 @@ public class RouterTester {
 
 		Vehicles v = s.getTransitVehicles();
 		TransitSchedule ts = s.getTransitSchedule();
-		PopulationImpl p = (PopulationImpl) s.getPopulation();
+		StreamingPopulation p = (StreamingPopulation) s.getPopulation();
 
 		new MatsimNetworkReader(s.getNetwork()).readFile(NETWORK);
 		new VehicleReaderV1(v).readFile(VEHICLES);

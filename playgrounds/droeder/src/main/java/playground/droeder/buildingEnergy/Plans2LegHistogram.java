@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -64,8 +64,8 @@ public abstract class Plans2LegHistogram {
 		
 		final LegHistogram histo = new LegHistogram(300);
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
+		((StreamingPopulation) sc.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
 			
 			@Override
 			public void run(Person person) {

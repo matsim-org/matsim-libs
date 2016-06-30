@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -55,7 +55,7 @@ public class FixModeChainingPopulation {
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
-		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 		pop.setIsStreaming( true );
 
 		final PopulationWriter writer =

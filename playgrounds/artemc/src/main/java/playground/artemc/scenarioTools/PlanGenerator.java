@@ -45,7 +45,7 @@ public class PlanGenerator {
 		HashMap<String, String> sexMap = new HashMap<String, String>();
 		HashMap<String,Integer> carTracker = new HashMap<String, Integer>();
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		population.setIsStreaming(true);
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());

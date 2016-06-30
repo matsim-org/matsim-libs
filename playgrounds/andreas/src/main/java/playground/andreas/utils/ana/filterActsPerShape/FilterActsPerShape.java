@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -25,7 +25,7 @@ public class FilterActsPerShape {
 		log.info("Reading network from " + networkFile);
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
-		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
+		final StreamingPopulation plans = (StreamingPopulation) sc.getPopulation();
 		plans.setIsStreaming(true);
 
 		WorkHomeShapeCounter wHSC = new WorkHomeShapeCounter(minXY, maxXY, actTypeOne, actTypeTwo, shapeFile);

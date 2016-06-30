@@ -40,7 +40,7 @@ import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -166,7 +166,7 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 
 	private void run(String popFilename) {
 		this.sc.getConfig().plans().setInputFile(popFilename);
-		PopulationImpl pop = (PopulationImpl) this.sc.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) this.sc.getPopulation();
 		pop.setIsStreaming(true);
 		MatsimPopulationReader popReader = new MatsimPopulationReader(this.sc);
 		pop.addAlgorithm(this);

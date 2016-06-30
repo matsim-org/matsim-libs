@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -13,7 +13,7 @@ public class PopulationWriterTask implements PersonSink {
 	
 	private final String filename;
 
-    private PopulationImpl population;
+    private StreamingPopulation population;
 
 	private PopulationWriter populationWriter;
 
@@ -28,7 +28,7 @@ public class PopulationWriterTask implements PersonSink {
 	
 	private void init() {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		population = (PopulationImpl) scenario.getPopulation();
+		population = (StreamingPopulation) scenario.getPopulation();
 		population.setIsStreaming(true);
 		populationWriter = new PopulationWriter(population, network);
 		population.addAlgorithm(populationWriter);

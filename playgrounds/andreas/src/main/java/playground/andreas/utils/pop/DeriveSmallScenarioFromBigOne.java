@@ -11,7 +11,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -111,7 +111,7 @@ public class DeriveSmallScenarioFromBigOne {
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 
-		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation plans = (StreamingPopulation) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);

@@ -44,7 +44,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -111,7 +111,7 @@ public class MATSimUtils {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 		new MatsimPopulationReader(scenario).readFile(this.plansFile);
-		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation plans = (StreamingPopulation) scenario.getPopulation();
 
 
 		plans.printPlansCount();
@@ -148,7 +148,7 @@ public class MATSimUtils {
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
 		new MatsimPopulationReader(this.scenario).readFile(this.plansFile);		
-		final PopulationImpl plans = (PopulationImpl) this.scenario.getPopulation();
+		final StreamingPopulation plans = (StreamingPopulation) this.scenario.getPopulation();
 		plans.setIsStreaming(true);
 		
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

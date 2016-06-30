@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UnicodeInputStream;
@@ -196,7 +196,7 @@ public final class PopulationSampler extends JFrame {
 			}
 		}
 		
-		PopulationImpl pop = (PopulationImpl) sc.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) sc.getPopulation();
 		pop.setIsStreaming(true);
 		
 		PopulationWriter writer = null;

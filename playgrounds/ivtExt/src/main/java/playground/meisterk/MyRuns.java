@@ -37,7 +37,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonRemoveLinkAndRoute;
@@ -369,7 +369,7 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation matsimAgentPopulation = (StreamingPopulation) scenario.getPopulation();
 		matsimAgentPopulation.setIsStreaming(true);
 		matsimAgentPopulation.addAlgorithm(pa);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
@@ -458,7 +458,7 @@ public class MyRuns {
 
 	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, MutableScenario scenario) {
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
 
 		System.out.println("  reading plans xml file... ");
 		population.setIsStreaming(isStreaming);
@@ -512,7 +512,7 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		PopulationImpl matsimAgentPopulation = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation matsimAgentPopulation = (StreamingPopulation) scenario.getPopulation();
 		matsimAgentPopulation.setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());

@@ -13,7 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -51,7 +51,7 @@ public class FilterSample {
 		});
 		System.out.println(personIds.size());
 		
-		PopulationImpl filterpop = (PopulationImpl) filtersc.getPopulation();
+		StreamingPopulation filterpop = (StreamingPopulation) filtersc.getPopulation();
 		filterpop.setIsStreaming(true);
 		
 		final PopulationReader plansReader = new MatsimPopulationReader(filtersc);

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
@@ -57,7 +57,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 		pop.setIsStreaming( true );
 
 		final PopulationWriter writer =

@@ -54,7 +54,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -101,7 +101,7 @@ public class RunAnalyses {
 	public void extractSelectedPlansOnly() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
-		PopulationImpl pop = (PopulationImpl) s.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) s.getPopulation();
 		pop.setIsStreaming(true);
 
 		PopulationWriter writer = new PopulationWriter(pop, s.getNetwork());
@@ -117,7 +117,7 @@ public class RunAnalyses {
 	}
 
 	public void createPersonAttributeTable(final String attributesFilename, final String idsFilename) {
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 		pop.setIsStreaming(true);
 		try {
 			PersonAttributesWriter attributesWriter = new PersonAttributesWriter(attributesFilename);

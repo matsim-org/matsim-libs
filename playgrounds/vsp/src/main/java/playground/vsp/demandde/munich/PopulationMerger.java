@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -80,7 +80,7 @@ public class PopulationMerger {
 	private void run(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationImpl mergedPopulation = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation mergedPopulation = (StreamingPopulation) scenario.getPopulation();
 
 		mergedPopulation.setIsStreaming(true);
 		populationWriter = new PopulationWriter(mergedPopulation, scenario.getNetwork());

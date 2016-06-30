@@ -40,7 +40,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -108,7 +108,7 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		Gbl.printElapsedTime();
 		
 		sc.getConfig().plans().setInputFile(popInFile);
-		PopulationImpl pop = (PopulationImpl) sc.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) sc.getPopulation();
 		pop.setIsStreaming(true);
 		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		PopulationWriter popWriter = new PopulationWriter(pop, sc.getNetwork());

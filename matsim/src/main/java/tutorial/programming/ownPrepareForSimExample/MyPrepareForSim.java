@@ -35,11 +35,11 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -103,8 +103,8 @@ public class MyPrepareForSim implements PrepareForSim {
 						return new MyPersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
 					}
 				});
-		if (population instanceof PopulationImpl) {
-			((PopulationImpl) population).setLocked();
+		if (population instanceof Lockable) {
+			((Lockable) population).setLocked();
 		}
 
 	}

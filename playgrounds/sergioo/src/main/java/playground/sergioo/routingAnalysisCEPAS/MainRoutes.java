@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -239,8 +239,8 @@ public class MainRoutes{
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[2]);
 		RoutesPopulation routesPopulation = new RoutesPopulation(scenario, list.get(index).getKey());
-		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(routesPopulation);
+		((StreamingPopulation)scenario.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation)scenario.getPopulation()).addAlgorithm(routesPopulation);
 		new MatsimPopulationReader(scenario).readFile(args[3]);
 		final Map<Journey, Integer> journeysPlan = routesPopulation.getJourneyPlan();
 		LayersPanel panel2 = new LayersPanel() {
@@ -279,8 +279,8 @@ public class MainRoutes{
 		RoutesWindow window2 = new RoutesWindow(panel2);
 		window2.setVisible(true);
 		routesPopulation = new RoutesPopulation(scenario, list.get(index).getKey());
-		((PopulationImpl)scenario2.getPopulation()).setIsStreaming(true);
-		((PopulationImpl)scenario2.getPopulation()).addAlgorithm(routesPopulation);
+		((StreamingPopulation)scenario2.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation)scenario2.getPopulation()).addAlgorithm(routesPopulation);
 		new MatsimPopulationReader(scenario2).readFile(args[4]);
 		final Map<Journey, Integer> journeysPlan2 = routesPopulation.getJourneyPlan();
 		LayersPanel panel3 = new LayersPanel() {

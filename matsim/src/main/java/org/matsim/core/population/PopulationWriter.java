@@ -164,7 +164,7 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void startStreaming(final String filename) {
-		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
 			// write the file head if it is used with streaming.
 			writeStartPlans(filename);
 		} else {
@@ -178,7 +178,7 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	}
 
 	public void closeStreaming() {
-		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
 			if (this.writer != null) {
 				writeEndPlans();
 			} else {

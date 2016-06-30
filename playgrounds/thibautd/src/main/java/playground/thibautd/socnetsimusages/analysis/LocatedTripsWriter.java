@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -177,8 +177,8 @@ public class LocatedTripsWriter {
 		final Collection<TripInfo> infos = new ArrayList<TripInfo>();
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((PopulationImpl) scenario.getPopulation()).setIsStreaming( true );
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm( new InfoFiller( filter , infos ) );
+		((StreamingPopulation) scenario.getPopulation()).setIsStreaming( true );
+		((StreamingPopulation) scenario.getPopulation()).addAlgorithm( new InfoFiller( filter , infos ) );
 
 		new MatsimPopulationReader( scenario ).parse( inPopFile );
 		return infos;

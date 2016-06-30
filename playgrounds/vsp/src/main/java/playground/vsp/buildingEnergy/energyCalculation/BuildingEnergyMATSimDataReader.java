@@ -34,7 +34,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -239,8 +239,8 @@ class BuildingEnergyMATSimDataReader {
 		Collections.sort(links);
 		// TODO[dr] this slows down the very drastic. Streaming is only necessary here because we need a 
 		// filtered population for the berlin-scenario. 
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(plansAna);
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation) sc.getPopulation()).addAlgorithm(plansAna);
+		((StreamingPopulation) sc.getPopulation()).setIsStreaming(true);
 		new MatsimPopulationReader(sc).readFile(plansFile);
 		log.info("resulting population contains " + plansAna.getPopulation().getPersons().size() + " persons.");
 		return sc;

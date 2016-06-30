@@ -25,7 +25,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -958,7 +958,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
-            PopulationImpl temp = (PopulationImpl) PopulationUtils.createPopulation(config);
+            StreamingPopulation temp = (StreamingPopulation) PopulationUtils.createPopulation(config);
             temp.setIsStreaming(true);
             OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
             org.matsim.core.population.PopulationWriter pw = new org.matsim.core.population.PopulationWriter(

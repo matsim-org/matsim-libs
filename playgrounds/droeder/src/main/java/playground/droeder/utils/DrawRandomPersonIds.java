@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -61,8 +61,8 @@ final class DrawRandomPersonIds {
 		Scenario sc =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Set<Id> ids =  new HashSet<Id>();
 		
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
+		((StreamingPopulation) sc.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
 			
 			private Random r = null;
 

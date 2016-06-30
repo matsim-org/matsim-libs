@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
@@ -68,7 +68,7 @@ public class GenerateDemand {
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");
-		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation plans = (StreamingPopulation) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(plans, networkLayer);
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());

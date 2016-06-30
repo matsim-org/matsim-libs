@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -76,7 +76,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	}
 
 	public void startStreaming(final String filename) {
-		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
 			// write the file head if it is used with streaming.
 			writeStartPlans(filename);
 		} else {
@@ -85,7 +85,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	}
 
 	public void closeStreaming() {
-		if ((this.population instanceof PopulationImpl) && (((PopulationImpl) this.population).isStreaming())) {
+		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
 			if (this.fileOpened) {
 				writeEndPlans();
 			} else {

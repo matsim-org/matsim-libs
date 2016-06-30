@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -112,7 +112,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		}
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final PopulationImpl pop = (PopulationImpl) sc.getPopulation();
+		final StreamingPopulation pop = (StreamingPopulation) sc.getPopulation();
 
 		log.info( "parse persons" );
 		final Set<Id> hhsWithSometimes = new HashSet<Id>();

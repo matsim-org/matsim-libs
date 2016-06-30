@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,7 +83,7 @@ public class PopulationCutter {
     }
 
     private void createSubscenario(String populationInputFile, String populationOutputFile, CoordFilter coordFilter, Coord centerAlternative, int radiusAlternative) {
-        PopulationImpl population = (PopulationImpl)scenario.getPopulation();
+        StreamingPopulation population = (StreamingPopulation)scenario.getPopulation();
         Network network = scenario.getNetwork();
 
         // Identify all links within area of interest:

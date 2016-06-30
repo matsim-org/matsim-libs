@@ -44,7 +44,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -193,7 +193,7 @@ public final class LinkActivityCalculationFromEventsMain {
 		log.info("load scenario-data.");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
+		((StreamingPopulation) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
 			
 			@Override
 			public void run(Person person) {
@@ -207,7 +207,7 @@ public final class LinkActivityCalculationFromEventsMain {
 			}
 		});
 		new MatsimPopulationReader(sc).readFile(plansFile);
-		((PopulationImpl) sc.getPopulation()).runAlgorithms();
+		((StreamingPopulation) sc.getPopulation()).runAlgorithms();
 		log.info("finished (load scenario-data).");
 		return sc;
 	}

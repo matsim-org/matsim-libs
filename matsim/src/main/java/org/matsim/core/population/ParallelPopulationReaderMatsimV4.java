@@ -85,7 +85,7 @@ import org.xml.sax.helpers.AttributesImpl;
 		/*
 		 * Check whether population streaming is activated
 		 */
-		if (scenario.getPopulation() instanceof PopulationImpl && ((PopulationImpl)scenario.getPopulation()).isStreaming()) {
+		if (scenario.getPopulation() instanceof StreamingPopulation && ((StreamingPopulation)scenario.getPopulation()).isStreaming()) {
 			log.warn("Population streaming is activated - cannot use " + ParallelPopulationReaderMatsimV4.class.getName() + "!");
 			
 			this.isPopulationStreaming = true;

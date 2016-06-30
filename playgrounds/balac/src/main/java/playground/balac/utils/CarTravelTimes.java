@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
@@ -95,7 +95,7 @@ public class CarTravelTimes {
 
 		
 		
-		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
+		final StreamingPopulation plans = (StreamingPopulation) sc.getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(outputPlansFile);

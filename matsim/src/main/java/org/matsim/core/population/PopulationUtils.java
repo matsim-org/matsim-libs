@@ -116,7 +116,7 @@ public final class PopulationUtils {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+		return new StreamingPopulation(new PopulationFactoryImpl(routeFactory));
 	}
 
 	public static Leg unmodifiableLeg( Leg leg ) {

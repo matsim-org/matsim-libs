@@ -10,7 +10,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.io.FileNotFoundException;
@@ -47,7 +47,7 @@ public class QuickfixLegDistanceDistributionWriter {
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 		pop.setIsStreaming(true);
 		
 		Network network = scenario.getNetwork();

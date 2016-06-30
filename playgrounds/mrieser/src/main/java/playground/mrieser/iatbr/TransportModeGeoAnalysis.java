@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -140,7 +140,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			log.info("analyzing plans");
 			BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/coordsGmde.txt");
 			infoFile.write("X\tY\tID\tTYPE\tGID\tGNAME\n");
-			PopulationImpl pImpl = (PopulationImpl) scenario.getPopulation();
+			StreamingPopulation pImpl = (StreamingPopulation) scenario.getPopulation();
 			pImpl.setIsStreaming(true);
 			TransportModeGeoAnalysis analysis = new TransportModeGeoAnalysis(infoFile);
 			analysis.readGemeindegrenzen("/Users/cello/Desktop/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp");

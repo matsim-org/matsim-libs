@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -59,8 +59,8 @@ public class GenerateOdXy {
 
 			final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
-			(( PopulationImpl) sc.getPopulation()).setIsStreaming( true );
-			(( PopulationImpl) sc.getPopulation()).addAlgorithm(
+			(( StreamingPopulation) sc.getPopulation()).setIsStreaming( true );
+			(( StreamingPopulation) sc.getPopulation()).addAlgorithm(
 					p -> {
 						try {
 							final Plan plan = p.getSelectedPlan();

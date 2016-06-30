@@ -105,7 +105,7 @@ public class Version2DemandGenerationScript {
 	}
 
 	private void createPlans() {
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter popWriter = new PopulationWriter(pop,
 				scenario.getNetwork());

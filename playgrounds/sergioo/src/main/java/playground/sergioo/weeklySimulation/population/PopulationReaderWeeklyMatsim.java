@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -127,8 +127,8 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			if (this.plans instanceof PopulationImpl) {
-				((PopulationImpl) this.plans).addPerson(this.currperson);
+			if (this.plans instanceof StreamingPopulation) {
+				((StreamingPopulation) this.plans).addPerson(this.currperson);
 			} else {
 				this.plans.addPerson(this.currperson);
 			}

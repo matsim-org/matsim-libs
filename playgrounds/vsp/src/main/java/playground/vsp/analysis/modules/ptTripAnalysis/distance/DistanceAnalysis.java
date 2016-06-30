@@ -36,7 +36,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -88,9 +88,9 @@ public class DistanceAnalysis {
 		new NetworkReaderMatsimV1(sc.getNetwork()).parse(network);
 		this.eventsHandler.addLinks((Map<Id<Link>, Link>) sc.getNetwork().getLinks());
 		
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation) sc.getPopulation()).setIsStreaming(true);
 		AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter(); 
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(planFilter);
+		((StreamingPopulation) sc.getPopulation()).addAlgorithm(planFilter);
 		
 		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
 		

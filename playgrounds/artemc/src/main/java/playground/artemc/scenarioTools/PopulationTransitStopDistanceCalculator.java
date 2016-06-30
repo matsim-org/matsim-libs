@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -34,7 +34,7 @@ public class PopulationTransitStopDistanceCalculator {
 		new MatsimPopulationReader(scenario).readFile(populationPath);
 		new TransitScheduleReaderV1(scenario).readFile(transitSchedulePath);
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
 		TransitScheduleImpl schedule = (TransitScheduleImpl) scenario.getTransitSchedule();
 		
 		for(TransitLine line:schedule.getTransitLines().values()){

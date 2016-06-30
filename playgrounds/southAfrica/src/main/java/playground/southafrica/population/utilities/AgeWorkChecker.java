@@ -82,8 +82,8 @@ public class AgeWorkChecker {
 	
 	public void checkForWorkingKids(String population){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(this.algorithm);
-		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation)scenario.getPopulation()).addAlgorithm(this.algorithm);
+		((StreamingPopulation)scenario.getPopulation()).setIsStreaming(true);
 		
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		pr.readFile(population);

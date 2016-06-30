@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -76,7 +76,7 @@ public class DuplicatePersons {
 		final int rate = args.getIntegerValue( "-r" );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 		pop.setIsStreaming( true );
 
 		final PopulationWriter writer =

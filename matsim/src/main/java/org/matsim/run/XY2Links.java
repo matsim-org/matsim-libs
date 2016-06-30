@@ -29,7 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -109,7 +109,7 @@ public class XY2Links {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		this.config = scenario.getConfig();
 
-		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation plans = (StreamingPopulation) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);

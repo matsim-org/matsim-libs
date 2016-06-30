@@ -5,12 +5,12 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 
 class PlansSubsampler {
 
 	public void run(Scenario s, String fileName, double samplingProbability) {
-		PopulationImpl plans = (PopulationImpl) s.getPopulation();
+		StreamingPopulation plans = (StreamingPopulation) s.getPopulation();
 		plans.setIsStreaming(true);
 		org.matsim.core.population.PopulationWriter pw = new org.matsim.core.population.PopulationWriter(
 				plans, s.getNetwork());

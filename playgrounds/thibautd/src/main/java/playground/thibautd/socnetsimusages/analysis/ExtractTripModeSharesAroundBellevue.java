@@ -40,7 +40,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -149,7 +149,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
 		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).parse( networkFile );
 
-		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
+		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
 
 		if ( attributesFile != null ) {
 			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).parse( attributesFile );

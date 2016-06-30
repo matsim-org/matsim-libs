@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
@@ -186,8 +186,8 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 			}
 		};
 		BackwardsWindow window = new BackwardsWindow(new TransitRoute[]{routeA, routeB, routeC, routeD, routeE, routeF, routeG, routeH}, args, new StationsPainter[]{stationsPainterA, stationsPainterB, stationsPainterC, stationsPainterD, stationsPainterE, stationsPainterF, stationsPainterG, stationsPainterH}, panel);
-		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(window);
+		((StreamingPopulation)scenario.getPopulation()).setIsStreaming(true);
+		((StreamingPopulation)scenario.getPopulation()).addAlgorithm(window);
 		new MatsimPopulationReader(scenario).readFile(args[2]);
 		printWriter.close();
 		/*BufferedReader reader = new BufferedReader(new FileReader("./data/coordsBack.txt"));

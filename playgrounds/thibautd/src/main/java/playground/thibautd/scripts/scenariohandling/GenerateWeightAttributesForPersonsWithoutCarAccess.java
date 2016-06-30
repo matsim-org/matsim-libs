@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -43,7 +43,7 @@ public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 		final ObjectAttributes attrs = new ObjectAttributes();
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(
+		((StreamingPopulation) sc.getPopulation()).addAlgorithm(
 			new PersonAlgorithm() {
 				@Override
 				public void run(final Person person) {
@@ -60,7 +60,7 @@ public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 					}
 				}
 			});
-		((PopulationImpl) sc.getPopulation()).setIsStreaming( true );
+		((StreamingPopulation) sc.getPopulation()).setIsStreaming( true );
 		new MatsimPopulationReader( sc ).readFile( populationFile );
 
 		new ObjectAttributesXmlWriter( attrs ).writeFile( outObjectAttributesFile );
