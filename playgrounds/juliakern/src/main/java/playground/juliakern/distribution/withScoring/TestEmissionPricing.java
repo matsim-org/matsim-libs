@@ -38,7 +38,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import java.util.HashSet;
@@ -301,7 +300,7 @@ public class TestEmissionPricing {
 	}
 	
 	private static void createPassiveAgents(Scenario scenario) {
-		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory pFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		// passive agents' home coordinates are around node 9 (12500, 7500)
 		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){

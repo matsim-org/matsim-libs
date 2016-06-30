@@ -47,7 +47,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -137,7 +136,7 @@ public class QsimTestTravelTime {
 	private void setPopulation(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);

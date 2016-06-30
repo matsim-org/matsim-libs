@@ -36,7 +36,7 @@ import com.google.inject.Inject;
  * @author nagel
  *
  */
-class VspPlansCleaner implements BeforeMobsimListener {
+/* deliberately package */ class VspPlansCleaner implements BeforeMobsimListener {
 
 	@Inject private PlansConfigGroup plansConfigGroup;
 	@Inject private Population population;

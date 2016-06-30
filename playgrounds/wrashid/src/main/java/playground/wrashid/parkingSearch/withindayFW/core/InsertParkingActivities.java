@@ -34,15 +34,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
@@ -55,7 +55,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	private final PersonAlgorithm personPrepareForSim;
 	private final ParkingInfrastructure parkingInfrastructure;
 	private final TripRouter tripRouter;
-	private final RouteFactoriesRegister modeRouteFactory;
+	private final RouteFactories modeRouteFactory;
 
 	
 	// TODO: instead of selecting closest parking, we could select parking from previous day.
@@ -68,7 +68,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		this.personPrepareForSim = new PersonPrepareForSim(new PlanRouter(tripRouter), scenario);
 		this.parkingInfrastructure = parkingInfrastructure;
 		
-		this.modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactoriesRegister();
+		this.modeRouteFactory = ((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories();
 	}
 
 	@Override

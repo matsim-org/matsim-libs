@@ -237,7 +237,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currroute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
+		this.currroute = this.plans.getFactory().getRouteFactories().createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
 		if (atts.getValue("dist") != null) {
 			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));

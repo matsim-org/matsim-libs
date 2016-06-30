@@ -35,7 +35,7 @@ import org.matsim.core.scenario.Lockable;
 /**
  * Default implementation of {@link Person} interface.
  */
-final class PersonImpl implements Person, Lockable {
+/* deliberately package */ final class PersonImpl implements Person, Lockable {
 
 	private List<Plan> plans = new ArrayList<Plan>(6);
 	private Id<Person> id;

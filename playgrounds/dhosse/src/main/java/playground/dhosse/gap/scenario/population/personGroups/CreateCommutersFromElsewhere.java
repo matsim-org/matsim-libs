@@ -15,8 +15,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -52,7 +52,7 @@ public class CreateCommutersFromElsewhere {
 		TravelTime ttime = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 		dijkstra = dijkstraFactory.createPathCalculator(scenario.getNetwork(), tdis, ttime);
 		
-		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory factory = (PopulationFactory) scenario.getPopulation().getFactory();
 		 facilities = scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.work.name());
 		
 		//parse over commuter relations

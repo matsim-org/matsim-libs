@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -30,9 +31,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 
@@ -70,7 +70,7 @@ public class RetailersLocationListener
   {
     this.controler = event.getServices();
     FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(this.controler.getConfig().planCalcScore());
-      RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getRouteFactoriesRegister();
+      RouteFactories routeFactory = ((PopulationFactory) this.controler.getScenario().getPopulation().getFactory()).getRouteFactories();
 
     this.facilityIdFile = this.controler.getConfig().findParam("Retailers", "retailers");
     if (this.facilityIdFile == null) throw new RuntimeException("In config file, param = retailers in module = Retailers not defined!");

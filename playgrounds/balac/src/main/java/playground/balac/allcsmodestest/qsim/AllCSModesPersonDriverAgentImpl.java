@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -36,7 +37,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -443,7 +443,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		Leg carLeg = PopulationUtils.createLeg(mode);
 		
 		carLeg.setTravelTime( travelTime );
-		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
+		NetworkRoute route = ((PopulationFactory)scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
 		
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);

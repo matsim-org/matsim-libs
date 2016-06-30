@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -65,7 +65,7 @@ public class CreateScheduleToMatchPseudoNetwork{
 		//read schedule
 		TransitScheduleFactoryImpl builder = new TransitScheduleFactoryImpl();
 		TransitScheduleImpl Schedule = (TransitScheduleImpl) builder.createTransitSchedule();
-		TransitScheduleReaderV1 tsreader = new TransitScheduleReaderV1(Schedule, new RouteFactoriesRegister());
+		TransitScheduleReaderV1 tsreader = new TransitScheduleReaderV1(Schedule, new RouteFactories());
 		tsreader.readFile(ScheduleFile);
 
 		//pseudonetwork to use the getnetworkstop method

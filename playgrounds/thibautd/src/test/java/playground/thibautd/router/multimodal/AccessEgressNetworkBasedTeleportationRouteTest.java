@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -77,7 +77,7 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Population pop = sc.getPopulation();
 
-		((PopulationFactoryImpl) pop.getFactory()).setRouteFactory(
+		((PopulationFactory) pop.getFactory()).getRouteFactories().setRouteFactory(
 				AccessEgressNetworkBasedTeleportationRoute.class,
 					new AccessEgressNetworkBasedTeleportationRouteFactory( ) );
 
@@ -98,7 +98,7 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 
 		final Scenario insc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
-		((PopulationFactoryImpl) insc.getPopulation().getFactory()).setRouteFactory(
+		((PopulationFactory) insc.getPopulation().getFactory()).getRouteFactories().setRouteFactory(
 				AccessEgressNetworkBasedTeleportationRoute.class,
 					new AccessEgressNetworkBasedTeleportationRouteFactory( ) );
 

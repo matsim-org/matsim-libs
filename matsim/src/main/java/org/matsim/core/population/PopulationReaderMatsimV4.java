@@ -348,7 +348,7 @@ import org.xml.sax.Attributes;
 		if ("car".equals(this.currleg.getMode())) {
 			routeType = NetworkRoute.class;
 		}
-		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(routeType, null, null);
+		this.currRoute = this.plans.getFactory().getRouteFactories().createRoute(routeType, null, null);
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

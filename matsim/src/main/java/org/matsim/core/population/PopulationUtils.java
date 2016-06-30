@@ -53,7 +53,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
@@ -105,7 +105,7 @@ public final class PopulationUtils {
 
 	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
 		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
-		RouteFactoriesRegister routeFactory = new RouteFactoriesRegister();
+		RouteFactories routeFactory = new RouteFactories();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
@@ -121,7 +121,7 @@ public final class PopulationUtils {
 	
 	public static StreamingPopulation createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
 		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
-		RouteFactoriesRegister routeFactory = new RouteFactoriesRegister();
+		RouteFactories routeFactory = new RouteFactories();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {

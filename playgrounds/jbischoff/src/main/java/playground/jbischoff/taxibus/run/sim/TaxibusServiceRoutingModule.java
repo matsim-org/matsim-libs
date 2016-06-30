@@ -26,8 +26,8 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -60,7 +60,7 @@ public class TaxibusServiceRoutingModule implements RoutingModule {
 		Leg taxiLeg = PopulationUtils.createLeg(TaxibusUtils.TAXIBUS_MODE);
 		taxiLeg.setTravelTime( travelTime );
 		NetworkRoute route = 
-				((PopulationFactoryImpl)controler.getScenario().getPopulation().getFactory()).getRouteFactoriesRegister().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
+				((PopulationFactory)controler.getScenario().getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
 		route.setTravelTime( travelTime);
 		
 		taxiLeg.setRoute(route);

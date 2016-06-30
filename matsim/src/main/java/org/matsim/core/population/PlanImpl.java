@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scenario.CustomizableUtils;
 
- final class PlanImpl implements Plan {
+/* deliberately package */  final class PlanImpl implements Plan {
 
 	private ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 

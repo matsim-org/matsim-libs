@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -58,7 +58,7 @@ import org.xml.sax.Attributes;
 public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
 
 	private final TransitSchedule schedule;
-	private final RouteFactoriesRegister routeFactory;
+	private final RouteFactories routeFactory;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
@@ -70,20 +70,20 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	/**
 	 * @param schedule
 	 * @param network
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, RouteFactoriesRegister)}
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, RouteFactories)}
 	 */
 	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
-		this(schedule, new RouteFactoriesRegister());
+		this(schedule, new RouteFactories());
 	}
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final RouteFactoriesRegister routeFactory) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final RouteFactories routeFactory) {
 		this( new IdentityTransformation() , schedule , routeFactory );
 	}
 
 	public TransitScheduleReaderV1(final Scenario scenario) {
 		this( scenario.getTransitSchedule(),
-				((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getRouteFactoriesRegister() );
+				((PopulationFactory) (scenario.getPopulation().getFactory())).getRouteFactories() );
 	}
 
 	public TransitScheduleReaderV1(
@@ -91,13 +91,13 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			final Scenario scenario) {
 		this( coordinateTransformation,
 				scenario.getTransitSchedule(),
-				((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getRouteFactoriesRegister() );
+				((PopulationFactory) (scenario.getPopulation().getFactory())).getRouteFactories() );
 	}
 
 	public TransitScheduleReaderV1(
 			CoordinateTransformation coordinateTransformation,
 			TransitSchedule schedule,
-			RouteFactoriesRegister routeFactory) {
+			RouteFactories routeFactory) {
 		this.coordinateTransformation = coordinateTransformation;
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;

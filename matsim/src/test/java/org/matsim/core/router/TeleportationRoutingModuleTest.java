@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -41,7 +41,7 @@ public class TeleportationRoutingModuleTest {
 	@Test
 	public void testRouteLeg() {
 		PopulationFactory populationFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
-		RouteFactoriesRegister routeFactory = new RouteFactoriesRegister();
+		RouteFactories routeFactory = new RouteFactories();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));

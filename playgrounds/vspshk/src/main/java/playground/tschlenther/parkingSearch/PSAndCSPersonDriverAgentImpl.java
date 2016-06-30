@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
@@ -44,11 +45,10 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -136,7 +136,7 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl)pf).getRouteFactoriesRegister() ;
+		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 
 		// === walk leg: ===
 
@@ -197,7 +197,7 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 				
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
 				PopulationFactory pf = scenario.getPopulation().getFactory() ;
-				RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl)pf).getRouteFactoriesRegister() ;
+				RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 
 				// === walk leg: ===
 

@@ -39,7 +39,6 @@ import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlanRouter;
@@ -154,7 +153,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		transitSchedule.addStopFacility(stop3);
 		transitSchedule.addTransitLine(line1);
 
-		PopulationFactoryImpl populationFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory populationFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromCoord("h", link1.getCoord());
@@ -229,7 +228,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		network.addLink(link1);
 		network.addLink(link2);
 		network.addLink(link3);
-		PopulationFactoryImpl populationFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory populationFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromLinkId("h", link1.getId());
@@ -237,7 +236,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		plan.addActivity(a1);
 
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
-		Route ptRoute = populationFactory.createRoute(Route.class, link1.getId(), link3.getId());
+		Route ptRoute = populationFactory.getRouteFactories().createRoute(Route.class, link1.getId(), link3.getId());
 		ptRoute.setTravelTime(3600);
         ptRoute.setDistance(1000);
 		leg.setRoute(ptRoute);

@@ -38,14 +38,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
@@ -74,7 +74,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	private Plan plan;
 	private TripRouter tripRouter;
 	private LeastCostPathCalculator pathCalculator ;
-	private RouteFactoriesRegister routeFactory ;
+	private RouteFactories routeFactory ;
 	
 	/**
 	 * @author cdobler
@@ -452,7 +452,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
 		this.pathCalculator = new Dijkstra(scenario.getNetwork(), costFunction, timeFunction) ;
 		
-		this.routeFactory = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactoriesRegister() ;
+		this.routeFactory = ((PopulationFactory)scenario.getPopulation().getFactory()).getRouteFactories() ;
 	}
 	
 	/**

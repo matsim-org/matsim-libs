@@ -33,7 +33,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author nagel
  *
  */
-class PopulationImpl implements Population, Lockable {
+/* deliberately package */ class PopulationImpl implements Population, Lockable {
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
 	private String name;

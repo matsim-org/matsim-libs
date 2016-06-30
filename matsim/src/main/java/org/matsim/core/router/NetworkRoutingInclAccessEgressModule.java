@@ -218,7 +218,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		double dist = CoordUtils.calcEuclideanDistance(fromCoord,toCoord);
 
 		// create an empty route, but with realistic travel time
-		Route route = this.populationFactory.createRoute(Route.class, dpLinkId, arLinkId ); 
+		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, dpLinkId, arLinkId ); 
 
 		double beelineDistanceFactor = 1.3 ;
 		double networkTravelSpeed = 2.0 ;
@@ -260,7 +260,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// (a "true" route)
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
@@ -270,7 +270,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
