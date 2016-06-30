@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -235,8 +235,8 @@ public class IatbrPlanBuilder {
 		while(iterator.hasNext()){
 			Id<Person> id = iterator.next();
 			Person person = population.getPersons().get(id);
-			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
-			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
+			Activity firstActivity = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
+			Activity lastActivity = ((Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
 			if(firstActivity.getType().startsWith("h") && lastActivity.getType().startsWith("h")){
 
 				/* Check for home activity */
@@ -263,7 +263,7 @@ public class IatbrPlanBuilder {
 				for(int i = 1; i < person.getSelectedPlan().getPlanElements().size()-1; i++){
 					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 					if(pe instanceof Activity){
-						ActivityImpl act = (ActivityImpl) pe;
+						Activity act = (Activity) pe;
 						if(act.getType().startsWith("h")){
 							act.setFacilityId(home.getId());
 						} else if(act.getType().startsWith("w")){

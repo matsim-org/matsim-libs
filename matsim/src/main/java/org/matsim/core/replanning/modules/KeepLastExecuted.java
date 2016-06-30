@@ -21,7 +21,7 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.ExecutedPlansService;
 
@@ -45,8 +45,7 @@ public class KeepLastExecuted extends AbstractMultithreadedModule {
 			public void run(Plan plan) {
 				Plan newPlan = executedPlans.getExecutedPlans().get( plan.getPerson().getId() ) ;
 				Gbl.assertNotNull( newPlan ) ;
-				((PlanImpl) plan).copyFrom(newPlan);
-				// yyyy would not be able to solve this by copy constructor!
+				PopulationUtils.copyFromTo(newPlan, plan);
 			}
 		};
 	}

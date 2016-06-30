@@ -12,7 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
@@ -44,7 +44,7 @@ public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 		Network network = this.scenario.getNetwork();
 		LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(this.scenario);
 		PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
-		RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl)populationFactory).getRouteFactory();
+		RouteFactoriesRegister modeRouteFactory = ((PopulationFactoryImpl)populationFactory).getRouteFactoriesRegister();
 		
 		TripRouter tripRouter = new TripRouter();
 

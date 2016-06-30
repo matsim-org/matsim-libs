@@ -202,7 +202,7 @@ public class GraphBuilder {
 	}
 	
 	private SocialPerson createPerson(VertexRecord record, SQLDumpReader sqlData) {
-		Person matsimPerson = PopulationUtils.createPerson(Id.create(record.id, Person.class));
+		Person matsimPerson = PopulationUtils.getFactory().createPerson(Id.create(record.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;

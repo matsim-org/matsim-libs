@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -75,11 +75,11 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 				for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , stages ) ) {
 					if ( act.getType().equals( "home" ) ) {
 						final ActivityFacility fac = getHomeFacility( act , facilities );
-						((ActivityImpl) act).setFacilityId( fac.getId() );
+						((Activity) act).setFacilityId( fac.getId() );
 					}
 					else if ( act.getType().equals( "work" ) ) {
 						final ActivityFacility fac = getWorkFacility( act , facilities );
-						((ActivityImpl) act).setFacilityId( fac.getId() );
+						((Activity) act).setFacilityId( fac.getId() );
 					}
 				}
 

@@ -2,12 +2,16 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.*;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.*;
 
 /**
- * Generates and calculates the PseudoRoutes for all the queued
- * TransitLines. If no path on the network can be found, artificial
- * links between link candidates are stored to be created later.
+ * Generates and calculates the {@link PseudoTransitRoute} for each queued
+ * {@link TransitLine} using a {@link PseudoGraph}. Stores the PseudoTransitRoutes
+ * in a {@link PseudoSchedule}.<p/>
+ *
+ * If no path on the network can be found, an {@link ArtificialLink} between
+ * {@link LinkCandidate}s can be added to a network.
  *
  * @author polettif
  */

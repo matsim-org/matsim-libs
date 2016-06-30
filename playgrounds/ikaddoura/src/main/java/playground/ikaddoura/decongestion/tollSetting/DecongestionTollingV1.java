@@ -35,7 +35,7 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
  * 
  * Tolls in all further iterations
  * ... are recomputed
- * - If d > threshold: Increase the previous toll by the adjustment factor.
+ * - If d > threshold: Increase the previous toll by the adjustment rate.
  * - If d <= threshold: Set the toll to zero.
  * 
  * 
@@ -75,7 +75,7 @@ public class DecongestionTollingV1 implements DecongestionTollSetting {
 					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
 						
 						Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-						double updatedToll = time2toll.get(intervalNr) * (this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
+						double updatedToll = time2toll.get(intervalNr) * (1 + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
 						time2toll.put(intervalNr, updatedToll);
 											
 					} else {

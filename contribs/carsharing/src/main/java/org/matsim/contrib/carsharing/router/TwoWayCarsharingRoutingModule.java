@@ -6,7 +6,7 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
@@ -21,7 +21,7 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 			Facility toFacility, double departureTime, Person person) {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		
-		final Leg leg1 = new LegImpl( "twowaycarsharing" );
+		final Leg leg1 = PopulationUtils.createLeg("twowaycarsharing");
 		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg1.setRoute(route1);
 		

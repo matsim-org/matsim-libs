@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -171,7 +170,7 @@ public class CapstonePlansWriter {
                 ActivityInfo activityInfo = activitySequence.get(i);
                 if (i == 0 || i == activitySequence.size() - 1) {
                     Coord homeCoord = homefacility.getCoord();
-                    ActivityImpl home = (ActivityImpl) populationFactory.createActivityFromCoord("home", homeCoord);
+                    Activity home = (Activity) populationFactory.createActivityFromCoord("home", homeCoord);
                     plan.addActivity(home);
                     if (i == 0)
                         home.setEndTime(activityInfo.end);
@@ -181,14 +180,14 @@ public class CapstonePlansWriter {
                     Coord thecoord;
                     if (activityInfo.type.startsWith("w") || activityInfo.type.endsWith("school")) {
                         thecoord = mainfacility.getCoord();
-                        ActivityImpl mainAct = (ActivityImpl) populationFactory.createActivityFromCoord(activityInfo.type, thecoord);
+                        Activity mainAct = (Activity) populationFactory.createActivityFromCoord(activityInfo.type, thecoord);
                         plan.addActivity(mainAct);
                         mainAct.setEndTime(activityInfo.end);
                         mainAct.setFacilityId(mainfacility.getId());
                     } else {
                         ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(Id.create(activityInfo.postcode, ActivityFacility.class));
                         thecoord = activityFacility.getCoord();
-                        ActivityImpl act = (ActivityImpl) populationFactory.createActivityFromCoord(activityInfo.type, thecoord);
+                        Activity act = (Activity) populationFactory.createActivityFromCoord(activityInfo.type, thecoord);
                         plan.addActivity(act);
                         act.setEndTime(activityInfo.end);
                         act.setFacilityId(activityFacility.getId());

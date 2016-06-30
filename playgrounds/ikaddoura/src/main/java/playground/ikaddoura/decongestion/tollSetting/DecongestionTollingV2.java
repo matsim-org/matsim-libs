@@ -85,15 +85,13 @@ public class DecongestionTollingV2 implements DecongestionTollSetting {
 						if (averageDelay >= previousDelay) {
 							
 							Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-							double updatedToll = time2toll.get(intervalNr) + (time2toll.get(intervalNr) * this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-//							double updatedToll = time2toll.get(intervalNr) + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
+							double updatedToll = time2toll.get(intervalNr) * (1 + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
 							time2toll.put(intervalNr, updatedToll);
 							
 						} else {
 							
 							Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-							double updatedToll = time2toll.get(intervalNr) - (time2toll.get(intervalNr) * this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-//							double updatedToll = time2toll.get(intervalNr) - this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
+							double updatedToll = time2toll.get(intervalNr) * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
 							time2toll.put(intervalNr, updatedToll);							
 						}
 											

@@ -22,7 +22,7 @@ package org.matsim.contrib.dynagent.run;
 import java.util.*;
 
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.*;
 import org.matsim.facilities.Facility;
@@ -48,7 +48,7 @@ public class DynRoutingModule
         route.setDistance(Double.NaN);
         route.setTravelTime(Double.NaN);
 
-        Leg leg = new LegImpl(mode);
+        Leg leg = PopulationUtils.createLeg(mode);
         leg.setDepartureTime(departureTime);
         leg.setTravelTime(Double.NaN);
         leg.setRoute(route);

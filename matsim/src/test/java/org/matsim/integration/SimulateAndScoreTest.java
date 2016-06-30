@@ -39,7 +39,6 @@ import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlanRouter;
@@ -159,7 +158,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromCoord("h", link1.getCoord());
-		((ActivityImpl) a1).setLinkId(link1.getId());
+		((Activity) a1).setLinkId(link1.getId());
 
 		a1.setEndTime(3);
 		plan.addActivity(a1);
@@ -181,7 +180,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		final PlanAlgorithm plansCalcRoute = new PlanRouter(tripRouter);
 
 		Activity a2 = populationFactory.createActivityFromCoord("w", link3.getCoord());
-		((ActivityImpl) a2).setLinkId(link3.getId());
+		((Activity) a2).setLinkId(link3.getId());
 		plan.addActivity(a2);
 
 

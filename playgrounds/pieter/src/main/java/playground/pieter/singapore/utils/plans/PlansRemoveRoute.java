@@ -4,10 +4,10 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.LegImpl;
 
 /**
  * @author fouriep Utility to strip out transit plans, for running e.g.
@@ -31,7 +31,7 @@ class PlansRemoveRoute {
 				boolean transitPlan = false;
 
 				for (int j = 1; j < plan.getPlanElements().size(); j += 2) {
-					LegImpl leg = (LegImpl) plan.getPlanElements().get(j);
+					Leg leg = (Leg) plan.getPlanElements().get(j);
 					try {
 
 						if (!leg.getMode().equals("car")) {

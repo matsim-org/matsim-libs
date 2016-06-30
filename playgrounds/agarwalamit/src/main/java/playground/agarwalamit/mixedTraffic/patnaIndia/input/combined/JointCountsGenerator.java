@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.filter;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.VehicleData;
-import org.matsim.contrib.util.PartialSort;
-import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
+import org.matsim.counts.CountsWriter;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
-public class KStraightLineNearestVehicleDepartureFilter
-{
-    private final int k;
+/**
+ * @author amit
+ */
 
+public class JointCountsGenerator {
+	
+	private static final String urbanCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/urbanCounts_excl_rckw_osmNetwork.xml.gz";
+	private static final String externalCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonCounts_10pct_OC1Excluded.xml.gz";
+	private static final String jointCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_counts_osmNetwork.xml.gz";
+	
+	public static void main(String[] args) {
 
-    public KStraightLineNearestVehicleDepartureFilter(int k)
-    {
-        this.k = k;
-    }
-
-
-    public Iterable<VehicleData.Entry> filterVehiclesForRequest(
-            Iterable<VehicleData.Entry> vehicles, TaxiRequest request)
-    {
-        Link toLink = request.getFromLink();
-        PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
-
-        for (VehicleData.Entry veh : vehicles) {
-            double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.link, toLink);
-            nearestVehicleSort.add(veh, squaredDistance);
-        }
-
-        return nearestVehicleSort.retriveKSmallestElements();
-    }
+		Counts<Link> counts = new Counts<>();
+		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
+		reader.parse(urbanCountFile);
+		reader.parse(externalCountFile);
+		
+		new CountsWriter(counts).write(jointCountFile);
+	}
 }

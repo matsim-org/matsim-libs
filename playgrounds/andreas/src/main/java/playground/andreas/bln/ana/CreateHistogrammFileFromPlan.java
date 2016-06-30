@@ -8,13 +8,13 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
@@ -56,7 +56,7 @@ public class CreateHistogrammFileFromPlan extends NewPopulation {
 	public void run(Person person) {
 
 		Plan plan = person.getSelectedPlan();
-		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(0);
+		Activity act = (Activity) plan.getPlanElements().get(0);
 		act.getEndTime();
 
 			if(person.getId().toString().contains("passenger1")){

@@ -35,13 +35,14 @@ import org.matsim.api.core.v01.population.Route;
  */
 public abstract class AbstractPopulationWriterHandler implements PopulationWriterHandler {
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(AbstractPopulationWriterHandler.class);
 	
 	@Override
 	public final void writePerson(final Person person, final BufferedWriter writer) throws IOException {
 		this.startPerson(person, writer);
-		if (person instanceof PersonImpl) {
-			PersonImpl p = (PersonImpl)person;
+		if (person instanceof Person) {
+			Person p = (Person)person;
 			// travelcards
 			if (PersonUtils.getTravelcards(p) != null) {
 				for (String t : PersonUtils.getTravelcards(p)) {

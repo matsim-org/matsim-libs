@@ -42,6 +42,8 @@ public interface Population extends MatsimToplevelContainer {
 
 	public void addPerson(final Person p);
 	
+	public Person removePerson( final Id<Person> personId ) ;
+	
 	public ObjectAttributes getPersonAttributes();
 
 }

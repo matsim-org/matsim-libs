@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -59,9 +59,8 @@ public class RoutingUtils {
 
 			tripInPlan.clear();
 			tripInPlan.add(
-					new LegImpl(
-						mainModeIdentifier.identifyMainMode(
-							trip.getTripElements() ) ) );
+					PopulationUtils.createLeg(mainModeIdentifier.identifyMainMode(
+						trip.getTripElements() )) );
 		}
 
 		return structure;

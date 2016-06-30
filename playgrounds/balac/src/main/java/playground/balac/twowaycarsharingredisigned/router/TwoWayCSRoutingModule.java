@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -147,7 +147,7 @@ public class TwoWayCSRoutingModule implements RoutingModule {
 	
 	private Leg createWalkLeg(Facility fromFacility,
 			Facility toFacility) {
-		final Leg leg = new LegImpl( "walk_rb" );
+		final Leg leg = PopulationUtils.createLeg("walk_rb");
 		GenericRouteImpl route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg.setRoute(route);
 		return leg;
@@ -156,7 +156,7 @@ public class TwoWayCSRoutingModule implements RoutingModule {
 	
 	private Leg createCarLeg(Facility fromFacility,
 			Facility toFacility) {
-		final Leg leg1 = new LegImpl( "twowaycarsharing" );
+		final Leg leg1 = PopulationUtils.createLeg("twowaycarsharing");
 		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg1.setRoute(route1);
 		

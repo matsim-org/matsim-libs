@@ -3,12 +3,14 @@ package playground.vbmh.vmParking;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+
 import playground.vbmh.util.CSVWriter;
 import playground.vbmh.util.VMCharts;
 import playground.vbmh.vmEV.EVControl;
@@ -94,16 +96,17 @@ public class IterEndStats {
 
 
         for (Person person : controler.getScenario().getPopulation().getPersons().values()){
-			PersonImpl personImpl = (PersonImpl) person;
+			Person personImpl = (Person) person;
 			double soc;
 			boolean notParked=false;
 			boolean parkedAtHome=false;
-			PlanImpl planImpl=(PlanImpl)personImpl.getSelectedPlan();
-			LegImpl legImpl=(LegImpl)planImpl.getNextLeg(planImpl.getFirstActivity());
+			Plan planImpl=(Plan)personImpl.getSelectedPlan();
+			Leg legImpl=(Leg)PopulationUtils.getNextLeg(planImpl, PopulationUtils.getFirstActivity( planImpl ));
 			Id id = person.getId();
 			LinkedList<ParkingSpot> selectedParkings = parkings.get(id);
-			Activity firstAct = planImpl.getFirstActivity();
-			String actType = planImpl.getNextActivity(legImpl).getType();
+			Activity firstAct = PopulationUtils.getFirstActivity( planImpl );
+			final Leg leg = legImpl;
+			String actType = PopulationUtils.getNextActivity(planImpl, leg).getType();
 			ParkingSpot firstSelectedSpot;
 			ParkingSpot homeSpot;
 			String facId = firstAct.getFacilityId().toString();
@@ -318,10 +321,10 @@ public class IterEndStats {
 	}
 	
 	
-	double getPlanDistance(PlanImpl plan){
+	double getPlanDistance(Plan plan){
 		double distance=0;
 		for (PlanElement element : plan.getPlanElements()){
-			if(element.getClass()==LegImpl.class){
+			if(element.getClass()==Leg.class){
 				Leg leg = (Leg)element;
 				distance+=leg.getRoute().getDistance();
 			}

@@ -38,7 +38,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A LeastCostPathCalculator using FasAStarLandmarks.
+ * A LeastCostPathCalculator using FastAStarLandmarks.
+ *
+ * @author polettif
  */
 public class FastAStarRouter implements Router {
 
@@ -104,7 +106,7 @@ public class FastAStarRouter implements Router {
 	@Override
 	public double getArtificialLinkFreeSpeed(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
 		return 1;
-		/* Varying freespeeds do not work with maxAllowedTravelcost == 0
+		/* Varying freespeeds do not work with maxAllowedTravelcost == 0.
 		if(travelCostType.equals(PublicTransitMappingConfigGroup.TravelCostType.travelTime)) {
 			double linkLength = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
 			return linkLength / maxAllowedTravelCost;
@@ -127,6 +129,7 @@ public class FastAStarRouter implements Router {
 	public double getLinkTravelCost(Link link) {
 		return getLinkMinimumTravelDisutility(link);
 	}
+
 
 	// LeastCostPathCalculator methods
 	@Override

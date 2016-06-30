@@ -19,17 +19,17 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
+
 import java.util.*;
 
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentProblem.Mode;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
 
 public class TaxiOptimizerTestIT

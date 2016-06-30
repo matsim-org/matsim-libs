@@ -65,7 +65,7 @@ public class LeastCostPathTree {
 	private HashMap<Id<Node>, NodeData> nodeData = null;
 	
 	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.getDefaultVehicleType());
-	private final Person PERSON = PopulationUtils.createPerson(Id.create("thePerson", Person.class));
+	private final Person PERSON = PopulationUtils.getFactory().createPerson(Id.create("thePerson", Person.class));
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors

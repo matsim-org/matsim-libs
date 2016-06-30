@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -30,7 +30,7 @@ public class AddStayHomePlan {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile(inputPlansFile);
 		Population population = scenario.getPopulation();
 

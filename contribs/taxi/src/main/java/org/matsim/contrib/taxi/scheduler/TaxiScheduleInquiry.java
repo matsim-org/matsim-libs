@@ -27,9 +27,12 @@ public interface TaxiScheduleInquiry
 {
     LinkTimePair getImmediateDiversion(Vehicle veh);
 
+
     LinkTimePair getEarliestIdleness(Vehicle veh);
 
+
     LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
+
 
     boolean isIdle(Vehicle vehicle);
 }

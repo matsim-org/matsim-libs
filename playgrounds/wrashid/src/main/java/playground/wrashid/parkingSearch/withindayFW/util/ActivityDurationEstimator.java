@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
 
 
 public class ActivityDurationEstimator {
@@ -45,8 +45,8 @@ public class ActivityDurationEstimator {
 		int indexOfFirstActivity = currentCarLegPlanElementIndex + 3;
 		for (int i = indexOfFirstActivity; i < planElements.size(); i++) {
 
-			if (planElements.get(i) instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) planElements.get(i);
+			if (planElements.get(i) instanceof Activity) {
+				Activity act = (Activity) planElements.get(i);
 				double endTime = act.getEndTime();
 				double maximumDuration = act.getMaximumDuration();
 				if (endTime != Double.NEGATIVE_INFINITY) {
@@ -61,8 +61,8 @@ public class ActivityDurationEstimator {
 					break;
 				}
 
-				ActivityImpl prevAct = (ActivityImpl) planElements.get(i - 1);
-				ActivityImpl nextAct = (ActivityImpl) planElements.get(i + 1);
+				Activity prevAct = (Activity) planElements.get(i - 1);
+				Activity nextAct = (Activity) planElements.get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
 				if (leg.getMode().equalsIgnoreCase("walk") || leg.getMode().equalsIgnoreCase("transit_walk")) {
 					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance, pcrConfig);

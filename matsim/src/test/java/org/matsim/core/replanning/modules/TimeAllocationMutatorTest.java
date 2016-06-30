@@ -25,12 +25,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.misc.Time;
@@ -91,21 +92,21 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
 
 		// setup person
-		PlanImpl plan;
-		ActivityImpl act1, act2;
+		Plan plan;
+		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			plan = PersonUtils.createAndAddPlan(person, true);
-			act1 = plan.createAndAddActivity("h", link1.getId());
+			act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 			act1.setEndTime(4*3600);
-			plan.createAndAddLeg(TransportMode.car);
-			act2 = plan.createAndAddActivity("w", link1.getId());
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			act2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link1.getId());
 			act2.setMaximumDuration(14*3600);
-			plan.createAndAddLeg(TransportMode.car);
-			plan.createAndAddActivity("h", link1.getId());
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -170,21 +171,21 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
 
 		// setup person
-		PlanImpl plan;
-		ActivityImpl act1, act2;
+		Plan plan;
+		Activity act1, act2;
 		try {
 			/* The chosen times for the activity durations are such that it is likely
 			 * for the random mutation to reach midnight (either at 00:00:00 or at 24:00:00).
 			 */
-			Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			plan = PersonUtils.createAndAddPlan(person, true);
-			act1 = plan.createAndAddActivity("h", link1.getId());
+			act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 			act1.setEndTime(4*3600);
-			plan.createAndAddLeg(TransportMode.car);
-			act2 = plan.createAndAddActivity("w", link1.getId());
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			act2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link1.getId());
 			act2.setMaximumDuration(14*3600);
-			plan.createAndAddLeg(TransportMode.car);
-			plan.createAndAddActivity("h", link1.getId());
+			PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -52,11 +52,11 @@ public class PatnaNonSlumDemandCleaner {
 	}
 
 	public static void main(String[] args) {
-		String inputFile1 = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
-		String inputFile2 = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
-		String inputFile3 = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
+		String inputFile1 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
+		String inputFile2 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
+		String inputFile3 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
 
-		String outFile = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
+		String outFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
 
 		PatnaNonSlumDemandCleaner pdfc = new PatnaNonSlumDemandCleaner(outFile);
 		pdfc.run(inputFile1, inputFile2, inputFile3);
@@ -98,8 +98,8 @@ public class PatnaNonSlumDemandCleaner {
 			SortedMap<String, Double> groupNumbers = new TreeMap<>();
 			groupNumbers.put("car", 8.);
 			groupNumbers.put("motorbike", 38.);
-			groupNumbers.put("bike", 37.);
-			groupNumbers.put("pt", 11.);
+			groupNumbers.put("bike", 35.); //groupNumbers.put("bike", 37.);
+			groupNumbers.put("pt", 13.); // groupNumbers.put("pt", 11.);
 			groupNumbers.put("walk", 5.);
 
 			// to remove the top element, linkedlist is used.

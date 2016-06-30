@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
@@ -146,7 +146,7 @@ public class TransitRouterImpl implements TransitRouter {
 
     private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
         List<Leg> legs = new ArrayList<>();
-        Leg leg = new LegImpl(TransportMode.transit_walk);
+        Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
         double walkTime = getWalkTime(person, fromCoord, toCoord);
         leg.setTravelTime(walkTime);
         Route walkRoute = new GenericRouteImpl(null, null);
@@ -174,7 +174,7 @@ public class TransitRouterImpl implements TransitRouter {
 			    // (it must be one of the "transfer" links.) finish the pt leg, if there was one before...
 			    TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
 			    if (route != null) {
-				    leg = new LegImpl(TransportMode.pt);
+				    leg = PopulationUtils.createLeg(TransportMode.pt);
 				    ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 				    double arrivalOffset = (link.getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? link.fromNode.stop.getArrivalOffset() : link.fromNode.stop.getDepartureOffset();
 				    double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
@@ -202,7 +202,7 @@ public class TransitRouterImpl implements TransitRouter {
 					    transitRouteStart = ((TransitRouterNetworkLink) ll).getFromNode().stop;
 					    if (accessStop != egressStop) {
 						    if (accessStop != null) {
-							    leg = new LegImpl(TransportMode.transit_walk);
+							    leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 //							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 							    double transferTime = getTransferTime(person, accessStop.getCoord(), egressStop.getCoord());
 							    Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
@@ -216,7 +216,7 @@ public class TransitRouterImpl implements TransitRouter {
 							    time += transferTime;
 							    legs.add(leg);
 						    } else { // accessStop == null, so it must be the first walk-leg
-								leg = new LegImpl(TransportMode.transit_walk);
+								leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 								double walkTime = getWalkTime(person, fromCoord, egressStop.getCoord());
 								Route walkRoute = new GenericRouteImpl(null, egressStop.getLinkId());
 							    walkRoute.setTravelTime(walkTime);
@@ -238,7 +238,7 @@ public class TransitRouterImpl implements TransitRouter {
 	    }
 	    if (route != null) {
 		    // the last part of the path was with a transit route, so add the pt-leg and final walk-leg
-		    leg = new LegImpl(TransportMode.pt);
+		    leg = PopulationUtils.createLeg(TransportMode.pt);
 		    TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 		    ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			ptRoute.setDistance( currentDistance );
@@ -254,7 +254,7 @@ public class TransitRouterImpl implements TransitRouter {
 			accessStop = egressStop;
 	    }
 	    if (prevLink != null) {
-		    leg = new LegImpl(TransportMode.transit_walk);
+		    leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		    double walkTime;
 		    if (accessStop == null) {
 			    walkTime = getWalkTime(person, fromCoord, toCoord);
@@ -267,7 +267,7 @@ public class TransitRouterImpl implements TransitRouter {
 	    if (transitLegCnt == 0) {
 		    // it seems, the agent only walked
 		    legs.clear();
-		    leg = new LegImpl(TransportMode.transit_walk);
+		    leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		    double walkTime = getWalkTime(person, fromCoord, toCoord);
 		    leg.setTravelTime(walkTime);
 		    legs.add(leg);

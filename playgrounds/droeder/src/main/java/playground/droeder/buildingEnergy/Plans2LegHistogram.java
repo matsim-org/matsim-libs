@@ -24,12 +24,12 @@ import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -71,9 +71,9 @@ public abstract class Plans2LegHistogram {
 			public void run(Person person) {
 				List<PlanElement> pe = person.getSelectedPlan().getPlanElements();
 				for(int i = 1; i < pe.size(); i += 2){
-					LegImpl l = (LegImpl) pe.get(i);
+					Leg l = (Leg) pe.get(i);
 					histo.handleEvent(new PersonDepartureEvent(l.getDepartureTime(), null, null, l.getMode()));
-					double arrivaltime = (l.getArrivalTime() == Time.UNDEFINED_TIME) ? l.getDepartureTime() + l.getTravelTime() : l.getArrivalTime();
+					double arrivaltime = (l.getDepartureTime() + l.getTravelTime() == Time.UNDEFINED_TIME) ? l.getDepartureTime() + l.getTravelTime() : l.getDepartureTime() + l.getTravelTime();
 					histo.handleEvent(new PersonArrivalEvent(arrivaltime, null, null, l.getMode()));
 				}
 			}

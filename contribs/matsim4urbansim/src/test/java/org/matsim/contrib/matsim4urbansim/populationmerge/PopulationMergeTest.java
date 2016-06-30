@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
@@ -45,7 +46,6 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel.PopulationCounter;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -109,38 +109,38 @@ public class PopulationMergeTest extends MatsimTestCase{
 		Coord dummyCoord = dummyFacility.getCoord();
 		// create persons
 		
-		Person person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
-		PlanImpl plan1 = PersonUtils.createAndAddPlan(person1, true);
+		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan plan1 = PersonUtils.createAndAddPlan(person1, true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan1, dummyCoord, dummyFacility);
 		PersonUtils.setEmployed(person1, true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan1, dummyCoord, dummyFacility);
 		
-		Person person2 = PopulationUtils.createPerson(Id.create(2, Person.class));
-		PlanImpl plan2 = PersonUtils.createAndAddPlan(person2, true);
+		Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
+		Plan plan2 = PersonUtils.createAndAddPlan(person2, true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan2, dummyCoord, dummyFacility);
 		PersonUtils.setEmployed(person2, true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan2, dummyCoord, dummyFacility);
 		
-		Person person3 = PopulationUtils.createPerson(Id.create(3, Person.class));
-		PlanImpl plan3 = PersonUtils.createAndAddPlan(person3, true);
+		Person person3 = PopulationUtils.getFactory().createPerson(Id.create(3, Person.class));
+		Plan plan3 = PersonUtils.createAndAddPlan(person3, true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan3, dummyCoord, dummyFacility);
 		PersonUtils.setEmployed(person3, true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan3, dummyCoord, dummyFacility);
 		
-		Person person4 = PopulationUtils.createPerson(Id.create(4, Person.class));
-		PlanImpl plan4 = PersonUtils.createAndAddPlan(person4, true);
+		Person person4 = PopulationUtils.getFactory().createPerson(Id.create(4, Person.class));
+		Plan plan4 = PersonUtils.createAndAddPlan(person4, true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan4, dummyCoord, dummyFacility);
 		PersonUtils.setEmployed(person4, true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan4, dummyCoord, dummyFacility);
 		
-		Person person5 = PopulationUtils.createPerson(Id.create(5, Person.class));
-		PlanImpl plan5 = PersonUtils.createAndAddPlan(person5, true);
+		Person person5 = PopulationUtils.getFactory().createPerson(Id.create(5, Person.class));
+		Plan plan5 = PersonUtils.createAndAddPlan(person5, true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan5, dummyCoord, dummyFacility);
 		PersonUtils.setEmployed(person5, true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan5, dummyCoord, dummyFacility);
 		
-		Person person6 = PopulationUtils.createPerson(Id.create(6, Person.class));
-		PlanImpl plan6 = PersonUtils.createAndAddPlan(person6, true);
+		Person person6 = PopulationUtils.getFactory().createPerson(Id.create(6, Person.class));
+		Plan plan6 = PersonUtils.createAndAddPlan(person6, true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan6, dummyCoord, dummyFacility);
 		PersonUtils.setEmployed(person6, false);
 		// person 6 is unemployed (no completePlanToHwh)

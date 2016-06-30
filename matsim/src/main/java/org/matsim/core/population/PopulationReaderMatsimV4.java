@@ -30,7 +30,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
@@ -84,13 +87,13 @@ import org.xml.sax.Attributes;
 	/*package*/ Person currperson = null;
 	private String curracttype = null;
 	private ActivityOption curractivity = null;
-	private PlanImpl currplan = null;
-	private ActivityImpl curract = null;
-	private LegImpl currleg = null;
+	private Plan currplan = null;
+	private Activity curract = null;
+	private Leg currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
 
@@ -192,7 +195,7 @@ import org.xml.sax.Attributes;
 //		int age = Integer.MIN_VALUE;
 		Integer age = null;
 		if (ageString != null) age = Integer.parseInt(ageString);
-		this.currperson = PopulationUtils.createPerson(Id.create(atts.getValue("id"), Person.class));
+		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
 		PersonUtils.setAge(this.currperson, age);
 		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
@@ -274,16 +277,15 @@ import org.xml.sax.Attributes;
 	private void startAct(final Attributes atts) {
 		if (atts.getValue("link") != null) {
 			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
-			this.curract = this.currplan.createAndAddActivity(
-					atts.getValue(ATTR_TYPE), linkId);
+			final Id<Link> linkId1 = linkId;
+			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_TYPE), linkId1);
 			if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 				final Coord coord = parseCoord( atts );
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue("x") != null) && (atts.getValue("y") != null)) {
 			final Coord coord = parseCoord( atts );
-			this.curract = this.currplan.createAndAddActivity(
-					atts.getValue(ATTR_TYPE), coord);
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException(
 					"In this version of MATSim either the coords or the link must be specified for an Act.");
@@ -332,10 +334,12 @@ import org.xml.sax.Attributes;
 		if (mode.equals("undef")) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createAndAddLeg(mode.intern());
+		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue("dep_time")));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
-		this.currleg.setArrivalTime(Time.parseTime(atts.getValue("arr_time")));
+//		LegImpl r = this.currleg;
+//		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 	}
 
 	private void startRoute(final Attributes atts) {

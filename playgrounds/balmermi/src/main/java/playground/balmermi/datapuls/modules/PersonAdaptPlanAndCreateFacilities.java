@@ -25,11 +25,11 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -77,7 +77,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 		double time = 0.0;
 		for (PlanElement e : plan.getPlanElements()) {
 			if (e instanceof Activity) {
-				ActivityImpl a = (ActivityImpl)e;
+				Activity a = (Activity)e;
 				
 				// set times
 				a.setStartTime(time);

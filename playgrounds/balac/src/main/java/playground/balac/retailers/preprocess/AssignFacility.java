@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.balac.retailers.utils.ActivityDifferentiatorBalac;
@@ -14,10 +14,10 @@ import playground.balac.retailers.utils.ActivityDifferentiatorBalac;
 public class AssignFacility {
 
 	private final static Logger log = Logger.getLogger(ActivityDifferentiatorBalac.class);
-	private ActivityImpl act;
+	private Activity act;
 	private Map<Id, ActivityFacility> facilities;
 
-	public AssignFacility(ActivityImpl act,	Map<Id, ActivityFacility> map) {
+	public AssignFacility(Activity act,	Map<Id, ActivityFacility> map) {
 		
 		this.act = act;
 		this.facilities = map;

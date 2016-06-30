@@ -53,13 +53,13 @@ public class TransitDriver extends AbstractTransitDriver {
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, 
 			final TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
 		super(internalInterface, agentTracker);
-		Person driver = PopulationUtils.createPerson(Id.createPersonId("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
+		Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
-		Plan plan = new PlanImpl();
-		Leg leg = new LegImpl(TransportMode.car);
+		Plan plan = PopulationUtils.createPlan();
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setRoute(getWrappedCarRoute(getCarRoute()));
-		Activity startActivity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getStartLinkId());
-		Activity endActiity = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getEndLinkId());
+		Activity startActivity = PopulationUtils.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getStartLinkId());
+		Activity endActiity = PopulationUtils.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, leg.getRoute().getEndLinkId());
 		plan.addActivity(startActivity);
 		plan.addLeg(leg);
 		plan.addActivity(endActiity);

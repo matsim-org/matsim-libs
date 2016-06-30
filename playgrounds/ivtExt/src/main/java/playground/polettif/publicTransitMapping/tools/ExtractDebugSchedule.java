@@ -47,13 +47,14 @@ public class ExtractDebugSchedule {
 						debug.addTransitLine(line);
 
 						for(TransitRouteStop rs : tr.getStops()) {
-							debug.addStopFacility(rs.getStopFacility());
+							if(!debug.getFacilities().containsKey(rs.getStopFacility().getId())) {
+								debug.addStopFacility(rs.getStopFacility());
+							}
 						}
 					}
 				}
 			}
 		}
-
 		ScheduleTools.writeTransitSchedule(debug, args[3]);
 	}
 

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,7 +38,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -168,10 +168,10 @@ public class FacilitiesFromPopulation {
 							facility.addActivityOption(option);
 						}
 						
-						((ActivityImpl) a).setFacilityId(facility.getId());
+						((Activity) a).setFacilityId(facility.getId());
 						if (this.removeLinksAndCoordinates) {
-							((ActivityImpl) a).setLinkId(null);
-							((ActivityImpl) a).setCoord(null);
+							((Activity) a).setLinkId(null);
+							((Activity) a).setCoord(null);
 						}
 					}
 				}

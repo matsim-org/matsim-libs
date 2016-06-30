@@ -33,12 +33,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
@@ -210,21 +210,15 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 							tRoute,
 							scenario.getTransitSchedule(),
 							scenario.getNetwork()));
-				final ActivityImpl act =
-					new ActivityImpl(
-							PtConstants.TRANSIT_ACTIVITY_TYPE, 
-							scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
-							tRoute.getStartLinkId());
+				final Activity act =
+					PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, scenario.getTransitSchedule().getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
 				act.setMaximumDuration(0.0);
 				trip.add(act);
 				nextCoord = scenario.getTransitSchedule().getFacilities().get(tRoute.getEgressStopId()).getCoord();
 			}
 			else { // walk legs don't have a coord, use the coord from the last egress point
-				final ActivityImpl act =
-					new ActivityImpl(
-							PtConstants.TRANSIT_ACTIVITY_TYPE,
-							nextCoord, 
-							leg.getRoute().getStartLinkId());
+				final Activity act =
+					PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg.getRoute().getStartLinkId());
 				act.setMaximumDuration(0.0);
 				trip.add(act);	
 			}
@@ -233,11 +227,8 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		}
 
 		// put an interaction before the egress
-		final ActivityImpl act =
-			new ActivityImpl(
-					PtConstants.TRANSIT_ACTIVITY_TYPE,
-					nextCoord, 
-					nextLinkId );
+		final Activity act =
+			PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, nextLinkId);
 		act.setMaximumDuration(0.0);
 		trip.add(act);
 		return trip;
@@ -334,7 +325,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 				TransitStopFacility egressStop = l.fromNode.stop.getStopFacility();
 				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
 				if (route != null) {
-					final Leg leg = new LegImpl(TransportMode.pt);
+					final Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset =
@@ -361,7 +352,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
-								final Leg leg = new LegImpl(TransportMode.transit_walk);
+								final Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 								double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
@@ -375,7 +366,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 								if ( !depStop.getLinkId().equals( egressStop.getLinkId() ) ) {
 									// this is possible when several stops are for instance
 									// on the opposite direction links
-									final Leg leg = new LegImpl( TransportMode.transit_walk );
+									final Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 									final double walkTime =
 										getWalkTime(
 												person,
@@ -403,7 +394,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		}
 		if (route != null) {
 			// the last part of the path was with a transit route, so add the pt-leg and final walk-leg
-			final Leg leg = new LegImpl(TransportMode.pt);
+			final Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 			TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			leg.setRoute(ptRoute);

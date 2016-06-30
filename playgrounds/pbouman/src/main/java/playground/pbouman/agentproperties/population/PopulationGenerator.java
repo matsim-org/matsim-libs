@@ -4,13 +4,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
+
 import playground.pbouman.agentproperties.ActivityProperties;
 import playground.pbouman.agentproperties.AgentProperties;
 import playground.pbouman.agentproperties.LocationDescription;
@@ -63,16 +64,16 @@ public class PopulationGenerator
 				if (first)
 				{
 					
-					ActivityImpl act;
+					Activity act;
 					if (home.describesLink())
 					{
 						Link l = findLink(home.getLinkId(),network); //network.getLinks().get(scen.createId(home.getLinkId()));
-						act = (ActivityImpl) factory.createActivityFromCoord("home", l.getCoord());
+						act = (Activity) factory.createActivityFromCoord("home", l.getCoord());
 						act.setLinkId(l.getId());
 					}
 					else
 					{
-						act = (ActivityImpl) factory.createActivityFromCoord("home", new Coord(home.getX(), home.getY()));
+						act = (Activity) factory.createActivityFromCoord("home", new Coord(home.getX(), home.getY()));
 						act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 					}
 			
@@ -87,17 +88,17 @@ public class PopulationGenerator
 				
 				plan.addLeg(factory.createLeg("pt"));
 				LocationDescription loc = getFirst(ap.getLocations());
-				ActivityImpl act;
+				Activity act;
 				if (loc.describesLink())
 				{
 					Link l = findLink(loc.getLinkId(),network);
 					//Link l = network.getLinks().get(scen.createId(loc.getLinkId()));
-					act = (ActivityImpl) factory.createActivityFromCoord(ap.getName(), l.getCoord());
+					act = (Activity) factory.createActivityFromCoord(ap.getName(), l.getCoord());
 					act.setLinkId(l.getId());
 				}
 				else
 				{
-					act = (ActivityImpl) factory.createActivityFromCoord(ap.getName(), new Coord(loc.getX(), loc.getY()));
+					act = (Activity) factory.createActivityFromCoord(ap.getName(), new Coord(loc.getX(), loc.getY()));
 					act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 				}
 				
@@ -110,16 +111,16 @@ public class PopulationGenerator
 			}
 			
 			plan.addLeg(factory.createLeg("pt"));
-			ActivityImpl act;
+			Activity act;
 			if (home.describesLink())
 			{
 				Link l = findLink(home.getLinkId(),network);
-				act = (ActivityImpl) factory.createActivityFromCoord("home", l.getCoord());
+				act = (Activity) factory.createActivityFromCoord("home", l.getCoord());
 				act.setLinkId(l.getId());
 			}
 			else
 			{
-				act = (ActivityImpl) factory.createActivityFromCoord("home", new Coord(home.getX(), home.getY()));
+				act = (Activity) factory.createActivityFromCoord("home", new Coord(home.getX(), home.getY()));
 				act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 			}
 			plan.addActivity(act);

@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -98,7 +98,7 @@ public class AAMRoutingModule implements RoutingModule {
 				
 				route.setTravelTime(travelTime);
 				route.setDistance(distance);
-				final Leg leg = new LegImpl( "movingpathways" );
+				final Leg leg = PopulationUtils.createLeg("movingpathways");
 				leg.setRoute(route);
 				trip.add( leg );
 				
@@ -120,7 +120,7 @@ public class AAMRoutingModule implements RoutingModule {
 					
 					route.setTravelTime(distance / Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")));
 					route.setDistance(distance);
-					final Leg leg = new LegImpl( "walk" );
+					final Leg leg = PopulationUtils.createLeg("walk");
 					leg.setRoute(route);
 					trip.add( leg );
 					
@@ -139,7 +139,7 @@ public class AAMRoutingModule implements RoutingModule {
 					
 					route.setTravelTime(travelTime);
 					route.setDistance(distance);
-					final Leg leg = new LegImpl( "movingpathways" );
+					final Leg leg = PopulationUtils.createLeg("movingpathways");
 					leg.setRoute(route);
 					trip.add( leg );
 					
@@ -152,7 +152,7 @@ public class AAMRoutingModule implements RoutingModule {
 				
 				route.setTravelTime(distance / Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")));
 				route.setDistance(distance);
-				final Leg leg = new LegImpl( "walk" );
+				final Leg leg = PopulationUtils.createLeg("walk");
 				leg.setRoute(route);
 				trip.add( leg );
 				
@@ -204,7 +204,7 @@ public class AAMRoutingModule implements RoutingModule {
 				
 				route.setTravelTime(travelTime);
 				route.setDistance(distance);
-				final Leg leg = new LegImpl( "movingpathways" );
+				final Leg leg = PopulationUtils.createLeg("movingpathways");
 				leg.setRoute(route);
 				trip.add( leg );
 				
@@ -226,7 +226,7 @@ public class AAMRoutingModule implements RoutingModule {
 					
 					route.setTravelTime(distance / Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")));
 					route.setDistance(distance);
-					final Leg leg = new LegImpl( "walk" );
+					final Leg leg = PopulationUtils.createLeg("walk");
 					leg.setRoute(route);
 					trip.add( leg );
 					
@@ -245,7 +245,7 @@ public class AAMRoutingModule implements RoutingModule {
 					
 					route.setTravelTime(travelTime);
 					route.setDistance(distance);
-					final Leg leg = new LegImpl( "movingpathways" );
+					final Leg leg = PopulationUtils.createLeg("movingpathways");
 					leg.setRoute(route);
 					trip.add( leg );
 					
@@ -258,7 +258,7 @@ public class AAMRoutingModule implements RoutingModule {
 				
 				route.setTravelTime(distance / Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")));
 				route.setDistance(distance);
-				final Leg leg = new LegImpl( "walk" );
+				final Leg leg = PopulationUtils.createLeg("walk");
 				leg.setRoute(route);
 				trip.add( leg );
 				

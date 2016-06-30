@@ -20,8 +20,8 @@
 package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentProblem.Mode;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 
 
 public class AssignmentTaxiOptimizerParams

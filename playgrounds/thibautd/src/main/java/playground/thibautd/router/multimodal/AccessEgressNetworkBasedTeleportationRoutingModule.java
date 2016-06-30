@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -115,7 +115,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		route.setLinks( toIds( path.links ) ); 
 		route.setEgressTime( egressTime );
 
-		final Leg leg = new LegImpl( mode );
+		final Leg leg = PopulationUtils.createLeg(mode);
 		leg.setRoute( route );
 		leg.setTravelTime( route.getTravelTime() );
 

@@ -12,12 +12,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -163,7 +163,7 @@ public class AffordabilityCalculator {
 					index++;
 				}
 				if(person != null){
-					Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();					
+					Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();					
 					Tuple<Double, Double> tuple = getRatios(hh);
 //					if(!Double.isInfinite(tuple.getSecond()) && !Double.isNaN(tuple.getSecond())){
 						bw.write(String.format("%s,%.0f,%.4f,%d,%d,%d,%.4f,%.4f,%.0f,%.0f\n", 
@@ -297,8 +297,8 @@ public class AffordabilityCalculator {
 				numberOfMembers++;
 				for(int i = 2; i < person.getSelectedPlan().getPlanElements().size()-1; i++){
 					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
-					if(pe instanceof ActivityImpl){
-						Activity act = (ActivityImpl) pe;
+					if(pe instanceof Activity){
+						Activity act = (Activity) pe;
 
 						/* Get actual travel time and cost to relevant activities. */
 						String actType = act.getType();

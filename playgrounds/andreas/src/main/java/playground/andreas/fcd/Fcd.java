@@ -139,25 +139,25 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 				continue;
 			}
 			
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, add activities
-				currentPerson.getSelectedPlan().addLeg(new LegImpl(TransportMode.car));
+				currentPerson.getSelectedPlan().addLeg(PopulationUtils.createLeg(TransportMode.car));
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 				
 			} else {
 				// different one, new person
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 			}
 		
@@ -207,10 +207,10 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 				continue;
@@ -218,16 +218,16 @@ public class Fcd {
 			
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, add activities
-				currentPerson.getSelectedPlan().addLeg(new LegImpl(TransportMode.car));
+				currentPerson.getSelectedPlan().addLeg(PopulationUtils.createLeg(TransportMode.car));
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 				
 			} else {
 				// different one, new person
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 			}
@@ -309,13 +309,13 @@ public class Fcd {
 	// HELPER
 	
 	private Activity createActivityFromFcdEvent(FcdEvent fcdEvent){
-		Activity act = new ActivityImpl("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
+		Activity act = PopulationUtils.createActivityFromCoord("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
 		act.setEndTime(fcdEvent.getTime());
 		return act;
 	}
 
 	private Activity createActivityWithLinkFromFcdEvent(FcdEvent fcdEvent, Link link) {
-		Activity act = new ActivityImpl("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()), link.getId());
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()), link.getId());
 		act.setEndTime(fcdEvent.getTime());
 		return act;
 	}

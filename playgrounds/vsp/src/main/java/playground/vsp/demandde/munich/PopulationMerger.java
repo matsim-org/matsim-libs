@@ -24,12 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -160,14 +161,16 @@ public class PopulationMerger {
 	private static void addFreightPrefix(Person person) {
 		Id<Person> id = person.getId();
 		Id<Person> newId = Id.create("gv_" + id.toString(), Person.class);
-        ((PersonImpl) person).setId(newId);
+		final Id<Person> id1 = newId;
+        PopulationUtils.changePersonId( ((Person) person), id1 ) ;
 
     }
 
 	private static void addCommuterPrefix(Person person) {
 		Id<Person> id = person.getId();
 		Id<Person> newId = Id.create("pv_" + id.toString(), Person.class);
-        ((PersonImpl) person).setId(newId);
+		final Id<Person> id1 = newId;
+        PopulationUtils.changePersonId( ((Person) person), id1 ) ;
 
     }
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.filter;
+package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.PartialSort;
-import org.matsim.contrib.util.distance.DistanceUtils;
 
 
-public class KStraightLineNearestRequestFilter
+public abstract class AssignmentDestinationData<D>
 {
-    private final TaxiScheduleInquiry scheduleInquiry;
-    private final int k;
-
-
-    public KStraightLineNearestRequestFilter(TaxiScheduleInquiry scheduleInquiry, int k)
+    public static class DestEntry<D>
     {
-        this.scheduleInquiry = scheduleInquiry;
-        this.k = k;
+        public final int idx;
+        public final D destination;
+        public final Link link;
+        public final double time;
+
+
+        public DestEntry(int idx, D destination, Link link, double time)
+        {
+            this.idx = idx;
+            this.destination = destination;
+            this.link = link;
+            this.time = time;
+        }
     }
 
 
-    public List<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
-            Vehicle vehicle)
+    protected final List<DestEntry<D>> entries = new ArrayList<>();
+
+
+    public int getSize()
     {
-        Link fromLink = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(vehicle).link;
-        PartialSort<TaxiRequest> nearestRequestSort = new PartialSort<TaxiRequest>(k);
+        return entries.size();
+    }
 
-        for (TaxiRequest req : requests) {
-            Link toLink = req.getFromLink();
-            double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
-            nearestRequestSort.add(req, squaredDistance);
-        }
 
-        return nearestRequestSort.retriveKSmallestElements();
+    public DestEntry<D> getEntry(int idx)
+    {
+        return entries.get(idx);
+    }
+
+
+    public List<DestEntry<D>> getEntries()
+    {
+        return entries;
     }
 }

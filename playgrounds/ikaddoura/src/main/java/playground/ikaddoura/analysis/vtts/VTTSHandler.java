@@ -44,8 +44,9 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
@@ -209,10 +210,10 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 											
 				// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
 					
-				ActivityImpl activityMorning = new ActivityImpl(this.personId2firstActivityType.get(personId), linkId);
+				Activity activityMorning = PopulationUtils.createActivityFromLinkId(this.personId2firstActivityType.get(personId), linkId);
 				activityMorning.setEndTime(this.personId2firstActivityEndTime.get(personId));
 				
-				ActivityImpl activityEvening = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+				Activity activityEvening = PopulationUtils.createActivityFromLinkId(this.personId2currentActivityType.get(personId), linkId);
 				activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
 					
 				activityDelayDisutilityOneSec = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, 1.0);
@@ -220,7 +221,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			} else {
 				// The activity has an end time indicating a 'normal' activity.
 				
-				ActivityImpl activity = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+				Activity activity = PopulationUtils.createActivityFromLinkId(this.personId2currentActivityType.get(personId), linkId);
 				activity.setStartTime(this.personId2currentActivityStartTime.get(personId));
 				activity.setEndTime(activityEndTime);	
 				activityDelayDisutilityOneSec = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, 1.);

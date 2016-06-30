@@ -26,6 +26,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -156,7 +159,7 @@ public class ExternalTripsCreator {
 						
 			for (int i = 0; i < numOfTrips; i++) {
 				Id<Person> id = Id.create("tta_" + type + "_" + String.valueOf(counter.getCounter()), Person.class);
-				PersonImpl person = (PersonImpl)populationFactory.createPerson(id);
+				Person person = (Person)populationFactory.createPerson(id);
 				
 				setBasicParameters(person);		
 				
@@ -194,7 +197,7 @@ public class ExternalTripsCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public void createAndAddInitialPlan(PersonImpl person, ExternalTrip externalTrip, 
+	public void createAndAddInitialPlan(Person person, ExternalTrip externalTrip, 
 			DepartureTimeCalculator departureTimeCalculator) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
@@ -203,8 +206,8 @@ public class ExternalTripsCreator {
 		person.setSelectedPlan(plan);
 		//Desires desires = person.createDesires("");
 		
-		LegImpl leg;
-		ActivityImpl activity;
+		Leg leg;
+		Activity activity;
 		ActivityFacility activityFacility;
 
 		int originNode = externalTrip.originNodeId;
@@ -223,7 +226,7 @@ public class ExternalTripsCreator {
 		 * create car leg from origin zone to destination zone
 		 * create tta activity in destination zone 
 		 */
-		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("tta", originLinkId);
+		activity = (Activity) populationFactory.createActivityFromLinkId("tta", originLinkId);
 		activity.setStartTime(0.0);
 		activity.setMaximumDuration(departureTime);
 		activity.setEndTime(departureTime);
@@ -232,13 +235,14 @@ public class ExternalTripsCreator {
 		activity.setCoord(activityFacility.getCoord());
 		plan.addActivity(activity);
 		
-		leg = (LegImpl) populationFactory.createLeg(TransportMode.car);
+		leg = (Leg) populationFactory.createLeg(TransportMode.car);
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(0.0);
-		leg.setArrivalTime(departureTime);
+		final double arrTime = departureTime;
+		leg.setTravelTime( arrTime - leg.getDepartureTime() );
 		plan.addLeg(leg);
 		
-		activity = (ActivityImpl) populationFactory.createActivityFromLinkId("tta", destinationLinkId);
+		activity = (Activity) populationFactory.createActivityFromLinkId("tta", destinationLinkId);
 		activity.setStartTime(departureTime);
 		activityFacility = getActivityFacilityByLinkId(destinationLinkId);
 		activity.setFacilityId(activityFacility.getId());

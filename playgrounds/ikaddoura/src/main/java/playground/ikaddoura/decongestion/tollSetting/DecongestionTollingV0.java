@@ -36,9 +36,9 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
  * - If d > threshold: The toll is set based on the average delay increased by the adjustment rate.
  * - If d <= threshold: Set the toll to zero.
  * 
- * Set the adjustment factor to 1.0 to run basic average congestion cost pricing.
+ * Set the adjustment factor to 0.0 to run basic average congestion cost pricing.
  * 
- * => Seems to produce a stable outcome. Increasing the toll by an adjustment factor > 1.0 results in lower delays.
+ * => Seems to produce a stable outcome. Increasing the toll by an adjustment factor > 0.0 results in lower delays.
  * 
  * @author ikaddoura
  */
@@ -72,7 +72,7 @@ public class DecongestionTollingV0 implements DecongestionTollSetting {
 
 				} else {
 					
-					double toll = (this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT()) * averageDelay * vtts_hour / 3600.;
+					double toll = (1 + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT()) * averageDelay * vtts_hour / 3600.;
 					this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);
 				}
 			}

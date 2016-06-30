@@ -2,12 +2,12 @@ package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -323,8 +323,8 @@ public class PreparationScript {
 		boolean continueTest = true;
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
-				if (planElement instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) planElement;
+				if (planElement instanceof Activity) {
+					Activity act = (Activity) planElement;
 					if (act.getFacilityId() != null) {
 						ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(act.getFacilityId());
 						if (!activityFacility.getActivityOptions().keySet().contains(act.getType())) {

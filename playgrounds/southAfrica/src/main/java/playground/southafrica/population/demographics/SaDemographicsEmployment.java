@@ -1,7 +1,7 @@
 package playground.southafrica.population.demographics;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.southafrica.population.capeTownTravelSurvey.HouseholdEnums;
 import playground.southafrica.population.capeTownTravelSurvey.PersonEnums;
@@ -40,7 +40,7 @@ public enum SaDemographicsEmployment {
 	/**
 	 * Converts the employment details from the South African Census 2011 
 	 * population (either sample or synthetic) into a generic employment 
-	 * status. The detail is taken from the {@link PersonImpl#isEmployed()}
+	 * status. The detail is taken from the {@link Person#isEmployed()}
 	 * method.
 	 * 
 	 * @param employed
@@ -60,7 +60,7 @@ public enum SaDemographicsEmployment {
 	 * Nelson Mandela Bay in 2004 into a generic employment status. In this
 	 * case the 'employed' status is true if the individual as a work-related
 	 * activity in the activity chain. It was captured in {@link NmbmSurveyParser}.
-	 * The detail is taken from the {@link PersonImpl#isEmployed()} method.
+	 * The detail is taken from the {@link Person#isEmployed()} method.
 	 * 
 	 * @param employed
 	 * @return

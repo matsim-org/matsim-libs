@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
@@ -32,7 +33,6 @@ import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -192,7 +192,7 @@ public class RunUtils {
 				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
 					if (act.getCoord() != null) continue;
 					if (act.getLinkId() == null) throw new NullPointerException();
-					((ActivityImpl) act).setCoord(
+					((Activity) act).setCoord(
 						scenario.getNetwork().getLinks().get( act.getLinkId() ).getCoord() );
 				}
 			}

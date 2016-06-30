@@ -30,12 +30,13 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 
 import javax.inject.Inject;
 
@@ -58,7 +59,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private Map<Id<Person>, ActivityImpl> activities = new HashMap<>();
+    private Map<Id<Person>, Activity> activities = new HashMap<>();
     private List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
@@ -78,9 +79,9 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        ActivityImpl activity = activities.get(event.getPersonId());
+        Activity activity = activities.get(event.getPersonId());
         if (activity == null) {
-            ActivityImpl firstActivity = new ActivityImpl(event.getActType(), event.getLinkId());
+            Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
             activity = firstActivity;
         }
@@ -93,7 +94,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
+        Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
         activities.put(event.getPersonId(), activity);
@@ -109,7 +110,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
     }
 
     public void finish() {
-        for (Map.Entry<Id<Person>, ActivityImpl> entry : activities.entrySet()) {
+        for (Map.Entry<Id<Person>, Activity> entry : activities.entrySet()) {
             for (ActivityHandler activityHandler : activityHandlers) {
                 activityHandler.handleActivity(new PersonExperiencedActivity(entry.getKey(), entry.getValue()));
             }

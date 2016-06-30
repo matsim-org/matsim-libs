@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -67,7 +67,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 		final CharyparNagelLegScoring scoring1 = createScoring( 1 , network );
 		final CharyparNagelLegScoring scoring2 = createScoring( 2 , network );
 
-		final Leg leg = new LegImpl( TransportMode.car );
+		final Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime( 0 );
 		leg.setTravelTime( 120 );
 

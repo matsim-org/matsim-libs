@@ -33,7 +33,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -349,7 +348,7 @@ class BuildingEnergyMATSimDataReader {
 							if(aa.getType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
 								Coord c = aa.getCoord();
 								aa = this.population.getFactory().createActivityFromLinkId(homeType, aa.getLinkId());
-								((ActivityImpl)aa).setCoord(c);
+								((Activity)aa).setCoord(c);
 								if(warn){
 									log.warn("modifying activitytypes for berlin-scenario. Thrown only once...");
 									warn = false;

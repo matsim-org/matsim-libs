@@ -179,11 +179,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		Person p1 = PopulationUtils.createPerson(Id.create("1", Person.class));
+		Person p1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		PersonUtils.setAge(p1, 90);
 		PersonUtils.setSex(p1, "f");
 
-		Person p2 = PopulationUtils.createPerson(Id.create("2", Person.class));
+		Person p2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
 		PersonUtils.setAge(p2, 20);
 		PersonUtils.setSex(p2, "m");
 		

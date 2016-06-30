@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.LegImpl;
 
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventH
 		
 		if (personAttributes.get("ActCounter")!= null){
 			Integer counter = (Integer) personAttributes.get("ActCounter");
-			LegImpl leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(counter);
+			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(counter);
 			legMode = leg.getMode();
 			counter ++;
 			personAttributes.put("ActCounter", counter);

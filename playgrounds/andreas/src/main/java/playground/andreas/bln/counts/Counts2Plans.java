@@ -9,11 +9,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -85,13 +90,13 @@ public class Counts2Plans {
 		for (int i = 1; i <= number; i++) {
 
 			Person person = createPerson();
-			ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(from).getLinkId());
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "start", this.transitSchedule.getFacilities().get(from).getLinkId());
 			a.setCoord(this.transitSchedule.getFacilities().get(from).getCoord());
 
-			((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
-			((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime(time);
+			PopulationUtils.createAndAddLeg( ((Plan) person.getSelectedPlan()), (String) TransportMode.pt );
+			PopulationUtils.getFirstActivity( ((Plan) person.getSelectedPlan()) ).setEndTime(time);
 
-			a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(to).getLinkId());
+			a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "finish", this.transitSchedule.getFacilities().get(to).getLinkId());
 			a.setCoord(this.transitSchedule.getFacilities().get(to).getCoord());
 
 			this.completedAgents.add(person);
@@ -130,7 +135,7 @@ public class Counts2Plans {
 									log.warn("StopID: " + stopID + ", Passenger should leave the vehicle, but none is there");
 									this.numberOfPersonsCouldNotLeaveTheBusWhenSupposedTo++;
 								} else {
-									ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.transitSchedule.getFacilities().get(stopID).getLinkId());
+									Activity a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "finish", this.transitSchedule.getFacilities().get(stopID).getLinkId());
 									a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 									//									((PlanImpl) person.getSelectedPlan()).createAndAddActivity("finish", this.egress.getCount(stopID).getCoord());
 									this.completedAgents.add(person);
@@ -145,16 +150,16 @@ public class Counts2Plans {
 
 							for (int i = 0; i < this.access.getCount(stopIdAsLink).getVolume(hour).getValue(); i++) {
 								Person person = createPerson();
-								ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
+								Activity a = PopulationUtils.createAndAddActivityFromLinkId(((Plan) person.getSelectedPlan()), (String) "start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
 								a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
 								//								((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.access.getCount(stopID).getCoord());
-								((PlanImpl) person.getSelectedPlan()).createAndAddLeg(TransportMode.pt);
+								PopulationUtils.createAndAddLeg( ((Plan) person.getSelectedPlan()), (String) TransportMode.pt );
 
 								// Verlegen der Nachfrage auf die Zeit des OEV-Angebots. Dieses geht von 3:30 bis 27:30 Uhr.
 								if(hour < 4){
-									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour + 24 - 1 + rnd.nextDouble()) * 3600);
+									PopulationUtils.getFirstActivity( ((Plan) person.getSelectedPlan()) ).setEndTime((hour + 24 - 1 + rnd.nextDouble()) * 3600);
 								} else {
-									((PlanImpl) person.getSelectedPlan()).getFirstActivity().setEndTime((hour - 1 + rnd.nextDouble()) * 3600);
+									PopulationUtils.getFirstActivity( ((Plan) person.getSelectedPlan()) ).setEndTime((hour - 1 + rnd.nextDouble()) * 3600);
 								}
 								passengersInVehicle.add(person);
 							}
@@ -175,7 +180,7 @@ public class Counts2Plans {
 	}
 
 	private Person createPerson(){
-		Person person = PopulationUtils.createPerson(Id.create(this.runningID, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(this.runningID, Person.class));
 		PersonUtils.createAndAddPlan(person, true);
 		this.runningID++;
 		return person;

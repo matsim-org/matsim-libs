@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
@@ -65,7 +65,7 @@ public class TransitTripRouterFactory implements Provider<TripRouter> {
 		if (this.scenario.getConfig().transit().isUseTransit()) {
 
             PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
-			RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getRouteFactory();
+			RouteFactoriesRegister modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getRouteFactoriesRegister();
 			PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 			RoutingModule transitWalkRoutingModule;
 			

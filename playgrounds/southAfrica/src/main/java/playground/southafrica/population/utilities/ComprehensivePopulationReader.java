@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.IncomeImpl;
@@ -58,7 +58,7 @@ public class ComprehensivePopulationReader {
 		
 		/* Read population. */
 		LOG.info("Reading population...");
-		PopulationReaderMatsimV5 pr = new PopulationReaderMatsimV5(this.sc);
+		MatsimPopulationReader pr = new MatsimPopulationReader(this.sc);
 		pr.parse(inputfolder + "population.xml.gz");
 		
 		/* Read population attributes. */

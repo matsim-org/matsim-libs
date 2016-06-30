@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.VrpDataImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
@@ -79,6 +80,10 @@ public class ConfigBasedTaxibusLaunchUtils {
 		orderManager = new TaxibusPassengerOrderManager();
 		} else {
 			orderManager = null;
+		}
+		if (tbcg.isOtfvis()){
+            controler.addOverridingModule(new OTFVisLiveModule());
+
 		}
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));

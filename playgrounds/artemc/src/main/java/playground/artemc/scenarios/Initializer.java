@@ -5,12 +5,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 
+
+
 /**
  * Created by artemc on 22/4/15.
  * Initializer for scenarios with heterogeneous agents
  *
  */
-public class scenarioInitializer {
+public class Initializer {
 
 //	Config config = null;
 //

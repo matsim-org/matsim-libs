@@ -27,10 +27,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -60,17 +64,17 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Link link5 = network.createAndAddLink(Id.create("5", Link.class), node4, node5, 20, 20, 100, 1);
 
 		// create a test person
-		Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
 
-		ActivityImpl act1 = plan.createAndAddActivity("h", link0.getId());
+		Activity act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link0.getId());
 		act1.setEndTime(8.0*3600);
 
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 
-		plan.createAndAddActivity("w", link5.getId());
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
 
 		NetworkRoute route = new LinkNetworkRouteImpl(link0.getId(), link5.getId());
 		leg.setRoute(route);

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * A possible link for a StopFacility. A LinkCandidate contains
+ * A possible link for a TransitStopFacility. A LinkCandidate contains
  * theoretically a link and the parent StopFacility. However, all
  * values besides Coord are stored as primitive/Id since one might
  * be working with multiple separated networks.
@@ -52,9 +52,13 @@ public interface LinkCandidate extends Comparable<LinkCandidate> {
 
 	double getLinkTravelCost();
 
-	int compareTo(LinkCandidate other);
-
 	boolean isLoopLink();
+
+	/**
+	 * Should return a value greater than 1 if the other LinkCandidate
+	 * has a lower priority.
+	 */
+	int compareTo(LinkCandidate other);
 
 	/**
 	 * @return the link candidates priority compared to all other

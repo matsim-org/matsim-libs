@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,8 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteUtils;
@@ -59,16 +59,16 @@ public class BlowUp {
 					Plan pl2 = fac.createPlan();
 					p2.addPlan(pl2);
 					for (PlanElement al : pl.getPlanElements()) {
-						if (al instanceof ActivityImpl) {
-							ActivityImpl act = (ActivityImpl)al;
+						if (al instanceof Activity) {
+							Activity act = (Activity)al;
 							//						ActivityImpl al2 = new ActivityImpl(act.getType(), Id.create("car"+act.getLinkId().toString()));
 							Activity al2 = fac.createActivityFromLinkId(act.getType(), Id.create(act.getLinkId().toString(), Link.class));
 							al2.setEndTime(act.getEndTime());
 							al2.setMaximumDuration(act.getMaximumDuration());
 							al2.setStartTime(act.getStartTime());
 							pl2.addActivity(al2);
-						} else if (al instanceof LegImpl){
-							LegImpl leg = (LegImpl)al;
+						} else if (al instanceof Leg){
+							Leg leg = (Leg)al;
 							Leg leg2 = fac.createLeg(leg.getMode());
 							leg2.setDepartureTime(leg.getDepartureTime());
 							leg2.setTravelTime(leg.getTravelTime());

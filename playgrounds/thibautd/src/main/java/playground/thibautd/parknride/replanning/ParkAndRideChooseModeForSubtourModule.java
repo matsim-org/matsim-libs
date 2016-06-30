@@ -21,10 +21,10 @@ package playground.thibautd.parknride.replanning;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
@@ -104,7 +104,7 @@ public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreaded
 
 			Person person = plan.getPerson();
 			if (CHECK_CAR_AVAIL &&
-					person instanceof PersonImpl &&
+					person instanceof Person &&
 					"never".equals( PersonUtils.getCarAvail(person) )) {
 				available.remove( TransportMode.car );
 				available.remove( ParkAndRideConstants.PARK_N_RIDE_LINK_MODE );

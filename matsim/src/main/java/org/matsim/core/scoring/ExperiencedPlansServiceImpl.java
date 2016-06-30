@@ -8,7 +8,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				for (Person person : population.getPersons().values()) {
-					agentRecords.put(person.getId(), new PlanImpl());
+					agentRecords.put(person.getId(), PopulationUtils.createPlan());
 				}
 			}
 		});
@@ -66,7 +65,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	public void writeExperiencedPlans(String iterationFilename) {
 		Population tmpPop = PopulationUtils.createPopulation(config);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Person person = PopulationUtils.createPerson(entry.getKey());
+			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			if (scoringFunctionsForPopulation != null) {
 				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId()).getScore());

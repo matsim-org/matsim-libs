@@ -29,6 +29,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
+ * A Router that uses org.opentripplanner from Conveyal to route and write out a Matrix of traveltimes and
+ *  another Matrix of traveldistances.
+ * For access call the Main with the there declared arguments to launch it.
+ *
  * @author gthunig
  */
 public class OTPMatrixRouter {
@@ -42,12 +46,12 @@ public class OTPMatrixRouter {
                     "1.fromIndividualsFilePath " +
                     "2.toIndividualsFilePath " +
                     "3.graphParentDirecoryPath " +
-                    "4.outputDirectory" +
-                    "5.timeZone" +
-                    "6.date" +
-                    "7.departureTime" +
-                    "8.inputCRS" +
-                    "9.outputCRS");
+                    "4.outputDirectory " +
+                    "5.timeZone " +
+                    "6.date " +
+                    "7.departureTime " +
+                    "8.inputCRS for output Conversion " +
+                    "9.outputCRS for output Conversion ");
         } else {
         	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(args[7], args[8]);
         	
@@ -65,6 +69,11 @@ public class OTPMatrixRouter {
         }
     }
 
+	/**
+     * creates a directory if it doesen't exist jet
+     *
+     * @param outputDir the directory to check
+     */
     private static void mkdir(String outputDir) {
         if (new File(outputDir).mkdir()) {
             log.info("Did not found outputRoot at " + outputDir + " Created it as a new directory.");

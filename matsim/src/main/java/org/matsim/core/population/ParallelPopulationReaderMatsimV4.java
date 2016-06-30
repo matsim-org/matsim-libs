@@ -28,7 +28,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -57,7 +56,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * 
  * @author cdobler
  */
-public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
+ class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	
 	static final Logger log = Logger.getLogger(ParallelPopulationReaderMatsimV4.class);
 
@@ -226,10 +225,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			return this.delegate.getActivityFacilities();
 		}
 
-		public Coord createCoord(double x, double y) {
-			return new Coord(x, y);
-		}
-
 		@Override
 		public TransitSchedule getTransitSchedule() {
 			return this.delegate.getTransitSchedule();
@@ -307,6 +302,12 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		@Override
 		public void addPerson(Person p) {
 			throw new RuntimeException("Calls to this method are not expected to happen...");
+		}
+
+		@Override
+		public Person removePerson(Id<Person> personId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 	

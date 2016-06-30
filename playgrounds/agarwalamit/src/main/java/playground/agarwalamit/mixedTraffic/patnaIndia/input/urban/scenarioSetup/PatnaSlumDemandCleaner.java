@@ -51,8 +51,8 @@ public class PatnaSlumDemandCleaner {
 	}
 
 	public static void main(String[] args) {
-		String inputFile = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/raw_uncleanData/slum_allZones_uncleanedData.txt"; 
-		String outFile = PatnaUtils.INPUT_FILES_DIR+"/tripDiaryDataIncome/slum_allZones_cleanedData.txt";
+		String inputFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/raw_uncleanData/slum_allZones_uncleanedData.txt"; 
+		String outFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";
 
 		PatnaSlumDemandCleaner pdfc = new PatnaSlumDemandCleaner(outFile);
 		pdfc.run(inputFile);
@@ -91,8 +91,8 @@ public class PatnaSlumDemandCleaner {
 			// using aggregate distribution; see Table 5-13
 			SortedMap<String, Double> groupNumbers = new TreeMap<>();
 			groupNumbers.put("motorbike", 7.);
-			groupNumbers.put("bike", 39.);
-			groupNumbers.put("pt", 15.);
+			groupNumbers.put("bike", 35.); //groupNumbers.put("bike", 39.);
+			groupNumbers.put("pt", 19.); // groupNumbers.put("pt", 15.);
 			groupNumbers.put("walk", 38.);
 
 			// to remove the top element, linkedlist is used.

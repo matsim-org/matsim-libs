@@ -13,13 +13,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.matrices.Matrix;
@@ -468,7 +468,7 @@ public class CreateDemandV2 {
 					if(prevActType.equals(Global.ActType.home.name())){
 
 						currentAct = factory.createActivityFromCoord(homeAct.getType(), homeCoord);
-						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), homeCoord).getId());
+						((Activity)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), homeCoord).getId());
 						
 					} else{
 						
@@ -483,7 +483,7 @@ public class CreateDemandV2 {
 							
 						}
 						currentAct = factory.createActivityFromCoord(Global.ActType.other.name(), coord);
-						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
+						((Activity)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
 						
 					}
 					
@@ -566,7 +566,7 @@ public class CreateDemandV2 {
 				
 				lastMunId = toId;
 				
-				((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
+				((Activity)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
 				
 				double ttime = CoordUtils.calcEuclideanDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
 				
@@ -1219,7 +1219,7 @@ public class CreateDemandV2 {
 				
 				lastMunId = toId;
 				
-				((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
+				((Activity)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
 				
 				double ttime = CoordUtils.calcEuclideanDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
 				

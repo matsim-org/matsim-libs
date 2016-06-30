@@ -22,6 +22,7 @@ package playground.thibautd.scripts;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -30,7 +31,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.ReplayEvents;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -108,7 +108,7 @@ public class EventsToExperiencedPlans {
 			final Activity origAct = origIterator.next();
 			final Activity newAct = newIterator.next();
 
-			((ActivityImpl) newAct).setCoord( origAct.getCoord() );
+			((Activity) newAct).setCoord( origAct.getCoord() );
 		}
 	}
 }

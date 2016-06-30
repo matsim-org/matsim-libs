@@ -9,6 +9,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -59,6 +60,10 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 		for (TaxibusRequest req : this.unplannedRequests) {
 			if (!req.getToLink().getId().equals(this.commonDestination)) {
 				throw new RuntimeException("optimizer only supports one single destination");
+			} if (!stateSpace.acceptableStartTime(req.getT1())){
+				req.setRejected(true);
+				req.getPassenger().setStateToAbort(req.getT1());
+				continue;
 			}
 			TaxibusPickupTask lastScheduledPickup = getLastPickupTask(schedule);
 			Path lastPickupToNextPickup = null;
@@ -95,10 +100,20 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 					
 					// new dispatch, i.e. first customer
 				} else {
-					removeAllTasksSinceLastPickup(schedule);
+					if( removeAllTasksSinceLastPickup(schedule)){
 					
 					this.dispatch.path.clear(); // otherwise we would add the same path several times 
 					this.dispatch.addRequestAndPath(req, pickupPath);
+					}
+					else{
+						// we are too late to modify the last task
+						req.setRejected(true);
+						req.getPassenger().setStateToAbort(req.getT1());
+
+						handledRequests.add(req);
+						continue;
+					}
+					
 				}
 				this.dispatch.addPath(dropoffPath);
 				// mitnehmen
@@ -115,6 +130,8 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 			}
 			}
 			req.setRejected(true);
+			req.getPassenger().setStateToAbort(req.getT1());
+
 			handledRequests.add(req);
 		}
 		
@@ -126,16 +143,25 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	/**
 	 * @param schedule
 	 */
-	private void removeAllTasksSinceLastPickup(Schedule<TaxibusTask> schedule) {
+	private boolean removeAllTasksSinceLastPickup(Schedule<TaxibusTask> schedule) {
 		int idx = schedule.getTaskCount()-1;
+		int lastPickupIdx = idx;
 		for (int i = idx; i>= 0; i--){
 			TaxibusTask task = schedule.getTasks().get(i);
 			if (task instanceof TaxibusPickupTask) {
-				return;
+				lastPickupIdx = task.getTaskIdx();
+				break;
 			}
-			else schedule.removeLastTask();
+			if (task.getStatus()!=TaskStatus.PLANNED){
+				return false;
+			}
+			
+		}
+		for (int i = idx; i>lastPickupIdx; i--){
+			schedule.removeLastTask();
 		}
 		
+		return true;
 	}
 
 	/**

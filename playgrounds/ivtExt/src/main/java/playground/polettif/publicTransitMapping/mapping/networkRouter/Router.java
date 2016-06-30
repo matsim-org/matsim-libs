@@ -28,17 +28,17 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import playground.polettif.publicTransitMapping.mapping.PseudoRouting;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 /**
- * A Router interface combining travelDisUtility and TravelTime.
+ * A Router that calculates the least cost path on a network.
  *
  * @author polettif
  */
 public interface Router extends TravelDisutility, TravelTime {
 
     /**
-     *
      * @param fromNode  Node to route from...
      * @param toNode    Node to route to...
      * @return  Least cost path.
@@ -47,11 +47,25 @@ public interface Router extends TravelDisutility, TravelTime {
 
     Network getNetwork();
 
+	/**
+	 * @return The minimal travel cost between two TransitRouteStops
+	 */
 	double getMinimalTravelCost(TransitRouteStop fromStop, TransitRouteStop toStop);
 
+	/**
+	 * @return The travel cost for the given link
+	 */
 	double getLinkTravelCost(Link link);
 
+	/**
+	 * If {@link PseudoRouting} needs to add an artificial link to the network, this method returns
+	 * the freespeed value.
+	 */
 	double getArtificialLinkFreeSpeed(double maxAllowedTravelCost, LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
 
+	/**
+	 * If {@link PseudoRouting} needs to add an artificial link to the network, this method returns
+	 * the link length.
+	 */
 	double getArtificialLinkLength(double maxAllowedTravelCost, LinkCandidate linkCandidateCurrent, LinkCandidate linkCandidateNext);
 }

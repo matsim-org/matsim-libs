@@ -4,9 +4,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -14,9 +16,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -101,10 +101,10 @@ public class GeneticAlgorithmMode {
 		private void calculateScore(final Scenario scenario) {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = PopulationUtils.createPerson(person.getId());
+				Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
 				PersonUtils.setCarAvail(copyPerson, PersonUtils.getCarAvail(person));
-				PlanImpl copyPlan = new PlanImpl(copyPerson);
-				copyPlan.copyFrom(person.getSelectedPlan());
+				Plan copyPlan = PopulationUtils.createPlan(copyPerson);
+				PopulationUtils.copyFromTo(person.getSelectedPlan(), copyPlan);
 				copyPerson.addPlan(copyPlan);
 				transitActsRemover.run(copyPlan);
 				for(PlanElement planElement:copyPlan.getPlanElements())
@@ -216,7 +216,7 @@ public class GeneticAlgorithmMode {
 		for(Person person:scenario.getPopulation().getPersons().values())
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
 				if(planElement instanceof Activity)
-					((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
+					((Activity)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((Activity)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
 		EventsManager events = new EventsManagerImpl();

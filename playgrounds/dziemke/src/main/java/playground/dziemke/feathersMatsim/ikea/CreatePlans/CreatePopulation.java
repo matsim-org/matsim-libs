@@ -11,10 +11,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class CreatePopulation {
@@ -117,7 +117,7 @@ public class CreatePopulation {
 						//Create plan and link it to person
 						Plan plan = populationFactory.createPlan();
 						person.addPlan(plan);
-						((PersonImpl)person).setSelectedPlan(plan);
+						((Person)person).setSelectedPlan(plan);
 					}
 					//			ConditionTravelMode=false;
 					ConditionTAZ=false;

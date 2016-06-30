@@ -22,13 +22,14 @@ package playground.andreas.utils.pop;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -55,7 +56,7 @@ public class DuplicatePlans extends NewPopulation {
 
 		for (int i = 1; i < this.numberOfCopies + 1; i++) {
 
-            ((PersonImpl) person).setId(Id.create(personId.toString() + "X" + i, Person.class));
+            PopulationUtils.changePersonId( ((Person) person), Id.create(personId.toString() + "X" + i, Person.class) ) ;
             this.popWriter.writePerson(person);
 
 		}

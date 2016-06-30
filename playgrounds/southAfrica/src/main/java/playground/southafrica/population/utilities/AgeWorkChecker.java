@@ -22,6 +22,7 @@ package playground.southafrica.population.utilities;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
@@ -61,8 +62,8 @@ public class AgeWorkChecker {
 			private boolean hasWork(Person person){
 				if(person.getPlans().size() > 0){
 					for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-						if(pe instanceof ActivityImpl){
-							ActivityImpl activity = (ActivityImpl) pe;
+						if(pe instanceof Activity){
+							Activity activity = (Activity) pe;
 							if(activity.getType().contains("w")){
 								return true;
 							}

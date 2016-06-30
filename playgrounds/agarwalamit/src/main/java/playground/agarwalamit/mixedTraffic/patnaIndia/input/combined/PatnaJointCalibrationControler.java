@@ -47,6 +47,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -60,13 +61,13 @@ public class PatnaJointCalibrationControler {
 	private final static double SAMPLE_SIZE = 0.10;
 	private final static String subPopAttributeName = "userGroup";
 
-	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network_diff_linkSpeed.xml.gz"; //
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_counts.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint_vehicles_10pct.xml.gz";
+	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz"; //
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_counts_osmNetwork.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_vehicles_10pct.xml.gz";
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c3/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxxx/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -80,10 +81,10 @@ public class PatnaJointCalibrationControler {
 			config = pjc.createBasicConfigSettings();
 			
 			config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
-			config.planCalcScore().getOrCreateModeParams("bike").setConstant(12.);
-			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(9.);
-			config.planCalcScore().getOrCreateModeParams("pt").setConstant(-15.);
-			config.planCalcScore().getOrCreateModeParams("walk").setConstant(-11.);
+			config.planCalcScore().getOrCreateModeParams("bike").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("pt").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("walk").setConstant(0.);
 		}
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -92,6 +93,7 @@ public class PatnaJointCalibrationControler {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -103,7 +105,10 @@ public class PatnaJointCalibrationControler {
 				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
 
-				for(String mode : Arrays.asList("car_ext","motorbike_ext","truck_ext","truck","motorbike")){
+				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
+				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
+				
+				for(String mode : Arrays.asList("car_ext","motorbike_ext","motorbike")){
 					addTravelTimeBinding(mode).to(networkTravelTime());
 					addTravelDisutilityFactoryBinding(mode).to(carTravelDisutilityFactoryKey());					
 				}
@@ -158,7 +163,7 @@ public class PatnaJointCalibrationControler {
 		config.plans().setSubpopulationAttributeName(subPopAttributeName);
 		config.plans().setInputPersonAttributeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
 
-		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
 
 		config.controler().setFirstIteration(0);
@@ -170,6 +175,7 @@ public class PatnaJointCalibrationControler {
 		config.counts().setCountsFileName(JOINT_COUNTS_10PCT);
 		config.counts().setWriteCountsInterval(50);
 		config.counts().setCountsScaleFactor(1/SAMPLE_SIZE);
+		config.counts().setOutputFormat("all");
 		//ZZ_TODO : there is something about multipleModes in counts. I could not see any effect of it.
 
 		config.qsim().setFlowCapFactor(SAMPLE_SIZE); //1.06% sample
@@ -289,12 +295,29 @@ public class PatnaJointCalibrationControler {
 		}
 
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
-		config.planCalcScore().setPerforming_utils_hr(6.0);
+		config.planCalcScore().setPerforming_utils_hr(0.30);
 
 		for(String mode : PatnaUtils.ALL_MODES){
 			ModeParams modeParam = new ModeParams(mode);
 			modeParam.setConstant(0.);
-			modeParam.setMarginalUtilityOfTraveling(0.0);
+			switch(mode){
+			case "car": 
+				modeParam.setMarginalUtilityOfTraveling(-0.64);
+				modeParam.setMonetaryDistanceRate(-3.7*Math.pow(10, -5)); break;
+			case "motorbike" :
+				modeParam.setMarginalUtilityOfTraveling(-0.18);
+				modeParam.setMonetaryDistanceRate(-1.6*Math.pow(10, -5)); break;
+			case "pt" :
+				modeParam.setMarginalUtilityOfTraveling(-0.29);
+				modeParam.setMonetaryDistanceRate(-0.3*Math.pow(10, -5)); break;
+			case "walk" :
+				modeParam.setMarginalUtilityOfTraveling(-0.0);
+				modeParam.setMonetaryDistanceRate(0.0); 
+				modeParam.setMarginalUtilityOfDistance(0.0002); break;
+			default :
+				modeParam.setMarginalUtilityOfTraveling(0.0);
+				modeParam.setMonetaryDistanceRate(0.0); break;
+			}
 			config.planCalcScore().addModeParams(modeParam);
 		}
 

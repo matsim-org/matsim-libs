@@ -171,7 +171,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						
 						BuildTrees util = new BuildTrees();
 						if (trees.get(act.getType()) == null) {
@@ -249,7 +249,7 @@ public class CreateNewZHScenario {
 				int cnt = 0;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						
 						// activity is not first or last activity
 						if (cnt > 0 && cnt < plan.getPlanElements().size() -1) {
@@ -263,7 +263,8 @@ public class CreateNewZHScenario {
 						}
 						else if (cnt == plan.getPlanElements().size() - 1) {
 							// get end time of previous activity and set it as start time
-							double previousEndTime = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act)).getEndTime();
+							final Activity act1 = act;
+							double previousEndTime = PopulationUtils.getPreviousActivity(((Plan)plan), PopulationUtils.getPreviousLeg(((Plan)plan), act1)).getEndTime();
 							act.setStartTime(previousEndTime);
 						}						
 					}
@@ -281,7 +282,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						double duration = 12.0 * 3600.0;
 						if (!act.getType().equals("tta")) {
@@ -293,7 +294,7 @@ public class CreateNewZHScenario {
 					}
 					//reset route
 					if (pe instanceof Leg) {
-						LegImpl leg = (LegImpl)pe;
+						Leg leg = (Leg)pe;
 						leg.setRoute(null);
 					}
 				}
@@ -306,7 +307,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
-						LegImpl leg = (LegImpl)pe;
+						Leg leg = (Leg)pe;
 						leg.setRoute(null);
 					}
 				}

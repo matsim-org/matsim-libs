@@ -27,20 +27,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreatorStandard;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoScheduleImpl;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoScheduleImpl;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
-import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -49,10 +48,14 @@ import java.util.*;
 
 /**
  * References an unmapped transit schedule to a network. Combines
- * routing of transit routes and referencing stopFacilities. Additional
- * stop facilities are created if a stopFacility has more than one
- * plausible link. Artificial links are added to the network if no
- * route can be found.
+ * finding link sequences for TransitRoutes and referencing
+ * TransitStopFacilities to link. Calculates the least cost path
+ * from the transit route's first to its last stop with the constraint
+ * that the path must contain a link candidate of every stop.<p/>
+ *
+ * Additional stop facilities are created if a stop facility has more
+ * than one plausible link. Artificial links are added to the network
+ * if no path can be found.
  *
  * @author polettif
  */
@@ -184,7 +187,7 @@ public class PTMapperImpl extends PTMapper {
 		log.info("Initiating final routers to map transit routes with referenced facilities to the network...");
 		Map<String, Router> finalRouters = new HashMap<>();
 		for(String scheduleMode : scheduleTransportModes) {
-			Set<String> routingTransportModes = new HashSet<>(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
+			Set<String> routingTransportModes = new HashSet<>(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE_AS_SET);
 			if(modeRoutingAssignment.get(scheduleMode) != null) routingTransportModes.addAll(modeRoutingAssignment.get(scheduleMode));
 			log.info("Initiating network and router for schedule mode \"" +scheduleMode+"\", network modes " + routingTransportModes);
 
@@ -246,7 +249,7 @@ public class PTMapperImpl extends PTMapper {
 
 	private void cleanScheduleAndNetwork() {
 		// might have been set higher during pseudo routing
-		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		NetworkTools.resetLinkLength(network, PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE);
 
 		// changing the freespeed of the artificial links (value is used in simulations)
 		PTMapperUtils.setFreeSpeedBasedOnSchedule(network, schedule, config.getScheduleFreespeedModes());
@@ -321,7 +324,7 @@ public class PTMapperImpl extends PTMapper {
 	private void printStatistics(int inputNStopFacilities) {
 		int nArtificialLinks = 0;
 		for(Link l : network.getLinks().values()) {
-			if(l.getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+			if(l.getAllowedModes().contains(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE)) {
 				nArtificialLinks++;
 			}
 		}
@@ -330,15 +333,14 @@ public class PTMapperImpl extends PTMapper {
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				nRoutes++;
-
-				boolean noArtificial = true;
+				boolean routeHasArtificialLink = false;
 				List<Id<Link>> linkIds = ScheduleTools.getTransitRouteLinkIds(transitRoute);
 				for(Id<Link> linkId : linkIds) {
-					if(!network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
-						noArtificial = false;
+					if(network.getLinks().get(linkId).getAllowedModes().contains(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE)) {
+						routeHasArtificialLink = true;
 					}
 				}
-				if(noArtificial) {
+				if(!routeHasArtificialLink) {
 					withoutArtificialLinks++;
 				}
 			}

@@ -36,9 +36,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -233,7 +235,7 @@ public class NmbmQTBuilder {
 								/* Add the person's selected plan to the QuadTree */
 								QuadTree<Plan> thisQt = qtMap.get(qtId);
 								Plan plan = person.getSelectedPlan();
-								ActivityImpl firstActivity = (ActivityImpl) plan.getPlanElements().get(0);
+								Activity firstActivity = (Activity) plan.getPlanElements().get(0);
 								Coord c = null;
 								if(firstActivity.getType().equalsIgnoreCase("h")){
 									c = firstActivity.getCoord();
@@ -271,8 +273,8 @@ public class NmbmQTBuilder {
 	
 	private boolean hasWork(Person person){
 		for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-			if(pe instanceof ActivityImpl){
-				ActivityImpl activity = (ActivityImpl) pe;
+			if(pe instanceof Activity){
+				Activity activity = (Activity) pe;
 				if(activity.getType().contains("w")){
 					return true;
 				}
@@ -405,15 +407,15 @@ public class NmbmQTBuilder {
 					List<Tuple<Plan,Double>> closestPlans = getClosestPlans(homeCoord, qtMap.get(qtId), 20);
 					/* Randomly pick any of the closest plans. and make a COPY of it. */
 					Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
-					PlanImpl plan = new PlanImpl();
-					plan.copyFrom(randomTuple.getFirst());
+					Plan plan = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(randomTuple.getFirst(), plan);
 				
 					distanceList.add(randomTuple.getSecond());
 
 					/* Should have a plan now. Change its home locations. */
 					for(PlanElement pe : plan.getPlanElements()){
-						if(pe instanceof ActivityImpl){
-							ActivityImpl activity = (ActivityImpl) pe;
+						if(pe instanceof Activity){
+							Activity activity = (Activity) pe;
 							/* Set the home location */
 							if(activity.getType().equalsIgnoreCase("h")){
 								activity.setCoord(homeCoord);
@@ -426,7 +428,7 @@ public class NmbmQTBuilder {
 					
 					/*TODO Remove after debugging */
 					if(p.getId().equals(Id.create("48548", Person.class))){
-						checkCoord = ((ActivityImpl)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
+						checkCoord = ((Activity)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
 						created = true;
 					}
 					
@@ -443,15 +445,15 @@ public class NmbmQTBuilder {
 			/* TODO Remove after debugging. Add to person and household counts. */
 			Person oneMember = outputPopulation.getPersons().get(hh.getMemberIds().get(0));
 			PlanElement firstActivity = oneMember.getSelectedPlan().getPlanElements().get(0);
-			if(firstActivity instanceof ActivityImpl){
-				ActivityImpl ai = (ActivityImpl)firstActivity;
+			if(firstActivity instanceof Activity){
+				Activity ai = (Activity)firstActivity;
 				if(ai.getType().equalsIgnoreCase("h")){
 					homeCoords2.add(ai.getCoord());
 				}
 			}
 			
 			if(created){
-				if(!((ActivityImpl) sc.getPopulation().getPersons().get(Id.create(48548, Person.class)).getSelectedPlan().getPlanElements().get(0)).getCoord().equals(checkCoord)){
+				if(!((Activity) sc.getPopulation().getPersons().get(Id.create(48548, Person.class)).getSelectedPlan().getPlanElements().get(0)).getCoord().equals(checkCoord)){
 					LOG.error("GOTCHA!!");
 				}
 			}
@@ -483,7 +485,7 @@ public class NmbmQTBuilder {
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest person. */
 			Plan closestPlan = qt.getClosest(c.getX(), c.getY());
-			double radius = CoordUtils.calcEuclideanDistance(c, ((ActivityImpl) closestPlan.getPlanElements().get(0)).getCoord());
+			double radius = CoordUtils.calcEuclideanDistance(c, ((Activity) closestPlan.getPlanElements().get(0)).getCoord());
 			Collection<Plan> plans = qt.getDisk(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -499,7 +501,7 @@ public class NmbmQTBuilder {
 		
 		/* Rank the plans based on distance. */
 		for(Plan plan : plansToRank){
-			double d = CoordUtils.calcEuclideanDistance(c, ((ActivityImpl) plan.getPlanElements().get(0)).getCoord());
+			double d = CoordUtils.calcEuclideanDistance(c, ((Activity) plan.getPlanElements().get(0)).getCoord());
 			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

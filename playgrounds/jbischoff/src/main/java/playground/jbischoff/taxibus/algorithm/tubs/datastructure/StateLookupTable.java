@@ -57,7 +57,6 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// TODO Auto-generated method stub
 		recalculateMatrix();
 		this.bookingsPerIteration.put(event.getIteration(), this.bookingCounter);
 		this.experiencedStates.clear();
@@ -73,6 +72,7 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 
 		for (State state : this.experiencedStates) {
 			int currentIterationValue = this.bookingCounter - state.confirmations - 1;
+			if (currentIterationValue<0) currentIterationValue = 0;
 			double oldValue = this.valueMatrix[state.time][state.slack];
 			double occurences = this.occurenceMatrix[state.time][state.slack];
 			double newValue = ((occurences * oldValue) + currentIterationValue) / (occurences + 1);
@@ -96,7 +96,9 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 			throw new RuntimeException("out of time bin");
 		}
 		double timefromStart = time - currentMatrixStartTime;
-		int bin = (int) (timefromStart / this.binsize);
+		int bin = (int) (timefromStart / this.binsize) -1;
+		if (bin < 0)
+			bin = 0;
 		return bin;
 	}
 
@@ -221,5 +223,16 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace#acceptableStartTime(double)
+	 */
+	@Override
+	public boolean acceptableStartTime(double now) {
+		if ((now > currentMatrixEndTime) | (now < currentMatrixStartTime)) {
+			return false;
+		}		else 
+			return true;
 	}
 }

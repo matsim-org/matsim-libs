@@ -39,7 +39,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,10 +53,7 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -109,8 +108,8 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		QVehicle v = new QVehicle(f.basicVehicle);
 
-		Person p = PopulationUtils.createPerson(Id.create("1", Person.class));
-		p.addPlan(new PlanImpl());
+		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+		p.addPlan(PopulationUtils.createPlan());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		
 		double now = 0. ;
@@ -140,14 +139,14 @@ public final class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		Person p = PopulationUtils.createPerson(Id.create(23, Person.class));
-		PlanImpl plan = new PlanImpl();
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(23, Person.class));
+		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", f.link2.getId()));
 		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(p, f.sim);
 		veh.setDriver(driver);
 		
@@ -203,8 +202,8 @@ public final class QLinkTest extends MatsimTestCase {
 		Id<Vehicle> id1 = Id.create("1", Vehicle.class);
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		Person p = PopulationUtils.createPerson(Id.create(42, Person.class));
-		p.addPlan(new PlanImpl());
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
+		p.addPlan(PopulationUtils.createPlan());
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
@@ -239,16 +238,16 @@ public final class QLinkTest extends MatsimTestCase {
 
 
 		QVehicle veh = new QVehicle(f.basicVehicle);
-		Person pers = PopulationUtils.createPerson(Id.create(80, Person.class));
-		Plan plan = new PlanImpl();
+		Person pers = PopulationUtils.getFactory().createPerson(Id.create(80, Person.class));
+		Plan plan = PopulationUtils.createPlan();
 		pers.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
 		route.setVehicleId(f.basicVehicle.getId());
 		leg.setRoute(route);
 		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", f.link2.getId()));
 		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(pers, f.sim);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
@@ -386,15 +385,16 @@ public final class QLinkTest extends MatsimTestCase {
 
 
 	private static Person createPerson(Id<Person> personId, MutableScenario scenario, Link link1, Link link2) {
-		Person p = PopulationUtils.createPerson(personId);
-		PlanImpl plan = PersonUtils.createAndAddPlan(p, true);
-		plan.createAndAddActivity("h", link1.getId());
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		final Id<Person> id = personId;
+		Person p = PopulationUtils.getFactory().createPerson(id);
+		Plan plan = PersonUtils.createAndAddPlan(p, true);
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		NetworkRoute route = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, link1.getId(), link2.getId());
 		leg.setRoute(route);
 		route.setLinkIds(link1.getId(), null, link2.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link2.getId());
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link2.getId());
 		return p;
 	}
 
@@ -471,16 +471,17 @@ public final class QLinkTest extends MatsimTestCase {
 
 
 	private Person createPerson2(Id<Person> personId, Fixture f) {
-		Person p = PopulationUtils.createPerson(personId);
-		Plan plan = new PlanImpl();
+		final Id<Person> id = personId;
+		Person p = PopulationUtils.getFactory().createPerson(id);
+		Plan plan = PopulationUtils.createPlan();
 		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("home", f.link1.getId()));
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
 		route.setVehicleId(f.basicVehicle.getId());
 		leg.setRoute(route);
 		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", f.link2.getId()));
 		return p;
 	}
 
@@ -500,12 +501,12 @@ public final class QLinkTest extends MatsimTestCase {
 		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node2, node2, 2 * 7.5, 7.5, 3600.0, 1.0);
 
 		for (int i = 0; i < 5; i++) {
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = new PlanImpl();
-			Activity act = new ActivityImpl("h", link1.getId());
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PopulationUtils.createPlan();
+			Activity act = PopulationUtils.createActivityFromLinkId("h", link1.getId());
 			act.setEndTime(7*3600);
 			plan.addActivity(act);
-			Leg leg = new LegImpl("car");
+			Leg leg = PopulationUtils.createLeg("car");
 			NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 			List<Id<Link>> links = new ArrayList<Id<Link>>();
 			links.add(link3.getId()); // let the person(s) drive around in circles to generate a traffic jam
@@ -515,7 +516,7 @@ public final class QLinkTest extends MatsimTestCase {
 			route.setLinkIds(link1.getId(), links, link2.getId());
 			leg.setRoute(route);
 			plan.addLeg(leg);
-			plan.addActivity(new ActivityImpl("w", link2.getId()));
+			plan.addActivity(PopulationUtils.createActivityFromLinkId("w", link2.getId()));
 			p.addPlan(plan);
 			scenario.getPopulation().addPerson(p);
 		}

@@ -30,7 +30,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
@@ -60,8 +60,8 @@ public class BasicScheduleEditor implements ScheduleEditor {
 
 	private final ParentStops parentStops;
 
-	private static final String SUFFIX_PATTERN = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
-	private static final String SUFFIX = PublicTransitMappingConfigGroup.SUFFIX_CHILD_STOP_FACILITIES;
+	private static final String SUFFIX_PATTERN = PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
+	private static final String SUFFIX = PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES;
 
 	// commands
 	public static final String RR_VIA_LINK = "rerouteViaLink";

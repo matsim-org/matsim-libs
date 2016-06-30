@@ -31,8 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -59,7 +58,7 @@ public class CharyparNagelWithSubpopulationsTest {
 						sc.getPopulation().getPersons().get(
 								Id.createPersonId( 2 ) ) );
 
-		final Leg leg = new LegImpl( "skateboard" );
+		final Leg leg = PopulationUtils.createLeg("skateboard");
 		leg.setDepartureTime( 10 );
 		leg.setTravelTime(10);
 
@@ -95,7 +94,7 @@ public class CharyparNagelWithSubpopulationsTest {
 						sc.getPopulation().getPersons().get(
 								Id.createPersonId( 2 ) ) );
 
-		final Activity act = new ActivityImpl( "chill" , null , null );
+		final Activity act = PopulationUtils.createActivityFromCoordAndLinkId("chill", null, null);
 		act.setStartTime( 8 * 3600d );
 		act.setEndTime( 18 * 3600d );
 

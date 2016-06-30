@@ -7,4 +7,5 @@ public interface StateSpace {
 	double getCurrentLastArrivalTime(double now);
 	void addExperiencedTimeSlack(double time, double slack, int confirmations);
 	void incBookingCounter();
+	boolean acceptableStartTime(double now);
 }

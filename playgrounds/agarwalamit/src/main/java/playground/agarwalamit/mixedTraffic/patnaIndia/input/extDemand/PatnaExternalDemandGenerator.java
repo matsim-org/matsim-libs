@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -58,17 +57,18 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class PatnaExternalDemandGenerator {
 	private static final Logger LOG = Logger.getLogger(PatnaExternalDemandGenerator.class);
 	private Scenario scenario;
-	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
+	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/counts/externalDemandInputFiles/";
 	private Random random = MatsimRandom.getRandom();
-	private final String networkFile = "../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz";
+	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz";
 	public static void main(String[] args) {
 		new PatnaExternalDemandGenerator().run();
 	}
 
 	private void run(){
+		String outPlansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonDemand_10pct.xml.gz";
 		scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		createDemandForAllStations();
-		new PopulationWriter(scenario.getPopulation()).write("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct_2.xml.gz");
+		new PopulationWriter(scenario.getPopulation()).write(outPlansFile);
 		System.out.println("Number of persons in the population are "+scenario.getPopulation().getPersons().size());
 	}
 
@@ -115,7 +115,7 @@ public class PatnaExternalDemandGenerator {
 
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, "In");
 		Link originActLink = getLinkFromOuterCordonKey(countingStationNumber, true);
-		Link destinationActLink = NetworkUtils.getConnectingLink(originActLink.getToNode(), originActLink.getFromNode()); 
+		Link destinationActLink = getLinkFromOuterCordonKey(countingStationNumber, false); 
 
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
@@ -140,14 +140,13 @@ public class PatnaExternalDemandGenerator {
 						zonalActs.add(act);
 					}
 
-
 					// fix activity duration such that, all plans are differntiated based on ONLY zonal activity locations.
 					double firstActEndTime = (timebin-1)*3600. + random.nextDouble()*3600.;
 					double secondActEndTime = firstActEndTime + 5*3600. + random.nextDouble() * 3. *3600.;
 
 					if((secondActEndTime > 21*3600. && secondActEndTime <24*3600.)  ) {
 						if ( countingStationNumber.equals("OC3") ) {
-							secondActEndTime = secondActEndTime - (1*3600.+random.nextDouble()* 3 *3600.); //preponding departure time of higher counts aroung mid night
+							secondActEndTime = secondActEndTime - (1*3600.+random.nextDouble()* 3 *3600.); //preponing departure time of higher counts around mid night
 						} else if ( countingStationNumber.equals("OC6")){
 //							secondActEndTime = secondActEndTime - (3*3600+random.nextDouble()*4*3600);
 							secondActEndTime = 9*3600.+random.nextDouble()*6*3600.; 
@@ -225,7 +224,7 @@ public class PatnaExternalDemandGenerator {
 				double throughTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
 
 				// the through traffic share is increased by 10% because total persons generated were about 10% short. This is not uniform for all counting stations.
-				throughTrafficShare = 1.1 * throughTrafficShare;
+				throughTrafficShare = 1.0 * throughTrafficShare;
 
 				double personCount = Math.round( timebin2mode2count.get(timebin).get(mode) * throughTrafficShare * OuterCordonUtils.SAMPLE_SIZE );
 
@@ -275,24 +274,40 @@ public class PatnaExternalDemandGenerator {
 		String link = null;
 		if(isOrigin){
 			switch(countingStationNumber){
-			case "OC1": link = "1386010000-1385710000-1385110000-1380010000"; break;
+			case "OC1": link = "5672-5876-5732"; break;
 			case "OC2": link = "OC2_in"; break;
-			case "OC3": link = "476810000-475210000-477510000"; break;
+			case "OC3": link = "1207-999-1335"; break;
 			case "OC4": link = "OC4_in"; break;
-			case "OC5": link = "OC5_in"; break;
-			case "OC6": link = "919-828-1033-1022-1035-101710000-1053-106110000-106010000-1058-69210000-146010000"; break;
-			case "OC7": link = "1973-2158-215210000-2163-2169"; break;
+			case "OC5": link = "9427"; break;
+			case "OC6": link = "6766"; break;
+			case "OC7": link = "741"; break;
+//			following is useful only if network is created using transcad data. Amit June 2016 
+//			case "OC1": link = "1386010000-1385710000-1385110000-1380010000"; break;
+//			case "OC2": link = "OC2_in"; break;
+//			case "OC3": link = "476810000-475210000-477510000"; break;
+//			case "OC4": link = "OC4_in"; break;
+//			case "OC5": link = "OC5_in"; break;
+//			case "OC6": link = "919-828-1033-1022-1035-101710000-1053-106110000-106010000-1058-69210000-146010000"; break;
+//			case "OC7": link = "1973-2158-215210000-2163-2169"; break;
 			default : throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 			}
 		} else {
 			switch(countingStationNumber){
-			case "OC1": link = "13800-13851-13857-13860"; break;
+			case "OC1": link = "5733-5877-5673"; break;
 			case "OC2": link = "OC2_out"; break;
-			case "OC3": link = "4775-4752-4768"; break;
+			case "OC3": link = "1334-998-1206"; break;
 			case "OC4": link = "OC4_out"; break;
-			case "OC5": link = "OC5_out"; break;
-			case "OC6": link = "1460-692-105810000-1060-1061-105310000-1017-103510000-102210000-103310000-82810000-91910000"; break;
-			case "OC7": link = "216910000-216310000-2152-215810000-197310000"; break;
+			case "OC5": link = "9428"; break;
+			case "OC6": link = "6767"; break;
+			case "OC7": link = "740"; break;
+//			following is useful only if network is created using transcad data. Amit June 2016 
+//			case "OC1": link = "13800-13851-13857-13860"; break;
+//			case "OC2": link = "OC2_out"; break;
+//			case "OC3": link = "4775-4752-4768"; break;
+//			case "OC4": link = "OC4_out"; break;
+//			case "OC5": link = "OC5_out"; break;
+//			case "OC6": link = "1460-692-105810000-1060-1061-105310000-1017-103510000-102210000-103310000-82810000-91910000"; break;
+//			case "OC7": link = "216910000-216310000-2152-215810000-197310000"; break;
 			default : throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 			}
 		}
@@ -336,16 +351,16 @@ public class PatnaExternalDemandGenerator {
 				}
 				Map<String, Double> mode2Count = new HashMap<>();
 				String parts[]	= line.split("\t");
-				double timebin = Double.valueOf(parts[0]);
-				double carCount = Double.valueOf(parts[1]);
-				double motorbikeCount = Double.valueOf(parts[2]);
-				double truckCount = Double.valueOf(parts[3]);
-				double bikeCount = Double.valueOf(parts[4]);
+				double timebin = Double.valueOf(parts[0]); //time bin
+				double carCount = Double.valueOf(parts[1]); // car
+				double motorbikeCount = Double.valueOf(parts[2]); //2w
+				double truckCount = Double.valueOf(parts[3]); //truck
+				double bikeCount = Double.valueOf(parts[4]); //bike
 
-				mode2Count.put("car", carCount);
-				mode2Count.put("motorbike", motorbikeCount);
-				mode2Count.put("truck", truckCount);
-				mode2Count.put("bike", bikeCount);
+				mode2Count.put("car_ext", carCount);
+				mode2Count.put("motorbike_ext", motorbikeCount);
+				mode2Count.put("truck_ext", truckCount);
+				mode2Count.put("bike_ext", bikeCount);
 				time2mode2count.put(timebin, mode2Count);
 				line=reader.readLine();
 			}

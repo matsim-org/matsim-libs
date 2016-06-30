@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -30,8 +31,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
@@ -115,7 +115,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		if(!personId.toString().startsWith("pt")){
 
 			//Create new leg for the person
-			journeys.get(personId).currentLeg = new LegImpl(event.getLegMode());
+			journeys.get(personId).currentLeg = PopulationUtils.createLeg(event.getLegMode());
 			journeys.get(personId).currentLeg.setDepartureTime(event.getTime());
 
 			if(!journeys.get(personId).mode.equals(TransportMode.pt)){
@@ -205,7 +205,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		Id<Person> perosnId = event.getPersonId();
 		Journey thisJourney = journeys.get(perosnId);
 		if(event.getActType().equals("work")){
-			ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
+			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			activities.put(perosnId, activity);

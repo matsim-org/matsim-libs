@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -104,7 +104,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 				return new OverlapScorerFactory() {
 						@Override
 						public BeingTogetherScoring.PersonOverlapScorer createScorer(final Id id) {
-							final PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get( id );
+							final Person person = (Person) scenario.getPopulation().getPersons().get( id );
 							if ( person == null ) {
 								// eg transit agent
 								return new BeingTogetherScoring.LinearOverlapScorer( 0 );
@@ -128,7 +128,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 
 	public static double getTypicalDuration(
 			final Scenario scenario,
-			final PersonImpl person,
+			final Person person,
 			final String type ) {
 		final Double typicalDuration =
 					(Double) scenario.getPopulation().getPersonAttributes().getAttribute(

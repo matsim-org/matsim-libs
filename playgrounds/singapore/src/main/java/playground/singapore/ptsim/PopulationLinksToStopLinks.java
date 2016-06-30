@@ -3,6 +3,7 @@ package playground.singapore.ptsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -11,7 +12,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -37,24 +37,24 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 	}
 
 	private void processPlan(final Plan plan) {
-		ActivityImpl act = null, ptAct = null;
+		Activity act = null, ptAct = null;
 		Id eStopId = null, eStopId2 = null;
 		ExperimentalTransitRouteFactory factory = new ExperimentalTransitRouteFactory();
 		for (PlanElement planElement : plan.getPlanElements()) {
-			if(planElement instanceof ActivityImpl && !((ActivityImpl)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+			if(planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				if(act!=null) {
 					act.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
 					ptAct.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
-					((ActivityImpl) planElement).setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
+					((Activity) planElement).setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
 				}
-				act = (ActivityImpl) planElement;
+				act = (Activity) planElement;
 				if(eStopId2!=null) {
 					act.setLinkId(eStopId2);
 					eStopId2 = null;
 				}
 			}
-			else if(planElement instanceof ActivityImpl) {
-				ptAct = (ActivityImpl) planElement;
+			else if(planElement instanceof Activity) {
+				ptAct = (Activity) planElement;
 				if(eStopId!=null) {
 					ptAct.setLinkId(eStopId);
 					eStopId2 = eStopId;

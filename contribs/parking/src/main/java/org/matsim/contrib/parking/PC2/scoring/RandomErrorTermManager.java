@@ -25,11 +25,11 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 /**
  * This class is based on work by Andreas Horni related to location choice, located at:
  * org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring

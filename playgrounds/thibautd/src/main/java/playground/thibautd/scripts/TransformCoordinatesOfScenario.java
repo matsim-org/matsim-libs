@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -31,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.network.algorithms.NetworkTransform;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -127,7 +127,7 @@ public class TransformCoordinatesOfScenario {
 		for ( Person person : population.getPersons().values() ) {
 			for ( Plan plan : person.getPlans() ) {
 				for ( Activity activity : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ) ) {
-					(( ActivityImpl) activity).setCoord( transformation.transform( activity.getCoord() ) );
+					(( Activity) activity).setCoord( transformation.transform( activity.getCoord() ) );
 				}
 			}
 		}

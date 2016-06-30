@@ -24,12 +24,10 @@ package playground.boescpa.ivtBaseline.preparation.freightCreation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -159,7 +157,7 @@ public class CreateFreightTraffic {
 
 	private void createSingleTripAgent(String type, int index, ActivityFacility startFacility, ActivityFacility endFacility) {
 		// create and add new agent
-		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(FREIGHT_TAG + "_" + index, Person.class));
+		Person p = org.matsim.core.population.PopulationUtils.getFactory().createPerson(Id.create(FREIGHT_TAG + "_" + index, Person.class));
 		freightPopulation.addPerson(p);
 		freightPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", FREIGHT_TAG);
 		freightPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "freight_type", type);
@@ -168,19 +166,19 @@ public class CreateFreightTraffic {
 	}
 
 	private Plan createSingleTripPlan(ActivityFacility startFacility, ActivityFacility endFacility) {
-		Plan plan = new PlanImpl();
+		Plan plan = org.matsim.core.population.PopulationUtils.createPlan();
 		int departureTime = getDepartureTime();
 
-		ActivityImpl actStart = new ActivityImpl(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());
+		Activity actStart = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, startFacility.getCoord(), startFacility.getLinkId());
 		actStart.setFacilityId(startFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(org.matsim.core.population.PopulationUtils.createLeg("car"));
 
-		ActivityImpl actEnd = new ActivityImpl(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
+		Activity actEnd = org.matsim.core.population.PopulationUtils.createActivityFromCoordAndLinkId(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
 		actEnd.setFacilityId(endFacility.getId());
 		actEnd.setStartTime(departureTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);

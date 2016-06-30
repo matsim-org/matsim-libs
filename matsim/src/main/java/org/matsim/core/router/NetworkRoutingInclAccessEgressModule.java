@@ -37,10 +37,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -58,7 +56,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
 		@Override public boolean isStageActivity(String activityType) {
-			if ( stageActivityType.equals( activityType ) ) {
+			if ( NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals( activityType ) ) {
 				return true ;
 			} else {
 				return false ;
@@ -69,10 +67,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				return false ;
 			}
 			AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj ;
-			return other.isStageActivity(stageActivityType) ;
+			return other.isStageActivity(NetworkRoutingInclAccessEgressModule.this.stageActivityType) ;
 		}
 		@Override public int hashCode() {
-			return stageActivityType.hashCode() ;
+			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.hashCode() ;
 		}
 	}
 
@@ -81,7 +79,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final RouteFactoryImpl routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 	private String stageActivityType;
 
@@ -90,10 +87,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final PopulationFactory populationFactory,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			final RouteFactoryImpl routeFactory, PlansCalcRouteConfigGroup calcRouteConfig) {
+			PlansCalcRouteConfigGroup calcRouteConfig) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
-		this.routeFactory = routeFactory;
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 		this.stageActivityType = this.mode + " interaction";
@@ -115,7 +111,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		Link accessActLink = null ;
 		if ( fromFacility.getLinkId()!=null ) {
-			accessActLink = network.getLinks().get( fromFacility.getLinkId() );
+			accessActLink = this.network.getLinks().get( fromFacility.getLinkId() );
 			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
 			// other link.
 			
@@ -129,17 +125,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				throw new RuntimeException("access/egress bushwhacking leg not possible when neither facility link id nor facility coordinate given") ;
 			}
 			
-			accessActLink = NetworkUtils.getNearestLink(network, fromFacility.getCoord()) ;
+			accessActLink = NetworkUtils.getNearestLink(this.network, fromFacility.getCoord()) ;
 			Gbl.assertNotNull(accessActLink);
 		}
 
 		Link egressActLink = null ;
 		if ( toFacility.getLinkId()!=null ) {  
-			egressActLink = 	network.getLinks().get( toFacility.getLinkId() );
+			egressActLink = 	this.network.getLinks().get( toFacility.getLinkId() );
 		}
 		if ( egressActLink==null ) {
 			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
-			egressActLink = NetworkUtils.getNearestLink(network, toFacility.getCoord()) ;
+			egressActLink = NetworkUtils.getNearestLink(this.network, toFacility.getCoord()) ;
 			Gbl.assertNotNull(egressActLink);
 		}
 		
@@ -172,7 +168,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === compute the network leg:
 		{
-			Leg newLeg = populationFactory.createLeg( mode );
+			Leg newLeg = this.populationFactory.createLeg( this.mode );
 			newLeg.setDepartureTime( now );
 			now += routeLeg( person, newLeg, accessActLink, egressActLink, now );
 
@@ -187,7 +183,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				Coord egressActCoord = egressActLink.getToNode().getCoord() ;
 				Gbl.assertNotNull( egressActCoord );
 
-				final ActivityImpl interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
+				final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
 				result.add( interactionActivity ) ;
 				Logger.getLogger(this.getClass()).warn( interactionActivity );
 
@@ -203,8 +199,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return result ;
 	}
 
-	private ActivityImpl createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
-		ActivityImpl act = new ActivityImpl( stageActivityType, interactionCoord, interactionLink);
+	private Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(this.stageActivityType, interactionCoord, interactionLink);
 		act.setMaximumDuration(0.0);
 		return act;
 	}
@@ -222,7 +218,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		double dist = CoordUtils.calcEuclideanDistance(fromCoord,toCoord);
 
 		// create an empty route, but with realistic travel time
-		Route route = this.routeFactory.createRoute(Route.class, dpLinkId, arLinkId ); 
+		Route route = this.populationFactory.createRoute(Route.class, dpLinkId, arLinkId ); 
 
 		double beelineDistanceFactor = 1.3 ;
 		double networkTravelSpeed = 2.0 ;
@@ -235,7 +231,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		Leg r = (leg);
+		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
@@ -247,7 +244,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	@Override
 	public String toString() {
-		return "[NetworkRoutingModule: mode="+mode+"]";
+		return "[NetworkRoutingModule: mode="+this.mode+"]";
 	}
 
 
@@ -263,7 +260,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// (a "true" route)
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
@@ -273,7 +270,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
@@ -282,8 +279,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		if ( leg instanceof LegImpl ) {
-			((LegImpl) leg).setArrivalTime(depTime + travTime); 
+		if ( leg instanceof Leg ) {
+			Leg r = (leg);
+			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
 			// (not in interface!)
 		}
 		return travTime;

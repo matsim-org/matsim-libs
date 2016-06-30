@@ -142,8 +142,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" link=\"" + act.getLinkId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act instanceof ActivityImpl){
-			ActivityImpl a = (ActivityImpl)act;
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME)
 				out.write(" dur=\"" + Time.writeTime(a.getMaximumDuration()) + "\"");
 		}
@@ -168,11 +168,12 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
 		if (leg.getTravelTime() != Integer.MIN_VALUE)
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
-		if (leg instanceof LegImpl){
-			LegImpl l = (LegImpl)leg;
-			if (l.getArrivalTime() != Time.UNDEFINED_TIME)
-				out.write(" arr_time=\"" + Time.writeTime(l.getArrivalTime()) + "\"");
-		}
+//		if (leg instanceof LegImpl){
+//			LegImpl l = (LegImpl)leg;
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME)
+//				out.write(" arr_time=\"" + Time.writeTime(l.getDepartureTime() + l.getTravelTime()) + "\"");
+//		}
+		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 		out.write(">\n");
 	}
 

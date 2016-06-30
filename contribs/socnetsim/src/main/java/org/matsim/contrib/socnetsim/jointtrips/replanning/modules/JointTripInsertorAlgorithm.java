@@ -31,12 +31,12 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
@@ -286,17 +286,14 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		/* scope of driver-specific variables */ {
 			// insert in driver plan
 			final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
-			driverTrip.add( new LegImpl( TransportMode.car ) );
+			driverTrip.add( PopulationUtils.createLeg(TransportMode.car) );
 			/* scope of firstAct */ {
-				final Activity firstAct = new ActivityImpl(
-						JointActingTypes.INTERACTION,
-						match.tripPassenger.departure.getCoord(),
-						match.tripPassenger.departure.getLinkId());
+				final Activity firstAct = PopulationUtils.createActivityFromCoordAndLinkId(JointActingTypes.INTERACTION, match.tripPassenger.departure.getCoord(), match.tripPassenger.departure.getLinkId());
 				firstAct.setMaximumDuration( 0 );
 				driverTrip.add( firstAct );
 			}
 			/* scope of leg */ {
-				final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
+				final Leg leg =  PopulationUtils.createLeg(JointActingTypes.DRIVER);
 				final DriverRoute dRoute = new DriverRoute(
 						match.tripPassenger.departure.getLinkId(),
 						match.tripPassenger.arrival.getLinkId());
@@ -305,14 +302,11 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				driverTrip.add( leg );
 			}
 			/* scope of secondAct */ {
-				final Activity secondAct = new ActivityImpl(
-						JointActingTypes.INTERACTION,
-						match.tripPassenger.arrival.getCoord(),
-						match.tripPassenger.arrival.getLinkId());
+				final Activity secondAct = PopulationUtils.createActivityFromCoordAndLinkId(JointActingTypes.INTERACTION, match.tripPassenger.arrival.getCoord(), match.tripPassenger.arrival.getLinkId());
 				secondAct.setMaximumDuration( 0 );
 				driverTrip.add( secondAct );
 			}
-			driverTrip.add( new LegImpl( TransportMode.car ) );
+			driverTrip.add( PopulationUtils.createLeg(TransportMode.car) );
 
 			TripRouter.insertTrip(
 					driverPlan,
@@ -323,7 +317,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 
 		/* scope of passenger-specific variables */ {
 			// insert in passenger plan
-			final Leg pLeg =  new LegImpl( JointActingTypes.PASSENGER );
+			final Leg pLeg =  PopulationUtils.createLeg(JointActingTypes.PASSENGER);
 			final PassengerRoute pRoute = new PassengerRoute(
 					match.tripPassenger.departure.getLinkId(),
 					match.tripPassenger.arrival.getLinkId());
@@ -366,7 +360,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			double dur = (act instanceof Activity ? ((Activity) act).getMaximumDuration() : Time.UNDEFINED_TIME);
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				return endTime;

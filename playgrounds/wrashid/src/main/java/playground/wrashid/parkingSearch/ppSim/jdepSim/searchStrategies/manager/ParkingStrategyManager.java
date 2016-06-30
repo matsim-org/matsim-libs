@@ -25,6 +25,8 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -34,8 +36,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
@@ -66,8 +66,8 @@ public class ParkingStrategyManager {
 		for (int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++) {
 			PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 
 				if (leg.getMode().equals(TransportMode.car)) {
 					HashMap<Integer, EvaluationContainer> agentHashMap = getStrategyEvaluations().get(agentId);

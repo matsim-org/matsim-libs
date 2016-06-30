@@ -45,16 +45,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "PublicTransitMapping";
 
-	/**
-	 * Suffix used for child stop facilities. The id of the referenced link is appended (i.e. stop0123.link:7852).
-	 */
-	public static final String SUFFIX_CHILD_STOP_FACILITIES = ".link:";
-	public static final String SUFFIX_CHILD_STOP_FACILITIES_REGEX = "[.]link:";
-
-	public static final String ARTIFICIAL_LINK_MODE = "artificial";
-	public static final String STOP_FACILITY_LOOP_LINK = "stopFacilityLink";
-	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
-
 	// param names
 	private static final String MODES_TO_KEEP_ON_CLEAN_UP = "modesToKeepOnCleanUp";
 	private static final String NODE_SEARCH_RADIUS = "nodeSearchRadius";
@@ -76,7 +66,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	// default values
 	private Map<String, Set<String>> modeRoutingAssignment = null;
 	private Map<String, LinkCandidateCreatorParams> linkCandidateParams = null;
-	private Set<String> scheduleFreespeedModes = new HashSet<>(ARTIFICIAL_LINK_MODE_AS_SET);
+	private Set<String> scheduleFreespeedModes = new HashSet<>(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE_AS_SET);
 	private double maxTravelCostFactor = 5.0;	private Set<String> modesToKeepOnCleanUp = new HashSet<>();
 	private String manualLinkCandidateCsvFile = null;
 	private String prefixArtificial = "pt_";
@@ -110,6 +100,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		lccParamsBus.setNetworkModesStr("car,bus");
 		LinkCandidateCreatorParams lccParamsRail = new LinkCandidateCreatorParams("rail");
 		lccParamsRail.setNetworkModesStr("rail,light_rail");
+		lccParamsRail.setMaxNClosestLinks(20);
+		lccParamsRail.setMaxLinkCandidateDistance(150);
 		LinkCandidateCreatorParams lccParamsTram = new LinkCandidateCreatorParams("tram");
 		lccParamsTram.setUseArtificialLoopLink(true);
 		config.addParameterSet(lccParamsBus);
@@ -151,7 +143,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(SCHEDULE_FREESPEED_MODES,
 				"After the schedule has been mapped, the free speed of links can be set according to the necessary travel \n" +
 						"\t\ttimes given by the transit schedule. The freespeed of a link is set to the minimal value needed by all \n" +
-						"\t\ttransit routes passing using it. This is performed for \""+ARTIFICIAL_LINK_MODE + "\" automatically, additional \n" +
+						"\t\ttransit routes passing using it. This is performed for \""+ PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE + "\" automatically, additional \n" +
 						"\t\tmodes (rail is recommended) can be added, separated by commas.");
 		map.put(MAX_TRAVEL_COST_FACTOR,
 				"If all paths between two stops have a [travelCost] > ["+MAX_TRAVEL_COST_FACTOR+"] * [minTravelCost], \n" +
@@ -743,7 +735,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		private static final String STOP_FACILITY = "stopFacility";
 		private static final String REPLACE = "replace";
 
-		private Id<TransitStopFacility> stopFacilityId;
+		private Id<TransitStopFacility> stopFacilityId = null;
 		private Set<String> scheduleModes = new HashSet<>();
 		private Set<Id<Link>> linkIds = new HashSet<>();
 		private boolean replace = true;
@@ -764,7 +756,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		public Map<String, String> getComments() {
 			Map<String, String> map = super.getComments();
 			map.put(SCHEDULE_MODES,
-					"The schedule transport modes for which these link apply.");
+					"The schedule transport modes for which these link apply. All possible links are considered if empty.");
 			map.put(LINK_IDS,
 					"The links, comma separated");
 			map.put(REPLACE,
@@ -779,7 +771,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		 */
 		@StringGetter(STOP_FACILITY)
 		public String getStopFacilityIdStr() {
-			return stopFacilityId.toString();
+			return stopFacilityId != null ? stopFacilityId.toString() : "";
 		}
 		public Id<TransitStopFacility> getStopFacilityId() {
 			return stopFacilityId;

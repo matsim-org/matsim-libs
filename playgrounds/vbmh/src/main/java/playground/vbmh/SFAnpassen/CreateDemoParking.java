@@ -8,12 +8,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -215,10 +215,10 @@ public class CreateDemoParking {
 		
 		for (Person person : personen){
 			for(Plan plan : person.getPlans()){ 
-				PlanImpl planImpl = (PlanImpl) plan;
+				Plan planImpl = (Plan) plan;
 				for(PlanElement element : planImpl.getPlanElements()){
-					if(element.getClass()==ActivityImpl.class){
-						ActivityImpl actImpl = (ActivityImpl) element;
+					if(element.getClass()==Activity.class){
+						Activity actImpl = (Activity) element;
 						if(actImpl.getType()=="work"){
 							String facId = actImpl.getFacilityId().toString();
 							if(anzahlArbeiter.containsKey(facId)){

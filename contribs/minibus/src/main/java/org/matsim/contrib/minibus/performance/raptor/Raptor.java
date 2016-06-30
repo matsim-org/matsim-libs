@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -118,7 +118,7 @@ public class Raptor implements TransitRouter {
 
 	private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
 		List<Leg> legs = new ArrayList<>();
-		Leg leg = new LegImpl(TransportMode.transit_walk);
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		double walkTime = getWalkTime(fromCoord, toCoord);
 		leg.setTravelTime(walkTime);
 		Route walkRoute = new GenericRouteImpl(null, null);
@@ -180,7 +180,7 @@ public class Raptor implements TransitRouter {
 	}
 
 	private Leg createTransitLeg(RouteSegment routeSegment) {
-		Leg leg = new LegImpl(TransportMode.pt);
+		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 
 		TransitStopFacility accessStop = routeSegment.fromStop;
 		TransitStopFacility egressStop = routeSegment.toStop;
@@ -202,7 +202,7 @@ public class Raptor implements TransitRouter {
 	}
 
 	private Leg createTransitWalkLeg(Coord fromCoord, Coord toCoord) {
-		Leg leg = new LegImpl(TransportMode.transit_walk);
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		double walkTime = getWalkTime(fromCoord, toCoord);
 		leg.setTravelTime(walkTime);
 		return leg;

@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -48,7 +47,7 @@ public class ReanalyseMZ2005Plans {
 
 			for (PlanElement pE : planElements) {
 				if (pE instanceof Leg) {
-					LegImpl leg = (LegImpl) pE;
+					Leg leg = (Leg) pE;
 					
 					if (leg.getMode().equals("walk")) {
 						double lastDistClass = 0;

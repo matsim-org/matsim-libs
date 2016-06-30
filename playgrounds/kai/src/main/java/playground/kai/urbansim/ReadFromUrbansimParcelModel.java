@@ -18,14 +18,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -159,7 +159,8 @@ public class ReadFromUrbansimParcelModel {
 				String[] parts = line.split("[\t\n]+");
 
 				Id<Person> personId = Id.create( parts[idxFromKey.get("person_id")], Person.class ) ;
-				Person newPerson = PopulationUtils.createPerson(personId);
+				final Id<Person> id = personId;
+				Person newPerson = PopulationUtils.getFactory().createPerson(id);
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;
@@ -178,7 +179,7 @@ public class ReadFromUrbansimParcelModel {
 					continue ;
 				}
 
-				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
+				Plan plan = PersonUtils.createAndAddPlan(newPerson, true);
 				Utils.makeHomePlan(plan, homeCoord) ;
 
 				int idx = idxFromKey.get("parcel_id_work") ;
@@ -216,8 +217,8 @@ public class ReadFromUrbansimParcelModel {
 						newPop.addPerson(newPerson) ;
 						break ;
 					}
-					Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-					Activity newHomeAct =    ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity() ;
+					Activity oldHomeAct = PopulationUtils.getFirstActivity( ((Plan) oldPerson.getSelectedPlan()) );
+					Activity newHomeAct =    PopulationUtils.getFirstActivity( ((Plan) newPerson.getSelectedPlan()) ) ;
 					if ( actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // act changed.  Accept new person:
 						newPop.addPerson(newPerson) ;
 						break ;
@@ -230,8 +231,8 @@ public class ReadFromUrbansimParcelModel {
 					}
 
 					// check if work act has changed:
-					ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
-					ActivityImpl newWorkAct = (ActivityImpl)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Activity oldWorkAct = (Activity) oldPerson.getSelectedPlan().getPlanElements().get(2) ;
+					Activity newWorkAct = (Activity)    newPerson.getSelectedPlan().getPlanElements().get(2) ;
 					if ( actHasChanged ( oldWorkAct, newWorkAct, network ) ) {
 						newPop.addPerson(newPerson) ;
 						break ;

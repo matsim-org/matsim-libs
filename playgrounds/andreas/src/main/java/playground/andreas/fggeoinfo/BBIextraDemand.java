@@ -9,14 +9,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -85,16 +84,16 @@ public class BBIextraDemand {
 				// create agents heading for BBI
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor; i++) {
 
-					Person person = PopulationUtils.createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.getFactory().createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = new PlanImpl();
-					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					Plan plan = PopulationUtils.createPlan();
+					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
-					plan.addLeg(new LegImpl(TransportMode.car));
+					plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
-					plan.addActivity(new ActivityImpl("leisure", this.coordBBI));
+					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordBBI));
 
 					person.addPlan(plan);
 
@@ -111,16 +110,16 @@ public class BBIextraDemand {
 				// create agents heading for TXL
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * demandBox.getShareTXL(); i++) {
 
-					Person person = PopulationUtils.createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.getFactory().createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = new PlanImpl();
-					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					Plan plan = PopulationUtils.createPlan();
+					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
-					plan.addLeg(new LegImpl(TransportMode.car));
+					plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
-					plan.addActivity(new ActivityImpl("leisure", this.coordTXL));
+					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordTXL));
 
 					person.addPlan(plan);
 
@@ -130,16 +129,16 @@ public class BBIextraDemand {
 				// create agents heading for SXF
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * (1 - demandBox.getShareTXL()); i++) {
 
-					Person person = PopulationUtils.createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.getFactory().createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
-					PlanImpl plan = new PlanImpl();
-					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
+					Plan plan = PopulationUtils.createPlan();
+					Activity act = PopulationUtils.createActivityFromCoord("home", demandBox.getCoord());
 					act.setEndTime(getStartTime() * 3600 + MatsimRandom.getRandom().nextDouble() * 3600);
 					plan.addActivity(act);
 
-					plan.addLeg(new LegImpl(TransportMode.car));
+					plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
-					plan.addActivity(new ActivityImpl("leisure", this.coordSXF));
+					plan.addActivity(PopulationUtils.createActivityFromCoord("leisure", this.coordSXF));
 
 					person.addPlan(plan);
 

@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -50,15 +49,15 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  * @author amit
  */
 
-public class PatnaNetworkGenerator {       
+public class PatnaNetworkFromTransCadDataGenerator {       
 
-	private static final Logger LOG = Logger.getLogger(PatnaNetworkGenerator.class);
+	private static final Logger LOG = Logger.getLogger(PatnaNetworkFromTransCadDataGenerator.class);
 	private Scenario scenario;
 
 	public static void main(String[] args) throws IOException  {  
-		PatnaNetworkGenerator png =  new PatnaNetworkGenerator();
+		PatnaNetworkFromTransCadDataGenerator png =  new PatnaNetworkFromTransCadDataGenerator();
 		png.startProcessingFile();
-		String outNetwork = "../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz";
+		String outNetwork = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/network_diff_linkSpeed.xml.gz";
 		new NetworkWriter(png.getPatnaNetwork()).write(outNetwork);
 		LOG.info("The network file is written to - "+ outNetwork);
 	}
@@ -67,7 +66,7 @@ public class PatnaNetworkGenerator {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
 
-		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/networkInputTransCad.csv" ;
+		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/network/networkInputTransCad.csv" ;
 
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();       
 		tabularFileParserConfig.setFileName(inputFileNetwork);
@@ -142,9 +141,10 @@ public class PatnaNetworkGenerator {
 				double linkLength = 1000 * Double.parseDouble(lengthInKm);
 				double capacity = getCapacityOfLink(widthOfRoad);
 
-				Set<String> allowedModes ;
-				if (capacity <= 500.0) allowedModes = new HashSet<>(Arrays.asList("car","bike","motorbike","car_ext","motorbike_ext","bike_ext")); 
-				else allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
+				Set<String> allowedModes ; //AA_TODO : fix this
+//				if (capacity <= 500.0) allowedModes = new HashSet<>(Arrays.asList("car","bike","motorbike","car_ext","motorbike_ext","bike_ext")); 
+//				else
+					allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
 				
 				link1.setFreespeed(freeSpeedInMPS);
 				link1.setCapacity(capacity);
@@ -166,15 +166,9 @@ public class PatnaNetworkGenerator {
 		tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
 		new NetworkCleaner().run(network);
 
-		LOG.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
+		LOG.info("Number of links in the network are "+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
 
 		NetworkSimplifier simplifier = new NetworkSimplifier();
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-
-		nodeTypesToMerge.add(Integer.valueOf(4));
-		nodeTypesToMerge.add(Integer.valueOf(5));
-
-		simplifier.setNodesToMerge(nodeTypesToMerge);
 		simplifier.run(network);
 
 		// manual cleaning (filtering) of the network.
@@ -204,8 +198,8 @@ public class PatnaNetworkGenerator {
 		Node oc4NearestNode = network.getNodes().get(Id.createNodeId("14653"));
 		Coord oc4NodeCoord = new Coord(oc4NearestNode.getCoord().getX() + 500, oc4NearestNode.getCoord().getY() + 500);
 		Node oc4Node = network.getFactory().createNode(Id.createNodeId("OC4_node"), oc4NodeCoord); network.addNode(oc4Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), oc4Node, oc4NearestNode, 500., 60., 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), oc4NearestNode, oc4Node, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), oc4Node, oc4NearestNode, 500., 60./3.6, 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), oc4NearestNode, oc4Node, 500., 60./3.6, 1500., 2);
 		network.getLinks().get(Id.createLinkId("OC4_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC4_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
@@ -214,8 +208,8 @@ public class PatnaNetworkGenerator {
 		Node oc2NearestNode = network.getNodes().get(Id.createNodeId("16224"));
 		Coord oc2NodeCoord = new Coord(oc2NearestNode.getCoord().getX() + 500, oc2NearestNode.getCoord().getY() - 500);
 		Node oc2Node = network.getFactory().createNode(Id.createNodeId("OC2_node"), oc2NodeCoord); network.addNode(oc2Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2NearestNode, 500., 60., 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2NearestNode, oc2Node, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2NearestNode, 500., 60./3.6, 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2NearestNode, oc2Node, 500., 60./3.6, 1500., 2);
 		network.getLinks().get(Id.createLinkId("OC2_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC2_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
@@ -223,8 +217,8 @@ public class PatnaNetworkGenerator {
 		Node oc5NearestNode = network.getNodes().get(Id.createNodeId("2426"));
 		Coord oc5NodeCoord = new Coord(oc5NearestNode.getCoord().getX() - 500, oc5NearestNode.getCoord().getY() + 100);
 		Node oc5Node = network.getFactory().createNode(Id.createNodeId("OC5_node"), oc5NodeCoord); network.addNode(oc5Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_in"), oc5Node, oc5NearestNode, 500., 60., 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_out"), oc5NearestNode, oc5Node, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_in"), oc5Node, oc5NearestNode, 500., 60./3.6, 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_out"), oc5NearestNode, oc5Node, 500., 60./3.6, 1500., 2);
 		network.getLinks().get(Id.createLinkId("OC5_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC5_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 	}
@@ -245,6 +239,16 @@ public class PatnaNetworkGenerator {
 		{//a major link, increase capacity from 300 to at least 1000.0
 			network.getLinks().get(Id.createLinkId("191610000-314110000")).setCapacity(1000.);
 			network.getLinks().get(Id.createLinkId("3141-1916")).setCapacity(1000.);
+		}
+		{//minimum of the links on either side 
+			network.getLinks().get(Id.createLinkId("1840910000")).setCapacity(1851.0);
+			network.getLinks().get(Id.createLinkId("18409")).setCapacity(1851.0);
+			
+			network.getLinks().get(Id.createLinkId("1820310000")).setCapacity(1851.0);
+			network.getLinks().get(Id.createLinkId("18203")).setCapacity(1851.0);
+			
+			network.getLinks().get(Id.createLinkId("18203")).setNumberOfLanes(2);
+			network.getLinks().get(Id.createLinkId("18203")).setNumberOfLanes(2);
 		}
 	}
 

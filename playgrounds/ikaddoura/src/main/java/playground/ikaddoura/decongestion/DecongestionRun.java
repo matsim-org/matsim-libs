@@ -61,7 +61,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/decongestion/output/";
+			outputBaseDirectory = "../../../runs-svn/decongestion/output_test/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -76,7 +76,8 @@ public class DecongestionRun {
 		Config config = ConfigUtils.loadConfig(configFile);	
 		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
 				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
-				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() + "/");
+				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
+				"tollBlendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + "/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);

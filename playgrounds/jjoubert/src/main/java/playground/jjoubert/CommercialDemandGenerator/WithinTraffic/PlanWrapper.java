@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -63,12 +63,12 @@ public class PlanWrapper {
 	 */
 	public static List<Plan> wrapPlan(Plan plan, String timeWindow) {
 		List<Plan> list = new ArrayList<Plan>();
-		PlanImpl tmpPlan = new PlanImpl();
-		tmpPlan.copyFrom(plan);
+		Plan tmpPlan = PopulationUtils.createPlan();
+		PopulationUtils.copyFromTo(plan, tmpPlan);
 		
 		int dayCount = 1;
 		
-		PlanImpl segment = new PlanImpl();
+		Plan segment = PopulationUtils.createPlan();
 		int index = 0;
 		while(index < tmpPlan.getPlanElements().size()){
 			PlanElement pe = tmpPlan.getPlanElements().get(index);
@@ -95,20 +95,20 @@ public class PlanWrapper {
 						 * activity type, though. */
 						if(act.getType().contains("minor")){
 							/* Split it up proportionally. */
-							Activity end = new ActivityImpl(act);
+							Activity end = PopulationUtils.createActivity(act);
 							end.setStartTime(end.getStartTime() - Time.MIDNIGHT*(dayCount-1));
 							end.setEndTime(Time.MIDNIGHT);
 							segment.addActivity(end);
 							
-							PlanImpl p = new PlanImpl();
-							p.copyFrom(segment);
+							Plan p = PopulationUtils.createPlan();
+							PopulationUtils.copyFromTo(segment, p);
 							list.add(p);
 												
 							/* Start a new segment. */
-							Activity start = new ActivityImpl(act);
+							Activity start = PopulationUtils.createActivity(act);
 							start.setStartTime(Time.parseTime("00:00:00"));
 							start.setEndTime(start.getEndTime() - Time.MIDNIGHT*(dayCount));
-							segment = new PlanImpl();
+							segment = PopulationUtils.createPlan();
 							segment.addActivity(start);
 							dayCount++;
 							index++;		
@@ -121,15 +121,15 @@ public class PlanWrapper {
 							act.setStartTime(act.getStartTime() - Time.MIDNIGHT*(dayCount-1));
 							act.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount-1));
 							segment.addActivity(act);
-							PlanImpl p = new PlanImpl();
-							p.copyFrom(segment);
+							Plan p = PopulationUtils.createPlan();
+							PopulationUtils.copyFromTo(segment, p);
 							list.add(p);	
 							
 							/* Start a new segment. */
-							Activity start = new ActivityImpl(act);
+							Activity start = PopulationUtils.createActivity(act);
 							start.setStartTime(Time.parseTime("00:00:00"));
 							start.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount));
-							segment = new PlanImpl();
+							segment = PopulationUtils.createPlan();
 							segment.addActivity(start);
 							dayCount++;
 							index++;
@@ -139,7 +139,8 @@ public class PlanWrapper {
 					/* The activity starts in a new day. Add a dummy activity
 					 * at midnight, the location being proportionally between 
 					 * the two activities. */
-					Activity previousActivity = tmpPlan.getPreviousActivity(tmpPlan.getPreviousLeg(act));
+					final Activity act1 = act;
+					Activity previousActivity = PopulationUtils.getPreviousActivity(tmpPlan, PopulationUtils.getPreviousLeg(tmpPlan, act1));
 					double chopFraction = (Time.MIDNIGHT*dayCount - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
 					double distance = CoordUtils.calcEuclideanDistance(act.getCoord(), previousActivity.getCoord()) * chopFraction;
 					double dy = act.getCoord().getY() - previousActivity.getCoord().getY();
@@ -147,22 +148,23 @@ public class PlanWrapper {
 					double angle = Math.atan(dy / dx);
 					Coord coord = new Coord(distance * Math.cos(angle), distance * Math.sin(angle));
 					
-					Activity chopEnd = new ActivityImpl("chopEnd", coord);
+					Activity chopEnd = PopulationUtils.createActivityFromCoord("chopEnd", coord);
 					chopEnd.setEndTime(Time.MIDNIGHT);
-					Activity chopStart = new ActivityImpl("chopStart", coord);
+					Activity chopStart = PopulationUtils.createActivityFromCoord("chopStart", coord);
 					chopStart.setEndTime(Time.parseTime("00:00:00"));
 					
 					/* Finish off the current segment. */
 					segment.addActivity(chopEnd);
-					PlanImpl p = new PlanImpl();
-					p.copyFrom(segment);
+					Plan p = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(segment, p);
 					list.add(p);
 										
 					/* Start a new segment. */
-					segment = new PlanImpl();
+					segment = PopulationUtils.createPlan();
 					segment.addActivity(chopStart);
-					segment.addLeg(tmpPlan.getPreviousLeg(act));
-					Activity firstRealActivity = new ActivityImpl(act);
+					final Activity act2 = act;
+					segment.addLeg(PopulationUtils.getPreviousLeg(tmpPlan, act2));
+					Activity firstRealActivity = PopulationUtils.createActivity(act);
 					firstRealActivity.setStartTime(act.getStartTime() - Time.MIDNIGHT*dayCount);
 					firstRealActivity.setEndTime(act.getEndTime() - Time.MIDNIGHT*dayCount);
 					segment.addActivity(act);

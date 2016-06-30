@@ -23,9 +23,9 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
@@ -54,7 +54,7 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 
 			DebugLib.traceAgent(personId);
 			
-			ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+			Activity nextAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(),

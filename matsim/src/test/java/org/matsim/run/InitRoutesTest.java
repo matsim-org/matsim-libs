@@ -26,7 +26,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -34,7 +37,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -63,13 +68,13 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		population.addPerson(person);
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", Id.create("1", Link.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", Id.create("1", Link.class));
 		a1.setEndTime(3600);
-		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", Id.create("20", Link.class));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", Id.create("20", Link.class));
 
 		// write person to file
 		new PopulationWriter(population, network).write(PLANS_FILE_TESTINPUT);
@@ -94,7 +99,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
-		LegImpl leg2 = (LegImpl) plan2.getPlanElements().get(1);
+		Leg leg2 = (Leg) plan2.getPlanElements().get(1);
 		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
 		assertNotNull("no route assigned.", route2);
 		assertEquals("wrong route", 2, route2.getLinkIds().size());

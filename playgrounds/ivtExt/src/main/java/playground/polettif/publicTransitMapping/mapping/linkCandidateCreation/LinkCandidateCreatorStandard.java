@@ -28,17 +28,21 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.*;
 
+/**
+ * @author polettif
+ */
 public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 
 	protected static Logger log = Logger.getLogger(LinkCandidateCreatorStandard.class);
 
-	private static final Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE+","+PublicTransitMappingConfigGroup.STOP_FACILITY_LOOP_LINK);
+	private static final Set<String> loopLinkModes = CollectionUtils.stringToSet(PublicTransitMappingStrings.ARTIFICIAL_LINK_MODE+","+ PublicTransitMappingStrings.STOP_FACILITY_LOOP_LINK);
 	private final Map<String, Router> modeSeparatedRouters;
 
 	private Map<String, PublicTransitMappingConfigGroup.LinkCandidateCreatorParams> lccParams;
@@ -47,7 +51,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	private final Network network;
 	private final PublicTransitMappingConfigGroup config;
 
-	private final Map<String, Map<TransitStopFacility, SortedSet<LinkCandidate>>> linkCandidates = new HashMap<>();
+	private final Map<String, Map<Id<TransitStopFacility>, SortedSet<LinkCandidate>>> linkCandidates = new HashMap<>();
 	private final Set<Tuple<TransitStopFacility, String>> loopLinks = new HashSet<>();
 
 	public LinkCandidateCreatorStandard(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config, Map<String, Router> modeSeparatedRouters) {
@@ -81,7 +85,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 					Router modeRouter = modeSeparatedRouters.get(scheduleTransportMode);
 					TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
 
-					SortedSet<LinkCandidate> modeLinkCandidates = MiscUtils.getSortedSet(stopFacility, MapUtils.getMap(scheduleTransportMode, linkCandidates));
+					SortedSet<LinkCandidate> modeLinkCandidates = MiscUtils.getSortedSet(stopFacility.getId(), MapUtils.getMap(scheduleTransportMode, linkCandidates));
 
 					// if no link candidates for the current stop and mode have been generated
 					if(modeLinkCandidates.size() == 0) {
@@ -138,16 +142,18 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 				scheduleModes = linkCandidates.keySet();
 			}
 
-			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
-			if(parentStopFacility == null) {
-				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
-			} else {
+			TransitStopFacility parentStopFacility = manualCandidates.getStopFacilityId() != null ? schedule.getFacilities().get(manualCandidates.getStopFacilityId()) : null;
+			if(parentStopFacility == null && manualCandidates.getStopFacilityId() != null) {
+				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are for this facility are ignored.");
+			}
+
+			if(parentStopFacility != null) {
 				for(String scheduleMode : scheduleModes) {
 					Router modeRouter = modeSeparatedRouters.get(scheduleMode);
 
 					PublicTransitMappingConfigGroup.LinkCandidateCreatorParams lccParams = config.getLinkCandidateCreatorParams().get(scheduleMode);
 
-					SortedSet<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new TreeSet<>() : MiscUtils.getSortedSet(parentStopFacility, MapUtils.getMap(scheduleMode, linkCandidates)));
+					SortedSet<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new TreeSet<>() : MiscUtils.getSortedSet(parentStopFacility.getId(), MapUtils.getMap(scheduleMode, linkCandidates)));
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if(link == null) {
@@ -162,7 +168,7 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 							lcSet.add(new LinkCandidateImpl(link, parentStopFacility, modeRouter.getLinkTravelCost(link)));
 						}
 					}
-					MapUtils.getMap(scheduleMode, linkCandidates).put(parentStopFacility, lcSet);
+					MapUtils.getMap(scheduleMode, linkCandidates).put(parentStopFacility.getId(), lcSet);
 				}
 			}
 		}
@@ -170,13 +176,8 @@ public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 	}
 
 	@Override
-	public SortedSet<LinkCandidate> getLinkCandidates(TransitStopFacility transitStopFacility, String scheduleTransportMode) {
+	public SortedSet<LinkCandidate> getLinkCandidates(Id<TransitStopFacility> transitStopFacility, String scheduleTransportMode) {
 		return linkCandidates.get(scheduleTransportMode).get(transitStopFacility);
-	}
-
-	@Override
-	public boolean stopFacilityOnlyHasLoopLink(TransitStopFacility stopFacility, String transportMode) {
-		return loopLinks.contains(new Tuple<>(stopFacility, transportMode));
 	}
 
 }

@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
@@ -106,8 +105,8 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.create( i , Person.class );
-			final Person person = PopulationUtils.createPerson(id);
-			final Plan plan = new PlanImpl( person );
+			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Plan plan = PopulationUtils.createPlan(person);
 			plans.add( plan );
 
 			if (random.nextDouble() < 0.2) {
@@ -136,8 +135,8 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.createPersonId( i );
-			final Person person = PopulationUtils.createPerson(id);
-			final Plan plan = new PlanImpl( person );
+			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Plan plan = PopulationUtils.createPlan(person);
 			jointPlan.put( id , plan );
 
 			if (random.nextDouble() < 0.2) {
@@ -168,8 +167,8 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.createPersonId( i );
-			final Person person = PopulationUtils.createPerson(id);
-			final Plan plan = new PlanImpl( person );
+			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Plan plan = PopulationUtils.createPlan(person);
 			if ( random.nextDouble() < 0.2 ) {
 				plans.add( plan );
 			}
@@ -215,8 +214,8 @@ public class RecomposeJointPlanAlgorithmTest {
 		Plan lastPlan = null;
 		for (int i=0; i < 100; i++) {
 			final Id<Person> id = Id.create( i , Person.class );
-			final Person person = PopulationUtils.createPerson(id);
-			final Plan plan = new PlanImpl( person );
+			final Person person = PopulationUtils.getFactory().createPerson(id);
+			final Plan plan = PopulationUtils.createPlan(person);
 			if ( random.nextDouble() < 0.2 ) {
 				plans.add( plan );
 			}

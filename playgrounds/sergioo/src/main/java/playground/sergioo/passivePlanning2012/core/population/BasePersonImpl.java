@@ -6,8 +6,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
@@ -23,7 +23,8 @@ public class BasePersonImpl implements BasePerson {
 	
 	//Constructors
 	public BasePersonImpl(Id<Person> id) {
-		delegate = PopulationUtils.createPerson(id) ;
+		final Id<Person> id1 = id;
+		delegate = PopulationUtils.getFactory().createPerson(id1) ;
 	}
 
 	//Static methods
@@ -34,7 +35,7 @@ public class BasePersonImpl implements BasePerson {
 		PersonUtils.setEmployed(newPerson, PersonUtils.isEmployed(person));
 		PersonUtils.setLicence(newPerson, PersonUtils.getLicense(person));
 		PersonUtils.setSex(newPerson, PersonUtils.getSex(person));
-		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+		Plan plan = (Plan) person.getSelectedPlan();
 		newPerson.addPlan(plan);
 		BasePlanImpl.createBasePlan(fixedTypes, types, newPerson, plan, tripRouter, facilities);
 		return newPerson;

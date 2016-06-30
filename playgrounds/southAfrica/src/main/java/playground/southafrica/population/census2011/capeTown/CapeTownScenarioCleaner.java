@@ -37,18 +37,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -246,8 +247,8 @@ public class CapeTownScenarioCleaner {
 		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).parse(folder + "personAttributes.xml.gz");
 		for(Id<Person> id : scPersons.getPopulation().getPersons().keySet()){
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
-			PlanImpl plan = new PlanImpl();
-			plan.copyFrom(scPersons.getPopulation().getPersons().get(id).getSelectedPlan());
+			Plan plan = PopulationUtils.createPlan();
+			PopulationUtils.copyFromTo(scPersons.getPopulation().getPersons().get(id).getSelectedPlan(), plan);
 			for(PlanElement pe : plan.getPlanElements()){
 				/* Check and add modes. */
 				if(pe instanceof Leg){
@@ -257,7 +258,7 @@ public class CapeTownScenarioCleaner {
 					}
 				} else if (pe instanceof Activity){
 					/* Transform the activity locations. */
-					ActivityImpl act = (ActivityImpl)pe;
+					Activity act = (Activity)pe;
 					Coord oldCoord = act.getCoord();
 					act.setCoord(ctPersons.transform(oldCoord));
 				}
@@ -283,8 +284,8 @@ public class CapeTownScenarioCleaner {
 		for(Id<Person> id : scCom.getPopulation().getPersons().keySet()){
 			String[] sa = id.toString().split("_");
 			Person person = pf.createPerson(Id.createPersonId("coct_c_" + sa[1]));
-			PlanImpl plan = new PlanImpl();
-			plan.copyFrom(scCom.getPopulation().getPersons().get(id).getSelectedPlan());
+			Plan plan = PopulationUtils.createPlan();
+			PopulationUtils.copyFromTo(scCom.getPopulation().getPersons().get(id).getSelectedPlan(), plan);
 			for(PlanElement pe : plan.getPlanElements()){
 				if(pe instanceof Leg){
 					/* Check and add modes. */
@@ -299,7 +300,7 @@ public class CapeTownScenarioCleaner {
 					
 					/* Update the coordinate. */
 					Coord oldCoord = act.getCoord();
-					((ActivityImpl)act).setCoord(ctFreight.transform(oldCoord));
+					((Activity)act).setCoord(ctFreight.transform(oldCoord));
 					
 					/* Since chopStart and chopEnd activities will not have 
 					 * facility IDs, they need to be ignored in the next 

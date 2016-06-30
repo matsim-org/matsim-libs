@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -45,7 +46,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -96,7 +97,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Id<Link> linkId = null;
 		
 		// test if zero delay results in zero activity delay disutility
-		ActivityImpl activity1 = new ActivityImpl("work", linkId);
+		Activity activity1 = PopulationUtils.createActivityFromLinkId("work", linkId);
 		activity1.setStartTime(10 * 3600.);
 		activity1.setEndTime(16 * 3600.);
 		double delay1 = 0 * 3600.;
@@ -104,7 +105,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
 
 		// test if a delay results in zero activity delay disutility if the agent would have arrived to late at the activity location anyway
-		ActivityImpl activity2 = new ActivityImpl("work", linkId);
+		Activity activity2 = PopulationUtils.createActivityFromLinkId("work", linkId);
 		activity2.setStartTime(19 * 3600.);
 		activity2.setEndTime(20 * 3600.);
 		double delay2 = 0.5 * 3600.;
@@ -112,7 +113,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility2, MatsimTestUtils.EPSILON);
 	
 		// test if a delay results in zero activity delay disutility if the agent would have arrived to early at the activity location anyway
-		ActivityImpl activity3 = new ActivityImpl("work", linkId);
+		Activity activity3 = PopulationUtils.createActivityFromLinkId("work", linkId);
 		activity3.setStartTime(4 * 3600.);
 		activity3.setEndTime(5 * 3600.);
 		double delay3 = 0.5 * 3600.;
@@ -120,7 +121,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility3, MatsimTestUtils.EPSILON);
 		
 		// test if a delay results in the right activity delay disutility if the agent would have had more time to perform the activity
-		ActivityImpl activity4 = new ActivityImpl("work", linkId);
+		Activity activity4 = PopulationUtils.createActivityFromLinkId("work", linkId);
 		activity4.setStartTime(10 * 3600.);
 		activity4.setEndTime(16 * 3600.);
 		double delay4 = 1 * 3600.;
@@ -158,9 +159,9 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		Id<Link> linkId = null;
 		
-		ActivityImpl activity1 = new ActivityImpl("overnightActivity", linkId);
+		Activity activity1 = PopulationUtils.createActivityFromLinkId("overnightActivity", linkId);
 		activity1.setEndTime(7 * 3600.);
-		ActivityImpl activity2 = new ActivityImpl("overnightActivity", linkId);
+		Activity activity2 = PopulationUtils.createActivityFromLinkId("overnightActivity", linkId);
 		activity2.setStartTime(18 * 3600.);
 		
 		// test if zero delay results in zero activity delay disutility
@@ -211,9 +212,9 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		Id<Link> linkId = null;
 		
-		ActivityImpl activity1 = new ActivityImpl("firstActivityType", linkId);
+		Activity activity1 = PopulationUtils.createActivityFromLinkId("firstActivityType", linkId);
 		activity1.setEndTime(7 * 3600.);
-		ActivityImpl activity2 = new ActivityImpl("lastActivityType", linkId);
+		Activity activity2 = PopulationUtils.createActivityFromLinkId("lastActivityType", linkId);
 		activity2.setStartTime(18 * 3600.);
 		
 		// test if zero delay results in zero activity delay disutility

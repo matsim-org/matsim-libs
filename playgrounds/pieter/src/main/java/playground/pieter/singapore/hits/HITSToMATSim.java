@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,7 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -672,8 +672,8 @@ public class HITSToMATSim {
 		List<?> actslegs = plan.getPlanElements();
 		int i = 0;
 		for (int j = 2; j < actslegs.size(); j = j + 2) {
-			ActivityImpl startAct = (ActivityImpl) actslegs.get(i);
-			ActivityImpl endAct = (ActivityImpl) actslegs.get(j);
+			Activity startAct = (Activity) actslegs.get(i);
+			Activity endAct = (Activity) actslegs.get(j);
 			Node startNode = links.get(startAct.getLinkId()).getToNode();
 			Node endNode = links.get(endAct.getLinkId()).getFromNode();
 			Path path = leastCostPathCalculator.calcLeastCostPath(startNode,

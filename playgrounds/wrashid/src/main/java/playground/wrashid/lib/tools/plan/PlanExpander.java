@@ -3,10 +3,10 @@ package playground.wrashid.lib.tools.plan;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import java.util.LinkedList;
@@ -47,7 +47,7 @@ public class PlanExpander {
 
 		for (int i = 0; i < populationExpansionFactor; i++) {
 			for (Person origPerson : originalAgents) {
-				PersonImpl originPersonImpl=(PersonImpl) origPerson;
+				Person originPersonImpl=(Person) origPerson;
 				//Desires originDesires = originPersonImpl.getDesires();
 				
 				Person newPerson = factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));

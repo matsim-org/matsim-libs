@@ -11,13 +11,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -34,7 +35,7 @@ class PlanFindLegDistances {
 	private final MutableScenario scenario;
 	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
 	private final NetworkImpl network;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactoriesRegister routeFactory;
 	private final DataBaseAdmin dba;
 	private final FastAStarLandmarks leastCostPathCalculator;
 
@@ -71,7 +72,7 @@ class PlanFindLegDistances {
 		leastCostPathCalculator = (FastAStarLandmarks) routerFactory.createPathCalculator(network, travelMinCost, timeFunction);
 		this.dba = dba;
 		routeFactory = ((PopulationFactoryImpl) scenario.getPopulation()
-				.getFactory()).getRouteFactory();
+				.getFactory()).getRouteFactoriesRegister();
 	}
 
 	public double getShortestPathDistance(Coord startCoord, Coord endCoord) {
@@ -124,15 +125,15 @@ class PlanFindLegDistances {
 			
 			if (pax.getPlans().size() == 0)
 				continue;
-			PlanImpl plan = (PlanImpl) pax.getPlans().get(0);
+			Plan plan = (Plan) pax.getPlans().get(0);
 //			new TransitActsRemover().run(plan);
 			for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
-				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
-				if (act.equals(plan.getLastActivity()))
+				Activity act = (Activity) plan.getPlanElements().get(i);
+				if (act.equals(PopulationUtils.getLastActivity(plan)))
 					break;
-				LegImpl leg =  (LegImpl) plan.getPlanElements()
+				Leg leg =  (Leg) plan.getPlanElements()
 						.get(i + 1);
-				ActivityImpl nextact = (ActivityImpl) plan.getPlanElements()
+				Activity nextact = (Activity) plan.getPlanElements()
 						.get(i + 2);
 				Coord startCoord = facilities.get(act.getFacilityId())
 						.getCoord();

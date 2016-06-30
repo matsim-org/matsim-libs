@@ -19,19 +19,16 @@
 
 package playground.michalm.taxi.optimizer;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
-
-import com.google.common.base.Function;
 
 import playground.michalm.ev.data.Charger;
 
 
 public class BestEDispatchFinder
 {
-    private static final Function<Charger, Link> CHARGER_TO_LINK = (charger) -> charger.getLink();
+    private static final LinkProvider<Charger> CHARGER_TO_LINK = (charger) -> charger.getLink();
 
     private final BestDispatchFinder dispatchFinder;
 
