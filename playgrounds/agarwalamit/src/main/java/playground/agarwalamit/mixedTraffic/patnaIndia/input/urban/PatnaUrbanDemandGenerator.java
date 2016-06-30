@@ -82,9 +82,9 @@ public class PatnaUrbanDemandGenerator {
 	public void startProcessing() {
 		this.features = readZoneFilesAndReturnFeatures();
 
-		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt"; //Urban_PlanFile.CSV; // urban plans for all zones except 27 to 42.
+		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt"; //Urban_PlanFile.CSV; // urban plans for all zones except 27 to 42.
 		//		String planFile2 = PatnaUtils.INPUT_FILES_DIR+"/27TO42zones.CSV";// urban plans for zones 27 to 42
-		String planFile3 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";//"/Slum_PlanFile.CSV";	
+		String planFile3 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";//"/Slum_PlanFile.CSV";	
 
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
