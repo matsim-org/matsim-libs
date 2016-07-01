@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -97,7 +98,8 @@ public class PathSetGenerator {
 		double linkDensity = 0.0;
 		double nodeDensity = 0.0;
 		for (Node n : network.getNodes().values()) {
-			linkDensity += ((NodeImpl) n).getIncidentLinks().size();
+			NodeImpl r = ((NodeImpl) n);
+			linkDensity += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks2( r )).size();
 			nodeDensity += ((NodeImpl) n).getIncidentNodes().size();
 		}
 		linkDensity /= network.getNodes().size();
@@ -114,7 +116,8 @@ public class PathSetGenerator {
 		linkDensity = 0.0;
 		nodeDensity = 0.0;
 		for (Id<Node> nid : nodeIds) {
-			linkDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentLinks().size();
+			NodeImpl r = ((NodeImpl) this.network.getNodes().get(nid));
+			linkDensity += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks2( r )).size();
 			nodeDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentNodes().size();
 		}
 		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
@@ -381,10 +384,10 @@ public class PathSetGenerator {
 			}
 			else {
 				nofNonePassNodesLCP++;
-				avLinkDensityPerNonePassNodeLCP += n.getIncidentLinks().size();
+				avLinkDensityPerNonePassNodeLCP += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks2( n )).size();
 				avIncidentNodeDensityPerNonePassNodeLCP += n.getIncidentNodes().size();
 			}
-			avLinkDensityPerNodeLCP += n.getIncidentLinks().size();
+			avLinkDensityPerNodeLCP += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks2( n )).size();
 			avIncidentNodeDensityPerNodeLCP += n.getIncidentNodes().size();
 		}
 		avLinkDensityPerNodeLCP /= leastCostPath.nodes.size();

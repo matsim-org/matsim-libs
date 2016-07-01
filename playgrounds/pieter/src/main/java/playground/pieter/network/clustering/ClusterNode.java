@@ -65,7 +65,7 @@ public class ClusterNode implements Node {
 	}
 
 	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
-		return node.getIncidentLinks();
+		return NetworkUtils.getIncidentLinks2( node );
 	}
 
 	public final Map<Id<Node>, ? extends Node> getInNodes() {

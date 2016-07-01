@@ -151,12 +151,6 @@ public class NodeImpl implements Node {
 		return this.type;
 	}
 
-	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
-		Map<Id<Link>, Link> links = new TreeMap<>(getInLinks());
-		links.putAll(getOutLinks());
-		return links;
-	}
-
 	public final Map<Id<Node>, ? extends Node> getInNodes() {
 		Map<Id<Node>, Node> nodes = new TreeMap<>();
 		for (Link link : getInLinks().values()) {

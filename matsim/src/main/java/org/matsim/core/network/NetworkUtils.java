@@ -525,4 +525,21 @@ public class NetworkUtils {
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
 		return new Coord(x, y);
 	}
+
+
+	public static Map<Id<Node>, ? extends Node> getOutNodes2(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
+		for (Link link : node.getOutLinks().values()) {
+			Node outNode = link.getToNode();
+			nodes.put(outNode.getId(), outNode);
+		}
+		return nodes;
+	}
+
+
+	public static Map<Id<Link>, ? extends Link> getIncidentLinks2(Node node) {
+		Map<Id<Link>, Link> links = new TreeMap<>(node.getInLinks());
+		links.putAll(node.getOutLinks());
+		return links;
+	}
 }
