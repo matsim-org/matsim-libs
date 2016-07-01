@@ -39,11 +39,11 @@ import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.Li
 public interface Router extends TravelDisutility, TravelTime {
 
     /**
-     * @param fromNode  Node to route from...
-     * @param toNode    Node to route to...
+     * @param fromLinkCandidate  Node to route from...
+     * @param toLinkCandidate    Node to route to...
      * @return  Least cost path.
      */
-    LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode);
+    LeastCostPathCalculator.Path calcLeastCostPath(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate);
 
     Network getNetwork();
 
@@ -68,4 +68,6 @@ public interface Router extends TravelDisutility, TravelTime {
 	 * the link length.
 	 */
 	double getArtificialLinkLength(double maxAllowedTravelCost, LinkCandidate linkCandidateCurrent, LinkCandidate linkCandidateNext);
+
+	LeastCostPathCalculator.Path calcLeastCostPath(Node toNode, Node fromNode);
 }
