@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 
-public class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
+public final class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 
 	private final double write_person_fraction;
 

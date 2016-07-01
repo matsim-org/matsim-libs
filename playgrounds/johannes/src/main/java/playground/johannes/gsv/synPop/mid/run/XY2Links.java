@@ -26,9 +26,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 

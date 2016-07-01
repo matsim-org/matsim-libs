@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -209,7 +210,7 @@ public class PopulationGenerator {
 		/*
 		 * Write the population (of 1 Person) to a file.
 		 */
-		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
+		MatsimWriter popWriter = new PopulationWriter(population, network);
 		popWriter.write("H:\\Mike Work\\input\\population-2junctions.xml");
 
 	}

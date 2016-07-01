@@ -1,22 +1,23 @@
 package playground.boescpa.ivtBaseline.preparation;
 
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.HOME;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.REMOTE_HOME;
+
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
-
-import java.util.List;
-import java.util.Random;
-
-import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 
 /**
  * Repairs incomplete and / or broken activity chains.

@@ -119,8 +119,8 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
-			new org.matsim.core.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
-			new org.matsim.core.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
+			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
+			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 0 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
@@ -141,8 +141,8 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 			
-			new org.matsim.core.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
-			new org.matsim.core.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
+			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
+			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 10 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));

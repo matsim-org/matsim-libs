@@ -21,17 +21,26 @@
 
 package playground.boescpa.ivtBaseline.preparation;
 
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.FACILITIES;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.HOUSEHOLDS;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.NETWORK;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.POPULATION;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.POPULATION_ATTRIBUTES;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.SCHEDULE;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.VEHICLES;
+
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -43,10 +52,6 @@ import org.matsim.households.Income;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
-
-import java.io.File;
-
-import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 
 /**
  * Provides the functionality to anonymize a scenario before publication.

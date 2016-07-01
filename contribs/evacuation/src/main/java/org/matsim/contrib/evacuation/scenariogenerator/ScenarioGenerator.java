@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.evacuation.scenariogenerator;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
@@ -51,13 +51,19 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.utils.gis.matsim2esri.network.*;
+import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
+import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import java.io.File;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Evacuation scenario generator workflow: GIS Metaformat --> ScenarioGenertor -->

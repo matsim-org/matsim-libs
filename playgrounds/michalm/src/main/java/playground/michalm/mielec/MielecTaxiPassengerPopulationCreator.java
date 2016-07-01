@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.util.CSVReaders;
 import org.matsim.core.config.*;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 

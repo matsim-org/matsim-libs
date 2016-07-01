@@ -19,19 +19,31 @@
 
 package herbie.creation;
 
+import java.io.File;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,12 +52,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 import utils.BuildTrees;
-
-import java.io.File;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.Vector;
 
 public class CreateNewZHScenario {
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);

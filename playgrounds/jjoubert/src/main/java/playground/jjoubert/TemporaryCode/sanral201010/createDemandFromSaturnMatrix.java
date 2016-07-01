@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.utils.io.IOUtils;
 

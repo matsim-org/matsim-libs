@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -27,9 +30,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -39,9 +42,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.MatsimFacilitiesReader;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * @author thibautd

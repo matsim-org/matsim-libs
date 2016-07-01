@@ -7,13 +7,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.PopulationWriter;
 
 class PlansExtractSingleMode {
 
 	public void run(Scenario s, String fileName) {
 		StreamingPopulation plans = (StreamingPopulation) s.getPopulation();
 		plans.setIsStreaming(true);
-		org.matsim.core.population.PopulationWriter pw = new org.matsim.core.population.PopulationWriter(plans, s.getNetwork());
+		PopulationWriter pw = new PopulationWriter(plans, s.getNetwork());
 		pw.startStreaming(fileName);
 		System.out.println("    running " + this.getClass().getName()
 				+ " algorithm...");

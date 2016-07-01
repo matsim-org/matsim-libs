@@ -42,9 +42,18 @@ public class PopulationWriter implements MatsimWriter {
 		this.population = population;
 		this.network = network;
 	}
-
+	public PopulationWriter(
+			final CoordinateTransformation transformation,
+			Population population) {
+		// w/o network works for V5
+		this( transformation, population, null ) ;
+	}
 	public PopulationWriter(Population population, Network network) {
 		this( new IdentityTransformation() , population , network );
+	}
+	public PopulationWriter(Population population) {
+		// w/o network works for V5
+		this( new IdentityTransformation() , population , null );
 	}
 
 	/**
@@ -52,7 +61,7 @@ public class PopulationWriter implements MatsimWriter {
 	 */
 	@Override
 	public void write(final String filename) {
-		writeV5(filename);
+		new org.matsim.api.core.v01.population.PopulationWriter(transformation , this.population, this.network).write(filename);
 	}
 
 	/**
@@ -61,7 +70,7 @@ public class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new org.matsim.core.population.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
+		new org.matsim.api.core.v01.population.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
 	}
 
 	/**
@@ -70,7 +79,7 @@ public class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV5(final String filename) {
-		new org.matsim.core.population.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
+		new org.matsim.api.core.v01.population.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
 	}
 
 }

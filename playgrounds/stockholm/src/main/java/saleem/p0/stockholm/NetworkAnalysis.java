@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
@@ -193,7 +194,7 @@ public class NetworkAnalysis {
 		System.out.println("Average Distance Travelled: " + avgdistancetravelled/totalagents);
 		System.out.println("Average Trip Duration: " + avgtripduration/totalagents);
 		System.out.println("Total Agents: " + totalagents);
-		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
+		MatsimWriter popWriter = new PopulationWriter(population, network);
 		popWriter.write("./ihop2/matsim-input/relevantpopulation.xml");
 
 	}

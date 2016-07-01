@@ -1,5 +1,8 @@
 package org.matsim.core.population;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -21,9 +24,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author thibautd
