@@ -542,4 +542,14 @@ public class NetworkUtils {
 		links.putAll(node.getOutLinks());
 		return links;
 	}
+
+
+	public static Map<Id<Node>, ? extends Node> getInNodes2(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
+		for (Link link : node.getInLinks().values()) {
+			Node inNode = link.getFromNode();
+			nodes.put(inNode.getId(), inNode);
+		}
+		return nodes;
+	}
 }

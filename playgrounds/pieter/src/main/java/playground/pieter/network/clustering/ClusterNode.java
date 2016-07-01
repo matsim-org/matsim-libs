@@ -69,7 +69,7 @@ public class ClusterNode implements Node {
 	}
 
 	public final Map<Id<Node>, ? extends Node> getInNodes() {
-		return node.getInNodes();
+		return NetworkUtils.getInNodes2(node);
 	}
 
 	public final Map<Id<Node>, ? extends Node> getOutNodes() {

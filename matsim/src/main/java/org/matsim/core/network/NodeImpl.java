@@ -151,27 +151,9 @@ public class NodeImpl implements Node {
 		return this.type;
 	}
 
-	public final Map<Id<Node>, ? extends Node> getInNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>();
-		for (Link link : getInLinks().values()) {
-			Node node = link.getFromNode();
-			nodes.put(node.getId(), node);
-		}
-		return nodes;
-	}
-
-	public final Map<Id<Node>, ? extends Node> getOutNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>();
-		for (Link link : getOutLinks().values()) {
-			Node node = link.getToNode();
-			nodes.put(node.getId(), node);
-		}
-		return nodes;
-	}
-
 	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes());
-		nodes.putAll(getOutNodes());
+		Map<Id<Node>, Node> nodes = new TreeMap<>(NetworkUtils.getInNodes2(this));
+		nodes.putAll(NetworkUtils.getOutNodes2(this));
 		return nodes;
 	}
 

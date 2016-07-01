@@ -92,7 +92,8 @@ public class NetworkAddEmmeManeuverRestrictions {
 				Node fn = network.getNodes().get(fnid);
 				Node tn = network.getNodes().get(tnid);
 				if ((n != null) && (fn != null) && (tn != null)) {
-					if (((NodeImpl) n).getInNodes().containsKey(fn.getId()) && (((NodeImpl) n).getOutNodes().containsKey(tn.getId()))) {
+					NodeImpl r = ((NodeImpl) n);
+					if (((Map<Id<Node>, ? extends Node>) NetworkUtils.getInNodes2(r)).containsKey(fn.getId()) && (((Map<Id<Node>, ? extends Node>) NetworkUtils.getOutNodes2(((NodeImpl) n))).containsKey(tn.getId()))) {
 						ArrayList<TurnInfo> mns = illegalManeuvers.get(n.getId());
 						if (mns == null) {
 							mns = new ArrayList<TurnInfo>();
