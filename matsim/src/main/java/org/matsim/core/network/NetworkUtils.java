@@ -202,10 +202,6 @@ public class NetworkUtils {
 		return links;
 	}
 
-	/**
-	 * @param list of links
-	 * @return list of link IDs
-	 */
 	public static List<Id<Link>> getLinkIds(final List<Link> links) {
 		List<Id<Link>> linkIds = new ArrayList<>();
 		if (links != null) {
@@ -229,12 +225,6 @@ public class NetworkUtils {
 		} else {
 			return numberOfLanes;
 		}
-	}
-
-	public static Map<Id<Link>, Link> getIncidentLinks(final Node n) {
-		Map<Id<Link>, Link> links = new TreeMap<>(n.getInLinks());
-		links.putAll(n.getOutLinks());
-		return links;
 	}
 
 	public static boolean isMultimodal(final Network network) {
@@ -527,7 +517,7 @@ public class NetworkUtils {
 	}
 
 
-	public static Map<Id<Node>, ? extends Node> getOutNodes2(Node node) {
+	public static Map<Id<Node>, ? extends Node> getOutNodes(Node node) {
 		Map<Id<Node>, Node> nodes = new TreeMap<>();
 		for (Link link : node.getOutLinks().values()) {
 			Node outNode = link.getToNode();
@@ -537,14 +527,14 @@ public class NetworkUtils {
 	}
 
 
-	public static Map<Id<Link>, ? extends Link> getIncidentLinks2(Node node) {
+	public static Map<Id<Link>, ? extends Link> getIncidentLinks(Node node) {
 		Map<Id<Link>, Link> links = new TreeMap<>(node.getInLinks());
 		links.putAll(node.getOutLinks());
 		return links;
 	}
 
 
-	public static Map<Id<Node>, ? extends Node> getInNodes2(Node node) {
+	public static Map<Id<Node>, ? extends Node> getInNodes(Node node) {
 		Map<Id<Node>, Node> nodes = new TreeMap<>();
 		for (Link link : node.getInLinks().values()) {
 			Node inNode = link.getFromNode();
@@ -555,8 +545,51 @@ public class NetworkUtils {
 
 
 	public static Map<Id<Node>, ? extends Node> getIncidentNodes2(Node node) {
-		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes2(node));
-		nodes.putAll(getOutNodes2(node));
+		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes(node));
+		nodes.putAll(getOutNodes(node));
 		return nodes;
+	}
+
+
+	public static NodeImpl createNode(Id<Node> id) {
+		return new NodeImpl(id);
+	}
+
+
+	public static NodeImpl createNode(Id<Node> id, Coord coord, String type) {
+		return new NodeImpl(id, coord, type);
+	}
+
+
+	public static NodeImpl createNode(Id<Node> id, Coord coord) {
+		return new NodeImpl(id, coord);
+	}
+
+
+	public static void setOrigId( final Node node, final String id ) {
+		if ( node instanceof NodeImpl ) {
+			NodeImpl r = ((NodeImpl)node);
+			NetworkUtils.setOrigId( r, id ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
+
+
+	public static void setType(Node node, final String type) {
+		if ( node instanceof NodeImpl ) {
+			((NodeImpl)node).setType( type ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
+
+
+	public static String getOrigId( Node node ) {
+		if ( node instanceof NodeImpl ) {
+			return ((NodeImpl) node).getOrigId() ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
 	}
 }

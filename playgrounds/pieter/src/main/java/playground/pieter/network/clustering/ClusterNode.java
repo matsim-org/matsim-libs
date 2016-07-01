@@ -22,11 +22,13 @@ public class ClusterNode implements Node {
 	}
 
 	public final void setOrigId(String id) {
-		node.setOrigId(id);
+		final String id1 = id;
+		NetworkUtils.setOrigId( node, id1 ) ;
 	}
 
 	public final void setType(String type) {
-		node.setType(type);
+		final String type1 = type;
+		NetworkUtils.setType(node,type1);
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class ClusterNode implements Node {
 	}
 
 	public final String getOrigId() {
-		return node.getOrigId();
+		return NetworkUtils.getOrigId( node ) ;
 	}
 
 	public final String getType() {
@@ -68,15 +70,15 @@ public class ClusterNode implements Node {
 	}
 
 	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
-		return NetworkUtils.getIncidentLinks2( node );
+		return NetworkUtils.getIncidentLinks( node );
 	}
 
 	public final Map<Id<Node>, ? extends Node> getInNodes() {
-		return NetworkUtils.getInNodes2(node);
+		return NetworkUtils.getInNodes(node);
 	}
 
 	public final Map<Id<Node>, ? extends Node> getOutNodes() {
-		return node.getOutNodes();
+		return NetworkUtils.getOutNodes(node);
 	}
 
 	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {

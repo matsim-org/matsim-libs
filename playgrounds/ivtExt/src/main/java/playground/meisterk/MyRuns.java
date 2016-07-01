@@ -35,6 +35,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.StreamingPopulation;
@@ -147,13 +148,13 @@ public class MyRuns {
 
 		NodeImpl node = null;
 
-		node = new NodeImpl(Id.create(1, Node.class));
+		node = NetworkUtils.createNode(Id.create(1, Node.class));
 		final double x = -824635.0;
 		final double y = -799519.0;
 		node.setCoord(new Coord(x, y));
 		network.addNode(node);
 
-		node = new NodeImpl(Id.create(2, Node.class));
+		node = NetworkUtils.createNode(Id.create(2, Node.class));
 		node.setCoord(new Coord(2732681.5, 2625289.25));
 		network.addNode(node);
 

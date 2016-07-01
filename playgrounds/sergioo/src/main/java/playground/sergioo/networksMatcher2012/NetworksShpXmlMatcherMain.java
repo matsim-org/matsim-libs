@@ -110,10 +110,13 @@ public class NetworksShpXmlMatcherMain {
 					if(nodes[n]==null) {
 						nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 						nodeLongId++;
-						if(n==0)
-							((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("INODE").toString());
-						else if(n==nodes.length-1)
-							((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("JNODE").toString());
+						if(n==0) {
+							NodeImpl r = ((NodeImpl)nodes[n]);
+							NetworkUtils.setOrigId( r, (String) feature.getAttribute("INODE").toString() ) ;
+						} else if(n==nodes.length-1) {
+							NodeImpl r1 = ((NodeImpl)nodes[n]);
+							NetworkUtils.setOrigId( r1, (String) feature.getAttribute("JNODE").toString() ) ;
+						}
 					}
 				}
 				for(int n=0; n<nodes.length-1; n++) {

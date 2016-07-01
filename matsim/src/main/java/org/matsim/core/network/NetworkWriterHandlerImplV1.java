@@ -121,8 +121,8 @@ import org.matsim.core.utils.misc.Time;
 			if (node2.getType() != null) {
 				out.write(" type=\"" + node2.getType() + "\"");
 			}
-			if (node2.getOrigId() != null) {
-				out.write(" origid=\"" + node2.getOrigId() + "\"");
+			if (NetworkUtils.getOrigId( node2 ) != null) {
+				out.write(" origid=\"" + NetworkUtils.getOrigId( node2 ) + "\"");
 			}
 		}
 		out.write(" />\n");

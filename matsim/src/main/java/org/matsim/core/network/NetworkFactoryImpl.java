@@ -50,7 +50,7 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	@Override
 	public NodeImpl createNode(final Id<Node> id, final Coord coord) {
-		NodeImpl node = new NodeImpl(id);
+		NodeImpl node = NetworkUtils.createNode(id);
 		node.setCoord(coord) ;
 		return node ;
 	}

@@ -58,33 +58,21 @@ public class NodeImpl implements Node {
 		this(id, coord, null);
 	}
 
-	protected NodeImpl(final Id<Node> id, final Coord coord, final String type) {
+	/* package */NodeImpl(final Id<Node> id, final Coord coord, final String type) {
 		this(id);
 		this.coord = coord;
+		NetworkUtils.setType(this,type);
+	}
+
+	/* package */NodeImpl(Id<Node> id) {
+		this.id = id ;
+		this.coord = null ;
+	}
+	
+	/* package */ void  setType( final String type ) {
 		this.type = type == null ? null : type.intern();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// interface methods
-	//////////////////////////////////////////////////////////////////////
-
-	public NodeImpl(Id<Node> id) {
-		this.id = id;
-		this.coord = null;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add / set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setOrigId(final String id) {
-		this.origid = id;
-	}
-
-	public final void setType(final String type) {
-		this.type = type == null ? null : type.intern();
-	}
-
+	}	
+	
 	private static int cnt2 = 0 ;
 	@Override
 	public final boolean addInLink(Link inlink) {
@@ -139,10 +127,10 @@ public class NodeImpl implements Node {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final String getOrigId() {
-		return this.origid;
+	/*package*/ String getOrigId() {
+		return this.origid ;
 	}
-
+	
 	public final String getType() {
 		return this.type;
 	}
