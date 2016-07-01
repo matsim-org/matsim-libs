@@ -552,4 +552,11 @@ public class NetworkUtils {
 		}
 		return nodes;
 	}
+
+
+	public static Map<Id<Node>, ? extends Node> getIncidentNodes2(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes2(node));
+		nodes.putAll(getOutNodes2(node));
+		return nodes;
+	}
 }

@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class NodeImpl implements Node {
 
@@ -149,12 +148,6 @@ public class NodeImpl implements Node {
 
 	public final String getType() {
 		return this.type;
-	}
-
-	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>(NetworkUtils.getInNodes2(this));
-		nodes.putAll(NetworkUtils.getOutNodes2(this));
-		return nodes;
 	}
 
 	@Override
