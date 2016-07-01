@@ -592,4 +592,14 @@ public class NetworkUtils {
 			throw new RuntimeException("wrong implementation of interface Node to do this") ;
 		}
 	}
+
+
+	public static String getType( Node node ) {
+		if ( node instanceof NodeImpl ) {
+			NodeImpl r = ((NodeImpl) node);
+			return NetworkUtils.getType( r ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
 }

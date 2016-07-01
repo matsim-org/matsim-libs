@@ -118,8 +118,8 @@ import org.matsim.core.utils.misc.Time;
 		out.write(" y=\"" + coord.getY() + "\"");
 		if (node instanceof NodeImpl) {
 			NodeImpl node2 = (NodeImpl) node;
-			if (node2.getType() != null) {
-				out.write(" type=\"" + node2.getType() + "\"");
+			if (NetworkUtils.getType( node2 ) != null) {
+				out.write(" type=\"" + NetworkUtils.getType( node2 ) + "\"");
 			}
 			if (NetworkUtils.getOrigId( node2 ) != null) {
 				out.write(" origid=\"" + NetworkUtils.getOrigId( node2 ) + "\"");

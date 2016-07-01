@@ -808,8 +808,8 @@ public class Emme2MatsimConverter {
 		ArrayList<Id> nodesToRemove = new ArrayList<Id>();
 		for (Node n : network.getNodes().values()){
 			NodeImpl N = (NodeImpl) n;
-			if (N.getType() == null) continue;
-			if (N.getType().equals("Zone")) nodesToRemove.add(N.getId());
+			if (NetworkUtils.getType( N ) == null) continue;
+			if (NetworkUtils.getType( N ).equals("Zone")) nodesToRemove.add(N.getId());
 		}
 		
 		for (Id i : nodesToRemove) network.removeNode(i);

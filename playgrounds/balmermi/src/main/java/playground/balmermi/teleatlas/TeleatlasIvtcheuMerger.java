@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
@@ -119,7 +120,8 @@ public class TeleatlasIvtcheuMerger {
 		int nodeMapCnt = 0;
 		for (Node n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
-				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),((NodeImpl) n).getType());
+				NodeImpl r = ((NodeImpl) n);
+				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),NetworkUtils.getType( r ));
 			}
 			else { nodeMapCnt++; }
 		}

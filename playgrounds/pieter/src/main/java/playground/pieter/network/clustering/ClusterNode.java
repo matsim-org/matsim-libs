@@ -66,7 +66,7 @@ public class ClusterNode implements Node {
 	}
 
 	public final String getType() {
-		return node.getType();
+		return NetworkUtils.getType( node ) ;
 	}
 
 	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {

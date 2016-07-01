@@ -131,8 +131,13 @@ public class NodeImpl implements Node {
 		return this.origid ;
 	}
 	
-	public final String getType() {
-		return this.type;
+	public static String getType( Node node ) {
+		if ( node instanceof NodeImpl ) {
+			NodeImpl r = ((NodeImpl) node);
+			return NodeImpl.getType( r ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
 	}
 
 	@Override
