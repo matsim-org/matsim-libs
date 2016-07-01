@@ -131,15 +131,10 @@ public class NodeImpl implements Node {
 		return this.origid ;
 	}
 	
-	public static String getType( Node node ) {
-		if ( node instanceof NodeImpl ) {
-			NodeImpl r = ((NodeImpl) node);
-			return NodeImpl.getType( r ) ;
-		} else {
-			throw new RuntimeException("wrong implementation of interface Node to do this") ;
-		}
+	/*package*/ String getType() {
+		return this.type ;
 	}
-
+	
 	@Override
 	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return this.inlinks;
