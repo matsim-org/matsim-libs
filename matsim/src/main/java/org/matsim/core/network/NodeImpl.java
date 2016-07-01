@@ -125,17 +125,14 @@ public class NodeImpl implements Node {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	// normally, the removed object should be passed back (like in other utils) balmermi
-	// the new collections convention seems to be that the return type is boolean, and "true" is returned when
-	// the collection is modified, and "false" else.  kai, dec06
-	public final void removeInLink(final Link inlink) {
-		this.inlinks.remove(inlink.getId());
+	@Override
+	public final Link removeInLink( final Id<Link> linkId ) {
+		return this.inlinks.remove(linkId) ;
 	}
 
-	// normally, the removed object should be passed back (like in other utils) balmermi
-	// see above (removeInLink).  kai, dec06
-	public final void removeOutLink(final Link outlink) {
-		this.outlinks.remove(outlink.getId());
+	@Override
+	public Link removeOutLink(final Id<Link> outLinkId) {
+		return this.outlinks.remove(outLinkId);
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -117,6 +117,18 @@ public final class TransitRouterNetworkWW implements Network {
 		public TransitLine getLine() {
 			return line;
 		}
+
+		@Override
+		public Link removeInLink(Id<Link> linkId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Link removeOutLink(Id<Link> outLinkId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 
 	/**

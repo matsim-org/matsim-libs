@@ -249,8 +249,11 @@ public class PathSetGenerator {
 	}
 
 	private void removeLinkFromNetwork(Link link) {
-		((NodeImpl) link.getFromNode()).removeOutLink(link);
-		((NodeImpl) link.getToNode()).removeInLink(link);
+		final Link outlink = link;
+		final Id<Link> outLinkId = outlink.getId();
+		((NodeImpl) link.getFromNode()).removeOutLink(outLinkId);
+		final Link inlink = link;
+		((NodeImpl) link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private final boolean containsPath(Set<Path> paths, Path path) {

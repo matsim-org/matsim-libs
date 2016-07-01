@@ -72,4 +72,16 @@ public class FakeNode implements Node {
 		return this.id;
 	}
 
+	@Override
+	public Link removeInLink(Id<Link> linkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Link removeOutLink(Id<Link> outLinkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 }

@@ -49,11 +49,14 @@ public class ClusterNode implements Node {
 	}
 
 	public final void removeInLink(Link inlink) {
-		node.removeInLink(inlink);
+		final Link inlink1 = inlink;
+		node.removeInLink(inlink1.getId());
 	}
 
 	public final void removeOutLink(Link outlink) {
-		node.removeOutLink(outlink);
+		final Link outlink1 = outlink;
+		final Id<Link> outLinkId = outlink1.getId();
+		node.removeOutLink(outLinkId);
 	}
 
 	public final String getOrigId() {
@@ -112,6 +115,20 @@ public class ClusterNode implements Node {
 	 */
 	public void setNewRoot(NodeCluster root){
 
+	}
+
+
+	@Override
+	public Link removeInLink(Id<Link> linkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+
+	@Override
+	public Link removeOutLink(Id<Link> outLinkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 
