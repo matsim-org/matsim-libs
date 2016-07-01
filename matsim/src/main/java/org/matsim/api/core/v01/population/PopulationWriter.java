@@ -28,7 +28,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 /**
  * @author nagel
  */
-public class PopulationWriter implements MatsimWriter {
+public final class PopulationWriter implements MatsimWriter {
 
 	private final CoordinateTransformation transformation;
 	private final Population population;
