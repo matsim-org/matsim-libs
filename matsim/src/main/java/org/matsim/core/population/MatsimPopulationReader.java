@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 
 /**
- * A reader for plans-files of MATSim. This reader recognizes the format of the plans-file and uses
+ * A population reader that reads the MATSim format. This reader recognizes the format of the plans-file and uses
  * the correct reader for the specific plans-version, without manual setting.
  *
  * @author mrieser
