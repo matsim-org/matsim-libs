@@ -101,7 +101,7 @@ public class PathSetGenerator {
 			NodeImpl r = ((NodeImpl) n);
 			linkDensity += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( r )).size();
 			NodeImpl r1 = ((NodeImpl) n);
-			nodeDensity += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(r1)).size();
+			nodeDensity += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r1)).size();
 		}
 		linkDensity /= network.getNodes().size();
 		nodeDensity /= network.getNodes().size();
@@ -120,7 +120,7 @@ public class PathSetGenerator {
 			NodeImpl r = ((NodeImpl) this.network.getNodes().get(nid));
 			linkDensity += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( r )).size();
 			NodeImpl r1 = ((NodeImpl) this.network.getNodes().get(nid));
-			nodeDensity += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(r1)).size();
+			nodeDensity += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r1)).size();
 		}
 		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
 		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity/nodeIds.size();
@@ -201,7 +201,7 @@ public class PathSetGenerator {
 			// find the beginning of the "oneway path" or "twoway path"
 			Link currLink = l;
 			NodeImpl fromNode = (NodeImpl) currLink.getFromNode();
-			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(fromNode)).size() == 2) &&
+			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(fromNode)).size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
@@ -218,7 +218,7 @@ public class PathSetGenerator {
 				s.links.add(currLink);
 				l2sMapping.put(currLink.getId(),s);
 				NodeImpl toNode = (NodeImpl) currLink.getToNode();
-				while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(toNode)).size() == 2) &&
+				while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(toNode)).size() == 2) &&
 						(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 						((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
 					Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
@@ -383,17 +383,17 @@ public class PathSetGenerator {
 		double avIncidentNodeDensityPerNonePassNodeLCP = 0.0;
 		for (Node n2 : leastCostPath.nodes) {
 			NodeImpl n = (NodeImpl) n2;
-			if ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(n)).size() == 2) &&
+			if ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(n)).size() == 2) &&
 			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
 			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {
 			}
 			else {
 				nofNonePassNodesLCP++;
 				avLinkDensityPerNonePassNodeLCP += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( n )).size();
-				avIncidentNodeDensityPerNonePassNodeLCP += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(n)).size();
+				avIncidentNodeDensityPerNonePassNodeLCP += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(n)).size();
 			}
 			avLinkDensityPerNodeLCP += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( n )).size();
-			avIncidentNodeDensityPerNodeLCP += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(n)).size();
+			avIncidentNodeDensityPerNodeLCP += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(n)).size();
 		}
 		avLinkDensityPerNodeLCP /= leastCostPath.nodes.size();
 		avIncidentNodeDensityPerNodeLCP /= leastCostPath.nodes.size();

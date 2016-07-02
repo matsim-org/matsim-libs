@@ -544,7 +544,7 @@ public class NetworkUtils {
 	}
 
 
-	public static Map<Id<Node>, ? extends Node> getIncidentNodes2(Node node) {
+	public static Map<Id<Node>, ? extends Node> getIncidentNodes(Node node) {
 		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes(node));
 		nodes.putAll(getOutNodes(node));
 		return nodes;
@@ -568,8 +568,7 @@ public class NetworkUtils {
 
 	public static void setOrigId( final Node node, final String id ) {
 		if ( node instanceof NodeImpl ) {
-			NodeImpl r = ((NodeImpl)node);
-			NetworkUtils.setOrigId( r, id ) ;
+			((NodeImpl)node).setOrigId( id ) ;
 		} else {
 			throw new RuntimeException("wrong implementation of interface Node to do this") ;
 		}
@@ -596,8 +595,7 @@ public class NetworkUtils {
 
 	public static String getType( Node node ) {
 		if ( node instanceof NodeImpl ) {
-			NodeImpl r = ((NodeImpl) node);
-			return NetworkUtils.getType( r ) ;
+			return ((NodeImpl) node).getType() ;
 		} else {
 			throw new RuntimeException("wrong implementation of interface Node to do this") ;
 		}

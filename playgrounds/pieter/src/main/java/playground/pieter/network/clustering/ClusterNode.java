@@ -83,7 +83,7 @@ public class ClusterNode implements Node {
 	}
 
 	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
-		return NetworkUtils.getIncidentNodes2(node);
+		return NetworkUtils.getIncidentNodes(node);
 	}
 
 	@Override

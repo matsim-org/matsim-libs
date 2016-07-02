@@ -87,7 +87,7 @@ public class NetworkThinner {
 			Link currLink = l;
 			Node fromNode = currLink.getFromNode();
 			NodeImpl r = ((NodeImpl) fromNode);
-			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(r)).size() == 2) &&
+			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r)).size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
@@ -108,7 +108,7 @@ public class NetworkThinner {
 			linksToMerge.add(currLink);
 			Node toNode = currLink.getToNode();
 			NodeImpl r = ((NodeImpl) toNode);
-			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes2(r)).size() == 2) &&
+			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r)).size() == 2) &&
 					(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 					((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
