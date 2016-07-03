@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Writes basic schedule statistics to the console
+ *
  * @author polettif
  */
 public class DescriptiveScheduleStat {

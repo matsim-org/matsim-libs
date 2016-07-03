@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.workbench;
+package playground.polettif.publicTransitMapping.workbench.analysis;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -59,14 +59,14 @@ public class CompareMapping {
 		/**
 		 * Stop Histogram hafas
 		 */
-		TransitSchedule mappedHafas = ScheduleTools.readTransitSchedule("output/2016-06-24/ch_schedule.xml.gz");
-		StopFacilityHistogram hafasHist = new StopFacilityHistogram(mappedHafas);
-		hafasHist.createCsv(output+"hafas_stopFacilities.csv");
+//		TransitSchedule mappedHafas = ScheduleTools.readTransitSchedule("output/2016-06-24/ch_schedule.xml.gz");
+//		StopFacilityHistogram hafasHist = new StopFacilityHistogram(mappedHafas);
+//		hafasHist.createCsv(output+"hafas_stopFacilities.csv");
 
 		/**
 		 * Convert GTFS to unmapped schedule
 		 */
- 		Gtfs2TransitSchedule.run(inputGtfs, serviceParam, ct, fullUnmappedMTS, null, args[1]);
+// 		Gtfs2TransitSchedule.run(inputGtfs, serviceParam, ct, fullUnmappedMTS, null, args[1]);
 
 		// single
 		TransitSchedule s = ScheduleTools.readTransitSchedule(fullUnmappedMTS);

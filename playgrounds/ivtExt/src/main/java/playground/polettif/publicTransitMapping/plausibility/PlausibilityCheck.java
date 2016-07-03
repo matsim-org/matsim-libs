@@ -54,7 +54,12 @@ import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTr
 
 /**
  * Performs a plausibility check on the given schedule
- * and network.
+ * and network. Checks for three implausibilities:
+ * <ul>
+ *     <li>loops</li>
+ *     <li>travel time</li>
+ *     <li>direction changes</li>
+ * </ul>
  *
  * @author polettif
  */
@@ -319,7 +324,7 @@ public class PlausibilityCheck {
 
 			// Travel Time Warnings
 			if(createTravelTimeFeature) {
-				SimpleFeature f = travelTimeWarningsFF.createPolyline(ShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
+				SimpleFeature f = travelTimeWarningsFF.createPolyline(GtfsShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -332,7 +337,7 @@ public class PlausibilityCheck {
 
 			// Direction Change Warning
 			if(createDirectionChangeFeature) {
-				SimpleFeature f = directionChangeWarnings.createPolyline(ShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
+				SimpleFeature f = directionChangeWarnings.createPolyline(GtfsShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -343,7 +348,7 @@ public class PlausibilityCheck {
 
 			// Loop Warnings
 			if(createLoopFeature) {
-				SimpleFeature f = loopWarningsFF.createPolyline(ShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
+				SimpleFeature f = loopWarningsFF.createPolyline(GtfsShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));

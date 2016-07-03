@@ -29,6 +29,12 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.IOException;
 
+/**
+ * Executes the BasicScheduleEditor with the given schedule, network and
+ * command files.
+ *
+ * @author polettif
+ */
 public class RunScheduleEditor {
 
 	protected static Logger log = Logger.getLogger(RunScheduleEditor.class);

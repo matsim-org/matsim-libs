@@ -42,7 +42,8 @@ import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import java.util.*;
 
 /**
- * Methods to load and change transit schedules
+ * Methods to load and modify transit schedules. Also provides
+ * methods to get information from transit routes.
  *
  * @author polettif
  */
@@ -58,7 +59,6 @@ public class ScheduleTools {
 	public static TransitSchedule readTransitSchedule(String fileName) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readFile(fileName);
-
 		return scenario.getTransitSchedule();
 	}
 
@@ -67,7 +67,6 @@ public class ScheduleTools {
 	 */
 	public static TransitSchedule createSchedule() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
 		return scenario.getTransitSchedule();
 	}
 

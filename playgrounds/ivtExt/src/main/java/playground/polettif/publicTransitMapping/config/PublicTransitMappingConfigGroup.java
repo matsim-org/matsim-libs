@@ -36,8 +36,8 @@ import java.util.*;
 
 
 /**
- * Config Group that is used by {@link PTMapper}
- * Defines parameters for mapping public transit to a network.
+ * Config Group usedd by {@link PTMapper}. Defines parameters for
+ * mapping public transit to a network.
  *
  * @author polettif
  */

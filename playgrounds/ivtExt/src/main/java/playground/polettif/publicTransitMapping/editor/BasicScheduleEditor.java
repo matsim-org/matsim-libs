@@ -42,7 +42,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Provides methods for rerouting and adapting schedules via a csv "command file".
+ * Implemenation of a schedule editor. Provides methods for
+ * rerouting and adapting schedules via a csv "command file".
  *
  * @author polettif
  */

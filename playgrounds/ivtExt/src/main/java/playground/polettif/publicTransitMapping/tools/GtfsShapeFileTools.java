@@ -26,6 +26,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
+import playground.polettif.publicTransitMapping.gtfs.GtfsConverter;
 import playground.polettif.publicTransitMapping.gtfs.lib.GTFSRoute;
 import playground.polettif.publicTransitMapping.gtfs.lib.Shape;
 import playground.polettif.publicTransitMapping.gtfs.lib.Trip;
@@ -33,12 +34,12 @@ import playground.polettif.publicTransitMapping.gtfs.lib.Trip;
 import java.util.*;
 
 /**
- * Provides tools to convert MATSim or gtfs data
- * to shapefiles.
+ * Provides tools to convert GTFS data
+ * to ESRI shapefiles. Is called within {@link GtfsConverter}
  *
  * @author polettif
  */
-public class ShapeFileTools {
+public class GtfsShapeFileTools {
 
 	/**
 	 * Converts a list of link ids to an array of coordinates for shp features

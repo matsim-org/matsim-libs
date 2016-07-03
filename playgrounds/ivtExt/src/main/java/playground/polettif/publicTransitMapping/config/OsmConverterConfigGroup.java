@@ -37,6 +37,7 @@ import java.util.Set;
 
 /**
  * Config group for osm conversion {@link OsmMultimodalNetworkConverter}
+ *
  * @author polettif
  */
 public class OsmConverterConfigGroup extends ReflectiveConfigGroup {

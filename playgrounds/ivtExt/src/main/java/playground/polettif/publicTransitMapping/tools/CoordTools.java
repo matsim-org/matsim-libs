@@ -18,7 +18,6 @@
 
 package playground.polettif.publicTransitMapping.tools;
 
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,6 +29,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Tools to calculate coordinate related
+ * values (mostly azimuth).
+ *
+ * @author polettif
+ */
 public class CoordTools {
 
 	private CoordTools() {}

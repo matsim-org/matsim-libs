@@ -23,6 +23,11 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+/**
+ * Extract one route from a schedule
+ *
+ * @author polettif
+ */
 public class ExtractDebugSchedule {
 
 	/**

@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Plausibility warning if a link sequence has abrupt direction changes
+ *
+ * @author polettif
+ */
 public class DirectionChangeWarning extends AbstractPlausibilityWarning {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
@@ -55,6 +60,6 @@ public class DirectionChangeWarning extends AbstractPlausibilityWarning {
 
 	@Override
 	public String toString() {
-		return "\tDIRECTION CHANGE\tlinks: "+fromId+"\t->\t"+toId+"\t\tdifference: "+diff*200/Math.PI +" gon";
+		return "\tDIRECTION CHANGE\tlinks: "+fromId+"\t->\t"+toId+"\t\tdifference: "+diff*180/Math.PI +" deg";
 	}
 }

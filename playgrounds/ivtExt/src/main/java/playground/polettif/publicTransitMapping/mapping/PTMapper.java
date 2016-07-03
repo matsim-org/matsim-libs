@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import playground.polettif.publicTransitMapping.config.CreateDefaultConfig;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -51,7 +52,7 @@ public abstract class PTMapper {
 	 * Routes the unmapped MATSim Transit Schedule to the network using the file
 	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
 	 *
-	 * @see playground.polettif.publicTransitMapping.workbench.CreateDefaultConfig
+	 * @see CreateDefaultConfig
 	 *
 	 * @param args <br/>[0] PublicTransitMapping config file<br/>
 	 */
@@ -67,7 +68,7 @@ public abstract class PTMapper {
 	 * Routes the unmapped MATSim Transit Schedule to the network using the file
 	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
 	 *
-	 * @see playground.polettif.publicTransitMapping.workbench.CreateDefaultConfig
+	 * @see CreateDefaultConfig
 	 *
 	 * @param configFile the PublicTransitMapping config file
 	 */

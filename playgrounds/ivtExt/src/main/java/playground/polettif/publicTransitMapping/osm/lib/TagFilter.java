@@ -31,6 +31,8 @@ import java.util.Set;
  * interested in or not.
  * 
  * @author mrieser / Senozon AG
+ *
+ * Slightly adapted, exceptions are possible.
  */
 public class TagFilter {
 

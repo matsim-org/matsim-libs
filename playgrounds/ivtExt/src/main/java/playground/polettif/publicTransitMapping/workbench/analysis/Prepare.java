@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.workbench;
+package playground.polettif.publicTransitMapping.workbench.analysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

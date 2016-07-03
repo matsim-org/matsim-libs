@@ -35,7 +35,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import java.util.*;
 
 /**
- * Converts a MATSim Transit Schedule to a GIS shape file
+ * Converts a MATSim Transit Schedule to a ESRI shape file
  *
  * @author polettif
  */

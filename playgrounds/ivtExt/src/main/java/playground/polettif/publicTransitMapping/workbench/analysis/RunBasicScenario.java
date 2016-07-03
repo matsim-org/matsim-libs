@@ -16,35 +16,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.workbench;
+package playground.polettif.publicTransitMapping.workbench.analysis;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+public class RunBasicScenario {
 
-/**
- * Creates a default osmConverter config file.
- *
- * @author polettif
- */
-public class CreateDefaultOsmConfig {
-
-	/**
-	 * Creates a default publicTransitMapping config file.
-	 * @param args [0] default config filename
-	 */
 	public static void main(final String[] args) {
-		Config config = ConfigUtils.createConfig();
+		final Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		config.addModule(OsmConverterConfigGroup.createDefaultConfig());
-
-		Set<String> toRemove = config.getModules().keySet().stream().filter(module -> !module.equals(OsmConverterConfigGroup.GROUP_NAME)).collect(Collectors.toSet());
-		toRemove.forEach(config::removeModule);
-
-		new ConfigWriter(config).write(args[0]);
+		Controler controler = new Controler(scenario);
+		controler.run();
 	}
+
 }

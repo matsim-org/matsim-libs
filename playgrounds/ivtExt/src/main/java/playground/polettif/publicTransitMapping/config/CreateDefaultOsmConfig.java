@@ -16,31 +16,35 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.publicTransitMapping.config;
 
-package playground.polettif.publicTransitMapping.workbench.santiago;
-
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.config.ConfigWriter;
+import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
 
-public class RunScenario {
+import java.util.Set;
+import java.util.stream.Collectors;
 
-	public static void main(String[] args) {
-		String base = "E:/data/santiago/";
+/**
+ * Creates a default osmConverter config file.
+ *
+ * @author polettif
+ */
+public class CreateDefaultOsmConfig {
 
-		// This creates a default matsim config:
-		Config config = ConfigUtils.loadConfig(base+"scenario/input/config_standard.xml");
+	/**
+	 * Creates a default publicTransitMapping config file.
+	 * @param args [0] default config filename
+	 */
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-//		config.setParam("controler", "outputDirectory", base+"output/emptySimulation/");
+		config.addModule(OsmConverterConfigGroup.createDefaultConfig());
 
-		// This creates a default matsim scenario (which is empty):
-		Scenario scenario = ScenarioUtils.createScenario(config) ;
-		Controler controler = new Controler(scenario);
+		Set<String> toRemove = config.getModules().keySet().stream().filter(module -> !module.equals(OsmConverterConfigGroup.GROUP_NAME)).collect(Collectors.toSet());
+		toRemove.forEach(config::removeModule);
 
-		controler.run();
+		new ConfigWriter(config).write(args[0]);
 	}
 }
