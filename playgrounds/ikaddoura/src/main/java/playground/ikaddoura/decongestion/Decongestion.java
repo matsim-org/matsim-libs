@@ -36,6 +36,8 @@ import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV2;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV3;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV4;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV5;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV6;
 
 /**
 * @author ikaddoura
@@ -76,6 +78,10 @@ public class Decongestion {
 			tollSettingApproach = new DecongestionTollingV3(info);
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V4)) {
 			tollSettingApproach = new DecongestionTollingV4(info);
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V5)) {
+			tollSettingApproach = new DecongestionTollingV5(info);
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V6)) {
+			tollSettingApproach = new DecongestionTollingV6(info);
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.NoPricing)) {
 			if (info.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() < info.getScenario().getConfig().controler().getLastIteration()) {
 				throw new RuntimeException("If you want to disable pricing, please set the update price interval to a larger number than the number of iterations. Aborting...");

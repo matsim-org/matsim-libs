@@ -27,9 +27,9 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	private TollingApproach TOLLING_APPROACH = TollingApproach.V4;
-	private double TOLL_ADJUSTMENT = 0.0;
-	private int UPDATE_PRICE_INTERVAL = 10;
+	private TollingApproach TOLLING_APPROACH = TollingApproach.V5;
+	private double TOLL_ADJUSTMENT = 0.1;
+	private int UPDATE_PRICE_INTERVAL = 50;
 	
 	private double TOLL_BLEND_FACTOR = 0.1;
 	private int WRITE_OUTPUT_ITERATION = 10;
@@ -37,7 +37,7 @@ public class DecongestionConfigGroup {
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
 	
 	public enum TollingApproach {
-        NoPricing, V0, V1, V2, V3, V4   
+        NoPricing, V0, V1, V2, V3, V4, V5, V6
 	}
 	
 	public int getWRITE_OUTPUT_ITERATION() {
