@@ -31,7 +31,7 @@ import java.io.IOException;
 
 /**
  * Executes the BasicScheduleEditor with the given schedule, network and
- * command files.
+ * command file.
  *
  * @author polettif
  */
@@ -40,10 +40,11 @@ public class RunScheduleEditor {
 	protected static Logger log = Logger.getLogger(RunScheduleEditor.class);
 
 	/**
+	 * Loads the schedule and network, then executes all commands in the commands csv file.
 	 *
 	 * @param args [0] schedule file
 	 *             [1] network file
-	 *             [2] command file
+	 *             [2] command csv file
 	 *             [3] output schedule file (optional if input file should be overwritten)
 	 *             [4] output network file (optional if input file should be overwritten)
 	 * @throws IOException

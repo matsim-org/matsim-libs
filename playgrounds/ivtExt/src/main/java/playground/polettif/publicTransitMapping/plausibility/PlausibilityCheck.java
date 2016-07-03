@@ -108,11 +108,27 @@ public class PlausibilityCheck {
 
 	/**
 	 * Performs a plausibility check on the given schedule and network files
-	 * and writes the results to the output folder.
+	 * and writes the results to the output folder. The following files are
+	 * created in the ouput folder:
+	 * <ul>
+	 * 	<li>allPlausibilityWarnings.csv: shows all plausibility warnings in a csv file</li>
+	 * 	<li>stopfacilities.csv: the number of child stop facilities for all stop facilities as csv</li>
+	 * 	<li>stopfacilities_histogram.png: a histogram as png showing the number of child stop facilities</li>
+	 * 	<li>shp/warnings/WarningsLoops.shp: Loops warnings as polyline shapefile</li>
+	 * 	<li>shp/warnings/WarningsTravelTime.shp: Travel time warnings as polyline shapefile</li>
+	 * 	<li>shp/warnings/WarningsDirectionChange.shp: Direction change warnings as polyline shapefile</li>
+	 * 	<li>shp/schedule/TransitRoutes.shp: Transit routes of the schedule as polyline shapefile</li>
+	 * 	<li>shp/schedule/StopFacilities.shp: Stop Facilities as point shapefile</li>
+	 * 	<li>shp/schedule/StopFacilities_refLinks.shp: The stop facilities' reference links as polyline shapefile</li>
+	 * </ul>
+	 * Shapefiles can be viewed in an GIS, a recommended open source GIS is QGIS. It is also possible to view them in senozon VIA. However, no
+	 * line attributes can be displayed or viewed there.
 	 * @param scheduleFile the schedule file
 	 * @param networkFile network file
 	 * @param coordinateSystem A name used by {@link MGC}. Use EPSG:* code to avoid problems.
 	 * @param outputFolder the output folder where all csv and shapefiles are written
+	 *
+	 *
 	 */
 	public static void run(String scheduleFile, String networkFile, String coordinateSystem, String outputFolder) {
 		setLogLevels();

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
@@ -114,7 +115,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 
 		String[] line = reader.readNext();
 		while(line != null) {
-			log.info(line);
+			log.info(CollectionUtils.arrayToString(line));
 			executeCmdLine(line);
 			line = reader.readNext();
 		}
@@ -133,7 +134,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 			if(cmd.length == 5) {
 				rerouteViaLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
 			} else {
-				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0] + "! 5 needed, " + cmd.length + " given");
 			}
 		}
 
@@ -145,7 +146,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 			if(cmd.length == 5) {
 				rerouteFromStop(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
 			} else {
-				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0] + "! 5 needed, " + cmd.length + " given");
 			}
 		}
 		/**
@@ -155,7 +156,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		 * ["changeRefLink"] ["allTransitRoutesOnLink"] [linkId] [ParentId] [newlinkId]
 		 */
 		else if(CHANGE_REF_LINK.equals(cmd[0])) {
-			if(cmd.length == 3) {
+			if("".equals(cmd[3])) {
 				changeRefLink(cmd[1], cmd[2]);
 			} else if(cmd.length == 5) {
 				switch (cmd[1]) {
@@ -169,7 +170,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 						changeRefLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
 				}
 			} else {
-				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0] + "! 3 or 5 needed, " + cmd.length + " given");
 			}
 		}
 
@@ -183,7 +184,7 @@ public class BasicScheduleEditor implements ScheduleEditor {
 				addLink(cmd[1], cmd[2], cmd[3], cmd[4]);
 				refreshSchedule();
 			} else {
-				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0] + "! 5 needed, " + cmd.length + " given");
 			}
 		}
 
@@ -192,10 +193,10 @@ public class BasicScheduleEditor implements ScheduleEditor {
 		 * [refreshTransitRoute] [transitLineId] [transitRouteId]
 		 */
 		else if(REFRESH_TRANSIT_ROUTE.equals(cmd[0])) {
-			if(cmd.length == 3) {
+			if(cmd.length >= 3) {
 				refreshTransitRoute(getTransitRoute(cmd[1], cmd[2]));
 			} else {
-				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0] + "! 3 needed, " + cmd.length + " given");
 			}
 		}
 

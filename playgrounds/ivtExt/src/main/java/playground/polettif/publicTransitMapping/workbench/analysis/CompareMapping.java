@@ -135,7 +135,7 @@ public class CompareMapping {
 		ptmConfig.setOutputNetworkFile(output + "ptm_network.xml.gz");
 		ptmConfig.setOutputScheduleFile(output + "ptm_schedule.xml.gz");
 
-		PTMapperImpl.run(ptmConfig, schedule, network);
+		new PTMapperImpl(ptmConfig, schedule, network).run();
 
 		// shapeFile
 		ScheduleShapeFileWriter.run(schedule, network, ct, output);
