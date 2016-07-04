@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -66,7 +67,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
 
-		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/network/networkInputTransCad.csv" ;
+		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"raw/network/networkInputTransCad.csv" ;
 
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();       
 		tabularFileParserConfig.setFileName(inputFileNetwork);
@@ -172,11 +173,78 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		simplifier.run(network);
 
 		// manual cleaning (filtering) of the network.
-		removeLinks();
+		removeLinksNodes();
 		removeIsolatedNodes();
 		modifyLinkCapacity();
 		addNodesAndLinks();
+		connectLinksDirectly(); 
 	}    
+
+	private void connectLinksDirectly() { 
+		
+		Network network = scenario.getNetwork();
+		
+		{// this connection with gandhi setu should not be present, thus making a link direct
+			Node desiredNode = network.getNodes().get(Id.createNodeId("15057"));
+			Link linkToBeRemoved = network.removeLink(Id.createLinkId("1878610000"));
+			Link linkToBeRemoved_reverse = network.removeLink(Id.createLinkId("18786"));
+			
+			Link linkToModify = network.getLinks().get(Id.createLinkId("16787-16771-16778-16718"));
+			Link linkToModify_reverse = network.getLinks().get(Id.createLinkId("1671810000-1677810000-1677110000-1678710000"));
+			
+			linkToModify.setFromNode(desiredNode);
+			linkToModify_reverse.setToNode(desiredNode);
+			
+			linkToModify.setLength(linkToModify.getLength() + linkToBeRemoved.getLength());
+			linkToModify_reverse.setLength(linkToModify_reverse.getLength() + linkToBeRemoved_reverse.getLength());	
+		}
+		{ //suddenly a small link with low capacity 
+			network.removeLink(Id.createLinkId("18778"));
+			network.removeLink(Id.createLinkId("1877810000"));
+			
+			Node n = network.getNodes().get(Id.createNodeId("10211"));
+			network.getLinks().get(Id.createLinkId("1018010000-1017110000")).setToNode(n);
+			network.getLinks().get(Id.createLinkId("10171-10180")).setFromNode(n);
+			
+			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+		}
+		{ // a junction, small link  (6m) become a bottleneck
+			network.removeLink(Id.createLinkId("1674810000"));
+			network.removeLink(Id.createLinkId("16748"));
+			
+			Node n = network.getNodes().get(Id.createNodeId("15009"));
+			network.getLinks().get(Id.createLinkId("16787-16771-16778-16718")).setToNode(n);
+			network.getLinks().get(Id.createLinkId("1671810000-1677810000-1677110000-1678710000")).setFromNode(n);
+			
+			network.getLinks().get(Id.createLinkId("1673110000-16768-1675710000-1676110000-1675510000-16754-16736-16751-1674910000-16750-16738")).setToNode(n);
+			network.getLinks().get(Id.createLinkId("1673810000-1675010000-16749-1675110000-1673610000-1675410000-16755-16761-16757-1676810000-16731")).setFromNode(n);
+			
+			n = network.getNodes().get(Id.createNodeId("14974"));
+			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+		}
+		{ // a small link  (3m) become a bottleneck
+			network.removeLink(Id.createLinkId("1878710000"));
+			network.removeLink(Id.createLinkId("18787"));
+			
+			Node n = network.getNodes().get(Id.createNodeId("16326"));
+			network.getLinks().get(Id.createLinkId("16790")).setToNode(n);
+			network.getLinks().get(Id.createLinkId("1679010000")).setFromNode(n);
+			
+			n = network.getNodes().get(Id.createNodeId("16318"));
+			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+		}
+		{ // a small link  (6m) become a bottleneck
+			network.removeLink(Id.createLinkId("17461"));
+			network.removeLink(Id.createLinkId("1746110000"));
+			
+			Node n = network.getNodes().get(Id.createNodeId("15498"));
+			network.getLinks().get(Id.createLinkId("1750110000-1742410000")).setToNode(n);
+			network.getLinks().get(Id.createLinkId("17424-17501")).setFromNode(n);
+			
+			n = network.getNodes().get(Id.createNodeId("15468"));
+			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+		}
+	}
 
 	public Network getPatnaNetwork() {
 		return scenario.getNetwork();
@@ -250,9 +318,56 @@ public class PatnaNetworkFromTransCadDataGenerator {
 			network.getLinks().get(Id.createLinkId("18203")).setNumberOfLanes(2);
 			network.getLinks().get(Id.createLinkId("18203")).setNumberOfLanes(2);
 		}
+		{// dont know y a link suddenly has so high capacity; does not make sense
+			network.getLinks().get(Id.createLinkId("17346")).setCapacity(1074.0);
+			network.getLinks().get(Id.createLinkId("1734410000")).setCapacity(1074.0);
+			network.getLinks().get(Id.createLinkId("17346")).setNumberOfLanes(1.0);
+			network.getLinks().get(Id.createLinkId("1734410000")).setNumberOfLanes(1.0);
+		}
+		{// suddenly so low capacity
+			network.getLinks().get(Id.createLinkId("10610-10625-1062110000-1062610000-10397-1090010000-10907-10905-1091110000-1089610000")).setCapacity(2790.0);
+			network.getLinks().get(Id.createLinkId("10896-10911-1090510000-1090710000-10900-1039710000-10626-10621-1062510000-1061010000")).setCapacity(2790.0);
+			network.getLinks().get(Id.createLinkId("10610-10625-1062110000-1062610000-10397-1090010000-10907-10905-1091110000-1089610000")).setNumberOfLanes(2.0);
+			network.getLinks().get(Id.createLinkId("10896-10911-1090510000-1090710000-10900-1039710000-10626-10621-1062510000-1061010000")).setNumberOfLanes(2.0);
+			
+			network.getLinks().get(Id.createLinkId("18783")).setCapacity(2790.0);
+			network.getLinks().get(Id.createLinkId("1878310000")).setCapacity(2790.0);
+			network.getLinks().get(Id.createLinkId("18783")).setNumberOfLanes(2.0);
+			network.getLinks().get(Id.createLinkId("1878310000")).setNumberOfLanes(2.0);
+		}
+		{ // suddenly so low capacity
+			Node n=network.getNodes().get(Id.createNodeId("10836"));
+			for(Link l : n.getInLinks().values()) {
+				l.setCapacity(2796.0); l.setNumberOfLanes(2.0);
+			}
+			for(Link l : n.getOutLinks().values()) {
+				l.setCapacity(2796.0); l.setNumberOfLanes(2.0);
+			}
+			
+			network.getLinks().get(Id.createLinkId("18795")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("1879510000")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("18795")).setNumberOfLanes(2.0);
+			network.getLinks().get(Id.createLinkId("1879510000")).setNumberOfLanes(2.0);
+			
+			network.getLinks().get(Id.createLinkId("10927")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("1092710000")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("10927")).setNumberOfLanes(2.0);
+			network.getLinks().get(Id.createLinkId("1092710000")).setNumberOfLanes(2.0);
+		}
+		{// suddenly so low capacity
+			network.getLinks().get(Id.createLinkId("220610000")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("2206")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("220610000")).setNumberOfLanes(2.0);
+			network.getLinks().get(Id.createLinkId("2206")).setNumberOfLanes(2.0);
+			
+			network.getLinks().get(Id.createLinkId("220710000")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("2207")).setCapacity(1838.0);
+			network.getLinks().get(Id.createLinkId("220710000")).setNumberOfLanes(2.0);
+			network.getLinks().get(Id.createLinkId("2207")).setNumberOfLanes(2.0);
+		}
 	}
 
-	private void removeLinks(){
+	private void removeLinksNodes(){
 		// remove links
 		List<String> links2remove = Arrays.asList("1478","147810000",
 				"1128-126410000-1262-126810000-126710000-127010000-126610000-1271-1258-128510000-71710000-1672-167310000-165510000-167710000-167610000-163910000-170410000-163810000-1735",
@@ -263,11 +378,14 @@ public class PatnaNetworkFromTransCadDataGenerator {
 				"145310000-1340-157710000-157110000-1569-156310000-68410000-1122-112310000-1124-109410000-110510000-1106-1101-1104-110210000-1103", //a useless links, dont know, y agents are diverted on it.
 				"110310000-1102-110410000-110110000-110610000-1105-1094-112410000-1123-112210000-684-1563-156910000-1571-1577-134010000-1453",
 				"145810000-1461-146210000","1462-146110000-1458","145510000","1455","1470-1471","147110000-147010000",
-				"13902","1390210000","1390110000-13898-1390410000-1387210000-13914-1391310000","13913-1391410000-13872-13904-1389810000-13901");// agents are entering on this link instead of passing through OC1
+				"13902","1390210000","1390110000-13898-1390410000-1387210000-13914-1391310000","13913-1391410000-13872-13904-1389810000-13901", // agents are entering on this link instead of passing through OC1
+				"1388010000-1388210000","13882-13880" // should not be present
+				);
 		for (String str : links2remove){
 			scenario.getNetwork().removeLink(Id.createLinkId(str));
 			LOG.warn("The link "+str+" is removed from the network.");
 		}
+		scenario.getNetwork().removeNode(Id.createNodeId("16348")); // this will also remove the connected links, these are new links after 2011
 	}
 
 	/**
