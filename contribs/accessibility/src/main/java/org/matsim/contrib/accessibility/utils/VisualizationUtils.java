@@ -49,7 +49,7 @@ public class VisualizationUtils {
 		// Write QGis project file
 		QGisWriter writer = new QGisWriter(crs, workingDirectory);
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
-		writer.setExtent(mapViewExtent);
+		writer.setBoundingBox(mapViewExtent);
 
 		// osm raster layer
 		// working directory needs to be the storage location of the file

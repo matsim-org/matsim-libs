@@ -22,6 +22,8 @@
  */
 package playground.ikaddoura.noise;
 
+import javafx.geometry.BoundingBox;
+
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
@@ -44,8 +46,8 @@ public static void main(String args[]){
 		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 			
 // ################################################################################################################################################
-		double[] extent = {4568808,5803042,4622772,5844280};
-		writer.setExtent(extent);
+		BoundingBox boundingBox = new BoundingBox(4568808,5803042,4622772,5844280);
+		writer.setBoundingBox(boundingBox);
 				
 		VectorLayer noiseLayer = new VectorLayer("noise", workingDirectory + "immission_57600.0.csv", QGisConstants.geometryType.Point, true);
 		noiseLayer.setDelimiter(";");

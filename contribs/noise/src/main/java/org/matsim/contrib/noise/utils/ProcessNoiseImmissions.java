@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.geometry.BoundingBox;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -244,8 +246,8 @@ public class ProcessNoiseImmissions {
 		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 			
 // ################################################################################################################################################
-		double[] extent = {4568808,5803042,4622772,5844280};
-		writer.setExtent(extent);
+		BoundingBox boundingBox = new BoundingBox(4568808,5803042,4622772,5844280);
+		writer.setBoundingBox(boundingBox);
 				
 		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
 		noiseLayer.setDelimiter(";");

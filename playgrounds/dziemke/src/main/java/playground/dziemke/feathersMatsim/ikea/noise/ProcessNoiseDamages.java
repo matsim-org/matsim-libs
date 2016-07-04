@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.geometry.BoundingBox;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
@@ -242,8 +244,8 @@ String label="damages";
 		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_UTM31N, workingDirectory);
 			
 // ################################################################################################################################################
-		double[] extent = {4568808,5803042,4622772,5844280};
-		writer.setExtent(extent);
+		BoundingBox boundingBox = new BoundingBox(4568808,5803042,4622772,5844280);
+		writer.setBoundingBox(boundingBox);
 				
 		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
 		noiseLayer.setDelimiter(";");
