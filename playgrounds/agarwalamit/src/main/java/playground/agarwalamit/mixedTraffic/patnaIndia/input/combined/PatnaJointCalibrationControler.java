@@ -64,7 +64,7 @@ public class PatnaJointCalibrationControler {
 	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/network_diff_linkSpeed.xml.gz"; //
 	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_plans_10pct.xml.gz"; //
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_counts_osmNetwork.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_vehicles_10pct.xml.gz";
 
 	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxxx/";
