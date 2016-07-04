@@ -1,112 +1,88 @@
 package playground.gthunig.mrOptiCheck;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.pt.PtConstants;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.FakeFacility;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.gthunig.utils.StopWatch;
+import org.matsim.pt.transitSchedule.api.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author gthunig on 04.07.2016.
  */
 public class MNDOptiCheck {
-	private static final int N_TRIES = 1000;
 
-	public static void main( final String... args ) {
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] );
-		final Scenario sc = ScenarioUtils.loadScenario( config );
+	public static void main(String[] args) {
 
-		final TransitRouterImpl transitRouter = new TransitRouterImpl( new TransitRouterConfig( config ) , sc.getTransitSchedule() );
-
-		final StopWatch stopWatch = new StopWatch();
-
-		if ( config.plans().getInputFile() == null ) {
-			measureForRandomODs(sc, transitRouter, stopWatch );
-		}
-		else {
-			measureForPopulation(sc, transitRouter, stopWatch );
+		File file = new File("../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.output_network.xml");
+		System.out.println("file.getAbsolutePath() = " + file.getAbsolutePath());
+		try {
+			System.out.println("file.getCanonicalPath() = " + file.getCanonicalPath());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
-		System.out.println(stopWatch.getStoppedTime());
+//        String networkFile = "playgrounds/dziemke/input/NMBM_PT_V1.xml";
+//        String transitScheduleFile = "playgrounds/dziemke/input/Transitschedule_PT_V1_WithVehicles.xml";
+		String networkFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.output_network.xml";
+		String transitScheduleFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.300.transitScheduleScored.xml";
+
+		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+		config.network().setInputFile(networkFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.getConfig().transit().setUseTransit(true);
+
+		// Read in public transport schedule
+		TransitScheduleReader reader = new TransitScheduleReader(scenario);
+		reader.readFile(transitScheduleFile);
+		TransitSchedule transitSchedule = scenario.getTransitSchedule();
+
+		// constructor of TransitRouterImpl needs TransitRouterConfig. This is why it is instantiated here.
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig());
+		TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
+
+		Double departureTime = 8. * 60 * 60;
+//        Coord origin = new Coord(137547.07266149623,-3706738.5909946687);
+//        Coord destination = new Coord(140245.15520623303,-3693657.6437037485);
+//        Coord origin = new Coord(143583.9441831379, -3699678.99131796);jtlu14b
+//        Coord destination = new Coord(150583.9441831379,-3699678.99131796);
+		Coord origin = new Coord(111583.94418313791,-3714678.99131796);
+		Coord destination = new Coord(153583.9441831379,-3688678.99131796);
+
+		System.out.println("StartLink Alberts origin " + origin);
+
+		List<Leg> legList = transitRouter.calcRoute(new FakeFacility(origin), new FakeFacility(destination), departureTime, null);
+		ArrayList<Coord> legEnds = new ArrayList<>();
+		ArrayList<Coord> ptStops = new ArrayList<>();
+		legEnds.add(origin);
+
+
+		legEnds.add(destination);
+		System.out.println("StartLink Alberts origin " + destination);
+
 	}
 
-	private static void measureForPopulation(
-			final Scenario sc,
-			final TransitRouterImpl reference,
-			final StopWatch stopWatch ) {
-		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
-		final List<TripStructureUtils.Trip> trips = new ArrayList<>();
-
-		final Counter planCounter = new Counter( "extract trips from plan # " );
-		for ( Person person : sc.getPopulation().getPersons().values() ) {
-			if ( person.getPlans().isEmpty() ) {
-				continue;
-			}
-			planCounter.incCounter();
-			trips.addAll(
-					TripStructureUtils.getTrips(
-							person.getSelectedPlan(),
-							stages ) );
-		}
-
-		final Counter counter = new Counter( "Compute route for random trip # " );
-		final Random random = new Random( 20151217 );
-		for ( int i = 0; i < N_TRIES; i++ ) {
-			final TripStructureUtils.Trip trip = trips.get( random.nextInt( trips.size() ) );
-
-			counter.incCounter();
-
-			stopWatch.reset();
-			reference.calcRoute( new FakeFacility(trip.getOriginActivity().getCoord()), new FakeFacility(trip.getDestinationActivity().getCoord()), trip.getOriginActivity().getEndTime(), null );
-			stopWatch.stop();
-		}
-		counter.printCounter();
-	}
-
-	private static void measureForRandomODs( Scenario sc,
-											 TransitRouterImpl reference,
-											 StopWatch stopWatch ) {
-		final List<Id<TransitStopFacility>> facilityIds = new ArrayList<>( sc.getTransitSchedule().getFacilities().keySet() );
-		Collections.sort( facilityIds );
-
-		final Random random = new Random( 20151210 );
-		final Counter counter = new Counter( "Compute route for random case # " );
-		for ( int i = 0; i < N_TRIES; i++ ) {
-			final TransitStopFacility orign =
-					sc.getTransitSchedule().getFacilities().get(
-							facilityIds.get(
-									random.nextInt( facilityIds.size() ) ) );
-
-			final TransitStopFacility destination =
-					sc.getTransitSchedule().getFacilities().get(
-							facilityIds.get(
-									random.nextInt( facilityIds.size() ) ) );
-
-			final double time = random.nextDouble() * 24 * 3600;
-
-			counter.incCounter();
-
-			stopWatch.reset();
-			reference.calcRoute( new FakeFacility(orign.getCoord()), new FakeFacility(destination.getCoord()), time, null );
-			stopWatch.stop();
-		}
-		counter.printCounter();
+	private static Coord invertCoord(Coord coord, CoordinateTransformation coordinateTransformation) {
+		return new Coord(coordinateTransformation.transform(coord).getY(),
+				coordinateTransformation.transform(coord).getX());
 	}
 }
