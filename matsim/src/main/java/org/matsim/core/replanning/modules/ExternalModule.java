@@ -36,8 +36,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
@@ -168,7 +168,7 @@ public class ExternalModule implements PlanStrategyModule {
 
 	private void importPopulationAndMutatePlans() {
 		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader plansReader = new MatsimPopulationReader(dummyScenario);
+		MatsimPopulationReader plansReader = new PopulationReader(dummyScenario);
 		Population plans = dummyScenario.getPopulation();
 		plansReader.readFile(this.outFileRoot + this.modulePrefix + ExternalOutFileName);
 		new UpdatePlansAlgo().run(plans);

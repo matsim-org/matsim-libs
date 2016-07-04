@@ -42,7 +42,7 @@ public class BerlinTaxiRequests
     {
         Scenario berlinBrbScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(berlinBrbScenario.getNetwork()).readFile(BERLIN_BRB_NET_FILE);
-        new MatsimPopulationReader(berlinBrbScenario).readFile(DIR + allPlansFile);
+        new PopulationReader(berlinBrbScenario).readFile(DIR + allPlansFile);
 
         Scenario onlyBerlinScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);

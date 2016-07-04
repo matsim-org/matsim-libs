@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 import playground.sergioo.visualizer2D2012.Layer;
 import playground.sergioo.visualizer2D2012.LayersPanel;
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainter;
@@ -244,7 +244,7 @@ public class MainRoutes {
 		StreamingUtils.setIsStreaming(((Population)scenario.getPopulation()), true);
 		final PersonAlgorithm algo = routesPopulation;
 		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), algo);
-		new MatsimPopulationReader(scenario).readFile(args[3]);
+		new PopulationReader(scenario).readFile(args[3]);
 		final Map<Journey, Integer> journeysPlan = routesPopulation.getJourneyPlan();
 		LayersPanel panel2 = new LayersPanel() {
 			{
@@ -285,7 +285,7 @@ public class MainRoutes {
 		StreamingUtils.setIsStreaming(((Population)scenario2.getPopulation()), true);
 		final PersonAlgorithm algo1 = routesPopulation;
 		StreamingUtils.addAlgorithm(((Population)scenario2.getPopulation()), algo1);
-		new MatsimPopulationReader(scenario2).readFile(args[4]);
+		new PopulationReader(scenario2).readFile(args[4]);
 		final Map<Journey, Integer> journeysPlan2 = routesPopulation.getJourneyPlan();
 		LayersPanel panel3 = new LayersPanel() {
 			{

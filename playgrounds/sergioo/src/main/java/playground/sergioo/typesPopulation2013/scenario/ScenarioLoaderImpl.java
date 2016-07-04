@@ -42,7 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -208,7 +208,7 @@ public class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new MatsimPopulationReader(this.scenario).parse(populationFileName);
+			new PopulationReader(this.scenario).parse(populationFileName);
 			
 			if (this.scenario.getPopulation() instanceof Population) {
 				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;

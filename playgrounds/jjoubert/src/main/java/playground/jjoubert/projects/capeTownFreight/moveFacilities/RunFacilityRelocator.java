@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -67,7 +67,7 @@ public class RunFacilityRelocator {
 		
 		FacilityRelocator fr = new FacilityRelocator(sc.getNetwork(), relocation);
 		
-		new MatsimPopulationReader(sc).parse(populationToRelocate);
+		new PopulationReader(sc).parse(populationToRelocate);
 		
 		Scenario newSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = newSc.getPopulation().getFactory();

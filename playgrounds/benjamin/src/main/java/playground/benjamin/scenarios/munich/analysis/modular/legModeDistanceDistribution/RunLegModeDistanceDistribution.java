@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -95,7 +95,7 @@ public class RunLegModeDistanceDistribution {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		logger.info("Setting network to " + networkFile);
-		new MatsimPopulationReader(scenario).readFile(popFile);
+		new PopulationReader(scenario).readFile(popFile);
 		logger.info("Setting population to " + popFile);
 		
 		Scenario relevantScenario;

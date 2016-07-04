@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -26,7 +26,7 @@ public class PlanChecker {
 	
 	public void run(String inputFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(inputFile);
+		new PopulationReader(scenario).readFile(inputFile);
 		this.checkFreight(scenario.getPopulation());
 		
 		log.info("finished ##############################################");

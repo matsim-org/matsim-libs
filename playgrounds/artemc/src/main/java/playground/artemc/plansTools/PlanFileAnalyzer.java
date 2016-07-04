@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -24,7 +24,7 @@ public class PlanFileAnalyzer {
 	String activity="";
 	String prevActivity="";
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimPopulationReader(scenario).parse("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
+	new PopulationReader(scenario).parse("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
 	Population population = scenario.getPopulation();
 
 	for(Person agent:population.getPersons().values()){

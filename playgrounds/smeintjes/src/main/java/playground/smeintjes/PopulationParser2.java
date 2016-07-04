@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -50,7 +50,7 @@ import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 public class PopulationParser2 {
 	private final static Logger LOG = Logger.getLogger(PopulationParser2.class.toString()); 
 	private Scenario scenario;
-	private MatsimPopulationReader reader;
+	private PopulationReader reader;
 
 	public static void main(String[] args) {
 		Header.printHeader(PopulationParser2.class.toString(), args);
@@ -385,7 +385,7 @@ public class PopulationParser2 {
 	
 	public PopulationParser2() {
 		this.scenario =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.reader = new MatsimPopulationReader(this.scenario);
+		this.reader = new PopulationReader(this.scenario);
 	}
 
 	public Collection<? extends Person> readPopulation(String populationFile) {

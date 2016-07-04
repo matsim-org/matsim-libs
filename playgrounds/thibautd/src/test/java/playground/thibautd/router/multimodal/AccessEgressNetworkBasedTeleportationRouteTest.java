@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -102,7 +102,7 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 				AccessEgressNetworkBasedTeleportationRoute.class,
 					new AccessEgressNetworkBasedTeleportationRouteFactory( ) );
 
-		new MatsimPopulationReader( insc ).readFile( file );
+		new PopulationReader( insc ).readFile( file );
 
 		final Person inperson = insc.getPopulation().getPersons().get( person.getId() );
 		final Leg inleg = (Leg) inperson.getSelectedPlan().getPlanElements().get( 1 );

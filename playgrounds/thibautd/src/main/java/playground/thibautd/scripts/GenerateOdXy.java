@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
@@ -83,7 +83,7 @@ public class GenerateOdXy {
 				}
 			});
 
-			new MatsimPopulationReader( sc ).readFile( inputPopulation );
+			new PopulationReader( sc ).readFile( inputPopulation );
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );

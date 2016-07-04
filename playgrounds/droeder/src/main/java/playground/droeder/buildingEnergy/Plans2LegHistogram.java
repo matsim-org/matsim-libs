@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,7 +81,7 @@ public abstract class Plans2LegHistogram {
 		};
 		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
-		new MatsimPopulationReader(sc).readFile(plansfile);
+		new PopulationReader(sc).readFile(plansfile);
 		
 		LegHistogramChart.writeGraphic(histo, outputpath + "legHistogram_all.png");
 		log.info(outputpath + "legHistogram_all.png written.");

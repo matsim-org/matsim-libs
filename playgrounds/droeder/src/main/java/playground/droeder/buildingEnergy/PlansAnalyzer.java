@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -80,7 +80,7 @@ final class PlansAnalyzer {
 		final PersonAlgorithm algo = pa;
 		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
-		new MatsimPopulationReader(sc).readFile(plansfile);
+		new PopulationReader(sc).readFile(plansfile);
 		pa.dumpStatistics(outputpath, "base");
 		
 		OutputDirectoryLogging.closeOutputDirLogging();

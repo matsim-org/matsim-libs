@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -33,7 +33,7 @@ public class ActivityChainRepairer {
         final String pathToOutputPopulation = args[1];
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+        PopulationReader plansReader = new PopulationReader(scenario);
         plansReader.readFile(pathToInputPopulation);
         Population population = scenario.getPopulation();
 

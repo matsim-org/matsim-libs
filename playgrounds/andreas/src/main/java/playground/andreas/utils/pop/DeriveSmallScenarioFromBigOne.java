@@ -11,8 +11,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -70,12 +70,12 @@ public class DeriveSmallScenarioFromBigOne {
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
 		Population wholeRoutedPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, wholeRoutedPop));
+		MatsimPopulationReader popReader = new PopulationReader(new SharedNetScenario(bigNetScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 
 		log.info("Reading unrouted population: " + unroutedWholePlansFile);
 		Population unroutedWholePop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, unroutedWholePop));
+		MatsimPopulationReader origPopReader = new PopulationReader(new SharedNetScenario(bigNetScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 
 		PopGeoFilter popGeoFilter = new PopGeoFilter(wholeRoutedPop, popGeoFilterOut, unroutedWholePop, bigNetScenario.getNetwork(), minXY, maxXY);
@@ -92,7 +92,7 @@ public class DeriveSmallScenarioFromBigOne {
 		log.info("Start SetPersonCoordsToBoundingBox");
 
 		Population inPop = smallNetScenario.getPopulation();
-		popReader = new MatsimPopulationReader(smallNetScenario);
+		popReader = new PopulationReader(smallNetScenario);
 		popReader.readFile(popGeoFilterOut);
 
 		SetPersonCoordsToBoundingBox setPersonCoordsToBoundingBox = new SetPersonCoordsToBoundingBox(smallNetScenario.getNetwork(), inPop, setBoundingBoxOut, minXY, maxXY);
@@ -115,7 +115,7 @@ public class DeriveSmallScenarioFromBigOne {
 
 		final Population plans = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
-		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		final MatsimPopulationReader plansReader = new PopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
 		StreamingUtils.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));

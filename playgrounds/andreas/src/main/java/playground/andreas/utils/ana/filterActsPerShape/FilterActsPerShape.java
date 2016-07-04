@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,7 +35,7 @@ public class FilterActsPerShape {
 		final PersonAlgorithm algo = wHSC;
 		StreamingUtils.addAlgorithm(plans, algo);
 		
-		PopulationReader plansReader = new MatsimPopulationReader(sc);		
+		MatsimPopulationReader plansReader = new PopulationReader(sc);		
 		log.info("Reading plans file from " + plansFile);
 		plansReader.readFile(plansFile);
 		PopulationUtils.printPlansCount(plans) ;

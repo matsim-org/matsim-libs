@@ -44,7 +44,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(scenario).readFile(BASE_FILE);
+		new PopulationReader(scenario).readFile(BASE_FILE);
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV0(testFile);
 
 		testConversionAtInput(testFile);
@@ -58,7 +58,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(scenario).readFile(BASE_FILE);
+		new PopulationReader(scenario).readFile(BASE_FILE);
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(testFile);
 
 		testConversionAtInput(testFile);
@@ -72,7 +72,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(scenario).readFile(BASE_FILE);
+		new PopulationReader(scenario).readFile(BASE_FILE);
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(testFile);
 
 		testConversionAtInput(testFile);
@@ -86,7 +86,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(originalScenario).readFile(BASE_FILE);
+		new PopulationReader(originalScenario).readFile(BASE_FILE);
 
 		// write test population with conversion
 		new PopulationWriter(
@@ -98,7 +98,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(reprojectedScenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(reprojectedScenario).readFile(testFile);
+		new PopulationReader(reprojectedScenario).readFile(testFile);
 
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
 	}
@@ -111,7 +111,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(originalScenario).readFile(BASE_FILE);
+		new PopulationReader(originalScenario).readFile(BASE_FILE);
 
 		// write test population with conversion
 		new PopulationWriter(
@@ -121,7 +121,7 @@ public class PopulationReprojectionIOTest {
 
 		// read converted population
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(reprojectedScenario).readFile(testFile);
+		new PopulationReader(reprojectedScenario).readFile(testFile);
 
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
 	}
@@ -138,7 +138,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).readFile(NET_FILE);
-		new MatsimPopulationReader(originalScenario).readFile(BASE_FILE);
+		new PopulationReader(originalScenario).readFile(BASE_FILE);
 		final Config config = ConfigUtils.createConfig();
 
 		// specify config
@@ -195,7 +195,7 @@ public class PopulationReprojectionIOTest {
 		controler.run();
 
 		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
-		new MatsimPopulationReader( dumpedScenario ).readFile( outputDirectory+"/output_plans.xml.gz" );
+		new PopulationReader( dumpedScenario ).readFile( outputDirectory+"/output_plans.xml.gz" );
 
 		for ( Id<Person> id : originalScenario.getPopulation().getPersons().keySet() ) {
 			final Person originalPerson = originalScenario.getPopulation().getPersons().get( id );
@@ -238,8 +238,8 @@ public class PopulationReprojectionIOTest {
 		new MatsimNetworkReader(originalScenario.getNetwork()).readFile(NET_FILE);
 		new MatsimNetworkReader(reprojectedScenario.getNetwork()).readFile(NET_FILE);
 
-		new MatsimPopulationReader(originalScenario).readFile(inputFile);
-		new MatsimPopulationReader(new Transformation(), reprojectedScenario).readFile(inputFile);
+		new PopulationReader(originalScenario).readFile(inputFile);
+		new PopulationReader(new Transformation(), reprojectedScenario).readFile(inputFile);
 
 		final Population originalPopulation = originalScenario.getPopulation();
 		final Population reprojectedPopulation = reprojectedScenario.getPopulation();

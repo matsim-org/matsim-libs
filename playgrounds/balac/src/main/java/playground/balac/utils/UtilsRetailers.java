@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -26,7 +26,7 @@ public class UtilsRetailers {
 	int numberOfRet1 = 29;
 	int numberOfRet2 = 17;
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	PopulationReader populationReader = new MatsimPopulationReader(scenario);
+	MatsimPopulationReader populationReader = new PopulationReader(scenario);
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	
 	MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(scenario);

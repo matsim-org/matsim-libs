@@ -30,7 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -189,7 +189,7 @@ class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
-				new MatsimPopulationReader(this.scenario).parse(populationFileName);
+				new PopulationReader(this.scenario).parse(populationFileName);
 			}
 			else {
 				final String inputCRS = config.plans().getInputCRS();
@@ -202,7 +202,7 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new MatsimPopulationReader(transformation , this.scenario).parse(populationFileName);
+				new PopulationReader(transformation , this.scenario).parse(populationFileName);
 			}
 
 			if (this.scenario.getPopulation() instanceof Population) {

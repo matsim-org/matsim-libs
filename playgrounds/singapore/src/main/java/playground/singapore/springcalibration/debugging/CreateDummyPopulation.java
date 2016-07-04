@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -45,7 +45,7 @@ public class CreateDummyPopulation {
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);	
-		new MatsimPopulationReader(scenario).readFile(populationFile);
+		new PopulationReader(scenario).readFile(populationFile);
 		
 		newScenario.addScenarioElement("network", scenario.getNetwork());
 	}

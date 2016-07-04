@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -70,7 +70,7 @@ public class MembershipMain
     new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 
     log.info("  reading file " + this.plansfilePath);
-    PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
+    MatsimPopulationReader plansReader = new PopulationReader(this.scenario);
     plansReader.readFile(this.plansfilePath);
   }
 

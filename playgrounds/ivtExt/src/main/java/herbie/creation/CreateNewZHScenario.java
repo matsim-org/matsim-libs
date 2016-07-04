@@ -42,7 +42,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.MutableScenario;
@@ -101,7 +101,7 @@ public class CreateNewZHScenario {
 		log.info("\tReading network, facilities and plans .............................");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
+		PopulationReader populationReader = new PopulationReader(this.scenario);
 		populationReader.readFile(plansV2filePath);
 	}
 	
@@ -133,7 +133,7 @@ public class CreateNewZHScenario {
 				ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
+		PopulationReader populationReader = new PopulationReader(sTmp);
 		populationReader.readFile(plansFilePath);
 		
 		this.map2Network(sTmp.getPopulation());

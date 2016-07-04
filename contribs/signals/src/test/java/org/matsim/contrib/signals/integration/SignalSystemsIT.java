@@ -40,7 +40,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
@@ -114,10 +114,10 @@ public class SignalSystemsIT {
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
-			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
+			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
 			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
 			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
@@ -136,10 +136,10 @@ public class SignalSystemsIT {
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
-			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
 			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
+			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 			
 			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
 			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
@@ -197,9 +197,9 @@ public class SignalSystemsIT {
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
-			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
+			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 0 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
@@ -215,9 +215,9 @@ public class SignalSystemsIT {
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
-			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
+			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 10 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));

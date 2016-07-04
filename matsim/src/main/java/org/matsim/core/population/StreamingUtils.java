@@ -19,7 +19,6 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 
@@ -30,6 +29,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 public class StreamingUtils {
 	private static final Logger log = Logger.getLogger( StreamingUtils.class ) ;
 	
+	@SuppressWarnings("unused")
 	public static void addAlgorithm( Population pop, PersonAlgorithm algo ) {
 		printError();
 	}
@@ -40,6 +40,7 @@ public class StreamingUtils {
 		log.fatal("reader.readFile(...)" ) ;
 		throw new RuntimeException("This does not work any more after change of the streaming api. ") ;
 	}
+	@SuppressWarnings("unused")
 	public static void runAlgorithms( Population pop ) {
 		printError() ;
 	}

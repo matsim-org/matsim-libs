@@ -24,7 +24,7 @@ import java.io.File;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -108,7 +108,7 @@ public class SviReplanningMain {
 //		pop.addAlgorithm(replanner);
 //		pop.addAlgorithm(ods);
 
-		new MatsimPopulationReader(scenario).parse(inputPopulationFilename);
+		new PopulationReader(scenario).parse(inputPopulationFilename);
 
 		// write new demand matrices
 		// TODO [MR] need description of format

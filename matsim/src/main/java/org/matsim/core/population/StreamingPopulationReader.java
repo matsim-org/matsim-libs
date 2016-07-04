@@ -37,10 +37,10 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public final class StreamingPopulationReader implements PopulationReader {
+public final class StreamingPopulationReader implements MatsimPopulationReader {
 	private static final Logger log = Logger.getLogger(StreamingPopulationReader.class);
 	
-	private MatsimPopulationReader reader ;
+	private PopulationReader reader ;
 	private final StreamingPopulation pop ;
 	private int cnt;
 
@@ -54,7 +54,7 @@ public final class StreamingPopulationReader implements PopulationReader {
 		if ( scenario instanceof MutableScenario ) {
 			pop = new StreamingPopulation( scenario.getConfig() ) ;
 			((MutableScenario) scenario).setPopulation(pop);
-			reader = new MatsimPopulationReader( coordinateTransformation, scenario, true) ;
+			reader = new PopulationReader( coordinateTransformation, scenario, true) ;
 		} else {
 			throw new RuntimeException("scenario given into this class needs to be an instance of MutableScenario.") ;
 		}

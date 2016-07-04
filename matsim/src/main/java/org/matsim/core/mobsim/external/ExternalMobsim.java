@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.external;
 
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -28,12 +27,10 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -44,13 +41,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.population.AbstractPopulationWriterHandler;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
 public class ExternalMobsim implements Mobsim {
@@ -132,59 +125,71 @@ public class ExternalMobsim implements Mobsim {
 		new ConfigWriter(extConfig).write(iterationConfigFile);
 	}
 
-	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
-		if ( false ) {
-			log.info("writing plans for external mobsim");
-			Population pop = (Population) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-			// yyyyyy is the streaming really necessary here? kai, jul'16
-			//		StreamingUtils.setIsStreaming(pop, true);
-			PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
-			AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
-			plansWriter.setWriterHandler(handler);
-			plansWriter.writeStartPlans(iterationPlansFile);
-			BufferedWriter writer = plansWriter.getWriter();
-			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-				Plan plan = person.getSelectedPlan();
-				if (plan != null) {
-					/* we have to re-implement a custom writer here, because we only want to
-					 * write a single plan (the selected one) and not all plans of the person.
-					 * 
-					 * yy could as well copy only the selected plans to a new population.  That would be closer to our 
-					 * programming style over the recent years (sacrifice performance for cleaner code at non-critical locations).
-					 * kai, jul'16
-					 */
-					handler.startPerson(person, writer);
-					handler.startPlan(plan, writer);
-
-					// act/leg
-					for (PlanElement pe : plan.getPlanElements()) {
-						if (pe instanceof Activity) {
-							Activity act = (Activity) pe;
-							handler.startAct(act, writer);
-							handler.endAct(writer);
-						} else if (pe instanceof Leg) {
-							Leg leg = (Leg) pe;
-							handler.startLeg(leg, writer);
-							// route
-							if (leg.getRoute() != null) {
-								NetworkRoute r = (NetworkRoute) leg.getRoute();
-								handler.startRoute(r, writer);
-								handler.endRoute(writer);
-							}
-							handler.endLeg(writer);
-						}
-					}
-					handler.endPlan(writer);
-					handler.endPerson(writer);
-					handler.writeSeparator(writer);
-					writer.flush();
-				}
-			}
-			handler.endPlans(writer);
-			writer.flush();
-			writer.close();
+	protected void writePlans(final String iterationPlansFile) {
+		log.info("writing plans for external mobsim");
+		log.warn("I don't know if this works; was changed after the streaming api changed, and never tested after that.  Pls let us know. kai, jul'16" ) ;
+		
+		Population pop2 = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
+		PopulationFactory pf = pop2.getFactory() ;
+		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
+			Person person2 = pf.createPerson( person.getId() ) ;
+			Plan plan2 = pf.createPlan() ;
+			PopulationUtils.copyFromTo( person.getSelectedPlan(), plan2 );
+			person2.addPlan(plan2) ;
+			pop2.addPerson(person2);
 		}
-		throw new RuntimeException("needs to be solved in other way after streaming API was changed.  kai, jul'16") ;
+		
+		PopulationWriter writer = new PopulationWriter( pop2 ) ;
+		writer.writeV4( iterationPlansFile );
+
+//		Population pop = (Population) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+//		// yyyyyy is the streaming really necessary here? kai, jul'16
+//		//		StreamingUtils.setIsStreaming(pop, true);
+//		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
+//		AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
+//		plansWriter.setWriterHandler(handler);
+//		plansWriter.writeStartPlans(iterationPlansFile);
+//		BufferedWriter writer = plansWriter.getWriter();
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//			Plan plan = person.getSelectedPlan();
+//			if (plan != null) {
+//				/* we have to re-implement a custom writer here, because we only want to
+//				 * write a single plan (the selected one) and not all plans of the person.
+//				 * 
+//				 * yy could as well copy only the selected plans to a new population.  That would be closer to our 
+//				 * programming style over the recent years (sacrifice performance for cleaner code at non-critical locations).
+//				 * kai, jul'16
+//				 */
+//				handler.startPerson(person, writer);
+//				handler.startPlan(plan, writer);
+//
+//				// act/leg
+//				for (PlanElement pe : plan.getPlanElements()) {
+//					if (pe instanceof Activity) {
+//						Activity act = (Activity) pe;
+//						handler.startAct(act, writer);
+//						handler.endAct(writer);
+//					} else if (pe instanceof Leg) {
+//						Leg leg = (Leg) pe;
+//						handler.startLeg(leg, writer);
+//						// route
+//						if (leg.getRoute() != null) {
+//							NetworkRoute r = (NetworkRoute) leg.getRoute();
+//							handler.startRoute(r, writer);
+//							handler.endRoute(writer);
+//						}
+//						handler.endLeg(writer);
+//					}
+//				}
+//				handler.endPlan(writer);
+//				handler.endPerson(writer);
+//				handler.writeSeparator(writer);
+//				writer.flush();
+//			}
+//		}
+//		handler.endPlans(writer);
+//		writer.flush();
+//		writer.close();
 	}
 
 	//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,

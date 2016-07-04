@@ -48,8 +48,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.population.StreamingUtils;
@@ -485,7 +485,7 @@ public class MyRuns {
 				}
 			}
 		}
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(inputFilename);
 		PopulationUtils.printPlansCount(reader) ;
 		System.out.println("  done.");
@@ -529,7 +529,7 @@ public class MyRuns {
 
 		Population matsimAgentPopulation = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(matsimAgentPopulation, true);
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		PopulationUtils.printPlansCount(matsimAgentPopulation) ;
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();

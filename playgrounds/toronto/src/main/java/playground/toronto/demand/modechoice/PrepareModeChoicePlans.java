@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -52,7 +52,7 @@ public class PrepareModeChoicePlans {
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(network, population, outputPlansFile);
 		final PersonAlgorithm algo = planGenerator;
 		StreamingUtils.addAlgorithm(population, algo);
-		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
+		new PopulationReader(scenario).readFile(inputPlansFile);
 		PopulationUtils.printPlansCount(population) ;
 		planGenerator.writeEndPlans();
 		System.out.println("done.");

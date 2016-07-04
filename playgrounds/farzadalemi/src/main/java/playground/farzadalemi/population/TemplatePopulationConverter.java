@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -135,6 +135,6 @@ public class TemplatePopulationConverter {
 	 * this is a first indication that the transformation was (technically) successful.
 	 */
 	private void testPopulation(String pathToOutputFile) {
-		new MatsimPopulationReader(ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(pathToOutputFile);
+		new PopulationReader(ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(pathToOutputFile);
 	}
 }

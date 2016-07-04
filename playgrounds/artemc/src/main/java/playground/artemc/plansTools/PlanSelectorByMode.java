@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -28,7 +28,7 @@ public class PlanSelectorByMode {
 		/*Create scenario and load population*/
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading population...");
-		new MatsimPopulationReader(scenario).readFile(inputPopulationFile);
+		new PopulationReader(scenario).readFile(inputPopulationFile);
 		Population population = ((MutableScenario)scenario).getPopulation();
 		
 		ArrayList<Id> personsForRemoval = new ArrayList<Id>();

@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -92,7 +92,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
 		Population population2 = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
+		new PopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
 		assertNotNull("person 1 missing", person2);

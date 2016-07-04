@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.config.*;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -48,7 +48,7 @@ public class MielecDemandExtractor
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimPopulationReader(scenario).readFile(planFile);
+        new PopulationReader(scenario).readFile(planFile);
 
         try (CompactCSVWriter csvWriter = new CompactCSVWriter(
                 IOUtils.getBufferedWriter(demandFile))) {

@@ -51,7 +51,7 @@ import org.xml.sax.Attributes;
  * @author balmermi
  */
 /*package*/ class PopulationReaderMatsimV1 extends MatsimXmlParser implements
-		PopulationReader {
+		MatsimPopulationReader {
 
 	private final static String PLANS = "plans";
 	private final static String PERSON = "person";

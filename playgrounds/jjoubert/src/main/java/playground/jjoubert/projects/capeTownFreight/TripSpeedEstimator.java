@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -75,7 +75,7 @@ public class TripSpeedEstimator{
 		String output = args[1];
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(plans);
+		new PopulationReader(sc).parse(plans);
 
 		LOG.info("Processing plans to extract trip times as a function of distance...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);

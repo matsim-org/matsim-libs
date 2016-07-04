@@ -43,7 +43,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -210,7 +210,7 @@ public final class LinkActivityCalculationFromEventsMain {
 				}
 			}
 		});
-		new MatsimPopulationReader(sc).readFile(plansFile);
+		new PopulationReader(sc).readFile(plansFile);
 		reader.runAlgorithms();
 		log.info("finished (load scenario-data).");
 		return sc;

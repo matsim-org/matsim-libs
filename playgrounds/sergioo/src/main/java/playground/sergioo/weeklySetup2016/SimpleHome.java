@@ -10,14 +10,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SimpleHome {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(args[0]);
+		new PopulationReader(scenario).readFile(args[0]);
 		Set<Id<Person>> toDelete = new HashSet<>();
 		for(Person person:scenario.getPopulation().getPersons().values()) {
 			if(person.getSelectedPlan()!=null) {

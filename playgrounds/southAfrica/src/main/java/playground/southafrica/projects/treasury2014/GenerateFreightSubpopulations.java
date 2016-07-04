@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -53,7 +53,7 @@ public class GenerateFreightSubpopulations {
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			String inputFreightFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "com_010per_30_15.xml.gz";;
 			String inputFreightAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "comAttr_010per_30_15.xml.gz";;
-			new MatsimPopulationReader(sc).parse(inputFreightFile);
+			new PopulationReader(sc).parse(inputFreightFile);
 			new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputFreightAttributeFile);;
 			
 			sc = InAreaPlanKeeper.run(sc, areaShapefile, false);

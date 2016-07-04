@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -57,7 +57,7 @@ public class Modify24hTrips {
 		
 		for( String filename :filenames){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(filename);
+		new PopulationReader(scenario).readFile(filename);
 		
 		for (Person person : scenario.getPopulation().getPersons().values()){
 			Plan plan = person.getSelectedPlan();

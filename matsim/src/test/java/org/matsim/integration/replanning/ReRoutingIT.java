@@ -29,7 +29,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -109,10 +109,10 @@ public class ReRoutingIT extends MatsimTestCase {
 		
 		Scenario referenceScenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
-		new MatsimPopulationReader(referenceScenario).readFile(originalFileName);
+		new PopulationReader(referenceScenario).readFile(originalFileName);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimPopulationReader(scenario).readFile(revisedFileName);
+		new PopulationReader(scenario).readFile(revisedFileName);
 
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {

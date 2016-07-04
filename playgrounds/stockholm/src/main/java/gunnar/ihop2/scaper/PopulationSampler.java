@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.PopulationWriter;
@@ -75,7 +75,7 @@ public final class PopulationSampler{
 						new BufferedInputStream(new UnicodeInputStream(fis))
 				) {
 				try {
-					new MatsimPopulationReader(sc).parse(is);
+					new PopulationReader(sc).parse(is);
 				} finally {
 					;
 				}

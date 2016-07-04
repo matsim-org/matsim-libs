@@ -75,7 +75,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -151,7 +151,7 @@ public class SantiagoScenarioBuilder {
 					  Normal + "comunas.csv");
 		
 		Scenario scenarioFromEOD = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenarioFromEOD).readFile(outputDir + "plans/plans_eod.xml.gz");
+		new PopulationReader(scenarioFromEOD).readFile(outputDir + "plans/plans_eod.xml.gz");
 		
 		//TODO: check if really needed with "relative score computation" and cutting only A0neAX to midnight (see below)
 		removePersons(scenarioFromEOD.getPopulation());
@@ -166,8 +166,8 @@ public class SantiagoScenarioBuilder {
 		
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
-		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
+		new PopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
+		new PopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
 		Population populationTmp = scenarioTmp.getPopulation();
 		//randomizeEndTimes(populationTmp);
 		
@@ -220,7 +220,7 @@ public class SantiagoScenarioBuilder {
 		} else {
 			log.info("Adding freight population to O-D based population");
 			Scenario scenarioFreight = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-			new MatsimPopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
+			new PopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
 			for (Person person : scenarioFreight.getPopulation().getPersons().values()){
 				populationOut.addPerson(person);
 			}

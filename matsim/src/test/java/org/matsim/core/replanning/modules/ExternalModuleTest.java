@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
@@ -92,7 +92,7 @@ public class ExternalModuleTest {
 
     private Population loadPopulation(String filename) {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimPopulationReader(scenario).readFile(filename);
+        new PopulationReader(scenario).readFile(filename);
         return scenario.getPopulation();
     }
 

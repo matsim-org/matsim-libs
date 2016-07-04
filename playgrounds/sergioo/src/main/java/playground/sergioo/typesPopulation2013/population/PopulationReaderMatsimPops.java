@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -50,7 +50,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class PopulationReaderMatsimPops extends MatsimXmlParser implements PopulationReader {
+public class PopulationReaderMatsimPops extends MatsimXmlParser implements MatsimPopulationReader {
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";

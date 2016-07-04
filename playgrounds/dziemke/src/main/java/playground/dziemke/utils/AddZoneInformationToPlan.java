@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -73,7 +73,7 @@ public class AddZoneInformationToPlan {
 		// load output plans/population
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(inputPlansFile);
 		Population population = scenario.getPopulation();
 		

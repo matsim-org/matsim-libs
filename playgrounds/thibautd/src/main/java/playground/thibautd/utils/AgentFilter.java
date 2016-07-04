@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class AgentFilter {
@@ -52,7 +52,7 @@ public class AgentFilter {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(netFile);
-		(new MatsimPopulationReader(scenario)).readFile(fileName);
+		(new PopulationReader(scenario)).readFile(fileName);
 		Population population = scenario.getPopulation();
 
 		Map<Id<Person>, ? extends Person> persons = population.getPersons();

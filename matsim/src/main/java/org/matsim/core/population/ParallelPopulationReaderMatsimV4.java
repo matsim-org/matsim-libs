@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -102,7 +101,7 @@ import org.xml.sax.helpers.AttributesImpl;
 				this.numThreads = scenario.getConfig().global().getNumberOfThreads();			
 			} else this.numThreads = 1;
 			
-			this.queue = new LinkedBlockingQueue<List<Tag>>();
+			this.queue = new LinkedBlockingQueue<>();
 			this.collectorPopulation = new CollectorPopulation(this.plans);
 			this.collectorScenario = new CollectorScenario(scenario, collectorPopulation);
 		}
@@ -144,7 +143,7 @@ import org.xml.sax.helpers.AttributesImpl;
 			// If it is an new person, create a new person and a list for its attributes.
 			if (PERSON.equals(name)) {
 				Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
-				currentPersonXmlData = new ArrayList<Tag>();
+				currentPersonXmlData = new ArrayList<>();
 				PersonTag personTag = new PersonTag();
 				personTag.person = person;
 				currentPersonXmlData.add(personTag);
@@ -171,7 +170,7 @@ import org.xml.sax.helpers.AttributesImpl;
 		if (PLANS.equals(name)) {
 			// signal the threads that they should end parsing
 			for (int i = 0; i < this.numThreads; i++) {
-				List<Tag> list = new ArrayList<Tag>();
+				List<Tag> list = new ArrayList<>();
 				list.add(new EndProcessingTag());
 				this.queue.add(list);
 			}

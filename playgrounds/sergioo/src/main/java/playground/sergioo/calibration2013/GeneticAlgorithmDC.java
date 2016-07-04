@@ -41,7 +41,7 @@ import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 import javax.inject.Provider;
 import java.io.FileWriter;
@@ -265,7 +265,7 @@ public class GeneticAlgorithmDC {
 	
 	public static void main(String[] args) throws IOException {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[3]);
 		for(Link link:scenario.getNetwork().getLinks().values()) {

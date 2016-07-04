@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
@@ -62,7 +62,7 @@ public class TimeAllocationMutatorTest {
 	@Before
 	public void initPlans() {
 		Scenario s = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		MatsimPopulationReader reader = new MatsimPopulationReader( s );
+		PopulationReader reader = new PopulationReader( s );
 		reader.readFile( utils.getPackageInputDirectory() + "/plans.xml.gz" );
 		plans = new ArrayList<Plan>();
 		for (Person p : s.getPopulation().getPersons().values()) {

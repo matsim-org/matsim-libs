@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -101,7 +101,7 @@ public class QuickLegAnalysisPtPlanbased {
 		
 		pop = scenario.getPopulation();
 		
-		new MatsimPopulationReader(scenario).readFile(PLANSFILE);
+		new PopulationReader(scenario).readFile(PLANSFILE);
 		
 		scenario.getConfig().transit().setUseTransit(true);
 		

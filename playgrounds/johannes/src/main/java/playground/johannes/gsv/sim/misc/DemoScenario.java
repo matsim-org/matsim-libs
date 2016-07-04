@@ -38,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -78,7 +78,7 @@ public class DemoScenario {
 		 * remove foreign persons and extract subsample
 		 */
 		logger.info("Loading persons...");
-		MatsimPopulationReader pReader = new MatsimPopulationReader(scenario);
+		PopulationReader pReader = new PopulationReader(scenario);
 		pReader.readFile(popFile);
 		logger.info("Done.");
 		

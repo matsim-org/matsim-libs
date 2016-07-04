@@ -39,7 +39,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
-public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
+/*package*/ class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
 	private final CoordinateTransformation coordinateTransformation;
 	private final Network network;

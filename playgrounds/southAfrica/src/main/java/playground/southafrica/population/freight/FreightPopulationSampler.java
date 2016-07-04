@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -62,7 +62,7 @@ public class FreightPopulationSampler {
 		String outputAttributes = args[5];
 		
 		Scenario inSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(inSc).parse(inputPopulation);
+		new PopulationReader(inSc).parse(inputPopulation);
 		new ObjectAttributesXmlReader(inSc.getPopulation().getPersonAttributes()).parse(inputAttributes);
 		
 		Scenario outSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());

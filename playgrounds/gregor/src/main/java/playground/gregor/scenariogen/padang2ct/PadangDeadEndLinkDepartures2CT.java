@@ -46,7 +46,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -220,7 +220,7 @@ public class PadangDeadEndLinkDepartures2CT {
 	}
 
 	private static Set<Id<Link>> loadPopulation(Scenario sc, Set<Id<Link>> deadEndLinks) {
-		new MatsimPopulationReader(sc).readFile(PDG_INPUT + "/output_plans.xml.gz");
+		new PopulationReader(sc).readFile(PDG_INPUT + "/output_plans.xml.gz");
 		Set<Person> rm = new HashSet<>();
 		for (Person pers : sc.getPopulation().getPersons().values()) {
 			for (Plan plan : pers.getPlans()) {

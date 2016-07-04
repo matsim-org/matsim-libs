@@ -367,7 +367,7 @@ public class CreateFreightTraffic {
 		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
+		PopulationReader populationReader = new PopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		
 //		ActTypeConverter actTypeConverter = new ActTypeConverter(false);

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -93,7 +93,7 @@ public class BikeSharingRouteIOTest {
 		final Scenario insc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		BikeSharingScenarioUtils.configurePopulationFactory( insc );
 
-		new MatsimPopulationReader( insc ).readFile( file );
+		new PopulationReader( insc ).readFile( file );
 
 		final BikeSharingRoute inRoute = unWrap( insc.getPopulation() );
 

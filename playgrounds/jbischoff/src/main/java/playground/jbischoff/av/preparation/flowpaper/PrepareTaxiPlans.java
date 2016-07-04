@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,7 +50,7 @@ public class PrepareTaxiPlans {
 		Random rnd = MatsimRandom.getLocalInstance();
 		for (double d = 0.0; d <= 1.0; d = d + 0.10) {
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimPopulationReader(scenario).readFile("D:/runs-svn/avsim/prerun02_10pct_0.15fc/output_plans.xml.gz");
+			new PopulationReader(scenario).readFile("D:/runs-svn/avsim/prerun02_10pct_0.15fc/output_plans.xml.gz");
 			Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 			List<Person> taxiriders = new ArrayList<>();
 			for (Person p : scenario.getPopulation().getPersons().values()) {

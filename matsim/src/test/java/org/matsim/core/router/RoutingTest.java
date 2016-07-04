@@ -35,7 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -179,13 +179,13 @@ public class RoutingTest  {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 //		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		final String inPlansName = utils.getClassInputDirectory() + "/plans.xml.gz" ;
-		new MatsimPopulationReader(scenario).readFile(inPlansName);
+		new PopulationReader(scenario).readFile(inPlansName);
 			
 		calcRoute(provider, scenario);
 
 		final Scenario referenceScenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
-		new MatsimPopulationReader(referenceScenario).readFile(inPlansName);
+		new PopulationReader(referenceScenario).readFile(inPlansName);
 		
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {

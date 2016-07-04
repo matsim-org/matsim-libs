@@ -30,10 +30,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -53,6 +52,11 @@ public class FixModeChainingPopulation {
 		final String outPopulation = args[ 1 ];
 		// necessary for V4...
 		final String facilitiesFile = args.length > 2 ? args[ 2 ] : null;
+		
+		if ( true ) {
+			throw new RuntimeException("Thibaut, I think could could do the following easily with StreamingPopulationWriter. "
+					+ "If you truly need to write v4, could add a writeV4(...) into that class.  Ok?  kai, jul'16") ;
+		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
@@ -63,7 +67,7 @@ public class FixModeChainingPopulation {
 			new PopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
-		writer.setWriterHandler( new PopulationWriterHandlerImplV4( scenario.getNetwork() ) );
+//		writer.setWriterHandler( new PopulationWriterHandlerImplV4( scenario.getNetwork() ) );
 		writer.writeStartPlans( outPopulation );
 
 		final Counter correctionCounter = new Counter( "correcting plan # " );
@@ -75,7 +79,7 @@ public class FixModeChainingPopulation {
 			}
 		});
 
-		new MatsimPopulationReader( scenario ).parse( inPopulation );
+		new PopulationReader( scenario ).parse( inPopulation );
 		writer.writeEndPlans();
 		correctionCounter.printCounter();
 	}

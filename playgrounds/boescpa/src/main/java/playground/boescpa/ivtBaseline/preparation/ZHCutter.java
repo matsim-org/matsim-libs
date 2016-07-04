@@ -68,7 +68,7 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -122,7 +122,7 @@ public class ZHCutter {
 		this.filteredAgents = new HashMap<>();
 		final String pathToInputScenarioFolder = cutterConfig.getPathToInputScenarioFolder() + File.separator;
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(pathToInputScenarioFolder + PreparationScript.CONFIG));
-		new MatsimPopulationReader(scenario).readFile(pathToInputScenarioFolder + POPULATION);
+		new PopulationReader(scenario).readFile(pathToInputScenarioFolder + POPULATION);
 		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(pathToInputScenarioFolder + POPULATION_ATTRIBUTES);
 		new HouseholdsReaderV10(scenario.getHouseholds()).readFile(pathToInputScenarioFolder + HOUSEHOLDS);
 		new ObjectAttributesXmlReader(scenario.getHouseholds().getHouseholdAttributes()).parse(pathToInputScenarioFolder + HOUSEHOLD_ATTRIBUTES);

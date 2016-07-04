@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -61,7 +61,7 @@ public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 			}
 		});
 		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
-		new MatsimPopulationReader( sc ).readFile( populationFile );
+		new PopulationReader( sc ).readFile( populationFile );
 
 		new ObjectAttributesXmlWriter( attrs ).writeFile( outObjectAttributesFile );
 	}

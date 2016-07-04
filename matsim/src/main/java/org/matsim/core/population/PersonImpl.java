@@ -37,7 +37,7 @@ import org.matsim.core.scenario.Lockable;
  */
 /* deliberately package */ final class PersonImpl implements Person, Lockable {
 
-	private List<Plan> plans = new ArrayList<Plan>(6);
+	private List<Plan> plans = new ArrayList<>(6);
 	private Id<Person> id;
 
 	private Plan selectedPlan = null;

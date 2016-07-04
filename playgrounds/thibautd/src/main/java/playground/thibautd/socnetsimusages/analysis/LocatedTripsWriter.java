@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -184,7 +184,7 @@ public class LocatedTripsWriter {
 		StreamingUtils.setIsStreaming(reader, true);
 		reader.addAlgorithm(new InfoFiller( filter , infos ));
 
-		new MatsimPopulationReader( scenario ).parse( inPopFile );
+		new PopulationReader( scenario ).parse( inPopFile );
 		return infos;
 	}
 

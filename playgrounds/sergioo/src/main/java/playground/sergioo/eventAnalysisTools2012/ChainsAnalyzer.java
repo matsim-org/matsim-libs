@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -54,7 +54,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 		activityChains = new HashMap<Id<Person>, List<String>>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
-		new MatsimPopulationReader(scenario).parse(plansFile);
+		new PopulationReader(scenario).parse(plansFile);
 		eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(this);
 		new EventsReaderXMLv1(eventsManager).parse(eventsFile);

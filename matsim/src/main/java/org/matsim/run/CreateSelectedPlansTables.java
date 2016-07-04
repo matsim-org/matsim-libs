@@ -122,7 +122,7 @@ public class CreateSelectedPlansTables {
 
 	private void readPlansFile(final String plansfilePath, final Population plans) {
 		System.out.println("  reading file "+plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, plans));
+		final MatsimPopulationReader plansReader = new PopulationReader(new PseudoScenario(this.scenario, plans));
 		plansReader.readFile(plansfilePath);
 	}
 

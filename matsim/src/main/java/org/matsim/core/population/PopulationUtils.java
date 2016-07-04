@@ -46,7 +46,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -292,7 +291,7 @@ public final class PopulationUtils {
 		
 		public UnmodifiablePlan( Plan plan ) {
 			this.delegate = plan;
-			List<PlanElement> tmp = new ArrayList<PlanElement>() ;
+			List<PlanElement> tmp = new ArrayList<>() ;
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if (pe instanceof Activity) {
                     tmp.add(unmodifiableActivity((Activity) pe));
@@ -358,7 +357,7 @@ public final class PopulationUtils {
 	 * @return sorted map containing containing the persons as values and their ids as keys.
 	 */
 	public static SortedMap<Id<Person>, Person> getSortedPersons(final Population population) {
-		return new TreeMap<Id<Person>, Person>(population.getPersons());
+		return new TreeMap<>(population.getPersons());
 	}
 	
 	/**
@@ -392,6 +391,8 @@ public final class PopulationUtils {
 			}
 		case minOfDurationAndEndTime:
 			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
+		default:
+			break ;
 		}
 		return Time.UNDEFINED_TIME ;
 	}
@@ -570,7 +571,9 @@ public final class PopulationUtils {
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
+			@SuppressWarnings("resource")
 			InputStream inputStream1 = null;
+			@SuppressWarnings("resource")
 			InputStream inputStream2 = null;
 			try {
 				inputStream1 = openPopulationInputStream(s1);
@@ -591,6 +594,7 @@ public final class PopulationUtils {
 	 * 
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
+	@SuppressWarnings("resource")
 	private static InputStream openPopulationInputStream(final Population s1) {
 		try {
 			final PipedInputStream in = new PipedInputStream();

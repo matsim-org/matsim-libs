@@ -34,8 +34,8 @@ import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -116,7 +116,7 @@ public class ZurichFromSwitzerland {
 		StreamingUtils.setIsStreaming(pop, true);
 		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork());
 		pop_writer.startStreaming(filenameOutput);
-		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader pop_reader = new PopulationReader(scenario);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

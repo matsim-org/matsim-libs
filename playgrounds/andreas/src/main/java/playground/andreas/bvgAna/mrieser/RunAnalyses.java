@@ -53,7 +53,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -96,7 +96,7 @@ public class RunAnalyses {
 	}
 
 	public void readPopulation() {
-		new MatsimPopulationReader(this.scenario).readFile(plansFilename);
+		new PopulationReader(this.scenario).readFile(plansFilename);
 	}
 
 	public void extractSelectedPlansOnly() {
@@ -110,12 +110,12 @@ public class RunAnalyses {
 		StreamingUtils.addAlgorithm(pop, new PersonFilterSelectedPlan());
 		final PersonAlgorithm algo = writer;
 		StreamingUtils.addAlgorithm(pop, algo);
-		new MatsimPopulationReader(s).readFile(plansFilename);
+		new PopulationReader(s).readFile(plansFilename);
 		writer.closeStreaming();
 	}
 
 	public void readSelectedPlansOnly() {
-		new MatsimPopulationReader(this.scenario).readFile("selectedPlansOnly.xml.gz");
+		new PopulationReader(this.scenario).readFile("selectedPlansOnly.xml.gz");
 	}
 
 	public void createPersonAttributeTable(final String attributesFilename, final String idsFilename) {
@@ -128,7 +128,7 @@ public class RunAnalyses {
 			PersonIdsWriter idsWriter = new PersonIdsWriter(idsFilename);
 			final PersonAlgorithm algo1 = idsWriter;
 			StreamingUtils.addAlgorithm(pop, algo1);
-			new MatsimPopulationReader(scenario).readFile(plansFilename);
+			new PopulationReader(scenario).readFile(plansFilename);
 			attributesWriter.close();
 			idsWriter.close();
 		} catch (IOException e) {

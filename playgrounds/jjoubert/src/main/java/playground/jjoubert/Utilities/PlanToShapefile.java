@@ -23,7 +23,7 @@ package playground.jjoubert.Utilities;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
@@ -45,7 +45,7 @@ public class PlanToShapefile {
 		}
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
-		MatsimPopulationReader pr = new MatsimPopulationReader(s);
+		PopulationReader pr = new PopulationReader(s);
 		nr.parse(networkFilename);
 		pr.parse(plansFilename);
 		

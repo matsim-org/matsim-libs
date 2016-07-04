@@ -44,8 +44,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -112,7 +112,7 @@ public class MATSimUtils {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFile);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
-		new MatsimPopulationReader(scenario).readFile(this.plansFile);
+		new PopulationReader(scenario).readFile(this.plansFile);
 		final Population plans = (Population) scenario.getPopulation();
 
 
@@ -128,7 +128,7 @@ public class MATSimUtils {
 		
 		MatsimRandom.reset(123);
 		
-		new MatsimPopulationReader(scenario).readFile(this.plansFile);
+		new PopulationReader(scenario).readFile(this.plansFile);
 		Iterator<Person> persons =  (Iterator<Person>) scenario.getPopulation().getPersons().values().iterator();
 
 		while(persons.hasNext()){
@@ -149,11 +149,11 @@ public class MATSimUtils {
 		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkFile);
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
-		new MatsimPopulationReader(this.scenario).readFile(this.plansFile);		
+		new PopulationReader(this.scenario).readFile(this.plansFile);		
 		final Population plans = (Population) this.scenario.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
 		
-		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
+		final MatsimPopulationReader plansReader = new PopulationReader(this.scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		
 

@@ -32,7 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -110,7 +110,7 @@ public class AnalyzeMicrocensus {
 		
 		this.zh_distanceDistribution = new Bins(500.0, 40000.0, type + "_zh_trips_mc_" + this.mode);
 		
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenarioCH);
+		PopulationReader populationReader = new PopulationReader(this.scenarioCH);
 		populationReader.readFile(plansFilePath);
 		
 		scenarioZH = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
@@ -164,7 +164,7 @@ public class PreparationScript {
 		log.info(" ------- Merge in the Sub-Populations ------- ");
 		// read the scenario population
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+		PopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(pathPopulation);
 		Population scenarioPopulation = scenario.getPopulation();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
@@ -306,7 +306,7 @@ public class PreparationScript {
             Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
             MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(scenario);
             facilitiesReader.readFile(pathFacilities);
-            MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+            PopulationReader plansReader = new PopulationReader(scenario);
             plansReader.readFile(pathPopulation);
 			if (executeFinalScenarioTests) {
 				testFacilityAssignment(scenario);

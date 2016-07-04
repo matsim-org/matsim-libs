@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -28,7 +28,7 @@ public class PlanPreprocessorRemoveWalks {
 	public void run(String plansFile, String plansOutFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MutableScenario scenarioTmp = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-		new MatsimPopulationReader(scenarioTmp).readFile(plansFile);
+		new PopulationReader(scenarioTmp).readFile(plansFile);
 		
 		this.keepBestOnly(scenario, scenarioTmp);
 		this.correctForLongWalks(scenario);

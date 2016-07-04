@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.StreamingPopulationReader;
@@ -147,7 +147,7 @@ public class PlansPrepare {
 		Population pop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		log.info("reading plans from file: " + fromFile);
-		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
+		new PopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
 
 		log.info("filter plans with " + mode + "-legs");
 		new PlansFilterByLegMode(mode, FilterType.keepAllPlansWithMode).run(pop);

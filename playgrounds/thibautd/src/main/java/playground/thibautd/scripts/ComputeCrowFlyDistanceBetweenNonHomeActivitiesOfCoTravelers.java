@@ -33,7 +33,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRouteFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -60,7 +60,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 		((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories().setRouteFactory(
 				PassengerRoute.class,//JointActingTypes.PASSENGER,
 				new PassengerRouteFactory() );
-		new MatsimPopulationReader( scenario ).readFile( popFile );
+		new PopulationReader( scenario ).readFile( popFile );
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writer.write( "typePassenger\ttypeDriver\tdist" );

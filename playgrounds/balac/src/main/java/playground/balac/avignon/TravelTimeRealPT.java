@@ -9,8 +9,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -26,7 +26,7 @@ ObjectAttributes bla = new ObjectAttributes();
 		new ObjectAttributesXmlReader(bla).parse(attributes);	
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-			PopulationReader populationReader = new MatsimPopulationReader(scenario);
+			MatsimPopulationReader populationReader = new PopulationReader(scenario);
 			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		populationReader.readFile(input);
 	//	networkReader.readFile(networkFilePath);

@@ -35,7 +35,7 @@ import org.matsim.core.scenario.CustomizableUtils;
 
 /* deliberately package */  final class PlanImpl implements Plan {
 
-	private ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
+	private ArrayList<PlanElement> actsLegs = new ArrayList<>();
 
 	private Double score = null;
 	private Person person = null;

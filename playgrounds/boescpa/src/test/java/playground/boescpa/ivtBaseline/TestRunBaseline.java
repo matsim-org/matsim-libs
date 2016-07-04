@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -75,7 +75,7 @@ public class TestRunBaseline {
 
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(tempScenario.getNetwork()).readFile(pathToOnlyStreetNetwork);
-		new MatsimPopulationReader(tempScenario).readFile(pathToInitialPopulation);
+		new PopulationReader(tempScenario).readFile(pathToInitialPopulation);
 		createPrefs(tempScenario, pathToPrefs);
 		createFacilities(tempScenario, pathToFacilities);
 		F2LCreator.createF2L(tempScenario, pathToF2L);

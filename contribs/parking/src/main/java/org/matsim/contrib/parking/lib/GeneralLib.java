@@ -70,9 +70,9 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -113,7 +113,7 @@ public class GeneralLib {
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(plansFile);
 
 		return scenario;
