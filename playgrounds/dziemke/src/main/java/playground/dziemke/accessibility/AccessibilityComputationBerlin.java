@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -85,8 +86,8 @@ public class AccessibilityComputationBerlin {
 //		int symbolSize = 210;
 		int symbolSize = 510;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-		
-        double[] mapViewExtent = {4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000};
+
+		Envelope envelope = new Envelope(4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000);
 				
 		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
@@ -195,7 +196,7 @@ public class AccessibilityComputationBerlin {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
 					}
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

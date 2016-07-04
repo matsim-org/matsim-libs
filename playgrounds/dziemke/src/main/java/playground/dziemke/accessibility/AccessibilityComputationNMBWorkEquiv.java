@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
@@ -102,7 +103,7 @@ public class AccessibilityComputationNMBWorkEquiv {
 		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
 		
 //		double[] mapViewExtent = {100000,-3720000,180000,-3675000}; // choose map view a bit bigger
-		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // what actually needs to be drawn
+		Envelope envelope = new Envelope(115000,-3718000,161000,-3679000); // what actually needs to be dran
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -140,7 +141,7 @@ public class AccessibilityComputationNMBWorkEquiv {
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 //				VisualizationUtils.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
-				VisualizationUtils.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+				VisualizationUtils.createQGisOutput(typeWEQ, mode, envelope, workingDirectory, crs, includeDensityLayer,
 						lowerBound, upperBound, range, symbolSize, populationThreshold);
 				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}

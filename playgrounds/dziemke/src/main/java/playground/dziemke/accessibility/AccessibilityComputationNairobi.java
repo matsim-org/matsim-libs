@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.vividsolutions.jts.geom.Envelope;
 import javafx.geometry.BoundingBox;
 
 import org.apache.log4j.Logger;
@@ -80,7 +81,7 @@ public class AccessibilityComputationNairobi {
 		
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		BoundingBox boundingBox = new BoundingBox(240000, 9844000, 280000, 9874000);
+		Envelope envelope = new Envelope(240000, 9844000, 280000, 9874000);
 		
 		// QGis
 		boolean createQGisOutput = true;
@@ -199,8 +200,8 @@ public class AccessibilityComputationNairobi {
 						@Override
 						public ControlerListener get() {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario, ConfigUtils.addOrGetModule((Config) config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
-							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY(), cellSize));
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories, boundingBox.getMinX(), boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY(), cellSize);
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize));
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 //							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
@@ -228,7 +229,7 @@ public class AccessibilityComputationNairobi {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, boundingBox, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

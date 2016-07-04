@@ -1,5 +1,6 @@
 package playground.dziemke.accessibility;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
@@ -34,7 +35,7 @@ public class CreateQGisVisualsForAccessibiliyComputation {
 		int symbolSize = 1010;
 		int cellSize = 1000;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // NMB
+		Envelope envelope = new Envelope(115000,-3718000,161000,-3679000); // NMB
 
 		// Set mapViewExtent by bounding box around network
 //		Network network = NetworkUtils.createNetwork();
@@ -48,7 +49,7 @@ public class CreateQGisVisualsForAccessibiliyComputation {
 		String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 		
 		for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-			VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+			VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 					lowerBound, upperBound, range, symbolSize, populationThreshold);
 			VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 		}
