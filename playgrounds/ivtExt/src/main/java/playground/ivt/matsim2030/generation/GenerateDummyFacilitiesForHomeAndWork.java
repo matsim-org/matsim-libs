@@ -25,18 +25,19 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -61,20 +62,21 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 		final String outputPopFile = args[ 2 ];
 		final String outputF2lFile = args[ 3 ];
 
-		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
-		population.setIsStreaming( true );
+		final MutableScenario scenario = ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() );
+//		final Population population = (Population) scenario.getPopulation();
+		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(population, true);
 		final ActivityFacilities facilities = scenario.getActivityFacilities();
 
-		final PopulationWriter writer = new PopulationWriter( population );
+		final PopulationWriter writer = new PopulationWriter( null );
 		writer.startStreaming( outputPopFile );
 
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
-		population.addAlgorithm( new PersonAlgorithm() {
+		population.addAlgorithm(new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				if ( person.getPlans().size() != 1 ) throw new IllegalArgumentException( ""+person.getPlans().size() );
-
+		
 				for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , stages ) ) {
 					if ( act.getType().equals( "home" ) ) {
 						final ActivityFacility fac = getHomeFacility( act , facilities );
@@ -85,7 +87,7 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 						((Activity) act).setFacilityId( fac.getId() );
 					}
 				}
-
+		
 				writer.writePerson( person );
 			}
 		});

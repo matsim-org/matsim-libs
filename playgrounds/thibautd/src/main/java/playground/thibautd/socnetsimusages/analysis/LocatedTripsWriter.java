@@ -19,6 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.analysis;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,7 +36,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -42,15 +51,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
-import playground.ivt.utils.Filter;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import playground.ivt.utils.Filter;
 
 /**
  * @author thibautd
@@ -177,8 +179,10 @@ public class LocatedTripsWriter {
 		final Collection<TripInfo> infos = new ArrayList<TripInfo>();
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((StreamingPopulation) scenario.getPopulation()).setIsStreaming( true );
-		((StreamingPopulation) scenario.getPopulation()).addAlgorithm( new InfoFiller( filter , infos ) );
+//		final Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		reader.addAlgorithm(new InfoFiller( filter , infos ));
 
 		new MatsimPopulationReader( scenario ).parse( inPopFile );
 		return infos;

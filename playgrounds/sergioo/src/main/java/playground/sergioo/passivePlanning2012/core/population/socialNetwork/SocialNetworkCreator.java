@@ -9,9 +9,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -22,8 +23,8 @@ public class SocialNetworkCreator implements PersonAlgorithm {
 	public static void main(String[] args) {
 		SocialNetwork socialNetwork = new SocialNetwork();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((StreamingPopulation)scenario.getPopulation()).setIsStreaming(true);
-		((StreamingPopulation)scenario.getPopulation()).addAlgorithm(new SocialNetworkCreator());
+		StreamingUtils.setIsStreaming(((Population)scenario.getPopulation()), true);
+		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), new SocialNetworkCreator());
 		new MatsimPopulationReader(scenario).readFile(args[0]);
 		for(Set<Id<Person>> persons:map.values())
 			for(Id<Person> personA:persons)

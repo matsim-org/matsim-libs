@@ -20,9 +20,10 @@ package playground.thibautd.scripts;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -59,30 +60,28 @@ public class GenerateOdXy {
 
 			final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
-			(( StreamingPopulation) sc.getPopulation()).setIsStreaming( true );
-			(( StreamingPopulation) sc.getPopulation()).addAlgorithm(
-					p -> {
-						try {
-							final Plan plan = p.getSelectedPlan();
-
-							for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan, stages ) ) {
-								writer.newLine();
-								writer.write( p.getId() + "\t" );
-
-								writer.write( trip.getOriginActivity().getType() + "\t" );
-								writer.write( trip.getOriginActivity().getCoord().getX() + "\t" );
-								writer.write( trip.getOriginActivity().getCoord().getY() + "\t" );
-
-								writer.write( trip.getDestinationActivity().getType() + "\t" );
-								writer.write( trip.getDestinationActivity().getCoord().getX() + "\t" );
-								writer.write( trip.getDestinationActivity().getCoord().getY()+"" );
-							}
-						}
-						catch ( IOException e ) {
-							throw new UncheckedIOException( e );
-						}
+			StreamingUtils.setIsStreaming((( Population) sc.getPopulation()), true);
+			StreamingUtils.addAlgorithm((( Population) sc.getPopulation()), p -> {
+				try {
+					final Plan plan = p.getSelectedPlan();
+			
+					for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan, stages ) ) {
+						writer.newLine();
+						writer.write( p.getId() + "\t" );
+			
+						writer.write( trip.getOriginActivity().getType() + "\t" );
+						writer.write( trip.getOriginActivity().getCoord().getX() + "\t" );
+						writer.write( trip.getOriginActivity().getCoord().getY() + "\t" );
+			
+						writer.write( trip.getDestinationActivity().getType() + "\t" );
+						writer.write( trip.getDestinationActivity().getCoord().getX() + "\t" );
+						writer.write( trip.getDestinationActivity().getCoord().getY()+"" );
 					}
-			);
+				}
+				catch ( IOException e ) {
+					throw new UncheckedIOException( e );
+				}
+			});
 
 			new MatsimPopulationReader( sc ).readFile( inputPopulation );
 		}

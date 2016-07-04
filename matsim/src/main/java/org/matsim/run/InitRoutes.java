@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -33,8 +34,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
@@ -129,15 +131,15 @@ public class InitRoutes {
 		this.config = ConfigUtils.loadConfig(this.configfile);
 		MatsimRandom.reset(config.global().getRandomSeed());
 		final MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
-		final StreamingPopulation plans = PopulationUtils.createStreamingPopulation( config.plans(), null);
-		scenario.setPopulation( plans);
+//		final Population plans = PopulationUtils.createStreamingPopulation( config.plans(), null );
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
 
-		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
+		StreamingUtils.setIsStreaming(reader, true);
+		final PopulationReader plansReader = new StreamingPopulationReader(scenario);
+		final PopulationWriter plansWriter = new PopulationWriter(null, network);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
@@ -158,10 +160,10 @@ public class InitRoutes {
 			}));
 			}
 		});
-		plans.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null));
-		plans.addAlgorithm(plansWriter);
+		reader.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null));
+		reader.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
-		PopulationUtils.printPlansCount(plans) ;
+		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 
 		System.out.println("done.");

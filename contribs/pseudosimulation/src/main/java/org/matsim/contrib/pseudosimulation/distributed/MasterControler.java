@@ -31,6 +31,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStats;
@@ -53,7 +54,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -973,8 +974,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
-            StreamingPopulation temp = (StreamingPopulation) PopulationUtils.createPopulation(config);
-            temp.setIsStreaming(true);
+            Population temp = (Population) PopulationUtils.createPopulation(config);
+            StreamingUtils.setIsStreaming(temp, true);
             OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
             PopulationWriter pw = new PopulationWriter(
                     temp, scenario.getNetwork());

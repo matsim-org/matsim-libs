@@ -37,8 +37,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PlansFilterByLegMode;
 import org.matsim.core.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.core.scenario.MutableScenario;
@@ -94,38 +95,50 @@ public class PlansPrepare {
 		log.info("creating diluted dpopulation:");
 		log.info("  input-file:  " + fromFile);
 		log.info("  output-file: " + toFile);
-		StreamingPopulation pop = (StreamingPopulation) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		pop.setIsStreaming(true);
+//		Population reader = (Population) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ) ;
+		StreamingUtils.setIsStreaming(reader, true);
 
-		PopulationWriter writer = new PopulationWriter(pop, this.scenario.getNetwork());
+		PopulationWriter writer = new PopulationWriter(null, this.scenario.getNetwork());
 		writer.startStreaming(toFile);
 
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInterest, network);
 		filter.setAlternativeAOI(center, radius);
-		pop.addAlgorithm(filter);
+		reader.addAlgorithm(filter);
+		
+		if ( true ) {
+			throw new RuntimeException("does not work any more after change of streaming api.  kai, jul'16" ) ;
+		}
 
-		new MatsimPopulationReader(new PseudoScenario(this.scenario, pop)).readFile(fromFile);
+		// I commented out the following because it did not compile any more after changing the streaming api.  kai, jul'16
+//		new MatsimPopulationReader(new PseudoScenario(this.scenario, reader)).readFile(fromFile);
 
 		writer.closeStreaming();
 
-		PopulationUtils.printPlansCount(pop) ;
+		PopulationUtils.printPlansCount(reader) ;
 		log.info("persons in output: " + filter.getCount());
 	}
 
 	public void createSamplePopulation(final String fromFile, final String toFile, final double percentage) {
-		StreamingPopulation pop = (StreamingPopulation) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		pop.setIsStreaming(true);
-		final PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork(), percentage);
+//		Population reader = (Population) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+		StreamingUtils.setIsStreaming(reader, true);
+		final PopulationWriter plansWriter = new PopulationWriter(null, this.scenario.getNetwork(), percentage);
 		plansWriter.startStreaming(toFile);
-		pop.addAlgorithm(plansWriter);
-		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, pop));
+		reader.addAlgorithm(plansWriter);
+		
+		if ( true ) {
+			throw new RuntimeException("don't know who the following should work after change of streaming api.  kai, jul'16") ;
+		}
+//		PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, reader));
 
 		log.info("extracting sample from population:");
 		log.info("  input-file:  " + fromFile);
 		log.info("  output-file: " + toFile);
 		log.info("  sample-size: " + percentage);
-		plansReader.readFile(fromFile);
-		PopulationUtils.printPlansCount(pop) ;
+//		plansReader.readFile(fromFile);
+		reader.readFile( fromFile );
+		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 	}
 

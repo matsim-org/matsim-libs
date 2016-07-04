@@ -47,6 +47,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -54,7 +55,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -101,13 +102,14 @@ public class RunAnalyses {
 	public void extractSelectedPlansOnly() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
-		StreamingPopulation pop = (StreamingPopulation) s.getPopulation();
-		pop.setIsStreaming(true);
+		Population pop = (Population) s.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 
 		PopulationWriter writer = new PopulationWriter(pop, s.getNetwork());
 		writer.startStreaming("selectedPlansOnly.xml.gz");
-		pop.addAlgorithm(new PersonFilterSelectedPlan());
-		pop.addAlgorithm(writer);
+		StreamingUtils.addAlgorithm(pop, new PersonFilterSelectedPlan());
+		final PersonAlgorithm algo = writer;
+		StreamingUtils.addAlgorithm(pop, algo);
 		new MatsimPopulationReader(s).readFile(plansFilename);
 		writer.closeStreaming();
 	}
@@ -117,13 +119,15 @@ public class RunAnalyses {
 	}
 
 	public void createPersonAttributeTable(final String attributesFilename, final String idsFilename) {
-		StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
-		pop.setIsStreaming(true);
+		Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 		try {
 			PersonAttributesWriter attributesWriter = new PersonAttributesWriter(attributesFilename);
-			pop.addAlgorithm(attributesWriter);
+			final PersonAlgorithm algo = attributesWriter;
+			StreamingUtils.addAlgorithm(pop, algo);
 			PersonIdsWriter idsWriter = new PersonIdsWriter(idsFilename);
-			pop.addAlgorithm(idsWriter);
+			final PersonAlgorithm algo1 = idsWriter;
+			StreamingUtils.addAlgorithm(pop, algo1);
 			new MatsimPopulationReader(scenario).readFile(plansFilename);
 			attributesWriter.close();
 			idsWriter.close();

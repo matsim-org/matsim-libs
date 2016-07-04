@@ -21,10 +21,11 @@ package playground.thibautd.scripts.scenariohandling;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -43,24 +44,23 @@ public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 		final ObjectAttributes attrs = new ObjectAttributes();
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((StreamingPopulation) sc.getPopulation()).addAlgorithm(
-			new PersonAlgorithm() {
-				@Override
-				public void run(final Person person) {
-					final String carAvail = PersonUtils.getCarAvail(person);
-					final String license = PersonUtils.getLicense(person);
-					final boolean isCarAvail =
-						!"no".equals( license ) &&
-						!"never".equals( carAvail );
-					if ( !isCarAvail ) {
-						attrs.putAttribute(
-							person.getId().toString(),
-							attName,
-							weight );
-					}
+		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), new PersonAlgorithm() {
+			@Override
+			public void run(final Person person) {
+				final String carAvail = PersonUtils.getCarAvail(person);
+				final String license = PersonUtils.getLicense(person);
+				final boolean isCarAvail =
+					!"no".equals( license ) &&
+					!"never".equals( carAvail );
+				if ( !isCarAvail ) {
+					attrs.putAttribute(
+						person.getId().toString(),
+						attName,
+						weight );
 				}
-			});
-		((StreamingPopulation) sc.getPopulation()).setIsStreaming( true );
+			}
+		});
+		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
 		new MatsimPopulationReader( sc ).readFile( populationFile );
 
 		new ObjectAttributesXmlWriter( attrs ).writeFile( outObjectAttributesFile );

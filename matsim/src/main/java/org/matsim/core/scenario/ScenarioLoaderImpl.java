@@ -25,13 +25,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -205,8 +205,8 @@ class ScenarioLoaderImpl {
 				new MatsimPopulationReader(transformation , this.scenario).parse(populationFileName);
 			}
 
-			if (this.scenario.getPopulation() instanceof StreamingPopulation) {
-				PopulationUtils.printPlansCount(((StreamingPopulation)this.scenario.getPopulation())) ;
+			if (this.scenario.getPopulation() instanceof Population) {
+				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;
 			}
 		}
 		else {

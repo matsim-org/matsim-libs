@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +39,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -84,7 +86,7 @@ public class PopulationCutter {
     }
 
     private void createSubscenario(String populationInputFile, String populationOutputFile, CoordFilter coordFilter, Coord centerAlternative, int radiusAlternative) {
-        StreamingPopulation population = (StreamingPopulation)scenario.getPopulation();
+        Population population = (Population)scenario.getPopulation();
         Network network = scenario.getNetwork();
 
         // Identify all links within area of interest:
@@ -99,7 +101,7 @@ public class PopulationCutter {
         log.info(" AOI contains: " + areaOfInterest.size() + " links.");
 
         log.info(" Setting up population objects...");
-        population.setIsStreaming(true);
+        StreamingUtils.setIsStreaming(population, true);
         PopulationWriter pop_writer = new PopulationWriter(population, scenario.getNetwork());
         pop_writer.startStreaming(populationOutputFile);
         PopulationReader pop_reader = new MatsimPopulationReader(scenario);
@@ -107,7 +109,8 @@ public class PopulationCutter {
         log.info(" Adding person modules...");
         PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer, areaOfInterest, network);
         filter.setAlternativeAOI(centerAlternative, radiusAlternative);
-        population.addAlgorithm(filter);
+	final PersonAlgorithm algo = filter;
+        StreamingUtils.addAlgorithm(population, algo);
 
         log.info(" Reading, processing, writing plans...");
         pop_reader.readFile(populationInputFile);

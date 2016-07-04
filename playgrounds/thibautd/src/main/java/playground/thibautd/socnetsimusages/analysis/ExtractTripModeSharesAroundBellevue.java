@@ -35,12 +35,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -149,7 +150,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
 		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).parse( networkFile );
 
-		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
+		final Population pop = (Population) scenario.getPopulation();
 
 		if ( attributesFile != null ) {
 			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).parse( attributesFile );
@@ -158,8 +159,8 @@ public class ExtractTripModeSharesAroundBellevue {
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
 		writer.write( "agentId\tmain_mode\ttotal_dist" );
 
-		pop.setIsStreaming( true );
-		pop.addAlgorithm( new PersonAlgorithm() {
+		StreamingUtils.setIsStreaming(pop, true);
+		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
 			final playground.ivt.utils.Filter<Id> personFilter = attributesFile != null ?
 					new SubpopulationFilter(
 						pop.getPersonAttributes(),
@@ -182,7 +183,7 @@ public class ExtractTripModeSharesAroundBellevue {
 					}
 				}			
 			}
-		} );
+		});
 		new MatsimPopulationReader( scenario ).parse( plansFile );
 
 		writer.close();

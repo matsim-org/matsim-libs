@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +70,8 @@ public class RouterTester {
 
 		Vehicles v = s.getTransitVehicles();
 		TransitSchedule ts = s.getTransitSchedule();
-		StreamingPopulation p = (StreamingPopulation) s.getPopulation();
+//		Population reader = (Population) s.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( s ) ;
 
 		new MatsimNetworkReader(s.getNetwork()).readFile(NETWORK);
 		new VehicleReaderV1(v).readFile(VEHICLES);
@@ -84,11 +85,13 @@ public class RouterTester {
 
 		PtRouter ptR = new PtRouter(router);
 
-		p.setIsStreaming(true);
-		p.addAlgorithm(ptR);
+		StreamingUtils.setIsStreaming(reader, true);
+		final PersonAlgorithm algo = ptR;
+		reader.addAlgorithm(algo);
 
 		log.info("start processing persons...");
-		new MatsimPopulationReader(s).readFile(PLANS);
+//		new MatsimPopulationReader(s).readFile(PLANS);
+		reader.readFile(PLANS);
 
 		ptR.close();
 	}

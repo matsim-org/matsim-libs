@@ -24,9 +24,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -112,8 +113,8 @@ public class Version2pt1DemandGenerationScript {
 	}
 
 	private void createPlans() {
-		StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
-		pop.setIsStreaming(true);
+		Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 		PopulationWriter popWriter = new PopulationWriter(pop,
 				scenario.getNetwork());
 		String plansFile = diverseScriptProperties.getProperty("plansFile");

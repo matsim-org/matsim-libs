@@ -46,6 +46,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -119,21 +120,21 @@ public final class PopulationUtils {
 		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
 	
-	public static StreamingPopulation createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
-		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
-		RouteFactories routeFactory = new RouteFactories();
-		String networkRouteType = plansConfigGroup.getNetworkRouteType();
-		RouteFactory factory;
-		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
-			factory = new LinkNetworkRouteFactory();
-		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-			factory = new CompressedNetworkRouteFactory(network);
-		} else {
-			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
-		}
-		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-		return new StreamingPopulation(new PopulationFactoryImpl(routeFactory));
-	}
+//	public static Population createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+//		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
+//		RouteFactories routeFactory = new RouteFactories();
+//		String networkRouteType = plansConfigGroup.getNetworkRouteType();
+//		RouteFactory factory;
+//		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+//			factory = new LinkNetworkRouteFactory();
+//		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+//			factory = new CompressedNetworkRouteFactory(network);
+//		} else {
+//			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+//		}
+//		routeFactory.setRouteFactory(NetworkRoute.class, factory);
+//		return new Population(new PopulationFactoryImpl(routeFactory));
+//	}
 
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
@@ -960,5 +961,9 @@ public final class PopulationUtils {
 
 		public static void printPlansCount( Population population ) {
 			log.info(" person # " + population.getPersons().size() );
+		}
+
+		public static void printPlansCount(StreamingPopulationReader reader) {
+			reader.printPlansCount() ;
 		}
 }

@@ -51,12 +51,16 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	
 	
 	public PopulationWriter(final Population population) {
+		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
+		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this(population, null, 1.0);
 	}
 
 	public PopulationWriter(
 			final CoordinateTransformation coordinateTransformation,
 			final Population population) {
+		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
+		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this(coordinateTransformation , population, null, 1.0);
 	}
 
@@ -69,6 +73,8 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 * @param population the population to write to file
 	 */
 	public PopulationWriter(final Population population, final Network network) {
+		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
+		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this(population, network, 1.0);
 	}
 
@@ -76,6 +82,8 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 			final CoordinateTransformation coordinateTransformation,
 			final Population population,
 			final Network network) {
+		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
+		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this(coordinateTransformation , population, network, 1.0);
 	}
 
@@ -94,6 +102,8 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 			final Population population,
 			final Network network,
 			final double fraction) {
+		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
+		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this.coordinateTransformation = coordinateTransformation;
 		this.population = population;
 		this.network = network;
@@ -114,6 +124,8 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 			final Population population,
 			final Network network,
 			final double fraction) {
+		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
+		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this( new IdentityTransformation() , population , network , fraction );
 	}
 
@@ -164,8 +176,9 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	// implementation of PersonAlgorithm
 	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void startStreaming(final String filename) {
-		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
-			// write the file head if it is used with streaming.
+//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+	// write the file head if it is used with streaming.
 			writeStartPlans(filename);
 		} else {
 			log.error("Cannot start streaming. Streaming must be activated in the Population.");
@@ -178,7 +191,8 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	}
 
 	public void closeStreaming() {
-		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
+//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
 			if (this.writer != null) {
 				writeEndPlans();
 			} else {

@@ -37,7 +37,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
 	private String name;
-	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
+	private Map<Id<Person>, Person> persons = new LinkedHashMap<>();
 	private final PopulationFactory populationFactory;
 	private final ObjectAttributes personAttributes = new ObjectAttributes();
 	private long counter = 0;

@@ -36,16 +36,18 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
@@ -88,11 +90,15 @@ public class DistanceAnalysis {
 		new NetworkReaderMatsimV1(sc.getNetwork()).parse(network);
 		this.eventsHandler.addLinks((Map<Id<Link>, Link>) sc.getNetwork().getLinks());
 		
-		((StreamingPopulation) sc.getPopulation()).setIsStreaming(true);
-		AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter(); 
-		((StreamingPopulation) sc.getPopulation()).addAlgorithm(planFilter);
+//		final Population reader = (Population) sc.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter();
+		final PersonAlgorithm algo = planFilter; 
+		reader.addAlgorithm(algo);
 		
-		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
+//		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
+		reader.parse(IOUtils.getInputStream(plans));
 		
 		for(Entry<Id, LinkedList<AbstractAnalysisTrip>> e:  planFilter.getTrips().entrySet()){
 			this.eventsHandler.addPerson(new DistAnalysisAgent(e.getValue(), e.getKey()));

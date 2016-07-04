@@ -3,9 +3,12 @@ package playground.vsp.pipeline;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -13,7 +16,7 @@ public class PopulationWriterTask implements PersonSink {
 	
 	private final String filename;
 
-    private StreamingPopulation population;
+    private Population reader;
 
 	private PopulationWriter populationWriter;
 
@@ -28,17 +31,19 @@ public class PopulationWriterTask implements PersonSink {
 	
 	private void init() {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		population = (StreamingPopulation) scenario.getPopulation();
-		population.setIsStreaming(true);
-		populationWriter = new PopulationWriter(population, network);
-		population.addAlgorithm(populationWriter);
+//		reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		populationWriter = new PopulationWriter(null, network);
+		final PersonAlgorithm algo = populationWriter;
+		reader.addAlgorithm(algo);
 		populationWriter.startStreaming(filename);
 		Logger.getLogger(this.getClass()).info("Will write to: " + filename ) ;
 	}
 
 	@Override
 	public void process(Person person) {
-		population.addPerson(person);
+		reader.addPerson(person);
 	}
 	
 	@Override

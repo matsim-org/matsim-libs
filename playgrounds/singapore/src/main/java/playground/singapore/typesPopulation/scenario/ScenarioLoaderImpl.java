@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
@@ -34,7 +35,6 @@ import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -216,8 +216,8 @@ public class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 			new MatsimPopulationReader(this.scenario).parse(populationFileName);
 			
-			if (this.scenario.getPopulation() instanceof StreamingPopulation) {
-				PopulationUtils.printPlansCount(((StreamingPopulation)this.scenario.getPopulation())) ;
+			if (this.scenario.getPopulation() instanceof Population) {
+				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;
 			}
 		}
 		else {

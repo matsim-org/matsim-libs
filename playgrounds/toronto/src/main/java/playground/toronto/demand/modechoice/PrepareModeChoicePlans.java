@@ -21,11 +21,13 @@
 package playground.toronto.demand.modechoice;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -45,10 +47,11 @@ public class PrepareModeChoicePlans {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
-		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
-		population.setIsStreaming(true);
+		Population population = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(population, true);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(network, population, outputPlansFile);
-		population.addAlgorithm(planGenerator);
+		final PersonAlgorithm algo = planGenerator;
+		StreamingUtils.addAlgorithm(population, algo);
 		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
 		PopulationUtils.printPlansCount(population) ;
 		planGenerator.writeEndPlans();

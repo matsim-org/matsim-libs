@@ -24,10 +24,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
@@ -55,8 +56,8 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
-		pop.setIsStreaming( true );
+		final Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 
 		final PopulationWriter writer =
 			new PopulationWriter(
@@ -70,13 +71,13 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 						PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					new MainModeIdentifierImpl()
 					);
-		pop.addAlgorithm( new PersonAlgorithm() {
+		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				if ( atts.getAttribute( person.getId().toString() , "subpopulation" ) != null ) return;
 				PersonUtils.removeUnselectedPlans(((Person) person));
 				trips2legs.run( person.getSelectedPlan() );
-
+		
 				for ( PlanElement pe : person.getSelectedPlan().getPlanElements() ) {
 					if ( pe instanceof Activity ) {
 						((Activity) pe).setLinkId( null );

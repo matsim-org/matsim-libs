@@ -26,10 +26,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -76,24 +76,31 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	}
 
 	public void startStreaming(final String filename) {
-		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
-			// write the file head if it is used with streaming.
-			writeStartPlans(filename);
-		} else {
-			log.error("Cannot start streaming. Streaming must be activated in the Population.");
+		if ( true ) {
+			throw new RuntimeException("copy and paste from original PopulationWriter, cannot be retrofitted to changed streaming interface, sorry") ;
 		}
+		
+//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+//			// write the file head if it is used with streaming.
+//			writeStartPlans(filename);
+//		} else {
+//			log.error("Cannot start streaming. Streaming must be activated in the Population.");
+//		}
 	}
 
 	public void closeStreaming() {
-		if ((this.population instanceof StreamingPopulation) && (((StreamingPopulation) this.population).isStreaming())) {
-			if (this.fileOpened) {
-				writeEndPlans();
-			} else {
-				log.error("Cannot close streaming. File is not open.");
-			}
-		} else {
-			log.error("Cannot close streaming. Streaming must be activated in the Population.");
+		if ( true ) {
+			throw new RuntimeException("copy and paste from original PopulationWriter, cannot be retrofitted to changed streaming interface, sorry") ;
 		}
+//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+//			if (this.fileOpened) {
+//				writeEndPlans();
+//			} else {
+//				log.error("Cannot close streaming. File is not open.");
+//			}
+//		} else {
+//			log.error("Cannot close streaming. Streaming must be activated in the Population.");
+//		}
 	}
 
 	public final void setWriterHandler(final PopulationWriterHandler handler) {

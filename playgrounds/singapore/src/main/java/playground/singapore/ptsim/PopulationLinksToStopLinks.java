@@ -14,8 +14,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
@@ -84,13 +85,17 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
-		((StreamingPopulation) scenario.getPopulation()).setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		final Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		plansWriter.startStreaming(args[2]);
-		((StreamingPopulation) scenario.getPopulation()).addAlgorithm(new PopulationLinksToStopLinks(scenario.getNetwork()));
-		((StreamingPopulation) scenario.getPopulation()).addAlgorithm(plansWriter);
-		plansReader.readFile(args[0]);
+		reader.addAlgorithm(new PopulationLinksToStopLinks(scenario.getNetwork()));
+		final PersonAlgorithm algo = plansWriter;
+		reader.addAlgorithm(algo);
+//		plansReader.readFile(args[0]);
+		reader.readFile(args[0]);
 		plansWriter.closeStreaming();
 	}
 	

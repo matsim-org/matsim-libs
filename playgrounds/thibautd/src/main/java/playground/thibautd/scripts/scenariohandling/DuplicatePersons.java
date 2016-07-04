@@ -34,8 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -75,8 +76,14 @@ public class DuplicatePersons {
 		final int rate = args.getIntegerValue( "-r" );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final StreamingPopulation pop = (StreamingPopulation) scenario.getPopulation();
-		pop.setIsStreaming( true );
+//		final Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		
+		if ( true ) {
+			throw new RuntimeException("I don't think that the following will work any more with the changed streaming api, sorry.  kai, jul'16" ) ;
+		}
+		
+		StreamingUtils.setIsStreaming(reader, true);
 
 		final PopulationWriter writer =
 			new PopulationWriter(
@@ -85,13 +92,13 @@ public class DuplicatePersons {
 		writer.writeStartPlans( outPopulation );
 
 		final Map<String, Set<String>> clones = new HashMap< >();
-		pop.addAlgorithm( new PersonAlgorithm() {
+		reader.addAlgorithm(new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				final Set<String> cloneIds = new LinkedHashSet< >();
 				final String id = person.getId().toString();
 				clones.put( id , cloneIds );
-
+		
 				for ( int i=0; i < rate; i++ ) {
 					final String currId = id +"-"+ i;
 					cloneIds.add( currId );

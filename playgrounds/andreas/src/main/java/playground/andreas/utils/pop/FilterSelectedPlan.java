@@ -20,12 +20,13 @@
 package playground.andreas.utils.pop;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,13 +56,13 @@ public class FilterSelectedPlan {
 		log.info("Reading network from " + networkFile);
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
-		final StreamingPopulation plans = (StreamingPopulation) sc.getPopulation();
-		plans.setIsStreaming(true);
-		plans.addAlgorithm(new PersonFilterSelectedPlan());
+		final Population plans = (Population) sc.getPopulation();
+		StreamingUtils.setIsStreaming(plans, true);
+		StreamingUtils.addAlgorithm(plans, new PersonFilterSelectedPlan());
 		
 		final PopulationWriter plansWriter = new PopulationWriter(plans, sc.getNetwork());
 		plansWriter.startStreaming(outPlansFile);
-		plans.addAlgorithm(plansWriter);
+		StreamingUtils.addAlgorithm(plans, plansWriter);
 		PopulationReader plansReader = new MatsimPopulationReader(sc);		
 
 		log.info("Reading plans file from " + inPlansFile);

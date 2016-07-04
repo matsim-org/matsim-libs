@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.StreamingPopulationReader.StreamingPopulation;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -57,7 +58,16 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 
 	public MatsimPopulationReader(
 			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
+			final Scenario scenario ) {
+		this( coordinateTransformation, scenario, false ) ;
+	}
+	/*deliberately package*/ MatsimPopulationReader(
+				final CoordinateTransformation coordinateTransformation,
+				final Scenario scenario, boolean streaming ) {
+		if ( !streaming && scenario.getPopulation() instanceof StreamingPopulation ) {
+			throw new RuntimeException("MatsimPopulationReader called direction with an instance of StreamingPopulation "
+					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;
+		}
 		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 	}
@@ -81,7 +91,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	 */
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
+		super.parse(filename);
 	}
 
 	@Override

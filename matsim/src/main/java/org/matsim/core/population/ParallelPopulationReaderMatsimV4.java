@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -85,7 +86,8 @@ import org.xml.sax.helpers.AttributesImpl;
 		/*
 		 * Check whether population streaming is activated
 		 */
-		if (scenario.getPopulation() instanceof StreamingPopulation && ((StreamingPopulation)scenario.getPopulation()).isStreaming()) {
+//		if (scenario.getPopulation() instanceof Population && ((Population)scenario.getPopulation()).isStreaming()) {
+		if ( scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation ) {
 			log.warn("Population streaming is activated - cannot use " + ParallelPopulationReaderMatsimV4.class.getName() + "!");
 			
 			this.isPopulationStreaming = true;

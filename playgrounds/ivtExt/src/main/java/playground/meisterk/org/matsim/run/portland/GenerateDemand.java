@@ -29,8 +29,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -69,26 +71,28 @@ public class GenerateDemand {
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");
-		StreamingPopulation plans = (StreamingPopulation) scenario.getPopulation();
-		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans, networkLayer);
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		PopulationWriter plansWriter = new PopulationWriter(null, networkLayer);
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("Setting up plans objects...done.");
 
 		System.out.println("Setting up person modules...");
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		plans.addAlgorithm(
-				new PlanRouter(
-						new TripRouterFactoryBuilderWithDefaults().build(
-								scenario ).get(
-						) ) );
+		reader.addAlgorithm(new PlanRouter(
+		new TripRouterFactoryBuilderWithDefaults().build(
+				scenario ).get(
+		) ));
 		System.out.println("Setting up person modules...done.");
 
 		System.out.println("Reading, processing and writing plans...");
-		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(config.plans().getInputFile());
-		PopulationUtils.printPlansCount(plans) ;
+		final PersonAlgorithm algo = plansWriter;
+		reader.addAlgorithm(algo);
+//		plansReader.readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
+		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 		System.out.println("Reading, processing and writing plans...done.");
 

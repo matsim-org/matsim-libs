@@ -35,12 +35,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -73,9 +75,10 @@ final class PlansAnalyzer {
 		log.info("outputpath: " + outputpath);
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((StreamingPopulation) sc.getPopulation()).setIsStreaming(true);
+		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
 		MyPersonAlgorithm pa = new MyPersonAlgorithm();
-		((StreamingPopulation) sc.getPopulation()).addAlgorithm(pa);
+		final PersonAlgorithm algo = pa;
+		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
 		new MatsimPopulationReader(sc).readFile(plansfile);
 		pa.dumpStatistics(outputpath, "base");

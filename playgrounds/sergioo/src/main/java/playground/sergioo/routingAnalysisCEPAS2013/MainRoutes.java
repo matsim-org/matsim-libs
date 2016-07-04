@@ -22,10 +22,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -239,8 +241,9 @@ public class MainRoutes {
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[2]);
 		RoutesPopulation routesPopulation = new RoutesPopulation(scenario, list.get(index).getKey());
-		((StreamingPopulation)scenario.getPopulation()).setIsStreaming(true);
-		((StreamingPopulation)scenario.getPopulation()).addAlgorithm(routesPopulation);
+		StreamingUtils.setIsStreaming(((Population)scenario.getPopulation()), true);
+		final PersonAlgorithm algo = routesPopulation;
+		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), algo);
 		new MatsimPopulationReader(scenario).readFile(args[3]);
 		final Map<Journey, Integer> journeysPlan = routesPopulation.getJourneyPlan();
 		LayersPanel panel2 = new LayersPanel() {
@@ -279,8 +282,9 @@ public class MainRoutes {
 		RoutesWindow window2 = new RoutesWindow(panel2);
 		window2.setVisible(true);
 		routesPopulation = new RoutesPopulation(scenario, list.get(index).getKey());
-		((StreamingPopulation)scenario2.getPopulation()).setIsStreaming(true);
-		((StreamingPopulation)scenario2.getPopulation()).addAlgorithm(routesPopulation);
+		StreamingUtils.setIsStreaming(((Population)scenario2.getPopulation()), true);
+		final PersonAlgorithm algo1 = routesPopulation;
+		StreamingUtils.addAlgorithm(((Population)scenario2.getPopulation()), algo1);
 		new MatsimPopulationReader(scenario2).readFile(args[4]);
 		final Map<Journey, Integer> journeysPlan2 = routesPopulation.getJourneyPlan();
 		LayersPanel panel3 = new LayersPanel() {

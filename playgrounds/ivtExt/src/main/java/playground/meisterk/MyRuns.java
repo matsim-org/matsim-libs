@@ -20,13 +20,24 @@
 
 package playground.meisterk;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -38,9 +49,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -49,6 +61,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.run.XY2Links;
+
 import playground.meisterk.PersonAnalyseTimesByActivityType.Activities;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
@@ -57,12 +70,6 @@ import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class MyRuns {
 
@@ -371,11 +378,14 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		StreamingPopulation matsimAgentPopulation = (StreamingPopulation) scenario.getPopulation();
-		matsimAgentPopulation.setIsStreaming(true);
-		matsimAgentPopulation.addAlgorithm(pa);
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		plansReader.readFile(config.plans().getInputFile());
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		final PersonAlgorithm algo = pa;
+		reader.addAlgorithm(algo);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		plansReader.readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
 
 		logger.info("Number of selected plans which are infeasible: " + pa.getNumInfeasiblePlans());
 	}
@@ -460,25 +470,28 @@ public class MyRuns {
 
 	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, MutableScenario scenario) {
 
-		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
 		System.out.println("  reading plans xml file... ");
-		population.setIsStreaming(isStreaming);
+		StreamingUtils.setIsStreaming(reader, isStreaming);
 
 		if (isStreaming) {
 			// add plans algos for streaming
 			if (algos != null) {
 				for (PersonAlgorithm algo : algos) {
-					population.addAlgorithm(algo);
+					final PersonAlgorithm algo1 = algo;
+					reader.addAlgorithm(algo1);
 				}
 			}
 		}
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(inputFilename);
-		PopulationUtils.printPlansCount(population) ;
+		PopulationUtils.printPlansCount(reader) ;
 		System.out.println("  done.");
 
-		return population;
+		throw new RuntimeException("can't see how this was supposed to work; if streaming is used, the population will be empty") ;
+//		return population ;
 	}
 
 	public static void readEvents(final EventsManager events, final NetworkImpl network, final String eventsInputFile) {
@@ -514,8 +527,8 @@ public class MyRuns {
 		ArrayList<PersonAlgorithm> plansAlgos = new ArrayList<PersonAlgorithm>();
 		plansAlgos.add(pa);
 
-		StreamingPopulation matsimAgentPopulation = (StreamingPopulation) scenario.getPopulation();
-		matsimAgentPopulation.setIsStreaming(true);
+		Population matsimAgentPopulation = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(matsimAgentPopulation, true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		PopulationUtils.printPlansCount(matsimAgentPopulation) ;

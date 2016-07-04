@@ -14,9 +14,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,9 +48,9 @@ public class PlanGenerator {
 		HashMap<String, String> sexMap = new HashMap<String, String>();
 		HashMap<String,Integer> carTracker = new HashMap<String, Integer>();
 
-		StreamingPopulation population = (StreamingPopulation) scenario.getPopulation();
+		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
-		population.setIsStreaming(true);
+		StreamingUtils.setIsStreaming(population, true);
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(populationPath);
 		

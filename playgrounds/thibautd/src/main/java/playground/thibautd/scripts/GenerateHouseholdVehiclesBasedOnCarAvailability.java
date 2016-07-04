@@ -23,10 +23,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -112,19 +113,19 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		}
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final StreamingPopulation pop = (StreamingPopulation) sc.getPopulation();
+		final Population pop = (Population) sc.getPopulation();
 
 		log.info( "parse persons" );
 		final Set<Id> hhsWithSometimes = new HashSet<Id>();
-		pop.setIsStreaming( true );
-		pop.addAlgorithm( new PersonAlgorithm() {
+		StreamingUtils.setIsStreaming(pop, true);
+		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				final Household hh = person2hh.get( person.getId() );
 				if ( "always".equals( PersonUtils.getCarAvail(person) ) ) {
 					((HouseholdImpl) hh).getVehicleIds().add( Id.create(person.getId().toString(), Vehicle.class) );
 				}
-
+		
 				if ( "sometimes".equals( PersonUtils.getCarAvail(person) ) ) {
 					hhsWithSometimes.add( hh.getId() );
 				}

@@ -8,12 +8,13 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.StreamingPopulation;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
@@ -51,13 +52,13 @@ public class FilterSample {
 		});
 		System.out.println(personIds.size());
 		
-		StreamingPopulation filterpop = (StreamingPopulation) filtersc.getPopulation();
-		filterpop.setIsStreaming(true);
+		Population filterpop = (Population) filtersc.getPopulation();
+		StreamingUtils.setIsStreaming(filterpop, true);
 		
 		final PopulationReader plansReader = new MatsimPopulationReader(filtersc);
 		
-		filterpop.addAlgorithm(new PersonAlgorithm() {
-
+		StreamingUtils.addAlgorithm(filterpop, new PersonAlgorithm() {
+		
 			@Override
 			public void run(Person person) {
 				if (count % 10 == 0) {
