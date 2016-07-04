@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import javafx.geometry.BoundingBox;
+
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,7 +19,6 @@ import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -103,7 +104,7 @@ public class AccessibilityComputationKiberaTest {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
-		final BoundingBox boundingBox = BoundingBox.createBoundingBox(251000, 9853000, 256000, 9857000);
+		final BoundingBox boundingBox = new BoundingBox(251000, 9853000, 256000, 9857000);
 //		final BoundingBox boundingBox = BoundingBox.createBoundingBox(250500, 9852500, 256500, 9857500);
 //		final BoundingBox boundingBox = BoundingBox.createBoundingBox(250000, 9852000, 257000, 9858000);
 //		final BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
@@ -152,7 +153,6 @@ public class AccessibilityComputationKiberaTest {
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory =  config.controler().getOutputDirectory();
-			double[] mapViewExtent = {boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax()};
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
@@ -161,7 +161,7 @@ public class AccessibilityComputationKiberaTest {
 //						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //						continue ;
 //					}
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, boundingBox, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}
