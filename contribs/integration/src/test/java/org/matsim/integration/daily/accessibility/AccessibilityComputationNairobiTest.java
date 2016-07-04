@@ -35,7 +35,6 @@ import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -47,6 +46,8 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
@@ -70,7 +71,7 @@ public class AccessibilityComputationNairobiTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		final BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
+		final Envelope envelope = new Envelope(240000, 9844000, 280000, 9874000);
 		
 		// QGis Parameters
 		boolean createQGisOutput = true;
@@ -136,13 +137,11 @@ public class AccessibilityComputationNairobiTest {
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
-			double[] mapViewExtent = {boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax()};
-
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.geometry.BoundingBox;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
@@ -41,6 +39,8 @@ import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author ikaddoura
@@ -243,8 +243,8 @@ public class ProcessNoiseImmissions {
 		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_UTM31N, workingDirectory);
 			
 // ################################################################################################################################################
-		BoundingBox boundingBox = new BoundingBox(4568808,5803042,4622772,5844280);
-		writer.setBoundingBox(boundingBox);
+		Envelope envelope = new Envelope(4568808,5803042,4622772,5844280);
+		writer.setEnvelope(envelope);
 				
 		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
 		noiseLayer.setDelimiter(";");

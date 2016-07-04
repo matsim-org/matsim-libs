@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javafx.geometry.BoundingBox;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +28,8 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationKiberaTest.class ) ;
@@ -104,7 +104,7 @@ public class AccessibilityComputationKiberaTest {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
-		final BoundingBox boundingBox = new BoundingBox(251000, 9853000, 256000, 9857000);
+		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
 //		final BoundingBox boundingBox = BoundingBox.createBoundingBox(250500, 9852500, 256500, 9857500);
 //		final BoundingBox boundingBox = BoundingBox.createBoundingBox(250000, 9852000, 257000, 9858000);
 //		final BoundingBox boundingBox = BoundingBox.createBoundingBox(240000, 9844000, 280000, 9874000);
@@ -161,7 +161,7 @@ public class AccessibilityComputationKiberaTest {
 //						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //						continue ;
 //					}
-					VisualizationUtils.createQGisOutput(actType, mode, boundingBox, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

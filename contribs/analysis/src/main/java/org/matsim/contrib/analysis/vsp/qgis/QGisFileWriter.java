@@ -63,10 +63,10 @@ public class QGisFileWriter {
 		out.write("\t\t<units>" + this.writer.getUnit().toString() + "</units>\n");
 		out.write("\t\t<extent>\n");
 		
-		out.write("\t\t\t<xmin>" + this.writer.getBoundingBox().getMinX() + "</xmin>\n");
-		out.write("\t\t\t<ymin>" + this.writer.getBoundingBox().getMinY() + "</ymin>\n");
-		out.write("\t\t\t<xmax>" + this.writer.getBoundingBox().getMaxX() + "</xmax>\n");
-		out.write("\t\t\t<ymax>" + this.writer.getBoundingBox().getMaxY() + "</ymax>\n");
+		out.write("\t\t\t<xmin>" + this.writer.getEnvelope().getMinX() + "</xmin>\n");
+		out.write("\t\t\t<ymin>" + this.writer.getEnvelope().getMinY() + "</ymin>\n");
+		out.write("\t\t\t<xmax>" + this.writer.getEnvelope().getMaxX() + "</xmax>\n");
+		out.write("\t\t\t<ymax>" + this.writer.getEnvelope().getMaxY() + "</ymax>\n");
 		
 		out.write("\t\t</extent>\n");
 		out.write("\t\t<projections>1</projections>\n");

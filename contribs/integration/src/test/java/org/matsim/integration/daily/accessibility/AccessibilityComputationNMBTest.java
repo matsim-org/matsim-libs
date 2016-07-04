@@ -155,12 +155,11 @@ public class AccessibilityComputationNMBTest {
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
-			double[] mapViewExtent = {envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
 			
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

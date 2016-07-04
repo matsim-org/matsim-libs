@@ -22,14 +22,13 @@
  */
 package playground.ikaddoura.noise;
 
-import javafx.geometry.BoundingBox;
-
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author ikaddoura
@@ -46,8 +45,8 @@ public static void main(String args[]){
 		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 			
 // ################################################################################################################################################
-		BoundingBox boundingBox = new BoundingBox(4568808,5803042,4622772,5844280);
-		writer.setBoundingBox(boundingBox);
+		Envelope envelope = new Envelope(4568808,5803042,4622772,5844280);
+		writer.setEnvelope(envelope);
 				
 		VectorLayer noiseLayer = new VectorLayer("noise", workingDirectory + "immission_57600.0.csv", QGisConstants.geometryType.Point, true);
 		noiseLayer.setDelimiter(";");

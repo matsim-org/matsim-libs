@@ -28,6 +28,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class AccessibilityComputationCapeTownTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationCapeTownTest.class ) ;
 
@@ -114,12 +116,8 @@ public class AccessibilityComputationCapeTownTest {
 
 
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		double xMin = boundingBox.getXMin();
-		double xMax = boundingBox.getXMax();
-		double yMin = boundingBox.getYMin();
-		double yMax = boundingBox.getYMax();
-		double[] mapViewExtent = {xMin, yMin, xMax, yMax};
-
+		Envelope envelope = new Envelope(boundingBox.getXMin(), boundingBox.getXMax(),
+										 boundingBox.getYMin(), boundingBox.getYMin());
 
 		// no pt block
 
@@ -166,7 +164,7 @@ public class AccessibilityComputationCapeTownTest {
 //						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //						continue ;
 //					}
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

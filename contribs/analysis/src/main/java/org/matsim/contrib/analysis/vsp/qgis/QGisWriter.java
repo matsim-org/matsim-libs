@@ -4,13 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.geometry.BoundingBox;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 
+import com.vividsolutions.jts.geom.Envelope;
 /**
  * Writer that creates a QuantumGIs project file (*.qgs). 
  *
@@ -34,7 +33,7 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 	private String title = "";
 	private String projectname = "";
 	
-	private BoundingBox boundingBox;
+	private Envelope envelope;
 	
 	/**
 	 * Creates a new instance of a QGis project file (*.qgs) writer.
@@ -42,7 +41,7 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 	 * Layers have to be added separately with the method {@code addLayer}. If no layers were
 	 * added, the writer creates an empty project file.
 	 * </p>
-	 * After calling the constructor you have to set the boundingBox (starting view) manually.
+	 * After calling the constructor you have to set the envelope (starting view) manually.
 	 * 
 	 * @param crs coordinate reference system of the network / spatial data
 	 * @param workingDir the directory in which all generated files (shapefiles, qgs file) are put.
@@ -116,7 +115,7 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 			// writes the layer tree (all layers of the project in order of painting)
 			this.handler.writeLayerTreeGroup(this.writer);
 			
-			// writes basic map information, such as boundingBox of view and spatial reference system
+			// writes basic map information, such as envelope of view and spatial reference system
 			this.handler.writeMapCanvas(this.writer);
 			
 			// TODO: what does this do?
@@ -155,10 +154,10 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 		log.info("QGis project uses the following configuration:");
 		
 		log.info("PROJECT VERSION:\t\t\t" + QGisConstants.currentVersion);
-		log.info("EXTENT (MINX, MINY, MAXX, MAXY):\t" + this.boundingBox.getMinX() + ", " +
-														this.boundingBox.getMinY() + ", " +
-														this.boundingBox.getMaxX() + ", " +
-														this.boundingBox.getMaxY());
+		log.info("EXTENT (MINX, MINY, MAXX, MAXY):\t" + this.envelope.getMinX() + ", " +
+														this.envelope.getMinY() + ", " +
+														this.envelope.getMaxX() + ", " +
+														this.envelope.getMaxY());
 		log.info("SPATIAL REFERENCE SYSTEM:\t\t" + this.srs.getDescription());
 		log.info("NUMBER OF LAYERS:\t\t\t" + this.layers.size());
 		log.info("LAYERS (IN DRAWING ORDER):");
@@ -204,8 +203,8 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 		return this.layers;
 	}
 	
-	public BoundingBox getBoundingBox(){
-		return this.boundingBox;
+	public Envelope getEnvelope(){
+		return this.envelope;
 	}
 	
 	public String getWorkingDir(){
@@ -215,10 +214,10 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 	/**
 	 * Sets the starting view on the map when opening the project file.
 	 * 
-	 * @param boundingBox with minx, miny, maxx and maxy coordinates of the starting view
+	 * @param envelope with minx, miny, maxx and maxy coordinates of the starting view
 	 */
-	public void setBoundingBox(BoundingBox boundingBox){
-		this.boundingBox = boundingBox;
+	public void setEnvelope(Envelope envelope){
+		this.envelope = envelope;
 	}
 	
 	/**
