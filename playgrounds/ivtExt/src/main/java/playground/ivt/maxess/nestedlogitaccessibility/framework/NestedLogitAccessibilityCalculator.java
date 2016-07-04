@@ -24,22 +24,13 @@ import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.ivt.utils.ConcurrentStopWatch;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
-
-import static org.osgeo.proj4j.parser.Proj4Keyword.k;
-import static playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator.computeExpectedMaximumUtility;
-import static playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator.logSumNestUtilities;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
 
 /**
  * @author thibautd
@@ -169,5 +160,4 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 		return ( model.getMu() / nest.getMu_n() ) * calculator.computeLogsumExp();
-	}
-}
+	}}
