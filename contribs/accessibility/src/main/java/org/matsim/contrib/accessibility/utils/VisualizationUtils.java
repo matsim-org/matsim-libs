@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
+import javafx.geometry.BoundingBox;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -39,7 +41,7 @@ public class VisualizationUtils {
 	private VisualizationUtils(){} // do not instantiate
 
 	
-	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
+	public static void createQGisOutput(String actType, Modes4Accessibility mode, BoundingBox boundingBox,
 			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
 			Double upperBound, Integer range, int symbolSize, int populationThreshold) {
 		
@@ -49,7 +51,7 @@ public class VisualizationUtils {
 		// Write QGis project file
 		QGisWriter writer = new QGisWriter(crs, workingDirectory);
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
-		writer.setBoundingBox(mapViewExtent);
+		writer.setBoundingBox(boundingBox);
 
 		// osm raster layer
 		// working directory needs to be the storage location of the file
