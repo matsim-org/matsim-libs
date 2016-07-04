@@ -2,27 +2,35 @@ package playground.gthunig.utils;
 
 import java.util.concurrent.TimeUnit;
 
-public class TimeWatch {    
+public class StopWatch {
     
-	long starts;
+	private long start;
+	private long end;
 
-    public static TimeWatch start() {
-        return new TimeWatch();
-    }
-
-    private TimeWatch() {
+    public StopWatch() {
         reset();
     }
 
-    public TimeWatch reset() {
-        starts = System.currentTimeMillis();
-        return this;
+	public void reset() {
+        start = System.currentTimeMillis();
     }
 
     public long time() {
         long ends = System.currentTimeMillis();
-        return ends - starts;
+        return ends - start;
     }
+
+	public void stop() {
+		end = System.currentTimeMillis();
+	}
+
+	public String getStoppedTime() {
+		long time = TimeUnit.SECONDS.convert(end - start, TimeUnit.MILLISECONDS);
+		int hours = (int) time / 3600;
+		int minutes = (int) (time - hours * 3600) / 60;
+		int seconds = (int) (time - hours * 3600 - minutes * 60);
+		return hours + ":" + minutes + ":" + seconds;
+	}
 
     public long time(TimeUnit unit) {
         return unit.convert(time(), TimeUnit.MILLISECONDS);
