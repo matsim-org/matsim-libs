@@ -113,13 +113,13 @@ public class XY2Links {
 
 //		final Population plans = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(reader, true);
-		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		StreamingUtils.setIsStreaming(reader, true);
+//		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(null, network);
 		plansWriter.startStreaming(this.plansfile);
 		reader.addAlgorithm(new org.matsim.core.population.algorithms.XY2Links(scenario));
 		reader.addAlgorithm(plansWriter);
-		plansReader.readFile(this.config.plans().getInputFile());
+		reader.readFile(this.config.plans().getInputFile());
 		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 

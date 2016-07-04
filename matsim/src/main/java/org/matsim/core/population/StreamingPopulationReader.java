@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -51,7 +52,7 @@ public final class StreamingPopulationReader implements PopulationReader {
 	}
 	public StreamingPopulationReader(CoordinateTransformation coordinateTransformation, Scenario scenario ) {
 		if ( scenario instanceof MutableScenario ) {
-			pop = new StreamingPopulation(  ) ;
+			pop = new StreamingPopulation( scenario.getConfig() ) ;
 			((MutableScenario) scenario).setPopulation(pop);
 			reader = new MatsimPopulationReader( coordinateTransformation, scenario, true) ;
 		} else {
@@ -133,8 +134,8 @@ public final class StreamingPopulationReader implements PopulationReader {
 	final class StreamingPopulation implements Population {
 		private Population delegate ;
 		
-		StreamingPopulation() {
-			delegate = PopulationUtils.createPopulation(null) ;
+		StreamingPopulation(Config config) {
+			delegate = PopulationUtils.createPopulation(config) ;
 		}
 		
 		@Override
@@ -155,7 +156,7 @@ public final class StreamingPopulationReader implements PopulationReader {
 				/* Add Person to map, for algorithms might reference to the person
 				 * with "agent = population.getPersons().get(personId);"
 				 * remove it after running the algorithms! */
-				pop.addPerson(p);
+				delegate.addPerson(p);
 
 				// run algos
 				for (PersonAlgorithm algo : personAlgos) {
@@ -163,7 +164,7 @@ public final class StreamingPopulationReader implements PopulationReader {
 				}
 
 				// remove again as we are streaming
-				pop.removePerson(p.getId());
+				delegate.removePerson(p.getId());
 //			}
 
 		}

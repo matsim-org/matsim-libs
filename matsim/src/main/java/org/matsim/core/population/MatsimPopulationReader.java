@@ -65,7 +65,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 				final CoordinateTransformation coordinateTransformation,
 				final Scenario scenario, boolean streaming ) {
 		if ( !streaming && scenario.getPopulation() instanceof StreamingPopulation ) {
-			throw new RuntimeException("MatsimPopulationReader called direction with an instance of StreamingPopulation "
+			throw new RuntimeException("MatsimPopulationReader called directly with an instance of StreamingPopulation "
 					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;
 		}
 		this.coordinateTransformation = coordinateTransformation;

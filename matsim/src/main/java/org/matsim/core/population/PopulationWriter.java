@@ -23,11 +23,14 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -36,6 +39,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 
@@ -177,12 +181,12 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	// this is primarily to use the PlansWriter with filters and other algorithms.
 	public void startStreaming(final String filename) {
 //		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
-		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+//		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
 	// write the file head if it is used with streaming.
 			writeStartPlans(filename);
-		} else {
-			log.error("Cannot start streaming. Streaming must be activated in the Population.");
-		}
+//		} else {
+//			log.error("Cannot start streaming. Streaming must be activated in the Population.");
+//		}
 	}
 
 	@Override
@@ -192,22 +196,45 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 
 	public void closeStreaming() {
 //		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
-		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+//		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
 			if (this.writer != null) {
 				writeEndPlans();
 			} else {
 				log.error("Cannot close streaming. File is not open.");
 			}
-		} else {
-			log.error("Cannot close streaming. Streaming must be activated in the Population.");
-		}
+//		} else {
+//			log.error("Cannot close streaming. Streaming must be activated in the Population.");
+//		}
 	}
 
 	public final void writeStartPlans(final String filename) {
+		Population fakepop = new Population(){
+			@Override public PopulationFactory getFactory() {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public String getName() {
+				return "population written from streaming" ;
+			}
+			@Override public void setName(String name) {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public Map<Id<Person>, ? extends Person> getPersons() {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public void addPerson(Person p) {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public Person removePerson(Id<Person> personId) {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public ObjectAttributes getPersonAttributes() {
+				throw new RuntimeException("not implemented") ;
+			}
+		} ;
 		try {
 			this.openFile(filename);
 			this.handler.writeHeaderAndStartElement(this.writer);
-			this.handler.startPlans(this.population, this.writer);
+			this.handler.startPlans(fakepop, this.writer);
 			this.handler.writeSeparator(this.writer);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

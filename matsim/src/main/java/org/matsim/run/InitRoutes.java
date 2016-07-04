@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -137,9 +138,10 @@ public class InitRoutes {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
 
-		StreamingUtils.setIsStreaming(reader, true);
-		final PopulationReader plansReader = new StreamingPopulationReader(scenario);
+//		StreamingUtils.setIsStreaming(reader, true);
+//		final PopulationReader plansReader = new StreamingPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(null, network);
+		Gbl.assertNotNull(this.plansfile);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
@@ -162,7 +164,7 @@ public class InitRoutes {
 		});
 		reader.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null));
 		reader.addAlgorithm(plansWriter);
-		plansReader.readFile(this.config.plans().getInputFile());
+		reader.readFile(this.config.plans().getInputFile());
 		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 
