@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 public class StopWatch {
     
 	private long start;
-	private long end;
+	private long end = -1;
 
     public StopWatch() {
         reset();
@@ -25,6 +25,9 @@ public class StopWatch {
 	}
 
 	public String getStoppedTime() {
+		if (end == -1) {
+			end = System.currentTimeMillis();
+		}
 		long time = TimeUnit.SECONDS.convert(end - start, TimeUnit.MILLISECONDS);
 		int hours = (int) time / 3600;
 		int minutes = (int) (time - hours * 3600) / 60;
