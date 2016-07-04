@@ -91,7 +91,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic travel time
-		Route route = this.populationFactory.createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
+		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
 		route.setTravelTime(travTime);

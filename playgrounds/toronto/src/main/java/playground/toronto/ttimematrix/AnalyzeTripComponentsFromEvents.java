@@ -13,6 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -90,7 +91,7 @@ public class AnalyzeTripComponentsFromEvents {
 			double x = Double.parseDouble(tr.current().get("x"));
 			double y = Double.parseDouble(tr.current().get("y"));
 			
-			NodeImpl n = new NodeImpl(zoneId);
+			NodeImpl n = NetworkUtils.createNode(zoneId);
 			n.setCoord(new Coord(x, y));
 			network.addNode(n);
 		}

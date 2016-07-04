@@ -17,9 +17,9 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.XY2Links;
 
 import gunnar.ihop2.regent.demandreading.ActivityLocationSampler;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;

@@ -14,6 +14,7 @@ import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 //import org.matsim.core.network.TimeVariantLinkFactory;
 
@@ -37,7 +38,7 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 	// like in NetworkFactoryImpl
 	@Override
 	public NodeImpl createNode(final Id<Node> id, final Coord coord) {
-		NodeImpl node = new NodeImpl(id);
+		NodeImpl node = NetworkUtils.createNode(id);
 		node.setCoord(coord) ;
 		return node ;
 	}

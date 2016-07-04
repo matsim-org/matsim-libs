@@ -12,12 +12,13 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -84,13 +85,17 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
-		((PopulationImpl) scenario.getPopulation()).setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		final Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		plansWriter.startStreaming(args[2]);
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PopulationLinksToStopLinks(scenario.getNetwork()));
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(plansWriter);
-		plansReader.readFile(args[0]);
+		reader.addAlgorithm(new PopulationLinksToStopLinks(scenario.getNetwork()));
+		final PersonAlgorithm algo = plansWriter;
+		reader.addAlgorithm(algo);
+//		plansReader.readFile(args[0]);
+		reader.readFile(args[0]);
 		plansWriter.closeStreaming();
 	}
 	

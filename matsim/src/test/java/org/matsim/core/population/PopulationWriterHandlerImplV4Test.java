@@ -68,7 +68,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		new PopulationWriter(pop, network).writeV4(filename);
 
 		Population pop2 = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(filename);
+		new PopulationReader(scenario).readFile(filename);
 		Person person2 = pop2.getPersons().get(Id.create(1, Person.class));
 		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
 		Route route2 = leg2.getRoute();

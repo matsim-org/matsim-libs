@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
@@ -31,7 +31,7 @@ public class PrivateParkingReader {
 		
 		
 		
-		MatsimPopulationReader pReader=new MatsimPopulationReader(scenario);
+		PopulationReader pReader=new PopulationReader(scenario);
 		
 		pReader.readFile("c:/data/abmt/input/plans_1perc.xml");
 		

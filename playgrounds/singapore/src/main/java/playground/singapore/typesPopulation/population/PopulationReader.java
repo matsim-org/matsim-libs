@@ -24,7 +24,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -35,7 +35,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class MatsimPopulationReader extends MatsimXmlParser implements PopulationReader {
+public class PopulationReader extends MatsimXmlParser implements MatsimPopulationReader {
 
 	private final static String POPULATION_V5 = "population_v5.dtd";
 	private final static String POPULATION_POPS = "population_pops.dtd";
@@ -43,9 +43,9 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
 
-	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
+	private static final Logger log = Logger.getLogger(PopulationReader.class);
 
-	public MatsimPopulationReader(final Scenario scenario) {
+	public PopulationReader(final Scenario scenario) {
 		this.scenario = scenario;
 	}
 

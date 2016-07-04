@@ -10,7 +10,6 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
 import playground.artemc.plansTools.PlanRouteStripper;

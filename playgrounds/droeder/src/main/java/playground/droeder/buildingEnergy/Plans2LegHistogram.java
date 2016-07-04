@@ -27,14 +27,15 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 import java.io.File;
 import java.util.List;
@@ -64,8 +65,8 @@ public abstract class Plans2LegHistogram {
 		
 		final LegHistogram histo = new LegHistogram(300);
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
+		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
+		final PersonAlgorithm algo = new PersonAlgorithm() {
 			
 			@Override
 			public void run(Person person) {
@@ -77,9 +78,10 @@ public abstract class Plans2LegHistogram {
 					histo.handleEvent(new PersonArrivalEvent(arrivaltime, null, null, l.getMode()));
 				}
 			}
-		});
+		};
+		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
-		new MatsimPopulationReader(sc).readFile(plansfile);
+		new PopulationReader(sc).readFile(plansfile);
 		
 		LegHistogramChart.writeGraphic(histo, outputpath + "legHistogram_all.png");
 		log.info(outputpath + "legHistogram_all.png written.");

@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class RunAgain {
 		Scenario sc = ScenarioUtils.createScenario(c);
 //		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc.getNetwork()).readFile(RAW_INPUT + "/output_network.xml.gz");
-		new MatsimPopulationReader(sc).readFile(RAW_INPUT + "output_plans.xml.gz");
+		new PopulationReader(sc).readFile(RAW_INPUT + "output_plans.xml.gz");
 //		dropDepTimes(sc.getPopulation());
 
 		c.controler().setOutputDirectory(NEW_DIR + "output/");

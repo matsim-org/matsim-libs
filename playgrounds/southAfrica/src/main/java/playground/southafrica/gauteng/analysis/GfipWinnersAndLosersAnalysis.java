@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -61,11 +61,11 @@ public class GfipWinnersAndLosersAnalysis {
 		
 		/* Read the first (base) plan. */
 		Scenario sc1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc1).parse(file1);
+		new PopulationReader(sc1).parse(file1);
 
 		/* Read the second plan. */
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc2).parse(file2);
+		new PopulationReader(sc2).parse(file2);
 		
 		/* Calculate the gains/losses for each person. */
 //		Map<Id, Double> map = new TreeMap<Id, Double>();

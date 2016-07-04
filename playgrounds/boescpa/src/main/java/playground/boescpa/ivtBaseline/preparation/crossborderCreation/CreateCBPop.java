@@ -23,10 +23,10 @@ package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -207,7 +207,7 @@ public class CreateCBPop {
 	private static void mergeSubpopulations(String pathToMainPop, String pathToAdditionalPop, String pathToOutputPop) {
 		// read the scenario population
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+		PopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(pathToMainPop);
 		Population scenarioPopulation = scenario.getPopulation();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());

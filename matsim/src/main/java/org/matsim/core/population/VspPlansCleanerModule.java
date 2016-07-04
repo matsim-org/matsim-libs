@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.population;
+package org.matsim.core.population;
 
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;

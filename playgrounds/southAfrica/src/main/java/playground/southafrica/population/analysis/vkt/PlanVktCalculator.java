@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -95,7 +95,7 @@ public class PlanVktCalculator {
 		linkCounter.printCounter();
 		
 		/* Read the population file. */
-		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
+		PopulationReader mpr = new PopulationReader(scenario);
 		mpr.parse(plansfile);
 
 		/* The actual stuff to run the Vkt analysis. */

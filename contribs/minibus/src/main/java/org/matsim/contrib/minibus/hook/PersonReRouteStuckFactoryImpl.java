@@ -23,8 +23,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author droeder

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -150,8 +151,11 @@ public class PathSetGenerator {
 	}
 
 	private void removeLinkFromNetwork(Link link) {
-		((NodeImpl)link.getFromNode()).removeOutLink(link);
-		((NodeImpl)link.getToNode()).removeInLink(link);
+		final Link outlink = link;
+		final Id<Link> outLinkId = outlink.getId();
+		((NodeImpl)link.getFromNode()).removeOutLink(outLinkId);
+		final Link inlink = link;
+		((NodeImpl)link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private final boolean containsPath(Set<Path> paths, Path path) {

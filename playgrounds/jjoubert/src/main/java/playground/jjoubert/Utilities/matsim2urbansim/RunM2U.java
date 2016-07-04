@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -91,7 +92,7 @@ public class RunM2U {
 		Map<Id,Double> distanceToPt = new TreeMap<Id, Double>();
 		GeometryFactory gf = new GeometryFactory();
 		for(MyZone z : zones){
-			NodeImpl c = new NodeImpl(Id.create("dummy", Node.class));
+			NodeImpl c = NetworkUtils.createNode(Id.create("dummy", Node.class));
 			c.setCoord(new Coord(z.getCentroid().getX(), z.getCentroid().getY()));
 			Node n = nPt.getNearestNode(c.getCoord());
 			if(n != null){

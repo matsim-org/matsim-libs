@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -38,7 +38,7 @@ public class SiouxFallsNetworkAndPopulationUtils {
 		
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
-		new MatsimPopulationReader(scenario).readFile("C:/Users/Daniel/Desktop/Siouxfalls_population_initial.xml");
+		new PopulationReader(scenario).readFile("C:/Users/Daniel/Desktop/Siouxfalls_population_initial.xml");
 		
 		String toDirectory = "C:/Users/Daniel/Dropbox/siouxfalls/siouxfalls_network.xml";
 //		generateAndWriteNetwork(toDirectory);

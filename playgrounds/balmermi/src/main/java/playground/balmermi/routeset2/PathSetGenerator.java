@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -97,8 +98,10 @@ public class PathSetGenerator {
 		double linkDensity = 0.0;
 		double nodeDensity = 0.0;
 		for (Node n : network.getNodes().values()) {
-			linkDensity += ((NodeImpl) n).getIncidentLinks().size();
-			nodeDensity += ((NodeImpl) n).getIncidentNodes().size();
+			NodeImpl r = ((NodeImpl) n);
+			linkDensity += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( r )).size();
+			NodeImpl r1 = ((NodeImpl) n);
+			nodeDensity += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r1)).size();
 		}
 		linkDensity /= network.getNodes().size();
 		nodeDensity /= network.getNodes().size();
@@ -114,8 +117,10 @@ public class PathSetGenerator {
 		linkDensity = 0.0;
 		nodeDensity = 0.0;
 		for (Id<Node> nid : nodeIds) {
-			linkDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentLinks().size();
-			nodeDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentNodes().size();
+			NodeImpl r = ((NodeImpl) this.network.getNodes().get(nid));
+			linkDensity += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( r )).size();
+			NodeImpl r1 = ((NodeImpl) this.network.getNodes().get(nid));
+			nodeDensity += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r1)).size();
 		}
 		this.avLinkDensityPerNonePassNodeNetwork = linkDensity/nodeIds.size();
 		this.avIncidentNodeDensityPerNonePassNodeNetwork = nodeDensity/nodeIds.size();
@@ -196,7 +201,7 @@ public class PathSetGenerator {
 			// find the beginning of the "oneway path" or "twoway path"
 			Link currLink = l;
 			NodeImpl fromNode = (NodeImpl) currLink.getFromNode();
-			while ((fromNode.getIncidentNodes().size() == 2) &&
+			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(fromNode)).size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
@@ -213,7 +218,7 @@ public class PathSetGenerator {
 				s.links.add(currLink);
 				l2sMapping.put(currLink.getId(),s);
 				NodeImpl toNode = (NodeImpl) currLink.getToNode();
-				while ((toNode.getIncidentNodes().size() == 2) &&
+				while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(toNode)).size() == 2) &&
 						(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 						((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
 					Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
@@ -244,8 +249,11 @@ public class PathSetGenerator {
 	}
 
 	private void removeLinkFromNetwork(Link link) {
-		((NodeImpl) link.getFromNode()).removeOutLink(link);
-		((NodeImpl) link.getToNode()).removeInLink(link);
+		final Link outlink = link;
+		final Id<Link> outLinkId = outlink.getId();
+		((NodeImpl) link.getFromNode()).removeOutLink(outLinkId);
+		final Link inlink = link;
+		((NodeImpl) link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private final boolean containsPath(Set<Path> paths, Path path) {
@@ -375,17 +383,17 @@ public class PathSetGenerator {
 		double avIncidentNodeDensityPerNonePassNodeLCP = 0.0;
 		for (Node n2 : leastCostPath.nodes) {
 			NodeImpl n = (NodeImpl) n2;
-			if ((n.getIncidentNodes().size() == 2) &&
+			if ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(n)).size() == 2) &&
 			    (((n.getOutLinks().size() == 1) && (n.getInLinks().size() == 1)) ||
 			     ((n.getOutLinks().size() == 2) && (n.getInLinks().size() == 2)))) {
 			}
 			else {
 				nofNonePassNodesLCP++;
-				avLinkDensityPerNonePassNodeLCP += n.getIncidentLinks().size();
-				avIncidentNodeDensityPerNonePassNodeLCP += n.getIncidentNodes().size();
+				avLinkDensityPerNonePassNodeLCP += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( n )).size();
+				avIncidentNodeDensityPerNonePassNodeLCP += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(n)).size();
 			}
-			avLinkDensityPerNodeLCP += n.getIncidentLinks().size();
-			avIncidentNodeDensityPerNodeLCP += n.getIncidentNodes().size();
+			avLinkDensityPerNodeLCP += ((Map<Id<Link>, ? extends Link>) NetworkUtils.getIncidentLinks( n )).size();
+			avIncidentNodeDensityPerNodeLCP += ((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(n)).size();
 		}
 		avLinkDensityPerNodeLCP /= leastCostPath.nodes.size();
 		avIncidentNodeDensityPerNodeLCP /= leastCostPath.nodes.size();

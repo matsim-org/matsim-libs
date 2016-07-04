@@ -40,7 +40,8 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -48,7 +49,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -158,7 +158,7 @@ public class DataPrepare {
 
 	protected void routePopulation() {
 		Population pop = this.scenario.getPopulation();
-		new MatsimPopulationReader(this.scenario).parse(InInputPlansFileWithXY2Links);
+		new PopulationReader(this.scenario).parse(InInputPlansFileWithXY2Links);
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());

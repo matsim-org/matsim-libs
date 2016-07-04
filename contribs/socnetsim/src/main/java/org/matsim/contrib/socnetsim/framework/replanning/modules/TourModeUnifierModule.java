@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourFirstModeIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourModeIdentifier;
 

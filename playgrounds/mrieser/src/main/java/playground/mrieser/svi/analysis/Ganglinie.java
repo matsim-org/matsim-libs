@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -45,7 +45,7 @@ public class Ganglinie {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		new MatsimPopulationReader(scenario).readFile(populationFilename);
+		new PopulationReader(scenario).readFile(populationFilename);
 		
 		Map<String, int[]> countsPerActGroup = new HashMap<String, int[]>();
 		

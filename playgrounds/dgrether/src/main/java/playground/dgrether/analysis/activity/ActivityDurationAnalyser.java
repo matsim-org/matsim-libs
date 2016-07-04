@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -100,7 +100,7 @@ public class ActivityDurationAnalyser {
 		//reading plans, filter and calculate activity durations
 		for (String file : plansFiles) {
 			Population plans = scenario.getPopulation();
-			MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
+			PopulationReader plansParser = new PopulationReader(scenario);
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);

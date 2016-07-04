@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -68,7 +68,7 @@ public class EstimateCarOwnership {
 		
 		/* Parse the population and its attributes. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(args[0]);
+		new PopulationReader(sc).parse(args[0]);
 		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(args[1]);
 		new HouseholdsReaderV10(sc.getHouseholds()).parse(args[2]);
 		

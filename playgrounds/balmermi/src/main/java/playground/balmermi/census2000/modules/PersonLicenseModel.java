@@ -23,8 +23,8 @@ package playground.balmermi.census2000.modules;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.census2000.models.ModelLicenseOwnership;

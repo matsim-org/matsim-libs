@@ -3,6 +3,7 @@ package playground.balac.utils.carsharingusers;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -15,7 +16,7 @@ public class DistributePrivateCarsAmongMembers {
 	public static void main(String[] args) {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
@@ -34,7 +35,7 @@ public class DistributePrivateCarsAmongMembers {
 		}
 		
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_memb_fixedPrivateCars.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(args[2] + "/plans_memb_fixedPrivateCars.xml.gz");		
 
 		
 		

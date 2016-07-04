@@ -20,6 +20,7 @@
 package org.matsim.contrib.socnetsim.usage;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTimeModeChooserConfigGroup;
@@ -39,8 +40,7 @@ import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -62,7 +62,7 @@ public class JointScenarioUtils {
 
 	public static Scenario createScenario(final Config config) {
 		final Scenario sc = ScenarioUtils.createScenario( config );
-		final RouteFactoriesRegister rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getRouteFactoriesRegister();
+		final RouteFactories rFactory = ((PopulationFactory) sc.getPopulation().getFactory()).getRouteFactories();
 		rFactory.setRouteFactory(
 				DriverRoute.class,//JointActingTypes.DRIVER,
 				new DriverRouteFactory());

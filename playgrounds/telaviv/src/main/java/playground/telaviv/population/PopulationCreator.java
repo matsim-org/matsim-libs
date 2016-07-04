@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -197,7 +198,7 @@ public class PopulationCreator {
 		log.info("done.");
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(basePath + outputFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(basePath + outputFile);
 		log.info("done.");
 	}
 	

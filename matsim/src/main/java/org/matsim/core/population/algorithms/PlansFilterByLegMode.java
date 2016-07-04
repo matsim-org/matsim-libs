@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package org.matsim.core.population.algorithms;
 
 import java.util.Iterator;
 import java.util.TreeSet;

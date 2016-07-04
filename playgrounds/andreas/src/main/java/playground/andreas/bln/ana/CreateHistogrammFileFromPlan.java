@@ -15,8 +15,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -174,7 +174,7 @@ public class CreateHistogrammFileFromPlan extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		CreateHistogrammFileFromPlan dp = new CreateHistogrammFileFromPlan(net, inPop, outPlansFile);

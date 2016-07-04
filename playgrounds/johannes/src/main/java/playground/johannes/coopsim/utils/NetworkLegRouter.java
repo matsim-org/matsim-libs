@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -43,11 +43,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  public final class NetworkLegRouter implements LegRouter {
 
 	private final Network network;
-	private final RouteFactoriesRegister routeFactory;
+	private final RouteFactories routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
 	@Deprecated // use TripRouter (with RoutingModule) instead. kai, mar'15
-	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final RouteFactoriesRegister routeFactory) {
+	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final RouteFactories routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeFactory = routeFactory;

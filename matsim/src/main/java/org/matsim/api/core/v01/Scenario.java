@@ -36,8 +36,6 @@ import org.matsim.vehicles.Vehicles;
  * for the different return types, e.g. Network,
  * Facilities or Population.
  *
- * @see org.matsim.core.scenario.ScenarioLoaderImpl
- *
  * @author dgrether
  */
 public interface Scenario {
@@ -60,8 +58,8 @@ public interface Scenario {
 	 * @param name the name to which the object should be associated
 	 * @param o the object. <code>null</code> is not allowed.
 	 * 
-	 * @throws {@link NullPointerException} if the object is null
-	 * @throws {@link IllegalStateException} if there is already an object
+	 * @throws NullPointerException if the object is null
+	 * @throws IllegalStateException if there is already an object
 	 * associated to this name.
 	 */
 	void addScenarioElement(String name, Object o);

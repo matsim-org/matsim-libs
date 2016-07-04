@@ -48,7 +48,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -85,7 +85,7 @@ public class VisualizeTransitPlans {
 			new MatsimNetworkReader(this.realScenario.getNetwork()).readFile(NETWORK_FILE);
 		}
 		new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
-		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);
+		new PopulationReader(this.realScenario).readFile(POPULATION_FILE);
 //		this.realScenario.getPopulation().printPlansCount();
 	}
 

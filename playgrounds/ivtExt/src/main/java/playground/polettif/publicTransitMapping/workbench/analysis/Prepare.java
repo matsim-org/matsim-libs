@@ -168,7 +168,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader reader = new PopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -181,7 +181,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader reader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader reader = new PopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}

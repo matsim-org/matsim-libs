@@ -24,8 +24,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
 import playground.meisterk.kti.population.algorithms.PersonInvalidateScores;

@@ -41,6 +41,12 @@ public class ScenarioUtils {
 		}
 		return new MutableScenario(config);
 	}
+	public static MutableScenario createMutableScenario(final Config config) {
+		if (config == null) {
+			throw new NullPointerException("config must not be null!");
+		}
+		return new MutableScenario(config);
+	}
 
 	/**
 	 *

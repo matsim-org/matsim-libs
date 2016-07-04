@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -45,7 +46,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -112,7 +112,7 @@ public class EquilTestSetUp {
 	 * Exposure to these agents will result in toll for active agent.
 	 */
 	public void createPassiveAgents(Scenario scenario) {
-		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory pFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		// passive agents' home coordinates are around node 9 (12500, 7500)
 		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){

@@ -32,7 +32,7 @@ import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 import javax.inject.Provider;
 import java.io.FileWriter;
@@ -200,7 +200,7 @@ public class GeneticAlgorithmMode {
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).setConstant((double) 10);
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 10);
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 10);
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[3]);
 		new TransitScheduleReader(scenario).readFile(args[4]);

@@ -39,7 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
@@ -101,7 +101,7 @@ public class LegZoneAnalyzer {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 			
 		// load population
-		new MatsimPopulationReader(scenario).readFile(populationFile);
+		new PopulationReader(scenario).readFile(populationFile);
 
 		new LegZoneAnalyzer(scenario);
 	}

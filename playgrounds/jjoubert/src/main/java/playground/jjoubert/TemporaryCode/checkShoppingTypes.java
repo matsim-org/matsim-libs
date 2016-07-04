@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.southafrica.utilities.Header;
@@ -42,7 +42,7 @@ public class checkShoppingTypes {
 		Header.printHeader(checkShoppingTypes.class.toString(), args);
 		
 		Scenario sc  = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader pr = new MatsimPopulationReader(sc);
+		MatsimPopulationReader pr = new PopulationReader(sc);
 		pr.readFile(args[0]);
 		
 		int s1 = 0;

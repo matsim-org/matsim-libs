@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -92,7 +92,7 @@ public class FilterStuckScores implements PersonStuckEventHandler{
 
 				Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-				new MatsimPopulationReader(sc).readFile(planFile);
+				new PopulationReader(sc).readFile(planFile);
 
 				for (Person person : sc.getPopulation().getPersons().values()) {
 					double score = person.getSelectedPlan().getScore().doubleValue();

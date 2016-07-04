@@ -19,10 +19,20 @@ package playground.gregor.scenariogen.padang2ct;
  *                                                                         *
  * *********************************************************************** */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -31,15 +41,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.gregor.ctsim.run.CTRunner;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import playground.gregor.ctsim.run.CTRunner;
 
 /**
  * Created by laemmel on 13/10/15.
@@ -144,7 +150,7 @@ public class Padang2CT {
 	}
 
 	private static void loadPopulation(Scenario sc) {
-		new MatsimPopulationReader(sc).readFile(PDG_INPUT + "/output_plans.xml.gz");
+		new PopulationReader(sc).readFile(PDG_INPUT + "/output_plans.xml.gz");
 		for (Person pers : sc.getPopulation().getPersons().values()) {
 			for (Plan plan : pers.getPlans()) {
 				boolean flipFlop = true;

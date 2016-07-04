@@ -24,14 +24,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -80,16 +81,26 @@ public class PopulationMerger {
 	private void run(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationImpl mergedPopulation = (PopulationImpl) scenario.getPopulation();
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
-		mergedPopulation.setIsStreaming(true);
-		populationWriter = new PopulationWriter(mergedPopulation, scenario.getNetwork());
-		mergedPopulation.addAlgorithm(populationWriter);
+		StreamingUtils.setIsStreaming(reader, true);
+		populationWriter = new PopulationWriter(null, scenario.getNetwork());
+		final PersonAlgorithm algo = populationWriter;
+		reader.addAlgorithm(algo);
 		populationWriter.startStreaming(outputPath + outputFileName);
+		
+		if ( true ) {
+			throw new RuntimeException("don't know how the following was supposed to work; after streaming, the "
+					+ "population would have been empty.") ;
+		}
 
-		addMidDemand(midDemandFile, networkFile, mergedPopulation);
-		addPendlerstatistikInCommuterDemand(pendlerstatistikCommutingDemandFile, networkFile, mergedPopulation);
-		addPrognose2025FreightDemand(prognose2025FreightDemandFile, networkFile, mergedPopulation);
+		// outcommented the following three.  kai, jul'16
+//		addMidDemand(midDemandFile, networkFile, reader);
+//		addPendlerstatistikInCommuterDemand(pendlerstatistikCommutingDemandFile, networkFile, reader);
+//		addPrognose2025FreightDemand(prognose2025FreightDemandFile, networkFile, reader);
+
+		// this one was outcommented.  kai, jul'16
 //		addPrognose2025CommuterDemand(prognose2025CommuterDemandFile, networkFile, mergedPopulation);
 
 		populationWriter.closeStreaming();

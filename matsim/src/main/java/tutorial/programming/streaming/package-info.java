@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * PersonAlgorithm.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,11 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.population.algorithms;
-
-import org.matsim.api.core.v01.population.Person;
-
-public interface PersonAlgorithm {
-	public void run(Person person);
-}
+/**
+ * @author nagel
+ *
+ */
+package tutorial.programming.streaming;

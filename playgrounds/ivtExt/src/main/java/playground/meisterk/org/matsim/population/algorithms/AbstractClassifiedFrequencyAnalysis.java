@@ -24,7 +24,7 @@ import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 
 import java.io.PrintStream;
 import java.text.NumberFormat;

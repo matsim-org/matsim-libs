@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.population.algorithms;
+package org.matsim.core.population.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;

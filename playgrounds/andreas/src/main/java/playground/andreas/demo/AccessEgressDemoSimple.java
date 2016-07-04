@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -49,7 +50,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -164,7 +164,7 @@ public class AccessEgressDemoSimple {
 		// transit line A		
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
-		NetworkRoute networkRouteA = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 		
 		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
 		linkListA.add(Id.create("1011", Link.class)); 
@@ -184,7 +184,7 @@ public class AccessEgressDemoSimple {
 		// transit line B		
 		Link startLinkB = this.scenario.getNetwork().getLinks().get(Id.create("0220", Link.class));
 		Link endLinkB = this.scenario.getNetwork().getLinks().get(Id.create("2324", Link.class));
-		NetworkRoute networkRouteB = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkB.getId(), endLinkB.getId());
+		NetworkRoute networkRouteB = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkB.getId(), endLinkB.getId());
 		
 		ArrayList<Id<Link>> linkListB = new ArrayList<Id<Link>>();
 		linkListB.add(Id.create("2021", Link.class));

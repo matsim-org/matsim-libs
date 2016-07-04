@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
@@ -20,7 +21,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 
@@ -117,7 +118,7 @@ public class NetworkAnalysis {
 		Config config = ConfigUtils.loadConfig(path);
 	    final Scenario scenario = ScenarioUtils.loadScenario(config);
 	    scenario.getPopulation().getPersons().clear();
-	    final MatsimPopulationReader popReader = new MatsimPopulationReader(
+	    final PopulationReader popReader = new PopulationReader(
 				scenario);
 		popReader.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\PNP01\\it.1000\\1000.plans.xml.gz");
 //	    popReader.readFile("./ihop2/matsim-input/5.plans.xml.gz");
@@ -193,7 +194,7 @@ public class NetworkAnalysis {
 		System.out.println("Average Distance Travelled: " + avgdistancetravelled/totalagents);
 		System.out.println("Average Trip Duration: " + avgtripduration/totalagents);
 		System.out.println("Total Agents: " + totalagents);
-		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
+		MatsimWriter popWriter = new PopulationWriter(population, network);
 		popWriter.write("./ihop2/matsim-input/relevantpopulation.xml");
 
 	}

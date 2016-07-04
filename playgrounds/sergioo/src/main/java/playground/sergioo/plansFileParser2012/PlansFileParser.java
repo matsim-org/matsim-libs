@@ -12,8 +12,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -29,7 +29,7 @@ public class PlansFileParser {
 		final MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetworkReader.readFile(args[0]);
 		final Population plans = scenario.getPopulation();
-		final PopulationReader matsimPlansReader = new MatsimPopulationReader(scenario);
+		final MatsimPopulationReader matsimPlansReader = new PopulationReader(scenario);
 		matsimPlansReader.readFile(args[1]);
 		
 		double totalTime = Double.parseDouble(args[2]);

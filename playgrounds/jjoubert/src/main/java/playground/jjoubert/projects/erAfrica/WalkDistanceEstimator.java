@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -75,7 +75,7 @@ public class WalkDistanceEstimator {
 		/* Parse the entire population. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new HouseholdsReaderV10(sc.getHouseholds()).parse(householdFile);
-		new MatsimPopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).parse(populationFile);
 		
 		/* Parse the attributes. */
 		ObjectAttributesXmlReader hhaReader = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());

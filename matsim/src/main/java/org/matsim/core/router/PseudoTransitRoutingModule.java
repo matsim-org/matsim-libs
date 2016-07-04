@@ -111,7 +111,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			// so let's calculate the final part.
 			double travelTimeLastLink = ((LinkImpl) toLink).getFreespeedTravelTime(depTime + path.travelTime);
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.speedFactor);
-			Route route = this.populationFactory.createRoute(Route.class, fromLink.getId(), toLink.getId());
+			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travTime);
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
@@ -123,7 +123,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink
-			Route route = this.populationFactory.createRoute(Route.class, fromLink.getId(), toLink.getId());
+			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);

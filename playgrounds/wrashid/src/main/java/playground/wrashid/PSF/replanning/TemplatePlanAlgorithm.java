@@ -23,8 +23,8 @@ package playground.wrashid.PSF.replanning;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class TemplatePlanAlgorithm implements PlanAlgorithm {
 

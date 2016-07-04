@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.io.*;
@@ -23,7 +23,7 @@ public class ReanalyseMZ2005Plans {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		Population pop = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());		
+		new PopulationReader(scenario).readFile(config.plans().getInputFile());		
 
 		double[] distanceClasses = new double[]{
 				Double.MAX_VALUE, 100000

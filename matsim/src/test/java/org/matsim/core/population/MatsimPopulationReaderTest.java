@@ -47,7 +47,7 @@ public class MatsimPopulationReaderTest {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertEquals(0, s.getPopulation().getPersons().size());
 		new MatsimNetworkReader(s.getNetwork()).readFile("test/scenarios/equil/network.xml");
-		new MatsimPopulationReader(s).readFile("test/scenarios/equil/plans1.xml");
+		new PopulationReader(s).readFile("test/scenarios/equil/plans1.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
 	}
 
@@ -55,7 +55,7 @@ public class MatsimPopulationReaderTest {
 	public void testReadFile_v5() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertEquals(0, s.getPopulation().getPersons().size());
-		new MatsimPopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_example.xml");
+		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_example.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
 		Assert.assertNotNull(person);
@@ -72,7 +72,7 @@ public class MatsimPopulationReaderTest {
 	public void testReadFile_v5_multipleSuccessiveLegs() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertEquals(0, s.getPopulation().getPersons().size());
-		new MatsimPopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegs.xml");
+		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegs.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
 		Assert.assertNotNull(person);
@@ -91,7 +91,7 @@ public class MatsimPopulationReaderTest {
 	public void testReadFile_v5_multipleSuccessiveLegsWithRoutes() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertEquals(0, s.getPopulation().getPersons().size());
-		new MatsimPopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegsWithRoutes.xml");
+		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleLegsWithRoutes.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
 		Assert.assertNotNull(person);
@@ -116,7 +116,7 @@ public class MatsimPopulationReaderTest {
 	public void testReadFile_v5_multipleSuccessiveLegsWithTeleportation() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertEquals(0, s.getPopulation().getPersons().size());
-		new MatsimPopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleTeleportedLegs.xml");
+		new PopulationReader(s).readFile("test/input/org/matsim/core/utils/io/MatsimFileTypeGuesserTest/population_v5_multipleTeleportedLegs.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
 		Person person = s.getPopulation().getPersons().get(Id.create(1, Person.class));
 		Assert.assertNotNull(person);

@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -70,7 +70,7 @@ public class PlansGetActDepartures {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("data/plans/singapore6.xml.gz");
-		new MatsimPopulationReader(scenario)
+		new PopulationReader(scenario)
 				.readFile("data/plans/matsimSG2plans.xml.gz");
 //		.readFile("data/short_plans.xml");
 		Population pop = scenario.getPopulation();

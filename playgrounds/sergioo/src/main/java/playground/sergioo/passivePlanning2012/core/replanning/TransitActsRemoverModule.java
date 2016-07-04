@@ -22,8 +22,8 @@ package playground.sergioo.passivePlanning2012.core.replanning;
 
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Uses the routing algorithm provided by the {@linkplain Controler} for 

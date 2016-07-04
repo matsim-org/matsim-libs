@@ -57,7 +57,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-/* package */class PopulationReaderMatsimV4 extends MatsimXmlParser implements PopulationReader {
+/* package */class PopulationReaderMatsimV4 extends MatsimXmlParser implements MatsimPopulationReader {
 
 	/* package */final static String PLANS = "plans";
 	/* package */final static String PERSON = "person";
@@ -223,9 +223,7 @@ import org.xml.sax.Attributes;
 		String y = atts.getValue("y");
 		String freq = atts.getValue("freq");
 		String iP = atts.getValue("isPrimary");
-		boolean isPrimary = false;
 		if ("yes".equals(iP)) {
-			isPrimary = true;
 		}
 
 		if (type != null) {
@@ -350,7 +348,7 @@ import org.xml.sax.Attributes;
 		if ("car".equals(this.currleg.getMode())) {
 			routeType = NetworkRoute.class;
 		}
-		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(routeType, null, null);
+		this.currRoute = this.plans.getFactory().getRouteFactories().createRoute(routeType, null, null);
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

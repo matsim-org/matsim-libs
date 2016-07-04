@@ -1,34 +1,27 @@
 package playground.smetzler.bike;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.XY2Links;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 class BikePrepareForSimImpl implements PrepareForSim {
 
@@ -54,8 +47,8 @@ class BikePrepareForSimImpl implements PrepareForSim {
 
 	@Override
 	public void run() {
-		if (scenario instanceof MutableScenario) {
-			((MutableScenario)scenario).setLocked();
+		if (scenario instanceof Lockable) {
+			((Lockable)scenario).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 
@@ -101,8 +94,8 @@ class BikePrepareForSimImpl implements PrepareForSim {
 
 		
 		
-		if (population instanceof PopulationImpl) {
-			((PopulationImpl) population).setLocked();
+		if (population instanceof Lockable) {
+			((Lockable) population).setLocked();
 			
 		}
 

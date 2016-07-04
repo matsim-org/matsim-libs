@@ -148,9 +148,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 									Double.parseDouble(atts.getValue("y")))) );
 		this.network.addNode(node);
 		if (node instanceof NodeImpl) {
-			((NodeImpl) node).setType(atts.getValue("type"));
+			NodeImpl r1 = ((NodeImpl) node);
+			NetworkUtils.setType(r1,atts.getValue("type"));
 			if (atts.getValue("origid") != null) {
-				((NodeImpl) node).setOrigId(atts.getValue("origid"));
+				NodeImpl r = ((NodeImpl) node);
+				NetworkUtils.setOrigId( r, atts.getValue("origid") ) ;
 			}
 		}
 	}

@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.population.routes.RouteFactories;
 
 /**
  * @author dgrether
@@ -53,6 +54,6 @@ public interface PopulationFactory extends MatsimFactory {
 
 	Leg createLeg(String legMode);
 
-	<R extends Route> R createRoute(Class<R> routeType, Id<Link> startLinkId, Id<Link> endLinkId);
+	RouteFactories getRouteFactories();
 
 }

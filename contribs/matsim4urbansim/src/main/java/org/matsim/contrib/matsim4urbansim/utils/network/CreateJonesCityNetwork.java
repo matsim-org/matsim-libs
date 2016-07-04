@@ -35,6 +35,7 @@ import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -168,8 +169,8 @@ public class CreateJonesCityNetwork {
 
 			// create a new node
 			NodeImpl node = (NodeImpl)network.createAndAddNode(Id.create(zoneID, Node.class), coord);
-			node.setOrigId(zoneID.toString());
-			node.setType("unknownType");		
+			NetworkUtils.setOrigId( node, zoneID.toString() ) ;
+			NetworkUtils.setType(node,"unknownType");		
 		}
 		return network.getNodes().values().iterator();
 	}

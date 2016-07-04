@@ -33,15 +33,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
@@ -192,7 +192,7 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 					copy.remove( idx ) ;
 				}
 				copy.addAll( idx, this.alternativeLinks ) ;
-				final RouteFactoriesRegister modeRouteFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactoriesRegister();
+				final RouteFactories modeRouteFactory = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories();
 				NetworkRoute newRoute = modeRouteFactory.createRoute( NetworkRoute.class, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
 
 				//			RouteUtils.createNetworkRoute(routeLinkIds, network) ;

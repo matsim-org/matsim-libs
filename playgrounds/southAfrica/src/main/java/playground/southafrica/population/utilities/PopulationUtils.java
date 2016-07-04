@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -64,7 +64,7 @@ public class PopulationUtils {
 	 */
 	public static void extractActivityDurations(String populationFile, String outputFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).parse(populationFile);
 		
 		/*TODO Remove after debugging. */
 		double maxS = Double.NEGATIVE_INFINITY;
@@ -196,7 +196,7 @@ public class PopulationUtils {
 	 */
 	public static void printPopulationStatistics(String populationFilename){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(populationFilename);
 		
 		/* Print the statistics to the console. */
@@ -215,7 +215,7 @@ public class PopulationUtils {
 	 */
 	public static void printActivityStatistics(String populationFilename){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(populationFilename);
 		
 		LOG.info("Population parsed. Analysing activity types...");
@@ -256,7 +256,7 @@ public class PopulationUtils {
 	
 	public static void printNumberOfEmployedPersons(String population){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(population);
 		
 		LOG.info("Population parsed. Analysing employment types...");
@@ -282,7 +282,7 @@ public class PopulationUtils {
 	 */
 	public static void printNumberOfAgentTypes(String population){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(population);
 		
 		Map<String, Integer> map = new TreeMap<String, Integer>();
@@ -314,7 +314,7 @@ public class PopulationUtils {
 		LOG.info("Checking for activity chain types...");
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(population);
 		
 		Map<String, Integer> map = new TreeMap<>();
@@ -373,7 +373,7 @@ public class PopulationUtils {
 		int trips = 0;
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(population);
 		
 		for(Id<Person> pid : sc.getPopulation().getPersons().keySet()){

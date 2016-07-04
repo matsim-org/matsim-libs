@@ -23,7 +23,7 @@ package playground.andreas.bvgAna.mrieser;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * Removes all non-selected plans from a person. If a person has no

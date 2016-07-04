@@ -9,9 +9,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -22,7 +22,7 @@ public class PersonDataCS {
 		// TODO Auto-generated method stub
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[1]);
 		populationReader.readFile(args[0]);	

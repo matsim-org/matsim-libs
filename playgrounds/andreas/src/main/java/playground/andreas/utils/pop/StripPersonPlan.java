@@ -87,7 +87,7 @@ public class StripPersonPlan extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		StripPersonPlan dp = new StripPersonPlan(net, inPop, outPlansFile);

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
@@ -56,7 +56,7 @@ public class Matsim2Proxy {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		logger.info("Loading matsim population...");
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(args[0]);
 		logger.info(String.format("Loaded %s matsim persons.", scenario.getPopulation().getPersons().size()));
 		

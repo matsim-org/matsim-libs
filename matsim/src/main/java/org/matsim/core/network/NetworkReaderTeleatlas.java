@@ -243,7 +243,9 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 			}
 			String type = feattyp + "-" + jncttyp;
 			Node n = network.getFactory().createNode(Id.create(id.toString(), Node.class), c);
-			((NodeImpl) n).setType(type);
+			final String type1 = type;
+			NodeImpl r = ((NodeImpl) n);
+			NetworkUtils.setType(r,type1);
 			network.addNode(n);
 		}
 		fIt.close();

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -87,7 +87,7 @@ public class JoinSubpopulations {
 	public static void Run(String first, String firstAttribute, String second, String secondAttribute, String output, String outputAttribute){
 		/* Read the first subpopulation. */
 		Scenario sc1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc1).parse(first);
+		new PopulationReader(sc1).parse(first);
 		/* Read the (optional) attributes of the first subpopulation. */
 		File f1 = new File(firstAttribute);
 		if(f1.exists() && f1.canRead()){
@@ -96,7 +96,7 @@ public class JoinSubpopulations {
 		
 		/* Read the second subpopulation. */
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc2).parse(second);
+		new PopulationReader(sc2).parse(second);
 		/* Read the (optional) attributes of the first subpopulation. */
 		File f2 = new File(secondAttribute);
 		if(f2.exists() && f2.canRead()){

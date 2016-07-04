@@ -3,7 +3,7 @@ package others.sergioo.mains;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -25,7 +25,7 @@ public class PopulationReduction {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new MatsimFacilitiesReader((MutableScenario) scenario).readFile(args[1]);
-		new MatsimPopulationReader(scenario).readFile(args[2]);
+		new PopulationReader(scenario).readFile(args[2]);
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), new Double(args[3])).write(args[4]);
 	}
 	

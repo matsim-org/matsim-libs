@@ -26,10 +26,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
-import org.matsim.population.algorithms.PlanAlgorithm;
+
 import playground.thibautd.parknride.ParkAndRideConfigGroup;
 import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideFacilities;

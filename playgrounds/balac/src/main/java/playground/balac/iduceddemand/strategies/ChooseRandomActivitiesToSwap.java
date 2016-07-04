@@ -5,9 +5,9 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ChooseRandomActivitiesToSwap implements PlanAlgorithm {
 

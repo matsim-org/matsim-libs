@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -123,7 +123,7 @@ public class DgAnalysisPopulationReader {
 		Population plans = sc.getPopulation();
 
 		log.info("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader plansReader = new PopulationReader(sc);
 		plansReader.readFile(filename);
 		log.info("  done");
 

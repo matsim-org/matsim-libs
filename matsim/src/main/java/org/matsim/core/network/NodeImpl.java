@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class NodeImpl implements Node {
 
@@ -59,33 +58,21 @@ public class NodeImpl implements Node {
 		this(id, coord, null);
 	}
 
-	protected NodeImpl(final Id<Node> id, final Coord coord, final String type) {
+	/* package */NodeImpl(final Id<Node> id, final Coord coord, final String type) {
 		this(id);
 		this.coord = coord;
+		NetworkUtils.setType(this,type);
+	}
+
+	/* package */NodeImpl(Id<Node> id) {
+		this.id = id ;
+		this.coord = null ;
+	}
+	
+	/* package */ void  setType( final String type ) {
 		this.type = type == null ? null : type.intern();
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// interface methods
-	//////////////////////////////////////////////////////////////////////
-
-	public NodeImpl(Id<Node> id) {
-		this.id = id;
-		this.coord = null;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// add / set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setOrigId(final String id) {
-		this.origid = id;
-	}
-
-	public final void setType(final String type) {
-		this.type = type == null ? null : type.intern();
-	}
-
+	}	
+	
 	private static int cnt2 = 0 ;
 	@Override
 	public final boolean addInLink(Link inlink) {
@@ -122,65 +109,36 @@ public class NodeImpl implements Node {
 		this.coord = coord;
 	}
 
+	/*pakcage*/ void setOrigId(final String origId){
+		this.origid = origId ;
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	// normally, the removed object should be passed back (like in other utils) balmermi
-	// the new collections convention seems to be that the return type is boolean, and "true" is returned when
-	// the collection is modified, and "false" else.  kai, dec06
-	public final void removeInLink(final Link inlink) {
-		this.inlinks.remove(inlink.getId());
+	@Override
+	public final Link removeInLink( final Id<Link> linkId ) {
+		return this.inlinks.remove(linkId) ;
 	}
 
-	// normally, the removed object should be passed back (like in other utils) balmermi
-	// see above (removeInLink).  kai, dec06
-	public final void removeOutLink(final Link outlink) {
-		this.outlinks.remove(outlink.getId());
+	@Override
+	public Link removeOutLink(final Id<Link> outLinkId) {
+		return this.outlinks.remove(outLinkId);
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final String getOrigId() {
-		return this.origid;
+	/*package*/ String getOrigId() {
+		return this.origid ;
 	}
-
-	public final String getType() {
-		return this.type;
+	
+	/*package*/ String getType() {
+		return this.type ;
 	}
-
-	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
-		Map<Id<Link>, Link> links = new TreeMap<>(getInLinks());
-		links.putAll(getOutLinks());
-		return links;
-	}
-
-	public final Map<Id<Node>, ? extends Node> getInNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>();
-		for (Link link : getInLinks().values()) {
-			Node node = link.getFromNode();
-			nodes.put(node.getId(), node);
-		}
-		return nodes;
-	}
-
-	public final Map<Id<Node>, ? extends Node> getOutNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>();
-		for (Link link : getOutLinks().values()) {
-			Node node = link.getToNode();
-			nodes.put(node.getId(), node);
-		}
-		return nodes;
-	}
-
-	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes());
-		nodes.putAll(getOutNodes());
-		return nodes;
-	}
-
+	
 	@Override
 	public Map<Id<Link>, ? extends Link> getInLinks() {
 		return this.inlinks;

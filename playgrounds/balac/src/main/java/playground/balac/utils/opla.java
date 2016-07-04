@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -16,7 +16,7 @@ public class opla {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader populationReader = new PopulationReader(sc);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);

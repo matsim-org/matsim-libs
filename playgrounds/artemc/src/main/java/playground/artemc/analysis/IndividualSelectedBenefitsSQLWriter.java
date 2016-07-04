@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -50,7 +50,7 @@ public class IndividualSelectedBenefitsSQLWriter {
 				populationFile = file.getAbsolutePath() + "/output_plans.xml.gz";
 				populationAttributesFile = file.getAbsolutePath() + "/output_personAttributes.xml.gz";
 
-				new MatsimPopulationReader(scenario).readFile(populationFile);
+				new PopulationReader(scenario).readFile(populationFile);
 				System.out.println("   Population size: " + scenario.getPopulation().getPersons().size());
 
 				new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(populationAttributesFile);

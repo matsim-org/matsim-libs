@@ -47,7 +47,7 @@ import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
@@ -84,7 +84,7 @@ public class RunErgmSimulator {
 		 * load population
 		 */
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(config.findParam("plans", "inputPlansFile"));
 		Population population = scenario.getPopulation();
 		/*

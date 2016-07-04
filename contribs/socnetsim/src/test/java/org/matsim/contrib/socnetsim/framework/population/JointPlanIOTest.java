@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -102,7 +102,7 @@ public class JointPlanIOTest {
 		new PopulationWriter( scenario.getPopulation() , scenario.getNetwork() ).write( file );
 
 		final Scenario scenarioReRead = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( scenarioReRead ).parse( file );
+		new PopulationReader( scenarioReRead ).parse( file );
 
 		final Iterator<? extends Person> dumpedPersons = scenario.getPopulation().getPersons().values().iterator();
 		final Iterator<? extends Person> readPersons = scenarioReRead.getPopulation().getPersons().values().iterator();

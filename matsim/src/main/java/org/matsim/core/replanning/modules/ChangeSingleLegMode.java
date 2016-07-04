@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.population.algorithms.ChooseRandomSingleLegMode;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.ChooseRandomSingleLegMode;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen

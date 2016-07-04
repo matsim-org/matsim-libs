@@ -26,8 +26,8 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.Random;
 

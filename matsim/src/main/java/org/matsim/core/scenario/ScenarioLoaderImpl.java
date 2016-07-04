@@ -19,18 +19,20 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import com.google.inject.Inject;
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -42,9 +44,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -189,7 +189,7 @@ class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
-				new MatsimPopulationReader(this.scenario).parse(populationFileName);
+				new PopulationReader(this.scenario).parse(populationFileName);
 			}
 			else {
 				final String inputCRS = config.plans().getInputCRS();
@@ -202,11 +202,11 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new MatsimPopulationReader(transformation , this.scenario).parse(populationFileName);
+				new PopulationReader(transformation , this.scenario).parse(populationFileName);
 			}
 
-			if (this.scenario.getPopulation() instanceof PopulationImpl) {
-				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
+			if (this.scenario.getPopulation() instanceof Population) {
+				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;
 			}
 		}
 		else {

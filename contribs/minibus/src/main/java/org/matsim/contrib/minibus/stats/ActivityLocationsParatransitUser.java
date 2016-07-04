@@ -28,8 +28,8 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -193,7 +193,7 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimPopulationReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 		
 		ActivityLocationsParatransitUser ana = new ActivityLocationsParatransitUser("para_", 100.0);
