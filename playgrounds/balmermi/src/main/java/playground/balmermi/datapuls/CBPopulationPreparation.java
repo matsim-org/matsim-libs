@@ -69,7 +69,7 @@ public class CBPopulationPreparation {
 		plansWriter.startStreaming(args[1].trim());
 
 		ActivityFacilities afs = scenario.getActivityFacilities();
-
+		
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonAdaptPlanAndCreateFacilities(afs));
 		final PersonAlgorithm algo = plansWriter;

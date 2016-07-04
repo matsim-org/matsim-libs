@@ -64,10 +64,16 @@ public final class StreamingPopulationReader implements PopulationReader {
 	}
 	@Override
 	public void readFile(String filename) {
+//		for ( PersonAlgorithm algo : personAlgos ) {
+//			algo.initialize() ;
+//		}
 		reader.readFile(filename);
+//		for ( PersonAlgorithm algo : personAlgos ) {
+//			algo.finalize() ;
+//		}
 	}
 	public void parse(String filename) {
-		reader.readFile(filename);
+		reader.parse(filename);
 	}
 	public void parse(InputStream is) {
 		reader.parse(is);
@@ -76,7 +82,7 @@ public final class StreamingPopulationReader implements PopulationReader {
 
 	@SuppressWarnings("static-method")
 	public void runAlgorithms() {
-		throw new RuntimeException("need to call the readFile method.  need the filename for this") ;
+		throw new RuntimeException("need to call the readFile method.  need the output filename for that") ;
 //		if (!this.isStreaming) {
 //			for (PersonAlgorithm algo : this.personAlgos) {
 //				log.info("running algorithm " + algo.getClass().getName());

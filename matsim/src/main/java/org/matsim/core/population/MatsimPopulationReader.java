@@ -61,6 +61,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 			final Scenario scenario ) {
 		this( coordinateTransformation, scenario, false ) ;
 	}
+	
 	/*deliberately package*/ MatsimPopulationReader(
 				final CoordinateTransformation coordinateTransformation,
 				final Scenario scenario, boolean streaming ) {
