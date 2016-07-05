@@ -153,11 +153,17 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
 		assert !nest.getAlternatives().isEmpty();
 		for ( Alternative<N> alternative : nest.getAlternatives() ) {
-			calculator.addTerm( nest.getMu_n() *
-					model.getUtility().calcUtility(
-							p,
-							alternative ) );
+			try {
+				calculator.addTerm( nest.getMu_n() *
+						model.getUtility().calcUtility(
+								p,
+								alternative ) );
+			}
+			catch (Exception e){
+				throw new RuntimeException( "Problem with utility of alternative "+alternative , e );
+			}
 		}
 
 		return ( model.getMu() / nest.getMu_n() ) * calculator.computeLogsumExp();
-	}}
+	}
+}
