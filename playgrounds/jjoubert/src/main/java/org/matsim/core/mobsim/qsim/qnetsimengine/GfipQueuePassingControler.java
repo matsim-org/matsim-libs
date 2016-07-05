@@ -655,7 +655,7 @@ public class GfipQueuePassingControler {
 
 			/* Write the load for each link. */
 			for(Id<Link> linkId : this.countMap.keySet()){
-				String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv");
+				String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv.gz");
 				log.info("Writing link counts to " + filename);
 
 				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -695,7 +695,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the space-time observations. */
-			String spaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv");
+			String spaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv.gz");
 			log.info("Writing space-time observations to " + spaceTimeFilename);
 
 			BufferedWriter bw = IOUtils.getBufferedWriter(spaceTimeFilename);
@@ -720,7 +720,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the space-time observations for ALL links. */
-			String allSpaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "allSpaceTime.csv");
+			String allSpaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "allSpaceTime.csv.gz");
 			log.info("Writing all space-time observations to " + allSpaceTimeFilename);
 
 			BufferedWriter bwAll = IOUtils.getBufferedWriter(allSpaceTimeFilename);
@@ -745,7 +745,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the rho observations. */
-			String rhoFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv");
+			String rhoFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv.gz");
 			log.info("Writing space-time observations to " + rhoFilename);
 
 			BufferedWriter bwRho = IOUtils.getBufferedWriter(rhoFilename);
@@ -770,7 +770,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the estimated versus actual times to file. */
-			String timeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
+			String timeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv.gz");
 			log.info("Writing space-time observations to " + timeFilename);
 
 			BufferedWriter bwTime = IOUtils.getBufferedWriter(timeFilename);
@@ -798,7 +798,7 @@ public class GfipQueuePassingControler {
 
 			/* Now write the estimated versus actual times for ALL link 2 
 			 * segments to file. */
-			String timeAllFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancyAll.csv");
+			String timeAllFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancyAll.csv.gz");
 			log.info("Writing time discrepancy observations for ALL link 2 segments to " + timeAllFilename);
 
 			BufferedWriter bwTimeAll = IOUtils.getBufferedWriter(timeAllFilename);
