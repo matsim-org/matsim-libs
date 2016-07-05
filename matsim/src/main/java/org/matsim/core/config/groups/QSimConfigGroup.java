@@ -570,4 +570,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
+	// ---
+	public static enum InflowConstraint { none, maxflowFromFdiag } ;
+	private InflowConstraint inflowConstraint = InflowConstraint.none ;
+	public InflowConstraint getInflowConstraint() {
+		return this.inflowConstraint ;
+	}
+	public void setInflowConstraint( InflowConstraint inflowConstraint ) {
+		this.inflowConstraint = inflowConstraint ;
+	}
 }
