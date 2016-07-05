@@ -53,8 +53,8 @@ public class MyPlansToPlans {
 //		new MatsimNetworkReader(scenario).readFile(args[0]);
 //		new MatsimPopulationReader(scenario).readFile(args[0]);
         System.out.println(scenario.getPopulation().getPersons().size());
-        new PlanResetter(scenario).run();
-//        new PlansSubsampler().run(scenario, args[1], 0.01);
+//        new PlanResetter(scenario).run();
+        new PlansSubsampler().run(scenario, args[1], 0.04);
         new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()).write(args[1]);
 
 

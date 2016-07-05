@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 
-class ClusterLink implements Link {
+public class ClusterLink implements Link {
 	private final LinkImpl link;
 	private NodeCluster rootCluster;
 	// set this to true if the link is an interlink

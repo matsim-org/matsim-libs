@@ -52,8 +52,10 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
         double travelTime = starttime;
         double travelCost = 0;
         Node currentNode = fromNode;
-        networkPainter.addForegroundPixel(fromNode.getId());
-        networkPainter.addForegroundPixel(toNode.getId());
+        if (networkPainter != null) {
+            networkPainter.addForegroundPixel(fromNode.getId());
+            networkPainter.addForegroundPixel(toNode.getId());
+        }
         while (currentNode != toNode) {
             Object[] outLinks = currentNode.getOutLinks().values().toArray();
             //come up witha set of costs based on how much nearer (eucl) the link brings you to your destination,
@@ -77,10 +79,10 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
             for (int i = 0; i < outLinks.length; i++) {
                 double linkCost = dists[i] - minCost;
                 if (links.contains(outLinks[i]) || nodes.contains(((Link) outLinks[i]).getToNode())) {
-                    linkCost = 2 * (maxCost-minCost);
+                    linkCost = 1e6 * (maxCost - minCost);
                 }
                 linkCost = Math.exp(-beta * linkCost);
-                linkCost = linkCost==1 ? 2 : linkCost;
+                linkCost = linkCost == 1 ? 2 : linkCost;
                 cumulativeWeights[i] = i > 0 ? cumulativeWeights[i - 1] + linkCost : linkCost;
                 weights[i] = linkCost;
             }
@@ -100,21 +102,25 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
                     }
                 }
             }
-            networkPainter.addForegroundLine(selection.getId());
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (networkPainter != null) {
+                networkPainter.addForegroundLine(selection.getId());
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             currentNode = selection.getToNode();
 
 
         }
-        try {
-            Thread.sleep(500);
-            networkPainter.clearForeground();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (networkPainter != null) {
+            try {
+                Thread.sleep(500);
+                networkPainter.clearForeground();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return new Path(nodes, links, travelTime, travelCost);
 
@@ -151,7 +157,7 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
             public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
                 return link.getLength() / link.getFreespeed();
             }
-        }, 0.08);
+        }, 0.5);
         SimpleNetworkPainter networkPainter = new SimpleNetworkPainter(400, 400);
         networkPainter.setNetworkTransformation(network);
         stochasticRouter.setNetworkPainter(networkPainter);
@@ -162,7 +168,7 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
         Node[] nodesArray = nodeSet.toArray(new Node[nodeSet.size()]);
 
         long currentTimeMillis = -System.currentTimeMillis();
-        for (int i = 0; i < 1e2; i++) {
+        for (int i = 0; i < 1e3; i++) {
             int[] ints = Sample.sampleMfromN(2, nodesArray.length);
             System.out.println(nodesArray[ints[0]] + " " + nodesArray[ints[1]]);
             stochasticRouter.calcLeastCostPath(nodesArray[ints[0]], nodesArray[ints[1]], 3600, null, null);
@@ -191,7 +197,7 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
             }
         }, null);
         currentTimeMillis = -System.currentTimeMillis();
-        for (int i = 0; i < 1e2; i++) {
+        for (int i = 0; i < 1e3; i++) {
             int[] ints = Sample.sampleMfromN(2, nodesArray.length);
             dijkstra.calcLeastCostPath(nodesArray[ints[0]], nodesArray[ints[1]], 3600, null, null);
         }
