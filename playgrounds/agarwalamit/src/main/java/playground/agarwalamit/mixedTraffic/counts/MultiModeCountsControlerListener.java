@@ -136,7 +136,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 							if(this.linkStats.get(linkId).get(mode).length<24) throw new RuntimeException("time bins are smaller than 24. Aborting...");
 							
 							for(double d : this.linkStats.get(linkId).get(mode)) {
-								writer.write(d+"\t");
+								writer.write(d*config.getCountsScaleFactor()+"\t");
 							}
 							writer.newLine();
 						}
