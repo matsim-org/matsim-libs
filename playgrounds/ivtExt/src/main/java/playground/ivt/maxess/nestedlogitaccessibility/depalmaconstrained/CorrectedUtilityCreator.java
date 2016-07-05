@@ -182,7 +182,13 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 	private static double getSupply( final ActivityFacility f,
 			final String activityType,
 			final ConstrainedAccessibilityConfigGroup configGroup ) {
-		return f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+		final double scaledSupply = f.getActivityOptions().get( activityType ).getCapacity() * configGroup.getCapacityScalingFactor();
+
+		if ( scaledSupply < 0 || Double.isNaN( scaledSupply ) ) {
+			throw new RuntimeException( "invalid supply for facility "+f+" and type "+activityType+": "+scaledSupply );
+		}
+
+		return scaledSupply;
 	}
 
 	public static class CorrectedUtility<N extends Enum<N>> implements Utility<N> {
@@ -223,7 +229,13 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				return Math.log( supply / demand );
 			}
 
-			return Math.log( individualOmegas.get( p.getId() ) );
+			final double omega =  individualOmegas.get( p.getId() );
+
+			if ( Double.isInfinite( omega ) || Double.isNaN( omega ) ) {
+				throw new RuntimeException( "invalid omega for individual "+p.getId()+": "+omega );
+			}
+
+			return Math.log( omega );
 		}
 
 
