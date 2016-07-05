@@ -131,7 +131,8 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	}
 
 	private static <N extends Enum<N>> double computeExpectedMaximumUtility(
-			final ConcurrentStopWatch<Measurement> stopWatch, final Person p,
+			final ConcurrentStopWatch<Measurement> stopWatch,
+			final Person p,
 			final NestedLogitModel<N> model,
 			final NestedChoiceSet<N> choiceSet ) {
 		stopWatch.startMeasurement( Measurement.logsumComputation );
