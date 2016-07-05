@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -47,16 +46,15 @@ import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 
 /**
- * @author dgrether
+ * @author amit after dgrether
  */
-public class AACountsControlerListener implements StartupListener, IterationEndsListener {
+public class MyCountsControlerListener implements StartupListener, IterationEndsListener {
 
 	/*
 	 * String used to identify the operation in the IterationStopWatch.
 	 */
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 
-    private GlobalConfigGroup globalConfigGroup;
     private Network network;
     private ControlerConfigGroup controlerConfigGroup;
     private final CountsConfigGroup config;
@@ -72,8 +70,7 @@ public class AACountsControlerListener implements StartupListener, IterationEnds
     private int iterationsUsed = 0;
 
     @Inject
-    AACountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
-        this.globalConfigGroup = globalConfigGroup;
+    MyCountsControlerListener(Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
         this.network = network;
         this.controlerConfigGroup = controlerConfigGroup;
         this.config = countsConfigGroup;
@@ -85,19 +82,19 @@ public class AACountsControlerListener implements StartupListener, IterationEnds
 
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-        if (counts != null) {
-            for (Id<Link> linkId : counts.getCounts().keySet()) {
-                Map<String, double[]> mode2counts = new HashMap<>();
-                if(this.config.isFilterModes()){
-                for(String mode : this.analyzedModes){
-                	mode2counts.put(mode, new double [24]);
-                }
-                } else {// adding a fake mode 
-                	mode2counts.put("all", new double [24]);
-                }
-            	this.linkStats.put(linkId, mode2counts);
-            }
-        }
+		if (counts != null) {
+			for (Id<Link> linkId : counts.getCounts().keySet()) {
+				Map<String, double[]> mode2counts = new HashMap<>();
+				if(this.config.isFilterModes()){
+					for(String mode : this.analyzedModes){
+						mode2counts.put(mode, new double [24]);
+					}
+				} else {
+					throw new RuntimeException("If not filtering modes for counts, doesn't make sense to use it. Aborting ...");
+				}
+				this.linkStats.put(linkId, mode2counts);
+			}
+		}
 	}
 
     @Override
@@ -135,36 +132,30 @@ public class AACountsControlerListener implements StartupListener, IterationEnds
                 		for(Id<Link> linkId : averages.keySet()) {
                 			modalAverage.put(linkId, averages.get(linkId).get(mode));                    	
                 		}
-                		compareAndPlot(event, modalAverage,mode);	
+						final Map<Id<Link>, double[]> modalAverage1 = modalAverage;
+						final String mode1 = mode;
+                	
+						CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(modalAverage1, counts, network, config.getCountsScaleFactor());
+						if ((this.config.getDistanceFilter() != null) && (this.config.getDistanceFilterCenterNode() != null)) {
+							cca.setDistanceFilter(this.config.getDistanceFilter(), this.config.getDistanceFilterCenterNode());
+						}
+						cca.setCountsScaleFactor(this.config.getCountsScaleFactor());
+						cca.run();
+						
+						if (this.config.getOutputFormat().contains("txt") ||
+								this.config.getOutputFormat().contains("all")) {
+							String filename = controlerIO.getIterationFilename(event.getIteration(), mode1.concat("countscompare.txt"));
+							CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
+							ctw.writeFile(filename);
+						}	
                 	}
                 } else {
-                	Map<Id<Link>,double[]> modalAverage = new HashMap<>();
-
-                	for(Id<Link> linkId : averages.keySet()) {
-                		modalAverage.put(linkId, averages.get(linkId).values().iterator().next()); // only one entry
-                	}
-                	compareAndPlot(event, modalAverage,"");
+                	//dont do anything
                 }
                 reset();
                 iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
             }
         }
-	}
-
-	private void compareAndPlot(final IterationEndsEvent event, final Map<Id<Link>, double[]> modalAverage, final String mode) {
-		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(modalAverage, counts, network, config.getCountsScaleFactor());
-		if ((this.config.getDistanceFilter() != null) && (this.config.getDistanceFilterCenterNode() != null)) {
-			cca.setDistanceFilter(this.config.getDistanceFilter(), this.config.getDistanceFilterCenterNode());
-		}
-		cca.setCountsScaleFactor(this.config.getCountsScaleFactor());
-		cca.run();
-
-		if (this.config.getOutputFormat().contains("txt") ||
-				this.config.getOutputFormat().contains("all")) {
-			String filename = controlerIO.getIterationFilename(event.getIteration(), mode.concat("countscompare.txt"));
-			CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
-			ctw.writeFile(filename);
-		}
 	}
 
 	/*package*/ boolean useVolumesOfIteration(final int iteration, final int firstIteration) {
@@ -188,14 +179,7 @@ public class AACountsControlerListener implements StartupListener, IterationEnds
 		for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
 			Id<Link> linkId = e.getKey();
 			Map<String, double[]> mode2counts =  e.getValue();
-			if( ! this.config.isFilterModes() ) {
-				double[] volumesPerHour = mode2counts.values().iterator().next();//only one entry
-				double[] newVolume = volumes.getVolumesPerHourForLink(linkId);	
-				for (int i = 0; i < 24; i++) {
-					volumesPerHour[i] += newVolume[i];
-				}
-				mode2counts.put(mode2counts.keySet().iterator().next(), volumesPerHour);
-			} else {
+			if(  this.config.isFilterModes() ) {
 				for (String mode : mode2counts.keySet()) {
 					double[] volumesPerHour = mode2counts.get(mode); 
 					double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode); 
@@ -206,7 +190,6 @@ public class AACountsControlerListener implements StartupListener, IterationEnds
 				}
 				this.linkStats.put(linkId, mode2counts);	
 			}
-			
 		}
 	}
 	
@@ -220,5 +203,4 @@ public class AACountsControlerListener implements StartupListener, IterationEnds
 			}
 		}
 	}
-
 }

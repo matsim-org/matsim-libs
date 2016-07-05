@@ -22,6 +22,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -62,7 +63,7 @@ import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListn
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.counts.AACountsControlerListener;
+import playground.agarwalamit.mixedTraffic.counts.MyCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
@@ -78,7 +79,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class PatnaCadytsControler {
 
 	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork/";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork_xxx/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
 
@@ -146,7 +147,7 @@ public class PatnaCadytsControler {
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
 
-				this.addControlerListenerBinding().to(AACountsControlerListener.class);
+				this.addControlerListenerBinding().to(MyCountsControlerListener.class);
 			}
 		});
 
@@ -212,6 +213,8 @@ public class PatnaCadytsControler {
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
+		config.counts().setFilterModes(true);
+		config.counts().setAnalyzedModes(StringUtils.join(PatnaUtils.EXT_MAIN_MODES.toArray(),","));
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
