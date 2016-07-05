@@ -72,7 +72,6 @@ public class T6_Transit {
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
 		config.transit().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setEndTime(24.0*3600);
 	}
