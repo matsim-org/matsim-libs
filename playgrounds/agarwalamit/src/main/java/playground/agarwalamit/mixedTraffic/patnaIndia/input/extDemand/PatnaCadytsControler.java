@@ -18,8 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
+import java.io.File;
+
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -52,11 +55,18 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 
+import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
+import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.counts.AACountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.PatnaJointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
@@ -71,55 +81,55 @@ public class PatnaCadytsControler {
 	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
-	
+
 	public static void main(String[] args) {
 		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/outerCordonVehicles_10pct.xml.gz";
-		
+
 		if( STABILITY_CHECK_AFTER_CADYTS) {
 			String inPlans = outputDir+"/output_plans.xml.gz";	
 			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/cordonOutput_plans_10pct_selected.xml.gz";
-			
+
 			SelectedPlansFilter spf = new SelectedPlansFilter();
 			spf.run(inPlans);
 			spf.writePlans(plansFile);
-			
+
 			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork_ctd/";
 			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
-		
+
 		PatnaCadytsControler pcc = new PatnaCadytsControler();
 		final Config config = pcc.getConfig();
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
 		pvg.createVehicles(PatnaUtils.EXT_MAIN_MODES);
-		
+
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike_ext", config.planCalcScore());
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				
+
 				addTravelTimeBinding("car_ext").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("car_ext").to(carTravelDisutilityFactoryKey());
-				
+
 				addTravelTimeBinding("motorbike_ext").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike_ext").to(carTravelDisutilityFactoryKey());
-				
+
 				// due to speed difference of bike and truck, using configured free speed travel time, builder should also use this.
 				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
-				
+
 				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
 				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
 			}
@@ -127,7 +137,29 @@ public class PatnaCadytsControler {
 
 		if(!STABILITY_CHECK_AFTER_CADYTS) pcc.addCadytsSetting(controler, config);
 
+		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+			@Override
+			public void install() {
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+
+				this.addControlerListenerBinding().to(AACountsControlerListener.class);
+			}
+		});
+
 		controler.run();
+
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		for (int index =firstIt+1; index <lastIt; index ++){
+			String dirToDel = outputDir+"/ITERS/it."+index;
+			Logger.getLogger(PatnaJointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			IOUtils.deleteDirectory(new File(dirToDel),false);
+		}
 	}
 
 	private void addCadytsSetting(final Controler controler, final Config config){
@@ -136,7 +168,7 @@ public class PatnaCadytsControler {
 		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfigGroup.setStartTime(0);
 		cadytsConfigGroup.setEndTime(24*3600-1);
-		
+
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
