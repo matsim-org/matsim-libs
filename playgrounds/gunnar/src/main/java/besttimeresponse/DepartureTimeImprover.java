@@ -123,30 +123,30 @@ public class DepartureTimeImprover {
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
 
 	public static void main(String[] args) {
-
-		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
-
-		final InterpolatedTravelTimes travelTimes = new InterpolatedTravelTimes(timeDiscretization) {
-			@Override
-			public double get_dTravelTime_dDptTime(Object origin, Object destination, double dptTime_s, Object mode) {
-				return 0;
-			}
-
-			@Override
-			public double getTravelTimeOffset_s(Object origin, Object destination, double dptTime_s, Object mode) {
-				return 1;
-			}
-		};
-
-		final double slack_s = 0.0;
-		final DepartureTimeImprover allocator = new DepartureTimeImprover(travelTimes, 1.0, 0, 0, 0, 0, slack_s);
-		final Trip home2work = new Trip("home", "work", 6.5 * 3600, "car", 1.0, 1.0, Integer.MAX_VALUE, 6 * 3600,
-				Integer.MIN_VALUE, Integer.MAX_VALUE, travelTimes);
-		final Trip work2home = new Trip("work", "home", 17.5 * 3600, "car", 1.0, 1.0, 17 * 3600, Integer.MIN_VALUE,
-				Integer.MIN_VALUE, Integer.MAX_VALUE, travelTimes);
-		allocator.addTrip(home2work);
-		allocator.addTrip(work2home);
-
-		System.out.println(allocator.getUpdatedDepartureTimes_s());
+//
+//		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
+//
+//		final InterpolatedTravelTimes travelTimes = new InterpolatedTravelTimes(timeDiscretization) {
+//			@Override
+//			public double get_dTravelTime_dDptTime(Object origin, Object destination, double dptTime_s, Object mode) {
+//				return 0;
+//			}
+//
+//			@Override
+//			public double getTravelTimeOffset_s(Object origin, Object destination, double dptTime_s, Object mode) {
+//				return 1;
+//			}
+//		};
+//
+//		final double slack_s = 0.0;
+//		final DepartureTimeImprover allocator = new DepartureTimeImprover(travelTimes, 1.0, 0, 0, 0, 0, slack_s);
+//		final Trip home2work = new Trip("home", "work", 6.5 * 3600, "car", 1.0, 1.0, Integer.MAX_VALUE, 6 * 3600,
+//				Integer.MIN_VALUE, Integer.MAX_VALUE, travelTimes);
+//		final Trip work2home = new Trip("work", "home", 17.5 * 3600, "car", 1.0, 1.0, 17 * 3600, Integer.MIN_VALUE,
+//				Integer.MIN_VALUE, Integer.MAX_VALUE, travelTimes);
+//		allocator.addTrip(home2work);
+//		allocator.addTrip(work2home);
+//
+//		System.out.println(allocator.getUpdatedDepartureTimes_s());
 	}
 }

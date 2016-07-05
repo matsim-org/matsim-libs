@@ -19,7 +19,7 @@ public class LinearTimeAllocationProblem {
 
 	// -------------------- MEMBERS --------------------
 
-	private final InterpolatedTravelTimes travelTimes;
+	// private final InterpolatedTravelTimes travelTimes;
 
 	// coefficient for duration of an activity
 	private final double betaDur_1_s;
@@ -40,14 +40,16 @@ public class LinearTimeAllocationProblem {
 	private final double slack_s;
 
 	// (chronological) sequence of trips to be time-optimized
-	private final List<Trip> trips = new ArrayList<>();
+	// private final List<Trip> trips = new ArrayList<>();
+	private final RealizedTimeStructure timeStructure;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public LinearTimeAllocationProblem(final InterpolatedTravelTimes interpolatedTravelTimes, final double betaDur_1_s,
+	public LinearTimeAllocationProblem(final RealizedTimeStructure timeStructure, final double betaDur_1_s,
 			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s,
 			final double betaWait_1_s, final double slack_s) {
-		this.travelTimes = interpolatedTravelTimes;
+		// this.travelTimes = interpolatedTravelTimes;
+		this.timeStructure = timeStructure;
 		this.betaDur_1_s = betaDur_1_s;
 		this.betaTravel_1_s = betaTravel_1_s;
 		this.betaLateArr_1_s = betaLateArr_1_s;
@@ -58,36 +60,41 @@ public class LinearTimeAllocationProblem {
 
 	// -------------------- HELPERS --------------------
 
-	private int getStep(final double time_s) {
-		return this.travelTimes.getTimeDiscretization().getBin(time_s);
-	}
-
-	private int getBinStartTime_s(final int bin) {
-		return this.travelTimes.getTimeDiscretization().getBinStartTime_s(bin);
-	}
-
-	private int getBinEndTime_s(final int bin) {
-		return this.travelTimes.getTimeDiscretization().getBinEndTime_s(bin);
-	}
+//	private int getStep(final double time_s) {
+//		return this.travelTimes.getTimeDiscretization().getBin(time_s);
+//	}
+//
+//	private int getBinStartTime_s(final int bin) {
+//		return this.travelTimes.getTimeDiscretization().getBinStartTime_s(bin);
+//	}
+//
+//	private int getBinEndTime_s(final int bin) {
+//		return this.travelTimes.getTimeDiscretization().getBinEndTime_s(bin);
+//	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public void addTrip(final Trip trip) {
-		this.trips.add(trip);
-	}
+//	public void addTrip(final Trip trip) {
+//		this.trips.add(trip);
+//	}
+//
+//	public void addTrips(final List<Trip> tripList) {
+//		this.trips.addAll(tripList);
+//	}
 
-	public void addTrips(final List<Trip> tripList) {
-		this.trips.addAll(tripList);
+	public LinearTimeAllocationProblem(InterpolatedTravelTimes travelTimes, double betaDur_1_s2, double betaTravel_1_s2,
+			double betaLateArr_1_s2, double betaEarlyDpt_1_s2, double betaWait_1_s2, double slack_s2) {
+		throw new UnsupportedOperationException();
 	}
 
 	public RealVector get__dScore_dDptTimes__1_s() {
 
-		final RealVector dScore_dDptTimes__1_s = new ArrayRealVector(this.trips.size());
+		final RealVector dScore_dDptTimes__1_s = new ArrayRealVector(this.timeStructure.realizedActivities.size());
 
-		for (int tripIndex = 0; tripIndex < this.trips.size(); tripIndex++) {
-			final Trip trip = this.trips.get(tripIndex);
+		for (int tripIndex = 0; tripIndex < this.timeStructure.realizedActivities.size(); tripIndex++) {
+			final Trip trip = this.timeStructure.getTrip(tripIndex);
 
-			final double dTravelTime_dDptTime = this.travelTimes.get_dTravelTime_dDptTime(trip);
+			// final double dTravelTime_dDptTime = this.travelTimes.get_dTravelTime_dDptTime(trip);
 
 			/*-----------------------------------------------------------------
 			 * EFFECT OF DEPARTURE TIME ON ORIGIN ACTIVITY DURATION SCORE.
@@ -115,7 +122,7 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * ----------------------------------------------------------------
 			 */
-			if (!trip.originClosesBeforeDeparture) {
+			if (!trip.originClosesBeforeDeparture()) {
 				dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaDur_1_s * trip.originTimePressure);
 			}
 
@@ -133,7 +140,7 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * ----------------------------------------------------------------
 			 */
-			if (trip.earlyDepartureFromOrigin) {
+			if (trip.earlyDepartureFromOrigin()) {
 				dScore_dDptTimes__1_s.addToEntry(tripIndex, -this.betaEarlyDpt_1_s);
 			}
 
@@ -165,9 +172,9 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * ----------------------------------------------------------------
 			 */
-			if (!trip.destinationOpensAfterArrival) {
+			if (!trip.destinationOpensAfterArrival()) {
 				dScore_dDptTimes__1_s.addToEntry(tripIndex,
-						this.betaDur_1_s * trip.destinationTimePressure * -(1.0 + dTravelTime_dDptTime));
+						this.betaDur_1_s * trip.destinationTimePressure * -(1.0 + trip.dTravelTime_dDptTime));
 			}
 
 			/*-----------------------------------------------------------------
@@ -190,8 +197,8 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * ----------------------------------------------------------------
 			 */
-			if (trip.destinationOpensAfterArrival) {
-				dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaWait_1_s * -(1.0 + dTravelTime_dDptTime));
+			if (trip.destinationOpensAfterArrival()) {
+				dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaWait_1_s * -(1.0 + trip.dTravelTime_dDptTime));
 			}
 
 			/*-----------------------------------------------------------------
@@ -213,8 +220,8 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * ----------------------------------------------------------------
 			 */
-			if (trip.lateArrivalToDestination) {
-				dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaLateArr_1_s * (1.0 + dTravelTime_dDptTime));
+			if (trip.lateArrivalToDestination()) {
+				dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaLateArr_1_s * (1.0 + trip.dTravelTime_dDptTime));
 			}
 
 			/*-----------------------------------------------------------------
@@ -228,7 +235,7 @@ public class LinearTimeAllocationProblem {
 			 * 
 			 * ----------------------------------------------------------------
 			 */
-			dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaTravel_1_s * dTravelTime_dDptTime);
+			dScore_dDptTimes__1_s.addToEntry(tripIndex, this.betaTravel_1_s * trip.dTravelTime_dDptTime);
 		}
 
 		return dScore_dDptTimes__1_s;
@@ -243,27 +250,15 @@ public class LinearTimeAllocationProblem {
 
 		// The first departure must not occur before midnight.
 		{
-			final RealVector coeffs = new ArrayRealVector(this.trips.size());
-			coeffs.setEntry(0, 1.0);
-			constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, 0.0));
+//			final RealVector coeffs = new ArrayRealVector(this.timeStructure.activities.size());
+//			coeffs.setEntry(0, 1.0);
+//			constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, 0.0));
 		}
 
 		// The remaining constraints apply to all trip departure times.
-		for (int tripIndex = 0; tripIndex < this.trips.size(); tripIndex++) {
-			final Trip trip = this.trips.get(tripIndex);
-
-			final int dptTimeStep = this.getStep(trip.departureTime_s);
-			final double dptTimeStepStart_s = this.getBinStartTime_s(dptTimeStep);
-			final double dptTimeStepEnd_s = this.getBinEndTime_s(dptTimeStep);
-
-			final double arrivalTime_s = this.travelTimes.getArrivalTime_s(trip);
-			final int arrTimeStep = this.getStep(arrivalTime_s);
-			final double arrTimeStepStart_s = this.getBinStartTime_s(arrTimeStep);
-			final double arrTimeStepEnd_s = this.getBinEndTime_s(arrTimeStep);
-
-			final double dTravelTime_dDptTime = this.travelTimes.get_dTravelTime_dDptTime(trip);
-			final double travelTimeOffset_s = this.travelTimes.getTravelTimeOffset_s(trip);
-
+//		for (int tripIndex = 0; tripIndex < this.timeStructure.activities.size(); tripIndex++) {
+//			final Trip trip = this.timeStructure.getTrip(tripIndex);
+		{
 			/*-----------------------------------------------------------------
 			 * LOWER BOUND CONSTRAINTS.
 			 * 
@@ -291,11 +286,11 @@ public class LinearTimeAllocationProblem {
 			 *-----------------------------------------------------------------
 			 */
 			{
-				final RealVector coeffs = new ArrayRealVector(this.trips.size());
-				coeffs.setEntry(tripIndex, 1.0);
-				final double lowerBound = Math.max(dptTimeStepStart_s,
-						(arrTimeStepStart_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
-				constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, lowerBound - this.slack_s));
+//				final RealVector coeffs = new ArrayRealVector(this.timeStructure.activities.size());
+//				coeffs.setEntry(tripIndex, 1.0);
+//				final double lowerBound = Math.max(dptTimeStepStart_s,
+//						(arrTimeStepStart_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
+//				constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, lowerBound - this.slack_s));
 			}
 
 			/*-----------------------------------------------------------------
@@ -325,11 +320,11 @@ public class LinearTimeAllocationProblem {
 			 *-----------------------------------------------------------------
 			 */
 			{
-				final RealVector coeffs = new ArrayRealVector(this.trips.size());
-				coeffs.setEntry(tripIndex, 1.0);
-				final double upperBound = Math.min(dptTimeStepEnd_s,
-						(arrTimeStepEnd_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
-				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, upperBound + this.slack_s));
+//				final RealVector coeffs = new ArrayRealVector(this.timeStructure.activities.size());
+//				coeffs.setEntry(tripIndex, 1.0);
+//				final double upperBound = Math.min(dptTimeStepEnd_s,
+//						(arrTimeStepEnd_s - travelTimeOffset_s) / (1.0 + dTravelTime_dDptTime));
+//				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ, upperBound + this.slack_s));
 			}
 
 			/*-----------------------------------------------------------------
@@ -359,7 +354,7 @@ public class LinearTimeAllocationProblem {
 			// } else {
 			// nextTripIndex = tripIndex + 1;
 			// }
-			// final RealVector coeffs = new ArrayRealVector(this.trips.size());
+			// final RealVector coeffs = new ArrayRealVector(this.timeStructure.activities.size());
 			// coeffs.setEntry(tripIndex, 1.0 + dTravelTime_dDptTime);
 			// coeffs.setEntry(nextTripIndex, -1.0);
 			// constraints.add(new LinearConstraint(coeffs, Relationship.LEQ,
@@ -368,5 +363,9 @@ public class LinearTimeAllocationProblem {
 		}
 
 		return new LinearConstraintSet(constraints);
+	}
+
+	public void addTrips(List<Trip> trips) {
+		throw new UnsupportedOperationException();
 	}
 }
