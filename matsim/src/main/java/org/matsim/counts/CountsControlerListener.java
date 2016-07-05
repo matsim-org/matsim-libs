@@ -48,7 +48,6 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -73,7 +72,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     @com.google.inject.Inject(optional=true)
     private Counts<Link> counts = null;
 
-    private final Map<Id<Link>, Map<String,double[]>> linkStats = new HashMap<>();
+    private final Map<Id<Link>, double[]> linkStats = new HashMap<>();
     private int iterationsUsed = 0;
 
     @Inject
@@ -92,15 +91,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
         if (counts != null) {
             for (Id<Link> linkId : counts.getCounts().keySet()) {
-                Map<String, double[]> mode2counts = new HashMap<>();
-                if(this.config.isFilterModes()){
-                for(String mode : this.analyzedModes){
-                	mode2counts.put(mode, new double [24]);
-                }
-                } else {// adding a fake mode 
-                	mode2counts.put("all", new double [24]);
-                }
-            	this.linkStats.put(linkId, mode2counts);
+                this.linkStats.put(linkId, new double[24]);
             }
         }
 	}
@@ -114,55 +105,51 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
             if (createCountsInIteration(event.getIteration())) {
                 iterationStopwatch.beginOperation(OPERATION_COMPARECOUNTS);
-                Map<Id<Link>, Map<String, double[]>> averages;
+                Map<Id<Link>, double[]> averages;
                 if (this.iterationsUsed > 1) {
                     averages = new HashMap<>();
-                    for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
+                    for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
                         Id<Link> linkId = e.getKey();
-                        Map<String, double[]> mode2avgcounts = new HashMap<>();
-                        for(Entry<String, double[]> entry : e.getValue().entrySet()) {
-                        	double[] totalVolumesPerHour = entry.getValue();
-                        	double[] averageVolumesPerHour = new double[totalVolumesPerHour.length];
-                        	for (int i = 0; i < totalVolumesPerHour.length; i++) {
-                                averageVolumesPerHour[i] = totalVolumesPerHour[i] / this.iterationsUsed;
-                            }
-                        	mode2avgcounts.put(entry.getKey(), averageVolumesPerHour);
+                        double[] totalVolumesPerHour = e.getValue();
+                        double[] averageVolumesPerHour = new double[totalVolumesPerHour.length];
+                        for (int i = 0; i < totalVolumesPerHour.length; i++) {
+                            averageVolumesPerHour[i] = totalVolumesPerHour[i] / this.iterationsUsed;
                         }
-                        averages.put(linkId, mode2avgcounts);
+                        averages.put(linkId, averageVolumesPerHour);
                     }
                 } else {
                     averages = this.linkStats;
                 }
-//                CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(averages, counts, network, config.getCountsScaleFactor());
-//                if ((this.config.getDistanceFilter() != null) && (this.config.getDistanceFilterCenterNode() != null)) {
-//                    cca.setDistanceFilter(this.config.getDistanceFilter(), this.config.getDistanceFilterCenterNode());
-//                }
-//                cca.setCountsScaleFactor(this.config.getCountsScaleFactor());
-//                cca.run();
+                CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(averages, counts, network, config.getCountsScaleFactor());
+                if ((this.config.getDistanceFilter() != null) && (this.config.getDistanceFilterCenterNode() != null)) {
+                    cca.setDistanceFilter(this.config.getDistanceFilter(), this.config.getDistanceFilterCenterNode());
+                }
+                cca.setCountsScaleFactor(this.config.getCountsScaleFactor());
+                cca.run();
 
-//                if (this.config.getOutputFormat().contains("html") ||
-//                        this.config.getOutputFormat().contains("all")) {
-//                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controlerIO.getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration());
-//                    cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
-//                    cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
-//                    cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
-//                    cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-//                    cgw.createHtmlAndGraphs();
-//                }
-//                if (this.config.getOutputFormat().contains("kml") ||
-//                        this.config.getOutputFormat().contains("all")) {
-//                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.kmz");
-//                    CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-//                            cca.getComparison(), network, TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84));
-//                    kmlWriter.setIterationNumber(event.getIteration());
-//                    kmlWriter.writeFile(filename);
-//                }
-//                if (this.config.getOutputFormat().contains("txt") ||
-//                        this.config.getOutputFormat().contains("all")) {
-//                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.txt");
-//                    CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
-//                    ctw.writeFile(filename);
-//                }
+                if (this.config.getOutputFormat().contains("html") ||
+                        this.config.getOutputFormat().contains("all")) {
+                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controlerIO.getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration());
+                    cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
+                    cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
+                    cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
+                    cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+                    cgw.createHtmlAndGraphs();
+                }
+                if (this.config.getOutputFormat().contains("kml") ||
+                        this.config.getOutputFormat().contains("all")) {
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.kmz");
+                    CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
+                            cca.getComparison(), network, TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84));
+                    kmlWriter.setIterationNumber(event.getIteration());
+                    kmlWriter.writeFile(filename);
+                }
+                if (this.config.getOutputFormat().contains("txt") ||
+                        this.config.getOutputFormat().contains("all")) {
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.txt");
+                    CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
+                    ctw.writeFile(filename);
+                }
                 reset();
                 iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
             }
@@ -187,38 +174,37 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
 	private void addVolumes(final VolumesAnalyzer volumes) {
 		this.iterationsUsed++;
-		for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
+		for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
 			Id<Link> linkId = e.getKey();
-			Map<String, double[]> mode2counts =  e.getValue();
-			if( ! this.config.isFilterModes() ) {
-				double[] volumesPerHour = mode2counts.values().iterator().next();//only one entry
-				double[] newVolume = volumes.getVolumesPerHourForLink(linkId);	
-				for (int i = 0; i < 24; i++) {
-					volumesPerHour[i] += newVolume[i];
-				}
-				mode2counts.put(mode2counts.keySet().iterator().next(), volumesPerHour);
-			} else {
-				for (String mode : mode2counts.keySet()) {
-					double[] volumesPerHour = mode2counts.get(mode); 
-					double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode); 
-					for (int i = 0; i < 24; i++) {
-						volumesPerHour[i] += newVolume[i];
-					}
-					mode2counts.put(mode, volumesPerHour);
-				}
-				this.linkStats.put(linkId, mode2counts);	
+			double[] volumesPerHour = e.getValue(); 
+			double[] newVolume = getVolumesPerHourForLink(volumes, linkId); 
+			for (int i = 0; i < 24; i++) {
+				volumesPerHour[i] += newVolume[i];
 			}
-			
+		}
+	}
+	
+	private double[] getVolumesPerHourForLink(final VolumesAnalyzer volumes, final Id<Link> linkId) {
+		if (this.config.isFilterModes()) {
+			double[] newVolume = new double[24];
+			for (String mode : this.analyzedModes) {
+				double[] volumesForMode = volumes.getVolumesPerHourForLink(linkId, mode);
+				if (volumesForMode == null) continue;
+				for (int i = 0; i < 24; i++) {
+					newVolume[i] += volumesForMode[i];
+				}
+			}
+			return newVolume;
+		} else {
+			return volumes.getVolumesPerHourForLink(linkId);
 		}
 	}
 	
 	private void reset() {
 		this.iterationsUsed = 0;
-		for(Map<String, double[]> mode2counts : this.linkStats.values()) {
-			for (double[] hours : mode2counts.values()) {
-				for (int i = 0; i < hours.length; i++) {
-					hours[i] = 0.0;
-				}
+		for (double[] hours : this.linkStats.values()) {
+			for (int i = 0; i < hours.length; i++) {
+				hours[i] = 0.0;
 			}
 		}
 	}
