@@ -24,12 +24,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 
 /**
  * @author dgrether
  *
  */
+@Singleton
 public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
 
 	private TransitRouterConfig trConfig;

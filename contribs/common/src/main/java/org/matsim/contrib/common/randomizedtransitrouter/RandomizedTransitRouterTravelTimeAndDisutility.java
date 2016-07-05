@@ -191,15 +191,15 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 				localMarginalUtilityOfTravelTimePt_utl_s = tmp;
 			}
 			
-			if ( this.dataCollectionConfig.get(DataCollection.randomizedParameters) ) {
-//				StringBuffer strb = this.dataCollectionStrings.get(DataCollection.randomizedParameters) ;
-//				strb.append
-				System.out.println("personId: " + person.getId() +
-						"; margUtlOfTimeWlk_h: " + this.localMarginalUtilityOfTravelTimeWalk_utl_s*3600. +
-						"; utlOfLineSwitch: " + this.localUtilityOfLineSwitch_utl +
-						"; margUtlOfWait_h: " + this.localMarginalUtilityOfWaitingPt_utl_s*3600. + 
-						"; margUtlOfTimePt_h: " + this.localMarginalUtilityOfTravelTimePt_utl_s*3600. ) ;
-			}
+//			if ( this.dataCollectionConfig.get(DataCollection.randomizedParameters) ) {
+////				StringBuffer strb = this.dataCollectionStrings.get(DataCollection.randomizedParameters) ;
+////				strb.append
+//				System.out.println("personId: " + person.getId() +
+//						"; margUtlOfTimeWlk_h: " + this.localMarginalUtilityOfTravelTimeWalk_utl_s*3600. +
+//						"; utlOfLineSwitch: " + this.localUtilityOfLineSwitch_utl +
+//						"; margUtlOfWait_h: " + this.localMarginalUtilityOfWaitingPt_utl_s*3600. +
+//						"; margUtlOfTimePt_h: " + this.localMarginalUtilityOfTravelTimePt_utl_s*3600. ) ;
+//			}
 		}
 	}
 	

@@ -1084,6 +1084,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         slave.sendBoolean(FullTransitPerformanceTransmission);
         slave.sendBoolean(TrackGenome);
         slave.sendBoolean(IntelligentRouters);
+        slave.sendBoolean(false); //for diversity generation;
         slave.readMemoryStats();
         slave.readNumberOfThreadsOnSlave();
     }

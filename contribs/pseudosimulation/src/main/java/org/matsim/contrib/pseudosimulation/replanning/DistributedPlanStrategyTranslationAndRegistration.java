@@ -82,6 +82,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
+                    addPlanStrategyBinding(e.getKey()).toProvider(e.getValue());
                     addPlanStrategyBinding(e.getKey() + SUFFIX).toProvider(new DistributedPlanSelectorStrategyFactory(slave, quickReplanning, selectionInflationFactor, controler, e.getKey()));
                 }
             });
@@ -92,6 +93,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
+                    addPlanStrategyBinding(e.getKey()).toProvider(e.getValue());
                     addPlanStrategyBinding(e.getKey() + SUFFIX).toProvider(new DistributedPlanMutatorStrategyFactory(slave, SupportedMutatorGenes.get(e.getKey()), TrackGenome, controler, e.getKey()));
                 }
             });

@@ -184,7 +184,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         initialRouting = reader.readBoolean();
         boolean quickReplannning = reader.readBoolean();
         fullTransitPerformanceTransmission = reader.readBoolean();
-        boolean singaporeScenario = reader.readBoolean();
         boolean trackGenome = reader.readBoolean();
         IntelligentRouters = reader.readBoolean();
         boolean diversityGeneratingPlanSelection = reader.readBoolean();

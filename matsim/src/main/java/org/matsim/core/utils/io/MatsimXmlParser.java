@@ -57,7 +57,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	// yy this is NOT working for me with "dtd", but it IS working with null. 
 	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
 	
-	private boolean preferLocalDtds = false;
+	private boolean preferLocalDtds = true;
 
 	private String doctype = null;
 	/**

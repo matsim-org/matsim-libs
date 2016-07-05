@@ -15,17 +15,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -53,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 
 /**
  * @author illenberger
@@ -198,10 +189,11 @@ public class PSim implements Mobsim {
                         if (prevLeg.getMode().equals(TransportMode.car)) {
                             try {
                                 eventQueue.add(new PersonEntersVehicleEvent(prevEndTime, personId, personId));
+                                eventQueue.add(new VehicleEntersTrafficEvent(prevEndTime,personId, prevLeg.getRoute().getStartLinkId(),personId, TransportMode.car,1.0));
                                 NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
 
                                 travelTime = calcRouteTravelTime(croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personId);
-
+                                eventQueue.add(new VehicleLeavesTrafficEvent(prevEndTime + travelTime,personId, prevLeg.getRoute().getEndLinkId(),personId, TransportMode.car,1.0));
                                 eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, personId));
                             } catch (NullPointerException ne) {
                                 Logger.getLogger(this.getClass()).error("No route for car leg. Continuing with next leg");
@@ -351,10 +343,8 @@ public class PSim implements Mobsim {
             if (route.getStartLinkId() != route.getEndLinkId()) {
                 Id<Link> startLink = route.getStartLinkId();
                 double linkEnterTime = startTime;
-                VehicleEntersTrafficEvent wait2Link = new VehicleEntersTrafficEvent(linkEnterTime, agentId, startLink, agentId, PtConstants.NETWORK_MODE, 1.0);
                 LinkEnterEvent linkEnterEvent = null;
                 LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink);
-                eventQueue.add(wait2Link);
                 eventQueue.add(linkLeaveEvent);
                 double linkLeaveTime = linkEnterTime;
                 List<Id<Link>> routeLinkIds = route.getLinkIds();

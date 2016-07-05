@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterFactory;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
@@ -214,7 +215,7 @@ public class RunPSim {
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(scenario,
                             waitTimeCalculator.getWaitTimes(),
                             stopStopTimeCalculator.getStopStopTimes()));
                 }
@@ -230,11 +231,12 @@ public class RunPSim {
                 }
             });
             disutilityFactory.setSigma(0.1);
+
             matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }
 
         if (TrackGenome) {
-            matsimControler.addControlerListener(new GenomeAnalysis(true, false, false));
+            matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));
         }
 
         matsimControler.addOverridingModule(new AbstractModule() {
@@ -329,13 +331,9 @@ public class RunPSim {
                     mobSimSwitcher);
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
         }
-        config.linkStats().setWriteLinkStatsInterval(config.linkStats().getWriteLinkStatsInterval() * IterationsPerCycle);
+
         config.controler().setCreateGraphs(false);
-        config.controler().setWriteEventsInterval(config.controler().getWriteEventsInterval() * IterationsPerCycle);
-        config.controler().setWritePlansInterval(config.controler().getWritePlansInterval() * IterationsPerCycle);
-        config.controler().setWriteSnapshotsInterval(config.controler().getWriteSnapshotsInterval() * IterationsPerCycle);
-        Logger.getLogger(this.getClass()).warn("Please note: this script violates the matsim convention that the config output should be useable "
-        		+ "as input to another run.   Instead, the write invervals would be multiplied every time this is done.  kai, may'15");
+
     }
 
 
@@ -374,6 +372,11 @@ public class RunPSim {
         private int startIter;
         private int endIter;
         private Map<Id<Person>, Double> selectedPlanScoreMemory;
+
+        public PSimFactory getpSimFactory() {
+            return pSimFactory;
+        }
+
         private PSimFactory pSimFactory;
 
 
