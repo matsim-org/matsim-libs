@@ -77,24 +77,24 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 public class PatnaCadytsControler {
 
-	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork_xxx/";
+	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonDemand_10pct.xml.gz";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded_shpNetwork/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
 
 	public static void main(String[] args) {
-		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/outerCordonVehicles_10pct.xml.gz";
+		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonVehicles_10pct.xml.gz";
 
 		if( STABILITY_CHECK_AFTER_CADYTS) {
 			String inPlans = outputDir+"/output_plans.xml.gz";	
-			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/cordonOutput_plans_10pct_selected.xml.gz";
+			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/cordonOutput_plans_10pct_selected.xml.gz";
 
 			SelectedPlansFilter spf = new SelectedPlansFilter();
 			spf.run(inPlans);
 			spf.writePlans(plansFile);
 
-			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork_ctd/";
-			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonVehicles_10pct_ctd.xml.gz";
+			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded_shpNetwork_ctd/";
+			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
 
 		PatnaCadytsControler pcc = new PatnaCadytsControler();
@@ -106,7 +106,7 @@ public class PatnaCadytsControler {
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -198,7 +198,7 @@ public class PatnaCadytsControler {
 		config.global().setCoordinateSystem(PatnaUtils.EPSG);
 
 		config.plans().setInputFile(plansFile);
-		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/network_diff_linkSpeed.xml.gz");
+		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE+"/network.xml.gz");
 
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
@@ -208,7 +208,7 @@ public class PatnaCadytsControler {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		config.counts().setCountsFileName(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/"+"/outerCordonCounts_10pct_OC1Excluded.xml.gz");
+		config.counts().setCountsFileName(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonCounts_10pct_OC1Excluded.xml.gz");
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");

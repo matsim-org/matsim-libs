@@ -49,10 +49,10 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class PatnaJointDemandGenerator {
 
-	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_shpNetwork/output_plans.xml.gz"; // calibrated from cadyts.
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_vehicles_10pct.xml.gz";
+	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"outerCordonOutput_10pct_OC1Excluded/output_plans.xml.gz"; // calibrated from cadyts.
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 	private static final int CLONING_FACTOR = 10; 
 	private static Scenario sc;
 	
