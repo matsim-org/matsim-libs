@@ -668,7 +668,7 @@ class MyTableModel extends AbstractTableModel {
 		editable[0][1] = true;
 
 		table[1][0] = "Euklidean length";
-		table[1][1] = Double.toString(CoordUtils.calcEuclideanDistance(activeLink.from.getCoord(), activeLink.to.getCoord()));
+		table[1][1] = Double.toString(CoordUtils.calcEuclideanDistance(activeLink.getFromNode().getCoord(), activeLink.getToNode().getCoord()));
 
 		table[2][0] = "Flow capacity / sec";
 		table[2][1] = Double.toString(activeLink.getFlowCapacityPerSec());

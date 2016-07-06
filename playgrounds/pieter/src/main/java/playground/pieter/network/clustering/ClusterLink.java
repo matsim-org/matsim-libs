@@ -94,7 +94,7 @@ class ClusterLink implements Link {
 	}
 
 	public final double getEuklideanDistance() {
-		return CoordUtils.calcEuclideanDistance(link.from.getCoord(), link.to.getCoord());
+		return CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 	}
 
 	public double getCapacity() {
