@@ -49,6 +49,7 @@ import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
+import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -128,6 +129,20 @@ public class PatnaJointCalibrationControler {
 				this.addControlerListenerBinding().to(MultiModeCountsControlerListener.class);
 			}
 		});
+		
+		// adding pt fare system based on distance 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.bind(PtFareEventHandler.class);
+			}
+		});
+		
+		// for above make sure that util_dist and monetary dist rate for pt are zero.
+		ModeParams mp = controler.getScenario().getConfig().planCalcScore().getModes().get("pt");
+		mp.setMarginalUtilityOfDistance(0.0);
+		mp.setMonetaryDistanceRate(0.0);
+		
 		controler.run();
 
 		// delete unnecessary iterations folder here.
@@ -304,15 +319,17 @@ public class PatnaJointCalibrationControler {
 			ModeParams modeParam = new ModeParams(mode);
 			modeParam.setConstant(0.);
 			switch(mode){
-			case "car": 
+			case "car":
+			case "car_ext": 
 				modeParam.setMarginalUtilityOfTraveling(-0.64);
 				modeParam.setMonetaryDistanceRate(-3.7*Math.pow(10, -5)); break;
+			case "motorbike_ext" :
 			case "motorbike" :
 				modeParam.setMarginalUtilityOfTraveling(-0.18);
 				modeParam.setMonetaryDistanceRate(-1.6*Math.pow(10, -5)); break;
 			case "pt" :
 				modeParam.setMarginalUtilityOfTraveling(-0.29);
-				modeParam.setMonetaryDistanceRate(-0.3*Math.pow(10, -5)); break;
+				/* modeParam.setMonetaryDistanceRate(-0.3*Math.pow(10, -5)); */ break;
 			case "walk" :
 				modeParam.setMarginalUtilityOfTraveling(-0.0);
 				modeParam.setMonetaryDistanceRate(0.0); 
