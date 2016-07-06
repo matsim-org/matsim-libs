@@ -20,12 +20,6 @@
 
 package org.matsim.pt.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -40,15 +34,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.pt.router.TransitLeastCostPathTree.InitialNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
+
+import java.util.*;
 
 /**
  * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
@@ -59,37 +51,34 @@ public class TransitRouterImpl implements TransitRouter {
 
     private final TransitRouterNetwork transitNetwork;
 
-    private final MultiNodeDijkstra dijkstra;
-    private final TransitRouterConfig config;
-    private final TransitTravelDisutility travelDisutility;
-    private final TravelTime travelTime;
+	private final TransitRouterConfig config;
+	private final TransitTravelDisutility travelDisutility;
+	private final TravelTime travelTime;
 
 
     private final PreparedTransitSchedule preparedTransitSchedule;
 
-    public TransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule) {
-        this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-        TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
-        this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
-        this.config = config;
-        this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-        this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
-        this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-    }
+	public TransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule) {
+		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
+		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+		this.config = config;
+		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
+	}
 
-    public TransitRouterImpl(
-            final TransitRouterConfig config,
-            final PreparedTransitSchedule preparedTransitSchedule,
-            final TransitRouterNetwork routerNetwork,
-            final TravelTime travelTime,
-            final TransitTravelDisutility travelDisutility) {
-        this.config = config;
-        this.transitNetwork = routerNetwork;
-        this.travelTime = travelTime;
-        this.travelDisutility = travelDisutility;
-        this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-        this.preparedTransitSchedule = preparedTransitSchedule;
-    }
+	public TransitRouterImpl(
+			final TransitRouterConfig config,
+			final PreparedTransitSchedule preparedTransitSchedule,
+			final TransitRouterNetwork routerNetwork,
+			final TravelTime travelTime,
+			final TransitTravelDisutility travelDisutility) {
+		this.config = config;
+		this.transitNetwork = routerNetwork;
+		this.travelTime = travelTime;
+		this.travelDisutility = travelDisutility;
+		this.preparedTransitSchedule = preparedTransitSchedule;
+	}
 
     private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
         Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
@@ -128,8 +117,11 @@ public class TransitRouterImpl implements TransitRouter {
         // find possible end stops
         Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
 
-        // find routes between start and end stops
-        Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(transitNetwork, travelDisutility, travelTime,
+				wrappedFromNodes, wrappedToNodes, person);
+
+		// find routes between start and end stop
+		Path p = tree.getPath(wrappedToNodes);
 
         if (p == null) {
             return null;
@@ -283,12 +275,8 @@ public class TransitRouterImpl implements TransitRouter {
         return transitNetwork;
     }
 
-    protected MultiNodeDijkstra getDijkstra() {
-        return dijkstra;
-    }
-
-    protected TransitRouterConfig getConfig() {
-        return config;
-    }
+	protected TransitRouterConfig getConfig() {
+		return config;
+	}
 
 }

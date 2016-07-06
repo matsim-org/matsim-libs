@@ -54,7 +54,7 @@ public class OTPMatrixRouter {
                     "9.outputCRS for output Conversion ");
         } else {
         	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(args[7], args[8]);
-        	
+
         	List<Individual> fromIndividuals = readIndividuals(args[0]);
             List<Individual> toIndividuals = readIndividuals(args[1]);
 
@@ -172,7 +172,7 @@ public class OTPMatrixRouter {
 
     private static List<Individual> indexIndividuals(Graph graph, List<Individual> individuals, CoordinateTransformation ct, String filePath) {
         log.info("Start indexing vertices and writing them out...");
-        InputsCSVWriter individualsWriter = new InputsCSVWriter(filePath, ",");        
+        InputsCSVWriter individualsWriter = new InputsCSVWriter(filePath, ",");
         SampleFactory sampleFactory = graph.getSampleFactory();
         int counter = 0;
         for (int i = 0; i < individuals.size(); i++) {
@@ -186,7 +186,7 @@ public class OTPMatrixRouter {
             }
             Coord inputCoord = CoordUtils.createCoord(individual.lon, individual.lat);
             Coord outputCoord = ct.transform(inputCoord);
-          
+
             individual.sample = sample;
             individualsWriter.writeField(individual.label);
 //			individualsWriter.writeField(individual.lat);
