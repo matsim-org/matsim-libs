@@ -259,7 +259,8 @@ public class PatnaCadytsControler {
 
 		ModeParams car = new ModeParams("car_ext");
 		car.setConstant(0.0);
-		car.setMarginalUtilityOfTraveling(0.0);
+		car.setMarginalUtilityOfTraveling(-0.64);
+		car.setMonetaryDistanceRate(-3.7*Math.pow(10, -5));
 		config.planCalcScore().addModeParams(car);
 
 		ModeParams bike = new ModeParams("bike_ext");
@@ -269,10 +270,11 @@ public class PatnaCadytsControler {
 
 		ModeParams motorbike = new ModeParams("motorbike_ext");
 		motorbike.setConstant(0.0);
-		motorbike.setMarginalUtilityOfTraveling(0.0);
+		motorbike.setMarginalUtilityOfTraveling(-0.18);
+		motorbike.setMonetaryDistanceRate(-1.6*Math.pow(10, -5));
 		config.planCalcScore().addModeParams(motorbike);
 
-		ModeParams truck = new ModeParams("truck_ext");
+		ModeParams truck = new ModeParams("truck_ext"); // using default for them.
 		truck.setConstant(0.0);
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);
