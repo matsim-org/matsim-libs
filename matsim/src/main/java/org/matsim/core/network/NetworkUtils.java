@@ -603,4 +603,12 @@ public class NetworkUtils {
 			throw new RuntimeException("wrong implementation of interface Node to do this") ;
 		}
 	}
+
+
+	public static double getFreespeedTravelTime( Link link ) {
+		return link.getLength() / link.getFreespeed() ;
+	}
+	public static double getFreespeedTravelTime( Link link, double time ) {
+		return link.getLength() / link.getFreespeed(time) ;
+	}
 }

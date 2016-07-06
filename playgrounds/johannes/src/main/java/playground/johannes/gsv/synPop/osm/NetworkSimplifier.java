@@ -30,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.scenario.MutableScenario;
@@ -108,7 +109,7 @@ public class NetworkSimplifier {
 									// freespeed depends on total length and time needed for inLink and outLink
 									link.setFreespeed(
 											(inLink.getLength() + outLink.getLength()) /
-											(inLink.getFreespeedTravelTime() + outLink.getFreespeedTravelTime())
+											(NetworkUtils.getFreespeedTravelTime(inLink) + NetworkUtils.getFreespeedTravelTime(outLink))
 											);
 
 									// the capacity and the new links end is important, thus it will be set to the minimum

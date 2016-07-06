@@ -139,15 +139,6 @@ public final class TimeVariantLinkImpl extends LinkImpl {
 
 	/**
 	 * @param time - the time in seconds.
-	 * @return the freespeed travel time at time <tt>time</tt>.
-	 */
-	@Override
-	public synchronized double getFreespeedTravelTime(final double time) {
-		return getLength()/getFreespeed(time);
-	}
-
-	/**
-	 * @param time - the time in seconds.
 	 * @return the flow capacity at time <tt>time</tt>.
 	 */
 	@Override

@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class TimeVariantLinkImplTest extends MatsimTestCase {
 
-	/** Tests the method {@link TimeVariantLinkImpl#getFreespeedTravelTime(double)}.	 */
+	/** Tests the method {@link NetworkUtils#getFreespeedTravelTime(double)}.	 */
 	public void testGetFreespeedTravelTime(){
 	    for (LinkFactory lf : linkFactories(1, 5)) {
     		final NetworkImpl network = NetworkImpl.createNetwork();
@@ -88,7 +88,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// test base values
     		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON);
     
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -104,14 +104,14 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		assertEquals(20.0, link.getFreespeed(8*3600.0), EPSILON); // some time later, still new value
     
     		// test derived values
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 1.0), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 0.1), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(7*3600.0), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(8*3600.0), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
-    		assertEquals(5.0, link.getFreespeedTravelTime(30*3600.0), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(36*3600.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 1.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 0.1), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 8*3600.0), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 30*3600.0), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 36*3600.0), EPSILON);
         }
 	}
 
@@ -131,7 +131,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// test base values
     		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON);
     
     		// add a relative change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -147,14 +147,14 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		assertEquals(5.0, link.getFreespeed(8*3600.0), EPSILON); // some time later, still new value
     
     		// do tests for derived values
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 1.0), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 0.1), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(7*3600.0), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(8*3600.0), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
-    		assertEquals(20.0, link.getFreespeedTravelTime(30*3600.0), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(36*3600.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 1.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 0.1), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 8*3600.0), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 30*3600.0), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 36*3600.0), EPSILON);
 	    }
 	}
 
@@ -174,7 +174,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// test base values
     		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON);
     
     		// add some changes:
     		// - first a change event starting at 7am

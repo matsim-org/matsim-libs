@@ -65,8 +65,6 @@ public class LinkImpl implements Link {
 
 	private String origid = null;
 
-	private final double euklideanDist;
-
 	private final Network network;
 
 	private static int fsWarnCnt = 0 ;
@@ -103,7 +101,6 @@ public class LinkImpl implements Link {
 		this.checkCapacitiySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
-		this.euklideanDist = CoordUtils.calcEuclideanDistance(this.from.getCoord(), this.to.getCoord());
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");
@@ -186,23 +183,13 @@ public class LinkImpl implements Link {
 	}
 
 	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFreespeedTravelTime() {
-		return getFreespeedTravelTime(Time.UNDEFINED_TIME);
-	}
-
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFreespeedTravelTime(@SuppressWarnings("unused") final double time) {
-		return this.length / this.freespeed;
-	}
-
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
 	public double getFlowCapacityPerSec() {
 		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
 	}
 
 	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
 	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
-		return this.capacity / network.getCapacityPeriod();
+		return this.getCapacity(time) / network.getCapacityPeriod();
 	}
 
 	public final String getOrigId() {
@@ -213,15 +200,9 @@ public class LinkImpl implements Link {
 		return this.type;
 	}
 
-	public final double getEuklideanLength() {
-		// maybe ok to keep this since it is an expensive computation. kai, mar'16
-		return this.euklideanDist;
-	}
-
 	@Override
 	public double getCapacity() {
 		return this.capacity;
-//		return getCapacity(Time.UNDEFINED_TIME);
 	}
 
 	@Override

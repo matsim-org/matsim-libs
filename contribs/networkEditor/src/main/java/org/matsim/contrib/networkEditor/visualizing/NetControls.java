@@ -23,6 +23,8 @@ import javax.swing.table.AbstractTableModel;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author danielmaxx
@@ -666,7 +668,7 @@ class MyTableModel extends AbstractTableModel {
 		editable[0][1] = true;
 
 		table[1][0] = "Euklidean length";
-		table[1][1] = Double.toString(activeLink.getEuklideanLength());
+		table[1][1] = Double.toString(CoordUtils.calcEuclideanDistance(activeLink.from.getCoord(), activeLink.to.getCoord()));
 
 		table[2][0] = "Flow capacity / sec";
 		table[2][1] = Double.toString(activeLink.getFlowCapacityPerSec());
@@ -677,7 +679,7 @@ class MyTableModel extends AbstractTableModel {
 		editable[3][1] = true;
 
 		table[4][0] = "Free speed travel time";
-		table[4][1] = Double.toString(activeLink.getFreespeedTravelTime());
+		table[4][1] = Double.toString(NetworkUtils.getFreespeedTravelTime(activeLink));
 		//editable[4][1] = true;
 
 		table[5][0] = "Length";

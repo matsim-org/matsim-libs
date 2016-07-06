@@ -176,11 +176,11 @@ public class LinkImplTest {
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 50, (double) 50));
 		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 1000.0, 1.0);
-		Assert.assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
+		Assert.assertEquals("wrong freespeed traveltime.", 50.0, NetworkUtils.getFreespeedTravelTime(link1), EPSILON);
 		link1.setLength(1000.0);
-		Assert.assertEquals("wrong freespeed traveltime.", 100.0, link1.getFreespeedTravelTime(), EPSILON);
+		Assert.assertEquals("wrong freespeed traveltime.", 100.0, NetworkUtils.getFreespeedTravelTime(link1), EPSILON);
 		link1.setFreespeed(20.0);
-		Assert.assertEquals("wrong freespeed traveltime.", 50.0, link1.getFreespeedTravelTime(), EPSILON);
+		Assert.assertEquals("wrong freespeed traveltime.", 50.0, NetworkUtils.getFreespeedTravelTime(link1), EPSILON);
 	}
 
 	/**

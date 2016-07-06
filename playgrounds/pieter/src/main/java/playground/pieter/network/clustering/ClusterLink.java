@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 class ClusterLink implements Link {
@@ -68,11 +69,12 @@ class ClusterLink implements Link {
 	}
 
 	public double getFreespeedTravelTime() {
-		return link.getFreespeedTravelTime();
+		return NetworkUtils.getFreespeedTravelTime(link) ;
 	}
 
 	public double getFreespeedTravelTime(double time) {
-		return link.getFreespeedTravelTime(time);
+		final double time1 = time;
+		return NetworkUtils.getFreespeedTravelTime(link, time1) ;
 	}
 
 	public double getFlowCapacity() {
@@ -92,7 +94,7 @@ class ClusterLink implements Link {
 	}
 
 	public final double getEuklideanDistance() {
-		return link.getEuklideanLength();
+		return CoordUtils.calcEuclideanDistance(link.from.getCoord(), link.to.getCoord());
 	}
 
 	public double getCapacity() {
