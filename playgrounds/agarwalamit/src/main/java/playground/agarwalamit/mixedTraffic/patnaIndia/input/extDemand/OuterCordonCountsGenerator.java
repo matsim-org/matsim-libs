@@ -43,10 +43,10 @@ public class OuterCordonCountsGenerator {
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_out = new HashMap<>();
 	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandInputFiles/";
-
+	
 	public static void main(String[] args) {
 
-		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/shpNetwork/"+"/outerCordonCounts_10pct_OC1Excluded.xml.gz";
+		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/outerCordonCounts_10pct_OC1Excluded.xml.gz";
 
 		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
 	
@@ -86,12 +86,14 @@ public class OuterCordonCountsGenerator {
 	private void processCountingStation(final String countingStationNumber, final String inDirectionFile, final String outDirectionFile){
 		{
 			Map<Integer, Double> hourlyCounts = readFileAndReturnHourlyCounts(inDirectionFile);
-			Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(OuterCordonUtils.getCountingStationKey(countingStationNumber, "in"));
+			String key = OuterCordonUtils.getCountingStationKey(countingStationNumber, "in");
+			Id<Link> linkId = new OuterCordonLinks(  PatnaUtils.PATNA_NETWORK_TYPE  ).getLinkId(key);
 			countStation2time2countInfo_in.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
 		}
 		{
 			Map<Integer, Double> hourlyCounts = readFileAndReturnHourlyCounts(outDirectionFile);
-			Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(OuterCordonUtils.getCountingStationKey(countingStationNumber, "out"));
+			String key = OuterCordonUtils.getCountingStationKey(countingStationNumber, "out");
+			Id<Link> linkId = new OuterCordonLinks(  PatnaUtils.PATNA_NETWORK_TYPE  ).getLinkId(key);
 			countStation2time2countInfo_out.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
 		}
 	}

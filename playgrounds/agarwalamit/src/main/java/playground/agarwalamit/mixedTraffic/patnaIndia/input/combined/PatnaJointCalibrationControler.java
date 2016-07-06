@@ -63,13 +63,13 @@ public class PatnaJointCalibrationControler {
 	private final static double SAMPLE_SIZE = 0.10;
 	private final static String subPopAttributeName = "userGroup";
 
-	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/network_diff_linkSpeed.xml.gz"; //
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_counts.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/shpNetwork/joint_vehicles_10pct.xml.gz";
+	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz"; //
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxxx/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -134,12 +134,12 @@ public class PatnaJointCalibrationControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(PtFareEventHandler.class);
+				this.addEventHandlerBinding().to(PtFareEventHandler.class);
 			}
 		});
 		
 		// for above make sure that util_dist and monetary dist rate for pt are zero.
-		ModeParams mp = controler.getScenario().getConfig().planCalcScore().getModes().get("pt");
+		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
 		mp.setMarginalUtilityOfDistance(0.0);
 		mp.setMonetaryDistanceRate(0.0);
 		

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -45,6 +44,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 /**
  * @author amit
@@ -58,7 +58,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 	public static void main(String[] args) throws IOException  {  
 		PatnaNetworkFromTransCadDataGenerator png =  new PatnaNetworkFromTransCadDataGenerator();
 		png.startProcessingFile();
-		String outNetwork = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/network_diff_linkSpeed.xml.gz";
+		String outNetwork = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaNetworkType.shpNetwork.toString()+"/network.xml.gz";
 		new NetworkWriter(png.getPatnaNetwork()).write(outNetwork);
 		LOG.info("The network file is written to - "+ outNetwork);
 	}
