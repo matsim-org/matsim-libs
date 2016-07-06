@@ -78,7 +78,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class PatnaCadytsControler {
 
 	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded_shpNetwork/";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
 
