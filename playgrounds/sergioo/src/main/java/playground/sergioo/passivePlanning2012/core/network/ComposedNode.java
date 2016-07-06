@@ -169,5 +169,10 @@ public class ComposedNode implements Node {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
+	@Override
+	public void setCoord(Coord coord) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 
 }

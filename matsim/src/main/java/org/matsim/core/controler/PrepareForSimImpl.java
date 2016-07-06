@@ -47,11 +47,6 @@ class PrepareForSimImpl implements PrepareForSim {
 
 	@Override
 	public void run() {
-		if (scenario instanceof MutableScenario) {
-			((MutableScenario)scenario).setLocked();
-			// see comment in ScenarioImpl. kai, sep'14
-		}
-
 		/*
 		 * Create single-mode network here and hand it over to PersonPrepareForSim. Otherwise, each instance would create its
 		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
@@ -77,8 +72,18 @@ class PrepareForSimImpl implements PrepareForSim {
 						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
 					}
 				});
+
+		if (scenario instanceof Lockable) {
+			((Lockable)scenario).setLocked();
+			// see comment in ScenarioImpl. kai, sep'14
+		}
+
 		if (population instanceof Lockable) {
 			((Lockable) population).setLocked();
+		}
+		
+		if ( network instanceof Lockable ) {
+			((Lockable) network).setLocked();
 		}
 
 	}

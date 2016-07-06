@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
@@ -47,7 +48,7 @@ import org.matsim.core.utils.collections.QuadTree;
  * @author nagel
  * @author mrieser
  */
-public final class NetworkImpl implements Network {
+public final class NetworkImpl implements Network, Lockable {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
@@ -86,6 +87,8 @@ public final class NetworkImpl implements Network {
 
 	private int nextMsg2=1;
 
+	private boolean locked = false ;
+
 	NetworkImpl() {
 		this.factory = new NetworkFactoryImpl(this);
 	}
@@ -123,6 +126,9 @@ public final class NetworkImpl implements Network {
 		if (this.counter % this.nextMsg == 0) {
 			this.nextMsg *= 2;
 			printLinksCount();
+		}
+		if ( this.locked && link instanceof Lockable ) {
+			((Lockable)link).setLocked() ;
 		}
 	}
 	
@@ -168,6 +174,10 @@ public final class NetworkImpl implements Network {
 		if (this.counter2 % this.nextMsg2 == 0) {
 			this.nextMsg2 *= 2;
 			printNodesCount();
+		}
+		
+		if ( this.locked && node instanceof Lockable ) {
+			((Lockable)node).setLocked() ;
 		}
 	}
 	// ////////////////////////////////////////////////////////////////////
@@ -468,4 +478,23 @@ public final class NetworkImpl implements Network {
 		this.name = name;
 	}
 
+	@Override
+	public void setLocked() {
+		this.locked = true ;
+		for ( Link link : this.links.values() ) {
+			if ( link instanceof Lockable ) {
+				((Lockable) link).setLocked();
+			}
+		}
+		for ( Node node : this.nodes.values() ) {
+			if ( node instanceof Lockable ) {
+				((Lockable) node).setLocked();
+			}
+		}
+	}
+	private void testForLocked() {
+		if ( locked ) {
+			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
+		}
+	}
 }

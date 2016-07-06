@@ -123,6 +123,12 @@ public class TestSpatialTripCutter {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	public void setCoord(Coord coord) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
     }
     private class DummyLink implements Link {
         private final Node to;
