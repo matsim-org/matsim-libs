@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
+import static org.osgeo.proj4j.parser.Proj4Keyword.a;
+
 /**
  * @author thibautd
  */
@@ -156,8 +158,8 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 				final TObjectDoubleMap<Id<ActivityFacility>> probabilities =
 						demand.getProbabilitiesForIndividual( p );
 
-				final AtomicDouble sumConstrained = new AtomicDouble( 0 );
-				final AtomicDouble sumUnconstrained = new AtomicDouble( 0 );
+				final AtomicDouble sumConstrained = new AtomicDouble( 0d );
+				final AtomicDouble sumUnconstrained = new AtomicDouble( 0d );
 
 				probabilities.forEachEntry(
 						(facility, probability) -> {
@@ -172,6 +174,21 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 							return true;
 						}
 				);
+
+
+				if ( sumUnconstrained.get() == 0d ) {
+					log.error( "UNABLE TO PROCEED:\n"+
+								 "\tThe unconstrained set is empty for person "+p+", resulting in an infinite \'omega\'.\n"+
+								 "\tThe paper avoids this by checking that supply is higher than demand, but we use here restricted choice\n"+
+								 "\tsets, that make that a person might only have constrained alternatives in its choice set.\n"+
+								 "\tThe only solution right now is to increase the size of the choice set..." );
+					throw new RuntimeException( "unable to proceed" );
+				}
+
+				assert sumConstrained.get() <= 1 : sumConstrained.get();
+				assert sumConstrained.get() >= 0 : sumConstrained.get();
+				assert sumUnconstrained.get() <= 1 : sumUnconstrained.get();
+				assert sumUnconstrained.get() >= 0 : sumUnconstrained.get();
 
 				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}
@@ -231,7 +248,7 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 			final double omega =  individualOmegas.get( p.getId() );
 
-			if ( Double.isInfinite( omega ) || Double.isNaN( omega ) ) {
+			if ( Double.isInfinite( omega ) || Double.isNaN( omega ) || omega <= 0d ) {
 				throw new RuntimeException( "invalid omega for individual "+p.getId()+": "+omega );
 			}
 

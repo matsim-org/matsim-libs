@@ -139,8 +139,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 		for ( Nest<N> nest : choiceSet.getNests() ) {
 			if ( nest.getAlternatives().isEmpty() ) continue;
-			calculator.addTerm( logSumNestUtilities( p , model, nest ) );
-		}
+			calculator.addTerm( logSumNestUtilities( p , model, nest ) );}
 
 		final double r = calculator.computeLogsumExp() / model.getMu();
 		stopWatch.endMeasurement( Measurement.logsumComputation );
