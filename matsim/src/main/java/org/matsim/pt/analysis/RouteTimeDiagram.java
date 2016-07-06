@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.pt.analysis;
+package org.matsim.pt.analysis;
 
 import java.awt.Color;
 import java.io.File;

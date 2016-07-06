@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.pt.analysis;
+package org.matsim.pt.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
