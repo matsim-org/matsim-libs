@@ -19,12 +19,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
 public class VisumFile2MatsimNetwork {
@@ -174,7 +174,7 @@ public class VisumFile2MatsimNetwork {
 		String line = reader.readLine();
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
-			NodeImpl node=NetworkUtils.createNode(Id.createNodeId(parts[columnsIndices[0]]));
+			Node node=NetworkUtils.createNode(Id.createNodeId(parts[columnsIndices[0]]));
 			node.setCoord(new Coord(Double.parseDouble(parts[columnsIndices[1]]), Double.parseDouble(parts[columnsIndices[2]])));
 			network.addNode(node);
 			line=reader.readLine();
@@ -190,7 +190,7 @@ public class VisumFile2MatsimNetwork {
 		String line = reader.readLine();
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
-			NodeImpl node=NetworkUtils.createNode(Id.createNodeId(parts[columnsIndices[0]]));
+			Node node=NetworkUtils.createNode(Id.createNodeId(parts[columnsIndices[0]]));
 			node.setCoord(new Coord(Double.parseDouble(parts[columnsIndices[1]]), Double.parseDouble(parts[columnsIndices[2]])));
 			Id<Node> repeated = null;
 			for(Id<Node> idB:nodesRep.keySet())

@@ -9,11 +9,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -60,7 +60,7 @@ public class DetermineZonesWithInfeasiblePT {
 		this.stops = NetworkImpl.createNetwork();
 		for (TransitStopFacility stop : schedule.getFacilities().values()){
 			Id<TransitStopFacility> stopId = stop.getId();
-			NodeImpl n = NetworkUtils.createNode(Id.create(stopId, Node.class));
+			Node n = NetworkUtils.createNode(Id.create(stopId, Node.class));
 			n.setCoord(stop.getCoord());
 			stops.addNode(n);
 		}
@@ -73,7 +73,7 @@ public class DetermineZonesWithInfeasiblePT {
 		while (tr.next()){
 			Id<Node> zid = Id.create(tr.current().get("zone_id"), Node.class);
 			Coord coord = new Coord(Double.parseDouble(tr.current().get("x")), Double.parseDouble(tr.current().get("y")));
-			NodeImpl n = NetworkUtils.createNode(zid);
+			Node n = NetworkUtils.createNode(zid);
 			n.setCoord(coord);
 			zones.add(n);
 		}

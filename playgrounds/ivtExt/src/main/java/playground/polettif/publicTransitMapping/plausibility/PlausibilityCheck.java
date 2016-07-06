@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -395,7 +395,7 @@ public class PlausibilityCheck {
 		Logger.getLogger(MatsimFileTypeGuesser.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimNetworkReader.class).setLevel(Level.ERROR);
 		Logger.getLogger(NetworkImpl.class).setLevel(Level.ERROR);
-		Logger.getLogger(NodeImpl.class).setLevel(Level.ERROR);
+		Logger.getLogger(Node.class).setLevel(Level.ERROR);
 		Logger.getLogger(LinkImpl.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimXmlParser.class).setLevel(Level.ERROR);
 	}

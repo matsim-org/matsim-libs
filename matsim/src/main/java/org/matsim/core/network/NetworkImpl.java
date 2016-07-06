@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -432,13 +433,13 @@ public final class NetworkImpl implements Network, Lockable {
 		if (this.nodes.containsKey(id)) {
 			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
 		}
-		NodeImpl n = this.factory.createNode(id, coord);
+		Node n = this.factory.createNode(id, coord);
 		this.addNode(n) ;
 		return n;
 	}
 
 	public Node createAndAddNode(final Id<Node> id, final Coord coord, final String nodeType) {
-		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
+		Node n = (Node) createAndAddNode(id, coord);
 		NetworkUtils.setType(n,nodeType);
 		return n;
 	}

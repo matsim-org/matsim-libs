@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 
 public class NetworkDoubleLinks {
 
@@ -59,7 +59,7 @@ public class NetworkDoubleLinks {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
 		Coord nc = new Coord(0.5 * (fn.getCoord().getX() + tn.getCoord().getX()), 0.5 * (fn.getCoord().getY() + tn.getCoord().getY()));
-		NodeImpl r = ((NodeImpl) fn);
+		Node r = ((Node) fn);
 		Node n = network.createAndAddNode(Id.create(l.getId()+this.suffix, Node.class),nc,NetworkUtils.getType( r ));
 		network.removeLink(l.getId());
 		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());

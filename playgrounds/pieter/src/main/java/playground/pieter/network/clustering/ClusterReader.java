@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 
 class ClusterReader {
@@ -69,7 +69,7 @@ class ClusterReader {
 					String[] split = line.split("\t");
 					if (split.length == 3) {
 						Id nodeId = Id.createNodeId(split[1]);
-						ClusterNode cn = new ClusterNode((NodeImpl) network
+						ClusterNode cn = new ClusterNode((Node) network
 								.getNodes().get(nodeId));
 						NodeCluster nc = new NodeCluster(cn, nca, 0,
 								Integer.parseInt(split[2]),

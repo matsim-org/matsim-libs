@@ -11,13 +11,13 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,31 +83,31 @@ public class LinkStopsToNearestNode {
 				modes = cells[modCol];
 			}
 			
-			NodeImpl N;
+			Node N;
 			fixedStopsWriter.write(id + "\n");
 			
 			// Get nearest node for the mode-filtered network (or base, if no mode is specified). This will be slow, but hopefully okay.
 			if (modes.isEmpty()){
-				N = (NodeImpl) noHighways.getNearestNode(new Coord(stopLon, stopLat));
+				N = (Node) noHighways.getNearestNode(new Coord(stopLon, stopLat));
 			}
 			else{
 
 				Coord c = new Coord(stopLon, stopLat);
 				
 				if (modes.equals("[Bus]")){
-					N = (NodeImpl) BusNetwork.getNearestNode(c);
+					N = (Node) BusNetwork.getNearestNode(c);
 				}
 				else if (modes.equals("[Streetcar]")){
-					N = (NodeImpl) StreetcarNetwork.getNearestNode(c);
+					N = (Node) StreetcarNetwork.getNearestNode(c);
 				}
 				else if (modes.equals("[Subway]")){
-					N = (NodeImpl) SubwayNetwork.getNearestNode(c);
+					N = (Node) SubwayNetwork.getNearestNode(c);
 				}
 				else if (modes.equals("[Train]")){
-					N = (NodeImpl) TrainNetwork.getNearestNode(c);
+					N = (Node) TrainNetwork.getNearestNode(c);
 				}
 				else if (modes.equals("[Streetcar; Bus]") || modes.equals("[Bus; Streetcar]")){
-					N = (NodeImpl) StreetcarNetwork.getNearestNode(c);
+					N = (Node) StreetcarNetwork.getNearestNode(c);
 				}
 				else{
 					System.err.println("Error: mode combination " + modes + " not supported!");

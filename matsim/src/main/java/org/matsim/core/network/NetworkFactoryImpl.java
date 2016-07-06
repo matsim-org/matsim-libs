@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -49,8 +50,8 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	}
 
 	@Override
-	public NodeImpl createNode(final Id<Node> id, final Coord coord) {
-		NodeImpl node = NetworkUtils.createNode(id);
+	public Node createNode(final Id<Node> id, final Coord coord) {
+		Node node = NetworkUtils.createNode(id);
 		node.setCoord(coord) ;
 		return node ;
 	}

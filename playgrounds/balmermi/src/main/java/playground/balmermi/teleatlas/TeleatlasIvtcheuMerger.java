@@ -31,13 +31,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -120,7 +120,7 @@ public class TeleatlasIvtcheuMerger {
 		int nodeMapCnt = 0;
 		for (Node n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
-				NodeImpl r = ((NodeImpl) n);
+				Node r = ((Node) n);
 				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),NetworkUtils.getType( r ));
 			}
 			else { nodeMapCnt++; }

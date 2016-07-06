@@ -27,13 +27,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -73,17 +73,17 @@ public class RouteSetGenerator {
 
 	private void addLinkToNetwork(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
-		((NodeImpl) link.getFromNode()).addOutLink(link);
-		((NodeImpl) link.getToNode()).addInLink(link);
+		((Node) link.getFromNode()).addOutLink(link);
+		((Node) link.getToNode()).addInLink(link);
 	}
 
 	private void removeLinkFromNetwork(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
 		final Link outlink = link;
 		final Id<Link> outLinkId = outlink.getId();
-		((NodeImpl) link.getFromNode()).removeOutLink(outLinkId);
+		((Node) link.getFromNode()).removeOutLink(outLinkId);
 		final Link inlink = link;
-		((NodeImpl) link.getToNode()).removeInLink(inlink.getId());
+		((Node) link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private boolean containsRoute(NetworkRoute route, LinkedList<NetworkRoute> routes) {
@@ -184,7 +184,7 @@ public class RouteSetGenerator {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final LinkedList<NetworkRoute> calcRouteSet(final NodeImpl o, final NodeImpl d, final int k, final int time, final int var_factor, final float localRoute_factor) {
+	public final LinkedList<NetworkRoute> calcRouteSet(final Node o, final Node d, final int k, final int time, final int var_factor, final float localRoute_factor) {
 		if (o.getId().equals(d.getId())) { throw new RuntimeException("O == D not alloed!"); }
 		if (k < 1) { throw new RuntimeException("k < 1 not allowed!"); }
 

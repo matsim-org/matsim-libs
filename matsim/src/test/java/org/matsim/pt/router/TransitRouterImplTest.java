@@ -35,13 +35,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -612,13 +612,13 @@ public class TransitRouterImplTest {
 
 			// network
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
-			NodeImpl node1 = network.getFactory().createNode(Id.create("1", Node.class), this.coord1);
-			NodeImpl node2 = network.getFactory().createNode(Id.create("2", Node.class), this.coord2);
-			NodeImpl node3 = network.getFactory().createNode(Id.create("3", Node.class), this.coord3);
-			NodeImpl node4 = network.getFactory().createNode(Id.create("4", Node.class), this.coord4);
-			NodeImpl node5 = network.getFactory().createNode(Id.create("5", Node.class), this.coord5);
-			NodeImpl node6 = network.getFactory().createNode(Id.create("6", Node.class), this.coord6);
-			NodeImpl node7 = network.getFactory().createNode(Id.create("7", Node.class), this.coord7);
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), this.coord1);
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), this.coord2);
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), this.coord3);
+			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), this.coord4);
+			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), this.coord5);
+			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), this.coord6);
+			Node node7 = network.getFactory().createNode(Id.create("7", Node.class), this.coord7);
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);

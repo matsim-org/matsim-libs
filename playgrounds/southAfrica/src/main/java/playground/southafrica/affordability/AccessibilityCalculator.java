@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -28,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.AStarEuclidean;
@@ -365,7 +365,7 @@ public class AccessibilityCalculator {
 					
 					/* Also need to deal with taxis here. */
 					for(Id<Link> linkId : route.getRoute().getLinkIds()){
-						NodeImpl toNode = (NodeImpl) transitNetwork.getLinks().get(linkId).getToNode();
+						Node toNode = (Node) transitNetwork.getLinks().get(linkId).getToNode();
 						if(toNode.getOutLinks().size() > 1 || toNode.getInLinks().size() > 1){
 							/* Only consider intersections. */
 							Coord albersIntersection = new Coord(toNode.getCoord().getX(), toNode.getCoord().getY());

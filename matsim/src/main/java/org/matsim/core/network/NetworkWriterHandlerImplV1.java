@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -116,8 +117,8 @@ import org.matsim.core.utils.misc.Time;
 		final Coord coord = transformation.transform( node.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");
-		if (node instanceof NodeImpl) {
-			NodeImpl node2 = (NodeImpl) node;
+		if (node instanceof Node) {
+			Node node2 = (Node) node;
 			if (NetworkUtils.getType( node2 ) != null) {
 				out.write(" type=\"" + NetworkUtils.getType( node2 ) + "\"");
 			}

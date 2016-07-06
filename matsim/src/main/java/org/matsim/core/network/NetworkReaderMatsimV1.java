@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -147,11 +148,11 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 									Double.parseDouble(atts.getValue("x")),
 									Double.parseDouble(atts.getValue("y")))) );
 		this.network.addNode(node);
-		if (node instanceof NodeImpl) {
-			NodeImpl r1 = ((NodeImpl) node);
+		if (node instanceof Node) {
+			Node r1 = ((Node) node);
 			NetworkUtils.setType(r1,atts.getValue("type"));
 			if (atts.getValue("origid") != null) {
-				NodeImpl r = ((NodeImpl) node);
+				Node r = ((Node) node);
 				NetworkUtils.setOrigId( r, atts.getValue("origid") ) ;
 			}
 		}

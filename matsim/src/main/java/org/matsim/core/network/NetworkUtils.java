@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -551,17 +552,17 @@ public class NetworkUtils {
 	}
 
 
-	public static NodeImpl createNode(Id<Node> id) {
+	public static Node createNode(Id<Node> id) {
 		return new NodeImpl(id);
 	}
 
 
-	public static NodeImpl createNode(Id<Node> id, Coord coord, String type) {
+	public static Node createNode(Id<Node> id, Coord coord, String type) {
 		return new NodeImpl(id, coord, type);
 	}
 
 
-	public static NodeImpl createNode(Id<Node> id, Coord coord) {
+	public static Node createNode(Id<Node> id, Coord coord) {
 		return new NodeImpl(id, coord);
 	}
 

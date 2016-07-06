@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author mrieser
@@ -52,8 +53,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
 		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
 
-		NodeImpl node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		NodeImpl node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		net.addNode(node1);
 		net.addNode(node2);
 		Link link = net.getFactory().createLink(Id.create(1, Link.class), node1, node2);
@@ -69,11 +70,11 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddLink_existingId() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		NodeImpl node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		NodeImpl node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
+		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
 		final double y = -500;
-		NodeImpl node4 = NetworkUtils.createNode(Id.create(4, Node.class), new Coord((double) 2000, y));
+		Node node4 = NetworkUtils.createNode(Id.create(4, Node.class), new Coord((double) 2000, y));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
@@ -155,10 +156,10 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddNode_existingId() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		NodeImpl node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		NodeImpl node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
-		NodeImpl node1b = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 2000, (double) 0));
+		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord((double) 2000, (double) 500));
+		Node node1b = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 2000, (double) 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
@@ -184,8 +185,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddNode_singleNodeFirstOnly() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
-		NodeImpl node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
+		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
+		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
 		network.addNode(node1);
 		Assert.assertEquals(1, network.getNodes().size());
@@ -207,8 +208,8 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddTwoNodes_initializedEmptyQuadtree() {
 		NetworkImpl network = new NetworkImpl();
-		NodeImpl node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
-		NodeImpl node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
+		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
+		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
 		Node n = network.getNearestNode(new Coord((double) 550, (double) 450));
 		Assert.assertNull(n);

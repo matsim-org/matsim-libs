@@ -31,10 +31,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
@@ -86,7 +86,7 @@ public class NetworkThinner {
 		for (Link l : network.getLinks().values()) {
 			Link currLink = l;
 			Node fromNode = currLink.getFromNode();
-			NodeImpl r = ((NodeImpl) fromNode);
+			Node r = ((Node) fromNode);
 			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r)).size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
@@ -107,7 +107,7 @@ public class NetworkThinner {
 			Link currLink = network.getLinks().get(lid);
 			linksToMerge.add(currLink);
 			Node toNode = currLink.getToNode();
-			NodeImpl r = ((NodeImpl) toNode);
+			Node r = ((Node) toNode);
 			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r)).size() == 2) &&
 					(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 					((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {

@@ -31,13 +31,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -168,7 +168,7 @@ public class CreateJonesCityNetwork {
 			coord = new Coord(x, y);
 
 			// create a new node
-			NodeImpl node = (NodeImpl)network.createAndAddNode(Id.create(zoneID, Node.class), coord);
+			Node node = (Node)network.createAndAddNode(Id.create(zoneID, Node.class), coord);
 			NetworkUtils.setOrigId( node, zoneID.toString() ) ;
 			NetworkUtils.setType(node,"unknownType");		
 		}

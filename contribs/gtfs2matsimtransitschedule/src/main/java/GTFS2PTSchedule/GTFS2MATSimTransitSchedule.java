@@ -47,13 +47,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -437,7 +437,7 @@ public class GTFS2MATSimTransitSchedule {
 			}
 			//Coordinates system of the network
 			for(Node node:network.getNodes().values())
-				((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
+				((Node)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 			//Public Transport Schedule
 			TransitScheduleFactory transitScheduleFactory = new TransitScheduleFactoryImpl();
 			TransitSchedule transitSchedule = transitScheduleFactory.createTransitSchedule();

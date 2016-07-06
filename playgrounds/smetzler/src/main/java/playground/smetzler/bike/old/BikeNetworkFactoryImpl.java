@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -15,8 +16,6 @@ import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
-//import org.matsim.core.network.TimeVariantLinkFactory;
 
 public class BikeNetworkFactoryImpl implements NetworkFactory {
 	
@@ -37,8 +36,8 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 	
 	// like in NetworkFactoryImpl
 	@Override
-	public NodeImpl createNode(final Id<Node> id, final Coord coord) {
-		NodeImpl node = NetworkUtils.createNode(id);
+	public Node createNode(final Id<Node> id, final Coord coord) {
+		Node node = NetworkUtils.createNode(id);
 		node.setCoord(coord) ;
 		return node ;
 	}

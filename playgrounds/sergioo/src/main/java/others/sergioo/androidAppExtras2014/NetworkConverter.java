@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -83,7 +83,7 @@ public class NetworkConverter {
 				if(nodes[n]==null) {
 					nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 					nodeLongId++;
-					NodeImpl r = ((NodeImpl)nodes[n]);
+					Node r = ((Node)nodes[n]);
 					NetworkUtils.setOrigId( r, (String) feature.getAttribute("OBJECTID").toString() ) ;
 				}
 			}

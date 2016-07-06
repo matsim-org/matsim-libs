@@ -8,11 +8,11 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -52,7 +52,7 @@ public class Converter {
 //		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4,TransformationFactory.WGS84);
 		
 		for(Node node : scenario.getNetwork().getNodes().values()){
-			((NodeImpl)node).setCoord(ct.transform(node.getCoord()));
+			((Node)node).setCoord(ct.transform(node.getCoord()));
 		}
 		
 		/* Write the resulting network. */

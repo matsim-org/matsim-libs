@@ -32,7 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.IdentifiableArrayMap;
 
-public class NodeImpl implements Node, Lockable {
+/*deliberately package*/ class NodeImpl implements Node, Lockable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -48,7 +48,7 @@ public class NodeImpl implements Node, Lockable {
 	private final Id<Node> id;
 	private boolean locked = false ;
 
-	private final static Logger log = Logger.getLogger(NodeImpl.class);
+	private final static Logger log = Logger.getLogger(Node.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor

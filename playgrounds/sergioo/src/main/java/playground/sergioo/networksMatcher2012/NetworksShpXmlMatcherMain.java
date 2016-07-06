@@ -32,11 +32,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -111,10 +111,10 @@ public class NetworksShpXmlMatcherMain {
 						nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 						nodeLongId++;
 						if(n==0) {
-							NodeImpl r = ((NodeImpl)nodes[n]);
+							Node r = ((Node)nodes[n]);
 							NetworkUtils.setOrigId( r, (String) feature.getAttribute("INODE").toString() ) ;
 						} else if(n==nodes.length-1) {
-							NodeImpl r1 = ((NodeImpl)nodes[n]);
+							Node r1 = ((Node)nodes[n]);
 							NetworkUtils.setOrigId( r1, (String) feature.getAttribute("JNODE").toString() ) ;
 						}
 					}

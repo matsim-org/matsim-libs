@@ -22,10 +22,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.RouteUtils;
@@ -199,10 +199,10 @@ public class MainRoutes{
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()), scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		for(Node node:scenario.getNetwork().getNodes().values())
-			((NodeImpl)node).setCoord(transformation.transform(node.getCoord()));
+			((Node)node).setCoord(transformation.transform(node.getCoord()));
 		new MatsimNetworkReader(scenario2.getNetwork()).readFile(args[1]);
 		for(Node node:scenario2.getNetwork().getNodes().values())
-			((NodeImpl)node).setCoord(transformation.transform(node.getCoord()));
+			((Node)node).setCoord(transformation.transform(node.getCoord()));
 		LayersPanel panel = new LayersPanel() {
 			{
 				addLayer(new Layer(new NetworkPainter(scenario2.getNetwork())));

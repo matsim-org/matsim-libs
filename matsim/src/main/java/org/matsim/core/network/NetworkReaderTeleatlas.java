@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -211,10 +212,10 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * </ul>
 	 * </ul>
 	 * </p>
-	 * The MATSim {@link NodeImpl#type} is set as
+	 * The MATSim {@link Node#type} is set as
 	 * 
 	 * <pre>
-	 * <code>{@link NodeImpl#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
+	 * <code>{@link Node#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
 	 * </pre>
 	 *
 	 */
@@ -244,7 +245,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 			String type = feattyp + "-" + jncttyp;
 			Node n = network.getFactory().createNode(Id.create(id.toString(), Node.class), c);
 			final String type1 = type;
-			NodeImpl r = ((NodeImpl) n);
+			Node r = ((Node) n);
 			NetworkUtils.setType(r,type1);
 			network.addNode(n);
 		}

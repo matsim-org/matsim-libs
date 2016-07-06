@@ -21,12 +21,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -455,7 +455,7 @@ public class Emme2MatsimConverter {
 				}*/
 				boolean isZone = cells[0].contains("*");
 				
-				NodeImpl n = NetworkUtils.createNode(Id.create(cells[1], Node.class));
+				Node n = NetworkUtils.createNode(Id.create(cells[1], Node.class));
 				final double y = Double.parseDouble(cells[3].length() == 6 ? "4" + cells[3] : cells[3]);
 				n.setCoord(new Coord(Double.parseDouble(cells[2]), y));
 				//Some EMME networks are restricted to using only 6 characters for the y-coordinate. This appends a '4' to the start if this is the case.
@@ -537,7 +537,7 @@ public class Emme2MatsimConverter {
 	
 	private static void convertCoordinates(){
 		for(Node n : network.getNodes().values()){
-			NodeImpl N = (NodeImpl) n;
+			Node N = (Node) n;
 			N.setCoord(coordinateTransformation.transform(n.getCoord()));
 		}
 		
@@ -744,7 +744,7 @@ public class Emme2MatsimConverter {
 				}
 				
 				if (!tweakedNodes.contains(lrtLane.getFromNode().getId())){
-					NodeImpl N = (NodeImpl) lrtLane.getFromNode();
+					Node N = (Node) lrtLane.getFromNode();
 					N.setCoord(new Coord(sumX / incomingTransfers.size(), sumY / incomingTransfers.size()));
 					tweakedNodes.add(N.getId());
 				}
@@ -766,7 +766,7 @@ public class Emme2MatsimConverter {
 				}
 				
 				if (!tweakedNodes.contains(lrtLane.getToNode().getId())){
-					NodeImpl N = (NodeImpl) lrtLane.getToNode();
+					Node N = (Node) lrtLane.getToNode();
 					N.setCoord(new Coord(sumX / outgoingTransfers.size(), sumY / outgoingTransfers.size()));
 					tweakedNodes.add(N.getId());
 				}
@@ -807,7 +807,7 @@ public class Emme2MatsimConverter {
 		
 		ArrayList<Id> nodesToRemove = new ArrayList<Id>();
 		for (Node n : network.getNodes().values()){
-			NodeImpl N = (NodeImpl) n;
+			Node N = (Node) n;
 			if (NetworkUtils.getType( N ) == null) continue;
 			if (NetworkUtils.getType( N ).equals("Zone")) nodesToRemove.add(N.getId());
 		}

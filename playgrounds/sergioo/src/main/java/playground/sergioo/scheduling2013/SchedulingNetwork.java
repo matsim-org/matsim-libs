@@ -19,12 +19,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -47,15 +47,20 @@ public class SchedulingNetwork implements Network {
 
 	//Predecessor
 	
-	public class SchedulingNode extends NodeImpl implements Node {
+	public class SchedulingNode implements Node {
 		
 		private double time;
 		private List<SchedulingLink> path;
 		private double utility = -Double.MAX_VALUE;
 		private final double maxUtilityFrom;
 		
+		private Node delegateNode ;
+		
 		public SchedulingNode(Id<Node> id, Coord coord, double time, double maxUtilityFrom) {
-			super(id, coord);
+//			super(id, coord);
+			// I replaced inheritance by delegation.  kai, jul'16
+			
+			delegateNode = NetworkUtils.createNode(id, coord) ;
 			this.time = time;
 			this.maxUtilityFrom = maxUtilityFrom;
 		}
@@ -73,6 +78,42 @@ public class SchedulingNetwork implements Network {
 				currentMaximumUtility = utility;
 				//System.out.println(path+"("+utility+")");
 			}
+		}
+
+		public Id<Node> getId() {
+			return this.delegateNode.getId();
+		}
+
+		public Coord getCoord() {
+			return this.delegateNode.getCoord();
+		}
+
+		public boolean addInLink(Link link) {
+			return this.delegateNode.addInLink(link);
+		}
+
+		public boolean addOutLink(Link link) {
+			return this.delegateNode.addOutLink(link);
+		}
+
+		public Map<Id<Link>, ? extends Link> getInLinks() {
+			return this.delegateNode.getInLinks();
+		}
+
+		public Map<Id<Link>, ? extends Link> getOutLinks() {
+			return this.delegateNode.getOutLinks();
+		}
+
+		public Link removeInLink(Id<Link> linkId) {
+			return this.delegateNode.removeInLink(linkId);
+		}
+
+		public Link removeOutLink(Id<Link> outLinkId) {
+			return this.delegateNode.removeOutLink(outLinkId);
+		}
+
+		public void setCoord(Coord coord) {
+			this.delegateNode.setCoord(coord);
 		}
 
 	}
