@@ -134,12 +134,12 @@ public class PatnaJointCalibrationControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(PtFareEventHandler.class);
+				this.addEventHandlerBinding().to(PtFareEventHandler.class);
 			}
 		});
 		
 		// for above make sure that util_dist and monetary dist rate for pt are zero.
-		ModeParams mp = controler.getScenario().getConfig().planCalcScore().getModes().get("pt");
+		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
 		mp.setMarginalUtilityOfDistance(0.0);
 		mp.setMonetaryDistanceRate(0.0);
 		

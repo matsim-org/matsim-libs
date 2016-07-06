@@ -67,7 +67,9 @@ public class PtFareEventHandler implements PersonDepartureEventHandler, Teleport
 	}
 	
 	private final double getPTFareFromDistance(final double distance) {
-		double fareInRs = 0.01* ( 300 + (distance/1000 - 4)*31 );
+		double fareInRs = Double.NEGATIVE_INFINITY;
+		if(distance < 4000) fareInRs = 0.01 * 300;
+		else fareInRs = 0.01* ( 300 + (distance/1000 - 4)*31 );
 		return fareInRs/USD2INRRate;
 	}
 
