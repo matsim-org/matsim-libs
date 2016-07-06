@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class MyLinkUtils
 {
@@ -45,7 +46,8 @@ public class MyLinkUtils
     Id<Link> closestLinkId = Id.create(0L, Link.class);
     for (Link link : network.getLinks().values()) {
       LinkImpl mylink = (LinkImpl)link;
-      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
+	final Coord coord1 = coord;
+      Double newDistance = Double.valueOf(CoordUtils.distancePointLinesegment(mylink.getFromNode().getCoord(), mylink.getToNode().getCoord(), coord1));
       if (newDistance.doubleValue() < distance) {
         distance = newDistance.doubleValue();
         closestLinkId = link.getId();

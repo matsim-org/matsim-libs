@@ -95,7 +95,9 @@ public class NetworkPainterManager {
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Link link: network.getLinks().values()) {
-			double distance = ((LinkImpl) link).calcDistance(coord); 
+			final Coord coord1 = coord;
+			LinkImpl r = ((LinkImpl) link);
+			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1); 
 			if(distance<nearestDistance) {
 				nearest = link;
 				nearestDistance = distance;

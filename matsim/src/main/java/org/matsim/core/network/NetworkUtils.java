@@ -373,7 +373,8 @@ public class NetworkUtils {
         List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
         incidentLinks.addAll(nearestNode.getOutLinks().values());
         for (Link link : incidentLinks) {
-            double dist = ((LinkImpl) link).calcDistance(coord);
+            LinkImpl r = ((LinkImpl) link);
+		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
             if (dist <= shortestRightDistance) {
                 // Generate a vector representing the link
                 double[] linkVector = new double[2];
@@ -450,7 +451,8 @@ public class NetworkUtils {
         // (For Great Britain it would be the "left" side. Could be a global config param...)
         double shortestDistance = Double.MAX_VALUE;
         for (Link link : getIncidentLinks(nearestNode).values()) {
-            double dist = ((LinkImpl) link).calcDistance(coord);
+            LinkImpl r = ((LinkImpl) link);
+		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
             if (dist < shortestDistance) {
                 shortestDistance = dist;
                 nearestLink = link;

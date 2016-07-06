@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.*;
  * @author illenberger
  *
  */
-public class TimeVariantLinkImpl extends LinkImpl {
+public final class TimeVariantLinkImpl extends LinkImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

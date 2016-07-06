@@ -833,7 +833,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 		Link selected = null;
 		double minDist = Double.MAX_VALUE;
 		for(Link link:net.getLinks().values()){
-			double thisDist = ((LinkImpl) link).calcDistance(coord);
+			final Coord coord1 = coord;
+			LinkImpl r = ((LinkImpl) link);
+			double thisDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if(thisDist < minDist) {
 				minDist = thisDist;
 				selected = link;
@@ -856,14 +858,18 @@ public class NetBlackboard extends javax.swing.JPanel {
 		double minDist = Double.MAX_VALUE;
 		for(Node node:nodes) {
 			for(Link link:node.getInLinks().values()) {
-				double curDist = ((LinkImpl) link).calcDistance(coord);
+				final Coord coord1 = coord;
+				LinkImpl r = ((LinkImpl) link);
+				double curDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
 					minDist = curDist;
 				}
 			}
 			for(Link link:node.getOutLinks().values()) {
-				double curDist = ((LinkImpl) link).calcDistance(coord);
+				final Coord coord1 = coord;
+				LinkImpl r = ((LinkImpl) link);
+				double curDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
 					minDist = curDist;

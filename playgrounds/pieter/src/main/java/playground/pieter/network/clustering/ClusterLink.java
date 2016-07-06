@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 class ClusterLink implements Link {
 	private final LinkImpl link;
@@ -46,7 +47,8 @@ class ClusterLink implements Link {
 	}
 
 	public final double calcDistance(Coord coord) {
-		return link.calcDistance(coord);
+		final Coord coord1 = coord;
+		return CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord1);
 	}
 
 	public Node getFromNode() {

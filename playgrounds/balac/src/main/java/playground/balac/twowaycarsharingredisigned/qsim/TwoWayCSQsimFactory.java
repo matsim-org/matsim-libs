@@ -21,6 +21,7 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 
@@ -143,7 +144,8 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 		    Id<Link> closestLinkId = Id.create(0L, Link.class);
 		    for (Link link : network.getLinks().values()) {
 		      LinkImpl mylink = (LinkImpl)link;
-		      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
+			final Coord coord1 = coord;
+		      Double newDistance = Double.valueOf(CoordUtils.distancePointLinesegment(mylink.getFromNode().getCoord(), mylink.getToNode().getCoord(), coord1));
 		      if (newDistance.doubleValue() < distance) {
 		        distance = newDistance.doubleValue();
 		        closestLinkId = link.getId();
