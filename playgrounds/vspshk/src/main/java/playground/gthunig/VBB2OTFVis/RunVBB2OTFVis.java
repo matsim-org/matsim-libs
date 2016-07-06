@@ -45,11 +45,11 @@ public class RunVBB2OTFVis {
 
     public static void main(String[] args) {
 
-        String gtfsPath = "playgrounds/vspshk/input/gthunig/VBB2OTFVis/380248.zip";
-        String outputRoot = "playgrounds/vspshk/output/gthunig/VBB2OTFVis/";
+//        String gtfsPath = "playgrounds/vspshk/input/gthunig/VBB2OTFVis/380248.zip";
+//        String outputRoot = "playgrounds/vspshk/output/gthunig/VBB2OTFVis/";
 
-//        String gtfsPath = "/Users/michaelzilske/wurst/vbb/380248.zip";
-//        String outputRoot = "output";
+        String gtfsPath = "/Users/michaelzilske/wurst/vbb/380248.zip";
+        String outputRoot = "output";
 
         File outputFile = new File(outputRoot);
         if (outputFile.mkdir()) {
@@ -93,6 +93,8 @@ public class RunVBB2OTFVis {
         }
 
         Config config = ConfigUtils.createConfig();
+        config.global().setRandomSeed(666);
+        config.global().setNumberOfThreads(8);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.
                 OverwriteFileSetting.deleteDirectoryIfExists);
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -117,7 +119,7 @@ public class RunVBB2OTFVis {
         Network network = scenario.getNetwork();
         List<Link> links = new ArrayList<>(network.getLinks().values());
 
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 1000; ++i) {
 
             Coord source = links.get(MatsimRandom.getRandom().nextInt(network.getLinks().size())).getCoord();
             Coord sink = links.get(MatsimRandom.getRandom().nextInt(network.getLinks().size())).getCoord();
