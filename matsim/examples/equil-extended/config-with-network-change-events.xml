@@ -8,13 +8,13 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="examples/equil-extended/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 		<param name="timeVariantNetwork" value="true" />
-		<param name="inputChangeEventsFile" value="examples/equil-extended/networkChangeEvents.xml" />
+		<param name="inputChangeEventsFile" value="networkChangeEvents.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="examples/equil/plans100.xml" />
+		<param name="inputPlansFile" value="../equil/plans100.xml" />
 	</module>
 
 	<module name="controler">
