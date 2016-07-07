@@ -38,10 +38,19 @@ public class Coord implements Serializable {
 
 	private double x;
 	private double y;
+	private double z;
+	private boolean hasZ = false;
 
 	public Coord(final double x, final double y) {
 		this.x = x;
+		this.y = y;		
+	}
+	
+	public Coord (final double x, final double y, final double z){
+		this.x = x;
 		this.y = y;
+		this.z = z;
+		this.hasZ = true;
 	}
 
 
@@ -52,6 +61,15 @@ public class Coord implements Serializable {
 	public double getY() {
 		return this.y;
 	}
+	
+	public double getZ() {
+		if(!hasZ) throw new IllegalStateException("Coord has no Z component defined.");
+		return z;
+	}
+	
+	public boolean hasZ(){
+		return this.hasZ;
+	}
 
 	public void setX(final double x) {
 		this.x = x;
@@ -60,10 +78,22 @@ public class Coord implements Serializable {
 	public void setY(final double y) {
 		this.y = y;
 	}
+	
+	public void setZ(final double z) {
+		this.z = z;
+		this.hasZ = true;
+	}
 
 	public void setXY(final double x, final double y) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	public void setXYZ(final double x, final double y, final double z){
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.hasZ = true;
 	}
 
 	@Override
