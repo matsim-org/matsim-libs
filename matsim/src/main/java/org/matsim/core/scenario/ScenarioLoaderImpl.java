@@ -206,15 +206,13 @@ class ScenarioLoaderImpl {
 				new PopulationReader(transformation , this.scenario).parse(populationFileName);
 			}
 
-			if (this.scenario.getPopulation() instanceof Population) {
-				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;
-			}
+			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}
 		else {
 			log.info("no population file set in config, not able to load population");
 		}
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
-			String personAttributesFileName = this.config.plans().getInputPersonAttributeFile();
+			URL personAttributesFileName = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes());
 			reader.putAttributeConverters( attributeConverters );

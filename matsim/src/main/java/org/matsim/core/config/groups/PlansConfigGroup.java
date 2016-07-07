@@ -122,6 +122,14 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
+	public URL getInputPersonAttributeFileURL(URL context) {
+		try {
+			return new URL(context, this.inputPersonAttributeFile);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@StringGetter( NETWORK_ROUTE_TYPE )
 	public String getNetworkRouteType() {
 		return this.networkRouteType;
