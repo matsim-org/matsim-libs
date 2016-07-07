@@ -84,7 +84,9 @@ public class InputsForFDTestSetUp {
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 
-		stuckTime = this.travelModes.length==1 && (this.travelModes[0]=="car" || this.travelModes[0]=="truck") ? 60 : 10;
+		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) this.stuckTime = 60;
+		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) this.stuckTime = 180;
+
 		setUpConfig();
 		createTriangularNetwork();
 		fillTravelModeData();
