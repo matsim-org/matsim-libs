@@ -95,11 +95,6 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			config.addCoreModules();
 		}
 		new ConfigReader(config).parse(filename);
-		try {
-			config.setContext(new URL("file", null, filename));
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
@@ -107,7 +102,6 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			config.addCoreModules();
 		}
 		new ConfigReader(config).parse(url);
-		config.setContext(url);
 	}
 
 
