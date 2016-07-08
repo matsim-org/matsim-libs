@@ -19,8 +19,8 @@
 
 package org.matsim.core.scenario;
 
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +62,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadPersonAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "personAttributesConfig.xml"));
-		config.plans().addParam("inputPersonAttributesFile", this.util.getClassInputDirectory() + "personAttributes.xml");
+		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getPopulation().getPersonAttributes().getAttribute("1", "hello"));
 	}

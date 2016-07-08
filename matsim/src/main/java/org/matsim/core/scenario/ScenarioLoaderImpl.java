@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -120,9 +119,8 @@ class ScenarioLoaderImpl {
 	 * Loads the network into the scenario of this class
 	 */
 	private void loadNetwork() {
-		URL networkUrl = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-			networkUrl = this.config.network().getInputFileURL(this.config.getContext());
+			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
 			if ( config.network().getInputCRS() == null ) {
 				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkUrl);
@@ -212,11 +210,11 @@ class ScenarioLoaderImpl {
 			log.info("no population file set in config, not able to load population");
 		}
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
-			URL personAttributesFileName = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
-			log.info("loading person attributes from " + personAttributesFileName);
+			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
+			log.info("loading person attributes from " + personAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.parse(personAttributesFileName);
+			reader.parse(personAttributesURL);
 		}
 		else {
 			log.info("no person-attributes file set in config, not loading any person attributes");
