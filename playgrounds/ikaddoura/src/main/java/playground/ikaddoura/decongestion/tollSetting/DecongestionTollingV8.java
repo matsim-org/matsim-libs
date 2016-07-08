@@ -79,6 +79,8 @@ public class DecongestionTollingV8 implements DecongestionTollSetting {
 																	
 					if (averageDelay > 0.) {
 						
+						log.info("+++ link Id: " + linkId + " // time interval: " + intervalNr + " +++") ;
+						
 						double previousDelay = linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);						
 						log.info("Previous delay: " + previousDelay + " // Current delay: " + averageDelay);
 						
@@ -117,7 +119,7 @@ public class DecongestionTollingV8 implements DecongestionTollSetting {
 					toll = averageDelayBasedCostToll;
 				}
 				
-				log.info("Previous toll: " + previousToll + " // Average delay based cost toll: " + averageDelayBasedCostToll + " // Next toll: " + toll);
+				if (previousToll > 0 || toll > 0.) log.info("Previous toll: " + previousToll + " // Average delay based cost toll: " + averageDelayBasedCostToll + " // Next toll: " + toll);
 
 				if (toll > 0.) {
 					this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);
