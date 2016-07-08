@@ -49,8 +49,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * @author dziemke
+ */
 public class AccessibilityComputationNairobiTest {
-	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
+	public static final Logger log = Logger.getLogger(AccessibilityComputationNairobiTest.class);
 
 	private static final Double cellSize = 2000.;
 
@@ -64,24 +67,23 @@ public class AccessibilityComputationNairobiTest {
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile ;
-		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
-		String outputDirectory = utils.getOutputDirectory();
-//		String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/46/";		
-
+		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
+		final String outputDirectory = utils.getOutputDirectory();
+		
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
 		final Envelope envelope = new Envelope(240000, 9844000, 280000, 9874000);
+		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
 		
-		// QGis Parameters
+		// QGis parameters
 		boolean createQGisOutput = true;
-		boolean includeDensityLayer = false;
-		Double lowerBound = 2.;
-		Double upperBound = 7.25;
-		Integer range = 9; // in the current implementation, this need always be 9
-		int symbolSize = 2010;
-		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-
+		final boolean includeDensityLayer = false;
+		final Double lowerBound = 2.; // (upperBound - lowerBound) is ideally easily divisible by 7
+		final Double upperBound = 7.25;
+		final Integer range = 9; // in the current implementation, this must always be 9
+		final int symbolSize = 2010;
+		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		
 		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
@@ -90,48 +92,43 @@ public class AccessibilityComputationNairobiTest {
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 		
-		// Switch computation on for all modes		
+		// Choose modes for accessibility computation
 		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 
-		// Some (otherwise irrelevant) settings to make the vsp check happy:
+		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
-
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
+		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		stratSets.setWeight(1.);
 		config.strategy().addStrategySettings(stratSets);
-
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
-
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-//		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 		
 		assertNotNull(config);
 		
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
-//		log.warn( "found activity types: " + activityTypes );
+//		log.info("Found activity types: " + activityTypes);
 		final List<String> activityTypes = new ArrayList<>();
-		activityTypes.add(FacilityTypes.WORK);		
-
+		activityTypes.add(FacilityTypes.WORK);
+		
 		// Network density points
 		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
-		
 		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
-				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
+		final ActivityFacilities densityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-				
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, networkDensityFacilities, crs, name, cellSize));
-
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, cellSize));
 		controler.run();
-
 		
 		// QGis
 		if (createQGisOutput == true) {
@@ -139,7 +136,6 @@ public class AccessibilityComputationNairobiTest {
 			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);

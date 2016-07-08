@@ -25,14 +25,12 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import com.vividsolutions.jts.geom.Envelope;
-import javafx.geometry.BoundingBox;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
@@ -42,8 +40,8 @@ import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
@@ -55,6 +53,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
@@ -94,42 +94,35 @@ public class AccessibilityComputationNairobi {
 
 		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(outputDirectory);
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
-
-		// some (otherwise irrelevant) settings to make the vsp check happy:
+		
+		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
-		{
-			StrategySettings stratSets = new StrategySettings();
-			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-			stratSets.setWeight(1.);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		
+		StrategySettings stratSets = new StrategySettings();
+		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+		stratSets.setWeight(1.);
+		config.strategy().addStrategySettings(stratSets);
+
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
-		// yy For a test, "abort" may be too strict.  kai, may'16
 				
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 //		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 
 
-
-		// matrix-based pt
+		// Matrix-based pt
 		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
 		mbpcg.setPtStopsInputFile(ptStops);
 		mbpcg.setUsingTravelTimesAndDistances(true);
 		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
 		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
-
 
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
@@ -158,32 +151,26 @@ public class AccessibilityComputationNairobi {
 //		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
 		
-		// collect activity types
+		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 //		log.warn( "found activity types: " + activityTypes );
 		final List<String> activityTypes = new ArrayList<>();
-		activityTypes.add("Educational");
+		activityTypes.add(FacilityTypes.EDUCATION);
 //		activityTypes.add("Commercial");
 //		activityTypes.add("Industrial");
 //		activityTypes.add("Public Purpose");
 //		activityTypes.add("Recreational");
-		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
-		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
-		// no collection of homes for Nairobi; was necessary for density layer, instead based on network. see below
-//		String activityFacilityType = "h";
-//		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
-
-		
-		// network density points
-//		ActivityFacilities measuringPoints = 
-//				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+		// Network density points
+//		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
 //		
 //		double maximumAllowedDistance = 0.5 * cellSize;
 //		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
 //				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
 
-		final Controler controler = new Controler(scenario) ;
+		// Controller
+		final Controler controler = new Controler(scenario);
+		
 //		controler.addOverridingModule(new AccessibilityComputationTestModuleCustomBoundary(
 //				activityTypes, networkDensityFacilities, crs, name, cellSize, boundingBox));
 		
@@ -222,7 +209,7 @@ public class AccessibilityComputationNairobi {
 		controler.run();
 
 		
-		/* Write QGis output */
+		// QGis
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
