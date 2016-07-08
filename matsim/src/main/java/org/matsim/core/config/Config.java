@@ -31,6 +31,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +101,11 @@ public class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public Config() {
-		// nothing to do
+		try {
+			setContext(new URL("file", null, "."));
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

@@ -44,11 +44,6 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	public static Config createConfig() {
 		Config config = new Config();
 		config.addCoreModules();
-		try {
-			config.setContext(new URL("file", null, "."));
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
 		return config;
 	}
 
