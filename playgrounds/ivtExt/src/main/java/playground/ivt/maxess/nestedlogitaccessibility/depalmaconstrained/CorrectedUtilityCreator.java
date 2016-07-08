@@ -165,8 +165,13 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 						(facility, probability) -> {
 							if ( constrainedExPost.contains( facility ) ) {
 								final ActivityFacility f = scenario.getActivityFacilities().getFacilities().get( facility );
-								final double supply = getSupply( f, activityType, configGroup );
-								sumConstrained.addAndGet( (supply / demand.getDemand( facility )) * probability );
+								final double facilitySupply = getSupply( f, activityType, configGroup );
+								final double facilityDemand = demand.getDemand( facility );
+
+								// wrong: need to correct demand with omega
+								//assert facilityDemand >= facilitySupply : facilityDemand+" < "+facilitySupply;
+
+								sumConstrained.addAndGet( (facilitySupply / facilityDemand ) * probability );
 							}
 							else {
 								sumUnconstrained.addAndGet( probability );
@@ -185,10 +190,11 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 					throw new RuntimeException( "unable to proceed" );
 				}
 
-				assert sumConstrained.get() <= 1 : sumConstrained.get();
-				assert sumConstrained.get() >= 0 : sumConstrained.get();
 				assert sumUnconstrained.get() <= 1 : sumUnconstrained.get();
 				assert sumUnconstrained.get() >= 0 : sumUnconstrained.get();
+
+				assert sumConstrained.get() <= 1 : sumConstrained.get();
+				assert sumConstrained.get() >= 0 : sumConstrained.get();
 
 				individualOmegas.put( p , (1 - sumConstrained.get()) / sumUnconstrained.get() );
 			}

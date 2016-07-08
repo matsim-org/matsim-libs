@@ -170,6 +170,7 @@ class Demand<N extends Enum<N>> {
 		}
 
 		final TObjectDoubleMap<Id<ActivityFacility>> probabilities = new TObjectDoubleHashMap<>();
+		double sum = 0;
 		for ( Nest<N> nest : choiceSet.getNests() ) {
 			final LogitProbabilityCalculator nestProbabilityCalculator = new LogitProbabilityCalculator();
 			nestProbabilityCalculator.setNumeratorUtility( nestLogsums.get( nest.getNestId() ) );
@@ -188,9 +189,11 @@ class Demand<N extends Enum<N>> {
 				probabilities.adjustOrPutValue(
 						alternative.getAlternative().getDestination().getId(),
 						prob , prob );
+				sum += prob;
 			}
 		}
 
+		assert Math.abs( sum - 1 ) < 1E-9 : sum;
 		return probabilities;
 	}
 }
