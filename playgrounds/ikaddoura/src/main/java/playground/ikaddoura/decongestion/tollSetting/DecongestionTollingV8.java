@@ -43,6 +43,7 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
  * - If d > threshold: Compare the current delay d(t) with the delay when previously computing the tolls d(t-1).
  * 			- If d(t) >= d(t-1): Increase the link and time specific toll weight
  * 			- If d(t) < d(t-1): Decrease the link and time specific toll weight  
+ * 			- If d(t) == 0: Set weight to zero.
  * - If d <= threshold: Set weight to zero.
  * 
  * Second: Compute the toll: d * VTTS * weight
