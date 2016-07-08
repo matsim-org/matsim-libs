@@ -188,7 +188,7 @@ public class SeepageTest {
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
 			
-			config.qsim().setSeepMode(TransportMode.walk);
+			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 			

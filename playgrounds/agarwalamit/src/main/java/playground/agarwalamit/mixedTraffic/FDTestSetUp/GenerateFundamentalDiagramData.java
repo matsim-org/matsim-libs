@@ -123,14 +123,14 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
-			String outFolder ="/car/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
+			String outFolder ="/carMotorbikeBikeSeepage_bikeSeep/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car"; // travel (main) modes
-			args[2] = "5.0"; // modal split in pcu
-			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
-			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[1] = "car,motorbike,bike"; // travel (main) modes
+			args[2] = "1.0,1.0,1.0"; // modal split in pcu
+			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
+			args[4] = LinkDynamics.SeepageQ.toString(); // isPassingAllowed
 			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}

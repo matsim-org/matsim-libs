@@ -157,7 +157,7 @@ public class CreateAutomatedFDTest {
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
 	
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
-			scenario.getConfig().qsim().setSeepMode("bike");
+			scenario.getConfig().qsim().setSeepModes(Arrays.asList("bike"));
 			scenario.getConfig().qsim().setSeepModeStorageFree(false);
 			scenario.getConfig().qsim().setRestrictingSeepage(true);
 		}

@@ -118,7 +118,7 @@ public class InputsForFDTestSetUp {
 		}
 		
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
-			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModes(Arrays.asList("bike"));
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 		}

@@ -20,6 +20,7 @@ package playground.agarwalamit.mixedTraffic.simTime;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -129,7 +130,7 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setTrafficDynamics(td);
 
 		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
-			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModes(Arrays.asList("bike"));
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 		}
