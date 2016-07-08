@@ -151,14 +151,12 @@ public class ScenarioGenerator {
 		ScenarioCRSTransformation.transform(this.matsimScenario, VIS_CRS);
 		this.matsimConfig.global().setCoordinateSystem(VIS_CRS);
 		//save network
-		String networkOutputFile = gcm.getOutputDir() + "/network.xml.gz";
-		new NetworkWriter(this.matsimScenario.getNetwork()).write(networkOutputFile);
-		this.matsimScenario.getConfig().network().setInputFile(networkOutputFile);
+		new NetworkWriter(this.matsimScenario.getNetwork()).write(gcm.getOutputDir() + "/network.xml.gz");
+		this.matsimScenario.getConfig().network().setInputFile("network.xml.gz");
 		//save population
-		String outputPopulationFile = gcm.getOutputDir() + "/population.xml.gz";
 		new PopulationWriter(this.matsimScenario.getPopulation(), this.matsimScenario.getNetwork(),
-				gcm.getSampleSize()).write(outputPopulationFile);
-		this.matsimScenario.getConfig().plans().setInputFile(outputPopulationFile);
+				gcm.getSampleSize()).write(gcm.getOutputDir() + "/population.xml.gz");
+		this.matsimScenario.getConfig().plans().setInputFile("population.xml.gz");
 
 
 		log.info("saving matsim config file to:" + this.matsimConfigFile);
