@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.tollSetting;
+package playground.ikaddoura.decongestion.tollSetting.old;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 
 /**
  * 
@@ -37,25 +38,22 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
  * 
  * Tolls in all further iterations
  * ... are recomputed
- * - If d > threshold: Compare the current delay d(t) with the delay when previously computing the tolls d(t-1).
- * 			- If d(t) >= d(t-1): Increase the toll by the adjustment value.
- * 			- If d(t) < d(t-1): Decrease the toll by the adjustment value but not below adjustment value.
- *   
- * - If d <= Decrease the toll by the adjustment value but not below zero.
+ * 		- If d(t) >= d(t-1): Increase the toll by the adjustment value.
+ * 		- If d(t) < d(t-1): Decrease the toll by the adjustment value but not below zero.
  * 
  * @author ikaddoura
  */
 
-public class DecongestionTollingV6 implements DecongestionTollSetting {
+public class DecongestionTollingV5 implements DecongestionTollSetting {
 	
-	private static final Logger log = Logger.getLogger(DecongestionTollingV6.class);
+	private static final Logger log = Logger.getLogger(DecongestionTollingV5.class);
 
 	private final DecongestionInfo congestionInfo;
 	private final double vtts_hour;
 
 	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();
 	
-	public DecongestionTollingV6(DecongestionInfo congestionInfo) {
+	public DecongestionTollingV5(DecongestionInfo congestionInfo) {
 		this.congestionInfo = congestionInfo;
 		this.vtts_hour = (this.congestionInfo.getScenario().getConfig().planCalcScore().getPerforming_utils_hr() - this.congestionInfo.getScenario().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling()) / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("VTTS [monetary units / hour]: " + this.vtts_hour);
@@ -70,57 +68,43 @@ public class DecongestionTollingV6 implements DecongestionTollSetting {
 
 				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);
 								
-				if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
 					
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
+					double previousDelay = linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
+					
+					log.info("Previous delay: " + previousDelay + " --- Current delay: " + averageDelay);
+					
+					if (averageDelay >= previousDelay) {
+						
+						Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
+						double updatedToll = time2toll.get(intervalNr) * (1 + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
+						time2toll.put(intervalNr, updatedToll);
+						
+					} else {
+						
 						Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
 						double updatedToll = time2toll.get(intervalNr) * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
 						if (updatedToll < 0.) {
 							log.warn("Toll below zero. Setting to zero.");
 							updatedToll = 0.;
 						}
-						time2toll.put(intervalNr, updatedToll);	
+						time2toll.put(intervalNr, updatedToll);							
 					}
-					
+										
 				} else {
 					
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
-						
-						double previousDelay = linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
-						
-						log.info("Previous delay: " + previousDelay + " --- Current delay: " + averageDelay);
-						
-						if (averageDelay >= previousDelay) {
-							
-							Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-							double updatedToll = time2toll.get(intervalNr) * (1 + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-							time2toll.put(intervalNr, updatedToll);
-							
-						} else {
-							
-							Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-							double updatedToll = time2toll.get(intervalNr) * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-							if (updatedToll < 0.) {
-								log.warn("Toll below zero. Setting to zero.");
-								updatedToll = 0.;
-							}
-							time2toll.put(intervalNr, updatedToll);							
-						}
-											
+					// initial toll
+					
+					double toll = 0.;
+					if (this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL() < 0.) {
+						toll = averageDelay * vtts_hour / 3600.;
 					} else {
-						
-						// initial toll
-						
-						double toll = 0.;
-						if (this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL() < 0.) {
-							toll = averageDelay * vtts_hour / 3600.;
-						} else {
-							toll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
-						}
-						
-						log.info("initial toll at time " + intervalNr  + ": " + toll);
-						this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);	
+						toll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
 					}
+					
+					log.info("initial toll at time " + intervalNr  + ": " + toll);
+					this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);		
+					
 				}
 			}
 		}

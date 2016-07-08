@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
+import playground.ikaddoura.analysis.pngSequence2Video.CreateVideo;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -69,7 +70,7 @@ public class DecongestionRun {
 		
 	}
 
-	private void run() {
+	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		
@@ -77,7 +78,7 @@ public class DecongestionRun {
 		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
 				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
 				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
-				"tollBlendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + "/");
+				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_initialToll" + decongestionSettings.getINITIAL_TOLL() + "_5plans_setToZero/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
@@ -87,6 +88,8 @@ public class DecongestionRun {
 		log.info("Analyzing the final iteration...");
 		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());
 		analysis.run();
+		
+		CreateVideo.run(config.controler().getOutputDirectory());
 	}
 }
 

@@ -27,17 +27,18 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	private TollingApproach TOLLING_APPROACH = TollingApproach.V5;
+	private TollingApproach TOLLING_APPROACH = TollingApproach.V8;
 	private double TOLL_ADJUSTMENT = 0.1;
-	private int UPDATE_PRICE_INTERVAL = 50;
+	private int UPDATE_PRICE_INTERVAL = 1;
 	
-	private double TOLL_BLEND_FACTOR = 0.1;
+	private double INITIAL_TOLL = -1.0; // relevant for V6 (Set to a negative value to use the average delay cost as initial toll!)
+	private double TOLL_BLEND_FACTOR = 1.0; // relevant for: V4, V8 (Set to 1.0 if tolls in previous iterations should be ignored!)
 	private int WRITE_OUTPUT_ITERATION = 10;
-	private double TOLERATED_AVERAGE_DELAY_SEC = 1.;
+	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0;
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
 	
 	public enum TollingApproach {
-        NoPricing, V0, V1, V2, V3, V4, V5, V6
+        NoPricing, V0, V1, V2, V3, V4, V5, V6, V7, V8
 	}
 	
 	public int getWRITE_OUTPUT_ITERATION() {
@@ -94,6 +95,14 @@ public class DecongestionConfigGroup {
 
 	public void setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(double fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT) {
 		FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT;
+	}
+
+	public double getINITIAL_TOLL() {
+		return INITIAL_TOLL;
+	}
+
+	public void setINITIAL_TOLL(double iNITIAL_TOLL) {
+		INITIAL_TOLL = iNITIAL_TOLL;
 	}
 		
 }

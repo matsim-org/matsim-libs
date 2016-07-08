@@ -38,24 +38,24 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
  * Tolls in all further iterations
  * ... are recomputed
  * - If d > threshold: Compare the current delay d(t) with the delay when previously computing the tolls d(t-1).
- * 			- If d(t) >= d(t-1): Increase the toll by the adjustment value.
- * 			- If d(t) < d(t-1): Decrease the toll by the adjustment value but not below adjustment value.
+ * 			- If d(t) >= d(t-1): Increase the link and time specific toll weight
+ * 			- If d(t) < d(t-1): Decrease the link and time specific toll weight
  *   
- * - If d <= Decrease the toll by the adjustment value but not below zero.
+ * - If d <= threshold: Set toll to zero.
  * 
  * @author ikaddoura
  */
 
-public class DecongestionTollingV6 implements DecongestionTollSetting {
+public class DecongestionTollingV8 implements DecongestionTollSetting {
 	
-	private static final Logger log = Logger.getLogger(DecongestionTollingV6.class);
+	private static final Logger log = Logger.getLogger(DecongestionTollingV8.class);
 
 	private final DecongestionInfo congestionInfo;
 	private final double vtts_hour;
 
 	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();
 	
-	public DecongestionTollingV6(DecongestionInfo congestionInfo) {
+	public DecongestionTollingV8(DecongestionInfo congestionInfo) {
 		this.congestionInfo = congestionInfo;
 		this.vtts_hour = (this.congestionInfo.getScenario().getConfig().planCalcScore().getPerforming_utils_hr() - this.congestionInfo.getScenario().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling()) / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("VTTS [monetary units / hour]: " + this.vtts_hour);
@@ -65,62 +65,75 @@ public class DecongestionTollingV6 implements DecongestionTollSetting {
 	public void updateTolls() {
 	
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
-			
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
 
 				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);
-								
 				if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+					averageDelay = 0.;
+				} 
+				
+				if (averageDelay > 0) {
 					
+					// 1) adjust the weight
+					
+					double weight = 0.;					
 					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
-						Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-						double updatedToll = time2toll.get(intervalNr) * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-						if (updatedToll < 0.) {
-							log.warn("Toll below zero. Setting to zero.");
-							updatedToll = 0.;
-						}
-						time2toll.put(intervalNr, updatedToll);	
-					}
-					
-				} else {
-					
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
-						
+													
 						double previousDelay = linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
+						log.info("Previous delay: " + previousDelay + " / Current delay: " + averageDelay);
 						
-						log.info("Previous delay: " + previousDelay + " --- Current delay: " + averageDelay);
-						
+						weight = this.congestionInfo.getlinkInfos().get(linkId).getTime2weight().get(intervalNr);
+
 						if (averageDelay >= previousDelay) {
 							
-							Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-							double updatedToll = time2toll.get(intervalNr) * (1 + this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-							time2toll.put(intervalNr, updatedToll);
+							// increase the cost
+							
+							log.info("Old weight: " + weight);
+							
+							weight += this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();						
+							this.congestionInfo.getlinkInfos().get(linkId).getTime2weight().put(intervalNr, weight);
+							
+							log.info("New weight: " + weight);
 							
 						} else {
-							
-							Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-							double updatedToll = time2toll.get(intervalNr) * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT());
-							if (updatedToll < 0.) {
-								log.warn("Toll below zero. Setting to zero.");
-								updatedToll = 0.;
-							}
-							time2toll.put(intervalNr, updatedToll);							
+							// do not (further) increase the weight
 						}
 											
 					} else {
-						
-						// initial toll
-						
-						double toll = 0.;
-						if (this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL() < 0.) {
-							toll = averageDelay * vtts_hour / 3600.;
-						} else {
-							toll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
-						}
-						
-						log.info("initial toll at time " + intervalNr  + ": " + toll);
-						this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);	
+						// initial toll, no need to consider the weight						
 					}
+					
+					this.congestionInfo.getlinkInfos().get(linkId).getTime2weight().put(intervalNr, weight);
+					
+					// 2) compute the toll
+					
+					double averageDelayBasedCostToll = (1 + weight) * averageDelay * vtts_hour / 3600.;
+
+					double previousToll = Double.NEGATIVE_INFINITY;
+					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
+						previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
+					}
+						
+					double toll = Double.NEGATIVE_INFINITY;
+					if (previousToll > 0.) {
+						toll = averageDelayBasedCostToll * this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR() + previousToll * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR());
+					} else {
+						toll = averageDelayBasedCostToll;
+					}
+					
+					log.info("Previous toll: " + previousToll + " // Average delay based cost toll: " + averageDelayBasedCostToll + " // Next toll: " + toll);
+					
+					this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);
+	
+					
+				} else {
+					
+					// average delay is below threshold
+					
+					// do not change the tolls vs. set tolls and weights to zero?
+					this.congestionInfo.getlinkInfos().get(linkId).getTime2weight().remove(intervalNr);
+					this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().remove(intervalNr);
+
 				}
 			}
 		}

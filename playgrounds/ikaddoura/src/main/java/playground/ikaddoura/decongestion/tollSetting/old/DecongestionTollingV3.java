@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.tollSetting;
+package playground.ikaddoura.decongestion.tollSetting.old;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 
 /**
  * 
@@ -46,6 +47,7 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
  * @author ikaddoura
  */
 
+@Deprecated
 public class DecongestionTollingV3 implements DecongestionTollSetting {
 	
 	private static final Logger log = Logger.getLogger(DecongestionTollingV3.class);

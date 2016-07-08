@@ -57,7 +57,7 @@ import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
+import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV1;
 
 
 /**
@@ -233,7 +233,9 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL());
 			log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
 
-			this.nextEnableInnovativeStrategiesIteration = (int) (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() + 1);
+			if (this.nextDisableInnovativeStrategiesIteration != 0) {
+				this.nextEnableInnovativeStrategiesIteration = (int) (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() + 1);
+			}
 			log.info("next enable innovative strategies iteration: " + this.nextEnableInnovativeStrategiesIteration);
 
 		} else {
@@ -246,7 +248,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 					
 					String strategyName = strategy.toString();
 					if (isInnovativeStrategy(strategyName)) {
-						log.warn("Setting weight for " + strategyName + " to zero.");
+						log.info("Setting weight for " + strategyName + " to zero.");
 						event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, 0.0);
 					}
 				}
@@ -257,32 +259,39 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			} else if (event.getIteration() == this.nextEnableInnovativeStrategiesIteration) {
 				// set weight back to original value
 
-				log.warn("Strategy weight adjustment (set back to original value) in iteration " + event.getIteration());
-				
-				for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
+				if (event.getIteration() >= congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * (congestionInfo.getScenario().getConfig().controler().getLastIteration() - congestionInfo.getScenario().getConfig().controler().getFirstIteration())) {
 					
-					String strategyName = strategy.toString();
-					if (isInnovativeStrategy(strategyName)) {
+					log.info("Strategies are switched off by global settings. Do not set back the strategy parameters to original values...");
+				
+				} else {
+					
+					log.info("Strategy weight adjustment (set back to original value) in iteration " + event.getIteration());
+					
+					for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
 						
-						double originalValue = -1.0;
-						for (StrategySettings setting : event.getServices().getConfig().strategy().getStrategySettings()) {
-							log.info("setting: " + setting.getStrategyName());
-							log.info("strategyName: " + strategyName);
+						String strategyName = strategy.toString();
+						if (isInnovativeStrategy(strategyName)) {
+							
+							double originalValue = -1.0;
+							for (StrategySettings setting : event.getServices().getConfig().strategy().getStrategySettings()) {
+								log.info("setting: " + setting.getStrategyName());
+								log.info("strategyName: " + strategyName);
 
-							if (strategyName.contains(setting.getStrategyName())) {
-								originalValue = setting.getWeight();
+								if (strategyName.contains(setting.getStrategyName())) {
+									originalValue = setting.getWeight();
+								}
+							}		
+							
+							if (originalValue == -1.0) {
+								throw new RuntimeException("Aborting...");
 							}
-						}		
-						
-						if (originalValue == -1.0) {
-							throw new RuntimeException("Aborting...");
+							
+							log.warn("Setting weight for " + strategyName + " back to original value: " + originalValue);
+							event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, originalValue);
 						}
-						
-						log.warn("Setting weight for " + strategyName + " back to original value: " + originalValue);
-						event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, originalValue);
-					}
-				}			
-				this.nextEnableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+					}			
+					this.nextEnableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+				}
 			}
 		}
 

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.tollSetting;
+package playground.ikaddoura.decongestion.tollSetting.old;
 
 import java.util.Map;
 
@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 
 /**
  * 
@@ -80,8 +81,16 @@ public class DecongestionTollingV1 implements DecongestionTollSetting {
 											
 					} else {
 						
-						// start with an average delay based toll setting
-						double toll = averageDelay * vtts_hour / 3600.;
+						// initial toll
+						
+						double toll = 0.;
+						if (this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL() < 0.) {
+							toll = averageDelay * vtts_hour / 3600.;
+						} else {
+							toll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
+						}
+						
+						log.info("initial toll at time " + intervalNr  + ": " + toll);
 						this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, toll);		
 					}
 				}

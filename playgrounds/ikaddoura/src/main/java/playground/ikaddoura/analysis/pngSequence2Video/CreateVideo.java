@@ -17,49 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.data;
+package playground.ikaddoura.analysis.pngSequence2Video;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import javax.imageio.ImageIO;
+
+import org.apache.log4j.Logger;
+import org.jcodec.api.awt.SequenceEncoder;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 /**
- * 
- * @author ikaddoura
- */
+* @author ikaddoura
+*/
 
-public class LinkInfo {
+public class CreateVideo {
+	private static final Logger log = Logger.getLogger(CreateVideo.class);
+
+	public static void run(String runDirectory) throws IOException {
+		
+		log.info("Creating a video for the departure times...");
 	
-	private final Id<Link> linkId;
-	
-	private final Map<Integer, Double> time2toll = new HashMap<>();
-	private Map<Integer, Double> time2avgDelay = new HashMap<>();
-	private final Map<Integer, Double> time2weight = new HashMap<>();
-	
-	public LinkInfo(Id<Link> linkId) {
-		this.linkId = linkId;
-	}
+		SequenceEncoder enc = new SequenceEncoder(new File(runDirectory + "departureTimes.mp4"));
+				
+		final Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
 
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
-
-	public Map<Integer, Double> getTime2toll() {
-		return time2toll;
-	}
-
-	public Map<Integer, Double> getTime2avgDelay() {
-		return time2avgDelay;
-	}
-
-	public void setTime2avgDelay(Map<Integer, Double> time2avgDelay) {
-		this.time2avgDelay = time2avgDelay;
-	}
-
-	public Map<Integer, Double> getTime2weight() {
-		return time2weight;
+		for(int i = config.controler().getFirstIteration(); i<= config.controler().getLastIteration(); i++) {
+			
+			String pngFile = runDirectory + "ITERS/it." + i + "/" + i + ".legHistogram_car.png";
+			BufferedImage image = ImageIO.read(new File(pngFile));
+			enc.encodeImage(image);
+		}
+		enc.finish();
+		
+		log.info("Creating a video for the departure times... Done.");
 	}
 
 }
