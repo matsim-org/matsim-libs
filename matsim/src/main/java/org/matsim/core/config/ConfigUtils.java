@@ -53,9 +53,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config createConfig(ConfigGroup... customModules) {
-		Config config = new Config();
-		config.addCoreModules();
-
+		Config config = createConfig();
         for (ConfigGroup customModule : customModules) {
             config.addModule(customModule);
         }
