@@ -34,26 +34,55 @@ import org.matsim.core.config.ConfigUtils;
 * @author ikaddoura
 */
 
-public class CreateVideo {
-	private static final Logger log = Logger.getLogger(CreateVideo.class);
+public class MATSimVideoUtils {
+	private static final Logger log = Logger.getLogger(MATSimVideoUtils.class);
 
-	public static void run(String runDirectory) throws IOException {
+	public static void createLegHistogramVideo(String runDirectory) throws IOException {
+		createVideo(runDirectory, 1, "legHistogram_all");
+	}
+
+	public static void createVideo(String outputDirectory, int interval, String pngFileName) throws IOException {
+
+		log.info("Generating a video using a png sequence...");
 		
-		log.info("Creating a video for the departure times...");
-	
-		SequenceEncoder enc = new SequenceEncoder(new File(runDirectory + "departureTimes.mp4"));
-				
-		final Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
+		String outputFile = outputDirectory + pngFileName + ".mp4";
+		SequenceEncoder enc = new SequenceEncoder(new File(outputFile));
+						
+		final Config config = ConfigUtils.loadConfig(outputDirectory + "output_config.xml.gz");
 
-		for(int i = config.controler().getFirstIteration(); i<= config.controler().getLastIteration(); i++) {
+		int counter = 0;
+		for (int i = config.controler().getFirstIteration(); i<= config.controler().getLastIteration(); i++) {
 			
-			String pngFile = runDirectory + "ITERS/it." + i + "/" + i + ".legHistogram_car.png";
-			BufferedImage image = ImageIO.read(new File(pngFile));
-			enc.encodeImage(image);
+			if (counter % interval == 0) {
+				String pngFile = null;
+				BufferedImage image = null;
+				
+				try {
+					pngFile = outputDirectory + "ITERS/it." + i + "/" + i + "." + pngFileName + ".png";
+					log.info("Trying to read " + pngFile + "...");
+					image = ImageIO.read(new File(pngFile));
+				
+				} catch (IOException e) {
+					log.info("File does not exist.");
+					
+					pngFile = outputDirectory + "ITERS/it." + i + "/" + pngFileName + ".png";
+					log.info("Trying to read " + pngFile + "...");
+					image = ImageIO.read(new File(pngFile));
+				}
+								
+				if (image != null) {
+					log.info("... File successfully read.");
+					enc.encodeImage(image);
+				} else {
+					log.warn("Skipping...");
+				}
+			}
+			counter++;
 		}
+		
 		enc.finish();
 		
-		log.info("Creating a video for the departure times... Done.");
+		log.info("Generating a video using a png sequence... Done. Video written to " + outputFile);
 	}
 
 }

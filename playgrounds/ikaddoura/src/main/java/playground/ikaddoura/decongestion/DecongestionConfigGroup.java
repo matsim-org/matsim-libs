@@ -27,14 +27,14 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	private TollingApproach TOLLING_APPROACH = TollingApproach.V8;
+	private TollingApproach TOLLING_APPROACH = TollingApproach.V6;
 	private double TOLL_ADJUSTMENT = 0.1;
 	private int UPDATE_PRICE_INTERVAL = 1;
 	
 	private double INITIAL_TOLL = -1.0; // relevant for V6 (Set to a negative value to use the average delay cost as initial toll!)
-	private double TOLL_BLEND_FACTOR = 1.0; // relevant for: V4, V8 (Set to 1.0 if tolls in previous iterations should be ignored!)
+	private double TOLL_BLEND_FACTOR = 0.1; // relevant for: V4, V8 (Set to 1.0 if tolls in previous iterations should be ignored!)
 	
-	private int WRITE_OUTPUT_ITERATION = 10;
+	private int WRITE_OUTPUT_ITERATION = 1;
 	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0;
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
 	

@@ -140,6 +140,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		
 		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0.) {
 			CongestionInfoWriter.writeCongestionInfoTimeInterval(congestionInfo, this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/");
+			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/");
 		}
 	}
 

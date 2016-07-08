@@ -33,7 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
-import playground.ikaddoura.analysis.pngSequence2Video.CreateVideo;
+import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -78,7 +78,7 @@ public class DecongestionRun {
 		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
 				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
 				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
-				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_test/");
+				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_7200/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
@@ -89,7 +89,8 @@ public class DecongestionRun {
 		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
-		CreateVideo.run(config.controler().getOutputDirectory());
+		MATSimVideoUtils.createLegHistogramVideo(config.controler().getOutputDirectory());
+		MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), decongestionSettings.getWRITE_OUTPUT_ITERATION(), "tolls");
 	}
 }
 

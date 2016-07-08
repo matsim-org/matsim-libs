@@ -27,10 +27,11 @@ import java.io.IOException;
 
 public class CreateVideoRun {
 
-	private static final String runDirectory = "../../../runs-svn/decongestion/output_test/decongestion_total500it_V8_priceUpdate1it_timeBinSize300_adjustment0.1_BrainExpBeta1.0_initialToll-1.0/";
+	private static final String runDirectory = "../../../runs-svn/decongestion/output_final/decongestion_total500it_V8_priceUpdate1it_timeBinSize300_adjustment0.1_BrainExpBeta1.0_test/";
 
 	public static void main(String[] args) throws IOException {
-		CreateVideo.run(runDirectory);
+		MATSimVideoUtils.createVideo(runDirectory, 10, "tolls");
+		MATSimVideoUtils.createLegHistogramVideo(runDirectory);
 	}
 	
 }
