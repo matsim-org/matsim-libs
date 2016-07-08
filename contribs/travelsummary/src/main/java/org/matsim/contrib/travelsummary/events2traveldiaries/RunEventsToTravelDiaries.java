@@ -90,7 +90,7 @@ public class RunEventsToTravelDiaries {
         }
         Scenario scenario = ScenarioUtils.createScenario(config);
 
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
+        new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
 
         if (config.transit().isUseTransit() ) {
 
