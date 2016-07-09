@@ -21,8 +21,8 @@
 package playground.meisterk;
 
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * Summarizes numbers of departures, arrivals and en-routes by activity type.

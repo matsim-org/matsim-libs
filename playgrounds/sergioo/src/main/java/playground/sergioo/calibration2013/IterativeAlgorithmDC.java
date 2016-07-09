@@ -42,7 +42,7 @@ import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 import javax.inject.Provider;
 import java.io.IOException;
@@ -122,7 +122,7 @@ public class IterativeAlgorithmDC {
 	 */
 	public static void main(String[] args) throws IOException {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 		Map<String, Set<Person>> typePopulations = new HashMap<String, Set<Person>>();
 		for(String type:actTypes.split(","))
 			typePopulations.put(type, new HashSet<Person>());

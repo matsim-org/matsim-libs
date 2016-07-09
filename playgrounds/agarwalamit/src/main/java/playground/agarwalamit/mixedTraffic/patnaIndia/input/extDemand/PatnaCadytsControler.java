@@ -18,8 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
+import java.io.File;
+
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -52,11 +55,18 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 
+import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
+import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.PatnaJointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
@@ -67,59 +77,59 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 public class PatnaCadytsControler {
 
-	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
+	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonDemand_10pct.xml.gz";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
-	
+
 	public static void main(String[] args) {
-		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/outerCordonVehicles_10pct.xml.gz";
-		
+		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonVehicles_10pct.xml.gz";
+
 		if( STABILITY_CHECK_AFTER_CADYTS) {
 			String inPlans = outputDir+"/output_plans.xml.gz";	
-			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/cordonOutput_plans_10pct_selected.xml.gz";
-			
+			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/cordonOutput_plans_10pct_selected.xml.gz";
+
 			SelectedPlansFilter spf = new SelectedPlansFilter();
 			spf.run(inPlans);
 			spf.writePlans(plansFile);
-			
-			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_ctd/";
-			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonVehicles_10pct_ctd.xml.gz";
+
+			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded_ctd/";
+			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
-		
+
 		PatnaCadytsControler pcc = new PatnaCadytsControler();
 		final Config config = pcc.getConfig();
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
 		pvg.createVehicles(PatnaUtils.EXT_MAIN_MODES);
-		
+
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike_ext", config.planCalcScore());
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				
+
 				addTravelTimeBinding("car_ext").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("car_ext").to(carTravelDisutilityFactoryKey());
-				
+
 				addTravelTimeBinding("motorbike_ext").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike_ext").to(carTravelDisutilityFactoryKey());
-				
+
 				// due to speed difference of bike and truck, using configured free speed travel time, builder should also use this.
 				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
-				
+
 				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
 				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
 			}
@@ -127,7 +137,29 @@ public class PatnaCadytsControler {
 
 		if(!STABILITY_CHECK_AFTER_CADYTS) pcc.addCadytsSetting(controler, config);
 
+		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+			@Override
+			public void install() {
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+
+				this.addControlerListenerBinding().to(MultiModeCountsControlerListener.class);
+			}
+		});
+
 		controler.run();
+
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		for (int index =firstIt+1; index <lastIt; index ++){
+			String dirToDel = outputDir+"/ITERS/it."+index;
+			Logger.getLogger(PatnaJointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			IOUtils.deleteDirectory(new File(dirToDel),false);
+		}
 	}
 
 	private void addCadytsSetting(final Controler controler, final Config config){
@@ -136,7 +168,7 @@ public class PatnaCadytsControler {
 		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfigGroup.setStartTime(0);
 		cadytsConfigGroup.setEndTime(24*3600-1);
-		
+
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
@@ -166,7 +198,7 @@ public class PatnaCadytsControler {
 		config.global().setCoordinateSystem(PatnaUtils.EPSG);
 
 		config.plans().setInputFile(plansFile);
-		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz");
+		config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE+"/network.xml.gz");
 
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
@@ -176,7 +208,7 @@ public class PatnaCadytsControler {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		config.counts().setCountsFileName(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+"/outerCordonCounts_10pct_OC1Excluded.xml.gz");
+		config.counts().setCountsFileName(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonCounts_10pct_OC1Excluded.xml.gz");
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
@@ -227,7 +259,8 @@ public class PatnaCadytsControler {
 
 		ModeParams car = new ModeParams("car_ext");
 		car.setConstant(0.0);
-		car.setMarginalUtilityOfTraveling(0.0);
+		car.setMarginalUtilityOfTraveling(-0.64);
+		car.setMonetaryDistanceRate(-3.7*Math.pow(10, -5));
 		config.planCalcScore().addModeParams(car);
 
 		ModeParams bike = new ModeParams("bike_ext");
@@ -237,10 +270,11 @@ public class PatnaCadytsControler {
 
 		ModeParams motorbike = new ModeParams("motorbike_ext");
 		motorbike.setConstant(0.0);
-		motorbike.setMarginalUtilityOfTraveling(0.0);
+		motorbike.setMarginalUtilityOfTraveling(-0.18);
+		motorbike.setMonetaryDistanceRate(-1.6*Math.pow(10, -5));
 		config.planCalcScore().addModeParams(motorbike);
 
-		ModeParams truck = new ModeParams("truck_ext");
+		ModeParams truck = new ModeParams("truck_ext"); // using default for them.
 		truck.setConstant(0.0);
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);

@@ -73,7 +73,7 @@ class RoadpricingScenarioBuilder {
 	}
 
 	private Node addNode(final String id, final double x, final double y) {
-		final NodeImpl node = new NodeImpl(Id.createNodeId(id));
+		final NodeImpl node = NetworkUtils.createNode(Id.createNodeId(id));
 		node.setCoord(new Coord(x * this.linkLength, y * this.linkLength));
 		this.net.addNode(node);
 		return node;

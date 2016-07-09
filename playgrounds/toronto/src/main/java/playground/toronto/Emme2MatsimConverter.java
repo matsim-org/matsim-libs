@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -454,12 +455,12 @@ public class Emme2MatsimConverter {
 				}*/
 				boolean isZone = cells[0].contains("*");
 				
-				NodeImpl n = new NodeImpl(Id.create(cells[1], Node.class));
+				NodeImpl n = NetworkUtils.createNode(Id.create(cells[1], Node.class));
 				final double y = Double.parseDouble(cells[3].length() == 6 ? "4" + cells[3] : cells[3]);
 				n.setCoord(new Coord(Double.parseDouble(cells[2]), y));
 				//Some EMME networks are restricted to using only 6 characters for the y-coordinate. This appends a '4' to the start if this is the case.
 				
-				n.setType(isZone ? "Zone" : "");
+				NetworkUtils.setType(n,(String) (isZone ? "Zone" : ""));
 				
 				network.addNode(n);
 			}
@@ -807,8 +808,8 @@ public class Emme2MatsimConverter {
 		ArrayList<Id> nodesToRemove = new ArrayList<Id>();
 		for (Node n : network.getNodes().values()){
 			NodeImpl N = (NodeImpl) n;
-			if (N.getType() == null) continue;
-			if (N.getType().equals("Zone")) nodesToRemove.add(N.getId());
+			if (NetworkUtils.getType( N ) == null) continue;
+			if (NetworkUtils.getType( N ).equals("Zone")) nodesToRemove.add(N.getId());
 		}
 		
 		for (Id i : nodesToRemove) network.removeNode(i);

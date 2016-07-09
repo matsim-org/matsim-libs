@@ -19,8 +19,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -199,7 +199,7 @@ public class SantiagoDemandGenTry {
 		
 		// Re-classify the activities using the new end_times from the randomizedEndTimes method //		
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenarioTmp).readFile(output_for_new_input + "expanded_plans_final_0.xml.gz");
+		new PopulationReader(scenarioTmp).readFile(output_for_new_input + "expanded_plans_final_0.xml.gz");
 		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
 		aap.run();
 		new PopulationWriter(aap.getOutPop()).write(output_for_new_input + "expanded_plans_final_1.xml.gz");
@@ -230,7 +230,7 @@ public class SantiagoDemandGenTry {
 		
 		/*New group of parameters considering the new classification of the activities*/
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenarioTmp).readFile(output_for_new_input + "expanded_plans_final_0.xml.gz");
+		new PopulationReader(scenarioTmp).readFile(output_for_new_input + "expanded_plans_final_0.xml.gz");
 		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
 		aap.run();		
 		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();

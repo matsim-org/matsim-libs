@@ -13,7 +13,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.singapore.utils.Sample;
@@ -85,7 +85,7 @@ public class EventsStripper {
 	}
 
 	private void populateList(String plansFile) {
-		MatsimPopulationReader pn = new MatsimPopulationReader(scenario);
+		PopulationReader pn = new PopulationReader(scenario);
 		pn.readFile(plansFile);
 		ArrayList<Id> ids = new ArrayList<>();
 		CollectionUtils.addAll(ids, scenario.getPopulation().getPersons()

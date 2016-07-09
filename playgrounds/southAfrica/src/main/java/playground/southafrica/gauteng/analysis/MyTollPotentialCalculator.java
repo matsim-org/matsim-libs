@@ -39,7 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -114,7 +114,7 @@ public class MyTollPotentialCalculator {
 	}
 	
 	private void readPopulation(String filename){
-		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
+		PopulationReader mpr = new PopulationReader(sc);
 		mpr.parse(filename);
 	}
 	

@@ -297,5 +297,17 @@ public class ComposedNode implements Node {
 		anglesDeviation = inOut==0?Double.POSITIVE_INFINITY:anglesDeviation/inOut;
 	}
 
+	@Override
+	public Link removeInLink(Id<Link> linkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Link removeOutLink(Id<Link> outLinkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 
 }

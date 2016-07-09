@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,7 +56,7 @@ public class SampleHouseholds {
 		config.scenario().setUseHouseholds( true );
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		new HouseholdsReaderV10( ((MutableScenario) sc).getHouseholds() ).parse( inHouseholdFile );
-		new MatsimPopulationReader( sc ).parse( inPopFile );
+		new PopulationReader( sc ).parse( inPopFile );
 
 		final HouseholdsImpl newHouseholds = new HouseholdsImpl();
         MutableScenario sc1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

@@ -40,6 +40,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
+import com.vividsolutions.jts.geom.Envelope;
 /**
  * @author ikaddoura
  *
@@ -242,8 +243,8 @@ String label="damages";
 		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_UTM31N, workingDirectory);
 			
 // ################################################################################################################################################
-		double[] extent = {4568808,5803042,4622772,5844280};
-		writer.setExtent(extent);
+		Envelope envelope = new Envelope(4568808,5803042,4622772,5844280);
+		writer.setEnvelope(envelope);
 				
 		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
 		noiseLayer.setDelimiter(";");

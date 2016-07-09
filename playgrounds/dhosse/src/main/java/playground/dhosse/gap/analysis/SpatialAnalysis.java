@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -38,7 +38,7 @@ public class SpatialAnalysis {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		new MatsimPopulationReader(scenario).parse(plansFile);
+		new PopulationReader(scenario).parse(plansFile);
 		
 		org.matsim.core.utils.gis.PolylineFeatureFactory.Builder builder = new org.matsim.core.utils.gis.PolylineFeatureFactory.Builder();
 		
@@ -119,7 +119,7 @@ public class SpatialAnalysis {
 	public static void writePopulationToShape(String plansFile, String outputShapefile){
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).parse(plansFile);
+		new PopulationReader(scenario).parse(plansFile);
 
 		Builder builder = new Builder();
 		builder.setCrs(MGC.getCRS(Global.toCrs));

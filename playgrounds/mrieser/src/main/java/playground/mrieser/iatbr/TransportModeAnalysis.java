@@ -30,14 +30,15 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 
@@ -95,11 +96,13 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 		log.info("analyzing plans");
 		BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/coords.txt");
 		infoFile.write("X\tY\tID\tTYPE\n");
-		PopulationImpl pImpl = (PopulationImpl) scenario.getPopulation();
-		pImpl.setIsStreaming(true);
-		pImpl.addAlgorithm(new TransportModeAnalysis(infoFile));
-		new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
-		pImpl.printPlansCount();
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		reader.addAlgorithm(new TransportModeAnalysis(infoFile));
+//		new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
+		reader.parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
+		PopulationUtils.printPlansCount(reader) ;
 		infoFile.close();
 		log.info("done");
 	}

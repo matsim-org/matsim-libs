@@ -79,8 +79,11 @@ public class RouteSetGenerator {
 
 	private void removeLinkFromNetwork(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
-		((NodeImpl) link.getFromNode()).removeOutLink(link);
-		((NodeImpl) link.getToNode()).removeInLink(link);
+		final Link outlink = link;
+		final Id<Link> outLinkId = outlink.getId();
+		((NodeImpl) link.getFromNode()).removeOutLink(outLinkId);
+		final Link inlink = link;
+		((NodeImpl) link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private boolean containsRoute(NetworkRoute route, LinkedList<NetworkRoute> routes) {

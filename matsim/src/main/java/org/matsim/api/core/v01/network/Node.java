@@ -81,5 +81,9 @@ public interface Node extends BasicLocation<Node>, Identifiable<Node> {
 	 */
 	public Map<Id<Link>, ? extends Link> getOutLinks();
 
+	Link removeInLink(Id<Link> linkId);
+
+	Link removeOutLink(Id<Link> outLinkId);
+
 
 }

@@ -27,6 +27,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationControlI;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
+import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -38,25 +39,16 @@ import java.util.concurrent.Semaphore;
 public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 
 	public enum Status {
-		PAUSE, PLAY, STEP, FINISHED
+		PAUSE, PLAY
 	}
 
-	private volatile Status status = Status.PAUSE;
-	// "volatile" seems to mean "can be changed by more than one thread", and it hedges against that by
-	// ensuring that the object is changed as a whole before the next thread interferes.  The tutorial says
-	// that still bad things can happen, but does not say which.  Seems to me that they mean that
-	// there can still be race conditions, which is rather obvious. 
-	// Problems here can occur when multiple threads (here mostly: the playpausecontrol and the 
-	// mobsim itself) both try to modify state here. kai, jan'16
-	
+	private volatile Status status = Status.PLAY;
+
 	private final Semaphore accessToQNetwork = new Semaphore(1, true);
 
-	private volatile int localTime = 0;
-	private volatile double stepToTime = 0;
+	private volatile double localTime = -1;
 
-	private final Object paused = new Object();
-	private final Object stepDone = new Object();
-	private final Object updateFinished = new Object();
+	private final Phaser stepDone = new Phaser(1);
 
 	public PlayPauseSimulationControl(VisMobsim qSim) {
 		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
@@ -74,75 +66,40 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 		}
 		@Override
 		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
-			double time = event.getSimulationTime();
 			accessToQNetwork.release();
-			localTime = (int) time;
-			if ( status == Status.STEP) {
-				// Time and Iteration reached?
-				if ( stepToTime <= localTime ) {
-					synchronized (stepDone) {
-						stepDone.notifyAll(); // releases all stepDone.wait()
-						status = Status.PAUSE ;
-					}
-				}
-			}
-			synchronized(paused) {
-				while (status == Status.PAUSE) {
-					try {
-						paused.wait();
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			}
+			localTime = (int) event.getSimulationTime();
+			stepDone.arriveAndAwaitAdvance();
 		}
 		@Override
 		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-			status = Status.FINISHED;
+			localTime = Double.MAX_VALUE;
+			stepDone.arriveAndDeregister();
 		}
 	}
 
 	@Override
 	public final void doStep(int time) {
-		// yy seems to me that this is packing two functionalities into one:
-		// (1) if time==0, step exactly one step.  For this, don't have to know the current time.
-		// (2) if time is something else, step until this time.
-		// ????
-		
-		// leave Status on pause but let one step run (if one is waiting)
-		if (status != Status.FINISHED) {
-			synchronized(paused) {
-				this.stepToTime = time;
-				status = Status.STEP ;
-				paused.notifyAll();
-			}
-			synchronized (stepDone) {
-				if (status == Status.PAUSE) return;
-				try {
-					stepDone.wait();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
+		if (status == Status.PLAY) {
+			throw new IllegalStateException();
+		}
+		while (localTime < time) {
+			stepDone.arriveAndAwaitAdvance();
 		}
 	}
 
 	@Override
 	public final void pause() {
-		if (status != Status.FINISHED) {
-			synchronized (updateFinished) {
-				status = Status.PAUSE ;
-			}
+		if (status != Status.PAUSE) {
+			stepDone.register();
+			status = Status.PAUSE;
 		}
 	}
 
 	@Override
 	public final void play() {
-		if (status != Status.FINISHED) {
-			synchronized(paused) {
-				status = Status.PLAY ;
-				paused.notifyAll();
-			}
+		if (status != Status.PLAY) {
+			stepDone.arriveAndDeregister();
+			status = Status.PLAY;
 		}
 	}
 
@@ -155,10 +112,10 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 	// purely observational only below this line (probably not a problem)
 	
 	boolean isFinished() {
-		return ( status == Status.FINISHED ) ;
+		return ( localTime == Double.MAX_VALUE ) ;
 	}
 
-	public int getLocalTime() {
+	public double getLocalTime() {
 		return localTime;
 	}
 

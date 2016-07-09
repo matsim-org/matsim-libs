@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.ExecutedPlansService;
 
 /**

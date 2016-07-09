@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -71,7 +71,7 @@ public class WriteEventsIntoDbScheme implements PersonDepartureEventHandler, Per
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[2]);
 		
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 
 		log.info("Storing persons for leg analysis...");
 		

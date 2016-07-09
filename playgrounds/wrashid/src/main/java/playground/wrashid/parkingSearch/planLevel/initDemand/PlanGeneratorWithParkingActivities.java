@@ -25,8 +25,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,7 +57,7 @@ public class PlanGeneratorWithParkingActivities {
 
 		this.closestParkingMatrix = new ClosestParkingMatrix(scenario.getActivityFacilities(), network);
 
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(inputPlansFilePath);
 	}
 

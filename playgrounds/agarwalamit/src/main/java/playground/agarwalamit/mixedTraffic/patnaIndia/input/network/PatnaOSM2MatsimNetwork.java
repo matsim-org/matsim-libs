@@ -36,6 +36,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -45,8 +46,8 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class PatnaOSM2MatsimNetwork {
 	
-	private static final String osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/network/osmNetworkFile.osm"; // this file has been already modified.
-	private static final String out_osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz"; 
+	private static final String osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/raw/network/osmNetworkFile.osm"; // this file has been already modified.
+	private static final String out_osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/"+PatnaNetworkType.osmNetwork.toString()+"/network.xml.gz"; 
 	
 	public static void main(String[] args) {
 		
@@ -57,13 +58,18 @@ public class PatnaOSM2MatsimNetwork {
 		reader.setHighwayDefaults(2, "trunk",         2,  80.0/3.6, 1.0, 1500); // it looks that each direction has 2 lanes
 		reader.setHighwayDefaults(2, "primary",       2,  60.0/3.6, 1.0, 1500);
 		
+		reader.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  400);// reducing capacities
+		reader.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  400);
+		reader.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  300);
+		reader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  300);
+		
 		reader.parse(osmNetworkFile);
 		
 		NetworkSimplifier simplifier = new NetworkSimplifier();
 		simplifier.run(sc.getNetwork());
 		
-		String uncleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/networkFromOSM.xml.gz";
-		String cleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/networkFromOSM_cleaned.xml.gz";
+		String uncleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/"+PatnaNetworkType.osmNetwork.toString()+"/networkFromOSM.xml.gz";
+		String cleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/"+PatnaNetworkType.osmNetwork.toString()+"/networkFromOSM_cleaned.xml.gz";
 		
 		new NetworkWriter(sc.getNetwork()).write(uncleanedNetworkFile);
 		
@@ -135,7 +141,4 @@ public class PatnaOSM2MatsimNetwork {
 		return n;
 	}
 
-}
-
-
-	
+}	

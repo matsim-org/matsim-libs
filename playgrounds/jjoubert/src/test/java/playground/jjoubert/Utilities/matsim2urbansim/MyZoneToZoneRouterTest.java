@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -65,7 +65,7 @@ public class MyZoneToZoneRouterTest{
 	@Test
 	public void testProcessZones(){
 		setupNetwork();
-		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
+		PopulationReader pr = new PopulationReader(scenario);
 		pr.readFile(inputFolder + "/plans100.xml"); /* Standard equil plans100.xml file. */
 		
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);

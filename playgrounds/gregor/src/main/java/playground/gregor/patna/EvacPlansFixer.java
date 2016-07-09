@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class EvacPlansFixer {
@@ -47,7 +47,7 @@ public class EvacPlansFixer {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		
-		MatsimPopulationReader r = new MatsimPopulationReader(sc);
+		PopulationReader r = new PopulationReader(sc);
 		r.readFile(inFile);
 		
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());

@@ -28,7 +28,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.PTMapper;
+import playground.polettif.publicTransitMapping.mapping.RunPublicTransitMapper;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -36,8 +36,8 @@ import java.util.*;
 
 
 /**
- * Config Group that is used by {@link PTMapper}
- * Defines parameters for mapping public transit to a network.
+ * Config Group usedd by {@link RunPublicTransitMapper}. Defines parameters for
+ * mapping public transit to a network.
  *
  * @author polettif
  */

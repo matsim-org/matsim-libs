@@ -43,7 +43,7 @@ public class WeeklyPlans {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		facilitiesWithType = new HashMap<String, Set<ActivityFacility>>();
 		for(String type:config.findParam("locationchoice", "flexible_types").split(","))

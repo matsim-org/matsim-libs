@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
@@ -71,7 +72,7 @@ public class AccessibilityComputationCottbus {
 		Integer range = 9;
 		int symbolSize = 210;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-		double[] mapViewExtent = {447000,5729000,461000,5740000};
+		Envelope envelope = new Envelope(447000,5729000,461000,5740000);
 		
 		
 		//
@@ -157,7 +158,7 @@ public class AccessibilityComputationCottbus {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

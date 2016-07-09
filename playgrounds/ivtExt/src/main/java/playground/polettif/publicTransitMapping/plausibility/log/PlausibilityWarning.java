@@ -27,6 +27,11 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.List;
 
+/**
+ * Warnings for implausibilities in transit schedules
+ *
+ * @author polettif
+ */
 public interface PlausibilityWarning extends Identifiable<PlausibilityWarning> {
 
 	String getType();

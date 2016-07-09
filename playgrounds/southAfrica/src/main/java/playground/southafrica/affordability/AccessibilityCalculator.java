@@ -29,7 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -126,7 +126,7 @@ public class AccessibilityCalculator {
 		/* Read population */
 		String populationFile = args[1];
 		sc.getTransitSchedule();
-		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
+		PopulationReader mpr = new PopulationReader(sc);
 		mpr.readFile(populationFile);
 		LOG.info("Number of persons: " + sc.getPopulation().getPersons().size());
 //		PopulationUtils.printActivityStatistics(populationFile);

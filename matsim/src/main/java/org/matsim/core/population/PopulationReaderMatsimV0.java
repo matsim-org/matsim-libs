@@ -50,7 +50,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-/*package*/ class PopulationReaderMatsimV0 extends MatsimXmlParser implements PopulationReader {
+/*package*/ class PopulationReaderMatsimV0 extends MatsimXmlParser implements MatsimPopulationReader {
 
 	private final static String PLANS = "plans";
 	private final static String DEMAND = "demand";
@@ -115,11 +115,7 @@ import org.xml.sax.Attributes;
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			if (this.plans instanceof PopulationImpl) {
-				this.plans.addPerson(this.currperson);
-			} else {
-				this.plans.addPerson(this.currperson);
-			}
+			this.plans.addPerson(this.currperson);
 			this.currperson = null;
 		} else if (PLAN.equals(name)) {
 			this.currplan = null;
@@ -217,7 +213,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute() {
-		this.currroute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
+		this.currroute = this.plans.getFactory().getRouteFactories().createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
 	}
 

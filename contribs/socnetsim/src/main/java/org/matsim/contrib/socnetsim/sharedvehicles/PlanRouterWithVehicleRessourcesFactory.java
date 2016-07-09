@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 
 /**

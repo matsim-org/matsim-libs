@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;

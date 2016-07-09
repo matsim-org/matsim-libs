@@ -27,17 +27,19 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	private final TollingApproach TOLLING_APPROACH = TollingApproach.V4;
-	private final double TOLL_ADJUSTMENT = 0.0;
-	private final int UPDATE_PRICE_INTERVAL = 10;
-	private final double TOLL_BLEND_FACTOR = 0.5;
-
-	private final int WRITE_OUTPUT_ITERATION = 10;
-	private final double TOLERATED_AVERAGE_DELAY_SEC = 1.;
-	private final double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
+	private TollingApproach TOLLING_APPROACH = TollingApproach.V6;
+	private double TOLL_ADJUSTMENT = 0.1;
+	private int UPDATE_PRICE_INTERVAL = 1;
+	
+	private double INITIAL_TOLL = -1.0; // relevant for V6 (Set to a negative value to use the average delay cost as initial toll!)
+	private double TOLL_BLEND_FACTOR = 0.1; // relevant for: V4, V8 (Set to 1.0 if tolls in previous iterations should be ignored!)
+	
+	private int WRITE_OUTPUT_ITERATION = 1;
+	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0;
+	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
 	
 	public enum TollingApproach {
-        NoPricing, V0, V1, V2, V3, V4   
+        NoPricing, V0, V1, V2, V3, V4, V5, V6, V7, V8
 	}
 	
 	public int getWRITE_OUTPUT_ITERATION() {
@@ -67,6 +69,42 @@ public class DecongestionConfigGroup {
 	public double getTOLL_BLEND_FACTOR() {
 		return TOLL_BLEND_FACTOR;
 	}
-	
+
+	public void setTOLLING_APPROACH(TollingApproach tOLLING_APPROACH) {
+		TOLLING_APPROACH = tOLLING_APPROACH;
+	}
+
+	public void setTOLL_ADJUSTMENT(double tOLL_ADJUSTMENT) {
+		TOLL_ADJUSTMENT = tOLL_ADJUSTMENT;
+	}
+
+	public void setUPDATE_PRICE_INTERVAL(int uPDATE_PRICE_INTERVAL) {
+		UPDATE_PRICE_INTERVAL = uPDATE_PRICE_INTERVAL;
+	}
+
+	public void setTOLL_BLEND_FACTOR(double tOLL_BLEND_FACTOR) {
+		TOLL_BLEND_FACTOR = tOLL_BLEND_FACTOR;
+	}
+
+	public void setWRITE_OUTPUT_ITERATION(int wRITE_OUTPUT_ITERATION) {
+		WRITE_OUTPUT_ITERATION = wRITE_OUTPUT_ITERATION;
+	}
+
+	public void setTOLERATED_AVERAGE_DELAY_SEC(double tOLERATED_AVERAGE_DELAY_SEC) {
+		TOLERATED_AVERAGE_DELAY_SEC = tOLERATED_AVERAGE_DELAY_SEC;
+	}
+
+	public void setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(double fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT) {
+		FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT;
+	}
+
+	public double getINITIAL_TOLL() {
+		return INITIAL_TOLL;
+	}
+
+	public void setINITIAL_TOLL(double iNITIAL_TOLL) {
+		INITIAL_TOLL = iNITIAL_TOLL;
+	}
+		
 }
 

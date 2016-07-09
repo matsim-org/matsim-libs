@@ -36,10 +36,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.StreamingPopulationReader;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -112,11 +115,12 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming(true);
-		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork());
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		PopulationWriter pop_writer = new PopulationWriter(null, scenario.getNetwork());
 		pop_writer.startStreaming(null);//config.plans().getOutputFile());
-		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
+//		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -124,15 +128,17 @@ public class DilutedZurichFilter {
 		System.out.println("  adding person modules... ");
 		PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer,areaOfInterest, network);
 		filter.setAlternativeAOI(center,radius);
-		pop.addAlgorithm(filter);
+		final PersonAlgorithm algo = filter;
+		reader.addAlgorithm(algo);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		pop_reader.readFile(config.plans().getInputFile());
+//		pop_reader.readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
 		pop_writer.closeStreaming();
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(reader) ;
 		System.out.println("    => filtered persons: " + filter.getCount());
 		System.out.println("  done.");
 

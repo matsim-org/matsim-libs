@@ -37,7 +37,7 @@
  * mode, and allows to route between O/D pairs for any mode. It does not modify the plan.
  * It moreover provides access to a {@link org.matsim.core.router.StageActivityTypes} instance allowing
  * to identify all possible stage activities, for all modes.
- * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.population.algorithms.PlanAlgorithm} to
+ * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.core.population.algorithms.PlanAlgorithm} to
  * route all trips in a plan.
  * </ul>
  *

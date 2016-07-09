@@ -29,10 +29,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -70,19 +73,20 @@ public class PlansRemover {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(inputNetworkfile);
 
-		PopulationImpl pop = (PopulationImpl)scenario.getPopulation();
-		pop.setIsStreaming(true);
-		pop.addAlgorithm(new PersonRemovePlans(pids));
+		Population pop = (Population)scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
+		StreamingUtils.addAlgorithm(pop, new PersonRemovePlans(pids));
 		PopulationWriter writer = new PopulationWriter(pop,scenario.getNetwork());
 		writer.startStreaming(outputBase+"/plans.tmp.xml.gz");
-		pop.addAlgorithm(writer);
-		new MatsimPopulationReader(scenario).readFile(inputPlansfile);
-		pop.printPlansCount();
+		final PersonAlgorithm algo = writer;
+		StreamingUtils.addAlgorithm(pop, algo);
+		new PopulationReader(scenario).readFile(inputPlansfile);
+		PopulationUtils.printPlansCount(pop) ;
 		writer.closeStreaming();
 		
 		pop.getPersons().clear();
-		pop.setIsStreaming(false);
-		new MatsimPopulationReader(scenario).readFile(outputBase+"/plans.tmp.xml.gz");
+		StreamingUtils.setIsStreaming(pop, false);
+		new PopulationReader(scenario).readFile(outputBase+"/plans.tmp.xml.gz");
 		Set<Id<Person>> pidsToRemove = new HashSet<>();
 		for (Person p : pop.getPersons().values()) {
 			if (p.getPlans().isEmpty()) { pidsToRemove.add(p.getId()); }

@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-import playground.polettif.publicTransitMapping.tools.ShapeFileTools;
+import playground.polettif.publicTransitMapping.tools.GtfsShapeFileTools;
 
 /**
  * Contract class to read GTFS files and convert them to an unmapped MATSim Transit Schedule
@@ -130,7 +130,7 @@ public class Gtfs2TransitSchedule {
 				log.warn("Code " + outputCoordinateSystem + " not recognized by geotools. Shapefile not written.");
 			}
 			if(authExists)
-				ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeFile);
+				GtfsShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeFile);
 		}
 	}
 

@@ -44,8 +44,8 @@ import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -252,7 +252,7 @@ public class Simulator {
 	
 	private static void loadPlans(String file) {
 		Scenario scenario = new ScenarioBuilder(config).setNetwork(network).build() ;
-		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(file);
 		Population pop = scenario.getPopulation();
 		for(SocialVertex v : graph.getVertices()) {
@@ -295,7 +295,7 @@ public class Simulator {
 		
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, travelMinCost, MultiThreading.getNumAllowedThreads());
 		LeastCostPathCalculator router = factory.createPathCalculator(network, travelCost, travelTime);
-		NetworkLegRouter legRouter = new NetworkLegRouter(network, router, new RouteFactoriesRegister());
+		NetworkLegRouter legRouter = new NetworkLegRouter(network, router, new RouteFactories());
 		
 		return legRouter;
 	}

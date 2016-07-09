@@ -26,7 +26,7 @@ public class ResslerLabExperiments {
 			this.myGraphGrid = TriGraphConstructor.constructGridGraph(path);
 			LOG.info("Grid Graph created");
 			assocList = TriGraphConstructor.layerRessler(path,myGraphRessler,myGraphGrid);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraphRessler(path, assocList,fullPathSize, segSize, segPathLength );
+			TriGraphConstructor.constructGhostGraphRessler(path, assocList,fullPathSize, segSize, segPathLength );
 			LOG.info("The ghost lives");
 		}else{
 			this.myGraphRessler = TriGraphConstructor.constructResslerGraph(path);
@@ -34,7 +34,7 @@ public class ResslerLabExperiments {
 			this.myGraphGrid = TriGraphConstructor.constructGridGraphSim(path,SimDim);
 			LOG.info("Grid Graph created");
 			assocList = TriGraphConstructor.layerResslerSim(path);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraphRessler(path, assocList,fullPathSize , segSize,segPathLength);
+			TriGraphConstructor.constructGhostGraphRessler(path, assocList,fullPathSize , segSize,segPathLength);
 			LOG.info("The ghost lives");	
 		}
 		
@@ -44,8 +44,8 @@ public class ResslerLabExperiments {
 	public void runThisSpecificExperiment(){
 		LinkedList<NmvLink> linkListGrid = new LinkedList<NmvLink>(myGraphGrid.getEdges());
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
-		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
-		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
+//		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
+//		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
 		LinkedList<NmvLink> linkListRessler = new LinkedList<NmvLink>(myGraphRessler.getEdges());
 		ArrayList<NmvNode> nodeListRessler = new ArrayList<NmvNode>(myGraphRessler.getVertices());
 		String shortFile=path+"ResslerShortPathStat.csv";
@@ -74,18 +74,18 @@ public class ResslerLabExperiments {
 		
 		//Centrality scores
 		
-		JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
-		JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
-		JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
-		JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
-
-		//Clustering
-		JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
-		JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
-		JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
-
-		//Graph distance
-		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
+//		JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
+//		JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
+//		JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
+//		JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
+//
+//		//Clustering
+//		JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
+//		JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
+//		JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
+//
+//		//Graph distance
+//		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
 		
 	}
 	

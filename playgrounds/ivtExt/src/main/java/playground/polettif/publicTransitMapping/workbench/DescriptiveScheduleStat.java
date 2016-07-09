@@ -13,12 +13,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Writes basic schedule statistics to the console
+ *
  * @author polettif
  */
 public class DescriptiveScheduleStat {
 
 	public static void main(String[] args) {
-		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
+		run(args[0]);
+	}
+
+	public static void run(String scheduleFile) {
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(scheduleFile);
 
 		int nTransitRoutes = 0;
 		Map<TransitLine, Integer> statTransitLine = new HashMap<>();
@@ -33,12 +39,11 @@ public class DescriptiveScheduleStat {
 
 		int nStopFacilities = schedule.getFacilities().size();
 		int nTransitLines = schedule.getTransitLines().size();
-		int nTransportModes = scheduleTransportModes.size();
 
-		System.out.println("Statistics for " + args[0]);
+		System.out.println("Statistics for " + scheduleFile);
 		System.out.println("   Stop Facilities   "+nStopFacilities);
 		System.out.println("   Transit Lines     "+nTransitLines);
 		System.out.println("   Transit Routes    "+nTransitRoutes);
-		System.out.println("   Transport Modes   "+CollectionUtils.setToString(scheduleTransportModes) + " ("+nTransportModes+")");
+		System.out.println("   Transport Modes   "+CollectionUtils.setToString(scheduleTransportModes) + " ("+scheduleTransportModes.size()+")");
 	}
 }

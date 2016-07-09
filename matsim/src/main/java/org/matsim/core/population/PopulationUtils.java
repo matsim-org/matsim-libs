@@ -53,7 +53,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
@@ -105,7 +105,7 @@ public final class PopulationUtils {
 
 	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
 		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
-		RouteFactoriesRegister routeFactory = new RouteFactoriesRegister();
+		RouteFactories routeFactory = new RouteFactories();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
@@ -118,6 +118,22 @@ public final class PopulationUtils {
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
 		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
+	
+//	public static Population createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+//		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
+//		RouteFactories routeFactory = new RouteFactories();
+//		String networkRouteType = plansConfigGroup.getNetworkRouteType();
+//		RouteFactory factory;
+//		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+//			factory = new LinkNetworkRouteFactory();
+//		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+//			factory = new CompressedNetworkRouteFactory(network);
+//		} else {
+//			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+//		}
+//		routeFactory.setRouteFactory(NetworkRoute.class, factory);
+//		return new Population(new PopulationFactoryImpl(routeFactory));
+//	}
 
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
@@ -275,7 +291,7 @@ public final class PopulationUtils {
 		
 		public UnmodifiablePlan( Plan plan ) {
 			this.delegate = plan;
-			List<PlanElement> tmp = new ArrayList<PlanElement>() ;
+			List<PlanElement> tmp = new ArrayList<>() ;
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if (pe instanceof Activity) {
                     tmp.add(unmodifiableActivity((Activity) pe));
@@ -341,7 +357,7 @@ public final class PopulationUtils {
 	 * @return sorted map containing containing the persons as values and their ids as keys.
 	 */
 	public static SortedMap<Id<Person>, Person> getSortedPersons(final Population population) {
-		return new TreeMap<Id<Person>, Person>(population.getPersons());
+		return new TreeMap<>(population.getPersons());
 	}
 	
 	/**
@@ -375,6 +391,8 @@ public final class PopulationUtils {
 			}
 		case minOfDurationAndEndTime:
 			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
+		default:
+			break ;
 		}
 		return Time.UNDEFINED_TIME ;
 	}
@@ -553,7 +571,9 @@ public final class PopulationUtils {
 	 */
 	public static boolean equalPopulation(final Population s1, final Population s2) {
 		try {
+			@SuppressWarnings("resource")
 			InputStream inputStream1 = null;
+			@SuppressWarnings("resource")
 			InputStream inputStream2 = null;
 			try {
 				inputStream1 = openPopulationInputStream(s1);
@@ -574,6 +594,7 @@ public final class PopulationUtils {
 	 * 
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
+	@SuppressWarnings("resource")
 	private static InputStream openPopulationInputStream(final Population s1) {
 		try {
 			final PipedInputStream in = new PipedInputStream();
@@ -940,5 +961,13 @@ public final class PopulationUtils {
 			} else {
 				throw new RuntimeException("wrong implementation of interface Person") ;
 			}
+		}
+
+		public static void printPlansCount( Population population ) {
+			log.info(" person # " + population.getPersons().size() );
+		}
+
+		public static void printPlansCount(StreamingPopulationReader reader) {
+			reader.printPlansCount() ;
 		}
 }

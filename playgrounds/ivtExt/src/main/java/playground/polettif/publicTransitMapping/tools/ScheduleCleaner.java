@@ -48,6 +48,10 @@ public class ScheduleCleaner {
 	private ScheduleCleaner() {
 	}
 
+	/**
+	 * Removes transit routes without link sequences and not used stop facilities from the schedule.
+	 * @param args [0] schedule file, [1] output schedule file (if original file should not be overwritten)
+	 */
 	public static void main(String[] args) {
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
 		removeTransitRoutesWithoutLinkSequences(schedule);
@@ -257,7 +261,7 @@ public class ScheduleCleaner {
 	}
 
 	/**
-	 * Combines Transit Routes with an identical stop sequence and combines them to one
+	 * Combines TransitRoutes with an identical stop sequence and combines them to one
 	 */
 	public static void uniteSameRoutesWithJustDifferentDepartures(TransitSchedule schedule) {
 		log.info("Combining TransitRoutes with identical stop sequence...");
@@ -369,7 +373,7 @@ public class ScheduleCleaner {
 	}
 
 	/**
-	 * cuts the schedule. All routes that pass stops within radius of center are kept
+	 * Cuts the schedule. All routes that pass stops within radius of center are kept
 	 */
 	public static void cutSchedule(TransitSchedule schedule, Coord center, double radius) {
 		Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
@@ -396,7 +400,7 @@ public class ScheduleCleaner {
 	}
 
 	/**
-	 * cuts the schedule, retains routes that pass stops defined in stopsInArea
+	 * Cuts the schedule, retains routes that pass stops defined in stopsInArea
 	 */
 	public static void cutSchedule(TransitSchedule schedule, Set<Id<TransitStopFacility>> stopsInArea) {
 		log.info("Cutting schedule...");

@@ -46,8 +46,10 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
+import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -61,13 +63,13 @@ public class PatnaJointCalibrationControler {
 	private final static double SAMPLE_SIZE = 0.10;
 	private final static String subPopAttributeName = "userGroup";
 
-	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz"; //
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_counts_osmNetwork.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/joint_vehicles_10pct.xml.gz";
+	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz"; //
+	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxxx/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -123,8 +125,24 @@ public class PatnaJointCalibrationControler {
 				
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+				
+				this.addControlerListenerBinding().to(MultiModeCountsControlerListener.class);
 			}
 		});
+		
+		// adding pt fare system based on distance 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().to(PtFareEventHandler.class);
+			}
+		});
+		
+		// for above make sure that util_dist and monetary dist rate for pt are zero.
+		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
+		mp.setMarginalUtilityOfDistance(0.0);
+		mp.setMonetaryDistanceRate(0.0);
+		
 		controler.run();
 
 		// delete unnecessary iterations folder here.
@@ -139,8 +157,6 @@ public class PatnaJointCalibrationControler {
 		new File(OUTPUT_DIR+"/analysis/").mkdir();
 		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
 		// write some default analysis
-		StatsWriter.run(OUTPUT_DIR);
-
 		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile);
 		mtta.run();
 		mtta.writeResults(OUTPUT_DIR+"/analysis/modalTravelTime.txt");
@@ -148,6 +164,8 @@ public class PatnaJointCalibrationControler {
 		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
 		msc.run();
 		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents.txt");
+		
+		StatsWriter.run(OUTPUT_DIR);
 	}
 
 	/**
@@ -301,15 +319,17 @@ public class PatnaJointCalibrationControler {
 			ModeParams modeParam = new ModeParams(mode);
 			modeParam.setConstant(0.);
 			switch(mode){
-			case "car": 
+			case "car":
+			case "car_ext": 
 				modeParam.setMarginalUtilityOfTraveling(-0.64);
 				modeParam.setMonetaryDistanceRate(-3.7*Math.pow(10, -5)); break;
+			case "motorbike_ext" :
 			case "motorbike" :
 				modeParam.setMarginalUtilityOfTraveling(-0.18);
 				modeParam.setMonetaryDistanceRate(-1.6*Math.pow(10, -5)); break;
 			case "pt" :
 				modeParam.setMarginalUtilityOfTraveling(-0.29);
-				modeParam.setMonetaryDistanceRate(-0.3*Math.pow(10, -5)); break;
+				/* modeParam.setMonetaryDistanceRate(-0.3*Math.pow(10, -5)); */ break;
 			case "walk" :
 				modeParam.setMarginalUtilityOfTraveling(-0.0);
 				modeParam.setMonetaryDistanceRate(0.0); 

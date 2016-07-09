@@ -158,7 +158,7 @@ public class PopulationWriterHandlerImplV5Test {
 		Assert.assertEquals("wrong distance", dist, route2.getDistance(), 1e-9);
 	}
 
-	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements PopulationReader {
+	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements MatsimPopulationReader {
 		private final MatsimXmlParser delegate;
 		/*package*/ String interceptedRouteContent = null;
 

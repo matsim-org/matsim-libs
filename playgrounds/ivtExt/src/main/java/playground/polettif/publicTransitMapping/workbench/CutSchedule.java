@@ -23,6 +23,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+
 public class CutSchedule {
 	
 	public static void main(final String[] args) {

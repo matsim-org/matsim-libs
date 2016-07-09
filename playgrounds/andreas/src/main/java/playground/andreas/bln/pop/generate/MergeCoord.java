@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -186,7 +186,7 @@ public class MergeCoord {
 
 		log.info("Start reading file " + plansFilename);
 		Population population = scenario.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
 		// Find persons with walking trips over 60 minutes long
@@ -264,7 +264,7 @@ public class MergeCoord {
 
 		log.info("Start reading file " + plansFilename);
 		Population population = scenario.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(plansFilename);
 
 

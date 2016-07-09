@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -30,7 +31,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -41,7 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -207,10 +208,10 @@ public class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new MatsimPopulationReader(this.scenario).parse(populationFileName);
+			new PopulationReader(this.scenario).parse(populationFileName);
 			
-			if (this.scenario.getPopulation() instanceof PopulationImpl) {
-				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
+			if (this.scenario.getPopulation() instanceof Population) {
+				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;
 			}
 		}
 		else {

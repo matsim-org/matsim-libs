@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -59,7 +60,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
@@ -240,7 +240,7 @@ public class SpaceTimeProbability {
 	}
 
 	private void createAgent(Scenario scenario) {
-		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory pFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		Person person = pFactory.createPerson(Id.create("worker", Person.class));
 		
 		Id<Link> homeLinkId = Id.create("1", Link.class);
@@ -279,7 +279,7 @@ public class SpaceTimeProbability {
 				throw new RuntimeException();
 			}
 			
-			NetworkRoute route1 = pFactory.createRoute(NetworkRoute.class, null, null);
+			NetworkRoute route1 = pFactory.getRouteFactories().createRoute(NetworkRoute.class, null, null);
 			route1.setLinkIds(homeLinkId, routeLinkIds, workLinkId);
 			leg1.setRoute(route1);
 			logger.info(((NetworkRoute) leg1.getRoute()).getLinkIds());
@@ -299,7 +299,7 @@ public class SpaceTimeProbability {
 			routeLinkIds2.add(id6);
 			routeLinkIds2.add(id7);
 
-			NetworkRoute route2 = pFactory.createRoute(NetworkRoute.class, null, null);
+			NetworkRoute route2 = pFactory.getRouteFactories().createRoute(NetworkRoute.class, null, null);
 			route2.setLinkIds(workLinkId, routeLinkIds2, homeLinkId);
 			leg2.setRoute(route2);
 			logger.info(((NetworkRoute) leg2.getRoute()).getLinkIds());

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.AbstractPlanFilter;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 import java.util.HashSet;
 import java.util.Set;

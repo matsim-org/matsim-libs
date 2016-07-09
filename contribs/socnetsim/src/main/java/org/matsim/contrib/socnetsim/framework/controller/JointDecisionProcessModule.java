@@ -39,9 +39,9 @@ import org.matsim.contrib.socnetsim.framework.scoring.InternalizingPlansScoring.
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.Collection;
 import java.util.Collections;

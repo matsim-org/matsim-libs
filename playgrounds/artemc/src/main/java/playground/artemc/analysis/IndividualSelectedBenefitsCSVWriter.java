@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -37,7 +37,7 @@ public class IndividualSelectedBenefitsCSVWriter {
 
 
 
-				new MatsimPopulationReader(scenario).readFile(populationFile);
+				new PopulationReader(scenario).readFile(populationFile);
 				System.out.println("   Population size: " + scenario.getPopulation().getPersons().size());
 
 				//Read selected plan score

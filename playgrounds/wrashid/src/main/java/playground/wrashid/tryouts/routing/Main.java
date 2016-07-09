@@ -29,14 +29,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -76,7 +76,7 @@ public class Main {
 //
 //		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, timeCostCalc);
 		
-		RouteFactoriesRegister routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactoriesRegister();
+		RouteFactories routeFactory = ((PopulationFactory) f.s.getPopulation().getFactory()).getRouteFactories();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0 / 3600, +6.0 / 3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(network, freespeed, freespeed);
 

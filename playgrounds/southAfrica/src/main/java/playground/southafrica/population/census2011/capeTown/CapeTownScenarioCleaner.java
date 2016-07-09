@@ -43,14 +43,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -243,7 +243,7 @@ public class CapeTownScenarioCleaner {
 		
 		/* Parse the persons. */
 		Scenario scPersons = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scPersons).parse(folder + "persons.xml.gz");
+		new PopulationReader(scPersons).parse(folder + "persons.xml.gz");
 		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).parse(folder + "personAttributes.xml.gz");
 		for(Id<Person> id : scPersons.getPopulation().getPersons().keySet()){
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
@@ -279,7 +279,7 @@ public class CapeTownScenarioCleaner {
 		
 		/* Parse the commercial vehicles. */
 		Scenario scCom = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scCom).parse(folder + "commercial.xml.gz");
+		new PopulationReader(scCom).parse(folder + "commercial.xml.gz");
 		new ObjectAttributesXmlReader(scCom.getPopulation().getPersonAttributes()).parse(folder + "commercialAttributes.xml.gz");
 		for(Id<Person> id : scCom.getPopulation().getPersons().keySet()){
 			String[] sa = id.toString().split("_");

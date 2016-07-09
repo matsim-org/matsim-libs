@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.XY2Links;
 
 import playground.southafrica.utilities.Header;
 
@@ -108,7 +108,7 @@ public class MyPlanMerger {
 	 */
 	public void preparePlanMerger(){
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
+		PopulationReader mpr = new PopulationReader(sc);
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		mpr.parse(baseFile);
 		nr.parse(networkFile);
@@ -132,7 +132,7 @@ public class MyPlanMerger {
 
 		Scenario scAdd = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		MatsimPopulationReader mprAdd = new MatsimPopulationReader(scAdd);
+		PopulationReader mprAdd = new PopulationReader(scAdd);
 		
 		mprAdd.parse(addFile);
 		Map<Id<Person>, ? extends Person> peopleToAdd = scAdd.getPopulation().getPersons();

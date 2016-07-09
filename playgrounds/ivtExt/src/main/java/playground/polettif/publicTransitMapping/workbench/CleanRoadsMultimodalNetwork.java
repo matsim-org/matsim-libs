@@ -16,7 +16,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.polettif.publicTransitMapping.workbench;
 
 import org.matsim.api.core.v01.network.Network;
@@ -26,6 +25,9 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.Set;
 
+/**
+ * Workbench. Runs the network cleaner on the "road" links of the given network.
+ */
 public class CleanRoadsMultimodalNetwork {
 
 	public static void main(String[] args) {

@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
@@ -61,7 +61,7 @@ public class MatsimAnalyzer {
 		String facFile = args[2];
 		String outFile = args[3];
 		
-		PopulationReader reader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(popFile);
 		
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());

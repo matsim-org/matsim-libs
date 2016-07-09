@@ -23,9 +23,9 @@ package playground.telaviv.population;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -130,7 +130,7 @@ public class MergePopulation {
 		}
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(outFile);
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outAttributesFile);
 		log.info("done.");
 	}

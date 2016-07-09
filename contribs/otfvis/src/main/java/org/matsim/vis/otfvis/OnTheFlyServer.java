@@ -309,7 +309,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public int getLocalTime() {
-		return playPauseSimulationControl.getLocalTime();
+		return (int) playPauseSimulationControl.getLocalTime();
 	}
 
 	@Override

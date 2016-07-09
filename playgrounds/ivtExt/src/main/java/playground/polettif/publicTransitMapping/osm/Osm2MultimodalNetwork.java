@@ -22,10 +22,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import playground.polettif.publicTransitMapping.config.CreateDefaultOsmConfig;
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 /**
+ * Abstract class to create a multimodal MATSim network from OSM.
  *
  * @author polettif
  */
@@ -37,7 +39,7 @@ public abstract class Osm2MultimodalNetwork {
 
 	/**
 	 * Converts an osm file to a MATSim network. The input and output file as well
-	 * as conversion parameters are defined in this file. Run {@link playground.polettif.publicTransitMapping.workbench.CreateDefaultOsmConfig}
+	 * as conversion parameters are defined in this file. Run {@link CreateDefaultOsmConfig}
 	 * to create a default config.
 	 *
 	 * @param args [0] the config.xml file<br/>
@@ -52,7 +54,7 @@ public abstract class Osm2MultimodalNetwork {
 
 	/**
 	 * Converts an osm file to a MATSim network. The input and output file as well
-	 * as conversion parameters are defined in this file. Run {@link playground.polettif.publicTransitMapping.workbench.CreateDefaultOsmConfig}
+	 * as conversion parameters are defined in this file. Run {@link CreateDefaultOsmConfig}
 	 * to create a default config.
 	 *
 	 * @param configFile the config.xml file

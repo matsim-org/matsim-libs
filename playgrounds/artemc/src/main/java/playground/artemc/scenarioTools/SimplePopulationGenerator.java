@@ -1,5 +1,9 @@
 package playground.artemc.scenarioTools;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Random;
+
 /**
  * Population generator for a corridor scenario 
  * 
@@ -17,17 +21,17 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.artemc.utils.Writer;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
+import playground.artemc.utils.Writer;
 
 public class SimplePopulationGenerator {
 
@@ -49,9 +53,9 @@ public class SimplePopulationGenerator {
 		SimplePopulationGenerator simplePopulationGenerator = new SimplePopulationGenerator();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
-		population.setIsStreaming(true);
+		StreamingUtils.setIsStreaming(population, true);
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(outputPath+"/corridorPopulation_"+populationSize+".xml");
 

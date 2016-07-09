@@ -28,10 +28,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -147,7 +147,7 @@ public class HouseholdSampler {
 		
 		/* Read and clean the population. */
 		String populationFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "population.xml.gz";
-		new MatsimPopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).parse(populationFile);
 		counter.reset();
 		LOG.info("  removing " + sampler.getSampledMemberIds().size() + " household members...");
 		for(Id id : sampler.getSampledMemberIds()){

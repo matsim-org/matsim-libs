@@ -46,6 +46,9 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import java.util.*;
 
 /**
+ * Implemenation of a network converter. Modified version from {@link org.matsim.core.utils.io.OsmNetworkReader}
+ * Uses a config file ({@link OsmConverterConfigGroup}) to store conversion parameters and default
+ * values.
  *
  * @author polettif
  */

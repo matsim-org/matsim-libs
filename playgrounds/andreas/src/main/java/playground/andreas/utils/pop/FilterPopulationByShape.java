@@ -34,13 +34,15 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -108,17 +110,17 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		Gbl.printElapsedTime();
 		
 		sc.getConfig().plans().setInputFile(popInFile);
-		PopulationImpl pop = (PopulationImpl) sc.getPopulation();
-		pop.setIsStreaming(true);
-		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
+		Population pop = (Population) sc.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
+		PopulationReader popReader = new PopulationReader(sc);
 		PopulationWriter popWriter = new PopulationWriter(pop, sc.getNetwork());
 		popWriter.startStreaming(popOutFile);
 		
-		pop.addAlgorithm(new PersonIdFilter(this.agentsToKeep, popWriter));
+		StreamingUtils.addAlgorithm(pop, new PersonIdFilter(this.agentsToKeep, popWriter));
 		Gbl.printMemoryUsage();
 		
 		popReader.readFile(popInFile);
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		popWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		Gbl.printElapsedTime();

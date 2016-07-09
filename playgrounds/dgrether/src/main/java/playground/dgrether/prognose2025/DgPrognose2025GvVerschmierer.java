@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -70,7 +70,7 @@ public class DgPrognose2025GvVerschmierer {
 		Verschmierer verschmierer = new Verschmierer(LANDKREISE);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(GV_POPULATION);
 
 		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

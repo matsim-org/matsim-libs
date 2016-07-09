@@ -5,11 +5,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -19,7 +19,7 @@ public class UpdateInitialTravelTimes {
 	public static void main(String[] args) {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
@@ -57,7 +57,7 @@ public class UpdateInitialTravelTimes {
 		}
 		
 		new PopulationWriter(scenario.getPopulation(),
-				scenario.getNetwork()).writeFileV4("C:/Users/balacm/Documents/InducedDemand/plans_0.1perc_fixedtt_50perc.xml.gz");		
+				scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/InducedDemand/plans_0.1perc_fixedtt_50perc.xml.gz");		
 
 		
 	}

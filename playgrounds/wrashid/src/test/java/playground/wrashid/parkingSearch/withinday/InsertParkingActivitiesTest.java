@@ -51,6 +51,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -64,7 +65,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;

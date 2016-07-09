@@ -32,7 +32,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-
+/**
+ * Abstract class for plausibility warnings
+ *
+ * @author polettif
+ */
 public abstract class AbstractPlausibilityWarning implements PlausibilityWarning {
 
 	private static final String sep = PlausibilityCheck.CsvSeparator;

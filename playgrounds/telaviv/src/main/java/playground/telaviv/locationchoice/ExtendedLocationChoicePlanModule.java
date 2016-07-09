@@ -30,11 +30,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.telaviv.population.ParsedPerson;
 import playground.telaviv.population.PersonFileParser;

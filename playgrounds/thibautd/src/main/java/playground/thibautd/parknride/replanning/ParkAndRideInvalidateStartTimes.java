@@ -23,9 +23,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
+
 import playground.thibautd.parknride.ParkAndRideConstants;
 
 /**

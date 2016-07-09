@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
 
 

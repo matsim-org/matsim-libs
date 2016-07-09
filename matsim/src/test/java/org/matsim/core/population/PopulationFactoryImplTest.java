@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -42,10 +43,12 @@ public class PopulationFactoryImplTest {
 	public void testConstructor_DefaultNetworkRouteType() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-        PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory pf = (PopulationFactory) scenario.getPopulation().getFactory();
 
         Id<Link> linkId = Id.create(1, Link.class);
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(NetworkRoute.class, linkId, linkId).getClass());
+	final Id<Link> startLinkId = linkId;
+	final Id<Link> endLinkId = linkId;
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
@@ -53,10 +56,12 @@ public class PopulationFactoryImplTest {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.LinkNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-        PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory pf = (PopulationFactory) scenario.getPopulation().getFactory();
 
         Id<Link> linkId = Id.create(1, Link.class);
-		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(NetworkRoute.class, linkId, linkId).getClass());
+	final Id<Link> startLinkId = linkId;
+	final Id<Link> endLinkId = linkId;
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
@@ -64,10 +69,12 @@ public class PopulationFactoryImplTest {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-        PopulationFactoryImpl pf = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory pf = (PopulationFactory) scenario.getPopulation().getFactory();
 
 		Id<Link> linkId = Id.create(1, Link.class);
-		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(NetworkRoute.class, linkId, linkId).getClass());
+		final Id<Link> startLinkId = linkId;
+		final Id<Link> endLinkId = linkId;
+		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 }

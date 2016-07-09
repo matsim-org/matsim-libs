@@ -30,7 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -207,7 +207,7 @@ X;Dritte GV;OV;1.000
 
 	protected void routePopulation() {
 		Population pop = this.scenario.getPopulation();
-		new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
+		new PopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
 
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());
 //		if ( scenario.getConfig().transit().isUseTransit() ) {

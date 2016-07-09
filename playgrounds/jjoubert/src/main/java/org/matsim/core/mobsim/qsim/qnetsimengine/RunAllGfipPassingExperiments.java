@@ -55,6 +55,11 @@ public class RunAllGfipPassingExperiments {
 	
 	private static String PATH;
 
+	final private static String fifo = QueueType.FIFO.name();
+	final private static String basicPassing = QueueType.BASIC_PASSING.name();
+	final private static String gfipFifo = QueueType.GFIP_FIFO.name(); 
+	final private static String gfipPassing = QueueType.GFIP_PASSING.name(); 
+
 	/**
 	 * 
 	 * @param args Only a single argument is required, namely the absolute path to the 
@@ -65,15 +70,36 @@ public class RunAllGfipPassingExperiments {
 		PATH = args[0];
 		PATH += PATH.endsWith("/") ? "" : "/";
 		
-		/* Set up the simulation options. */
-		String fifo = QueueType.FIFO.name();
-		String basicPassing = QueueType.BASIC_PASSING.name();
-		String gfipFifo = QueueType.GFIP_FIFO.name(); 
-		String gfipPassing = QueueType.GFIP_PASSING.name(); 
+		runFifoExperiments();
+		runBasicPassingExperiments();
+		runGfipFifoExperiments();
+		runGfipPassingExperiments();
 		
+		Header.printFooter();
+	}
+	
+	private static void runFifoExperiments(){
+		GfipQueuePassingControler.main(getArgs(fifo, 200, 17000));
+		
+		GfipQueuePassingControler.main(getArgs(fifo, 5000, 30000));
+	}
+	
+	private static void runBasicPassingExperiments(){
+		GfipQueuePassingControler.main(getArgs(basicPassing, 200, 17000));
+
+		GfipQueuePassingControler.main(getArgs(basicPassing, 5000, 30000));
+	}
+	
+	private static void runGfipFifoExperiments(){
+		GfipQueuePassingControler.main(getArgs(gfipFifo, 200, 17000));
+
+		GfipQueuePassingControler.main(getArgs(gfipFifo, 5000, 30000));
+	}
+
+	private static void runGfipPassingExperiments(){
 		/*=======================  Population of 5000  ==================== */
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 5000));
-
+		
 		/*=======================  Population of 10000  =================== */
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 50, 10000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 100, 10000));
@@ -87,7 +113,7 @@ public class RunAllGfipPassingExperiments {
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 12000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 13000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 14000));
-
+		
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 16000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 17000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 18000));
@@ -97,7 +123,7 @@ public class RunAllGfipPassingExperiments {
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 22000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 23000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 24000));
-
+		
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 26000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 27000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 200, 28000));
@@ -142,8 +168,6 @@ public class RunAllGfipPassingExperiments {
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 500, 35000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 1000, 35000));
 		GfipQueuePassingControler.main(getArgs(gfipPassing, 5000, 35000));
-		
-		Header.printFooter();
 	}
 	
 	private static String[] getArgs(String passingRegime, int linkLength, int population){

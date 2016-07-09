@@ -37,7 +37,7 @@ public class PrtAnalyzer {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/network_prt.xml");
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimPopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		VrpData data = new VrpDataImpl();
 		VehicleReader vehReader = new VehicleReader(scenario.getNetwork(), data);

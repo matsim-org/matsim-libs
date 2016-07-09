@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -78,7 +78,7 @@ public class AnalyseSacscOccupancy {
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(base.getNetwork());
 		nr.parse(args[2]);
 		/* Read in the plans file of the base case. */
-		MatsimPopulationReader pr = new MatsimPopulationReader(base);
+		PopulationReader pr = new PopulationReader(base);
 		pr.parse(args[3]);
 		for(Id id : base.getPopulation().getPersons().keySet()){
 			Plan plan = base.getPopulation().getPersons().get(id).getSelectedPlan();
@@ -102,7 +102,7 @@ public class AnalyseSacscOccupancy {
 		nr = new NetworkReaderMatsimV1(compare.getNetwork());
 		nr.parse(args[2]);
 		/* Read in the plans file of the comparative case. */
-		pr = new MatsimPopulationReader(compare);
+		pr = new PopulationReader(compare);
 		pr.parse(args[4]);
 		for(Id id : compare.getPopulation().getPersons().keySet()){
 			Plan plan = compare.getPopulation().getPersons().get(id).getSelectedPlan();

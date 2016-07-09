@@ -37,7 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -108,7 +108,7 @@ public class EconomicsControler {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
 
@@ -154,7 +154,7 @@ public class EconomicsControler {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
 		
@@ -190,7 +190,7 @@ public class EconomicsControler {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
 
@@ -224,7 +224,7 @@ public class EconomicsControler {
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			
 			new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
-			new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+			new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 			
 			Controler controler = new Controler(scenario);
 

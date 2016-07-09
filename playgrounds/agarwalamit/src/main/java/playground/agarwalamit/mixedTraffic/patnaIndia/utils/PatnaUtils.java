@@ -35,6 +35,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 
 /**
  * @author amit
@@ -42,11 +43,13 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 public final class PatnaUtils {
 
+	public static final PatnaNetworkType PATNA_NETWORK_TYPE = PatnaNetworkType.shpNetwork;
+	
 	public static final String EPSG = "EPSG:24345";
 	public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, PatnaUtils.EPSG);
 
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
-	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/others/wardFile/Wards.shp";
+	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/raw/others/wardFile/Wards.shp";
 
 	public static final String INCOME_ATTRIBUTE = "monthlyIncome";
 	public static final String TRANSPORT_COST_ATTRIBUTE = "dailyTransportCost";

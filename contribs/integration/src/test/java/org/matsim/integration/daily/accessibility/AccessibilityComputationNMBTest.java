@@ -57,7 +57,7 @@ public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
 	private static final Double cellSize = 500.;
-//	private static final double time = 8.*60*60;
+//	private static final double timeOfDay = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -69,52 +69,49 @@ public class AccessibilityComputationNMBTest {
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile ;
-		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = utils.getOutputDirectory();
+		final String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
+		final String outputDirectory = utils.getOutputDirectory();
 //		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
-		
-		// Regular pt
-		String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
-		String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
-		String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
+		final String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
+		final String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
+		final String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
 
 		// Parameters
-		String crs = TransformationFactory.WGS84_SA_Albers;
-		String name = "za_nmb_" + cellSize.toString().split("\\.")[0];
+		final String crs = TransformationFactory.WGS84_SA_Albers;
+		final Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
+		final String name = "za_nmb_" + cellSize.toString().split("\\.")[0];
 		
-		//QGis
+		// QGis parameters
 		boolean createQGisOutput = true;
-		boolean includeDensityLayer = true;
-		Double lowerBound = -3.5;
-		Double upperBound = 3.5;
-		Integer range = 9; // in the current implementation, this must always be 9
-		int symbolSize = 510;
-		int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
-//		final BoundingBox boundingBox = BoundingBox.createBoundingBox(115000,-3718000,161000,-3679000);
-		Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
-
+		final boolean includeDensityLayer = true;
+		final Double lowerBound = -3.5; // (upperBound - lowerBound) is ideally easily divisible by 7
+		final Double upperBound = 3.5;
+		final Integer range = 9; // in the current implementation, this must always be 9
+		final int symbolSize = 510;
+		final int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
+		
 		// Config and scenario
-		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 		
-		// Switch computation on for all modes		
+		// Choose modes for accessibility computation
 		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
 		}
-
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
-
-		// Some (otherwise irrelevant) settings to make the vsp check happy:
+		
+		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
-
+		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		stratSets.setWeight(1.);
@@ -132,35 +129,31 @@ public class AccessibilityComputationNMBTest {
 		assertNotNull(config);
 		
 		// Collect activity types
-//		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
-//		log.warn( "found activity types: " + activityTypes );
+//		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+//		log.info("Found activity types: " + activityTypes);
+		final List<String> activityTypes = new ArrayList<>();
+		activityTypes.add("e");
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
-		List<String> activityTypes = new ArrayList<String>();
-		activityTypes.add("e");
 		
 		// Collect homes
-		String activityFacilityType = "h";
-		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+		String activityFacilityType = "h"; // "h" stands for homes in the given facility file
+		ActivityFacilities densityFacilities = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 		
 		// Controller
-		Controler controler = new Controler(scenario) ;
-	
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, homes, crs, name, cellSize));
+		final Controler controler = new Controler(scenario);
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, cellSize));
 		controler.addOverridingModule(new MatrixBasedPtModule());
-		
 		controler.run();
-
 		
+		// QGis
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
-			double[] mapViewExtent = {envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
-			
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

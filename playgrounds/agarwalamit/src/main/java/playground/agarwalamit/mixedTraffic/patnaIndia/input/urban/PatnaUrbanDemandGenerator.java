@@ -37,10 +37,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -76,15 +76,15 @@ public class PatnaUrbanDemandGenerator {
 	public static void main (String []args) {
 		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator();
 		pudg.startProcessing();
-		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/");
+		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/");
 	}
 
 	public void startProcessing() {
 		this.features = readZoneFilesAndReturnFeatures();
 
-		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt"; //Urban_PlanFile.CSV; // urban plans for all zones except 27 to 42.
+		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt"; //Urban_PlanFile.CSV; // urban plans for all zones except 27 to 42.
 		//		String planFile2 = PatnaUtils.INPUT_FILES_DIR+"/27TO42zones.CSV";// urban plans for zones 27 to 42
-		String planFile3 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";//"/Slum_PlanFile.CSV";	
+		String planFile3 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";//"/Slum_PlanFile.CSV";	
 
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -35,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.gbl.Gbl;
@@ -154,7 +154,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private double usedBufferStorageCapacity = 0.0 ;
 	private double remainingHolesStorageCapacity = 0.0 ;
 
-	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
+	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
 
 	private double freespeedTravelTime = Double.NaN;
 	/** the last time-step the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
@@ -189,6 +189,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final NetsimEngineContext context;
 
 	private double lastUpdate = Double.NEGATIVE_INFINITY ;
+	
+	private double maxFlowFromFdiag = Double.POSITIVE_INFINITY ;
+
+	private double accumulatedInflowCap = 1. ;
 
 	private QueueWithBuffer(AbstractQLink qlink,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context, 
@@ -328,6 +332,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
 			}
 		}
+		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
+			this.accumulatedInflowCap += this.maxFlowFromFdiag ;
+			if ( this.accumulatedInflowCap > Math.ceil( this.maxFlowFromFdiag ) ) {
+				this.accumulatedInflowCap = Math.ceil( this.maxFlowFromFdiag ) ;
+			}
+		}
 	}
 
 	private void calculateFlowCapacity() {
@@ -336,6 +346,16 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
+		
+		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.maxflowFromFdiag ) {
+			// uncongested branch: q = vmax * rho
+			// congested branch: q = vhole * (rhojam - rho)
+			// equal: rho * (vmax + vhole) = vhole * rhojam
+			// rho(qmax) = vhole * rhojam / (vmax + vhole) 
+			// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
+			this.maxFlowFromFdiag = (1/7.5) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
+			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
+		}
 	}
 
 	private void calculateStorageCapacity() {
@@ -464,7 +484,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			addToBuffer(veh);
 			removeVehicleFromQueue(veh);
-			if(context.qsimConfig.isRestrictingSeepage() && context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ && veh.getDriver().getMode().equals(context.qsimConfig.getSeepMode())) {
+			if(context.qsimConfig.isRestrictingSeepage() 
+					&& context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
+					&& context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 				noOfSeepModeBringFwd++;
 			}
 		} // end while
@@ -481,7 +503,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if(context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
 				&& context.qsimConfig.isSeepModeStorageFree() 
-				&& veh.getVehicle().getType().getId().toString().equals(context.qsimConfig.getSeepMode()) ){
+				&& context.qsimConfig.getSeepModes().contains(veh.getVehicle().getType().getId().toString()) ){
 			// do nothing
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -551,28 +573,25 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	 final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
-		if ( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) ) {
+		if ( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) 
+				&& context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
 			return storageOk ;
 		}
-		// (continue only if HOLES)
+		// (continue only if HOLES and/or inflow constraing)
 
-//		if ( !storageOk ) { 
-//			// this is not necessary and only next statement is sufficient.
-//			return false ;
-//		}
-		// at this point, storage is ok, so start checking holes:
 		if ( remainingHolesStorageCapacity <=0 ) { 
-			// no holes available at all; in theory, this should not happen since covered by !storageOk (but that is commented out now)
-
-			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		} 
-		return true ;
-		
 		// remainingHolesStorageCapacity is:
 		// * initialized at linkStorageCapacity
 		// * reduced by entering vehicles
 		// * increased by holes arriving at upstream end of link
+		
+		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
+			return true ;
+		}
+		return this.accumulatedInflowCap >= 1. ; // can maximally be 1.
+		
 	}
 
 	private void recalcTimeVariantAttributes() {
@@ -711,7 +730,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// activate link since there is now action on it:
 		qLink.activateLink();
 
-		if(context.qsimConfig.isSeepModeStorageFree() && veh.getVehicle().getType().getId().toString().equals(context.qsimConfig.getSeepMode()) ){
+		if(context.qsimConfig.isSeepModeStorageFree() && context.qsimConfig.getSeepModes().contains( veh.getVehicle().getType().getId().toString() ) ){
 			// do nothing
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
@@ -737,6 +756,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
 			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
+		}
+		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
+			this.accumulatedInflowCap -= veh.getSizeInEquivalents() ;
 		}
 	}
 
@@ -886,7 +908,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			while(it.hasNext()){
 				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals( context.qsimConfig.getSeepMode() ) ) {
+				if( veh.getEarliestLinkExitTime()<=now && context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 					returnVeh = veh;
 					break;
 				}

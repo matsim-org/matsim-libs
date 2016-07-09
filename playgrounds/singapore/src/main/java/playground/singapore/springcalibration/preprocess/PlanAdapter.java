@@ -7,9 +7,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -27,7 +27,7 @@ public class PlanAdapter {
 	
 	public void run(String inputFile, String outFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(inputFile);
+		new PopulationReader(scenario).readFile(inputFile);
 		
 		this.adapt(scenario.getPopulation());
 		this.writePlans(scenario.getPopulation(), outFile);

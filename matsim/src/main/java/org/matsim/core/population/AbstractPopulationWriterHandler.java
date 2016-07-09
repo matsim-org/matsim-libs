@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Route;
  * @author mrieser
  * @author balmermi
  */
-public abstract class AbstractPopulationWriterHandler implements PopulationWriterHandler {
+abstract class AbstractPopulationWriterHandler implements PopulationWriterHandler {
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(AbstractPopulationWriterHandler.class);
@@ -41,8 +41,8 @@ public abstract class AbstractPopulationWriterHandler implements PopulationWrite
 	@Override
 	public final void writePerson(final Person person, final BufferedWriter writer) throws IOException {
 		this.startPerson(person, writer);
-		if (person instanceof Person) {
-			Person p = (Person)person;
+		if (person != null) {
+			Person p = person;
 			// travelcards
 			if (PersonUtils.getTravelcards(p) != null) {
 				for (String t : PersonUtils.getTravelcards(p)) {

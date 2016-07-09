@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonNoEducLessLeisure extends AbstractPersonAlgorithm {
 

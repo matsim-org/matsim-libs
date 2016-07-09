@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework;
 
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * If this proves to be useful, we could think of putting this in org.matsim.core.router.*

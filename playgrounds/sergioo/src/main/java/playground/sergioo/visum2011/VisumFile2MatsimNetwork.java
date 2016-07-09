@@ -174,7 +174,7 @@ public class VisumFile2MatsimNetwork {
 		String line = reader.readLine();
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
-			NodeImpl node=new NodeImpl(Id.createNodeId(parts[columnsIndices[0]]));
+			NodeImpl node=NetworkUtils.createNode(Id.createNodeId(parts[columnsIndices[0]]));
 			node.setCoord(new Coord(Double.parseDouble(parts[columnsIndices[1]]), Double.parseDouble(parts[columnsIndices[2]])));
 			network.addNode(node);
 			line=reader.readLine();
@@ -190,7 +190,7 @@ public class VisumFile2MatsimNetwork {
 		String line = reader.readLine();
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
-			NodeImpl node=new NodeImpl(Id.createNodeId(parts[columnsIndices[0]]));
+			NodeImpl node=NetworkUtils.createNode(Id.createNodeId(parts[columnsIndices[0]]));
 			node.setCoord(new Coord(Double.parseDouble(parts[columnsIndices[1]]), Double.parseDouble(parts[columnsIndices[2]])));
 			Id<Node> repeated = null;
 			for(Id<Node> idB:nodesRep.keySet())

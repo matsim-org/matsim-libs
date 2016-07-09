@@ -29,20 +29,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
@@ -168,7 +168,7 @@ public class ExternalModule implements PlanStrategyModule {
 
 	private void importPopulationAndMutatePlans() {
 		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader plansReader = new MatsimPopulationReader(dummyScenario);
+		MatsimPopulationReader plansReader = new PopulationReader(dummyScenario);
 		Population plans = dummyScenario.getPopulation();
 		plansReader.readFile(this.outFileRoot + this.modulePrefix + ExternalOutFileName);
 		new UpdatePlansAlgo().run(plans);

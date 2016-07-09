@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -39,7 +40,7 @@ public class VisualizationUtils {
 	private VisualizationUtils(){} // do not instantiate
 
 	
-	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
+	public static void createQGisOutput(String actType, Modes4Accessibility mode, Envelope envelope,
 			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
 			Double upperBound, Integer range, int symbolSize, int populationThreshold) {
 		
@@ -49,7 +50,7 @@ public class VisualizationUtils {
 		// Write QGis project file
 		QGisWriter writer = new QGisWriter(crs, workingDirectory);
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
-		writer.setExtent(mapViewExtent);
+		writer.setEnvelope(envelope);
 
 		// osm raster layer
 		// working directory needs to be the storage location of the file

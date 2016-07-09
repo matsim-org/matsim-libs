@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -95,7 +95,7 @@ public class FullyExploredPlansProvider {
 
 			log.info( "read plans from "+paths.plansFilePath );
 			final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-			new MatsimPopulationReader( scenario ).readFile( paths.plansFilePath );
+			new PopulationReader( scenario ).readFile( paths.plansFilePath );
 
 			log.info( "read joint plans from "+paths.jointPlansFilePath );
 			new JointPlansXmlReader( scenario ).parse( paths.jointPlansFilePath );

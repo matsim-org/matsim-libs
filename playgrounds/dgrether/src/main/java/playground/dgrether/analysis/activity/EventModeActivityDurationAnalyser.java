@@ -41,7 +41,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
@@ -92,7 +92,7 @@ public class EventModeActivityDurationAnalyser {
 		reader.readFile(NETWORK);
 
 		Population plans = scenario.getPopulation();
-		MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
+		PopulationReader plansParser = new PopulationReader(scenario);
 		plansParser.readFile(PLANSFILE);
 
 		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();

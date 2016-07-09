@@ -39,7 +39,7 @@ import org.xml.sax.Attributes;
  * 
  * @author cdobler
  */
- class ParallelPopulationReaderMatsimV4Runner extends PopulationReaderMatsimV4 implements Runnable {
+/* deliberately package */  class ParallelPopulationReaderMatsimV4Runner extends PopulationReaderMatsimV4 implements Runnable {
 	
 	private final BlockingQueue<List<Tag>> queue;
 	

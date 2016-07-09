@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -51,7 +51,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
- class PopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader {
+/* deliberately package */ class PopulationReaderMatsimV5 extends MatsimXmlParser implements MatsimPopulationReader {
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";
@@ -342,13 +342,10 @@ import org.xml.sax.Attributes;
 			}
 		}
 		
-		RouteFactoriesRegister factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactoriesRegister();
+		RouteFactories factory = this.scenario.getPopulation().getFactory().getRouteFactories();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
 		
-		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
-				routeClass, 
-				startLinkId == null ? null : Id.create(startLinkId, Link.class), 
-						endLinkId == null ? null : Id.create(endLinkId, Link.class));
+		this.currRoute = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(routeClass, startLinkId == null ? null : Id.create(startLinkId, Link.class), endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("trav_time") != null) {

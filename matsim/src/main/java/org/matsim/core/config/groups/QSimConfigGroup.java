@@ -107,19 +107,17 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 
 	// ---
 	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
-	/**
-	 * See Javadoc of {@link QueueWithBuffer}
-	 */
 	private boolean usingFastCapacityUpdate = false ;
 	// ---
 	private static final String VEHICLES_SOURCE = "vehiclesSource";
-	public static enum VehiclesSource { defaultVehicle, modeVehicleTypesFromVehiclesData, fromVehiclesData} ;
+	public enum VehiclesSource { defaultVehicle, modeVehicleTypesFromVehiclesData, fromVehiclesData} ;
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
 	private static final String SEEP_MODE = "seepMode";
 	private static final String IS_SEEP_MODE_STORAGE_FREE = "isSeepModeStorageFree";
 	private static final String IS_RESTRICTING_SEEPAGE = "isRestrictingSeepage";
-	private String seepMode = "bike";
+	
+	private Collection<String> seepModes = Arrays.asList(TransportMode.bike);;
 	private boolean isSeepModeStorageFree = false;
 	private boolean isRestrictingSeepage = true;
 
@@ -538,13 +536,11 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	}
 
 	// ---
-	@StringGetter(SEEP_MODE)
-	public String getSeepMode() {
-		return seepMode;
+	public Collection<String> getSeepModes() {
+		return seepModes;
 	}
-	@StringSetter(SEEP_MODE)
-	public void setSeepMode(String seepMode) {
-		this.seepMode = seepMode;
+	public void setSeepModes(Collection<String> seepModes) {
+		this.seepModes = seepModes;
 	}
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
@@ -569,5 +565,14 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	}
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
 		return this.usingTravelTimeCheckInTeleportation = val ;
+	}
+	// ---
+	public static enum InflowConstraint { none, maxflowFromFdiag } ;
+	private InflowConstraint inflowConstraint = InflowConstraint.none ;
+	public InflowConstraint getInflowConstraint() {
+		return this.inflowConstraint ;
+	}
+	public void setInflowConstraint( InflowConstraint inflowConstraint ) {
+		this.inflowConstraint = inflowConstraint ;
 	}
 }

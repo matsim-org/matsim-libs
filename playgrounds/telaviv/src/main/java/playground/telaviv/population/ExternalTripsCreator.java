@@ -20,6 +20,10 @@
 
 package playground.telaviv.population;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,21 +33,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.telaviv.config.TelAvivConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import playground.telaviv.config.TelAvivConfig;
 
 public class ExternalTripsCreator {
 
@@ -133,7 +134,7 @@ public class ExternalTripsCreator {
 		counter.printCounter();
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).writeFileV4(outPlansFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).writeV4(outPlansFile);
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(this.outAttributesFile);
 		log.info("done.");
 	}

@@ -27,7 +27,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
@@ -66,7 +66,7 @@ public class GenerateHeadsToChildrenSocialNetwork {
 		final String socialNetworkFile = argParser.getValue( "-o" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( sc ).readFile( plansFile );
+		new PopulationReader( sc ).readFile( plansFile );
 
 		final Households households = new HouseholdsImpl();
 		new HouseholdsReaderV10( households ).readFile( householdFile );

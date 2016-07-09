@@ -23,6 +23,7 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.tools.CsvTools;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -32,8 +33,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
- * Generates a histogram for all child stop facilities
- * of a schedule
+ * Generates a histogram for number of child stop
+ * facilities per parent stop of a schedule
  *
  * @author polettif
  */
@@ -44,8 +45,8 @@ public class StopFacilityHistogram {
 	private double[] hist;
 	private double[] histNr;
 
-	private static final String SUFFIX_PATTERN = "[.]link:";
-	private static final String SUFFIX = ".link:";
+	private static final String SUFFIX_PATTERN = PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES_REGEX;
+	private static final String SUFFIX = PublicTransitMappingStrings.SUFFIX_CHILD_STOP_FACILITIES;
 
 	/**
 	 * @param args [0] schedule file, [1] output file (csv or png), [2] output file (csv or png, optional)
@@ -132,7 +133,7 @@ public class StopFacilityHistogram {
 		}
 
 		try {
-			CsvTools.writeToFile(CsvTools.convertToCsvLines(stopStatCsv), outputFile);
+			CsvTools.writeToFile(CsvTools.convertToCsvLines(stopStatCsv, ';'), outputFile);
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

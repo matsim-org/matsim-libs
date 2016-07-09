@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -62,7 +62,7 @@ public class TransformSiouxfallsPopulation {
 		final String outputFacilities = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( sc ).readFile( inputPopulation );
+		new PopulationReader( sc ).readFile( inputPopulation );
 
 		final Map<Id<ActivityFacility>, Coord> homes = new LinkedHashMap<>();
 		final Map<Id<ActivityFacility>, Coord> leisures = new LinkedHashMap<>();

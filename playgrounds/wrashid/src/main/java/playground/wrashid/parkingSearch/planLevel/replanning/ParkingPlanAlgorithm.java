@@ -28,9 +28,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;

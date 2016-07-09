@@ -1,15 +1,10 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
-import org.matsim.api.core.v01.Scenario;
+import com.vividsolutions.jts.geom.Envelope;
+
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.SimpleNetworkRenderer;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class MainForQGisWriter {
@@ -25,7 +20,7 @@ public class MainForQGisWriter {
 		
 		// use case 1: nodes
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
-//		writer.setExtent(extent);
+//		writer.setEnvelope(extent);
 //		VectorLayer nodesLayer = new VectorLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point,false);
 //		new SimpleNetworkRenderer(nodesLayer);
 //		writer.addLayer(nodesLayer);
@@ -34,7 +29,7 @@ public class MainForQGisWriter {
 		
 //		// use case 2: links
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
-//		writer.setExtent(extent);
+//		writer.setEnvelope(extent);
 //		VectorLayer linksLayer = new VectorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line,false);
 //		new SimpleNetworkRenderer(linksLayer);
 //		writer.addLayer(linksLayer);
@@ -43,7 +38,7 @@ public class MainForQGisWriter {
 		
 		// use case 3: noise
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
-//		writer.setExtent(extent);
+//		writer.setEnvelope(extent);
 //		
 //		VectorLayer networkLayer = new VectorLayer("network", workingDirectory + "testFiles/network_detail/network.shp", QGisConstants.geometryType.Line);
 //		new SimpleNetworkRenderer(networkLayer);
@@ -69,7 +64,7 @@ public class MainForQGisWriter {
 // ################################################################################################################################################
 		
 		//use case 4: accessibility
-		double[] extent = {2790381,-4035858, 2891991,-3975105};
+		Envelope envelope = new Envelope(2790381,-4035858, 2891991,-3975105);
 		Double lowerBound = 1.75;
 		Double upperBound = 7.;
 		Integer range = 9;
@@ -77,7 +72,7 @@ public class MainForQGisWriter {
 		int cellSize = 1000;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
-		writer.setExtent(extent);
+		writer.setEnvelope(envelope);
 		
 		//example for adding a raster layer
 		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
@@ -109,7 +104,7 @@ public class MainForQGisWriter {
 // ################################################################################################################################################
 		
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
-//		writer.setExtent(extent);
+//		writer.setEnvelope(extent);
 //		
 //		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
 //				QGisConstants.geometryType.Point,true);

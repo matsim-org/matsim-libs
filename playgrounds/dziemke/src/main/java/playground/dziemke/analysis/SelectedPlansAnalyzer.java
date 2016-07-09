@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -49,7 +49,7 @@ public class SelectedPlansAnalyzer {
 				
 				Config config = ConfigUtils.createConfig();
 				Scenario scenario = ScenarioUtils.createScenario(config);
-				MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+				PopulationReader reader = new PopulationReader(scenario);
 				reader.readFile(plansFile);
 				Population population = scenario.getPopulation();
 	
@@ -63,7 +63,7 @@ public class SelectedPlansAnalyzer {
 			
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
-			MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+			PopulationReader reader = new PopulationReader(scenario);
 			reader.readFile(plansFileOutput);
 			Population population = scenario.getPopulation();
 	

@@ -55,7 +55,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -673,7 +672,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	private void setPopulation1(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -729,7 +728,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	private void setPopulation4(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -788,7 +787,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	private void setPopulation5(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -847,7 +846,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	private void setPopulation6(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);

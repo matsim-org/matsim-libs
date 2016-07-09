@@ -18,6 +18,9 @@
 
 package playground.polettif.publicTransitMapping.osm.lib;
 
+/**
+ * OSM values used by the converters
+ */
 public class OsmValue {
 
 	public static final String STOP = "stop";

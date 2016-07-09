@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -59,19 +61,58 @@ import java.util.*;
  *
  * @author polettif
  */
-public class PTMapperImpl extends PTMapper {
+public class PTMapperImpl implements PTMapper {
+
+	protected static Logger log = Logger.getLogger(RunPublicTransitMapper.class);
+
+	private PublicTransitMappingConfigGroup config;
+	private Network network;
+	private TransitSchedule schedule;
+
 
 	private final Map<String, Router> modeSeparatedRouters = new HashMap<>();
 	private final PseudoSchedule pseudoSchedule = new PseudoScheduleImpl();
 
-	public PTMapperImpl(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
-		super(config, schedule, network);
-	}
-
+	/**
+	 * Loads the PublicTransitMapping config file. If paths to input files
+	 * (schedule and network) are provided in the config, mapping can be run
+	 * via {@link #run()}
+	 *
+	 * @param configPath the config file
+	 */
 	public PTMapperImpl(String configPath) {
-		super(configPath);
+		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup());
+		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
+		this.schedule = config.getScheduleFile() == null ? null : ScheduleTools.readTransitSchedule(config.getScheduleFile());
+		this.network = config.getNetworkFile() == null ? null : NetworkTools.readNetwork(config.getNetworkFile());
 	}
 
+	/**
+	 * Use this constructor if you just want to use the config for mapping parameters.
+	 * The provided schedule is expected to contain the stops sequence and
+	 * the stop facilities each transit route. The routes will be newly routed,
+	 * any former routes will be overwritten. Changes are done on the schedule
+	 * network provided here.
+	 * <p/>
+	 *
+	 * @param config a PublicTransitMapping config that defines all parameters used
+	 *               for mapping.
+	 * @param schedule which will be newly routed.
+	 * @param network schedule is mapped to this network, is modified
+	 */
+	public PTMapperImpl(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
+		this.config = config;
+		this.schedule = schedule;
+		this.network = network;
+	}
+
+
+	/**
+	 * Reads the schedule and network file specified in the PublicTransitMapping
+	 * config and maps the schedule to the network. Writes the output files as
+	 * well if defined in config. The mapping parameters defined in the config
+	 * are used.
+	 */
 	@Override
 	public void run() {
 		if(schedule == null) {
@@ -366,6 +407,38 @@ public class PTMapperImpl extends PTMapper {
 		log.info("    Run PlausibilityCheck for further analysis");
 		log.info("");
 		log.info("==================================================");
+	}
+
+	@Override
+	public void setConfig(Config config) {
+		this.config = ConfigUtils.addOrGetModule(config, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
+	}
+
+	@Override
+	public void setSchedule(TransitSchedule schedule) {
+		this.schedule = schedule;
+	}
+
+	@Override
+	public void setNetwork(Network network) {
+		this.network = network;
+	}
+
+	@Override
+	public Config getConfig() {
+		Config configAll = ConfigUtils.createConfig();
+		configAll.addModule(config);
+		return configAll;
+	}
+
+	@Override
+	public TransitSchedule getSchedule() {
+		return schedule;
+	}
+
+	@Override
+	public Network getNetwork() {
+		return network;
 	}
 
 	private static void setLogLevels() {

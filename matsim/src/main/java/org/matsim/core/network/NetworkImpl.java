@@ -429,7 +429,7 @@ public final class NetworkImpl implements Network {
 
 	public Node createAndAddNode(final Id<Node> id, final Coord coord, final String nodeType) {
 		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
-		n.setType(nodeType);
+		NetworkUtils.setType(n,nodeType);
 		return n;
 	}
 

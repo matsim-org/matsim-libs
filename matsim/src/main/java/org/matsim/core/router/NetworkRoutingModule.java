@@ -122,7 +122,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			// (a "true" route)
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 			route.setTravelCost(path.travelCost);
@@ -132,7 +132,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.populationFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);

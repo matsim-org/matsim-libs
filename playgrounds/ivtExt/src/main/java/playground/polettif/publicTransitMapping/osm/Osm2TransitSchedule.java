@@ -35,8 +35,9 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 import java.util.*;
 
 /**
- * Convert available public transit data from OSM to a MATSim Transit Schedule (stop facilities,
- * transitRoutes and routeProfiles). Creates an unmapped schedule with missing departures.
+ * Creates an unmapped MATSim transit schedule from OSM. Converts
+ * available public transit data from OSM to a schedule: stop facilities,
+ * transitRoutes and routeProfiles. Departures and link sequences are missing.
  *
  * @author polettif
  */

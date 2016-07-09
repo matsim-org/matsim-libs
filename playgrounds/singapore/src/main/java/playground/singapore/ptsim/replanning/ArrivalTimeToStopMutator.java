@@ -26,16 +26,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
+ * Wraps the {@link org.matsim.core.population.algorithms.PlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser
- * @see org.matsim.population.algorithms.PlanMutateTimeAllocation
+ * @see org.matsim.core.population.algorithms.PlanMutateTimeAllocation
  */
 public class ArrivalTimeToStopMutator extends AbstractMultithreadedModule {
 

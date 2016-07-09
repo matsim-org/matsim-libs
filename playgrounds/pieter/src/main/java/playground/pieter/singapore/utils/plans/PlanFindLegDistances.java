@@ -15,10 +15,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoriesRegister;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -35,7 +35,7 @@ class PlanFindLegDistances {
 	private final MutableScenario scenario;
 	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
 	private final NetworkImpl network;
-	private final RouteFactoriesRegister routeFactory;
+	private final RouteFactories routeFactory;
 	private final DataBaseAdmin dba;
 	private final FastAStarLandmarks leastCostPathCalculator;
 
@@ -71,8 +71,8 @@ class PlanFindLegDistances {
 		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(network, travelMinCost);
 		leastCostPathCalculator = (FastAStarLandmarks) routerFactory.createPathCalculator(network, travelMinCost, timeFunction);
 		this.dba = dba;
-		routeFactory = ((PopulationFactoryImpl) scenario.getPopulation()
-				.getFactory()).getRouteFactoriesRegister();
+		routeFactory = ((PopulationFactory) scenario.getPopulation()
+				.getFactory()).getRouteFactories();
 	}
 
 	public double getShortestPathDistance(Coord startCoord, Coord endCoord) {

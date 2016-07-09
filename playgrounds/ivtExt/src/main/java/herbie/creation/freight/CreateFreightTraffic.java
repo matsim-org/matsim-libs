@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -366,7 +367,7 @@ public class CreateFreightTraffic {
 		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
+		PopulationReader populationReader = new PopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		
 //		ActTypeConverter actTypeConverter = new ActTypeConverter(false);

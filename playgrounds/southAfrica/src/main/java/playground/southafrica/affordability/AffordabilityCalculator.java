@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,7 +64,7 @@ public class AffordabilityCalculator {
 		/* Read population */
 		String populationFile = args[1];
 		sc.getTransitSchedule();
-		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
+		PopulationReader mpr = new PopulationReader(sc);
 		mpr.readFile(populationFile);
 		LOG.info("Number of persons: " + sc.getPopulation().getPersons().size());
 		
