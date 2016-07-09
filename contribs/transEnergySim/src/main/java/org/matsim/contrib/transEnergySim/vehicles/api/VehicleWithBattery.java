@@ -48,8 +48,10 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	 * state of charge
 	 */
 	protected double socInJoules;
+	protected double electricEnegyConsumedInJoules = 0.0, conventionalEnergyConsumedInJoules = 0.0;
 
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
+	private EnergyConsumptionModel hybridDriveEnergyConsumptionModel;
 	protected Id<Vehicle> vehicleId;
 	private boolean isBEV = true; //TODO set this based on vehicle type
 	private Double maxDischargingPowerInKW, maxLevel2ChargingPowerInKW, maxLevel3ChargingPowerInKW;
@@ -72,6 +74,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 
 	public void useBattery(double energyConsumptionInJoule) {
 		socInJoules -= energyConsumptionInJoule;
+		electricEnegyConsumedInJoules += energyConsumptionInJoule;
 	}
 
 	/**
@@ -124,15 +127,12 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		}
 		return 0.0;
 	}
-
 	public double getRemainingRangeInMeters() {
 		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
 	}
-
 	public boolean isBEV() {
 		return this.isBEV;
 	}
-
 	public void setChargingFields(String vehicleTypeName, Double maxDischargingPowerInKW,
 			Double maxLevel2ChargingPowerInKW, Double maxLevel3ChargingPowerInKW, HashSet<ChargingPlugType> compatiblePlugTypes) {
 		this.maxDischargingPowerInKW = maxDischargingPowerInKW;
@@ -146,6 +146,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	}
 
 	public void setMaxDischargingPowerInKW(Double maxDischargingPowerInKW) {
+		this.maxDischargingPowerInKW = maxDischargingPowerInKW;
 	}
 
 	public Double getMaxLevel2ChargingPowerInKW() {
@@ -173,6 +174,27 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	}
 	public VehicleAgent getVehicleAgent(){
 		return this.agent;
+	}
+	public EnergyConsumptionModel getElectricDriveEnergyConsumptionModel() {
+		return electricDriveEnergyConsumptionModel;
+	}
+
+	public void setElectricDriveEnergyConsumptionModel(
+			EnergyConsumptionModel electricDriveEnergyConsumptionModel) {
+		this.electricDriveEnergyConsumptionModel = electricDriveEnergyConsumptionModel;
+	}
+
+	public EnergyConsumptionModel getHybridDriveEnergyConsumptionModel() {
+		return hybridDriveEnergyConsumptionModel;
+	}
+
+	public void setHybridDriveEnergyConsumptionModel(
+			EnergyConsumptionModel hybridDriveEnergyConsumptionModel) {
+		this.hybridDriveEnergyConsumptionModel = hybridDriveEnergyConsumptionModel;
+	}
+
+	public void useHybridFuel(double hybridEnergyConsumed) {
+		this.conventionalEnergyConsumedInJoules += hybridEnergyConsumed;
 	}
 
 }
