@@ -61,7 +61,7 @@ public class RunTaxiScenarioTestIT
 
         TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
         Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new OTFVisConfigGroup());
-        config.plans().setInputFile(dir + plansFile);
+        config.plans().setInputFile(plansFile);
         taxiCfg.setTaxisFile(dir + taxisFile);
         RunTaxiScenario.createControler(config, false).run();
     }
