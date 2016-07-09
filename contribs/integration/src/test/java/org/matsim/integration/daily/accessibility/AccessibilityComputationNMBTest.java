@@ -35,6 +35,7 @@ import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -70,8 +71,8 @@ public class AccessibilityComputationNMBTest {
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile ;
 		final String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
-		final String outputDirectory = utils.getOutputDirectory();
-//		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
+//		final String outputDirectory = utils.getOutputDirectory();
+		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
 		final String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
 		final String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 		final String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
@@ -128,6 +129,10 @@ public class AccessibilityComputationNMBTest {
 
 		assertNotNull(config);
 		
+		// Network bounds
+		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
+		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
+		
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 //		log.info("Found activity types: " + activityTypes);
@@ -142,7 +147,7 @@ public class AccessibilityComputationNMBTest {
 		
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
 		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
