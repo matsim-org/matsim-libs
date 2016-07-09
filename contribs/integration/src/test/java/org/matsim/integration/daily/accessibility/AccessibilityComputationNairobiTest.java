@@ -83,9 +83,9 @@ public class AccessibilityComputationNairobiTest {
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
-		final boolean includeDensityLayer = true;
-		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
-		final Double upperBound = 3.5;
+		final boolean includeDensityLayer = false;
+		final Double lowerBound = -7.; // (upperBound - lowerBound) is ideally easily divisible by 7
+		final Double upperBound = 0.0;
 		final Integer range = 9; // in the current implementation, this must always be 9
 		final int symbolSize = 510;
 		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
