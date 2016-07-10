@@ -172,34 +172,12 @@ public final class AccessibilityCalculator {
 
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
-			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
-
-			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
-			double VjkWalkPowerTravelTime=0.; // this.betaWalkTTPower * (walkTravelTime_h * walkTravelTime_h);
-			double VjkWalkLnTravelTime	= 0.; // this.betaWalkLnTT * Math.log(walkTravelTime_h);
-
+			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
 			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-			double VjkWalkPowerDistnace	= 0.; //this.betaWalkTDPower * (distance_meter * distance_meter);
-			double VjkWalkLnDistance 	= 0.; //this.betaWalkLnTD * Math.log(distance_meter);
 
-			double VjkWalkMoney			= this.betaWalkTMC * 0.; 			// no monetary costs for walking
-			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
-			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 	// no monetary costs for walking
+			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
 
-			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
-					VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
-					VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
 			// add Vjk to sum
-//			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
-//				AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() );
-//				jco.addObject( opportunity.getId(), expVjk);
-//			} else {
-//				// assign Vjk to given network node
-//				opportunityClusterMap.put(
-//						nearestNode.getId(),
-//						new AggregationObject(opportunity.getId(), null, null, nearestNode, expVjk) 
-//						);
-//			}
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
 			if ( jco == null ) {
 				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
@@ -211,6 +189,7 @@ public final class AccessibilityCalculator {
 				log.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
+			
 			// yyyy if we knew the activity type, we could to do capacities as follows:
 //			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
 //			Assert.assertNotNull(opt);
