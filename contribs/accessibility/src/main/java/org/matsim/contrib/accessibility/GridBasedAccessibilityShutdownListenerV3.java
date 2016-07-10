@@ -231,7 +231,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				scenario.getConfig(),
 				AccessibilityConfigGroup.GROUP_NAME,
 				AccessibilityConfigGroup.class);
-		accessibilityCalculator.computeAccessibilities(scenario, moduleAPCM.getTimeOfDay(), opportunities);
+		accessibilityCalculator.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
 		
 		//
 		// do calculation of aggregate index values, e.g. gini coefficient

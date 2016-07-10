@@ -207,7 +207,7 @@ public final class AccessibilityCalculator {
 	}
 
 	
-	public final void computeAccessibilities( Scenario scenario, Double departureTime , ActivityFacilities opportunities) {
+	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);

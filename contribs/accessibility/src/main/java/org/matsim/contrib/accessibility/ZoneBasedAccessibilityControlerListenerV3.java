@@ -117,7 +117,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 						AccessibilityConfigGroup.class);
 
 
-		delegate.computeAccessibilities(controler.getScenario(), moduleAPCM.getTimeOfDay(), opportunities);
+		delegate.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
 	}
 
 	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
