@@ -87,8 +87,8 @@ public final class AccessibilityCalculator {
 
 	@Inject
 	public
-	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
-		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+		config = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 
@@ -105,7 +105,7 @@ public final class AccessibilityCalculator {
 			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 
-		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
+		useRawSum = config.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
@@ -115,7 +115,6 @@ public final class AccessibilityCalculator {
 		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 
 		this.scenario = scenario;
-		this.config = config;
 		calculators.put(
 				Modes4Accessibility.car,
 				new NetworkModeAccessibilityContributionCalculator(

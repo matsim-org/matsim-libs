@@ -9,7 +9,6 @@ import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -51,7 +50,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 				if (cellSize <= 0) {
 					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 				}
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 				accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize));
 				GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType), 
 						ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
