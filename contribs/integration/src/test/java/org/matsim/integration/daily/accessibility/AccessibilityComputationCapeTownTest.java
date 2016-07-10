@@ -128,6 +128,10 @@ public class AccessibilityComputationCapeTownTest {
 
 		assertNotNull(config);
 		
+		// Network bounds
+		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
+		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
+		
 		// Envelope by network
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 		Envelope envelope = new Envelope(boundingBox.getXMin(), boundingBox.getXMax(),
@@ -147,7 +151,7 @@ public class AccessibilityComputationCapeTownTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
 		controler.run();
 		
 		// QGis
