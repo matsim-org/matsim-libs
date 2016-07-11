@@ -37,16 +37,16 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  * @author amit
  */
 
-public class PatnaUrbanCountsGenerator {
+public class UrbanCountsGenerator {
 	
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo = new HashMap<>();
 	
 	public static void main(String[] args) {
 	
-		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/innerCordon_excl_rckw_shpNetwork.txt";
-		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/urbanCounts_excl_rckw_shpNetwork.xml.gz";
+		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
+		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE+"/urbanCounts_excl_rckw_incl_truck.xml.gz";
 		
-		PatnaUrbanCountsGenerator pcg = new PatnaUrbanCountsGenerator();
+		UrbanCountsGenerator pcg = new UrbanCountsGenerator();
 		pcg.readFileAndStoreCountInfo(innerCordonFile);
 		pcg.writeCountsDataToFile(outCountsFile);
 	}
@@ -56,7 +56,7 @@ public class PatnaUrbanCountsGenerator {
 		Counts<Link> counts = new Counts<Link>();
 		counts.setYear(2008);
 		counts.setName("Patna_counts");
-		counts.setDescription("OnlyUrbanCountsCarMotorbikeBike");
+		counts.setDescription("OnlyUrbanCountsCarMotorbikeBikeTruck");
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo.get(mcs).keySet()){
@@ -80,7 +80,8 @@ public class PatnaUrbanCountsGenerator {
  				String surveyLocation = parts[0];
  				Id<Link> linkId = Id.createLinkId( parts[1] );
  				Integer time = Integer.valueOf(parts[2]);
- 				Double count = Double.valueOf(parts[3]);
+// 				Double count = Double.valueOf(parts[3]); // if only total counts,
+ 				Double count = Double.valueOf(parts[7]); // it car, motorbike, bike, truck and total counts are in input counts
  				Tuple<Id<Link>,String> myCountStationInfo = new Tuple<>( linkId, surveyLocation);
  				if(countStation2time2countInfo.containsKey(myCountStationInfo)){
  					Map<Integer, Double> time2count = countStation2time2countInfo.get(myCountStationInfo);

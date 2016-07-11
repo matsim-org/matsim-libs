@@ -56,25 +56,25 @@ import playground.agarwalamit.utils.GeometryUtils;
  * The number of trips from trip diaries are 2% (not 1%).
  * @author amit
  */
-public class PatnaUrbanDemandGenerator {
+public class UrbanDemandGenerator {
 
-	private static final Logger LOG = Logger.getLogger(PatnaUrbanDemandGenerator.class);
+	private static final Logger LOG = Logger.getLogger(UrbanDemandGenerator.class);
 	private static final Random RAND = MatsimRandom.getLocalInstance();
 
 	private Scenario scenario;
 	private Collection<SimpleFeature> features ;
 	private final int cloningFactor ;
 
-	public PatnaUrbanDemandGenerator() {
+	public UrbanDemandGenerator() {
 		this(1);
 	}
 
-	public PatnaUrbanDemandGenerator(final int cloningFactor) {
+	public UrbanDemandGenerator(final int cloningFactor) {
 		this.cloningFactor = cloningFactor;
 	}
 
 	public static void main (String []args) {
-		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator();
+		UrbanDemandGenerator pudg = new UrbanDemandGenerator();
 		pudg.startProcessing();
 		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/");
 	}

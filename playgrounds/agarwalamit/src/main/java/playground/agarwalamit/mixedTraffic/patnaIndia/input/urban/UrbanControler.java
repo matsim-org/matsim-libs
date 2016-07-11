@@ -35,13 +35,13 @@ import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
  * @author amit
  */
 
-public class PatnaUrbanControler {
+public class UrbanControler {
 
 	private static final String INPUT_FILE_DIR = "../../../../repos/runs-svn/patnaIndia/run108/input/";
 	private static final String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/output/t3/";
 
 	public static void main(String[] args) {
-		PatnaUrbanConfigGenerator configGenerator = new PatnaUrbanConfigGenerator();
+		UrbanConfigGenerator configGenerator = new UrbanConfigGenerator();
 		configGenerator.createBasicConfigSettings();
 		Config config = configGenerator.getPatnaConfig();
 

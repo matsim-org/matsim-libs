@@ -35,7 +35,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.PatnaUrbanDemandGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -47,7 +47,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class PatnaJointDemandGenerator {
+public class JointDemandGenerator {
 
 	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/outerCordonOutput_10pct_OC1Excluded/output_plans.xml.gz"; // calibrated from cadyts.
 	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
@@ -57,7 +57,7 @@ public class PatnaJointDemandGenerator {
 	private static Scenario sc;
 	
 	public static void main(String[] args) {
-		PatnaJointDemandGenerator pjdg = new PatnaJointDemandGenerator();
+		JointDemandGenerator pjdg = new JointDemandGenerator();
 		pjdg.combinedPlans();
 		pjdg.createSubpopulationAttributes();
 		new PopulationWriter(sc.getPopulation()).write(JOINT_PLANS_10PCT);
@@ -100,7 +100,7 @@ public class PatnaJointDemandGenerator {
 	}
 
 	private Population getUrbanPlans() {
-		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator(CLONING_FACTOR);// 10% sample
+		UrbanDemandGenerator pudg = new UrbanDemandGenerator(CLONING_FACTOR);// 10% sample
 		pudg.startProcessing();
 		return pudg.getPopulation();
 	}

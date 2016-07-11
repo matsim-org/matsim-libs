@@ -12,13 +12,13 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
-public class PatnaUrbanConfigGenerator {
+public class UrbanConfigGenerator {
 
 	private Config config;
 
 	public static void main(String[] args) {
 		String outputConfig = "";
-		PatnaUrbanConfigGenerator configFile = new PatnaUrbanConfigGenerator();
+		UrbanConfigGenerator configFile = new UrbanConfigGenerator();
 		configFile.createBasicConfigSettings();
 		new ConfigWriter(configFile.getPatnaConfig()).write(outputConfig);
 	}

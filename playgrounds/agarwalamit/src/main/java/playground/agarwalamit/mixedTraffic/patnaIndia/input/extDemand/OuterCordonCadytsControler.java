@@ -66,7 +66,7 @@ import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListen
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.PatnaJointCalibrationControler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.JointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
@@ -75,7 +75,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
  * @author amit
  */
 
-public class PatnaCadytsControler {
+public class OuterCordonCadytsControler {
 
 	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonDemand_10pct.xml.gz";
 	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded/";
@@ -97,7 +97,7 @@ public class PatnaCadytsControler {
 			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
 
-		PatnaCadytsControler pcc = new PatnaCadytsControler();
+		OuterCordonCadytsControler pcc = new OuterCordonCadytsControler();
 		final Config config = pcc.getConfig();
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
@@ -157,7 +157,7 @@ public class PatnaCadytsControler {
 		int lastIt = controler.getConfig().controler().getLastIteration();
 		for (int index =firstIt+1; index <lastIt; index ++){
 			String dirToDel = outputDir+"/ITERS/it."+index;
-			Logger.getLogger(PatnaJointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
 			IOUtils.deleteDirectory(new File(dirToDel),false);
 		}
 	}

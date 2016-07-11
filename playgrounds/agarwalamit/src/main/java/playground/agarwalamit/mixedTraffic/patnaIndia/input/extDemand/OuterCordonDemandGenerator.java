@@ -55,14 +55,14 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class PatnaExternalDemandGenerator {
-	private static final Logger LOG = Logger.getLogger(PatnaExternalDemandGenerator.class);
+public class OuterCordonDemandGenerator {
+	private static final Logger LOG = Logger.getLogger(OuterCordonDemandGenerator.class);
 	private Scenario scenario;
 	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandInputFiles/";
 	private Random random = MatsimRandom.getRandom();
 	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz";
 	public static void main(String[] args) {
-		new PatnaExternalDemandGenerator().run();
+		new OuterCordonDemandGenerator().run();
 	}
 
 	private void run(){
