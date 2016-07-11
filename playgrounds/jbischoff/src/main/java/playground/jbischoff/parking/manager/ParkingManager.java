@@ -19,6 +19,8 @@
 
 package playground.jbischoff.parking.manager;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
@@ -33,6 +35,9 @@ public interface ParkingManager {
 	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);
 	boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
 	boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
+	
+	List<String> produceStatistics();
+	void reset(int iteration);
 	
 	
 }

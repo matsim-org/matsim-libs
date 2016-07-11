@@ -19,7 +19,9 @@
 
 package playground.jbischoff.parking.manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -43,11 +45,13 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 	Map<Id<Link>,MutableInt> occupation = new HashMap<>();
 	Map<Id<Vehicle>,Id<Link>> parkingPosition = new HashMap<>();
 	Random rand = MatsimRandom.getLocalInstance();
-	
+	int parkedVehicles = 0;
+	int unparkedVehicles = 0;
 	@Inject
 	public LinkLengthBasedParkingManagerWithRandomInitialUtilisation(Network network, Config config) {
 		 double assumedParkedVehicleLength = 4.0; 
 		 double shareOfLinkLengthUsedForParking = 0.7;
+		 
 		 //TODO: Make this configurable
 		for (Link link : network.getLinks().values()){
 			int maxCapacity = (int) (link.getLength()*shareOfLinkLengthUsedForParking / assumedParkedVehicleLength);
@@ -74,6 +78,7 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 		if (this.occupation.get(linkId).intValue()<this.capacity.get(linkId)){
 			this.occupation.get(linkId).increment();
 			this.parkingPosition.put(vehicleId, linkId);
+			parkedVehicles++;
 			return true;
 		}else return false;
 	}
@@ -84,9 +89,32 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 		else {
 			this.parkingPosition.remove(vehicleId);
 			this.occupation.get(linkId).decrement();
+			unparkedVehicles++;
 			return true;
 		}
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.parking.manager.ParkingManager#produceStatistics()
+	 */
+	@Override
+	public List<String> produceStatistics() {
+		List<String> stats = new ArrayList<>();
+		stats.add("parking occurences: "+ parkedVehicles);
+		stats.add("unparking occurences: "+ unparkedVehicles);
+		return stats;
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.parking.manager.ParkingManager#reset(int)
+	 */
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 }

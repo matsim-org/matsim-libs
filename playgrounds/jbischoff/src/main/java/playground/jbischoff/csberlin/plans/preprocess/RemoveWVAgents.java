@@ -20,39 +20,49 @@
 /**
  * 
  */
-package playground.jbischoff.parking;
+package playground.jbischoff.csberlin.plans.preprocess;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.parking.sim.SetupParking;
-
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-
-public class RunParkingExample {
-
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");
-		config.plans().setInputFile("../../../shared-svn/projects/bmw_carsharing/example/population100.xml");
-		config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/output");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
-        controler.addOverridingModule(new OTFVisLiveModule());
-
-		SetupParking.installParkingModules(controler);
-		controler.run();
-
+/**
+ *
+ */
+public class RemoveWVAgents {
+public static void main(String[] args) {
+	
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+	new PopulationReader(scenario).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans.xml.gz");
+	for (Person p : scenario.getPopulation().getPersons().values()){
+		if (!p.getId().toString().startsWith("wv")){
+			pop2.addPerson(p);
+			
+			Plan plan = p.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()){
+				if (pe instanceof Activity){
+					Activity act = (Activity) pe;
+					act.setFacilityId(null);
+				}
+			}
+		}
 	}
-
+	new PopulationWriter(pop2).write("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans-nowv.xml.gz");
+	
+	
+}
 }

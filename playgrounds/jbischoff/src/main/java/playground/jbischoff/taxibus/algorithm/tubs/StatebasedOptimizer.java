@@ -88,8 +88,12 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 			double newEstimatedSlack = this.stateSpace.getCurrentLastArrivalTime(optimContext.timer.getTimeOfDay()) - (lastEndTime + nextPickupToDestination.travelTime);
 			if (newEstimatedSlack>=0){
 			double valueWithoutCustomer = this.stateSpace.getValue(optimContext.timer.getTimeOfDay(), oldSlack);
-			
+				
 			double valueWithCustomer = 1+ this.stateSpace.getValue(optimContext.timer.getTimeOfDay(), newEstimatedSlack);
+			if (valueWithoutCustomer < 0){
+				//something went wrong, we'll not accept any new request
+				valueWithCustomer = valueWithoutCustomer-1.0;
+			}
 			if (valueWithCustomer>=valueWithoutCustomer)
 			{
 				VrpPathWithTravelData pickupPath = VrpPaths.createPath(lastLink, req.getFromLink(), lastEndTime, lastPickupToNextPickup, optimContext.travelTime);

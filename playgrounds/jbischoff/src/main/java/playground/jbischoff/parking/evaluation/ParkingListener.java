@@ -20,17 +20,21 @@
 /**
  * 
  */
-package playground.jbischoff.parking.sim;
+package playground.jbischoff.parking.evaluation;
 
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 
-import playground.jbischoff.parking.evaluation.ParkingListener;
-import playground.jbischoff.parking.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
+
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.io.IOUtils;
+
+import com.google.inject.Inject;
+
 import playground.jbischoff.parking.manager.ParkingManager;
-import playground.jbischoff.parking.manager.WalkLegFactory;
-import playground.jbischoff.parking.routing.ParkingRouter;
-import playground.jbischoff.parking.routing.WithinDayParkingRouter;
 
 /**
  * @author  jbischoff
@@ -39,23 +43,39 @@ import playground.jbischoff.parking.routing.WithinDayParkingRouter;
 /**
  *
  */
-public class SetupParking {
+public class ParkingListener implements IterationEndsListener {
+	
+	@Inject
+	ParkingManager manager;
+	@Inject
+	OutputDirectoryHierarchy output;
 
-	static public void installParkingModules(Controler controler){
-		controler.addOverridingModule(new AbstractModule() {
-			
-			
-			@Override
-			public void install() {
-			bind(WalkLegFactory.class).asEagerSingleton();
-			bind(ParkingManager.class).to(LinkLengthBasedParkingManagerWithRandomInitialUtilisation.class).asEagerSingleton();;
-			
-			this.install(new ParkingSearchQSimModule());
-			addControlerListenerBinding().to(ParkingListener.class);
-			bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		writeStats(manager.produceStatistics(), event.getIteration());
+	}
+
+	/**
+	 * @param produceStatistics
+	 */
+	private void writeStats(List<String> produceStatistics, int iteration) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(output.getIterationFilename(iteration, "parkingStats.csv"));
+		try {
+			for (String s : produceStatistics){
+				bw.write(s);
+				bw.newLine();
 			}
-		});
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
-	
+
 }

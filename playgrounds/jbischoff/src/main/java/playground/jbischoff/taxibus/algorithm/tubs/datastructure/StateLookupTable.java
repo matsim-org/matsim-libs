@@ -57,7 +57,9 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		recalculateMatrix();
+//		if (event.getIteration()<=1000) {
+//			recalculateMatrix();
+//			}
 		this.bookingsPerIteration.put(event.getIteration(), this.bookingCounter);
 		this.experiencedStates.clear();
 		this.bookingCounter = 0;
@@ -73,18 +75,26 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 		for (State state : this.experiencedStates) {
 			int currentIterationValue = this.bookingCounter - state.confirmations - 1;
 			if (currentIterationValue<0) currentIterationValue = 0;
+			try{
 			double oldValue = this.valueMatrix[state.time][state.slack];
 			double occurences = this.occurenceMatrix[state.time][state.slack];
 			double newValue = ((occurences * oldValue) + currentIterationValue) / (occurences + 1);
 			this.valueMatrix[state.time][state.slack] = newValue;
-			this.occurenceMatrix[state.time][state.slack]++;
+			this.occurenceMatrix[state.time][state.slack]++;}
+			catch (ArrayIndexOutOfBoundsException e){}
 		}
 
 	}
 
 	@Override
 	public double getValue(double time, double slack) {
-		double value = this.valueMatrix[getTimeBin(time)][getSlackBin(slack)];
+		double value = -1;
+		try{
+		 value = this.valueMatrix[getTimeBin(time)][getSlackBin(slack)];
+		}
+		catch (IndexOutOfBoundsException e){
+			
+		}
 		Logger.getLogger(getClass()).info("time " + time + " slack " + slack);
 		Logger.getLogger(getClass()).info(this.valueMatrix[getTimeBin(time)].length);
 		Logger.getLogger(getClass()).info(value);

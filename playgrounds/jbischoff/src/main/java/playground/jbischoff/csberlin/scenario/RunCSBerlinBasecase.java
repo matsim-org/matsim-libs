@@ -20,11 +20,13 @@
 /**
  * 
  */
-package playground.jbischoff.parking.sim;
+package playground.jbischoff.csberlin.scenario;
 
-import org.matsim.core.mobsim.qsim.QSim;
-
-import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author  jbischoff
@@ -33,16 +35,17 @@ import com.google.inject.Provider;
 /**
  *
  */
-public class ParkingQSimProvider implements Provider<QSim> {
-
-	/* (non-Javadoc)
-	 * @see com.google.inject.Provider#get()
-	 */
-	@Override
-	public QSim get() {
-		// TODO Auto-generated method stub
+public class RunCSBerlinBasecase {
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCModeChoice.xml");
+		String runId = "bc06_mc";
+		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
+		config.controler().setRunId(runId);
 		
-		return null;
+		
+		Controler controler = new Controler(config);
+		controler.run();
+		
+		
 	}
-
 }
