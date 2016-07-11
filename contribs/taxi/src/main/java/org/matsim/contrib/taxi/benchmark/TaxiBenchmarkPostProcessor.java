@@ -71,12 +71,12 @@ public class TaxiBenchmarkPostProcessor
 
     private static final Experiment EMPTY_COLUMN = new Experiment("empty column");
 
-    private final String header;
+    private final String[] header;
     private final Experiment[] experiments;
     private final String[] statsColumns;
 
 
-    public TaxiBenchmarkPostProcessor(String header, String... ids)
+    public TaxiBenchmarkPostProcessor(String[] header, String... ids)
     {
         this.header = header;
 
@@ -86,11 +86,10 @@ public class TaxiBenchmarkPostProcessor
             experiments[i] = id == null ? EMPTY_COLUMN : new Experiment(ids[i]);
         }
 
-        String[] cols = header.split("\\s+");
-        if (!cols[0].equals("n") || !cols[1].equals("m")) {
+        if (!header[0].equals("n") || !header[1].equals("m")) {
             throw new IllegalArgumentException("Incompatibile header");
         }
-        statsColumns = Arrays.copyOfRange(cols, 2, cols.length);
+        statsColumns = Arrays.copyOfRange(header, 2, header.length);
     }
 
 
