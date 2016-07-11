@@ -292,7 +292,7 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 		// (0)				(1)				(2)				(3)				(4)				(5)
 		//    -----link1----   ----link2----   ----link3----   ----link4----   ----link5----   
 		
-		Config config = testUtils.loadConfig(null);
+		Config config = testUtils.createConfig();
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);

@@ -207,7 +207,7 @@ public class ExtCostEventHandlerTest {
 		// (1) -> link1 -> (2)
 		//
 		
-		Config config = testUtils.loadConfig(null);
+		Config config = testUtils.createConfig();
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
