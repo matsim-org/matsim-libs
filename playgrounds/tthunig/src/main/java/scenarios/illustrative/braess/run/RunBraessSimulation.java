@@ -111,7 +111,7 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V9;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
@@ -122,7 +122,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/intervalBased/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/newBraessCap/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -201,7 +201,7 @@ public final class RunBraessSimulation {
 				config.strategy().addStrategySettings(strat);
 			}
 	
-			config.strategy().setMaxAgentPlanMemorySize( 3 );			
+			config.strategy().setMaxAgentPlanMemorySize( 5 );			
 			
 			config.qsim().setStuckTime(3600 * 10.);
 			
@@ -396,7 +396,7 @@ public final class RunBraessSimulation {
 	private static void createNetwork(Scenario scenario) {	
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
-		netCreator.setUseBTUProperties( false );
+//		netCreator.setUseBTUProperties( false );
 		netCreator.setSimulateInflowCap( false );
 		netCreator.setMiddleLinkExists( true );
 //		netCreator.setCapZ(1);

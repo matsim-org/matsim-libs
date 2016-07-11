@@ -217,6 +217,7 @@ public final class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(4)));
 			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+//			setLinkAttributes(l, capFirstLast, linkLengthBig, linkTTBig);
 //			setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 			net.addLink(l);
 		}
@@ -226,6 +227,7 @@ public final class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(4)));
 			setLinkAttributes(l, capZ, linkLengthSmall, linkTTMid);
+//			setLinkAttributes(l, capFirstLast, linkLengthSmall, linkTTMid);
 			net.addLink(l);
 		}
 	
@@ -233,6 +235,7 @@ public final class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(5)));
 		setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+//		setLinkAttributes(l, capFirstLast, linkLengthBig, linkTTBig);
 //		setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 		net.addLink(l);
 		
