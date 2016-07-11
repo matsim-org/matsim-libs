@@ -19,52 +19,36 @@
 
 package playground.michalm.ev;
 
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import playground.michalm.ev.charging.ChargingHandler;
+import com.google.inject.*;
+
 import playground.michalm.ev.data.EvData;
-import playground.michalm.ev.discharging.*;
 
 
-public class EvModule
-    extends AbstractModule
+public class IndividualSocTimeProfileCollectorProvider
+    implements Provider<MobsimListener>
 {
     private final EvData evData;
+    private final MatsimServices matsimServices;
 
 
-    public EvModule(EvData evData)
+    @Inject
+    public IndividualSocTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
     {
         this.evData = evData;
+        this.matsimServices = matsimServices;
     }
 
 
     @Override
-    public void install()
+    public MobsimListener get()
     {
-        bind(EvData.class).toInstance(evData);
-        bind(DriveDischargingHandler.class).asEagerSingleton();
-        addEventHandlerBinding().to(DriveDischargingHandler.class);
-        bind(AuxDischargingHandler.class).asEagerSingleton();
-        addMobsimListenerBinding().to(AuxDischargingHandler.class);
-        bind(ChargingHandler.class).asEagerSingleton();
-        addMobsimListenerBinding().to(ChargingHandler.class);
-
-        if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(AggregatedSocTimeProfileCollectorProvider.class);
-
-            if (evData.getElectricVehicles().size() <= 50) {//for smaller fleets
-                addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
-            }
-            //add more time profiles if necessary
-        }
-
-        addControlerListenerBinding().toInstance(new IterationEndsListener() {
-            public void notifyIterationEnds(IterationEndsEvent event)
-            {
-                evData.clearQueuesAndResetBatteries();
-            }
-        });
+        ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
+                EvTimeProfiles.createIndividualSocCalculator(evData));
+        return new TimeProfileCollector(calc, 300, "ev_indiv_soc_time_profiles.txt", matsimServices);
     }
 }

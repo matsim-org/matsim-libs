@@ -30,13 +30,11 @@ import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.*;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
-import org.matsim.contrib.util.*;
+import org.matsim.contrib.util.PartialSort;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.utils.io.IOUtils;
 
 import com.google.common.collect.*;
 
-import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.ev.data.*;
 import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.optimizer.ETaxiOptimizerContext;
@@ -98,17 +96,9 @@ public class AssignmentETaxiOptimizer
 
         int plugsCount = evData.getChargers().size() * 2;//TODO
         scheduledForCharging = Maps.newHashMapWithExpectedSize(plugsCount * 2);
-
-        socOut = new CompactCSVWriter(IOUtils.getBufferedWriter("d:/SOC.txt"));
-        CSVLineBuilder b = new CSVLineBuilder().add("time");
-        for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-            b.add(ev.getId() + "");
-        }
-        socOut.writeNext(b);
-        socOut.flush();
     }
-    
-    
+
+
     private final boolean chargingTaskRemovalEnabled = true;
 
 
@@ -124,16 +114,12 @@ public class AssignmentETaxiOptimizer
             }
             scheduleCharging();
             requiresReoptimization = true;
-
-            if (e.getSimulationTime() % 300 == 0) {
-                outputVehSoc(e.getSimulationTime());
-            }
         }
 
         super.notifyMobsimBeforeSimStep(e);
     }
-    
-    
+
+
     private void unscheduleAwaitingRequestsAndCharging()
     {
         eScheduler.beginChargingTaskRemoval();
@@ -144,20 +130,6 @@ public class AssignmentETaxiOptimizer
                 throw new RuntimeException();
             }
         }
-    }
-
-
-    CompactCSVWriter socOut;
-
-
-    private void outputVehSoc(double time)
-    {
-        CSVLineBuilder b = new CSVLineBuilder().add(time + "");
-        for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-            b.add( (ev.getBattery().getSoc() / UnitConversionRatios.J_PER_kWh) + "");
-        }
-        socOut.writeNext(b);
-        socOut.flush();
     }
 
 

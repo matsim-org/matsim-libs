@@ -19,6 +19,8 @@
 
 package playground.michalm.ev;
 
+import java.util.*;
+
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.util.stats.TimeProfiles;
@@ -58,6 +60,28 @@ public class EvTimeProfiles
                     mean.increment(ev.getBattery().getSoc());
                 }
                 return (mean.getResult() / UnitConversionRatios.J_PER_kWh) + "";//print out in [kWh]
+            }
+        };
+    }
+
+
+    public static ProfileCalculator createIndividualSocCalculator(final EvData evData)
+    {
+        List<String> ids = new ArrayList<>(evData.getElectricVehicles().size());
+        for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+            ids.add(ev.getId() + "");
+        }
+        String[] header = ids.toArray(new String[ids.size()]);
+
+        return new TimeProfiles.MultiValueProfileCalculator(header) {
+            @Override
+            public String[] calcValues()
+            {
+                List<String> vals = new ArrayList<>(evData.getElectricVehicles().size());
+                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+                    vals.add( (ev.getBattery().getSoc() / UnitConversionRatios.J_PER_kWh) + "");
+                }
+                return vals.toArray(new String[vals.size()]);
             }
         };
     }

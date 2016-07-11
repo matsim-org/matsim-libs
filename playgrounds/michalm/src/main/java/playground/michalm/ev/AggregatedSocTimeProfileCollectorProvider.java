@@ -29,7 +29,7 @@ import com.google.inject.*;
 import playground.michalm.ev.data.EvData;
 
 
-public class EvTimeProfileCollectorProvider
+public class AggregatedSocTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
     private final EvData evData;
@@ -37,7 +37,7 @@ public class EvTimeProfileCollectorProvider
 
 
     @Inject
-    public EvTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
+    public AggregatedSocTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
     {
         this.evData = evData;
         this.matsimServices = matsimServices;
@@ -50,6 +50,6 @@ public class EvTimeProfileCollectorProvider
         ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
                 EvTimeProfiles.createMeanSocCalculator(evData),
                 EvTimeProfiles.createUnderchargedVehiclesCounter(evData, 0.3));
-        return new TimeProfileCollector(calc, 300, "ev_time_profiles.txt", matsimServices);
+        return new TimeProfileCollector(calc, 300, "ev_agg_soc_time_profiles.txt", matsimServices);
     }
 }
