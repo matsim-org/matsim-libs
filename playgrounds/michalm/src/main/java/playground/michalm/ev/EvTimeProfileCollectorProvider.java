@@ -49,7 +49,7 @@ public class EvTimeProfileCollectorProvider
     {
         ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
                 EvTimeProfiles.createMeanSocCalculator(evData),
-                EvTimeProfiles.createDischargedVehiclesCounter(evData));
+                EvTimeProfiles.createUnderchargedVehiclesCounter(evData, 0.3));
         return new TimeProfileCollector(calc, 300, "ev_time_profiles.txt", matsimServices);
     }
 }

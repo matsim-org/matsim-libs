@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.optimizer.assignment;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.*;
-import org.xml.sax.Attributes;
-
-import playground.michalm.ev.UnitConversionRatios;
-import playground.michalm.taxi.data.EvrpVehicle;
+import org.apache.commons.configuration.Configuration;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 
 
-public class EvrpVehicleReader
-    extends VehicleReader
+public class AssignmentETaxiOptimizerParams
+    extends AssignmentTaxiOptimizerParams
 {
-    public EvrpVehicleReader(Network network, VrpData data)
-    {
-        super(network, data);
-    }
+    public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
+    public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
+
+    public final double minRelativeSoc;//XXX or absolute?
+    public final int socCheckTimeStep;
 
 
-    @Override
-    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0,
-            double t1, Attributes atts)
+    public AssignmentETaxiOptimizerParams(Configuration optimizerConfig)
     {
-        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
-                * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * batteryCapacity)
-                * UnitConversionRatios.J_PER_kWh;
-        return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity, initialSoc);
+        super(optimizerConfig);
+
+        //30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
+        //alternatively, in cold winter, it is enough to travel for 1 hour
+        //(for approx. 20 km => 3kWh) with 3 kW-heating on
+        minRelativeSoc = optimizerConfig.getDouble(MIN_RELATIVE_SOC, 0.3);
+
+        //in cold winter, 3kW heating consumes 1.25% SOC every 5 min
+        socCheckTimeStep = optimizerConfig.getInt(SOC_CHECK_TIME_STEP, 300);
     }
 }

@@ -48,7 +48,7 @@ public class ResultsPostProcessor
      */
     private static class Stats
     {
-        private final String cfg;
+//        private final String cfg;
         private final int n;
         private final int m;
 
@@ -57,7 +57,7 @@ public class ResultsPostProcessor
 
         private Stats(Scanner sc, int count)
         {
-            cfg = sc.next();
+//            cfg = sc.next();
             n = sc.nextInt();
             m = sc.nextInt();
 
@@ -71,21 +71,26 @@ public class ResultsPostProcessor
 
     private static final Experiment EMPTY_COLUMN = new Experiment("empty column");
 
+    private final String header;
     private final Experiment[] experiments;
     private final String[] statsColumns;
 
 
-    public ResultsPostProcessor(String... ids)
+    public ResultsPostProcessor(String header, String... ids)
     {
+        this.header = header;
+        
         experiments = new Experiment[ids.length];
         for (int i = 0; i < experiments.length; i++) {
             String id = ids[i];
             experiments[i] = id == null ? EMPTY_COLUMN : new Experiment(ids[i]);
         }
 
-        String[] cols = TaxiBenchmarkStats.HEADER.split("\\s+");
-        Arrays.equals(Arrays.copyOf(cols, 3), new String[] { "cfg", "n", "m" });
-        statsColumns = Arrays.copyOfRange(cols, 3, cols.length);
+        String[] cols = header.split("\\s+");
+        if (!cols[0].equals("n") || !cols[1].equals("m")) {
+            throw new IllegalArgumentException("Incompatibile header");
+        }
+        statsColumns = Arrays.copyOfRange(cols, 2, cols.length);
     }
 
 
@@ -93,7 +98,7 @@ public class ResultsPostProcessor
     {
         for (Experiment e : experiments) {
             if (e != EMPTY_COLUMN) {
-                readFile(dir + subDirPrefix + e.id + "/" + file, e);
+                readFile(dir + subDirPrefix + e.id + "/" + file + ".txt", e);
             }
         }
 
@@ -107,8 +112,8 @@ public class ResultsPostProcessor
     {
         try (Scanner sc = new Scanner(new File(file))) {
             String header = sc.nextLine();
-            if (!header.equals(TaxiBenchmarkStats.HEADER)) {
-                System.err.println("Non-standard header");
+            if (!header.equals(this.header)) {
+                throw new RuntimeException("Incompatibile header");
             }
 
             if (!sc.hasNext()) {
@@ -138,7 +143,7 @@ public class ResultsPostProcessor
     private void writeValues(String file, int column)
     {
         String field = statsColumns[column];
-        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file + "_" + field));
+        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file + "_" + field + ".txt"));
         StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
         StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
         StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
@@ -167,11 +172,11 @@ public class ResultsPostProcessor
         pw.println(lineRatio.toString());
 
         int statsCount = experiments[0].stats.size();
-        DecimalFormat format = new DecimalFormat("#.##");
+        DecimalFormat format = new DecimalFormat("#.###");
 
         for (int i = 0; i < statsCount; i++) {
-            String cfg0 = experiments[0].stats.get(i).cfg;
-            pw.printf("%20s", cfg0);
+//            String cfg0 = experiments[0].stats.get(i).cfg;
+//            pw.printf("%20s", cfg0);
 
             for (Experiment e : experiments) {
                 if (e == EMPTY_COLUMN) {
@@ -180,9 +185,9 @@ public class ResultsPostProcessor
                 else {
                     Stats s = e.stats.get(i);
 
-                    if (!cfg0.equals(s.cfg)) {
-                        throw new RuntimeException();
-                    }
+//                    if (!cfg0.equals(s.cfg)) {
+//                        throw new RuntimeException();
+//                    }
 
                     pw.print("\t" + format.format(s.values[column]));
                 }
@@ -200,7 +205,7 @@ public class ResultsPostProcessor
         String dir = "d:/PP-rad/mielec/2014_02/";
         String subDirPrefix = "";
 
-        new ResultsPostProcessor(//
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
                 "10-50", //
                 "15-50", //
                 "20-50", //
@@ -220,12 +225,31 @@ public class ResultsPostProcessor
     }
 
 
+    public static void processNewMielec(String type)
+    {
+        String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2016_06_euro2016_runs/new/";
+        String subDirPrefix = "";
+
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
+                "1.0", //
+                "1.5", //
+                "2.0", //
+                "2.5", //
+                "3.0", //
+                "3.5", //
+                "4.0"//
+        ).process(dir + type, subDirPrefix, "benchmark_stats");
+    }
+
+
+
+    
     public static void processBerlin()
     {
         String dir = "d:/PP-rad/berlin/Only_Berlin_2015_08/";
         String subDirPrefix = "demand_";
 
-        new ResultsPostProcessor(//
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
                 "1.0", //
                 "1.5", //
                 "2.0", //
@@ -247,7 +271,7 @@ public class ResultsPostProcessor
         String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
         String subDirPrefix = "demand_";
 
-        new ResultsPostProcessor(//
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
                 "0.2", //
                 "0.3", //
                 "0.4", //
@@ -266,7 +290,7 @@ public class ResultsPostProcessor
         String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
         String subDirPrefix = "supply_from_reqs_";
 
-        new ResultsPostProcessor(//
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
                 //"0.2", //
                 //"0.4", //
                 //                "0.6", //
@@ -287,7 +311,7 @@ public class ResultsPostProcessor
         String dir = "d:/PP-rad/audi_av/audi_av_10pct_2015_10/";
         String subDirPrefix = "taxi_vehicles_";
 
-        new ResultsPostProcessor(//
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
                 //                "04000", //
                 //                "04500", //
                 //                "05000", //
@@ -323,7 +347,7 @@ public class ResultsPostProcessor
         String dir = "d:/PP-rad/audi_av/audi_av_2015_10/";
         String subDirPrefix = "taxi_vehicles_";
 
-        new ResultsPostProcessor(//
+        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
                 //                "050000", //
                 //                "060000", //
                 //                "070000", //
@@ -351,7 +375,10 @@ public class ResultsPostProcessor
 
     public static void main(String[] args)
     {
-        processMielec();
+        //processMielec();
+        processNewMielec("ASSIGNMENT_");
+        processNewMielec("RULE_BASED_");
+
         //processBerlin();
         //processBarcelonaVariableDemand();
         //processBarcelonaVariableSupply();

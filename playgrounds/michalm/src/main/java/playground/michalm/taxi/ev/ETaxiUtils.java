@@ -26,6 +26,7 @@ import org.matsim.contrib.taxi.data.TaxiData;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.*;
+import playground.michalm.ev.discharging.OhdeSlaskiAuxEnergyConsumption.TemperatureProvider;
 import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
 
@@ -34,7 +35,7 @@ public class ETaxiUtils
 {
     public static void initEvData(TaxiData taxiData, EvData evData)
     {
-        int temperature = 20; // aux power about 1 kW at 20oC
+        TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
         double chargingSpeedFactor = 1.; //full speed
 
         for (Charger c : evData.getChargers().values()) {
@@ -44,18 +45,15 @@ public class ETaxiUtils
         for (Vehicle v : taxiData.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
             ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption(ev));
-            ev.setAuxEnergyConsumption(OhdeSlaskiAuxEnergyConsumption
-                    .createConsumptionForFixedTemperature(ev, temperature));
+            ev.setAuxEnergyConsumption(
+                    new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider, ETaxiUtils::isTurnedOn));
             evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
         }
     }
 
 
-    public static void consumeFixedAuxEnergyWhenScheduleStarted(ElectricVehicle ev, Vehicle taxi,
-            double auxPower, double period)
+    private static boolean isTurnedOn(ElectricVehicle ev)
     {
-        if (taxi.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-            ev.getBattery().discharge(auxPower * period);
-        }
+        return ((Ev)ev).getEvrpVehicle().getSchedule().getStatus() == ScheduleStatus.STARTED;
     }
 }

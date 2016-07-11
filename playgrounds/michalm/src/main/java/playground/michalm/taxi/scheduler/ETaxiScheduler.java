@@ -19,10 +19,14 @@
 
 package playground.michalm.taxi.scheduler;
 
+import java.util.*;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.scheduler.*;
@@ -39,7 +43,6 @@ import playground.michalm.taxi.schedule.ETaxiChargingTask;
 public class ETaxiScheduler
     extends TaxiScheduler
 {
-
     public ETaxiScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
@@ -51,12 +54,52 @@ public class ETaxiScheduler
     protected double calcNewEndTime(TaxiTask task, double newBeginTime)
     {
         if (task instanceof ETaxiChargingTask) {
+            //FIXME underestimated due to the ongoing AUX/drive consumption
             double duration = task.getEndTime() - task.getBeginTime();
             return newBeginTime + duration;
         }
         else {
             return super.calcNewEndTime(task, newBeginTime);
         }
+    }
+
+    //FIXME underestimated due to the ongoing AUX/drive consumption
+    //not a big issue for e-rule-based dispatching (no look ahead)
+    //more problematic for e-assignment dispatching
+    public void scheduleCharging(EvrpVehicle vehicle, Charger charger,
+            VrpPathWithTravelData vrpPath)
+    {
+        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        divertOrAppendDrive(schedule, vrpPath);
+
+        ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
+        Ev ev = vehicle.getEv();
+        double chargingEndTime = vrpPath.getArrivalTime() + logic.estimateMaxWaitTimeOnArrival()
+                + logic.estimateChargeTime(ev);
+        schedule.addTask(
+                new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev));
+
+        appendStayTask(schedule);
+    }
+
+
+    //=========================================================================================
+
+    private boolean chargingTasksRemovalMode = false;
+    private List<Vehicle> vehiclesWithUnscheduledCharging;
+
+
+    public void beginChargingTaskRemoval()
+    {
+        chargingTasksRemovalMode = true;
+        vehiclesWithUnscheduledCharging = new ArrayList<>();
+    }
+
+
+    public List<Vehicle> endChargingTaskRemoval()
+    {
+        chargingTasksRemovalMode = false;
+        return vehiclesWithUnscheduledCharging;
     }
 
 
@@ -100,13 +143,30 @@ public class ETaxiScheduler
     @Override
     protected void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx)
     {
-        super.removePlannedTasks(schedule, newLastTaskIdx);
+        List<TaxiTask> tasks = schedule.getTasks();
+
+        for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
+            TaxiTask task = tasks.get(i);
+
+            if (!chargingTasksRemovalMode && task instanceof ETaxiChargingTask) {
+                break;//cannot remove -> stop removing
+            }
+
+            schedule.removeTask(task);
+            taskRemovedFromSchedule(schedule, task);
+        }
+
+        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
+            return;
+        }
 
         TaxiTask lastTask = Schedules.getLastTask(schedule);
         if (lastTask instanceof ETaxiChargingTask) {
             //we must append 'wait' because both 'charge' and 'wait' are 'STAY' tasks,
             //so the standard TaxiScheduler cannot distinguish them and would treat 'charge' as 'wait'
 
+            //we can use chargeEndTime for both begin and end times,
+            //the right endTime is set in TaxiScheduler.removeAwaitingRequestsImpl()
             double chargeEndTime = lastTask.getEndTime();
             Link chargeLink = ((ETaxiChargingTask)lastTask).getLink();
             schedule.addTask(new TaxiStayTask(chargeEndTime, chargeEndTime, chargeLink));
@@ -119,28 +179,10 @@ public class ETaxiScheduler
     {
         if (task instanceof ETaxiChargingTask) {
             ((ETaxiChargingTask)task).removeFromCharger();
+            vehiclesWithUnscheduledCharging.add(schedule.getVehicle());
         }
         else {
             super.taskRemovedFromSchedule(schedule, task);
         }
-    }
-
-
-    public void scheduleCharging(EvrpVehicle vehicle, Charger charger,
-            VrpPathWithTravelData vrpPath)
-    {
-        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
-        divertOrAppendDrive(schedule, vrpPath);
-
-        ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
-        Ev ev = vehicle.getEv();
-        double chargingEndTime = vrpPath.getArrivalTime() + logic.estimateMaxWaitTimeOnArrival()
-                + logic.estimateChargeTime(ev);
-        schedule.addTask(
-                new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev));
-
-        appendStayTask(schedule);
-        
-//        System.err.println(vehicle.getId() +" sent to charger " + charger.getId());
     }
 }

@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Maps;
 
 import playground.michalm.ev.data.*;
 
@@ -92,7 +92,7 @@ public class FixedSpeedChargingWithQueueingLogic
             plugVehicle(vehicle);
         }
         else {
-            queuedVehicles.add(vehicle);
+            queueVehicle(vehicle);
         }
     }
 
@@ -114,11 +114,23 @@ public class FixedSpeedChargingWithQueueingLogic
     }
 
 
+    private void queueVehicle(ElectricVehicle vehicle)
+    {
+        queuedVehicles.add(vehicle);
+        notifyVehicleQueued(vehicle);
+    }
+
+
     private void plugVehicle(ElectricVehicle vehicle)
     {
         pluggedVehicles.put(vehicle.getId(), vehicle);
         notifyChargingStarted(vehicle);
     }
+
+
+    //meant for overriding
+    protected void notifyVehicleQueued(ElectricVehicle vehicle)
+    {}
 
 
     //meant for overriding

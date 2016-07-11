@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -29,10 +29,10 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiStatsWriter
 {
-    private final Map<String, TaxiStats> taxiStats;
+    private final List<TaxiStats> taxiStats;
 
 
-    public TaxiStatsWriter(Map<String, TaxiStats> taxiStats)
+    public TaxiStatsWriter(List<TaxiStats> taxiStats)
     {
         this.taxiStats = taxiStats;
     }
@@ -54,7 +54,7 @@ public class TaxiStatsWriter
         writer.writeNext("Passenger Wait Time [s]");
         writer.writeNext(getStatsSubheader("n"));
 
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id)
                     .add(s.passengerWaitTime.getN() + "");
             addStats(lineBuilder, "%.1f", "%.0f", s.passengerWaitTime);
@@ -69,7 +69,7 @@ public class TaxiStatsWriter
         writer.writeNext("Vehicle Empty Drive Ratio");
         writer.writeNext(getStatsSubheader("fleet"));
 
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
                     addf("%.4f", s.getFleetEmptyDriveRatio());
             addStats(lineBuilder, "%.4f", "%.3f", s.vehicleEmptyDriveRatio);
@@ -84,7 +84,7 @@ public class TaxiStatsWriter
         writer.writeNext("Vehicle Wait Ratio");
         writer.writeNext(getStatsSubheader("fleet"));
 
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
                     addf("%.4f", s.getFleetStayRatio());
             addStats(lineBuilder, "%.4f", "%.3f", s.vehicleStayRatio);
@@ -128,7 +128,7 @@ public class TaxiStatsWriter
         }
         writer.writeNext(headerBuilder.add("all"));
 
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id);
             for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
                 lineBuilder.addf("%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600);

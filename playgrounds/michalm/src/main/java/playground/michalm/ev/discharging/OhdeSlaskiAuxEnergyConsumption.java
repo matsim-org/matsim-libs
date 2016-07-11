@@ -19,6 +19,8 @@
 
 package playground.michalm.ev.discharging;
 
+import com.google.common.base.Predicate;
+
 import playground.michalm.ev.data.ElectricVehicle;
 
 
@@ -51,28 +53,32 @@ public class OhdeSlaskiAuxEnergyConsumption
     }
 
 
-    public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperature(
+    public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(
             ElectricVehicle ev, int temperature)
     {
-        return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature);
+        return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v) -> true);
     }
 
 
     private final ElectricVehicle ev;
     private final TemperatureProvider temperatureProvider;
+    private final Predicate<ElectricVehicle> isTurnedOn;
 
 
     public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev,
-            TemperatureProvider temperatureProvider)
+            TemperatureProvider temperatureProvider, Predicate<ElectricVehicle> isTurnedOn)
     {
         this.ev = ev;
         this.temperatureProvider = temperatureProvider;
+        this.isTurnedOn = isTurnedOn;
     }
 
 
     @Override
     public void consumeEnergy(double period)
     {
-        ev.getBattery().discharge(calcPower(temperatureProvider.getTemperature()) * period);
+        if (isTurnedOn.apply(ev)) {
+            ev.getBattery().discharge(calcPower(temperatureProvider.getTemperature()) * period);
+        }
     }
 }

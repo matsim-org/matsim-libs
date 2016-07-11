@@ -34,6 +34,7 @@ public class ETaxiChargingTask
     private final Charger charger;
     private final ETaxiChargingLogic logic;
     private final Ev ev;
+    private double chargingStartedTime;
 
 
     public ETaxiChargingTask(double beginTime, double endTime, Charger charger, Ev ev)
@@ -43,13 +44,13 @@ public class ETaxiChargingTask
         this.ev = ev;
         logic = (ETaxiChargingLogic)charger.getLogic();
 
-        logic.addDispatchedVehicle(ev);
+        logic.addAssignedVehicle(ev);
     }
 
 
     public void removeFromCharger()
     {
-        logic.removeDispatchedVehicle(ev);
+        logic.removeAssignedVehicle(ev);
     }
 
 
@@ -68,6 +69,18 @@ public class ETaxiChargingTask
     public Ev getEv()
     {
         return ev;
+    }
+
+
+    public void setChargingStartedTime(double chargingStartedTime)
+    {
+        this.chargingStartedTime = chargingStartedTime;
+    }
+
+
+    public double getChargingStartedTime()
+    {
+        return chargingStartedTime;
     }
 
 

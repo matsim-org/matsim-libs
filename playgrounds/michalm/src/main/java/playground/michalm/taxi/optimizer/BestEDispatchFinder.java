@@ -38,7 +38,7 @@ public class BestEDispatchFinder
         this.dispatchFinder = dispatchFinder;
     }
 
-
+    //FIXME include delays at chargers due to queues
     public Dispatch<Charger> findBestChargerForVehicle(Vehicle veh, Iterable<Charger> chargers)
     {
         return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);

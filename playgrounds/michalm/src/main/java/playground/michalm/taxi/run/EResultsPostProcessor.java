@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.run;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.*;
-import org.xml.sax.Attributes;
-
-import playground.michalm.ev.UnitConversionRatios;
-import playground.michalm.taxi.data.EvrpVehicle;
+import org.matsim.contrib.taxi.benchmark.ResultsPostProcessor;
 
 
-public class EvrpVehicleReader
-    extends VehicleReader
+public class EResultsPostProcessor
 {
-    public EvrpVehicleReader(Network network, VrpData data)
+
+    public static void processNewMielec(String type)
     {
-        super(network, data);
+        String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2016_06_euro2016_runs/";
+        String subDirPrefix = "";
+
+        new ResultsPostProcessor(ETaxiBenchmarkStats.HEADER,//
+                "1.0", //
+                "1.5", //
+                "2.0", //
+                "2.5", //
+                "3.0", //
+                "3.5", //
+                "4.0"//
+        ).process(dir + type, subDirPrefix, "ebenchmark_stats");
     }
 
 
-    @Override
-    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0,
-            double t1, Attributes atts)
+    public static void main(String[] args)
     {
-        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
-                * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * batteryCapacity)
-                * UnitConversionRatios.J_PER_kWh;
-        return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity, initialSoc);
+        //processMielec();
+
+        //        String variant = "";
+        String variant = "plugs-2and0";
+        //        String variant ="plugs-2and1";
+        //        String variant = "plugs-2and2";
+
+        processNewMielec("E_ASSIGNMENT_" + variant + "_");
+        processNewMielec("E_RULE_BASED_" + variant + "_");
     }
 }

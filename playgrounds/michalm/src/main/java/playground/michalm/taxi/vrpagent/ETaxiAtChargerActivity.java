@@ -81,11 +81,8 @@ public class ETaxiAtChargerActivity
         ETaxiChargingLogic logic = chargingTask.getLogic();
         Ev ev = chargingTask.getEv();
 
-        logic.removeDispatchedVehicle(ev);
+        logic.removeAssignedVehicle(ev);
         logic.addVehicle(ev);
-        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTimeOnArrival()
-                + logic.estimateChargeTime(ev);
-        state = State.queued;
     }
 
 
@@ -96,15 +93,27 @@ public class ETaxiAtChargerActivity
     }
 
 
-    public void notifyChargingStarted()
+    public void vehicleQueued()
     {
-        endTime = timer.getTimeOfDay()
-                + chargingTask.getLogic().estimateChargeTime(chargingTask.getEv());
-        state = State.plugged;
+        ETaxiChargingLogic logic = chargingTask.getLogic();
+        endTime = timer.getTimeOfDay() + logic.estimateMaxWaitTimeOnArrival()
+                + logic.estimateChargeTime(chargingTask.getEv());
+        state = State.queued;
     }
 
 
-    public void notifyChargingEnded()
+    public void chargingStarted()
+    {
+        //if veh is fully charged we must add at least 1 second to make sure that there is
+        //at least 1 time step (1 second) between chargingStarted() and chargingEnded()
+        endTime = timer.getTimeOfDay()
+                + Math.max(1, chargingTask.getLogic().estimateChargeTime(chargingTask.getEv()));
+        state = State.plugged;
+        chargingTask.setChargingStartedTime(timer.getTimeOfDay());
+    }
+
+
+    public void chargingEnded()
     {
         endTime = timer.getTimeOfDay();
         state = State.unplugged;

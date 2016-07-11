@@ -28,15 +28,16 @@ import playground.michalm.ev.data.*;
 
 public class EvTimeProfiles
 {
-    public static ProfileCalculator createDischargedVehiclesCounter(final EvData evData)
+    public static ProfileCalculator createUnderchargedVehiclesCounter(final EvData evData,
+            final double relativeSoc)
     {
-        return new TimeProfiles.SingleValueProfileCalculator("discharged") {
+        return new TimeProfiles.SingleValueProfileCalculator("undercharged") {
             @Override
             public String calcValue()
             {
                 int count = 0;
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    if (ev.getBattery().getSoc() < 0) {
+                    if (ev.getBattery().getSoc() < relativeSoc * ev.getBattery().getCapacity()) {
                         count++;
                     }
                 }

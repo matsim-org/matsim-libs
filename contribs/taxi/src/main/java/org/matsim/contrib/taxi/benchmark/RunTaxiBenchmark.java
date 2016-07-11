@@ -43,6 +43,20 @@ import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
  */
 public class RunTaxiBenchmark
 {
+    public static void run(String configFile, int runs, String demand)
+    {
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
+
+        String baseDir = "../../../shared-svn/projects/maciejewski/Mielec/";
+        config.plans().setInputFile(
+                baseDir + "2014_02_base_scenario/plans_taxi/plans_only_taxi_" + demand + ".xml.gz");
+        config.controler()
+                .setOutputDirectory(config.controler().getOutputDirectory() + "_" + demand);
+
+        createControler(config, runs).run();
+    }
+
+
     public static void run(String configFile, int runs)
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
@@ -76,7 +90,7 @@ public class RunTaxiBenchmark
             @Override
             public void install()
             {
-                addControlerListenerBinding().to(TaxiBenchmarkStats.class);
+                addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
             };
         });
 
@@ -100,6 +114,26 @@ public class RunTaxiBenchmark
 
     public static void main(String[] args)
     {
-        run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml", 20);
+        //run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml", 20);
+
+        int iter = 20;
+        String dir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
+        String cfg = dir + "mielec_taxi_benchmark_config_RULE_BASED.xml";
+        run(cfg, iter, "1.0");
+        run(cfg, iter, "1.5");
+        run(cfg, iter, "2.0");
+        run(cfg, iter, "2.5");
+        run(cfg, iter, "3.0");
+        run(cfg, iter, "3.5");
+        run(cfg, iter, "4.0");
+
+        cfg = dir + "mielec_taxi_benchmark_config_ASSIGNMENT.xml";
+        run(cfg, iter, "1.0");
+        run(cfg, iter, "1.5");
+        run(cfg, iter, "2.0");
+        run(cfg, iter, "2.5");
+        run(cfg, iter, "3.0");
+        run(cfg, iter, "3.5");
+        run(cfg, iter, "4.0");
     }
 }

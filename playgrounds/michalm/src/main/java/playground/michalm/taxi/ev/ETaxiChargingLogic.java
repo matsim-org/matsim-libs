@@ -37,7 +37,7 @@ public class ETaxiChargingLogic
     //fast charging up to 80% of the battery capacity
     private static final double MAX_RELATIVE_SOC = 0.8;
 
-    protected final Map<Id<Vehicle>, ElectricVehicle> dispatchedVehicles = new HashMap<>();
+    protected final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new HashMap<>();
     private final double effectivePower;
 
 
@@ -49,16 +49,16 @@ public class ETaxiChargingLogic
 
 
     //at this point ETaxiChargingTask should point to Charger
-    public void addDispatchedVehicle(ElectricVehicle vehicle)
+    public void addAssignedVehicle(ElectricVehicle vehicle)
     {
-        dispatchedVehicles.put(vehicle.getId(), vehicle);
+        assignedVehicles.put(vehicle.getId(), vehicle);
     }
 
 
     //on deleting ETaxiChargingTask or vehicle arrival (the veh becomes plugged or queued)
-    public void removeDispatchedVehicle(ElectricVehicle vehicle)
+    public void removeAssignedVehicle(ElectricVehicle vehicle)
     {
-        if (dispatchedVehicles.remove(vehicle.getId()) == null) {
+        if (assignedVehicles.remove(vehicle.getId()) == null) {
             throw new IllegalArgumentException();
         }
     }
@@ -80,16 +80,23 @@ public class ETaxiChargingLogic
 
 
     @Override
+    protected void notifyVehicleQueued(ElectricVehicle vehicle)
+    {
+        getActivity(vehicle).vehicleQueued();
+    }
+
+
+    @Override
     protected void notifyChargingStarted(ElectricVehicle vehicle)
     {
-        getActivity(vehicle).notifyChargingStarted();
+        getActivity(vehicle).chargingStarted();
     }
 
 
     @Override
     protected void notifyChargingEnded(ElectricVehicle vehicle)
     {
-        getActivity(vehicle).notifyChargingEnded();
+        getActivity(vehicle).chargingEnded();
     }
 
 
@@ -102,8 +109,8 @@ public class ETaxiChargingLogic
 
     public double estimateChargeTime(ElectricVehicle vehicle)
     {
-//        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
-//        System.err.println("effectivePower = " + effectivePower);
+        //        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
+        //        System.err.println("effectivePower = " + effectivePower);
         return getEnergyToCharge(vehicle) / effectivePower;
     }
 
@@ -126,9 +133,9 @@ public class ETaxiChargingLogic
     //does not include further demand (AUX for queued vehs; AUX+driving for dispatched vehs)
     public double estimateAssignedWorkload()
     {
-        double total = sumEnergyToCharge(pluggedVehicles.values())
-                + sumEnergyToCharge(queuedVehicles)
-                + sumEnergyToCharge(dispatchedVehicles.values());
+        double total = sumEnergyToCharge(pluggedVehicles.values()) //
+                + sumEnergyToCharge(queuedVehicles) //
+                + sumEnergyToCharge(assignedVehicles.values());
         return total / effectivePower;
     }
 
@@ -155,8 +162,8 @@ public class ETaxiChargingLogic
     }
 
 
-    public int getDispatchedCount()
+    public int getAssignedCount()
     {
-        return dispatchedVehicles.size();
+        return assignedVehicles.size();
     }
 }

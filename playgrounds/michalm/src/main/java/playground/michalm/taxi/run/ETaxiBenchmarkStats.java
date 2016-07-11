@@ -1,4 +1,4 @@
-package org.matsim.contrib.taxi.benchmark;
+package playground.michalm.taxi.run;
 
 import java.io.PrintWriter;
 
@@ -12,16 +12,20 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Inject;
 
+import playground.michalm.taxi.utli.stats.*;
 
-public class TaxiBenchmarkStats
+
+public class ETaxiBenchmarkStats
     implements AfterMobsimListener, ShutdownListener
+
 {
     static final String HEADER = "n\tm\t"//
             + "PassWait\t"//
             + "PassWait_p95\t"//
             + "PassWait_max\t"//
             + "EmptyDriveRatio\t"//
-            + "StayRatio\t";
+            + "StayRatio\t"//
+            + "QueuedTimeRatio\t";
 
     private final TaxiData taxiData;
     private final OutputDirectoryHierarchy controlerIO;
@@ -32,10 +36,12 @@ public class TaxiBenchmarkStats
 
     private final SummaryStatistics emptyDriveRatio = new SummaryStatistics();
     private final SummaryStatistics stayRatio = new SummaryStatistics();
+    
+    private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
 
     @Inject
-    public TaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public ETaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
         this.controlerIO = controlerIO;
@@ -47,6 +53,8 @@ public class TaxiBenchmarkStats
     {
         TaxiStats singleRunStats = new TaxiStatsCalculator(taxiData.getVehicles().values())
                 .getDailyStats();
+        ETaxiStats singleRunEStats = new ETaxiStatsCalculator(taxiData.getVehicles().values())
+                .getDailyEStats();
 
         passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());
         pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTime.getPercentile(95));
@@ -54,6 +62,8 @@ public class TaxiBenchmarkStats
 
         emptyDriveRatio.addValue(singleRunStats.getFleetEmptyDriveRatio());
         stayRatio.addValue(singleRunStats.getFleetStayRatio());
+        
+        queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
     }
 
 
@@ -61,12 +71,12 @@ public class TaxiBenchmarkStats
     public void notifyShutdown(ShutdownEvent event)
     {
         PrintWriter pw = new PrintWriter(
-                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("benchmark_stats.txt")));
+                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("ebenchmark_stats.txt")));
         pw.println(HEADER);
         pw.printf(
                 "%d\t%d\t"//
                         + "%.1f\t%.0f\t%.0f\t"//
-                        + "%.3f\t%.3f\t", //
+                        + "%.3f\t%.3f\t%.3f\t", //
                 taxiData.getRequests().size(), //
                 taxiData.getVehicles().size(), //
                 //
@@ -75,7 +85,9 @@ public class TaxiBenchmarkStats
                 maxPassengerWaitTime.getMean(), //
                 //
                 emptyDriveRatio.getMean(), //
-                stayRatio.getMean());
+                stayRatio.getMean(), //
+                //
+                queuedTimeRatio.getMean());
 
         pw.close();
     }

@@ -45,6 +45,21 @@ import playground.michalm.taxi.ev.*;
  */
 public class RunETaxiBenchmark
 {
+    public static void run(String configFile, int runs, String demand)
+    {
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+                new EvConfigGroup());
+
+        String baseDir = "../../../shared-svn/projects/maciejewski/Mielec/";
+        config.plans().setInputFile(
+                baseDir + "2014_02_base_scenario/plans_taxi/plans_only_taxi_" + demand + ".xml.gz");
+        config.controler()
+                .setOutputDirectory(config.controler().getOutputDirectory() + "_" + demand);
+
+        createControler(config, runs).run();
+    }
+
+
     public static void run(String configFile, int runs)
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
@@ -76,6 +91,7 @@ public class RunETaxiBenchmark
             public void install()
             {
                 addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+                addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }
         });
 
@@ -85,7 +101,24 @@ public class RunETaxiBenchmark
 
     public static void main(String[] args)
     {
-        String configFile = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_benchmark_config.xml";
-        run(configFile, 1);
+        int iter = 20;
+        String dir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
+        String cfg = dir + "mielec_etaxi_benchmark_config_E_RULE_BASED_plugs-2and2.xml";
+        run(cfg, iter, "1.0");
+        run(cfg, iter, "1.5");
+        run(cfg, iter, "2.0");
+        run(cfg, iter, "2.5");
+        run(cfg, iter, "3.0");
+        run(cfg, iter, "3.5");
+        run(cfg, iter, "4.0");
+
+        cfg = dir + "mielec_etaxi_benchmark_config_E_ASSIGNMENT_plugs-2and2.xml";
+        run(cfg, iter, "1.0");
+        run(cfg, iter, "1.5");
+        run(cfg, iter, "2.0");
+        run(cfg, iter, "2.5");
+        run(cfg, iter, "3.0");
+        run(cfg, iter, "3.5");
+        run(cfg, iter, "4.0");
     }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.utli.stats;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.*;
-import org.xml.sax.Attributes;
-
-import playground.michalm.ev.UnitConversionRatios;
-import playground.michalm.taxi.data.EvrpVehicle;
+import org.matsim.contrib.util.*;
 
 
-public class EvrpVehicleReader
-    extends VehicleReader
+public class ETaxiStats
 {
-    public EvrpVehicleReader(Network network, VrpData data)
+    public enum ETaxiState
     {
-        super(network, data);
+        QUEUED, PLUGGED;
     }
 
 
-    @Override
-    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0,
-            double t1, Attributes atts)
+    public final String id;
+
+    public final EnumAdder<ETaxiState, Long> stateTimeSumsByState = new LongEnumAdder<>(
+            ETaxiState.class);
+
+
+    public ETaxiStats(String id)
     {
-        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
-                * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * batteryCapacity)
-                * UnitConversionRatios.J_PER_kWh;
-        return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity, initialSoc);
+        this.id = id;
+    }
+
+
+    public double getFleetQueuedTimeRatio()
+    {
+        double queued = stateTimeSumsByState.get(ETaxiState.QUEUED);
+        double plugged = stateTimeSumsByState.get(ETaxiState.PLUGGED);
+        return queued / (queued + plugged);
     }
 }
