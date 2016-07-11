@@ -76,7 +76,8 @@ public class RunETaxiBenchmark
             public void install()
             {
                 addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
-                addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
+                //override the binding in RunTaxiBenchmark
+                bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }
         });
 
