@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 public class TaxiBenchmarkStats
     implements AfterMobsimListener, ShutdownListener
 {
-    static final String HEADER = "n\tm\t"//
+    public static final String HEADER = "n\tm\t"//
             + "PassWait\t"//
             + "PassWait_p95\t"//
             + "PassWait_max\t"//

@@ -19,18 +19,17 @@
 
 package playground.michalm.taxi.run;
 
-import org.matsim.contrib.taxi.benchmark.ResultsPostProcessor;
+import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkPostProcessor;
 
 
-public class EResultsPostProcessor
+public class PostProcessEBenchmarkResults
 {
-
     public static void processNewMielec(String type)
     {
         String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2016_06_euro2016_runs/";
         String subDirPrefix = "";
 
-        new ResultsPostProcessor(ETaxiBenchmarkStats.HEADER,//
+        new TaxiBenchmarkPostProcessor(ETaxiBenchmarkStats.HEADER,//
                 "1.0", //
                 "1.5", //
                 "2.0", //

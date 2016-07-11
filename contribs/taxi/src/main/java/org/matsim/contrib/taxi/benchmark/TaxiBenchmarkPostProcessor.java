@@ -27,7 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 
-public class ResultsPostProcessor
+public class TaxiBenchmarkPostProcessor
 {
     private static class Experiment
     {
@@ -48,7 +48,7 @@ public class ResultsPostProcessor
      */
     private static class Stats
     {
-//        private final String cfg;
+        //private final String cfg;
         private final int n;
         private final int m;
 
@@ -57,7 +57,7 @@ public class ResultsPostProcessor
 
         private Stats(Scanner sc, int count)
         {
-//            cfg = sc.next();
+            //cfg = sc.next();
             n = sc.nextInt();
             m = sc.nextInt();
 
@@ -76,10 +76,10 @@ public class ResultsPostProcessor
     private final String[] statsColumns;
 
 
-    public ResultsPostProcessor(String header, String... ids)
+    public TaxiBenchmarkPostProcessor(String header, String... ids)
     {
         this.header = header;
-        
+
         experiments = new Experiment[ids.length];
         for (int i = 0; i < experiments.length; i++) {
             String id = ids[i];
@@ -175,8 +175,8 @@ public class ResultsPostProcessor
         DecimalFormat format = new DecimalFormat("#.###");
 
         for (int i = 0; i < statsCount; i++) {
-//            String cfg0 = experiments[0].stats.get(i).cfg;
-//            pw.printf("%20s", cfg0);
+            //String cfg0 = experiments[0].stats.get(i).cfg;
+            //pw.printf("%20s", cfg0);
 
             for (Experiment e : experiments) {
                 if (e == EMPTY_COLUMN) {
@@ -185,9 +185,9 @@ public class ResultsPostProcessor
                 else {
                     Stats s = e.stats.get(i);
 
-//                    if (!cfg0.equals(s.cfg)) {
-//                        throw new RuntimeException();
-//                    }
+                    //if (!cfg0.equals(s.cfg)) {
+                    //    throw new RuntimeException();
+                    //}
 
                     pw.print("\t" + format.format(s.values[column]));
                 }
@@ -197,192 +197,5 @@ public class ResultsPostProcessor
         }
 
         pw.close();
-    }
-
-
-    public static void processMielec()
-    {
-        String dir = "d:/PP-rad/mielec/2014_02/";
-        String subDirPrefix = "";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                "10-50", //
-                "15-50", //
-                "20-50", //
-                "25-50", //
-                "30-50", //
-                "35-50", //
-                "40-50", //
-                null, // empty column
-                "10-25", //
-                "15-25", //
-                "20-25", //
-                "25-25", //
-                "30-25", //
-                "35-25", //
-                "40-25"//
-        ).process(dir, subDirPrefix, "stats");
-    }
-
-
-    public static void processNewMielec(String type)
-    {
-        String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2016_06_euro2016_runs/new/";
-        String subDirPrefix = "";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                "1.0", //
-                "1.5", //
-                "2.0", //
-                "2.5", //
-                "3.0", //
-                "3.5", //
-                "4.0"//
-        ).process(dir + type, subDirPrefix, "benchmark_stats");
-    }
-
-
-
-    
-    public static void processBerlin()
-    {
-        String dir = "d:/PP-rad/berlin/Only_Berlin_2015_08/";
-        String subDirPrefix = "demand_";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                "1.0", //
-                "1.5", //
-                "2.0", //
-                "2.5", //
-                "3.0", //
-                //                "3.1", //
-                //                "3.2", //
-                //                "3.3" //
-                "3.5", //
-                "4.0", //
-                "4.5", //
-                "5.0"//
-        ).process(dir, subDirPrefix, "stats");
-    }
-
-
-    public static void processBarcelonaVariableDemand()
-    {
-        String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
-        String subDirPrefix = "demand_";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                "0.2", //
-                "0.3", //
-                "0.4", //
-                "0.5", //
-                "0.6", //
-                "0.7", //
-                "0.8", //
-                "0.9" //
-        //"1.0"//
-        ).process(dir, subDirPrefix, "stats");
-    }
-
-
-    public static void processBarcelonaVariableSupply()
-    {
-        String dir = "d:/PP-rad/Barcelona/Barcelona_2015_09/";
-        String subDirPrefix = "supply_from_reqs_";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                //"0.2", //
-                //"0.4", //
-                //                "0.6", //
-                //                "0.8", //
-                //                "1.0", //
-                //                "1.2", //
-                //                "1.4", //
-                //                "1.6", //
-                //                "1.8", //
-                //                "2.0"//
-                "0.45_DSE"//
-        ).process(dir, subDirPrefix, "stats");
-    }
-
-
-    public static void processAudiAV_10()
-    {
-        String dir = "d:/PP-rad/audi_av/audi_av_10pct_2015_10/";
-        String subDirPrefix = "taxi_vehicles_";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                //                "04000", //
-                //                "04500", //
-                //                "05000", //
-                //                "05500", //
-                //                "06000", //
-                //                "06500", //
-                //                "07000", //
-                //                "07500", //
-                //                "08000" //
-                "09000", //
-                "10000", //
-                "11000", //
-                "12000", //
-                "13000" //
-        //                "14000", //
-        //                "15000", //
-        //                "16000", //
-        //                "17000", //
-        //                "18000", //
-        //                "19000", //
-        //                "20000", //
-        //                "21000", //
-        //                "22000", //
-        //                "23000", //
-        //                "24000", //
-        //                "25000" //
-        ).process(dir, subDirPrefix, "stats");
-    }
-
-
-    public static void processAudiAV_100()
-    {
-        String dir = "d:/PP-rad/audi_av/audi_av_2015_10/";
-        String subDirPrefix = "taxi_vehicles_";
-
-        new ResultsPostProcessor(TaxiBenchmarkStats.HEADER,//
-                //                "050000", //
-                //                "060000", //
-                //                "070000", //
-                "080000", //
-                "090000", //
-                "100000", //
-                "110000", //
-                "120000" //
-        //                "130000", //
-        //                "140000", //
-        //                "150000", //
-        //                "160000", //
-        //                "170000", //
-        //                "180000", //
-        //                "190000", //
-        //                "200000", //
-        //                "210000", //
-        //                "220000", //
-        //                "230000", //
-        //                "240000", //
-        //                "250000" //
-        ).process(dir, subDirPrefix, "stats");
-    }
-
-
-    public static void main(String[] args)
-    {
-        //processMielec();
-        processNewMielec("ASSIGNMENT_");
-        processNewMielec("RULE_BASED_");
-
-        //processBerlin();
-        //processBarcelonaVariableDemand();
-        //processBarcelonaVariableSupply();
-        //processAudiAV_10();
-        //processAudiAV_100();
     }
 }
