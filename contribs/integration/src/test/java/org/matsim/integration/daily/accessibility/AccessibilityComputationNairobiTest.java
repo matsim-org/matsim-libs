@@ -69,9 +69,10 @@ public class AccessibilityComputationNairobiTest {
 //		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/facilities.xml";
-		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml";
-//		final String outputDirectory = utils.getOutputDirectory();
-		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
+		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2016-07-09_facilities_airports.xml"; //airports
+//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
+		final String outputDirectory = utils.getOutputDirectory();
+//		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
 //		String travelTimeMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv";
 //		String travelDistanceMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/td.csv";
 //		String ptStops = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv";
@@ -79,16 +80,17 @@ public class AccessibilityComputationNairobiTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000);
-		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
+		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
+		name = name + "_airport";
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
-		final boolean includeDensityLayer = false;
+		final boolean includeDensityLayer = true;
 		final Double lowerBound = -7.; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 0.0;
 		final Integer range = 9; // in the current implementation, this must always be 9
 		final int symbolSize = 510;
-		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		final int populationThreshold = (int) (1 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
@@ -101,6 +103,7 @@ public class AccessibilityComputationNairobiTest {
 		// Choose modes for accessibility computation
 		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 
 		// Matrix-based pt
 //		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);

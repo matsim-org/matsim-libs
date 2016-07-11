@@ -57,7 +57,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 				listener.addAdditionalFacilityData(densityFacilities);
 				listener.writeToSubdirectoryWithName(activityType);
 				// for push to geoserver
-//				accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
+				accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
 				listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 				controlerListenerManager.addControlerListener(listener);
 			}
