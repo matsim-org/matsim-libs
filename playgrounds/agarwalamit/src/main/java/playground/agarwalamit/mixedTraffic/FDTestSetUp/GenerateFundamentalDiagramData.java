@@ -460,8 +460,6 @@ public class GenerateFundamentalDiagramData {
 
 				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
 
-				writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
-
 				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			}
 			
@@ -590,8 +588,6 @@ public class GenerateFundamentalDiagramData {
 		
 		if( travelModes.length > 1 ) {
 			writer.print("noOfCarsPerkm \t");
-
-			writer.print("totalBikesPassedByAllCarsPerKm \t");
 
 			writer.print("avgBikePassingRatePerkm \t");
 		}
