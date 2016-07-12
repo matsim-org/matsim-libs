@@ -37,7 +37,10 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 import playground.agarwalamit.utils.ListUtils;
 
@@ -46,6 +49,10 @@ import playground.agarwalamit.utils.ListUtils;
  */
 
 public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	
+	@Inject
+	private QSimConfigGroup qsimConfigGroup;
+	
 	private final Map<Id<Person>, Double> personId2TrackEnterTime;
 	
 	/**
@@ -103,8 +110,9 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 			
 			if( isFirstBikeLeavingTrack ) {
 				double numberOfBicyclesOvertaken = 0;
-				if( this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
-					numberOfBicyclesOvertaken = -getNumberOfOvertakenVehicles(personId); // this means bike is overtaking cars (seepage)
+				if( qsimConfigGroup.getSeepModes().contains( this.personId2LegMode.get(personId)) ){
+//						this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
+					numberOfBicyclesOvertaken = - getNumberOfOvertakenVehicles(personId); // this means bike is overtaking cars (seepage)
 				} else if ( this.personId2LegMode.get(personId).equals(TransportMode.car)){ 
 					numberOfBicyclesOvertaken = getNumberOfOvertakenVehicles(personId); // this means car is overtaking bikes
 				}

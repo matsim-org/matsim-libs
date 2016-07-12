@@ -372,7 +372,6 @@ public class GenerateFundamentalDiagramData {
 
 		events.addHandler(globalFlowDynamicsUpdator);
 		
-		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
 		
@@ -395,8 +394,10 @@ public class GenerateFundamentalDiagramData {
 			@Override
 			public void install() {
 				this.bindMobsim().toInstance( qSim );
+				if(travelModes.length > 1) this.addEventHandlerBinding().toInstance(passingEventsUpdator);
 			}
 		});
+		
 		controler.run();
 		
 		if(! inputs.getSnapshotFormats().isEmpty()) {
@@ -788,13 +789,11 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}
