@@ -78,7 +78,9 @@ public class DecongestionRun {
 		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
 				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
 				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
-				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_7200/");
+				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() +
+				"_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
+				+ "_0.3_7200_5plans_test/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);

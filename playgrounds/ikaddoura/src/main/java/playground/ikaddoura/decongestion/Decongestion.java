@@ -34,12 +34,6 @@ import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV4;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV6;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV8;
-import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV0;
-import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV1;
-import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV2;
-import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV3;
-import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV5;
-import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV7;
 
 /**
 * @author ikaddoura
@@ -70,30 +64,21 @@ public class Decongestion {
 						
 		DecongestionTollSetting tollSettingApproach = null;
 		
-		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V0)) {
-			tollSettingApproach = new DecongestionTollingV0(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V1)) {
-			tollSettingApproach = new DecongestionTollingV1(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V2)) {
-			tollSettingApproach = new DecongestionTollingV2(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V3)) {
-			tollSettingApproach = new DecongestionTollingV3(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V4)) {
+		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V4)) {
 			tollSettingApproach = new DecongestionTollingV4(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V5)) {
-			tollSettingApproach = new DecongestionTollingV5(info);
+		
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V6)) {
 			tollSettingApproach = new DecongestionTollingV6(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V7)) {
-			tollSettingApproach = new DecongestionTollingV7(info);
+		
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V8)) {
 			tollSettingApproach = new DecongestionTollingV8(info);
+		
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.NoPricing)) {
 			
 			info.getDecongestionConfigGroup().setTOLL_ADJUSTMENT(0.0);
 			info.getDecongestionConfigGroup().setUPDATE_PRICE_INTERVAL(Integer.MAX_VALUE);
 			info.getDecongestionConfigGroup().setTOLERATED_AVERAGE_DELAY_SEC(Double.MAX_VALUE);			
-			tollSettingApproach = new DecongestionTollingV0(info);
+			tollSettingApproach = new DecongestionTollingV8(info);
 			
 		} else {
 			throw new RuntimeException("Unknown decongestion toll setting approach. Aborting...");
