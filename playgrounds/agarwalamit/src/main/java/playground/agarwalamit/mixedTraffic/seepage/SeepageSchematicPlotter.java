@@ -64,8 +64,8 @@ import org.matsim.vehicles.VehicleUtils;
  * Tests that in congested part, walk (seep mode) can overtake (seep) car mode.
  * 
  */
-public class SchematicSeepagePlotter {
-	static private final Logger log = Logger.getLogger( SchematicSeepagePlotter.class);
+public class SeepageSchematicPlotter {
+	static private final Logger log = Logger.getLogger( SeepageSchematicPlotter.class);
 
 	public static void main(String [] args){
 
