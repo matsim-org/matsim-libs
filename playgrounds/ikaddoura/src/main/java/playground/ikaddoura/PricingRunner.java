@@ -85,31 +85,31 @@ public class PricingRunner {
 			String pricingApproachString = args[2];
 			
 			// no pricing
-			if (pricingApproachString.equals(PricingApproach.NoPricing)) {
+			if (pricingApproachString.equals(PricingApproach.NoPricing.toString())) {
 				pricingApproach = PricingApproach.NoPricing;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionNoPricing)) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionNoPricing.toString())) {
 				pricingApproach = PricingApproach.DecongestionNoPricing;
 			
 			// queue- and agent-based pricing
-			} else if (pricingApproachString.equals(PricingApproach.V3)) {
+			} else if (pricingApproachString.equals(PricingApproach.V3.toString())) {
 				pricingApproach = PricingApproach.V3;
-			} else if (pricingApproachString.equals(PricingApproach.V7)) {
+			} else if (pricingApproachString.equals(PricingApproach.V7.toString())) {
 				pricingApproach = PricingApproach.V7;
-			} else if (pricingApproachString.equals(PricingApproach.V8)) {
+			} else if (pricingApproachString.equals(PricingApproach.V8.toString())) {
 				pricingApproach = PricingApproach.V8;
-			} else if (pricingApproachString.equals(PricingApproach.V9)) {
+			} else if (pricingApproachString.equals(PricingApproach.V9.toString())) {
 				pricingApproach = PricingApproach.V9;
-			} else if (pricingApproachString.equals(PricingApproach.V10)) {
+			} else if (pricingApproachString.equals(PricingApproach.V10.toString())) {
 				pricingApproach = PricingApproach.V10;
 			
 			// interval-based pricing
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8a)) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8a.toString())) {
 				pricingApproach = PricingApproach.DecongestionV8a;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8b)) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8b.toString())) {
 				pricingApproach = PricingApproach.DecongestionV8b;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8c)) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8c.toString())) {
 				pricingApproach = PricingApproach.DecongestionV8c;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8d)) {
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8d.toString())) {
 				pricingApproach = PricingApproach.DecongestionV8d;
 			
 			// unknown pricing approach
