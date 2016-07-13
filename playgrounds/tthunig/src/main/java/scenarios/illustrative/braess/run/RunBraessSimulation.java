@@ -22,6 +22,7 @@
 package scenarios.illustrative.braess.run;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
@@ -59,7 +60,10 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 //import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
 //import matsimConnector.congestionpricing.MSATollHandler;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
-import playground.ikaddoura.intervalBasedCongestionPricing.IntervalBasedCongestionPricing;
+import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
+import playground.ikaddoura.decongestion.Decongestion;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -111,7 +115,7 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.INTERVALBASED;
 	public enum PricingType{
 		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
@@ -122,7 +126,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/newBraessCap/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/ICP/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -130,6 +134,17 @@ public final class RunBraessSimulation {
 		Controler controler = prepareController(scenario);
 	
 		controler.run();
+		
+		try {
+			MATSimVideoUtils.createLegHistogramVideo(config.controler().getOutputDirectory());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), 1, "tolls");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static Config defineConfig() {
@@ -146,7 +161,7 @@ public final class RunBraessSimulation {
 			signalConfigGroup.setUseSignalSystems( SIGNAL_TYPE.equals(SignalControlType.NONE)? false : true );
 	
 			// set brain exp beta
-			config.planCalcScore().setBrainExpBeta( 2 );
+			config.planCalcScore().setBrainExpBeta( 20 );
 	
 			// choose between link to link and node to node routing
 			// (only has effect if lanes are used)
@@ -157,7 +172,7 @@ public final class RunBraessSimulation {
 			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 			
 			// set travelTimeBinSize (only has effect if reRoute is used)
-			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
+			config.travelTimeCalculator().setTraveltimeBinSize( 300 );
 			
 			config.travelTimeCalculator().setTravelTimeCalculatorType(
 					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -352,17 +367,14 @@ public final class RunBraessSimulation {
 			
 		} else if (PRICING_TYPE.equals(PricingType.INTERVALBASED)) {
 			
-			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
-			
-			final RandomizingTimeDistanceTravelDisutilityFactory builder =
-					new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
-			builder.setSigma(SIGMA);
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(builder);
-				}
-			});
+			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
+			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+			decongestionSettings.setTOLL_BLEND_FACTOR(0.0);
+			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+			Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();
 			
 		} else { // no pricing
 			

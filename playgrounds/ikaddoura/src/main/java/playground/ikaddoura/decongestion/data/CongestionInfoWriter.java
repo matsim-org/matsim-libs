@@ -54,7 +54,7 @@ public class CongestionInfoWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			int totalNumberOfTimeBins = (int) ((3600. * 30) / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 			
 			bw.write("Link Id");
 			for (int i = 0; i < totalNumberOfTimeBins; i++) {
@@ -105,7 +105,7 @@ public class CongestionInfoWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
 			
-			int totalNumberOfTimeBins = (int) ((3600. * 30) / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 			
 			bw.write("Link Id");
 			for (int i = 0; i < totalNumberOfTimeBins; i++) {
@@ -139,8 +139,8 @@ public class CongestionInfoWriter {
 		
 		XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Toll [monetary units]");
 		
-		int totalNumberOfTimeBins = (int) ((3600. * 30) / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-		
+		int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+						
 		double[] timeBins = new double[totalNumberOfTimeBins];
 		for (int i = 0; i < totalNumberOfTimeBins; i++) {
 			double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
