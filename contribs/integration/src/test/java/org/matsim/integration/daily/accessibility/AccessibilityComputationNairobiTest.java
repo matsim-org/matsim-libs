@@ -81,7 +81,7 @@ public class AccessibilityComputationNairobiTest {
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000);
 		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		name = name + "_airport";
+		name = name + "_airport_min";
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -99,6 +99,9 @@ public class AccessibilityComputationNairobiTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
+		
+		// new
+		config.planCalcScore().setBrainExpBeta(200);
 		
 		// Choose modes for accessibility computation
 		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
