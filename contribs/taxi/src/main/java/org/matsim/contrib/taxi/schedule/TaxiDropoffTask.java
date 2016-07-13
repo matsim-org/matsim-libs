@@ -40,7 +40,7 @@ public class TaxiDropoffTask
 
 
     @Override
-    public void removeFromRequest()
+    public void disconnectFromRequest()
     {
         request.setDropoffTask(null);
     }
