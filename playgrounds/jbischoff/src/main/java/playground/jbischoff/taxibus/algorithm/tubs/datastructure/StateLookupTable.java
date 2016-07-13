@@ -57,9 +57,9 @@ public class StateLookupTable implements IterationEndsListener, ShutdownListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-//		if (event.getIteration()<=1000) {
-//			recalculateMatrix();
-//			}
+		if (event.getIteration()<=1000) {
+			recalculateMatrix();
+			}
 		this.bookingsPerIteration.put(event.getIteration(), this.bookingCounter);
 		this.experiencedStates.clear();
 		this.bookingCounter = 0;

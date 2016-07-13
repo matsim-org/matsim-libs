@@ -135,7 +135,7 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 			}
 			req.setRejected(true);
 			req.getPassenger().setStateToAbort(req.getT1());
-
+			
 			handledRequests.add(req);
 		}
 		
