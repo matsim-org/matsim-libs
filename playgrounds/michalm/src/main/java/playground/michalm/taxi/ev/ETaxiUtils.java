@@ -44,7 +44,7 @@ public class ETaxiUtils
 
         for (Vehicle v : taxiData.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
-            ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption(ev));
+            ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
             ev.setAuxEnergyConsumption(
                     new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider, ETaxiUtils::isTurnedOn));
             evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);

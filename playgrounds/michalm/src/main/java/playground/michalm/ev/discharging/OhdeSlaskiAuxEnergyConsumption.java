@@ -75,10 +75,8 @@ public class OhdeSlaskiAuxEnergyConsumption
 
 
     @Override
-    public void consumeEnergy(double period)
+    public double calcEnergyConsumption(double period)
     {
-        if (isTurnedOn.apply(ev)) {
-            ev.getBattery().discharge(calcPower(temperatureProvider.getTemperature()) * period);
-        }
+        return isTurnedOn.apply(ev) ? calcPower(temperatureProvider.getTemperature()) * period : 0;
     }
 }

@@ -88,7 +88,7 @@ public class RunETaxiBenchmark
     public static void main(String[] args)
     {
         String cfg = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/" + //
-                "mielec_etaxi_benchmark_config_E_RULE_BASED_plugs-2and2.xml";
+                "mielec_etaxi_benchmark_config.xml";
         run(cfg, 1);
     }
 }

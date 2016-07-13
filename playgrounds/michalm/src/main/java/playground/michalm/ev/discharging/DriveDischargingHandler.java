@@ -119,7 +119,8 @@ public class DriveDischargingHandler
         if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
             Link link = network.getLinks().get(linkId);
             double tt = eventTime - evDrive.movedOverNodeTime;
-            evDrive.ev.getDriveEnergyConsumption().consumeEnergy(link, tt);
+            double energy = evDrive.ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt);
+            evDrive.ev.getBattery().discharge(energy);
         }
         return evDrive;
     }

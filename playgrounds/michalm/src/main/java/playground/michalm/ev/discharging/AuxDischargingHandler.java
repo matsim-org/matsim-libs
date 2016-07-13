@@ -48,7 +48,9 @@ public class AuxDischargingHandler
     {
         if ( (e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
             for (ElectricVehicle v : vehicles) {
-                v.getAuxEnergyConsumption().consumeEnergy(auxDischargeTimeStep);
+                double energy = v.getAuxEnergyConsumption()
+                        .calcEnergyConsumption(auxDischargeTimeStep);
+                v.getBattery().discharge(energy);
             }
         }
     }
