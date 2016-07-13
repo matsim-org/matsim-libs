@@ -126,7 +126,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/ICP/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/pricingNewBraessCap/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -483,7 +483,7 @@ public final class RunBraessSimulation {
 
 		runName += "_" + config.controler().getLastIteration() + "it";
 
-		// create info about the different possible travel times
+		// create info about the different possible travel times, capacities and link length
 		Link middleLink = scenario.getNetwork().getLinks()
 				.get(Id.createLinkId("3_4"));
 		Link slowLink = scenario.getNetwork().getLinks()
@@ -495,20 +495,18 @@ public final class RunBraessSimulation {
 		if (middleLink == null){
 			runName += "_woZ";
 		} else {
-			int fastTT = (int)Math.ceil(middleLink.getLength()
+			int middleTT = (int)Math.ceil(middleLink.getLength()
 					/ middleLink.getFreespeed());
+			int fastTT = (int)Math.ceil(fastLink.getLength()
+					/ fastLink.getFreespeed());
 			int slowTT = (int)Math.ceil(slowLink.getLength()
 					/ slowLink.getFreespeed());
 			int capZ = (int)middleLink.getCapacity();
-			runName += "_" + fastTT + "-vs-" + slowTT + "_capZ" + capZ;
-		}
-		
-		// create info about capacity and link length
-		runName += "_cap" + (int)slowLink.getCapacity();
-		if (slowLink.getLength() != 200)
-			runName += "_l" + (int)slowLink.getLength() + "m";
-		if (slowLink.getLength() != fastLink.getLength()){
-			runName += "_l" + (int)fastLink.getLength() + "m";
+			int capFast = (int)fastLink.getCapacity();
+			int capSlow = (int)slowLink.getCapacity();
+			runName += "_tt-" + fastTT + "-" + middleTT + "-" + slowTT;
+			runName += "_cap-" + capFast + "-" + capZ + "-" + capSlow;
+			runName += "_l-" + (int)fastLink.getLength() + "-" + (int)middleLink.getLength() + "-" + (int)slowLink.getLength();
 		}
 		
 		if (scenario.getNetwork().getNodes().containsKey(Id.createNodeId(23))){
