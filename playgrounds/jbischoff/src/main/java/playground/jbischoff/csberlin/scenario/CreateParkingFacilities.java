@@ -51,11 +51,12 @@ public class CreateParkingFacilities {
 	public static void main(String[] args) {
 		
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/example/grid_network.xml");
+//		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
 		final ActivityFacilitiesFactory fac = scenario.getActivityFacilities().getFactory();
 		TabularFileParserConfig config = new TabularFileParserConfig();
         config.setDelimiterTags(new String[] {"\t"});
-        config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze.txt");
+        config.setFileName("../../../shared-svn/projects/bmw_carsharing/example/parking.txt");
         config.setCommentTags(new String[] { "#" });
         new TabularFileParser().parse(config, new TabularFileHandler() {
 
@@ -72,7 +73,7 @@ public class CreateParkingFacilities {
 			}
 		
 	});
-        new FacilitiesWriter(scenario.getActivityFacilities()).write("../../../shared-svn/projects/bmw_carsharing/data/parkingFacilities.xml");
+        new FacilitiesWriter(scenario.getActivityFacilities()).write("../../../shared-svn/projects/bmw_carsharing/example/parkingFacilities.xml");
         
 	}
 	

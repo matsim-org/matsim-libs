@@ -22,11 +22,12 @@
  */
 package playground.jbischoff.csberlin.scenario;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+
+import playground.jbischoff.parking.sim.SetupParking;
 
 /**
  * @author  jbischoff
@@ -35,15 +36,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  *
  */
-public class RunCSBerlinBasecase {
+public class RunCSBerlinBasecaseWithParking {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBC.xml");
-		String runId = "bc08";
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking.xml");
+		String runId = "bc08_park2";
 		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
 		config.controler().setRunId(runId);
-		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		Controler controler = new Controler(config);
+		SetupParking.installParkingModules(controler);
+		
 		controler.run();
 		
 		

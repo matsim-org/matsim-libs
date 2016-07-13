@@ -20,13 +20,21 @@
 /**
  * 
  */
-package playground.jbischoff.csberlin.scenario;
+package playground.jbischoff.csberlin.plans.preprocess;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author  jbischoff
@@ -35,17 +43,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  *
  */
-public class RunCSBerlinBasecase {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBC.xml");
-		String runId = "bc08";
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
-		config.controler().setRunId(runId);
-		
-		
-		Controler controler = new Controler(config);
-		controler.run();
-		
-		
+public class RemoveAgentsWhereCarUsageIsInconsistant {
+public static void main(String[] args) {
+	
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+	new PopulationReader(scenario).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans.xml.gz");
+	for (Person p : scenario.getPopulation().getPersons().values()){
+			Plan plan = p.getSelectedPlan();
+			Activity last = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
+			last.setEndTime(Time.UNDEFINED_TIME);
+			pop2.addPerson(p);
 	}
+	new PopulationWriter(pop2).write("../../../shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans_lastActNoEndtime.xml.gz");
+	
+	
+}
 }
