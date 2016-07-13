@@ -19,9 +19,9 @@ public class GnuplotUtils {
 		String osName = System.getProperty("os.name");
 		log.info("OS name is = " + osName);
 		
-		String allArgumentsAsString = gnuplotArguments[0];
-		for (int i=1; i < gnuplotArguments.length ; i++) {
-			allArgumentsAsString.concat(" " + gnuplotArguments[i]);
+		String allArgumentsAsString = "";
+		for (int i=0; i < gnuplotArguments.length ; i++) {
+			allArgumentsAsString.concat(gnuplotArguments[i] + " ");
 		}
 		
 		try {
