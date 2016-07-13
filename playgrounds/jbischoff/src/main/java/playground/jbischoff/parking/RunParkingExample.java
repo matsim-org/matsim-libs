@@ -43,12 +43,14 @@ public class RunParkingExample {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");
 		config.plans().setInputFile("../../../shared-svn/projects/bmw_carsharing/example/population100.xml");
+		config.facilities().setInputFile("../../../shared-svn/projects/bmw_carsharing/example/parkingFacilities.xml");
 		config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/output");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(50);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
-        controler.addOverridingModule(new OTFVisLiveModule());
+//        controler.addOverridingModule(new OTFVisLiveModule());
 
 		SetupParking.installParkingModules(controler);
 		controler.run();

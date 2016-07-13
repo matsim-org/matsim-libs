@@ -62,7 +62,7 @@ public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implement
 	}
 
 	@Override
-	public boolean canVehicleParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
+	public boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
 		return (this.occupation.get(linkId).intValue()<this.capacity.get(linkId))?true:false;
 
 	}

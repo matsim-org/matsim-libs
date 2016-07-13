@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.mutable.MutableInt;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -54,9 +55,14 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	Map<Id<Link>,Integer> capacity = new HashMap<>();
 	Map<Id<ActivityFacility>,MutableInt> occupation = new HashMap<>();
 	Map<Id<ActivityFacility>,ActivityFacility> parkingFacilities;
-	Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations;
-	Map<Id<Link>,Set<Id<ActivityFacility>>> facilitiesPerLink;
-	Map<Id<Link>,Id<Link>> backLinkId = new HashMap<>();;
+	Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
+	Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
+	
+	Map<Id<Vehicle>,Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
+	Map<Id<Link>,Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
+	Map<Id<Link>,Id<Link>> backLinkId = new HashMap<>();
+	
+	
 	Network network;
 	
 	/**
@@ -66,7 +72,7 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	public FacilityBasedParkingManager(Scenario scenario) {
 	this.network  = scenario.getNetwork();
 	parkingFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
-	
+	Logger.getLogger(getClass()).info(parkingFacilities);
 	
 	for (ActivityFacility fac : this.parkingFacilities.values()){
 		Id<Link> linkId = fac.getLinkId();
@@ -81,10 +87,11 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		
 	}
 	for (Id<Link> linkId : facilitiesPerLink.keySet()){
+		Logger.getLogger(getClass()).info("link added with parking restriction: "+linkId);
 		Link link = network.getLinks().get(linkId);
 		Link backLink = getBackLink(link);
 		if (backLink!=null){
-			this.backLinkId.put(linkId, backLink.getId());
+//			this.backLinkId.put(linkId, backLink.getId());
 		}
 	}
 	}
@@ -95,26 +102,40 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	 * @see playground.jbischoff.parking.manager.ParkingManager#canVehicleParkHere(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public boolean canVehicleParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
+	public boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
 		boolean canPark = false;
 		Id<Link> backLinkId = (this.backLinkId.containsKey(linkId)?this.backLinkId.get(linkId):null);
 		
 		if (linkIdHasAvailableParkingForVehicle(linkId,vehicleId)){
 			canPark = true;
-		}else if (backLinkId!=null){
+		}
+		else if (backLinkId!=null){
 			if (linkIdHasAvailableParkingForVehicle(backLinkId,vehicleId)){
 				canPark = true;
 			}	
 		}
-		
+//		Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
+
 		return canPark;
 	}
 	
 	private boolean linkIdHasAvailableParkingForVehicle(Id<Link> linkId, Id<Vehicle> vid){
+//		Logger.getLogger(getClass()).info("link "+linkId+" vehicle "+vid);
+		if (!this.facilitiesPerLink.containsKey(linkId)) {
+			//this implies: If no parking facility is present, we suppose that we can park freely (i.e. the matsim standard approach)
+			//it also means: a link without any parking spaces should have a parking facility with 0 capacity. 
+//			Logger.getLogger(getClass()).info("link not listed as parking space, we will say yes "+linkId);
+
+			return true;
+			}
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac: parkingFacilitiesAtLink){
 			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 			if (this.occupation.get(fac).doubleValue()<=cap) {
+//				Logger.getLogger(getClass()).info("occ: "+this.occupation.get(fac).toString()+" cap: "+cap);
+				this.occupation.get(fac).increment();
+				this.parkingReservation.put(vid, fac);
+				
 				return true;
 			}
 		}
@@ -129,6 +150,10 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		if (this.parkingLocations.containsKey(vehicleId)){
 			return this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getLinkId();
 		} else
+			if(this.parkingLocationsOutsideFacilities.containsKey(vehicleId)){
+				return this.parkingLocationsOutsideFacilities.get(vehicleId);
+		}
+		else
 		return null;
 	}
 
@@ -137,29 +162,42 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	 */
 	@Override
 	public boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
-		for (Id<ActivityFacility> fac: parkingFacilitiesAtLink){
-			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
-			if (this.occupation.get(fac).doubleValue()<=cap) {
-				this.occupation.get(fac).increment();
-				this.parkingLocations.put(vehicleId, fac);
-				return true;				
-			}
+		if(parkVehicleAtLink(vehicleId,linkId,time)){
+			return true;
 		}
-		Id<Link> backLinkId = (this.backLinkId.containsKey(linkId)?this.backLinkId.get(linkId):null);
-		if (backLinkId!= null){
-		Set<Id<ActivityFacility>> parkingFacilitiesAtBackLink = this.facilitiesPerLink.get(backLinkId);
-		for (Id<ActivityFacility> fac: parkingFacilitiesAtBackLink){
-			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
-			if (this.occupation.get(fac).doubleValue()<=cap) {
-				this.occupation.get(fac).increment();
-				this.parkingLocations.put(vehicleId, fac);
-				return true;				
-			}
-		}
+		else {
+			Id<Link> backLinkId = (this.backLinkId.containsKey(linkId)?this.backLinkId.get(linkId):null);
+			if (backLinkId!=null){
+			if(parkVehicleAtLink(vehicleId,backLinkId,time)){
+				return true;
+			}}
 		}
 		return false;
 	}
+
+	/**
+	 * @param vehicleId
+	 * @param linkId
+	 * @param time
+	 */
+	private boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		if (parkingFacilitiesAtLink == null){
+			this.parkingLocationsOutsideFacilities.put(vehicleId, linkId);
+			return true;
+		} else {
+			Id<ActivityFacility> fac = this.parkingReservation.remove(vehicleId);
+			if (fac!=null) {
+				this.parkingLocations.put(vehicleId, fac);
+				return true;
+			}else{
+				throw new RuntimeException("no parking reservation found for arrival on link with parking restriction");
+			}
+		}
+				
+	}
+
+
 
 	/* (non-Javadoc)
 	 * @see playground.jbischoff.parking.manager.ParkingManager#unParkVehicleHere(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, double)
@@ -167,7 +205,9 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	@Override
 	public boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if(!this.parkingLocations.containsKey(vehicleId)){
-		return false;}
+		return true;
+		// we assume the person parks somewhere else
+		}
 		else
 		{
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
