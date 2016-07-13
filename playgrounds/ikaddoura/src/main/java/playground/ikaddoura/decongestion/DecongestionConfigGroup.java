@@ -34,7 +34,7 @@ public class DecongestionConfigGroup {
 	private double INITIAL_TOLL = -1.0; // relevant for V6 (Set to a negative value to use the average delay cost as initial toll!)
 	private double TOLL_BLEND_FACTOR = 1.0; // relevant for: V4, V8 (Set to 1.0 if tolls in previous iterations should be ignored!)
 	
-	private int WRITE_OUTPUT_ITERATION = 1;
+	private int WRITE_OUTPUT_ITERATION = 100;
 	private double TOLERATED_AVERAGE_DELAY_SEC = 0.0;
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
 	
