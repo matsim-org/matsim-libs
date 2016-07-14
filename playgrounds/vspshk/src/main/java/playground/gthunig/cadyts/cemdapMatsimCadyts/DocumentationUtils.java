@@ -1,4 +1,4 @@
-package playground.gthunig.cemdapMatsimCadyts;
+package playground.gthunig.cadyts.cemdapMatsimCadyts;
 
 import org.apache.log4j.Logger;
 
