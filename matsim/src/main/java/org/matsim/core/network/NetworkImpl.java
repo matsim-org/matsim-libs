@@ -208,8 +208,10 @@ public final class NetworkImpl implements Network, Lockable {
 		if (l == null) {
 			return null;
 		}
-		l.getFromNode().getOutLinks().remove(l.getId());
-		l.getToNode().getInLinks().remove(l.getId());
+//		l.getFromNode().getOutLinks().remove(l.getId());
+		l.getFromNode().removeOutLink(l.getId()) ; 
+//		l.getToNode().getInLinks().remove(l.getId());
+		l.getToNode().removeInLink(l.getId()) ;
 		return l;
 	}
 
