@@ -287,8 +287,11 @@ public class CreateAutomatedFDTest {
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
 		String fileName = linkDynamics+"_"+trafficDynamics+"_"+inflowConstraint+".png";
+		
+		new File(outDir+ linkDynamics+"_"+trafficDynamics+".png").deleteOnExit();
+		
 		String outFile ; 
-		//ZZ_TODO : what is there exists some different directory => changing method name will keep collecting the old data.
+		//ZZ_TODO : what if, there exists some different directory (or files with old filename) => changing method name will keep collecting the old data.
 		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
 			outFile = helper.getOutputDirectory()+fileName;
 		} else {
