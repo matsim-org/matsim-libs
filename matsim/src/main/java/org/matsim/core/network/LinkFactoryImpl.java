@@ -30,7 +30,7 @@ public final class LinkFactoryImpl implements LinkFactory {
 	@Override
 	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
 			double capacity, double nOfLanes) {
-		return new LinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes);
+		return NetworkUtils.createLink(id, from, to, network, length, freespeed, capacity, nOfLanes);
 	}
 
 }

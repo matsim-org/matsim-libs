@@ -653,4 +653,10 @@ public class NetworkUtils {
 			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
 		}
 	}
+
+
+	public static LinkImpl createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
+			double capacity, double lanes) {
+		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
+	}
 }

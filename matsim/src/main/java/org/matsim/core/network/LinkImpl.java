@@ -84,7 +84,7 @@ public class LinkImpl implements Link {
 		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
 	}
 
-	protected LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
+	/*deliberately package*/ LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;
 		this.network = network;
 		this.from = from;

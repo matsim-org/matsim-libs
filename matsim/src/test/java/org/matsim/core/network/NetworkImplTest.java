@@ -80,9 +80,9 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addNode(node3);
 		network.addNode(node4);
 
-		LinkImpl link1 = new LinkImpl(Id.create(1, Link.class), node1, node2, network, 1000, 100.0, 2000.0, 1.0);
-		LinkImpl link1b = new LinkImpl(Id.create(1, Link.class), node2, node3, network, 1000, 100.0, 2000.0, 1.0);
-		LinkImpl link2 = new LinkImpl(Id.create(2, Link.class), node2, node4, network, 1000, 100.0, 2000.0, 1.0);
+		LinkImpl link1 = NetworkUtils.createLink(Id.create(1, Link.class), node1, node2, network, 1000, 100.0, 2000.0, 1.0);
+		LinkImpl link1b = NetworkUtils.createLink(Id.create(1, Link.class), node2, node3, network, 1000, 100.0, 2000.0, 1.0);
+		LinkImpl link2 = NetworkUtils.createLink(Id.create(2, Link.class), node2, node4, network, 1000, 100.0, 2000.0, 1.0);
 		network.addLink(link1);
 		Assert.assertEquals(1, network.getLinks().size());
 		try {

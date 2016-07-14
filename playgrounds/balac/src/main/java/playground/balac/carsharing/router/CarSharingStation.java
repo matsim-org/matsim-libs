@@ -13,7 +13,7 @@ public class CarSharingStation implements Facility<CarSharingStation>
   private final Id<CarSharingStation> id;
   private Coord coord;
   private int cars = 0;
-  private LinkImpl link;
+  private Link link;
 
   CarSharingStation(Id<CarSharingStation> id, Coord coord, LinkImpl link)
   {
@@ -40,7 +40,7 @@ public class CarSharingStation implements Facility<CarSharingStation>
     return this.coord;
   }
 
-  public LinkImpl getLink() {
+  public Link getLink() {
     return this.link;
   }
 
@@ -64,7 +64,7 @@ public class CarSharingStation implements Facility<CarSharingStation>
     this.coord = coord2;
   }
 
-  public void setLink(LinkImpl stationLink) {
+  public void setLink(Link stationLink) {
     this.link = stationLink;
   }
 }

@@ -11,6 +11,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -34,19 +35,19 @@ public class MembershipAssigner
   private static final Logger log = Logger.getLogger(MembershipAssigner.class);
   private MutableScenario scenario;
   private Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
-  private TreeMap<Integer, Coord> solutionDecoder = new TreeMap<Integer, Coord>();
+  private TreeMap<Integer, Coord> solutionDecoder = new TreeMap<>();
   private CarSharingStations carStations;
   private QuadTree<Person> personsQuadTree;
   private int counter;
   private SupplySideModel membershipModel;
-  private ArrayList<Person> personsWithLicense = new ArrayList<Person>();
+  private ArrayList<Person> personsWithLicense = new ArrayList<>();
   //private String stationfilePath = "C:/Users/balacm/Desktop/Stations_GreaterZurich_2x.txt";
   //private String newfilePath = "C:/Users/balacm/Documents/MobilityData/Stations_GreaterZurich.txt";
 
   private String stationfilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/FreeFloatingTransportation2014/CS_Stations.txt";
 
-  protected ArrayList<Integer> initialSolution = new ArrayList<Integer>();
-  private ArrayList<LinkImpl> availableLinks = new ArrayList< LinkImpl>();
+  protected ArrayList<Integer> initialSolution = new ArrayList<>();
+  private ArrayList<Link> availableLinks = new ArrayList<>();
 
   public MembershipAssigner(MutableScenario scenario) {
 	  this.scenario = scenario;
@@ -64,7 +65,7 @@ public class MembershipAssigner
 
   private double computeAccessCSWork(Person pi)
   {
-    Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
+    Vector<CarSharingStation> closestStations = new Vector<>();
     Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
     double access = 0.0D;
     
@@ -93,7 +94,7 @@ public class MembershipAssigner
 
   private double computeAccessCSHome(Person pi)
   {
-    Vector<CarSharingStation> closestStations = new Vector<CarSharingStation>();
+    Vector<CarSharingStation> closestStations = new Vector<>();
     Coord c = new Coord((1.0D / 0.0D), (1.0D / 0.0D));
     double access = 0.0D;
     for (PlanElement pe : pi.getSelectedPlan().getPlanElements())
@@ -179,7 +180,7 @@ public class MembershipAssigner
   private void setSolutionDecoder()
   {
     Integer i = Integer.valueOf(0);
-    for (LinkImpl link : this.availableLinks)
+    for (Link link : this.availableLinks)
     {
       this.solutionDecoder.put(i, link.getCoord());
       i = Integer.valueOf(i.intValue() + 1);
@@ -282,7 +283,8 @@ public class MembershipAssigner
     return this.initialSolution;
   }
 
-  public double computePotential(ArrayList<Integer> solution) {
+  @Override
+public double computePotential(ArrayList<Integer> solution) {
     this.counter = 0;
     updateStations(solution);
     modifyPlans();
@@ -292,8 +294,8 @@ public class MembershipAssigner
   private void updateStations(ArrayList<Integer> solution)
   {
 	
-    TreeMap<Integer, Coord> coordCode = new TreeMap<Integer, Coord>();
-    TreeMap<Integer, LinkImpl> linkCode = new TreeMap<Integer, LinkImpl>();
+    TreeMap<Integer, Coord> coordCode = new TreeMap<>();
+    TreeMap<Integer, Link> linkCode = new TreeMap<>();
     int j = 0;
     for (Integer i : solution)
     {
@@ -317,7 +319,8 @@ public class MembershipAssigner
     }
   }
 
-  public int calcMembership(FlexTransPersonImpl ftPerson)
+  @Override
+public int calcMembership(FlexTransPersonImpl ftPerson)
   {
     return 0;
   }
