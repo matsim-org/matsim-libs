@@ -22,15 +22,13 @@ public class DocumentationUtils {
 		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300_ber_dist");
 		try {
 			List<String> output = searchDocumentationValues(rootRunDirectory, tripAnalyzerExtendedAnalysisDirectories);
-			for (String currentOutput : output) {
-				System.out.println(currentOutput);
-			}
+			output.forEach(System.out::println);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static List<String> searchDocumentationValues(String rootRunDirectory, List<String> tripAnalyzerExtendedAnalysisDirectories) throws IOException {
+	private static List<String> searchDocumentationValues(String rootRunDirectory, List<String> tripAnalyzerExtendedAnalysisDirectories) throws IOException {
 		rootRunDirectory += "/";
 		List<String> result = new ArrayList<>();
 		log.info("Start searching for documentation values in \"" + rootRunDirectory + "\"");
@@ -144,7 +142,7 @@ public class DocumentationUtils {
 		result.add("/TAEs");
 	}
 
-	public static String formatInput(String input) {
+	private static String formatInput(String input) {
 		return input.replace('.', ',');
 	}
 }
