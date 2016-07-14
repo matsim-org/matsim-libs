@@ -27,6 +27,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
+import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
@@ -104,9 +106,43 @@ public class Decongestion {
 		});		
 	}
 
-	public void run() {		
+	public void run() {	
+		
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
+		
+		log.info("Decongestion simulation run completed.");
+		
+		analyze();
+	}
+
+	private void analyze() {
+		
+		log.info("Analyzing the final iteration...");
+		
+		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		analysis.run();
+		
+		try {
+			MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			MATSimVideoUtils.createVideo(controler.getConfig().controler().getOutputDirectory(), this.info.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			MATSimVideoUtils.createVideo(controler.getConfig().controler().getOutputDirectory(), this.info.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			MATSimVideoUtils.createVideo(controler.getConfig().controler().getOutputDirectory(), this.info.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "weight_perLinkAndTimeBin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Controler getControler() {

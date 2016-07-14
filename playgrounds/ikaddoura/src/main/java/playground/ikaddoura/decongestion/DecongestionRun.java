@@ -32,8 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
-import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -80,19 +78,13 @@ public class DecongestionRun {
 				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
 				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() +
 				"_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
-				+ "_0.3_7200_5plans_test/");
+				+ "_0.3_7200_5plans_test2/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 		Decongestion decongestion = new Decongestion(info);
 		decongestion.run();
 		
-		log.info("Analyzing the final iteration...");
-		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());
-		analysis.run();
-		
-		MATSimVideoUtils.createLegHistogramVideo(config.controler().getOutputDirectory());
-		MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), decongestionSettings.getWRITE_OUTPUT_ITERATION(), "tolls");
 	}
 }
 
