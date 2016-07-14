@@ -3,7 +3,7 @@ package playground.sergioo.simpleMapMatching2011;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import others.sergioo.util.geometry.Line2D;

@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 
 public class StayTaskImpl

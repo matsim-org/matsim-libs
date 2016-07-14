@@ -3,9 +3,9 @@ package org.matsim.contrib.carsharing.control.listeners;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
 import org.matsim.contrib.carsharing.events.handlers.NoVehicleCarSharingEventHandler;
-import org.matsim.core.network.Link;
 
 public class NoVehicleEventHandler implements NoVehicleCarSharingEventHandler {
 

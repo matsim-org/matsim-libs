@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 // a simple example how to implement an eventsHandler
 // More eventsHandler can be found under org.matsim.events.*

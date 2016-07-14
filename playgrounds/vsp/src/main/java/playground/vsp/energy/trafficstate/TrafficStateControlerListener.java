@@ -21,6 +21,7 @@ package playground.vsp.energy.trafficstate;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -29,7 +30,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.Link;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 

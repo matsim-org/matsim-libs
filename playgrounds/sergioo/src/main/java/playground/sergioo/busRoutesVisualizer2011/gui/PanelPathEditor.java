@@ -46,8 +46,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 
 import others.sergioo.util.geometry.Point2D;
 

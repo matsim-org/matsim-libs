@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.vis.otfvis.OTFClientControl;

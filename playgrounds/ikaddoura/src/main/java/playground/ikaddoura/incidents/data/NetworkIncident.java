@@ -19,7 +19,7 @@
 
 package playground.ikaddoura.incidents.data;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 /**
 * @author ikaddoura

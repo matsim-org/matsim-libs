@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;

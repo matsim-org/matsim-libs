@@ -5,9 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.Link;
 import org.matsim.core.population.PersonUtils;
 import playground.balac.carsharing.router.CarSharingStation;
 

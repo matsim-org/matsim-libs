@@ -3,9 +3,9 @@ package playground.sergioo.networksMatcher2012.kernel.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
 

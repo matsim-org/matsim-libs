@@ -28,11 +28,11 @@ import java.util.List;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.Link;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 

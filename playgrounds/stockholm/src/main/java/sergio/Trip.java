@@ -3,7 +3,7 @@ package sergio;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 import gunnar.ihop2.regent.demandreading.Zone;
 

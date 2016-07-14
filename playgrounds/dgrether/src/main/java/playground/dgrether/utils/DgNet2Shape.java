@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.utils;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.Link;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;

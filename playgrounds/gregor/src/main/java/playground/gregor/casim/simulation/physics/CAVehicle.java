@@ -23,10 +23,10 @@ package playground.gregor.casim.simulation.physics;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {

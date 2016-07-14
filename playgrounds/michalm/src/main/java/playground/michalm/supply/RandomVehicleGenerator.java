@@ -22,11 +22,11 @@ package playground.michalm.supply;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.contrib.util.random.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 

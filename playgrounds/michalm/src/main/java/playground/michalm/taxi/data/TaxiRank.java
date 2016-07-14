@@ -22,8 +22,8 @@ package playground.michalm.taxi.data;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.core.network.Link;
 
 
 public class TaxiRank

@@ -21,11 +21,11 @@ package playground.thibautd.hitchiking.routing;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.Link;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;

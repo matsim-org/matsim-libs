@@ -3,6 +3,7 @@ package playground.dhosse.prt.scheduler;
 import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -14,7 +15,6 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.network.Link;
 import org.matsim.core.router.util.*;
 
 

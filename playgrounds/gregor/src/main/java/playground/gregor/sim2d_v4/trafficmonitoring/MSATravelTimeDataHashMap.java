@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v4.trafficmonitoring;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
 import org.matsim.core.utils.misc.IntegerCache;
 

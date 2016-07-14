@@ -6,13 +6,13 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.gis.SpatialGridTableWriter;
 import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;

@@ -24,8 +24,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.control.helper.Algorithms;
-import org.matsim.core.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;

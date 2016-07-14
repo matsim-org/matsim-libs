@@ -9,8 +9,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.io.IOUtils;

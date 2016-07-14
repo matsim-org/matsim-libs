@@ -2,11 +2,11 @@ package tutorial.programming.ownMobsimAgentWithPerception;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.network.Link;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 

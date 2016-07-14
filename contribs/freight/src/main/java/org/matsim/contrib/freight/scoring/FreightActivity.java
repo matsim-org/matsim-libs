@@ -2,9 +2,9 @@ package org.matsim.contrib.freight.scoring;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.core.network.Link;
 import org.matsim.facilities.ActivityFacility;
 
 public class FreightActivity implements Activity {

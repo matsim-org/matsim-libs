@@ -20,7 +20,7 @@
 package playground.benjamin.utils.spatialAvg;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 public interface LinkWeightUtil {
 

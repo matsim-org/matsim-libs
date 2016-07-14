@@ -20,7 +20,7 @@
 package playground.dgrether.signalsystems;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * This class provides methods to check, if a vehicle is approximately in a certain distance from a link's end.

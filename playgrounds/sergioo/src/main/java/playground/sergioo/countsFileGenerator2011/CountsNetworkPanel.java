@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.countsFileGenerator2011.CountsWindow.Labels;
 import playground.sergioo.countsFileGenerator2011.CountsWindow.Options;

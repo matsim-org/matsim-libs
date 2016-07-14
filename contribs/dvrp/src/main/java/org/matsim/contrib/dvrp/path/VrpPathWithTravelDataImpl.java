@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.path;
 
 import java.util.Iterator;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.collect.Iterators;
 

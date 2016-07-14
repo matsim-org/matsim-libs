@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.*;
-import org.matsim.core.network.Link;
 import org.xml.sax.Attributes;
 
 import playground.michalm.ev.UnitConversionRatios;

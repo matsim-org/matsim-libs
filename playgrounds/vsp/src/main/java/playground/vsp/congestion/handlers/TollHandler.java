@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.vsp.congestion.events.CongestionEvent;
 

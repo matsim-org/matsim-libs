@@ -45,6 +45,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.contrib.evacuation.control.ShapeFactory;
 import org.matsim.contrib.evacuation.io.ConfigIO;
@@ -52,7 +53,6 @@ import org.matsim.contrib.evacuation.model.AbstractModule;
 import org.matsim.contrib.evacuation.model.AbstractToolBox;
 import org.matsim.contrib.evacuation.model.Constants;
 import org.matsim.contrib.evacuation.model.shape.LineShape;
-import org.matsim.core.network.Link;
 
 public class RCEToolBox extends AbstractToolBox {
 

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonLinks;

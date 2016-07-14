@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.router;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.network.Link;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 

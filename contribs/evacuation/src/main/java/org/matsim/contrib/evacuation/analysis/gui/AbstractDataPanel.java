@@ -22,8 +22,8 @@ package org.matsim.contrib.evacuation.analysis.gui;
 
 import javax.swing.JPanel;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
-import org.matsim.core.network.Link;
 
 public abstract class AbstractDataPanel extends JPanel implements DataPanelInterface {
 

@@ -25,9 +25,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.core.network.Link;
 
 import playground.jbischoff.taxibus.algorithm.TaxibusActionCreator;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;

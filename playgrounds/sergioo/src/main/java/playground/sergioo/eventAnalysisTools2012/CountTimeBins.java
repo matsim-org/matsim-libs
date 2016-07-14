@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 public class CountTimeBins implements LinkEnterEventHandler {
 	

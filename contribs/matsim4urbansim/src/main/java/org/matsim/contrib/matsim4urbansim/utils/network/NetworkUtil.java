@@ -3,10 +3,9 @@ package org.matsim.contrib.matsim4urbansim.utils.network;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Distances;
-import org.matsim.core.network.Link;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
 import com.vividsolutions.jts.geom.Point;

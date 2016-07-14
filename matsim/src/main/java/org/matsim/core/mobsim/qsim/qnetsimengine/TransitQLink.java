@@ -28,10 +28,10 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
-import org.matsim.core.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 

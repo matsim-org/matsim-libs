@@ -1,8 +1,8 @@
 package playground.wrashid.jdeqsim.parallel;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
-import org.matsim.core.network.Link;
 
 public class ExtendedRoad extends Road {
 

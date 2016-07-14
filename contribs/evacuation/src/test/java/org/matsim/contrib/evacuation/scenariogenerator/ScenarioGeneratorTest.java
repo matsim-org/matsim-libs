@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.analysis.control.EventReaderThread;
 import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.contrib.evacuation.io.ConfigIO;
@@ -39,7 +40,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.Link;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;

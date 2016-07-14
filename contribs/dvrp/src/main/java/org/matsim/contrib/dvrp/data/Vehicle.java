@@ -20,9 +20,9 @@
 package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.core.network.Link;
 
 
 /**

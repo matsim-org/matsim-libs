@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.data;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -27,7 +28,6 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.network.Link;
 
 
 public class TaxiRequest

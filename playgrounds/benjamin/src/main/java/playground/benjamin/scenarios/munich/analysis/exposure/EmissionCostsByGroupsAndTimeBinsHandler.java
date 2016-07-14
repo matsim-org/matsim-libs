@@ -22,11 +22,11 @@ package playground.benjamin.scenarios.munich.analysis.exposure;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.core.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 import playground.benjamin.internalization.EmissionCostModule;

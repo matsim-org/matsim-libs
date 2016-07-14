@@ -21,7 +21,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * This was separated out since there were some commonalities between "MobsimAgent" and "DriverAgent".

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dynagent.DriverDynLeg;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.Link;
 
 
 public class RandomDynLeg

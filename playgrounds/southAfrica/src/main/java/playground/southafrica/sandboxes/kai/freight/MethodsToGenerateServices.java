@@ -21,9 +21,9 @@ package playground.southafrica.sandboxes.kai.freight;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.core.network.Link;
 
 class MethodsToGenerateServices {
 	private MethodsToGenerateServices() {} // only static methods, do not instantiate

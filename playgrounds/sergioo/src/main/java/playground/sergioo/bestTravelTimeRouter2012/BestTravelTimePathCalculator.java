@@ -24,8 +24,8 @@ package playground.sergioo.bestTravelTimeRouter2012;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 
 public interface BestTravelTimePathCalculator {
 

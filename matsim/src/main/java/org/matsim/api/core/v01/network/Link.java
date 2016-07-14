@@ -17,12 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.api.core.v01.network;
 
 import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**

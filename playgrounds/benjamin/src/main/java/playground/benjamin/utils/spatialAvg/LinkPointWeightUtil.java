@@ -21,7 +21,7 @@ package playground.benjamin.utils.spatialAvg;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 

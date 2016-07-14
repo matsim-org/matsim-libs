@@ -1,6 +1,6 @@
 package opdytsintegration.example.networkparameters;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Created by michaelzilske on 08/10/15.

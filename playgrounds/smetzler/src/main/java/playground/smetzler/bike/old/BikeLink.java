@@ -1,6 +1,6 @@
 package playground.smetzler.bike.old;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 
 public interface BikeLink extends Link {

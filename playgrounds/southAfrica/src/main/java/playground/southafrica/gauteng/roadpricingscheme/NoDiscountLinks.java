@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 final class NoDiscountLinks {
 	private NoDiscountLinks(){} // do not instantiate

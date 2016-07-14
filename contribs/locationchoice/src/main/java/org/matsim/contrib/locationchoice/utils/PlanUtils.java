@@ -21,6 +21,7 @@ package org.matsim.contrib.locationchoice.utils;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.population.LCActivity;
 import org.matsim.contrib.locationchoice.population.LCLeg;
 import org.matsim.contrib.locationchoice.population.LCPlan;
-import org.matsim.core.network.Link;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
 

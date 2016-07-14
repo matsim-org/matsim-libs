@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.path;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 
 public interface VrpPath

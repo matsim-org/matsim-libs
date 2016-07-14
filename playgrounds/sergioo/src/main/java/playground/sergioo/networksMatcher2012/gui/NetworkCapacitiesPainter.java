@@ -7,9 +7,9 @@ import java.awt.Stroke;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.visualizer2D2012.LayersPanel;

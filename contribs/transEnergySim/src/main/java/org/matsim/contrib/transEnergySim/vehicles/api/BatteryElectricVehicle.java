@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * vehicle has only battery (no combustion engine)

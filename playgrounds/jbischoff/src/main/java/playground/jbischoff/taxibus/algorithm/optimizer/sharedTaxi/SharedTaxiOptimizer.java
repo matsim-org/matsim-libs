@@ -22,9 +22,9 @@ package playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.core.network.Link;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;

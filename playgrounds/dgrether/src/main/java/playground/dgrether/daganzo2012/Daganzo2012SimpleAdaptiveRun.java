@@ -22,6 +22,7 @@ package playground.dgrether.daganzo2012;
 import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -35,7 +36,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 

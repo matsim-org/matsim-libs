@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 
 import playground.gregor.proto.ProtoFrame;
 import playground.gregor.proto.ProtoScenario;

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.utils.zones;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;

@@ -21,10 +21,10 @@ package playground.gregor.ctsim.simulation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.network.Link;
 import org.matsim.vehicles.Vehicle;
 import playground.gregor.ctsim.simulation.physics.CTLink;
 import playground.gregor.ctsim.simulation.physics.CTNetsimEngine;

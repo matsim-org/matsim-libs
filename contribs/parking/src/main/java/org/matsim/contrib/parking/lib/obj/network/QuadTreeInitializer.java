@@ -20,7 +20,7 @@ package org.matsim.contrib.parking.lib.obj.network;
 
 import java.util.Collection;
 
-import org.matsim.core.network.Link;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 

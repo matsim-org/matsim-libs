@@ -21,11 +21,11 @@ package playground.wrashid.artemis.parkingPostprocessing;
 
 import org.geotools.math.Statistics;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;

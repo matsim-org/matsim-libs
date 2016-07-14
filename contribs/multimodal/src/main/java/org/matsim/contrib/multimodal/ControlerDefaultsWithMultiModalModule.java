@@ -23,9 +23,9 @@
 package org.matsim.contrib.multimodal;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.network.Link;
 import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Provider;

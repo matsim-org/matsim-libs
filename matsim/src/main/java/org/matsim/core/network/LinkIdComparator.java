@@ -23,6 +23,7 @@ package org.matsim.core.network;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
 
 

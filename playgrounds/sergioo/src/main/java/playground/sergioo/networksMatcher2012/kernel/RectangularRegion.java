@@ -1,8 +1,8 @@
 package playground.sergioo.networksMatcher2012.kernel;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 
 import playground.sergioo.networksMatcher2012.kernel.core.Region;
 

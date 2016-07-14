@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.util.random.*;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.util.RandomPointUtils;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 import com.vividsolutions.jts.geom.*;

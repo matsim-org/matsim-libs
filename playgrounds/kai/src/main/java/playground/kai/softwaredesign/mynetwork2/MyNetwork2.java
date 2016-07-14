@@ -3,10 +3,10 @@ package playground.kai.softwaredesign.mynetwork2;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
 public class MyNetwork2 implements Network {

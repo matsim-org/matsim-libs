@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.Link;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
 
