@@ -71,9 +71,9 @@ import java.util.Map;
 
 /**
  * @author pieterfourie
- *
- * A controler that alternates between the QSim and PSim for the mobility simulation.
- * Run this class with no arguments to get printed help listing current command line options.
+ *         <p>
+ *         A controler that alternates between the QSim and PSim for the mobility simulation.
+ *         Run this class with no arguments to get printed help listing current command line options.
  */
 public class RunPSim {
     private final Config config;
@@ -92,6 +92,7 @@ public class RunPSim {
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private PSimTravelTimeCalculator carTravelTimeCalculator;
     private PlanCatcher plancatcher;
+
     private RunPSim(String[] args) throws ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
@@ -223,7 +224,7 @@ public class RunPSim {
         } else {
             //randomized routing for car and transit
             final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                    new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
+                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -259,9 +260,9 @@ public class RunPSim {
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
         matsimControler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+                true ?
+                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
     }
 
     public static void main(String args[]) throws ParseException {
@@ -335,8 +336,6 @@ public class RunPSim {
         config.controler().setCreateGraphs(false);
 
     }
-
-
 
 
     /**
@@ -485,7 +484,7 @@ public class RunPSim {
         @Override
         public void notifyBeforeMobsim(BeforeMobsimEvent event) {
             //only for psim iterations
-            if(mobSimSwitcher.isQSimIteration())
+            if (mobSimSwitcher.isQSimIteration())
                 return;
 
             Scenario scenario = matsimControler.getScenario();
@@ -498,20 +497,20 @@ public class RunPSim {
                 selectedPlanScoreMemory.remove(plan.getPerson().getId());
             }
             pSimFactory.setPlans(plancatcher.getPlansForPSim());
-            if (matsimControler.getConfig().transit().isUseTransit() ) {
-                if(FullTransitPerformanceTransmission)
+            if (matsimControler.getConfig().transit().isUseTransit()) {
+                if (FullTransitPerformanceTransmission)
                     pSimFactory.setTransitPerformance(transitPerformanceRecorder.getTransitPerformance());
-                else{
-                    pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
-                    pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
-                }
+//                else{
+                pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
+                pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
+//                }
             }
             pSimFactory.setTravelTime(carTravelTimeCalculator.getLinkTravelTimes());
         }
 
         @Override
         public void notifyIterationEnds(IterationEndsEvent event) {
-            if(mobSimSwitcher.isQSimIteration())
+            if (mobSimSwitcher.isQSimIteration())
                 return;
             Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
             while (iterator.hasNext()) {
