@@ -12,6 +12,10 @@ import java.io.InputStreamReader;
 public class GnuplotUtils {
 	public static final Logger log = Logger.getLogger(GnuplotUtils.class);
 
+	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript) {
+		runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript, "");
+	}
+
 	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript, String gnuplotArgument){
 		/*
 			right now this only works with one argument
