@@ -262,6 +262,18 @@ public final class TransitRouterNetworkWW implements Network {
 			return line;
 		}
 
+		@Override
+		public double getFlowCapacityPerSec() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public double getFlowCapacityPerSec(double time) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
 	}
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 		Id id = null;

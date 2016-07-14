@@ -223,4 +223,12 @@ class ClusterLink implements Link {
 	public void setFromCluster(NodeCluster fromCluster) {
 		this.fromCluster = fromCluster;
 	}
+
+	public double getFlowCapacityPerSec() {
+		return this.link.getFlowCapacityPerSec();
+	}
+
+	public double getFlowCapacityPerSec(double time) {
+		return this.link.getFlowCapacityPerSec(time);
+	}
 }

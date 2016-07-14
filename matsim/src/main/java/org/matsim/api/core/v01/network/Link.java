@@ -119,4 +119,8 @@ public interface Link extends BasicLocation<Link> {
 	 */
 	public Set<String> getAllowedModes();
 
+	double getFlowCapacityPerSec();
+
+	double getFlowCapacityPerSec(double time);
+
 }

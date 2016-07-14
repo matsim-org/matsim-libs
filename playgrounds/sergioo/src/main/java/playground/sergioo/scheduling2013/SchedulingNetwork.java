@@ -132,7 +132,19 @@ public class SchedulingNetwork implements Network {
 			this.toNode = toNode;
 			this.duration = duration;
 		}
+		@Override
+		public double getFlowCapacityPerSec() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public double getFlowCapacityPerSec(double time) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	
+
 		public double getDuration() {
 			return duration; 
 		}
@@ -242,7 +254,7 @@ public class SchedulingNetwork implements Network {
 		public String toString() {
 			return "("+activityType+")"+((SchedulingNode)getToNode()).time+"<"+facilityId+">";
 		}
-	
+
 	}
 	public class JourneySchedulingLink extends SchedulingLink {
 	

@@ -234,6 +234,18 @@ public class TestSpatialTripCutter {
             return null;
         }
 
+	@Override
+	public double getFlowCapacityPerSec() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getFlowCapacityPerSec(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
     }
 
 }
