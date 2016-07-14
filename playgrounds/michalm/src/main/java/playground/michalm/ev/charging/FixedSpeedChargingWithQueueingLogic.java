@@ -22,6 +22,7 @@ package playground.michalm.ev.charging;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.Maps;
@@ -36,6 +37,8 @@ public class FixedSpeedChargingWithQueueingLogic
     protected final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles;
     protected final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
 
+    private EventsManager eventsManager;
+
 
     public FixedSpeedChargingWithQueueingLogic(Charger charger)
     {
@@ -46,7 +49,14 @@ public class FixedSpeedChargingWithQueueingLogic
 
 
     @Override
-    public void chargeVehicles(double chargePeriod)
+    public void initEventsHandling(EventsManager eventsManager)
+    {
+        this.eventsManager = eventsManager;
+    }
+
+
+    @Override
+    public void chargeVehicles(double chargePeriod, double now)
     {
         Iterator<ElectricVehicle> evIter = pluggedVehicles.values().iterator();
         while (evIter.hasNext()) {
@@ -57,14 +67,15 @@ public class FixedSpeedChargingWithQueueingLogic
 
             if (doStopCharging(ev)) {
                 evIter.remove();
-                notifyChargingEnded(ev);
+                eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+                notifyChargingEnded(ev, now);
             }
         }
 
         int fromQueuedToPluggedCount = Math.min(queuedVehicles.size(),
                 charger.getPlugs() - pluggedVehicles.size());
         for (int i = 0; i < fromQueuedToPluggedCount; i++) {
-            plugVehicle(queuedVehicles.poll());
+            plugVehicle(queuedVehicles.poll(), now);
         }
     }
 
@@ -86,67 +97,69 @@ public class FixedSpeedChargingWithQueueingLogic
 
 
     @Override
-    public void addVehicle(ElectricVehicle vehicle)
+    public void addVehicle(ElectricVehicle ev, double now)
     {
         if (pluggedVehicles.size() < charger.getPlugs()) {
-            plugVehicle(vehicle);
+            plugVehicle(ev, now);
         }
         else {
-            queueVehicle(vehicle);
+            queueVehicle(ev, now);
         }
     }
 
 
     @Override
-    public void removeVehicle(ElectricVehicle vehicle)
+    public void removeVehicle(ElectricVehicle ev, double now)
     {
-        if (pluggedVehicles.remove(vehicle.getId()) != null) {//successfully removed
-            notifyChargingEnded(vehicle);
+        if (pluggedVehicles.remove(ev.getId()) != null) {//successfully removed
+            eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
+            notifyChargingEnded(ev, now);
 
             if (!queuedVehicles.isEmpty()) {
-                plugVehicle(queuedVehicles.poll());
+                plugVehicle(queuedVehicles.poll(), now);
             }
         }
-        else if (!queuedVehicles.remove(vehicle)) {//neither plugged nor queued
-            throw new IllegalArgumentException("Vehicle: " + vehicle.getId()
+        else if (!queuedVehicles.remove(ev)) {//neither plugged nor queued
+            throw new IllegalArgumentException("Vehicle: " + ev.getId()
                     + " is neither queued nor plugged at charger: " + charger.getId());
         }
     }
 
 
-    private void queueVehicle(ElectricVehicle vehicle)
+    private void queueVehicle(ElectricVehicle ev, double now)
     {
-        queuedVehicles.add(vehicle);
-        notifyVehicleQueued(vehicle);
+        queuedVehicles.add(ev);
+        notifyVehicleQueued(ev, now);
     }
 
 
-    private void plugVehicle(ElectricVehicle vehicle)
+    private void plugVehicle(ElectricVehicle ev, double now)
     {
-        pluggedVehicles.put(vehicle.getId(), vehicle);
-        notifyChargingStarted(vehicle);
+        pluggedVehicles.put(ev.getId(), ev);
+        eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId()));
+        notifyChargingStarted(ev, now);
     }
 
 
     //meant for overriding
-    protected void notifyVehicleQueued(ElectricVehicle vehicle)
+    protected void notifyVehicleQueued(ElectricVehicle ev, double now)
     {}
 
 
     //meant for overriding
-    protected void notifyChargingStarted(ElectricVehicle vehicle)
+    protected void notifyChargingStarted(ElectricVehicle ev, double now)
     {}
 
 
     //meant for overriding
-    protected void notifyChargingEnded(ElectricVehicle vehicle)
+    protected void notifyChargingEnded(ElectricVehicle ev, double now)
     {}
 
 
     @Override
-    public boolean isPlugged(ElectricVehicle vehicle)
+    public boolean isPlugged(ElectricVehicle ev)
     {
-        return pluggedVehicles.containsKey(vehicle.getId());
+        return pluggedVehicles.containsKey(ev.getId());
     }
 
 

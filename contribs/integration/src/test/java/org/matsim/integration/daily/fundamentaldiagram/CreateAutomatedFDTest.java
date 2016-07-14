@@ -57,6 +57,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -88,49 +89,53 @@ import org.matsim.vehicles.VehicleUtils;
 @RunWith(Parameterized.class)
 public class CreateAutomatedFDTest {
 
-	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
+	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics, InflowConstraint inflowConstraint) {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
+		this.inflowConstraint = inflowConstraint;
 		this.travelModes = new String [] {"car","bike"};
 	}
 
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
+	private InflowConstraint inflowConstraint;
 	private final Map<Id<Person>,String> person2Mode = new HashMap<Id<Person>, String>();
 
-	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}")
+	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}; InflowConstraint == {2};")
 	public static Collection<Object[]> createFds() {
-		Object[] [] fdData = new Object [][] { 
-				{LinkDynamics.FIFO, TrafficDynamics.queue},
-				{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
-				{LinkDynamics.PassingQ,TrafficDynamics.queue},
-				{LinkDynamics.PassingQ,TrafficDynamics.withHoles},
-				{LinkDynamics.SeepageQ,TrafficDynamics.queue},
-				{LinkDynamics.SeepageQ,TrafficDynamics.withHoles}
-		};
-		return Arrays.asList(fdData);
+		Object [][] combos2run = new Object [12][3];
+		int index = 0;
+		for (LinkDynamics ld : LinkDynamics.values()) {
+			for (TrafficDynamics td : TrafficDynamics.values()) {
+				for (InflowConstraint ic : InflowConstraint.values()) {
+					combos2run[index] = new Object [] {ld, td, ic};
+					index++;
+				}
+			}
+		}
+		return Arrays.asList(combos2run);
 	}
 
 	@Test
 	public void fdsCarTruck(){
 		this.travelModes = new String [] {"car","truck"};
-		run(this.linkDynamics, this.trafficDynamics,false);
+		run(this.linkDynamics, this.trafficDynamics,this.inflowConstraint,false);
 	}
 
 	@Test
 	public void fdsCarBike(){
-		run(this.linkDynamics, this.trafficDynamics,false);
+		run(this.linkDynamics, this.trafficDynamics,this.inflowConstraint,false);
 	}
 
 	@Test 
 	public void fdsCarBikeFastCapacityUpdate(){
-		run(this.linkDynamics,this.trafficDynamics,true);
+		run(this.linkDynamics,this.trafficDynamics,this.inflowConstraint,true);
 	}
 	
 	@Test
 	public void fdsCarOnly(){
 		this.travelModes = new String [] {"car"};
-		run(this.linkDynamics,this.trafficDynamics,false);
+		run(this.linkDynamics,this.trafficDynamics,this.inflowConstraint,false);
 	}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
@@ -144,7 +149,7 @@ public class CreateAutomatedFDTest {
 
 	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
-	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final boolean isUsingFastCapacityUpdate) {
+	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final InflowConstraint inflowConstraint, final boolean isUsingFastCapacityUpdate) {
 
 		MatsimRandom.reset();
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
@@ -155,6 +160,7 @@ public class CreateAutomatedFDTest {
 		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
 		scenario.getConfig().qsim().setEndTime(14*3600);
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
+		scenario.getConfig().qsim().setInflowConstraint(inflowConstraint);
 	
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
 			scenario.getConfig().qsim().setSeepModes(Arrays.asList("bike"));
@@ -167,8 +173,6 @@ public class CreateAutomatedFDTest {
 
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
-		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
-
 		double networkDensity = 3.*(1000./7.5);
 		
 		double sumOfPCUInEachStep = 0.;
@@ -177,6 +181,9 @@ public class CreateAutomatedFDTest {
 		for (String mode : travelModes) {
 			sumOfPCUInEachStep += modeVehicleTypes.get(mode).getPcuEquivalents() *  getMinNumberOfAgentAtStart(mode) ;
 		};
+		
+		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
+		if( sumOfPCUInEachStep >=3 ) reduceNoOfDataPointsInPlot = 1 ;
 		
 		int numberOfPoints = (int) Math.ceil( networkDensity/ (reduceNoOfDataPointsInPlot * sumOfPCUInEachStep) ) + 5;
 
@@ -275,9 +282,12 @@ public class CreateAutomatedFDTest {
 		 */
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
-		String fileName = linkDynamics+"_"+trafficDynamics+".png";
+		String fileName = linkDynamics+"_"+trafficDynamics+"_"+inflowConstraint+".png";
+		
+		new File(outDir+ linkDynamics+"_"+trafficDynamics+".png").deleteOnExit();
+		
 		String outFile ; 
-		//ZZ_TODO : what is there exists some different directory => changing method name will keep collecting the old data.
+		//ZZ_TODO : what if, there exists some different directory (or files with old filename) => changing method name will keep collecting the old data.
 		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
 			outFile = helper.getOutputDirectory()+fileName;
 		} else {

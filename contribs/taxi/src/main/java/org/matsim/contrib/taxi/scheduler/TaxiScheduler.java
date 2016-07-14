@@ -576,7 +576,7 @@ public class TaxiScheduler
     {
         if (task instanceof TaxiTaskWithRequest) {
             TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-            taskWithReq.removeFromRequest();
+            taskWithReq.disconnectFromRequest();
 
             if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 removedRequests.add(taskWithReq.getRequest());

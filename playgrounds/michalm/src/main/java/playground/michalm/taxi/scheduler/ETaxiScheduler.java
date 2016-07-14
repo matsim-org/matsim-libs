@@ -178,7 +178,7 @@ public class ETaxiScheduler
     protected void taskRemovedFromSchedule(Schedule<TaxiTask> schedule, TaxiTask task)
     {
         if (task instanceof ETaxiChargingTask) {
-            ((ETaxiChargingTask)task).removeFromCharger();
+            ((ETaxiChargingTask)task).removeFromChargerLogic();
             vehiclesWithUnscheduledCharging.add(schedule.getVehicle());
         }
         else {

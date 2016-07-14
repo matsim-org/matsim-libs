@@ -48,7 +48,7 @@ public class ETaxiChargingTask
     }
 
 
-    public void removeFromCharger()
+    public void removeFromChargerLogic()
     {
         logic.removeAssignedVehicle(ev);
     }
