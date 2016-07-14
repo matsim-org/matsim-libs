@@ -4,6 +4,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -30,7 +31,7 @@ public class FlagTurnLinks {
 			
 			if (fn.getId().toString().contains("-") || tn.getId().toString().contains("-")){
 				//Link is a turn!
-				L.setType("Turn");
+				NetworkUtils.setType( L, (String) "Turn");
 			}
 		}
 		

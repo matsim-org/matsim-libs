@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
@@ -233,7 +234,7 @@ public abstract class AbstractResizeLinksByCount {
 		attrib.put("oldCap", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
 		attrib.put("newCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity()));
 		attrib.put("diffCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity() - this.oldNet.getLinks().get(link).getCapacity()));		
-		attrib.put("origId", ((LinkImpl)this.oldNet.getLinks().get(link)).getOrigId());
+		attrib.put("origId", NetworkUtils.getOrigId( ((LinkImpl)this.oldNet.getLinks().get(link)) ));
 		
 		this.modAttributes.put(link, attrib);
 	}

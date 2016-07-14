@@ -464,8 +464,8 @@ public final class NetworkImpl implements Network, Lockable {
 				}
 
 				LinkImpl link = (LinkImpl) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
-				link.setType(type);
-				link.setOrigId(origId);
+				NetworkUtils.setType( link, type);
+				NetworkUtils.setOrigId( link, origId ) ;
 
 				this.addLink( link ) ;
 

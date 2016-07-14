@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.io.*;
@@ -75,7 +76,7 @@ public class MatchLinkOccupancy {
 			
 			Id<Link> linkId = Id.create(id, Link.class);
 			Link link = network.getLinks().get(linkId);
-			String osmIds[] = ((LinkImpl)link).getOrigId().split(",");
+			String osmIds[] = NetworkUtils.getOrigId( ((LinkImpl)link) ).split(",");
 			for(String osmId : osmIds) {
 				matchedValues.put(osmId, value);
 			}

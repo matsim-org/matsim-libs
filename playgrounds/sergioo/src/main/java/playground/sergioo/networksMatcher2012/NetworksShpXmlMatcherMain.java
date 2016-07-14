@@ -125,7 +125,7 @@ public class NetworksShpXmlMatcherMain {
 					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n], nodes[n+1]);
 					link.setCapacity((Double)feature.getAttribute("DATA2"));
 					link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
-					((LinkImpl)link).setOrigId(feature.getID());
+					NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 				}
@@ -158,7 +158,7 @@ public class NetworksShpXmlMatcherMain {
 				link.setCapacity((Double)feature.getAttribute("DATA2"));
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));
-				((LinkImpl)link).setOrigId(feature.getID());
+				NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 				network.addLink(link);
 			}
 		return network;

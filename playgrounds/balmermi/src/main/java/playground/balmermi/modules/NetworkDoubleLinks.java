@@ -62,8 +62,8 @@ public class NetworkDoubleLinks {
 		Node r = ((Node) fn);
 		Node n = network.createAndAddNode(Id.create(l.getId()+this.suffix, Node.class),nc,NetworkUtils.getType( r ));
 		network.removeLink(l.getId());
-		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
-		LinkImpl l2new = network.createAndAddLink(Id.create(l.getId()+this.suffix, Link.class),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
+		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),NetworkUtils.getOrigId( l ),NetworkUtils.getType(l));
+		LinkImpl l2new = network.createAndAddLink(Id.create(l.getId()+this.suffix, Link.class),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),NetworkUtils.getOrigId( l ),NetworkUtils.getType(l));
 		log.info("    lid="+l.getId()+" split into lids="+l1new.getId()+","+l2new.getId()+" with additional nid="+n.getId());
 	}
 

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -51,9 +52,9 @@ public class AdditionOfRoadTypeInNetwork {
 			
 				double speedInMPS = link.getFreespeed();
 				if (speedInMPS == 25.0) {
-					((LinkImpl) link).setType("01");
+					NetworkUtils.setType( ((LinkImpl) link), (String) "01");
 				} else if (speedInMPS == 13.9) {
-					((LinkImpl) link).setType("02");
+					NetworkUtils.setType( ((LinkImpl) link), (String) "02");
 				} else {
 					throw new RuntimeException(
 							"Define road type in roadTypeMapping file for this category."

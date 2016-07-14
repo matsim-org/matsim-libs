@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,7 +68,7 @@ public class RoadTypeMappingCreator {
 		for (Link link : network.getLinks().values()) {
 			String linkIdentifier = link.getId().toString().split("___")[1];
 			if(roadTypeAndHBEFARoadType.containsKey(linkIdentifier)){
-				((LinkImpl) link).setType(roadTypeAndHBEFARoadType.get(linkIdentifier)[0]);
+				NetworkUtils.setType( ((LinkImpl) link), (String) roadTypeAndHBEFARoadType.get(linkIdentifier)[0]);
 			} else {
 				throw new RuntimeException("Road Category "+linkIdentifier+" is not defined.");
 			}

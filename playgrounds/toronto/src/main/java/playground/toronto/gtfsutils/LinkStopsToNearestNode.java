@@ -17,6 +17,7 @@ import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
@@ -44,7 +45,7 @@ public class LinkStopsToNearestNode {
 		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();
 		for (Link l : noHighways.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;
-			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") || L.getType().equals("On/Off Ramp")) linksToRemove.add(L.getId());
+			if (NetworkUtils.getType(L).equals("Highway") || NetworkUtils.getType(L).equals("Toll Highway") || NetworkUtils.getType(L).equals("On/Off Ramp")) linksToRemove.add(L.getId());
 		}
 		for (Id<Link> i : linksToRemove) noHighways.removeLink(i);
 		
@@ -118,7 +119,7 @@ public class LinkStopsToNearestNode {
 			
 			if(!loopedNodes.contains(N.getId())){//Loop link DNE
 				LinkImpl l = (LinkImpl) factory.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
-				l.setType("LOOP");
+				NetworkUtils.setType( l, (String) "LOOP");
 				
 				/*if(!modes.isEmpty()){
 					l.setAllowedModes(modes);

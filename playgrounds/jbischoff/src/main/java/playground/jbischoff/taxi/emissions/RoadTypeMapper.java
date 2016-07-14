@@ -54,11 +54,16 @@ public class RoadTypeMapper {
 		for (Entry<Id<Link>, Link> e :  network.getLinks().entrySet()){
 			LinkImpl l = (LinkImpl) e.getValue();
 			double freespeed = l.getFreespeed();
-			if (freespeed<9) l.setType("75");
-			else if (freespeed<14) l.setType("43");
-			else if (freespeed<17) l.setType("45");
-			else if (freespeed<23) l.setType("14");
-			else  l.setType("11");
+			if (freespeed<9)
+				NetworkUtils.setType( l, (String) "75");
+			else if (freespeed<14)
+				NetworkUtils.setType( l, (String) "43");
+			else if (freespeed<17)
+				NetworkUtils.setType( l, (String) "45");
+			else if (freespeed<23)
+				NetworkUtils.setType( l, (String) "14");
+			else
+				NetworkUtils.setType( l, (String) "11");
 			net2.addLink(l);
 		}
 	new NetworkWriter(net2).write(dir+"berlin_brb_t.xml");

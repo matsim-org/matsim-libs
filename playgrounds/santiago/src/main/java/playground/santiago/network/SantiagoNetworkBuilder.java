@@ -246,66 +246,66 @@ public class SantiagoNetworkBuilder {
 			double fs = ll.getFreespeed();
 			// TODO: rural areas might not be not considered; count the cases and decide...
 			if(fs <= 8.333333334){ //30kmh
-				((LinkImpl) ll).setType("URB/Access/30");
+				NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Access/30");
 			} else if(fs <= 11.111111112){ //40kmh
-				((LinkImpl) ll).setType("URB/Access/40");
+				NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Access/40");
 			} else if(fs <= 13.888888889){ //50kmh
 				double lanes = ll.getNumberOfLanes();
 				if(lanes <= 1.0){
-					((LinkImpl) ll).setType("URB/Local/50");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Local/50");
 				} else if(lanes <= 2.0){
-					((LinkImpl) ll).setType("URB/Distr/50");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Distr/50");
 				} else if(lanes > 2.0){
-					((LinkImpl) ll).setType("URB/Trunk-City/50");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Trunk-City/50");
 				} else{
 					throw new RuntimeException("NoOfLanes not properly defined");
 				}
 			} else if(fs <= 16.666666667){ //60kmh
 				double lanes = ll.getNumberOfLanes();
 				if(lanes <= 1.0){
-					((LinkImpl) ll).setType("URB/Local/60");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Local/60");
 				} else if(lanes <= 2.0){
-					((LinkImpl) ll).setType("URB/Trunk-City/60");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/Trunk-City/60");
 				} else if(lanes > 2.0){
-					((LinkImpl) ll).setType("URB/MW-City/60");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/MW-City/60");
 				} else{
 					throw new RuntimeException("NoOfLanes not properly defined");
 				}
 			} else if(fs <= 19.444444445){ //70kmh
 				double lanes = ll.getNumberOfLanes();
 				if(lanes <= 1.0){
-					((LinkImpl) ll).setType("RUR/Distr/70");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/Distr/70");
 				} else if(lanes <= 2.0){
-					((LinkImpl) ll).setType("RUR/Trunk/70");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/Trunk/70");
 				} else if(lanes > 2.0){
-					((LinkImpl) ll).setType("URB/MW-City/70");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/MW-City/70");
 				} else{
 					throw new RuntimeException("NoOfLanes not properly defined");
 				}
 			} else if(fs <= 22.222222223){ //80kmh
 				double lanes = ll.getNumberOfLanes();
 				if(lanes <= 1.0){
-					((LinkImpl) ll).setType("RUR/Distr/80");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/Distr/80");
 				} else if(lanes <= 2.0){
-					((LinkImpl) ll).setType("RUR/Trunk/80");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/Trunk/80");
 				} else if(lanes > 2.0){
-					((LinkImpl) ll).setType("URB/MW-Nat./80");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "URB/MW-Nat./80");
 				} else{
 					throw new RuntimeException("NoOfLanes not properly defined");
 				}
 			} else if(fs <= 27.777777778){ //100kmh
 				double lanes = ll.getNumberOfLanes();
 				if(lanes <= 1.0){
-					((LinkImpl) ll).setType("RUR/Distr/100");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/Distr/100");
 				} else if(lanes > 1.0){
-					((LinkImpl) ll).setType("RUR/MW/100");
+					NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/MW/100");
 				} else{
 					throw new RuntimeException("NoOfLanes not properly defined");
 				}
 			} else if(fs <= 33.333333334){ //120kmh
-				((LinkImpl) ll).setType("RUR/MW/120");
+				NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/MW/120");
 			} else if(fs > 33.333333334){ //faster
-				((LinkImpl) ll).setType("RUR/MW/>130");
+				NetworkUtils.setType( ((LinkImpl) ll), (String) "RUR/MW/>130");
 			} else{
 				throw new RuntimeException("Link not considered...");
 			}
@@ -384,7 +384,7 @@ public class SantiagoNetworkBuilder {
 			Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((LinkImpl)link)), link.getCapacity(), link.getFreespeed()}, null);
 			features.add(ft);
 		}   
 		ShapeFileWriter.writeGeometries(features, outputDir + "network_merged_cl_Links.shp");

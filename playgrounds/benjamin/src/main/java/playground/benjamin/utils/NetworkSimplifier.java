@@ -127,8 +127,8 @@ public class NetworkSimplifier {
 													+ outLink.getLength() * outLink.getNumberOfLanes())
 													/ (inLink.getLength() + outLink.getLength())
 													);
-									link.setOrigId(null);
-									link.setType(outLink.getType());
+									NetworkUtils.setOrigId( link, null ) ;
+									NetworkUtils.setType( link, (String) NetworkUtils.getType(outLink));
 									
 									network.addLink(link);
 									network.removeLink(inLink.getId());
@@ -147,7 +147,7 @@ public class NetworkSimplifier {
 												inLink.getCapacity(),
 												outLink.getNumberOfLanes(),
 												null,
-												outLink.getType());
+												NetworkUtils.getType(outLink));
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 

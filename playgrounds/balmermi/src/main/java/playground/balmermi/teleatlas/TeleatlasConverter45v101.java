@@ -36,6 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
@@ -201,9 +202,11 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesFT);
-				if (modesFT.size() == 3) { ((LinkImpl)link).setType(type); }
-				else if (type.startsWith("-")) { ((LinkImpl)link).setType(type); }
-				else { ((LinkImpl)link).setType("-"+type); }
+				if (modesFT.size() == 3) { final String type1 = type;
+				NetworkUtils.setType( ((LinkImpl)link), type1); }
+				else if (type.startsWith("-")) { final String type1 = type;
+				NetworkUtils.setType( ((LinkImpl)link), type1); }
+				else { NetworkUtils.setType( ((LinkImpl)link), (String) ("-"+type)); }
 			}
 			if (createTFElement) {
 				Link link = createLink(nwElement, "TF");
@@ -212,10 +215,13 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesTF);
-				((LinkImpl)link).setType(type);
-				if (modesTF.size() == 3) { ((LinkImpl)link).setType(type); }
-				else if (type.startsWith("-")) { ((LinkImpl)link).setType(type); }
-				else { ((LinkImpl)link).setType("-"+type); }
+				final String type1 = type;
+				NetworkUtils.setType( ((LinkImpl)link), type1);
+				if (modesTF.size() == 3) { final String type2 = type;
+				NetworkUtils.setType( ((LinkImpl)link), type2); }
+				else if (type.startsWith("-")) { final String type2 = type;
+				NetworkUtils.setType( ((LinkImpl)link), type2); }
+				else { NetworkUtils.setType( ((LinkImpl)link), (String) ("-"+type)); }
 			}
 		}
 	}

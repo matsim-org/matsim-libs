@@ -16,6 +16,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
@@ -113,7 +114,7 @@ public class RoadTypeInfoAnalyzer {
 			Id<Link> linkId = event.getLinkId();
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
 			UserGroup ug = pf.getUserGroupFromPersonId(personId);
-			String roadType = ((LinkImpl)net.getLinks().get(linkId)).getType();
+			String roadType = NetworkUtils.getType(((LinkImpl)net.getLinks().get(linkId)));
 
 			Map<String, Integer> road2count = userGrp2roadType2Count.get(ug);
 			if(road2count.containsKey(roadType)){

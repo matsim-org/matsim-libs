@@ -177,12 +177,12 @@ public class LinkImpl implements Link {
 		return true;
 	}
 
-	public final String getOrigId() {
-		return this.origid;
+	/*deliberately package*/ final String getOrigId2() {
+		return this.origid ;
 	}
 
-	public final String getType() {
-		return this.type;
+	/*deliberately package*/ final String getType2() {
+		return this.type ;
 	}
 	
 	// ---
@@ -282,14 +282,9 @@ public class LinkImpl implements Link {
 		this.allowedModes = HashSetCache.get(modes);
 	}
 
-	public final void setOrigId(final String id) {
+	/*deliberately package*/ final void setOrigId2(final String id) {
 		this.origid = id;
 	}
-
-	public void setType(final String type) {
-		this.type = type;
-	}
-
 	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
 		this.from.addOutLink(this);
@@ -350,5 +345,9 @@ public class LinkImpl implements Link {
 			return set3;
 		}
 
+	}
+
+	/*deliberately package*/ void setType2(String type2) {
+		this.type = type2 ;
 	}
 }

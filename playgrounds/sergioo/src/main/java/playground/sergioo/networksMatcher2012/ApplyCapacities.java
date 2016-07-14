@@ -99,7 +99,7 @@ public class ApplyCapacities {
 				link.setFreespeed(freeSpeedsMap.get((Integer)feature.getAttribute("VDF"))/3.6);
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));
-				((LinkImpl)link).setOrigId(feature.getID());
+				NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 				network.addLink(link);
 			}
 		return network;

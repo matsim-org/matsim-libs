@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -101,7 +102,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 			
 			//Create loop link at node
 			LinkImpl loopLink = (LinkImpl) netFact.createLink(Id.create(stopId +"_LOOP", Link.class), n, n, network, 0.0, 9999, 9999, 1.0);
-			loopLink.setType("LOOP");
+			NetworkUtils.setType( loopLink, (String) "LOOP");
 			this.network.addLink(loopLink);
 			
 			//Create TransitStop, link it to the loop link

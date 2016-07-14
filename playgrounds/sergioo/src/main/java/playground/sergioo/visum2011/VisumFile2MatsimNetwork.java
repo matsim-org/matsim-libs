@@ -242,7 +242,8 @@ public class VisumFile2MatsimNetwork {
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
 				Link link = linkFactory.createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
-				((LinkImpl)link).setOrigId(origId);
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((LinkImpl)link), id1 ) ;
 				Set<String> modes = new HashSet<String>();
 				modes.add("Car");
 				link.setAllowedModes(modes);
@@ -286,7 +287,8 @@ public class VisumFile2MatsimNetwork {
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
 				Link link = new LinkFactoryImpl().createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
-				((LinkImpl)link).setOrigId(origId);
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((LinkImpl)link), id1 ) ;
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				link.setAllowedModes(modes);

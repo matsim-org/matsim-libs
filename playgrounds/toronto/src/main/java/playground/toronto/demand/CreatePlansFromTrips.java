@@ -519,12 +519,12 @@ public class CreatePlansFromTrips {
 		for (Link l : network.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;
 			
-			if (L.getType() == null) continue; //Assumes that links without a type are OK.
+			if (NetworkUtils.getType(L) == null) continue; //Assumes that links without a type are OK.
 			
 			//Highway links (& on/off ramps)
-			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
-					|| L.getType().equals("On/Off Ramp") || L.getType().equals("Turn") ||
-					L.getType().equals("LOOP")) linksToRemove.add(L.getId());
+			if (NetworkUtils.getType(L).equals("Highway") || NetworkUtils.getType(L).equals("Toll Highway") 
+					|| NetworkUtils.getType(L).equals("On/Off Ramp") || NetworkUtils.getType(L).equals("Turn") ||
+					NetworkUtils.getType(L).equals("LOOP")) linksToRemove.add(L.getId());
 			
 			//Transit EX-ROW links
 			if (!L.getAllowedModes().contains("Car") || !L.getAllowedModes().contains("car")) linksToRemove.add(L.getId());

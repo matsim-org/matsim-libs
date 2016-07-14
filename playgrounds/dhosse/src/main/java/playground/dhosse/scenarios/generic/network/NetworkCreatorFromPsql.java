@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
@@ -380,8 +381,9 @@ public class NetworkCreatorFromPsql {
 				
 				if(link instanceof LinkImpl){
 					
-					((LinkImpl)link).setOrigId(origId);
-					((LinkImpl)link).setType(entry.highwayTag);
+					final String id = origId;
+					NetworkUtils.setOrigId( ((LinkImpl)link), id ) ;
+					NetworkUtils.setType( ((LinkImpl)link), (String) entry.highwayTag);
 					
 				}
 				
@@ -400,8 +402,9 @@ public class NetworkCreatorFromPsql {
 				
 				if(link instanceof LinkImpl){
 					
-					((LinkImpl)link).setOrigId(origId);
-					((LinkImpl)link).setType(entry.highwayTag);
+					final String id = origId;
+					NetworkUtils.setOrigId( ((LinkImpl)link), id ) ;
+					NetworkUtils.setType( ((LinkImpl)link), (String) entry.highwayTag);
 					
 				}
 				

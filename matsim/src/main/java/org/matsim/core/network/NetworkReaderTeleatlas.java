@@ -429,31 +429,31 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					((LinkImpl) l).setOrigId(id.toString());
-					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
+					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
 					l = network.getFactory().createLink(Id.create(id.toString() + "TF", Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					((LinkImpl) l).setOrigId(id.toString());
-					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
+					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("FT")) {
 					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					((LinkImpl) l).setOrigId(id.toString());
-					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
+					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("TF")) {
 					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					((LinkImpl) l).setOrigId(id.toString());
-					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
+					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
 				} else {
 					throw new IllegalArgumentException("linkId=" + id.toString() + ": " + LINK_ONEWAY_NAME + "=" + oneway + " not known!");
 				}

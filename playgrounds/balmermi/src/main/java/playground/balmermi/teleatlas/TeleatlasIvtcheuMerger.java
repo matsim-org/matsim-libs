@@ -151,8 +151,8 @@ public class TeleatlasIvtcheuMerger {
 					l.getFreespeed(),
 					l.getCapacity()/10.0,
 					l.getNumberOfLanes(),
-					((LinkImpl) l).getOrigId(),
-					((LinkImpl) l).getType());
+					NetworkUtils.getOrigId( ((LinkImpl) l) ),
+					NetworkUtils.getType(((LinkImpl) l)));
 		}
 
 		log.info("  number of lines processed: "+lineCnt);

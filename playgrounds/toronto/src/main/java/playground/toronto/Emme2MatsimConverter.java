@@ -488,7 +488,7 @@ public class Emme2MatsimConverter {
 						i, j, network, length, speed, cap, lanes);
 								
 				l.setAllowedModes(convertMode(modes));
-				l.setType(createType(cells));
+				NetworkUtils.setType( l, (String) createType(cells));
 
 				network.addLink(l);
 				
@@ -502,7 +502,7 @@ public class Emme2MatsimConverter {
 					if (modes.contains("q")) modeSet.add("Bus");
 					l.setAllowedModes(modeSet);
 					
-					l.setType("TransitROW");
+					NetworkUtils.setType( l, (String) "TransitROW");
 					
 					network.addLink(l);
 				}
@@ -584,7 +584,7 @@ public class Emme2MatsimConverter {
 		HashSet<Id> linksToRemove = new HashSet<Id>(); 
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
-			if(L.getType().equals("HOV") || L.getType().equals("HOV transfer")){
+			if(NetworkUtils.getType(L).equals("HOV") || NetworkUtils.getType(L).equals("HOV transfer")){
 				linksToRemove.add(L.getId());
 			}
 		}
@@ -616,7 +616,7 @@ public class Emme2MatsimConverter {
 		HashSet<Id> hovs = new HashSet<Id>(); 
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
-			if(L.getType().equals(TorontoLinkTypes.hov)) hovs.add(L.getId());
+			if(NetworkUtils.getType(L).equals(TorontoLinkTypes.hov)) hovs.add(L.getId());
 		}
 		
 		log.info("Re-drawing HOV lanes. " + hovs.size() + " links are flagged as HOV");
@@ -638,7 +638,7 @@ public class Emme2MatsimConverter {
 			Link incomingTransfer = null;
 			for (Link L : hovLane.getFromNode().getInLinks().values()) {
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals(TorontoLinkTypes.hovTransfer)) {
+				if (NetworkUtils.getType(l).equals(TorontoLinkTypes.hovTransfer)) {
 					if (incomingTransfer != null) 
 						System.out.println("Check here.");
 					incomingTransfer = L; 
@@ -650,7 +650,7 @@ public class Emme2MatsimConverter {
 			Link outgoingTransfer = null;
 			for (Link L : hovLane.getToNode().getOutLinks().values()){
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals(TorontoLinkTypes.hovTransfer)) {
+				if (NetworkUtils.getType(l).equals(TorontoLinkTypes.hovTransfer)) {
 					if (outgoingTransfer != null) 
 						System.out.println("Check here.");
 					outgoingTransfer = L; 
@@ -683,7 +683,7 @@ public class Emme2MatsimConverter {
 		ArrayList<Id> rows = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
-			if(L.getType().equals(TorontoLinkTypes.streetcarROW)) rows.add(L.getId());
+			if(NetworkUtils.getType(L).equals(TorontoLinkTypes.streetcarROW)) rows.add(L.getId());
 		}
 		
 		for (Id i : rows){
@@ -706,8 +706,8 @@ public class Emme2MatsimConverter {
 			ArrayList<Link> incomingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getFromNode().getInLinks().values()) {
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals(TorontoLinkTypes.transfer)) incomingTransfers.add(L);
-				if (l.getType().equals(TorontoLinkTypes.streetcarROW)) hasIncomingTransitLink = true;
+				if (NetworkUtils.getType(l).equals(TorontoLinkTypes.transfer)) incomingTransfers.add(L);
+				if (NetworkUtils.getType(l).equals(TorontoLinkTypes.streetcarROW)) hasIncomingTransitLink = true;
 			}
 			for (Link l : incomingTransfers) linksToRemove.add(l.getId());
 			
@@ -715,8 +715,8 @@ public class Emme2MatsimConverter {
 			ArrayList<Link> outgoingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getToNode().getOutLinks().values()){
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals(TorontoLinkTypes.transfer)) outgoingTransfers.add(L);
-				if (l.getType().equals(TorontoLinkTypes.streetcarROW)) hasOutgoingTransitLink = true;
+				if (NetworkUtils.getType(l).equals(TorontoLinkTypes.transfer)) outgoingTransfers.add(L);
+				if (NetworkUtils.getType(l).equals(TorontoLinkTypes.streetcarROW)) hasOutgoingTransitLink = true;
 			}
 			for (Link l : outgoingTransfers) linksToRemove.add(l.getId());
 	
@@ -799,7 +799,7 @@ public class Emme2MatsimConverter {
 		for(Link a : network.getLinks().values()){
 			LinkImpl link = (LinkImpl) a;
 			
-			if((link.getType() == "CC") || (link.getType() == "Transfer"))
+			if((NetworkUtils.getType(link) == "CC") || (NetworkUtils.getType(link) == "Transfer"))
 				linksToRemove.add(link.getId()); 
 		}
 		

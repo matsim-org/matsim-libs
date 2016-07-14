@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.AStarLandmarks;
@@ -173,7 +174,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 	private void splitVkmOnRoadType(List<Link> links){
 		for(Link link : links){
 			LinkImpl li = (LinkImpl) link;
-			RoadType roadType = RoadType.getRoadType(li.getType());
+			RoadType roadType = RoadType.getRoadType(NetworkUtils.getType(li));
 			double oldValue = typeVkmTotal.get(roadType);
 			typeVkmTotal.put(roadType, oldValue + (li.getLength()/1000));
  		}

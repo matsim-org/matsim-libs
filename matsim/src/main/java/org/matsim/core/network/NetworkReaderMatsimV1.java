@@ -174,8 +174,8 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
 		if (l instanceof LinkImpl) {
-			((LinkImpl) l).setOrigId(atts.getValue("origid"));
-			((LinkImpl) l).setType(atts.getValue("type"));
+			NetworkUtils.setOrigId( ((LinkImpl) l), atts.getValue("origid") ) ;
+			NetworkUtils.setType( ((LinkImpl) l), atts.getValue("type"));
 		}
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');

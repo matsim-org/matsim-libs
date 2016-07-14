@@ -40,6 +40,7 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -125,7 +126,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		Double linkLength = link.getLength();
 		Double freeVelocity = link.getFreespeed();
-		String roadTypeString = link.getType();
+		String roadTypeString = NetworkUtils.getType(link);
 		Integer roadType;
 
 		try{

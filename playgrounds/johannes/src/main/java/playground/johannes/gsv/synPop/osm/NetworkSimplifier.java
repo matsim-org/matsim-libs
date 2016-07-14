@@ -71,7 +71,7 @@ public class NetworkSimplifier {
 
 		for (Link link : network.getLinks().values()) {
 			if (overwriteIds) {
-				((LinkImpl) link).setOrigId(link.getId().toString());
+				NetworkUtils.setOrigId( ((LinkImpl) link), (String) link.getId().toString() ) ;
 			}
 			try {
 				long id = Long.parseLong(link.getId().toString());
@@ -126,7 +126,7 @@ public class NetworkSimplifier {
 									network.removeLink(inLink.getId());
 									(network).removeLink(outLink.getId());
 									
-									((LinkImpl)link).setOrigId(String.format("%s,%s", inLink.getOrigId(), outLink.getOrigId()));
+									NetworkUtils.setOrigId( ((LinkImpl)link), (String) String.format("%s,%s", NetworkUtils.getOrigId( inLink ), NetworkUtils.getOrigId( outLink )) ) ;
 
 								} else {
 
@@ -142,14 +142,14 @@ public class NetworkSimplifier {
 												inLink.getFreespeed(),
 												inLink.getCapacity(),
 												inLink.getNumberOfLanes(),
-												inLink.getOrigId() + "-" + outLink.getOrigId(),
+												NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ),
 												null);
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
 										
-										((LinkImpl)newLink).setOrigId(String.format("%s,%s", inLink.getOrigId(), outLink.getOrigId()));
+										NetworkUtils.setOrigId( ((LinkImpl)newLink), (String) String.format("%s,%s", NetworkUtils.getOrigId( inLink ), NetworkUtils.getOrigId( outLink )) ) ;
 									}
 
 								}

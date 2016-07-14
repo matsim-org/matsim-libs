@@ -93,11 +93,11 @@ public class NetworkConverter {
 					if(n+1==nodes.length-1 || CoordUtils.calcEuclideanDistance(prevNode.getCoord(), nodes[n+1].getCoord())>MIN_DISTANCE) {
 						network.addNode(nodes[n]);
 						Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
-						((LinkImpl)link).setOrigId(feature.getID());
+						NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 						network.addLink(link);
 						linkLongId++;
 						link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
-						((LinkImpl)link).setOrigId(feature.getID());
+						NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 						network.addLink(link);
 						linkLongId++;
 						prevNode = nodes[n+1];
@@ -105,11 +105,11 @@ public class NetworkConverter {
 				}
 				else {
 					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
-					((LinkImpl)link).setOrigId(feature.getID());
+					NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 					link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
-					((LinkImpl)link).setOrigId(feature.getID());
+					NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 					prevNode = nodes[n+1];

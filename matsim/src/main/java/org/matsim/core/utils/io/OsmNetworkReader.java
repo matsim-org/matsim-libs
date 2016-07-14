@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
@@ -565,8 +566,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
-					((LinkImpl) l).setType( highway );
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					final String type = highway;
+					NetworkUtils.setType( ((LinkImpl) l), type);
 				}
 				network.addLink(l);
 				this.id++;
@@ -578,8 +581,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
-					((LinkImpl) l).setType( highway );
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					final String type = highway;
+					NetworkUtils.setType( ((LinkImpl) l), type);
 				}
 				network.addLink(l);
 				this.id++;

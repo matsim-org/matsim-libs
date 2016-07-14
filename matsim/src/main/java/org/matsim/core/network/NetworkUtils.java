@@ -617,4 +617,40 @@ public class NetworkUtils {
 	public static double getFreespeedTravelTime( Link link, double time ) {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
+
+
+	public static void setType( Link link , String type ) {
+		if ( link instanceof LinkImpl ) {
+			((LinkImpl)link).setType2( type ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Link to do this") ;
+		}
+	}
+
+
+	public static String getType(Link link) {
+		if ( link instanceof LinkImpl ) {
+			return ((LinkImpl)link).getType2() ;	
+		} else {
+			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
+		}
+	}
+
+
+	public static String getOrigId( Link link ) {
+		if ( link instanceof LinkImpl ) {
+			return ((LinkImpl)link).getOrigId2() ;
+		} else {
+			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
+		}
+	}
+
+
+	public static void setOrigId( Link link, String id ) {
+		if ( link instanceof LinkImpl ) {
+			((LinkImpl) link).setOrigId2(id);
+		} else {
+			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
+		}
+	}
 }

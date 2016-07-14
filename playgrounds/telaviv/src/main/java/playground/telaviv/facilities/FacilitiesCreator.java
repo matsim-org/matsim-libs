@@ -43,6 +43,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -207,7 +208,7 @@ public class FacilitiesCreator {
 			log.info("removing links from network where no facilities should be attached to ...");
 			List<Id<Link>> linksToRemove = new ArrayList<Id<Link>>();
 			for (Link link : scenario.getNetwork().getLinks().values()) {
-				String type = ((LinkImpl) link).getType();
+				String type = NetworkUtils.getType(((LinkImpl) link));
 				if (!validLinkTypes.contains(type)) linksToRemove.add(link.getId());
 			}
 			log.info("\tfound " + linksToRemove.size() + " links which do not match the criteria");

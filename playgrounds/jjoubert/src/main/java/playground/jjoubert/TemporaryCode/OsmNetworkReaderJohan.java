@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -508,12 +509,14 @@ public class OsmNetworkReaderJohan {
 
 			if (!onewayReverse) {
 				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				this.id++;
 			}
 			if (!oneway) {
 				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				this.id++;
 			}
 

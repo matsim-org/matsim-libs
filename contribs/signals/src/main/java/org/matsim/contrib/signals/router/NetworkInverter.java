@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
 
@@ -86,7 +87,7 @@ class NetworkInverter {
 				outLink.getNumberOfLanes());
 		link.setAllowedModes(modes);
 //		log.error("created inverted link " + link.getId() + " from " + inLink.getId() + " to " + outLink.getId() + " with modes " + modes);
-		((LinkImpl) link).setType(((LinkImpl) outLink).getType());
+		NetworkUtils.setType( ((LinkImpl) link), NetworkUtils.getType(((LinkImpl) outLink)));
 		return numberOfLinksGenerated + 1;
 	}
 

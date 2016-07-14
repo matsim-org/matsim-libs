@@ -51,9 +51,9 @@ public class NetworkThinner {
 		// add a new link
 		double length = 0.0; for (Link l : list) { length += l.getLength(); }
 		Link newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(),first.getCapacity(),first.getNumberOfLanes());
-		((LinkImpl) newLink).setType(((LinkImpl) first).getType());
+		NetworkUtils.setType( ((LinkImpl) newLink), (String) NetworkUtils.getType(((LinkImpl) first)));
 		// always assign the origId of the first link (for convenience)
-		((LinkImpl) newLink).setOrigId(((LinkImpl) first).getOrigId());
+		NetworkUtils.setOrigId( ((LinkImpl) newLink), (String) NetworkUtils.getOrigId( ((LinkImpl) first) ) ) ;
 
 		// mapping info
 		for (Link l : list) { log.info("    mapping: "+l.getId()+" => "+newLink.getId()); }
@@ -119,7 +119,7 @@ public class NetworkThinner {
 						(currLink.getCapacity() != nextLink.getCapacity()) ||
 						(currLink.getFreespeed() != nextLink.getFreespeed()) ||
 						(currLink.getNumberOfLanes() != nextLink.getNumberOfLanes()) ||
-						!((LinkImpl) currLink).getType().equals(((LinkImpl) nextLink).getType()) ||
+						!NetworkUtils.getType(((LinkImpl) currLink)).equals(NetworkUtils.getType(((LinkImpl) nextLink))) ||
 						!currLink.getAllowedModes().equals(nextLink.getAllowedModes())) {
 					mergeGroups.add(linksToMerge);
 					linksToMerge = new ArrayList<Link>();

@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -654,7 +655,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					modesB.add("bike");
 					bikel.setAllowedModes(modesB);
 					if (bikel instanceof LinkImpl) {
-						((LinkImpl) bikel).setOrigId(origId);
+						final String id1 = origId;
+						NetworkUtils.setOrigId( ((LinkImpl) bikel), id1 ) ;
 					}
 					network.addLink(bikel);
 					bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
@@ -670,7 +672,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					l.setCapacity(capacity);
 					l.setNumberOfLanes(nofLanes);
 					if (l instanceof LinkImpl) {
-						((LinkImpl) l).setOrigId(origId);
+						final String id1 = origId;
+						NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 					}
 					network.addLink(l);
 				}	
@@ -695,7 +698,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					modesB.add("bike");
 					bikel.setAllowedModes(modesB);
 					if (bikel instanceof LinkImpl) {
-						((LinkImpl) bikel).setOrigId(origId);
+						final String id1 = origId;
+						NetworkUtils.setOrigId( ((LinkImpl) bikel), id1 ) ;
 					}
 					network.addLink(bikel);
 					bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
@@ -712,7 +716,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					l.setCapacity(capacity);
 					l.setNumberOfLanes(nofLanes);
 					if (l instanceof LinkImpl) {
-						((LinkImpl) l).setOrigId(origId);
+						final String id1 = origId;
+						NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 					}
 					network.addLink(l);
 				}	

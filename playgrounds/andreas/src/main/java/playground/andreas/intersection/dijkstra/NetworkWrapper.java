@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 public class NetworkWrapper {
 
@@ -61,7 +62,7 @@ public class NetworkWrapper {
 							outLink.getFreespeed(),
 							outLink.getCapacity(),
 							outLink.getNumberOfLanes());
-					((LinkImpl) link).setType(((LinkImpl) outLink).getType());
+					NetworkUtils.setType( ((LinkImpl) link), (String) NetworkUtils.getType(((LinkImpl) outLink)));
 					numberOfLinksGenerated++;
 				}
 			}

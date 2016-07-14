@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -495,7 +496,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
 				if(l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;
@@ -508,7 +510,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
 				if(l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;

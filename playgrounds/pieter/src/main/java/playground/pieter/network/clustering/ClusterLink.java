@@ -86,11 +86,11 @@ class ClusterLink implements Link {
 	}
 
 	public final String getOrigId() {
-		return link.getOrigId();
+		return NetworkUtils.getOrigId( link ) ;
 	}
 
 	public final String getType() {
-		return link.getType();
+		return NetworkUtils.getType(link);
 	}
 
 	public final double getEuklideanDistance() {
@@ -162,11 +162,13 @@ class ClusterLink implements Link {
 	}
 
 	public final void setOrigId(String id) {
-		link.setOrigId(id);
+		final String id1 = id;
+		NetworkUtils.setOrigId( link, id1 ) ;
 	}
 
 	public void setType(String type) {
-		link.setType(type);
+		final String type1 = type;
+		NetworkUtils.setType( link, type1);
 	}
 
 

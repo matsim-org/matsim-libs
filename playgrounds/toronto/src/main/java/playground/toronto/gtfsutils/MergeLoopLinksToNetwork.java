@@ -11,6 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -49,7 +50,7 @@ public class MergeLoopLinksToNetwork {
 		LinkFactoryImpl factory = new LinkFactoryImpl();
 		for (Link l : updatedNetwork.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;
-			if (L.getType().equals("LOOP")){
+			if (NetworkUtils.getType(L).equals("LOOP")){
 				
 				Node fn = baseNetwork.getNodes().get(L.getFromNode().getId());
 				Node tn = baseNetwork.getNodes().get(L.getToNode().getId());
@@ -63,7 +64,7 @@ public class MergeLoopLinksToNetwork {
 							L.getFreespeed(),
 							L.getCapacity(), 
 							L.getNumberOfLanes());
-					newLink.setType("LOOP");
+					NetworkUtils.setType( newLink, (String) "LOOP");
 					baseNetwork.addLink(newLink);
 					bw.write("\n" + fn.getId().toString());
 					loopsAdded++;

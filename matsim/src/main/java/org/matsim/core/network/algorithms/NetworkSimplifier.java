@@ -124,7 +124,7 @@ public class NetworkSimplifier {
 												inLink.getFreespeed(),
 												inLink.getCapacity(),
 												inLink.getNumberOfLanes(),
-												inLink.getOrigId() + "-" + outLink.getOrigId(),
+												NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ),
 												null);
 
 										newLink.setAllowedModes(inLink.getAllowedModes());

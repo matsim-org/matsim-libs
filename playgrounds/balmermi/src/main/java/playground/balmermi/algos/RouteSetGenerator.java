@@ -106,7 +106,7 @@ public class RouteSetGenerator {
 		boolean isLocal = true;
 		for (Id routeLink2Id : route.getLinkIds()) {
 			LinkImpl routeLink = (LinkImpl) this.network.getLinks().get(routeLink2Id);
-			if (!routeLink.getType().equals("39") && !routeLink.getType().equals("83") && !routeLink.getType().equals("90")) {
+			if (!NetworkUtils.getType(routeLink).equals("39") && !NetworkUtils.getType(routeLink).equals("83") && !NetworkUtils.getType(routeLink).equals("90")) {
 				isLocal = false;
 				break;
 			}

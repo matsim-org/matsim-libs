@@ -11,6 +11,7 @@ import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -46,7 +47,7 @@ public class RenameLoopLinks {
 			LinkImpl L = (LinkImpl) l;
 			
 			Id<Link> linkId;
-			if (L.getType().equals("LOOP")){
+			if (NetworkUtils.getType(L).equals("LOOP")){
 				linkId = Id.create(L.getFromNode().getId().toString() + "_LOOP", Link.class);
 				loopNamesMap.put(L.getId(), linkId);
 			}else linkId = L.getId();
@@ -61,7 +62,7 @@ public class RenameLoopLinks {
 					L.getFreespeed(),
 					L.getCapacity(), 
 					L.getNumberOfLanes());
-			newLink.setType(L.getType());
+			NetworkUtils.setType( newLink, (String) NetworkUtils.getType(L));
 			outNetwork.addLink(newLink);
 		}
 		TransitScheduleFactoryImpl tsFactory = new TransitScheduleFactoryImpl();

@@ -42,6 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -342,7 +343,7 @@ public class NetworkEmme2MATSim {
 		for (Link link : network.getLinks().values()) {
 			SimpleFeature ft = factory.createPolyline(
 					new Coordinate [] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()},
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), NetworkUtils.getType(((LinkImpl)link))},
 					link.getId().toString()
 					);
 			features.add(ft);

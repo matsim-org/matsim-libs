@@ -34,6 +34,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.feature.simple.SimpleFeature;
@@ -69,14 +70,14 @@ public class SetLinkAttributesControlerListener implements StartupListener {
 				logger.info("Changing freespeed of link " + ll.getId() + " from " + ll.getFreespeed() + " to 8.3333333334.");
 				ll.setFreespeed(30 / 3.6);
 				if(ll.getNumberOfLanes() == 1){
-					logger.info("Changing type of link " + ll.getId() + " from " + ll.getType() + " to 75.");
-					ll.setType("75");
+					logger.info("Changing type of link " + ll.getId() + " from " + NetworkUtils.getType(ll) + " to 75.");
+					NetworkUtils.setType( ll, (String) "75");
 					logger.info("Changing capacity of link " + ll.getId() + " from " + ll.getCapacity() + " to 11200.");
 					ll.setCapacity(11200);
 				}
 				else{
-					logger.info("Changing type of link " + ll.getId() + " from " + ll.getType() + " to 83.");
-					ll.setType("83");
+					logger.info("Changing type of link " + ll.getId() + " from " + NetworkUtils.getType(ll) + " to 83.");
+					NetworkUtils.setType( ll, (String) "83");
 					logger.info("Changing capacity of link " + ll.getId() + " from " + ll.getCapacity() + " to 20000.");
 					ll.setCapacity(20000);
 				}

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
@@ -167,7 +168,8 @@ public class NetworkSink implements SinkSource {
 			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber), Link.class);
 			if (!network.getLinks().containsKey(id)) {
 				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				tagWayForward(way, l);
 			} else {
 				log.warn("Duplicate link: " + id);
@@ -177,7 +179,8 @@ public class NetworkSink implements SinkSource {
 			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R", Link.class);
 			if (!network.getLinks().containsKey(id)) {
 				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				tagWayBackward(way, l);
 			} else {
 				log.warn("Duplicate link: " + id);

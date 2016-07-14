@@ -168,11 +168,11 @@ import org.matsim.core.utils.misc.Time;
 
 		if (link instanceof LinkImpl) {
 			LinkImpl li = (LinkImpl) link;
-			if (li.getOrigId() != null) {
-				out.write(" origid=\"" + li.getOrigId() + "\"");
+			if (NetworkUtils.getOrigId( li ) != null) {
+				out.write(" origid=\"" + NetworkUtils.getOrigId( li ) + "\"");
 			}
-			if (li.getType() != null) {
-				out.write(" type=\"" + li.getType() + "\"");
+			if (NetworkUtils.getType(li) != null) {
+				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
 			}
 		}
 		out.write(" />\n");

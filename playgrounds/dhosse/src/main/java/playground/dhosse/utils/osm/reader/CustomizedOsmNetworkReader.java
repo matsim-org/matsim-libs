@@ -43,6 +43,7 @@ import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -827,7 +828,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(allowedModes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.wayId2LinkId.put(way.id, l.getId());
@@ -842,7 +844,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(allowedModes);
 				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;

@@ -58,6 +58,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.router.TransitRouter;
@@ -130,9 +131,9 @@ public class ControlerWSPreCalcTimes {
             LinkImpl l1 = (LinkImpl) l;
             String[] parts = l.getId().toString().split(TransitSheduleToNetwork.SEPARATOR);
             if (parts[0].matches("[A-Z]+[0-9]*[_a-z]*")) {
-                l1.setType("rail");
+                NetworkUtils.setType( l1, (String) "rail");
             } else {
-                l1.setType("road");
+                NetworkUtils.setType( l1, (String) "road");
             }
         }
         final PTLinkSpeedCalculatorWithPreCalcTimes linkSpeedCalculatorWithPreCalcTimes = new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes, true);

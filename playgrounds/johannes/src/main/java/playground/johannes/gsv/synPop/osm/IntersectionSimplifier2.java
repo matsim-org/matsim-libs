@@ -163,7 +163,7 @@ public class IntersectionSimplifier2 {
 						newLink.setLength(link.getLength() + d);
 
 						newLink.setNumberOfLanes(link.getNumberOfLanes());
-						((LinkImpl)newLink).setOrigId(((LinkImpl)link).getOrigId());
+						NetworkUtils.setOrigId( ((LinkImpl)newLink), (String) NetworkUtils.getOrigId( ((LinkImpl)link) ) ) ;
 					}
 				}
 			}
