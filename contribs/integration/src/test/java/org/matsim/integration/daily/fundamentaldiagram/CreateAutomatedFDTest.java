@@ -103,22 +103,17 @@ public class CreateAutomatedFDTest {
 
 	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}; InflowConstraint == {2};")
 	public static Collection<Object[]> createFds() {
-		Object[] [] fdData = new Object [][] { 
-				{LinkDynamics.FIFO, TrafficDynamics.queue, InflowConstraint.maxflowFromFdiag},
-				{LinkDynamics.FIFO, TrafficDynamics.withHoles,InflowConstraint.maxflowFromFdiag}, 
-				{LinkDynamics.PassingQ,TrafficDynamics.queue,InflowConstraint.maxflowFromFdiag},
-				{LinkDynamics.PassingQ,TrafficDynamics.withHoles,InflowConstraint.maxflowFromFdiag},
-				{LinkDynamics.SeepageQ,TrafficDynamics.queue,InflowConstraint.maxflowFromFdiag},
-				{LinkDynamics.SeepageQ,TrafficDynamics.withHoles,InflowConstraint.maxflowFromFdiag},
-				
-				{LinkDynamics.FIFO, TrafficDynamics.queue, InflowConstraint.none},
-				{LinkDynamics.FIFO, TrafficDynamics.withHoles,InflowConstraint.none}, 
-				{LinkDynamics.PassingQ,TrafficDynamics.queue,InflowConstraint.none},
-				{LinkDynamics.PassingQ,TrafficDynamics.withHoles,InflowConstraint.none},
-				{LinkDynamics.SeepageQ,TrafficDynamics.queue,InflowConstraint.none},
-				{LinkDynamics.SeepageQ,TrafficDynamics.withHoles,InflowConstraint.none}
-		};
-		return Arrays.asList(fdData);
+		Object [][] combos2run = new Object [12][3];
+		int index = 0;
+		for (LinkDynamics ld : LinkDynamics.values()) {
+			for (TrafficDynamics td : TrafficDynamics.values()) {
+				for (InflowConstraint ic : InflowConstraint.values()) {
+					combos2run[index] = new Object [] {ld, td, ic};
+					index++;
+				}
+			}
+		}
+		return Arrays.asList(combos2run);
 	}
 
 	@Test
@@ -178,8 +173,6 @@ public class CreateAutomatedFDTest {
 
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
-		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
-
 		double networkDensity = 3.*(1000./7.5);
 		
 		double sumOfPCUInEachStep = 0.;
@@ -188,6 +181,9 @@ public class CreateAutomatedFDTest {
 		for (String mode : travelModes) {
 			sumOfPCUInEachStep += modeVehicleTypes.get(mode).getPcuEquivalents() *  getMinNumberOfAgentAtStart(mode) ;
 		};
+		
+		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
+		if( sumOfPCUInEachStep >=3 ) reduceNoOfDataPointsInPlot = 1 ;
 		
 		int numberOfPoints = (int) Math.ceil( networkDensity/ (reduceNoOfDataPointsInPlot * sumOfPCUInEachStep) ) + 5;
 
