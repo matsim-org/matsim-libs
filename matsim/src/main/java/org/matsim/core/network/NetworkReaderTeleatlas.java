@@ -27,7 +27,6 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
@@ -92,7 +91,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 
 	/**
 	 * option parameter: the reader redefines the number of lanes (see permlanes
-	 * in {@link LinkImpl}) if the value of
+	 * in {@link Link}) if the value of
 	 * <code>{@link #LINK_LANES_NAME}<1</code>. In that case the link gets 2 lanes
 	 * for <code>{@link #LINK_FRCTYP_NAME}</code> less or equal this parameter, 1
 	 * lane otherwise.
@@ -329,10 +328,10 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * link for "TF" or "FT"). The link id is defined as
 	 * <code>{@link #LINK_ID_NAME}+"TF"</code>,
 	 * <code>{@link #LINK_ID_NAME}+"FT"</code> resp.</li>
-	 * <li>The {@link LinkImpl#type} is set as:
+	 * <li>The {@link Link#type} is set as:
 	 * 
 	 * <pre>
-	 * <code>{@link LinkImpl#type} = {@link #LINK_FRCTYP_NAME}+"-"+{@link #LINK_FEATTYP_NAME}+"-"+{@link #LINK_FERRYTYP_NAME}</code>
+	 * <code>{@link Link#type} = {@link #LINK_FRCTYP_NAME}+"-"+{@link #LINK_FEATTYP_NAME}+"-"+{@link #LINK_FERRYTYP_NAME}</code>
 	 * </pre>
 	 * 
 	 * </li>
@@ -429,31 +428,31 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
-					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
+					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
 					l = network.getFactory().createLink(Id.create(id.toString() + "TF", Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
-					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
+					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("FT")) {
 					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
-					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
+					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("TF")) {
 					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((LinkImpl) l), id.toString() ) ;
-					NetworkUtils.setType( ((LinkImpl) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
+					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
 				} else {
 					throw new IllegalArgumentException("linkId=" + id.toString() + ": " + LINK_ONEWAY_NAME + "=" + oneway + " not known!");
 				}

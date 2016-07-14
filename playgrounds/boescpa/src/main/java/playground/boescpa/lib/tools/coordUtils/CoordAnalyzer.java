@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Link;
 import org.matsim.facilities.Facility;
 
 import com.vividsolutions.jts.geom.Coordinate;

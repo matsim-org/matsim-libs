@@ -23,11 +23,11 @@ package playground.johannes.gsv.synPop.osm;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -71,7 +71,7 @@ public class NetworkSimplifier {
 
 		for (Link link : network.getLinks().values()) {
 			if (overwriteIds) {
-				NetworkUtils.setOrigId( ((LinkImpl) link), (String) link.getId().toString() ) ;
+				NetworkUtils.setOrigId( ((Link) link), (String) link.getId().toString() ) ;
 			}
 			try {
 				long id = Long.parseLong(link.getId().toString());
@@ -88,12 +88,12 @@ public class NetworkSimplifier {
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
 				for (Link iL : iLinks) {
-					LinkImpl inLink = (LinkImpl) iL;
+					Link inLink = (Link) iL;
 
 					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
 
 					for (Link oL : oLinks) {
-						LinkImpl outLink = (LinkImpl) oL;
+						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
@@ -126,7 +126,7 @@ public class NetworkSimplifier {
 									network.removeLink(inLink.getId());
 									(network).removeLink(outLink.getId());
 									
-									NetworkUtils.setOrigId( ((LinkImpl)link), (String) String.format("%s,%s", NetworkUtils.getOrigId( inLink ), NetworkUtils.getOrigId( outLink )) ) ;
+									NetworkUtils.setOrigId( ((Link)link), (String) String.format("%s,%s", NetworkUtils.getOrigId( inLink ), NetworkUtils.getOrigId( outLink )) ) ;
 
 								} else {
 
@@ -134,7 +134,7 @@ public class NetworkSimplifier {
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
 										Id<Link> id = Id.create(++maxId, Link.class);
 										
-										LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
+										Link newLink = ((NetworkImpl) network).createAndAddLink(
 												id,
 												inLink.getFromNode(),
 												outLink.getToNode(),
@@ -149,7 +149,7 @@ public class NetworkSimplifier {
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
 										
-										NetworkUtils.setOrigId( ((LinkImpl)newLink), (String) String.format("%s,%s", NetworkUtils.getOrigId( inLink ), NetworkUtils.getOrigId( outLink )) ) ;
+										NetworkUtils.setOrigId( ((Link)newLink), (String) String.format("%s,%s", NetworkUtils.getOrigId( inLink ), NetworkUtils.getOrigId( outLink )) ) ;
 									}
 
 								}
@@ -197,7 +197,7 @@ public class NetworkSimplifier {
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
+	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
 
 		boolean bothLinksHaveSameLinkStats = true;
 

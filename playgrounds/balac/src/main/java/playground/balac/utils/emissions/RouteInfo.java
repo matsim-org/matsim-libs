@@ -3,7 +3,7 @@ package playground.balac.utils.emissions;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 public class RouteInfo {
 	private ArrayList<Id<Link>> links;

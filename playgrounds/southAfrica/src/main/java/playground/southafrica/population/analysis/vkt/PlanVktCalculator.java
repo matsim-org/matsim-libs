@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
@@ -86,7 +86,7 @@ public class PlanVktCalculator {
 		LOG.info("Updating road types... (" + scenario.getNetwork().getLinks().size() + " links)");
 		Counter linkCounter = new Counter("  links # ");
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()){
-			LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(linkId);
+			Link link = (Link) scenario.getNetwork().getLinks().get(linkId);
 			NetworkUtils.setType( link, (String) roadTypeMap.get(Long.parseLong(NetworkUtils.getOrigId( link ))));
 			if(NetworkUtils.getType(link) == null){
 				LOG.warn("Couldn't change the road type of link " + NetworkUtils.getOrigId( link ));

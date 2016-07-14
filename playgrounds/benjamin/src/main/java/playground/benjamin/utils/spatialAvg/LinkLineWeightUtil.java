@@ -23,7 +23,7 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 public class LinkLineWeightUtil implements LinkWeightUtil {
 	private final Logger logger = Logger.getLogger(LinkLineWeightUtil.class);

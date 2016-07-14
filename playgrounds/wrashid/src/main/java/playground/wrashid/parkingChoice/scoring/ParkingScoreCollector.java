@@ -3,7 +3,6 @@ package playground.wrashid.parkingChoice.scoring;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -11,6 +10,7 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.network.Link;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;

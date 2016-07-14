@@ -23,11 +23,11 @@ import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -76,7 +76,7 @@ public class MatchLinkOccupancy {
 			
 			Id<Link> linkId = Id.create(id, Link.class);
 			Link link = network.getLinks().get(linkId);
-			String osmIds[] = NetworkUtils.getOrigId( ((LinkImpl)link) ).split(",");
+			String osmIds[] = NetworkUtils.getOrigId( ((Link)link) ).split(",");
 			for(String osmId : osmIds) {
 				matchedValues.put(osmId, value);
 			}

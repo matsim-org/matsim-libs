@@ -3,7 +3,7 @@ package playground.wrashid.PSF2.tools.chargingLog.timeLine;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 import playground.wrashid.artemis.hubs.LinkHubMapping;
 

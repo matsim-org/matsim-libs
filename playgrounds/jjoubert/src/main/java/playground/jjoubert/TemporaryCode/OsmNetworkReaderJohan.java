@@ -38,10 +38,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -510,13 +510,13 @@ public class OsmNetworkReaderJohan {
 			if (!onewayReverse) {
 				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
 				final String id1 = origId;
-				NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				this.id++;
 			}
 			if (!oneway) {
 				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
 				final String id1 = origId;
-				NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				this.id++;
 			}
 

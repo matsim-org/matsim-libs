@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.network.Link;
 
 /**
  * Contains several test-cases for API-compliant Networks.

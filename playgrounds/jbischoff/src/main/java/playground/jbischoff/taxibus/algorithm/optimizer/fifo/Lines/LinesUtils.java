@@ -22,9 +22,9 @@ package playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.zone.*;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.io.tabularFileParser.*;
 
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;

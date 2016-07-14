@@ -10,7 +10,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
@@ -21,7 +20,8 @@ import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.FreeFloatingVehiclesLocation;
 import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
 import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -261,9 +261,9 @@ public class CarSharingVehicles {
 			
 		}
 		
-		public LinkImpl getClosestLink(Coord coord) {			
+		public Link getClosestLink(Coord coord) {			
 
-		    return (LinkImpl)network.getNearestLinkExactly(coord);			
+		    return (Link)network.getNearestLinkExactly(coord);			
 			
 		}
 	}

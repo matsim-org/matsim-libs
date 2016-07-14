@@ -3,9 +3,9 @@ package org.matsim.contrib.carsharing.control.listeners;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
 import org.matsim.contrib.carsharing.events.handlers.NoParkingSpotEventHandler;
+import org.matsim.core.network.Link;
 
 public class NoParkingEventHandler implements NoParkingSpotEventHandler {
 

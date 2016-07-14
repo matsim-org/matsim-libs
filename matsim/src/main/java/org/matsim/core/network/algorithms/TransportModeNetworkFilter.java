@@ -23,11 +23,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -85,7 +85,7 @@ public final class TransportModeNetworkFilter {
 				link2.setFreespeed(link.getFreespeed());
 				link2.setLength(link.getLength());
 				link2.setNumberOfLanes(link.getNumberOfLanes());
-				NetworkUtils.setType( ((LinkImpl) link2), NetworkUtils.getType(((LinkImpl) link)));
+				NetworkUtils.setType( ((Link) link2), NetworkUtils.getType(((Link) link)));
 				subNetwork.addLink(link2);
 			}
 		}

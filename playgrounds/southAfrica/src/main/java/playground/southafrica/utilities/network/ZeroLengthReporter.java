@@ -28,10 +28,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -79,14 +79,14 @@ public class ZeroLengthReporter {
 					/* Write to standard out. */
 					LOG.info("Link " + link.getId().toString() + 
 							" is " + String.format("%.2f", link.getLength()) + "m (OSM " + 
-					NetworkUtils.getOrigId( ((LinkImpl)link) ) + "); from " + 
+					NetworkUtils.getOrigId( ((Link)link) ) + "); from " + 
 							link.getFromNode().getId().toString() + " to " + 
 					link.getToNode().getId().toString());
 					
 					/* Write to file. */
 					bw.write(String.format("%s,%s,%s,%s,%.1f\n", 
 							link.getId().toString(),
-							NetworkUtils.getOrigId( ((LinkImpl)link) ),
+							NetworkUtils.getOrigId( ((Link)link) ),
 							link.getFromNode().getId().toString(),
 							link.getToNode().getId().toString(),
 							link.getLength()));

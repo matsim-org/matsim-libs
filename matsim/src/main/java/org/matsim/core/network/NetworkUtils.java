@@ -32,7 +32,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
@@ -379,7 +378,7 @@ public class NetworkUtils {
         List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
         incidentLinks.addAll(nearestNode.getOutLinks().values());
         for (Link link : incidentLinks) {
-            LinkImpl r = ((LinkImpl) link);
+            Link r = ((Link) link);
 		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
             if (dist <= shortestRightDistance) {
                 // Generate a vector representing the link
@@ -457,7 +456,7 @@ public class NetworkUtils {
         // (For Great Britain it would be the "left" side. Could be a global config param...)
         double shortestDistance = Double.MAX_VALUE;
         for (Link link : getIncidentLinks(nearestNode).values()) {
-            LinkImpl r = ((LinkImpl) link);
+            Link r = ((Link) link);
 		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
             if (dist < shortestDistance) {
                 shortestDistance = dist;
@@ -655,7 +654,7 @@ public class NetworkUtils {
 	}
 
 
-	public static LinkImpl createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
+	public static Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
 			double capacity, double lanes) {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
 	}

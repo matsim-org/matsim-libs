@@ -45,11 +45,11 @@ import javax.swing.border.TitledBorder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -225,7 +225,7 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 					node = network.getFactory().createNode(Id.createNodeId("fl"+oldNode.getId().toString()), oldNode.getCoord());
 					network.addNode(node);
 				}
-				LinkImpl newLink = (LinkImpl) network.getFactory().createLink(Id.createLinkId("fl"+link.getId().toString()), prevNode, node);
+				Link newLink = (Link) network.getFactory().createLink(Id.createLinkId("fl"+link.getId().toString()), prevNode, node);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				newLink.setAllowedModes(modes);
@@ -233,8 +233,8 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 				newLink.setFreespeed(link.getFreespeed());
 				newLink.setLength(link.getLength());
 				newLink.setNumberOfLanes(link.getNumberOfLanes()-1);
-				NetworkUtils.setOrigId( newLink, (String) NetworkUtils.getOrigId( ((LinkImpl)link) ) ) ;
-				NetworkUtils.setType( newLink, (String) NetworkUtils.getType(((LinkImpl)link)));
+				NetworkUtils.setOrigId( newLink, (String) NetworkUtils.getOrigId( ((Link)link) ) ) ;
+				NetworkUtils.setType( newLink, (String) NetworkUtils.getType(((Link)link)));
 				network.addLink(newLink);
 				Set<String> modes2 = new HashSet<String>();
 				modes2.add("bus");

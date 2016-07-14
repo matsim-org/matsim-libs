@@ -3,7 +3,6 @@ package playground.balac.twowaycarsharingredisigned.qsim;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -20,7 +19,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
@@ -138,12 +138,12 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 			
 			this.network = network;		}
 		
-		public LinkImpl getClosestLink(Coord coord) {
+		public Link getClosestLink(Coord coord) {
 			
 			double distance = (1.0D / 0.0D);
 		    Id<Link> closestLinkId = Id.create(0L, Link.class);
 		    for (Link link : network.getLinks().values()) {
-		      LinkImpl mylink = (LinkImpl)link;
+		      Link mylink = (Link)link;
 			final Coord coord1 = coord;
 		      Double newDistance = Double.valueOf(CoordUtils.distancePointLinesegment(mylink.getFromNode().getCoord(), mylink.getToNode().getCoord(), coord1));
 		      if (newDistance.doubleValue() < distance) {
@@ -153,7 +153,7 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 
 		    }
 
-		    return (LinkImpl)network.getLinks().get(closestLinkId);
+		    return (Link)network.getLinks().get(closestLinkId);
 			
 			
 		}

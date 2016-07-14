@@ -36,7 +36,7 @@ import java.util.Collection;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 import playground.sergioo.visualizer2D2012.Camera2D;
 import playground.sergioo.visualizer2D2012.Camera3DOrtho;

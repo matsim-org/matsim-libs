@@ -24,7 +24,7 @@
 package playground.vsp.parkAndRide;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 /**
  * The physics of a park-and-ride facility. The actual park-and-ride activity is performed on the link prLink3in.

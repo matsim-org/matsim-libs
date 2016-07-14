@@ -22,7 +22,6 @@ package playground.michalm.berlin;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;

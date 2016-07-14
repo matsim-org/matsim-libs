@@ -6,10 +6,10 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 public abstract class ComposedLink implements Link {
@@ -59,12 +59,12 @@ public abstract class ComposedLink implements Link {
 	}
 	
 	public double getAngle(ComposedLink link, boolean in) {
-		if(link.getLinks().size()==1 && link.getLinks().get(0).getClass().equals(LinkImpl.class))
+		if(link.getLinks().size()==1 && link.getLinks().get(0).getClass().equals(Link.class))
 			return Math.atan2(link.getLinks().get(0).getToNode().getCoord().getY()-link.getLinks().get(0).getFromNode().getCoord().getY(), link.getLinks().get(0).getToNode().getCoord().getX()-link.getLinks().get(0).getFromNode().getCoord().getX());
 		else if(in) {
 			for(Link subLink:link.getLinks())
 				if(subLink.getToNode().getId().equals(link.getToNode().getId()))
-					if(subLink.getClass().equals(LinkImpl.class))
+					if(subLink.getClass().equals(Link.class))
 						return Math.atan2(link.getLinks().get(0).getToNode().getCoord().getY()-link.getLinks().get(0).getFromNode().getCoord().getY(), link.getLinks().get(0).getToNode().getCoord().getX()-link.getLinks().get(0).getFromNode().getCoord().getX());
 					else		
 						return getAngle((ComposedLink) subLink, in);
@@ -72,7 +72,7 @@ public abstract class ComposedLink implements Link {
 		else
 			for(Link subLink:link.getLinks())
 				if(subLink.getFromNode().getId().equals(link.getFromNode().getId()))
-					if(subLink.getClass().equals(LinkImpl.class))
+					if(subLink.getClass().equals(Link.class))
 						return Math.atan2(link.getLinks().get(0).getToNode().getCoord().getY()-link.getLinks().get(0).getFromNode().getCoord().getY(), link.getLinks().get(0).getToNode().getCoord().getX()-link.getLinks().get(0).getFromNode().getCoord().getX());
 					else		
 						return getAngle((ComposedLink) subLink, in);

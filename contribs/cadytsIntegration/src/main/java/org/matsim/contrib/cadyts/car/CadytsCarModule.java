@@ -4,9 +4,10 @@ package org.matsim.contrib.cadyts.car;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import org.matsim.api.core.v01.network.Link;
+
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.network.Link;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 

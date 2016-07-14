@@ -1,7 +1,5 @@
 package org.matsim.core.network;
 
-import org.matsim.api.core.v01.network.Link;
-
 import java.util.ArrayList;
 import java.util.List;
 

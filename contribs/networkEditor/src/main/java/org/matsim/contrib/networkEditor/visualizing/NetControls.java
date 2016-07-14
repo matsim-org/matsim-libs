@@ -22,7 +22,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -650,7 +650,7 @@ class MyTableModel extends AbstractTableModel {
 	private int rows, cols;
 	public enum mode{LINK, NODE, NONE};
 	mode actualMode;
-	public LinkImpl activeLink;
+	public Link activeLink;
 	public Node activeNode;
 
 	public MyTableModel(){
@@ -658,7 +658,7 @@ class MyTableModel extends AbstractTableModel {
 		actualMode = mode.NONE;
 	}
 
-	public MyTableModel(LinkImpl activeLink) {
+	public MyTableModel(Link activeLink) {
 		this.activeLink = activeLink;
 		init(10, 2);
 		actualMode = mode.LINK;

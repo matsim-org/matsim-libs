@@ -11,10 +11,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -176,9 +176,9 @@ public class GeometryUtils {
 			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
 					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),
-					link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((LinkImpl)link)),
+					link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((Link)link)),
 					link.getCapacity(), link.getFreespeed(), CollectionUtils.setToString(link.getAllowedModes()),
-					link.getNumberOfLanes(), NetworkUtils.getOrigId( ((LinkImpl)link) )}, null);
+					link.getNumberOfLanes(), NetworkUtils.getOrigId( ((Link)link) )}, null);
 			linkFeatures.add(ft);
 		}
 		

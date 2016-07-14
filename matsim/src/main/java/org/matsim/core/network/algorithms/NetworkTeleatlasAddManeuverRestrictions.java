@@ -31,12 +31,12 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.utils.collections.Tuple;
@@ -72,7 +72,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 
 	/**
 	 * option flag: if set, expanded {@link Node nodes} (nodes that contains maneuver restrictions)
-	 * will not include new virtual {@link LinkImpl links} providing a u-turn maneuver at the
+	 * will not include new virtual {@link Link links} providing a u-turn maneuver at the
 	 * junction.
 	 */
 	public boolean removeUTurns = false;

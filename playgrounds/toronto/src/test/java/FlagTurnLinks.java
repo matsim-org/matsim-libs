@@ -1,7 +1,7 @@
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -24,7 +24,7 @@ public class FlagTurnLinks {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInfile);
 		
 		for (Link l : network.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
+			Link L = (Link) l;
 			
 			Node fn = L.getFromNode();
 			Node tn = L.getToNode();

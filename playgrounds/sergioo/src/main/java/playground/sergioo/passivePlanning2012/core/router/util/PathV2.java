@@ -1,6 +1,6 @@
 package playground.sergioo.passivePlanning2012.core.router.util;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class PathV2 extends Path {

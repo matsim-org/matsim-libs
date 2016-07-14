@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.core.network.Link;
 
 /**
  * A topological representation of an network node.

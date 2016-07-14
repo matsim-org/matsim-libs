@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;

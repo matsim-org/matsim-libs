@@ -31,7 +31,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
@@ -450,7 +449,7 @@ public final class NetworkImpl implements Network, Lockable {
 				return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 			}
 
-	public LinkImpl createAndAddLink(final Id<Link> id, final Node fromNode,
+	public Link createAndAddLink(final Id<Link> id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
 			final String origId, final String type) 
 	{
@@ -463,7 +462,7 @@ public final class NetworkImpl implements Network, Lockable {
 					throw new IllegalArgumentException(this+"[to="+toNode+" does not exist]");
 				}
 
-				LinkImpl link = (LinkImpl) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
+				Link link = (Link) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
 				NetworkUtils.setType( link, type);
 				NetworkUtils.setOrigId( link, origId ) ;
 

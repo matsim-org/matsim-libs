@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -16,7 +15,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -95,7 +95,7 @@ public class AccessibilityRunUtils {
 			Coord coord = measuringPoint.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
 			final Coord coord1 = coord;
-			LinkImpl r = ((LinkImpl) link);
+			Link r = ((Link) link);
 			// TODO check if this is good or if orthogonal projection etc. is more suitable
 			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if (distance <= maximumAllowedDistance) {

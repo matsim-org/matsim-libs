@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.scheduler;
 import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -34,6 +33,7 @@ import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.network.Link;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;

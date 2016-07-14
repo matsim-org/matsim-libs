@@ -25,10 +25,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -65,7 +65,7 @@ public class RunMunichZone30 {
 	private static void setZone30(Network net, Collection<SimpleFeature> zone30) {
 		for(Link link : net.getLinks().values()){
 			Id linkId = link.getId();
-			LinkImpl ll = (LinkImpl) net.getLinks().get(linkId);
+			Link ll = (Link) net.getLinks().get(linkId);
 			if(isLinkInShape(ll, zone30)){
 				logger.info("Changing freespeed of link " + ll.getId() + " from " + ll.getFreespeed() + " to 8.3333333334.");
 				ll.setFreespeed(30 / 3.6);

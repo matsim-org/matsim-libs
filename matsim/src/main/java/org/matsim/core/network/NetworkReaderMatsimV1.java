@@ -27,7 +27,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -173,9 +172,9 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		l.setCapacity(Double.parseDouble(atts.getValue("capacity")));
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
-		if (l instanceof LinkImpl) {
-			NetworkUtils.setOrigId( ((LinkImpl) l), atts.getValue("origid") ) ;
-			NetworkUtils.setType( ((LinkImpl) l), atts.getValue("type"));
+		if (l instanceof Link) {
+			NetworkUtils.setOrigId( ((Link) l), atts.getValue("origid") ) ;
+			NetworkUtils.setType( ((Link) l), atts.getValue("type"));
 		}
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');

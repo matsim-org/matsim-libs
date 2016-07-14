@@ -29,10 +29,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
@@ -51,9 +51,9 @@ public class NetworkThinner {
 		// add a new link
 		double length = 0.0; for (Link l : list) { length += l.getLength(); }
 		Link newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(),first.getCapacity(),first.getNumberOfLanes());
-		NetworkUtils.setType( ((LinkImpl) newLink), (String) NetworkUtils.getType(((LinkImpl) first)));
+		NetworkUtils.setType( ((Link) newLink), (String) NetworkUtils.getType(((Link) first)));
 		// always assign the origId of the first link (for convenience)
-		NetworkUtils.setOrigId( ((LinkImpl) newLink), (String) NetworkUtils.getOrigId( ((LinkImpl) first) ) ) ;
+		NetworkUtils.setOrigId( ((Link) newLink), (String) NetworkUtils.getOrigId( ((Link) first) ) ) ;
 
 		// mapping info
 		for (Link l : list) { log.info("    mapping: "+l.getId()+" => "+newLink.getId()); }
@@ -119,7 +119,7 @@ public class NetworkThinner {
 						(currLink.getCapacity() != nextLink.getCapacity()) ||
 						(currLink.getFreespeed() != nextLink.getFreespeed()) ||
 						(currLink.getNumberOfLanes() != nextLink.getNumberOfLanes()) ||
-						!NetworkUtils.getType(((LinkImpl) currLink)).equals(NetworkUtils.getType(((LinkImpl) nextLink))) ||
+						!NetworkUtils.getType(((Link) currLink)).equals(NetworkUtils.getType(((Link) nextLink))) ||
 						!currLink.getAllowedModes().equals(nextLink.getAllowedModes())) {
 					mergeGroups.add(linksToMerge);
 					linksToMerge = new ArrayList<Link>();

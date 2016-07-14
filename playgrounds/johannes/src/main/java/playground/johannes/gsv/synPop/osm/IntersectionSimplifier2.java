@@ -22,7 +22,6 @@ package playground.johannes.gsv.synPop.osm;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
@@ -163,7 +162,7 @@ public class IntersectionSimplifier2 {
 						newLink.setLength(link.getLength() + d);
 
 						newLink.setNumberOfLanes(link.getNumberOfLanes());
-						NetworkUtils.setOrigId( ((LinkImpl)newLink), (String) NetworkUtils.getOrigId( ((LinkImpl)link) ) ) ;
+						NetworkUtils.setOrigId( ((Link)newLink), (String) NetworkUtils.getOrigId( ((Link)link) ) ) ;
 					}
 				}
 			}

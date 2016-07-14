@@ -32,10 +32,10 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
@@ -158,7 +158,7 @@ public class NetworkChangeEventsAnalysis {
 					log.info("bin no: " + currentTimeBin + " - day: " + dayCounter + " - time: " + Time.writeTime(time));
 					
 					for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
-						LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(linkId);
+						Link link = (Link) scenario.getNetwork().getLinks().get(linkId);
 //						TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(linkId);
 						if (analyzeFreespeed) this.freespeeds.get(linkId)[currentTimeBin] = link.getFreespeed(time);
 						if (analyzeCapacity) this.capacities.get(linkId)[currentTimeBin] = link.getFlowCapacityPerSec(time) * 3600.;

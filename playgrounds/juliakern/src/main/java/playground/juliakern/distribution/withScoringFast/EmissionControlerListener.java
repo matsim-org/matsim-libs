@@ -22,7 +22,6 @@ package playground.juliakern.distribution.withScoringFast;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
@@ -38,6 +37,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.network.Link;
 
 import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.benjamin.scenarios.munich.exposure.IntervalHandler;

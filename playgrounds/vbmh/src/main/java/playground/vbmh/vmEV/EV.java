@@ -3,7 +3,7 @@ package playground.vbmh.vmEV;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 /**
  * Simulates one EV
  * 

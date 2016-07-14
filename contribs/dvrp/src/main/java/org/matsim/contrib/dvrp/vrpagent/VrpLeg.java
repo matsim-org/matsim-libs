@@ -20,9 +20,9 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.core.network.Link;
 
 
 /**

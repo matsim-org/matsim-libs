@@ -26,12 +26,12 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
 import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.network.Link;
 import org.matsim.core.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;

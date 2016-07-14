@@ -24,11 +24,11 @@ package playground.polettif.publicTransitMapping.osm;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -495,9 +495,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof LinkImpl) {
+				if(l instanceof Link) {
 					final String id1 = origId;
-					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;
@@ -509,9 +509,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof LinkImpl) {
+				if(l instanceof Link) {
 					final String id1 = origId;
-					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;

@@ -21,7 +21,7 @@ package playground.michalm.util.gis;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;

@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.optimizer.rules;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -30,6 +29,7 @@ import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.zone.*;
+import org.matsim.core.network.Link;
 
 
 public class RuleBasedTaxiOptimizer

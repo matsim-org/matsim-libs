@@ -21,8 +21,8 @@ package org.matsim.pt.router;
 
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Link;
 
 /**
  * A helper class to store custom data for {@link TransitTravelDisutility} which can be used

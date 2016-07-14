@@ -4,15 +4,15 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 class ClusterLink implements Link {
-	private final LinkImpl link;
+	private final Link link;
 	private NodeCluster rootCluster;
 	// set this to true if the link is an interlink
 	private boolean isInterLink = false;
@@ -33,7 +33,7 @@ class ClusterLink implements Link {
 		return isInterLink;
 	}
 
-	public ClusterLink(LinkImpl link) {
+	public ClusterLink(Link link) {
 		this.link = link;
 		this.isInterLink = false;
 

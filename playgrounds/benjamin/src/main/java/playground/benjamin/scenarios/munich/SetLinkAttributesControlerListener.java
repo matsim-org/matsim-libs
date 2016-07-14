@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -65,7 +65,7 @@ public class SetLinkAttributesControlerListener implements StartupListener {
 
 		for(Link link : network.getLinks().values()){
 			Id linkId = link.getId();
-			LinkImpl ll = (LinkImpl) network.getLinks().get(linkId);
+			Link ll = (Link) network.getLinks().get(linkId);
 			if(isLinkInShape(ll)){
 				logger.info("Changing freespeed of link " + ll.getId() + " from " + ll.getFreespeed() + " to 8.3333333334.");
 				ll.setFreespeed(30 / 3.6);

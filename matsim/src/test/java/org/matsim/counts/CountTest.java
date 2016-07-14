@@ -23,7 +23,7 @@ package org.matsim.counts;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CountTest extends MatsimTestCase {

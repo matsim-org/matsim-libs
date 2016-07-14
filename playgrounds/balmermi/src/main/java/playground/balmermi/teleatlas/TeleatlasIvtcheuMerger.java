@@ -28,12 +28,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -151,8 +151,8 @@ public class TeleatlasIvtcheuMerger {
 					l.getFreespeed(),
 					l.getCapacity()/10.0,
 					l.getNumberOfLanes(),
-					NetworkUtils.getOrigId( ((LinkImpl) l) ),
-					NetworkUtils.getType(((LinkImpl) l)));
+					NetworkUtils.getOrigId( ((Link) l) ),
+					NetworkUtils.getType(((Link) l)));
 		}
 
 		log.info("  number of lines processed: "+lineCnt);

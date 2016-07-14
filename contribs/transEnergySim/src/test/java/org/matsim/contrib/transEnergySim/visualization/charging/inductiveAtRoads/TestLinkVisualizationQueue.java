@@ -22,10 +22,10 @@ package org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoad
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.core.network.Link;
 
 public class TestLinkVisualizationQueue extends TestCase {
 

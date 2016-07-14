@@ -23,7 +23,6 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,7 +31,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -108,7 +108,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			// do not drive/walk around, if we stay on the same link
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			LinkImpl r1 = ((LinkImpl) toLink);
+			Link r1 = ((Link) toLink);
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
 			double travelTimeLastLink = NetworkUtils.getFreespeedTravelTime(r1, depTime + path.travelTime);

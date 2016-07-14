@@ -10,11 +10,11 @@ import java.util.Arrays;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -44,7 +44,7 @@ public class LinkStopsToNearestNode {
 		//Remove highways and on/off ramps. Should not affect routes which travel on highways since transit lines don't stop ON highways.	
 		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();
 		for (Link l : noHighways.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
+			Link L = (Link) l;
 			if (NetworkUtils.getType(L).equals("Highway") || NetworkUtils.getType(L).equals("Toll Highway") || NetworkUtils.getType(L).equals("On/Off Ramp")) linksToRemove.add(L.getId());
 		}
 		for (Id<Link> i : linksToRemove) noHighways.removeLink(i);
@@ -118,7 +118,7 @@ public class LinkStopsToNearestNode {
 			}
 			
 			if(!loopedNodes.contains(N.getId())){//Loop link DNE
-				LinkImpl l = (LinkImpl) factory.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
+				Link l = (Link) factory.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
 				NetworkUtils.setType( l, (String) "LOOP");
 				
 				/*if(!modes.isEmpty()){

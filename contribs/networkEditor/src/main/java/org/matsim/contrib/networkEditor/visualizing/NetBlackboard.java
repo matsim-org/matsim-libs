@@ -40,10 +40,10 @@ import javax.swing.SwingUtilities;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.networkEditor.utils.GeometryTools;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -83,7 +83,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The active link to be marked when painting
 	 */
-	protected LinkImpl activeLink;
+	protected Link activeLink;
 	/**
 	 * The active node to be marked when painting
 	 */
@@ -650,7 +650,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			javax.swing.JOptionPane.showMessageDialog(this, "El enlace ya es doble vía", "", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		activeLink = (LinkImpl)makeDoubleWay(activeLink);
+		activeLink = (Link)makeDoubleWay(activeLink);
 		controls.updateTable();
 		repaint();
 	}//GEN-LAST:event_jButton2ActionPerformed
@@ -834,7 +834,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		double minDist = Double.MAX_VALUE;
 		for(Link link:net.getLinks().values()){
 			final Coord coord1 = coord;
-			LinkImpl r = ((LinkImpl) link);
+			Link r = ((Link) link);
 			double thisDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if(thisDist < minDist) {
 				minDist = thisDist;
@@ -859,7 +859,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		for(Node node:nodes) {
 			for(Link link:node.getInLinks().values()) {
 				final Coord coord1 = coord;
-				LinkImpl r = ((LinkImpl) link);
+				Link r = ((Link) link);
 				double curDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
@@ -868,7 +868,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			}
 			for(Link link:node.getOutLinks().values()) {
 				final Coord coord1 = coord;
-				LinkImpl r = ((LinkImpl) link);
+				Link r = ((Link) link);
 				double curDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
@@ -935,7 +935,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			//System.out.println("Adding link " + link.getId());
 			selectedLinkList.add(link);
 		}
-		activeLink = (LinkImpl)link;
+		activeLink = (Link)link;
 		return true;
 	}
 
@@ -1176,7 +1176,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}
 
 	public Link makeDoubleWay(Link link){
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
+		Link newLink = (Link)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
 		newLink.setCapacity(link.getCapacity());
 		newLink.setLength(link.getLength());
 		newLink.setFreespeed(link.getFreespeed());
@@ -1210,7 +1210,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			endAdded = true;
 		}
 		Id<Link> id = getRandomLinkId();
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(id, start, end);
+		Link newLink = (Link)net.getFactory().createLink(id, start, end);
 		newLink.setLength(CoordUtils.calcEuclideanDistance(newLink.getFromNode().getCoord(), newLink.getToNode().getCoord()));
 		newLink.setCapacity(600.0);
 		newLink.setFreespeed(8.3333);

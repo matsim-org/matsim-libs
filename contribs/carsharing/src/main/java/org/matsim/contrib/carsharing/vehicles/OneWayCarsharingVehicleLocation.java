@@ -3,8 +3,8 @@ package org.matsim.contrib.carsharing.vehicles;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 
 

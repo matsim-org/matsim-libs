@@ -9,8 +9,8 @@ import javax.inject.Inject;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.network.Link;
 import org.matsim.counts.Counts;
 
 import floetteroed.opdyts.DecisionVariable;

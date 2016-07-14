@@ -22,10 +22,10 @@ package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -228,9 +228,9 @@ public class NetworkExpandNode {
 			l.setCapacity(inlink.getCapacity());
 			l.setNumberOfLanes(inlink.getNumberOfLanes());
 			l.setAllowedModes(inlink.getAllowedModes());
-			if (inlink instanceof LinkImpl) {
-				NetworkUtils.setOrigId( ((LinkImpl) l), NetworkUtils.getOrigId( ((LinkImpl) inlink) ) ) ;
-				NetworkUtils.setType( ((LinkImpl) l), NetworkUtils.getType(((LinkImpl) inlink)));
+			if (inlink instanceof Link) {
+				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) inlink) ) ) ;
+				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) inlink)));
 			}
 			network.addLink(l);
 		}
@@ -257,9 +257,9 @@ public class NetworkExpandNode {
 			l.setCapacity(outlink.getCapacity());
 			l.setNumberOfLanes(outlink.getNumberOfLanes());
 			l.setAllowedModes(outlink.getAllowedModes());
-			if (outlink instanceof LinkImpl) {
-				NetworkUtils.setOrigId( ((LinkImpl) l), NetworkUtils.getOrigId( ((LinkImpl) outlink) ) ) ;
-				NetworkUtils.setType( ((LinkImpl) l), NetworkUtils.getType(((LinkImpl) outlink)));
+			if (outlink instanceof Link) {
+				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) outlink) ) ) ;
+				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) outlink)));
 			}
 			network.addLink(l);
 		}
@@ -285,9 +285,9 @@ public class NetworkExpandNode {
 			} else {
 				l.setAllowedModes(turn.getModes());
 			}
-			if (fromLink instanceof LinkImpl) {
-				NetworkUtils.setOrigId( ((LinkImpl) l), NetworkUtils.getOrigId( ((LinkImpl) fromLink) ) ) ;
-				NetworkUtils.setType( ((LinkImpl) l), NetworkUtils.getType(((LinkImpl) fromLink)));
+			if (fromLink instanceof Link) {
+				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) fromLink) ) ) ;
+				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) fromLink)));
 			}
 			network.addLink(l);
 			newLinks.add(l);

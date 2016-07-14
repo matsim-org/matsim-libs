@@ -22,10 +22,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -52,9 +52,9 @@ public class AdditionOfRoadTypeInNetwork {
 			
 				double speedInMPS = link.getFreespeed();
 				if (speedInMPS == 25.0) {
-					NetworkUtils.setType( ((LinkImpl) link), (String) "01");
+					NetworkUtils.setType( ((Link) link), (String) "01");
 				} else if (speedInMPS == 13.9) {
-					NetworkUtils.setType( ((LinkImpl) link), (String) "02");
+					NetworkUtils.setType( ((Link) link), (String) "02");
 				} else {
 					throw new RuntimeException(
 							"Define road type in roadTypeMapping file for this category."

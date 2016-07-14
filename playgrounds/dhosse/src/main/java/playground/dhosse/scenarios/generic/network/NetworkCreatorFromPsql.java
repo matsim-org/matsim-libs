@@ -14,10 +14,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -379,11 +379,11 @@ public class NetworkCreatorFromPsql {
 				link.setLength(length);
 				link.setNumberOfLanes(lanesPerDirection);
 				
-				if(link instanceof LinkImpl){
+				if(link instanceof Link){
 					
 					final String id = origId;
-					NetworkUtils.setOrigId( ((LinkImpl)link), id ) ;
-					NetworkUtils.setType( ((LinkImpl)link), (String) entry.highwayTag);
+					NetworkUtils.setOrigId( ((Link)link), id ) ;
+					NetworkUtils.setType( ((Link)link), (String) entry.highwayTag);
 					
 				}
 				
@@ -400,11 +400,11 @@ public class NetworkCreatorFromPsql {
 				link.setLength(length);
 				link.setNumberOfLanes(lanesPerDirection);
 				
-				if(link instanceof LinkImpl){
+				if(link instanceof Link){
 					
 					final String id = origId;
-					NetworkUtils.setOrigId( ((LinkImpl)link), id ) ;
-					NetworkUtils.setType( ((LinkImpl)link), (String) entry.highwayTag);
+					NetworkUtils.setOrigId( ((Link)link), id ) ;
+					NetworkUtils.setType( ((Link)link), (String) entry.highwayTag);
 					
 				}
 				

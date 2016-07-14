@@ -21,10 +21,10 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
+import org.matsim.core.network.Link;
 
 
 public class VehicleData

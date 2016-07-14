@@ -25,13 +25,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -105,7 +105,7 @@ public class RouteSetGenerator {
 	private boolean isLocalRoute(NetworkRoute route) {
 		boolean isLocal = true;
 		for (Id routeLink2Id : route.getLinkIds()) {
-			LinkImpl routeLink = (LinkImpl) this.network.getLinks().get(routeLink2Id);
+			Link routeLink = (Link) this.network.getLinks().get(routeLink2Id);
 			if (!NetworkUtils.getType(routeLink).equals("39") && !NetworkUtils.getType(routeLink).equals("83") && !NetworkUtils.getType(routeLink).equals("90")) {
 				isLocal = false;
 				break;

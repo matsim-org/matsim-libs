@@ -22,9 +22,9 @@ package org.matsim.core.router;
 
 import java.util.ArrayList;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.network.Link;
 import org.matsim.core.router.util.NodeData;
 import org.matsim.core.router.util.NodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;

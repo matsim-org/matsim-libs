@@ -21,7 +21,7 @@ package playground.gregor.rtcadyts.debugging;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;

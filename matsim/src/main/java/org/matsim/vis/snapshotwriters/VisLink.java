@@ -2,7 +2,7 @@ package org.matsim.vis.snapshotwriters;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 /**Interface that is meant to replace the direct "QueueLink" accesses in the visualizer
  * 

@@ -15,10 +15,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -101,7 +101,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 			this.network.addNode(n);
 			
 			//Create loop link at node
-			LinkImpl loopLink = (LinkImpl) netFact.createLink(Id.create(stopId +"_LOOP", Link.class), n, n, network, 0.0, 9999, 9999, 1.0);
+			Link loopLink = (Link) netFact.createLink(Id.create(stopId +"_LOOP", Link.class), n, n, network, 0.0, 9999, 9999, 1.0);
 			NetworkUtils.setType( loopLink, (String) "LOOP");
 			this.network.addLink(loopLink);
 			

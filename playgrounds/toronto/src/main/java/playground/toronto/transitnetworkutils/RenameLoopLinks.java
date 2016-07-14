@@ -3,12 +3,12 @@ package playground.toronto.transitnetworkutils;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -44,7 +44,7 @@ public class RenameLoopLinks {
 		
 		LinkFactoryImpl factory = new LinkFactoryImpl();
 		for (Link l : baseNetwork.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
+			Link L = (Link) l;
 			
 			Id<Link> linkId;
 			if (NetworkUtils.getType(L).equals("LOOP")){
@@ -54,7 +54,7 @@ public class RenameLoopLinks {
 			Node fn = outNetwork.getNodes().get(L.getFromNode().getId());
 			Node tn = outNetwork.getNodes().get(L.getToNode().getId());
 			
-			LinkImpl newLink = (LinkImpl) factory.createLink(linkId, 
+			Link newLink = (Link) factory.createLink(linkId, 
 					fn, 
 					tn, 
 					outNetwork, 

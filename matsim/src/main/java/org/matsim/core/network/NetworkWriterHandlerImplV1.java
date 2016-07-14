@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -166,8 +165,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" modes=\"" + this.lastModes + "\"");
 		}
 
-		if (link instanceof LinkImpl) {
-			LinkImpl li = (LinkImpl) link;
+		if (link instanceof Link) {
+			Link li = (Link) link;
 			if (NetworkUtils.getOrigId( li ) != null) {
 				out.write(" origid=\"" + NetworkUtils.getOrigId( li ) + "\"");
 			}

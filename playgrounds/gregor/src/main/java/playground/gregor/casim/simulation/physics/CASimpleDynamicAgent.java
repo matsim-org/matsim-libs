@@ -23,7 +23,7 @@ package playground.gregor.casim.simulation.physics;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 //This class is for testing only will be removed in future [GL Nov '14]
 @Deprecated

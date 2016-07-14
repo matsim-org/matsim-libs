@@ -52,7 +52,7 @@ public class RoadTypeMapper {
 	        }
 		
 		for (Entry<Id<Link>, Link> e :  network.getLinks().entrySet()){
-			LinkImpl l = (LinkImpl) e.getValue();
+			Link l = (Link) e.getValue();
 			double freespeed = l.getFreespeed();
 			if (freespeed<9)
 				NetworkUtils.setType( l, (String) "75");

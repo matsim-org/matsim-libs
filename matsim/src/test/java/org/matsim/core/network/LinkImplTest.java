@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl.HashSetCache;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -67,10 +66,10 @@ public class LinkImplTest {
 		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
 		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
 		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 1000, (double) 0));
-		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
-		LinkImpl link2 = (LinkImpl) network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1, 3600, 1);
-		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
-		LinkImpl link4 = (LinkImpl) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
+		Link link1 = (Link) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
+		Link link2 = (Link) network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1, 3600, 1);
+		Link link3 = (Link) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
+		Link link4 = (Link) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
 
 		// do the following cases for each link
 
@@ -175,7 +174,7 @@ public class LinkImplTest {
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 50, (double) 50));
-		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 1000.0, 1.0);
+		Link link1 = (Link) network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 1000.0, 1.0);
 		Assert.assertEquals("wrong freespeed traveltime.", 50.0, NetworkUtils.getFreespeedTravelTime(link1), EPSILON);
 		link1.setLength(1000.0);
 		Assert.assertEquals("wrong freespeed traveltime.", 100.0, NetworkUtils.getFreespeedTravelTime(link1), EPSILON);

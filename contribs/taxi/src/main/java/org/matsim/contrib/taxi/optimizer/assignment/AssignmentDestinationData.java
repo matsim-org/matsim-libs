@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 
 public abstract class AssignmentDestinationData<D>

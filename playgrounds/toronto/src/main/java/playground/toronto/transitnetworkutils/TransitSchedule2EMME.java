@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -127,21 +127,21 @@ public class TransitSchedule2EMME {
 				//get node sequence
 				ArrayList<String> nodeIdSequence = new ArrayList<String>();
 				{					
-					LinkImpl currentLink = (LinkImpl) network.getLinks().get(route.getRoute().getStartLinkId());
+					Link currentLink = (Link) network.getLinks().get(route.getRoute().getStartLinkId());
 					if (NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.streetcarROW))
 						isStreetcarROW = true;
 					if (!NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.loop)){
 						nodeIdSequence.add(currentLink.getFromNode().getId().toString());
 					}
 					for (Id i : route.getRoute().getLinkIds()){
-						currentLink = (LinkImpl) network.getLinks().get(i);
+						currentLink = (Link) network.getLinks().get(i);
 						if (NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.streetcarROW))
 							isStreetcarROW = true;
 						if (NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.loop)) continue; //Skips loop links
 						
 						nodeIdSequence.add(currentLink.getFromNode().getId().toString());
 					}
-					currentLink = (LinkImpl) network.getLinks().get(route.getRoute().getEndLinkId());
+					currentLink = (Link) network.getLinks().get(route.getRoute().getEndLinkId());
 					nodeIdSequence.add(currentLink.getFromNode().getId().toString());
 					if (!NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.loop)){
 						nodeIdSequence.add(currentLink.getToNode().getId().toString()); //If the route does not end on a loop (not likely) then append the final node to the sequence
@@ -287,7 +287,7 @@ public class TransitSchedule2EMME {
 		//figure out line length, in m
 		double length = 0;
 		for (Id i : route.getRoute().getLinkIds()){
-			LinkImpl link = (LinkImpl) network.getLinks().get(i);
+			Link link = (Link) network.getLinks().get(i);
 			if (NetworkUtils.getType(link).equals(TorontoLinkTypes.loop)) continue;
 			length += link.getLength();
 		}

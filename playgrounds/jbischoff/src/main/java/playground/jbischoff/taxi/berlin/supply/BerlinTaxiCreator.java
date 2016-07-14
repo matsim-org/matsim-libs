@@ -26,10 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.contrib.zone.Zone;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;

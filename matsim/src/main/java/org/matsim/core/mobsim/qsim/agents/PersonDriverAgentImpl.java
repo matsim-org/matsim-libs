@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -30,6 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.network.Link;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;

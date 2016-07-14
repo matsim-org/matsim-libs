@@ -20,12 +20,12 @@
 package playground.thibautd.hitchiking.qsim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.qsim.PassengerQueuesPerLink.Queue;

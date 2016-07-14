@@ -4,8 +4,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import others.sergioo.util.geometry.Point2D;
@@ -75,7 +75,7 @@ public class Shape {
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Coord coord:points.values()) {
 			final Coord coord1 = coord;
-			LinkImpl r = ((LinkImpl)link);
+			Link r = ((Link)link);
 			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if(distance<nearestDistance)
 				nearestDistance = distance;

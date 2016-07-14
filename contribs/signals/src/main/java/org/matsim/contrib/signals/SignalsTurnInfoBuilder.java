@@ -22,10 +22,10 @@ package org.matsim.contrib.signals;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 
 import java.util.*;

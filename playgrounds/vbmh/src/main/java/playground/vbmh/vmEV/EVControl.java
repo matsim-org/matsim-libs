@@ -3,8 +3,9 @@ package playground.vbmh.vmEV;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.network.Link;
+
 import playground.vbmh.controler.VMConfig;
 import playground.vbmh.vmParking.ParkHistoryWriter;
 import playground.vbmh.vmParking.VMScoreKeeper;

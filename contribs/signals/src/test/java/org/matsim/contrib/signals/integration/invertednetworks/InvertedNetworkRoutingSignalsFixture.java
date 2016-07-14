@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.integration.invertednetworks;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -41,6 +40,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**

@@ -21,12 +21,12 @@
 package org.matsim.contrib.evacuation.model;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.model.locale.EnglishLocale;
 import org.matsim.contrib.evacuation.model.locale.Locale;
 import org.matsim.contrib.evacuation.model.shape.Shape.DrawMode;
 import org.matsim.contrib.evacuation.model.shape.ShapeStyle;
 import org.matsim.core.gbl.MatsimResource;
+import org.matsim.core.network.Link;
 
 import java.awt.*;
 

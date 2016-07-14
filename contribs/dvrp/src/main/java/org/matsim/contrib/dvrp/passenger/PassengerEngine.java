@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.network.Link;
 
 
 public class PassengerEngine

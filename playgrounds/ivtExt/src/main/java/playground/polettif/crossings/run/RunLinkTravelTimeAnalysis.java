@@ -20,7 +20,8 @@
 package playground.polettif.crossings.run;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
+
 import playground.polettif.crossings.analysis.LinkAnalysis;
 
 import java.io.FileNotFoundException;

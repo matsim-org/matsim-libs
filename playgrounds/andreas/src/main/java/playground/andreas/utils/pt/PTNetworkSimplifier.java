@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -125,12 +125,12 @@ public class PTNetworkSimplifier {
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
 				for (Link iL : iLinks) {
-					LinkImpl inLink = (LinkImpl) iL;
+					Link inLink = (Link) iL;
 
 					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
 
 					for (Link oL : oLinks) {
-						LinkImpl outLink = (LinkImpl) oL;
+						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
 
@@ -241,7 +241,7 @@ public class PTNetworkSimplifier {
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);
 	}
 
-	private boolean removeLinksFromTransitSchedule(Link link, LinkImpl inLink, LinkImpl outLink) {
+	private boolean removeLinksFromTransitSchedule(Link link, Link inLink, Link outLink) {
 		// first test - links must not be changed if, only one link is part of a route, but the other one not
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
@@ -304,7 +304,7 @@ public class PTNetworkSimplifier {
 		return true;
 	}
 
-	private boolean linkNeededByTransitStop(LinkImpl inLink, LinkImpl outLink) {
+	private boolean linkNeededByTransitStop(Link inLink, Link outLink) {
 
 		if(this.linksNeededByTransitSchedule == null){
 			this.linksNeededByTransitSchedule = new TreeSet<String>();
@@ -348,7 +348,7 @@ public class PTNetworkSimplifier {
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
+	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
 
 		boolean bothLinksHaveSameLinkStats = true;
 

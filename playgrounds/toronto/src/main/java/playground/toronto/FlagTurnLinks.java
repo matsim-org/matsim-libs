@@ -1,15 +1,15 @@
 package playground.toronto;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 public class FlagTurnLinks {
 
 	public static void run(Network network){
 		for (Link link : network.getLinks().values()){
-			LinkImpl l = (LinkImpl) link;
+			Link l = (Link) link;
 			String fromN = link.getFromNode().getId().toString();
 			String toN = link.getToNode().getId().toString();
 			

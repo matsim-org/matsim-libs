@@ -33,11 +33,11 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -234,7 +234,7 @@ public class RoutePath {
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(int i=0; i<links.size(); i++) {
 			final Coord coord1 = coord;
-			LinkImpl r = ((LinkImpl) links.get(i));
+			Link r = ((Link) links.get(i));
 			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1); 
 			if(distance<nearestDistance) {
 				nearest = i;
@@ -274,7 +274,7 @@ public class RoutePath {
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Link link:network.getLinks().values()) {
 			final Coord coord = point;
-			LinkImpl r = ((LinkImpl)link);
+			Link r = ((Link)link);
 			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
 			if(distance<nearestDistance) {
 				nearestDistance = distance;
@@ -474,7 +474,7 @@ public class RoutePath {
 					if(!withInsideStops || linkSegment.isNearestInside(new Point2D(coord.getX(),coord.getY())))
 						if(!withAngleShape || shape==null || linkVector.getAngleTo(shape.getVector(coord))<Math.PI/16) {
 							final Coord coord1 = coord;
-							LinkImpl r = ((LinkImpl)link);
+							Link r = ((Link)link);
 							double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 							if(distance<minDistance) {
 								int i=0;
@@ -493,7 +493,7 @@ public class RoutePath {
 		return nearestLinks;	
 	}
 	private double calculateDistance(Path path, Coord prevStop, Coord nextStop) {
-		LinkImpl firstLink = (LinkImpl)path.links.get(0);
+		Link firstLink = (Link)path.links.get(0);
 		Point2D fromPoint = new Point2D(firstLink.getFromNode().getCoord().getX(), firstLink.getFromNode().getCoord().getY());
 		Point2D toPoint = new Point2D(firstLink.getToNode().getCoord().getX(), firstLink.getToNode().getCoord().getY());
 		Line2D firstLinkLine = new Line2D(fromPoint, toPoint);
@@ -507,7 +507,7 @@ public class RoutePath {
 		else {
 			Coord firstToNodeCoord = firstLink.getToNode().getCoord();
 			distance += firstLinkLine.getNearestPoint(new Point2D(prevStop.getX(), prevStop.getY())).getDistance(new Point2D(firstToNodeCoord.getX(),firstToNodeCoord.getY()));
-			LinkImpl lastLink = (LinkImpl)path.links.get(path.links.size()-1);
+			Link lastLink = (Link)path.links.get(path.links.size()-1);
 			Point2D fromPoint2 = new Point2D(lastLink.getFromNode().getCoord().getX(), lastLink.getFromNode().getCoord().getY());
 			Point2D toPoint2 = new Point2D(lastLink.getToNode().getCoord().getX(), lastLink.getToNode().getCoord().getY());
 			Line2D lastLinkLine = new Line2D(fromPoint2, toPoint2);

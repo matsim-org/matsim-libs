@@ -8,11 +8,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 
 public abstract class NodeClusteringAlgorithm {
 	private final LinkedHashMap<Id, ClusterLink> links;
@@ -50,7 +50,7 @@ public abstract class NodeClusteringAlgorithm {
 		this.network = network;
 		links = new LinkedHashMap<>(network.getLinks().size());
 		for (Link l : network.getLinks().values()) {
-			links.put(l.getId(), new ClusterLink((LinkImpl) l));
+			links.put(l.getId(), new ClusterLink((Link) l));
 		}
 		setNodes(new LinkedHashMap<Id, ClusterNode>(network.getNodes().size()));
 		leafNodeClusters = new TreeMap<>();
@@ -73,7 +73,7 @@ public abstract class NodeClusteringAlgorithm {
 		this.network = network;
 		links = new LinkedHashMap<>(network.getLinks().size());
 		for (Link l : network.getLinks().values()) {
-			links.put(l.getId(), new ClusterLink((LinkImpl) l));
+			links.put(l.getId(), new ClusterLink((Link) l));
 		}
 		this.setNodes(new LinkedHashMap<Id, ClusterNode>(network.getNodes()
 				.size()));

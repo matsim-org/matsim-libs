@@ -21,9 +21,9 @@ package org.matsim.contrib.dvrp.schedule;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
+import org.matsim.core.network.Link;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;

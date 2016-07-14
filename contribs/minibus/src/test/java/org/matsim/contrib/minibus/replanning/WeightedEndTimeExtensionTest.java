@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
@@ -36,6 +35,7 @@ import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.operator.TimeProvider;
 import org.matsim.contrib.minibus.replanning.WeightedEndTimeExtension;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
+import org.matsim.core.network.Link;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,7 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -173,7 +173,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 
 	private void splitVkmOnRoadType(List<Link> links){
 		for(Link link : links){
-			LinkImpl li = (LinkImpl) link;
+			Link li = (Link) link;
 			RoadType roadType = RoadType.getRoadType(NetworkUtils.getType(li));
 			double oldValue = typeVkmTotal.get(roadType);
 			typeVkmTotal.put(roadType, oldValue + (li.getLength()/1000));

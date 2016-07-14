@@ -9,13 +9,13 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -93,11 +93,11 @@ public class NetworkConverter {
 					if(n+1==nodes.length-1 || CoordUtils.calcEuclideanDistance(prevNode.getCoord(), nodes[n+1].getCoord())>MIN_DISTANCE) {
 						network.addNode(nodes[n]);
 						Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
-						NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
+						NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 						network.addLink(link);
 						linkLongId++;
 						link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
-						NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
+						NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 						network.addLink(link);
 						linkLongId++;
 						prevNode = nodes[n+1];
@@ -105,11 +105,11 @@ public class NetworkConverter {
 				}
 				else {
 					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
-					NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
+					NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 					link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
-					NetworkUtils.setOrigId( ((LinkImpl)link), (String) feature.getID() ) ;
+					NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 					prevNode = nodes[n+1];

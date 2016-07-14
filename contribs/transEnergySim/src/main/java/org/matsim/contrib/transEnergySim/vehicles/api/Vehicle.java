@@ -20,9 +20,9 @@
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.core.network.Link;
 
 public interface Vehicle extends Identifiable<Vehicle>{
 

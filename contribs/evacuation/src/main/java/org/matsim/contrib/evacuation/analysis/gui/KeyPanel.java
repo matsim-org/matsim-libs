@@ -31,9 +31,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.model.Constants.Mode;
 import org.matsim.contrib.evacuation.model.Constants.Unit;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 
 public class KeyPanel extends AbstractDataPanel

@@ -12,13 +12,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -429,7 +429,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			ll.setAllowedModes(this.modes);
 			ll.setCapacity(30);
 			ll.setLength(link.length);
-			NetworkUtils.setOrigId( ((LinkImpl)ll), (String) this.linkId2LineId.get(link.id) ) ;
+			NetworkUtils.setOrigId( ((Link)ll), (String) this.linkId2LineId.get(link.id) ) ;
 			this.network.addLink(ll);
 			
 			if(!fromNode.getOutLinks().containsKey(ll.getId())){
@@ -480,7 +480,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						reverse.setFreespeed(ref.getFreespeed());
 						reverse.setLength(ref.getLength());
 						reverse.setNumberOfLanes(ref.getNumberOfLanes());
-						NetworkUtils.setOrigId( ((LinkImpl)reverse), (String) NetworkUtils.getOrigId( ((LinkImpl)ref) ) ) ;
+						NetworkUtils.setOrigId( ((Link)reverse), (String) NetworkUtils.getOrigId( ((Link)ref) ) ) ;
 						
 						this.network.addLink(reverse);
 						
@@ -516,7 +516,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						reverse.setFreespeed(designSpeed);
 						reverse.setLength(ref.getLength());
 						reverse.setNumberOfLanes(nTracks);
-						NetworkUtils.setOrigId( ((LinkImpl)reverse), (String) NetworkUtils.getOrigId( ((LinkImpl)ref) ) ) ;
+						NetworkUtils.setOrigId( ((Link)reverse), (String) NetworkUtils.getOrigId( ((Link)ref) ) ) ;
 						
 						this.network.addLink(reverse);
 						this.network.removeLink(ref.getId());

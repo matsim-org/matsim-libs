@@ -20,11 +20,11 @@
 package playground.johannes.studies.matrix2014.counts;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,7 +62,7 @@ public class OSM2MatsimCounts {
 		Map<String, Link> mapping = new HashMap<String, Link>();
 
 		for (Link link : network.getLinks().values()) {
-			String tokens[] = NetworkUtils.getOrigId( ((LinkImpl) link) ).split(",");
+			String tokens[] = NetworkUtils.getOrigId( ((Link) link) ).split(",");
 			for (String token : tokens) {
 				mapping.put(token, link);
 			}

@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.optimizer.zonal;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -30,6 +29,7 @@ import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.zone.*;
 import org.matsim.contrib.zone.util.*;
+import org.matsim.core.network.Link;
 
 
 public class ZonalTaxiOptimizer

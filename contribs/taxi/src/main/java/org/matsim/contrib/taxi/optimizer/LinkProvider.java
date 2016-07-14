@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 
 public interface LinkProvider<T>

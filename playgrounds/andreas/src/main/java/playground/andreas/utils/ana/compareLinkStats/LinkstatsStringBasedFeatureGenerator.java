@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
@@ -98,7 +98,7 @@ public class LinkstatsStringBasedFeatureGenerator implements FeatureGenerator{
 		attributes.put("capacity", link.getCapacity());
 		attributes.put("lanes", link.getNumberOfLanes());
 		attributes.put("visWidth", width);
-		attributes.put("type", NetworkUtils.getType(((LinkImpl) link)));
+		attributes.put("type", NetworkUtils.getType(((Link) link)));
 
 		// 3 hour average
 		if(this.compareResultMap.get(link.getId().toString()) != null){

@@ -37,14 +37,14 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -435,9 +435,9 @@ public class NetworkEmme2MATSim2012 {
 			link.setCapacity(capacity);
 			link.setNumberOfLanes(permlanes);
 			final String type1 = type;
-			NetworkUtils.setType( ((LinkImpl) link), type1);
+			NetworkUtils.setType( ((Link) link), type1);
 			final String id1 = origId;
-			NetworkUtils.setOrigId( ((LinkImpl) link), id1 ) ;
+			NetworkUtils.setOrigId( ((Link) link), id1 ) ;
 			network.addLink(link);
 			
 			/* 
@@ -474,7 +474,7 @@ public class NetworkEmme2MATSim2012 {
 		for (Link link : network.getLinks().values()) {
 			SimpleFeature ft = factory.createPolyline(
 					new Coordinate [] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), NetworkUtils.getType(((LinkImpl)link))},
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), NetworkUtils.getType(((Link)link))},
 					link.getId().toString()
 					);
 			features.add(ft);

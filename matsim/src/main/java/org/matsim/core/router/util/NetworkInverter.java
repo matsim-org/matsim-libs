@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
@@ -87,7 +87,7 @@ public class NetworkInverter {
 				outLink.getNumberOfLanes());
 		link.setAllowedModes(modes);
 //		log.error("created inverted link " + link.getId() + " from " + inLink.getId() + " to " + outLink.getId() + " with modes " + modes);
-		NetworkUtils.setType( ((LinkImpl) link), NetworkUtils.getType(((LinkImpl) outLink)));
+		NetworkUtils.setType( ((Link) link), NetworkUtils.getType(((Link) outLink)));
 		return numberOfLinksGenerated + 1;
 	}
 

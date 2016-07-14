@@ -20,10 +20,10 @@
 package playground.jbischoff.taxi.berlin.demand;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.zone.Zone;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 

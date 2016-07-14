@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 

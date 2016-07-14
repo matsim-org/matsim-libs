@@ -8,11 +8,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -87,13 +87,13 @@ public class LinkStops {
 		if(network.getNodes().get(Id.createNodeId(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i))==null)
 			network.addNode(toNode);
 		double length = -1;
-		if(NetworkUtils.getOrigId( ((LinkImpl)link) )!=null)
+		if(NetworkUtils.getOrigId( ((Link)link) )!=null)
 			length=link.getLength()*CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		else
 			length = CoordUtils.calcEuclideanDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
 		Link newLink = new LinkFactoryImpl().createLink(Id.createLinkId(link.getId().toString()+"_"+i), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
-		if(NetworkUtils.getOrigId( ((LinkImpl)link) )!=null)
-			NetworkUtils.setOrigId( ((LinkImpl)newLink), (String) NetworkUtils.getOrigId( ((LinkImpl)link) ) ) ;
+		if(NetworkUtils.getOrigId( ((Link)link) )!=null)
+			NetworkUtils.setOrigId( ((Link)newLink), (String) NetworkUtils.getOrigId( ((Link)link) ) ) ;
 		Set<String> modes = new HashSet<String>();
 		for(String mode:link.getAllowedModes())
 			modes.add(mode);

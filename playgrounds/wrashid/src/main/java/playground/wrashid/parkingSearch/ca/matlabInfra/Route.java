@@ -2,8 +2,8 @@ package playground.wrashid.parkingSearch.ca.matlabInfra;
 
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
 /**
@@ -27,7 +27,7 @@ class Route {
 		StringBuffer stringBuffer = new StringBuffer();
 		
 		for (Link link:links){
-			stringBuffer.append(((LinkImpl)link).getToNode().getId());
+			stringBuffer.append(((Link)link).getToNode().getId());
 			stringBuffer.append(" ");
 		}
 		

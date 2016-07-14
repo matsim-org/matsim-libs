@@ -27,11 +27,11 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.contrib.evacuation.control.ShapeFactory;
 import org.matsim.contrib.evacuation.control.eventlistener.AbstractListener;
 import org.matsim.contrib.evacuation.model.shape.LineShape;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkQuadTree;
 
 public class RCEEventListener extends AbstractListener

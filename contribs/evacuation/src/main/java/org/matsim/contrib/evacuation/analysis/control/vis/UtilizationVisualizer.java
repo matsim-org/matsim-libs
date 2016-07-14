@@ -26,13 +26,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.evacuation.analysis.control.Clusterizer;
 import org.matsim.contrib.evacuation.analysis.data.AttributeData;
 import org.matsim.contrib.evacuation.analysis.data.ColorationMode;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
 import org.matsim.contrib.evacuation.model.Constants.Mode;
+import org.matsim.core.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 
 public class UtilizationVisualizer {

@@ -31,7 +31,7 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.counts.CountSimComparison;
 
 /**

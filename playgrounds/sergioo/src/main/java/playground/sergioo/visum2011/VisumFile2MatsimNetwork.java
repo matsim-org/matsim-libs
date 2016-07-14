@@ -16,13 +16,13 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -243,7 +243,7 @@ public class VisumFile2MatsimNetwork {
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
 				Link link = linkFactory.createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				final String id1 = origId;
-				NetworkUtils.setOrigId( ((LinkImpl)link), id1 ) ;
+				NetworkUtils.setOrigId( ((Link)link), id1 ) ;
 				Set<String> modes = new HashSet<String>();
 				modes.add("Car");
 				link.setAllowedModes(modes);
@@ -288,7 +288,7 @@ public class VisumFile2MatsimNetwork {
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
 				Link link = new LinkFactoryImpl().createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				final String id1 = origId;
-				NetworkUtils.setOrigId( ((LinkImpl)link), id1 ) ;
+				NetworkUtils.setOrigId( ((Link)link), id1 ) ;
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				link.setAllowedModes(modes);

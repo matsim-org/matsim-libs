@@ -20,9 +20,9 @@
 package playground.jbischoff.networkChange;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.MatsimNetworkReader;

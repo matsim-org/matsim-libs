@@ -20,8 +20,8 @@
 package playground.wrashid.lib.tools.network;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;

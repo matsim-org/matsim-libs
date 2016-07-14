@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
@@ -80,9 +79,9 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addNode(node3);
 		network.addNode(node4);
 
-		LinkImpl link1 = NetworkUtils.createLink(Id.create(1, Link.class), node1, node2, network, 1000, 100.0, 2000.0, 1.0);
-		LinkImpl link1b = NetworkUtils.createLink(Id.create(1, Link.class), node2, node3, network, 1000, 100.0, 2000.0, 1.0);
-		LinkImpl link2 = NetworkUtils.createLink(Id.create(2, Link.class), node2, node4, network, 1000, 100.0, 2000.0, 1.0);
+		Link link1 = NetworkUtils.createLink(Id.create(1, Link.class), node1, node2, network, 1000, 100.0, 2000.0, 1.0);
+		Link link1b = NetworkUtils.createLink(Id.create(1, Link.class), node2, node3, network, 1000, 100.0, 2000.0, 1.0);
+		Link link2 = NetworkUtils.createLink(Id.create(2, Link.class), node2, node4, network, 1000, 100.0, 2000.0, 1.0);
 		network.addLink(link1);
 		Assert.assertEquals(1, network.getLinks().size());
 		try {

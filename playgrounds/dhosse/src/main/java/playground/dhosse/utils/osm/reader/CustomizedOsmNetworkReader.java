@@ -36,12 +36,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -827,9 +827,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(allowedModes);
-				if (l instanceof LinkImpl) {
+				if (l instanceof Link) {
 					final String id1 = origId;
-					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.wayId2LinkId.put(way.id, l.getId());
@@ -843,9 +843,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(allowedModes);
-				if (l instanceof LinkImpl) {
+				if (l instanceof Link) {
 					final String id1 = origId;
-					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;

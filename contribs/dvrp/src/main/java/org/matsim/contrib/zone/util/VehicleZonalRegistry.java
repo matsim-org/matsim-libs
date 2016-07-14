@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.zone.*;
+import org.matsim.core.network.Link;
 
 import com.google.common.collect.Maps;
 

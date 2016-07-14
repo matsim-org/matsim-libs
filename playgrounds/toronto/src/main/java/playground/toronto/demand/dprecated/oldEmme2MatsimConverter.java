@@ -11,11 +11,11 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -291,13 +291,13 @@ public class oldEmme2MatsimConverter {
 				
 				LinkFactoryImpl factory = new LinkFactoryImpl();
 				
-				LinkImpl l = (LinkImpl) factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
+				Link l = (Link) factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
 						i, j, network, length, speed, cap, lanes);
 				Link L = factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
 						i, j, network, length, speed, cap, lanes);
 				
 				L.setAllowedModes(convertMode(cells[4]));
-				NetworkUtils.setType( ((LinkImpl) L), (String) createType(cells));
+				NetworkUtils.setType( ((Link) L), (String) createType(cells));
 				
 				
 				l.setAllowedModes(convertMode(cells[4]));
@@ -361,7 +361,7 @@ public class oldEmme2MatsimConverter {
 		//HOV links
 		ArrayList<Id> hovs = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
-			LinkImpl L = (LinkImpl) i;
+			Link L = (Link) i;
 			if(NetworkUtils.getType(L) == "HOV") hovs.add(L.getId());
 		}
 		
@@ -412,7 +412,7 @@ public class oldEmme2MatsimConverter {
 		//Streetcar ROWs
 		ArrayList<Id> rows = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
-			LinkImpl L = (LinkImpl) i;
+			Link L = (Link) i;
 			if(NetworkUtils.getType(L).equals("Streetcar ROW")) rows.add(L.getId());
 		}
 		
@@ -435,7 +435,7 @@ public class oldEmme2MatsimConverter {
 			//Get incoming transfer link
 			ArrayList<Link> incomingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getFromNode().getInLinks().values()) {
-				LinkImpl l = (LinkImpl) L;
+				Link l = (Link) L;
 				if (NetworkUtils.getType(l).equals("Transfer")) incomingTransfers.add(L);
 				if (NetworkUtils.getType(l).equals("Streetcar ROW")) hasIncomingTransitLink = true;
 			}
@@ -444,7 +444,7 @@ public class oldEmme2MatsimConverter {
 			//Get outgoing transfer link
 			ArrayList<Link> outgoingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getToNode().getOutLinks().values()){
-				LinkImpl l = (LinkImpl) L;
+				Link l = (Link) L;
 				if (NetworkUtils.getType(l).equals("Transfer")) outgoingTransfers.add(L);
 				if (NetworkUtils.getType(l).equals("Streetcar ROW")) hasOutgoingTransitLink = true;
 			}
@@ -521,7 +521,7 @@ public class oldEmme2MatsimConverter {
 		ArrayList<Id> linksToRemove = new ArrayList<Id>();
 		
 		for(Link a : network.getLinks().values()){
-			LinkImpl link = (LinkImpl) a;
+			Link link = (Link) a;
 			
 			if((NetworkUtils.getType(link) == "CC") || (NetworkUtils.getType(link) == "Transfer"))
 				linksToRemove.add(link.getId()); 

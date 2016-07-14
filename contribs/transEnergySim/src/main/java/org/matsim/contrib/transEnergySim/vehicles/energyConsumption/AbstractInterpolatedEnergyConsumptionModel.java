@@ -22,8 +22,8 @@ package org.matsim.contrib.transEnergySim.vehicles.energyConsumption;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.core.network.Link;
 
 public abstract class AbstractInterpolatedEnergyConsumptionModel implements EnergyConsumptionModel{
 

@@ -28,11 +28,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -175,8 +175,8 @@ public abstract class AbstractResizeLinksByCount {
 		return this.oldNet;
 	}
 	
-	public LinkImpl getOriginalLink(Id id){
-		return (LinkImpl) this.oldNet.getLinks().get(id);
+	public Link getOriginalLink(Id id){
+		return (Link) this.oldNet.getLinks().get(id);
 	}
 	
 	public Network getNewNetwork(){
@@ -234,7 +234,7 @@ public abstract class AbstractResizeLinksByCount {
 		attrib.put("oldCap", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
 		attrib.put("newCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity()));
 		attrib.put("diffCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity() - this.oldNet.getLinks().get(link).getCapacity()));		
-		attrib.put("origId", NetworkUtils.getOrigId( ((LinkImpl)this.oldNet.getLinks().get(link)) ));
+		attrib.put("origId", NetworkUtils.getOrigId( ((Link)this.oldNet.getLinks().get(link)) ));
 		
 		this.modAttributes.put(link, attrib);
 	}

@@ -21,10 +21,10 @@ package org.matsim.contrib.signals;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Link;
 import org.matsim.integration.lanes11.MixedLaneTestFixture;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.contrib.signals.data.SignalsData;

@@ -35,11 +35,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -565,11 +565,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
+				if (l instanceof Link) {
 					final String id1 = origId;
-					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 					final String type = highway;
-					NetworkUtils.setType( ((LinkImpl) l), type);
+					NetworkUtils.setType( ((Link) l), type);
 				}
 				network.addLink(l);
 				this.id++;
@@ -580,11 +580,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
+				if (l instanceof Link) {
 					final String id1 = origId;
-					NetworkUtils.setOrigId( ((LinkImpl) l), id1 ) ;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 					final String type = highway;
-					NetworkUtils.setType( ((LinkImpl) l), type);
+					NetworkUtils.setType( ((Link) l), type);
 				}
 				network.addLink(l);
 				this.id++;

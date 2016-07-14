@@ -81,7 +81,7 @@ public class RunScheduleEditor {
 		Logger.getLogger(org.matsim.core.router.Dijkstra.class).setLevel(Level.ERROR); // suppress no route found warnings
 		Logger.getLogger(org.matsim.core.network.NetworkImpl.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.api.core.v01.network.Node.class).setLevel(Level.WARN);
-		Logger.getLogger(org.matsim.core.network.LinkImpl.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.network.Link.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.network.MatsimNetworkReader.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.utils.io.MatsimXmlParser.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.utils.io.MatsimFileTypeGuesser.class).setLevel(Level.WARN);

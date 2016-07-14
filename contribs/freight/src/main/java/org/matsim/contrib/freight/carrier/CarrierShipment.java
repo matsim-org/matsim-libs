@@ -1,7 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.Link;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.

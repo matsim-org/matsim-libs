@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.Link;
+import org.matsim.core.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -203,10 +203,10 @@ public class TeleatlasConverter45v101 {
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesFT);
 				if (modesFT.size() == 3) { final String type1 = type;
-				NetworkUtils.setType( ((LinkImpl)link), type1); }
+				NetworkUtils.setType( ((Link)link), type1); }
 				else if (type.startsWith("-")) { final String type1 = type;
-				NetworkUtils.setType( ((LinkImpl)link), type1); }
-				else { NetworkUtils.setType( ((LinkImpl)link), (String) ("-"+type)); }
+				NetworkUtils.setType( ((Link)link), type1); }
+				else { NetworkUtils.setType( ((Link)link), (String) ("-"+type)); }
 			}
 			if (createTFElement) {
 				Link link = createLink(nwElement, "TF");
@@ -216,12 +216,12 @@ public class TeleatlasConverter45v101 {
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesTF);
 				final String type1 = type;
-				NetworkUtils.setType( ((LinkImpl)link), type1);
+				NetworkUtils.setType( ((Link)link), type1);
 				if (modesTF.size() == 3) { final String type2 = type;
-				NetworkUtils.setType( ((LinkImpl)link), type2); }
+				NetworkUtils.setType( ((Link)link), type2); }
 				else if (type.startsWith("-")) { final String type2 = type;
-				NetworkUtils.setType( ((LinkImpl)link), type2); }
-				else { NetworkUtils.setType( ((LinkImpl)link), (String) ("-"+type)); }
+				NetworkUtils.setType( ((Link)link), type2); }
+				else { NetworkUtils.setType( ((Link)link), (String) ("-"+type)); }
 			}
 		}
 	}
