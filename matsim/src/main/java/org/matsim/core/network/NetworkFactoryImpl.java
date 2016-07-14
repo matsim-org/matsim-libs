@@ -26,15 +26,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author dgrether
  * @author mrieser
  */
-public class NetworkFactoryImpl implements NetworkFactory {
+public final class NetworkFactoryImpl implements NetworkFactory {
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
 
 	private LinkFactory linkFactory = null;

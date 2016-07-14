@@ -438,7 +438,7 @@ public final class NetworkImpl implements Network, Lockable {
 	}
 
 	public Node createAndAddNode(final Id<Node> id, final Coord coord, final String nodeType) {
-		Node n = (Node) createAndAddNode(id, coord);
+		Node n = createAndAddNode(id, coord);
 		NetworkUtils.setType(n,nodeType);
 		return n;
 	}
@@ -492,6 +492,7 @@ public final class NetworkImpl implements Network, Lockable {
 			}
 		}
 	}
+	@SuppressWarnings("unused")
 	private void testForLocked() {
 		if ( locked ) {
 			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;

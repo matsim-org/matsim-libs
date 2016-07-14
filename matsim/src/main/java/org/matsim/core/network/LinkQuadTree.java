@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author mrieser / senozon
  */
-public class LinkQuadTree {
+public final class LinkQuadTree {
 
 	private final Node top;
 

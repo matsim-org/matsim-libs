@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -37,7 +36,7 @@ import org.matsim.core.utils.misc.Time;
 	private final CoordinateTransformation transformation;
 
 	NetworkWriterHandlerImplV1() {
-			this( new IdentityTransformation() );
+		this( new IdentityTransformation() );
 	}
 
 	NetworkWriterHandlerImplV1(CoordinateTransformation transformation) {
@@ -117,14 +116,11 @@ import org.matsim.core.utils.misc.Time;
 		final Coord coord = transformation.transform( node.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");
-		if (node instanceof Node) {
-			Node node2 = (Node) node;
-			if (NetworkUtils.getType( node2 ) != null) {
-				out.write(" type=\"" + NetworkUtils.getType( node2 ) + "\"");
-			}
-			if (NetworkUtils.getOrigId( node2 ) != null) {
-				out.write(" origid=\"" + NetworkUtils.getOrigId( node2 ) + "\"");
-			}
+		if (NetworkUtils.getType( node ) != null) {
+			out.write(" type=\"" + NetworkUtils.getType( node ) + "\"");
+		}
+		if (NetworkUtils.getOrigId( node ) != null) {
+			out.write(" origid=\"" + NetworkUtils.getOrigId( node ) + "\"");
 		}
 		out.write(" />\n");
 	}
@@ -139,7 +135,7 @@ import org.matsim.core.utils.misc.Time;
 
 	private Set<String> lastSet = null;
 	private String lastModes = null;
-	
+
 	@Override
 	public void startLink(final Link link, final BufferedWriter out) throws IOException {
 		out.write("\t\t<link");
@@ -193,6 +189,6 @@ import org.matsim.core.utils.misc.Time;
 	@Override
 	public void writeSeparator(final BufferedWriter out) throws IOException {
 		out.write("<!-- =================================================" +
-							"===================== -->\n\n");
+				"===================== -->\n\n");
 	}
 }

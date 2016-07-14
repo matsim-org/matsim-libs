@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class LinkImpl implements Link {
@@ -97,7 +96,7 @@ public class LinkImpl implements Link {
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 		this.capacity = capacity;
-		this.calculateFlowCapacity();
+		this.checkCapacitiySemantics();
 		this.checkCapacitiySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
@@ -107,10 +106,6 @@ public class LinkImpl implements Link {
 			if ( loopWarnCnt == maxLoopWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
 		}
-	}
-
-	private void calculateFlowCapacity() {
-		this.checkCapacitiySemantics();
 	}
 
 	private void checkCapacitiySemantics() {
@@ -182,22 +177,20 @@ public class LinkImpl implements Link {
 		return true;
 	}
 
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
-	}
-
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
-		return this.getCapacity(time) / network.getCapacityPeriod();
-	}
-
 	public final String getOrigId() {
 		return this.origid;
 	}
 
 	public final String getType() {
 		return this.type;
+	}
+	
+	// ---
+
+	@Override
+	public void setCapacity(double capacityPerNetworkCapcityPeriod){
+		this.capacity = capacityPerNetworkCapcityPeriod;
+		this.checkCapacitiySemantics();
 	}
 
 	@Override
@@ -210,12 +203,24 @@ public class LinkImpl implements Link {
 		return this.capacity;
 	}
 
-	@Override
-	public void setCapacity(double capacityPerNetworkCapcityPeriod){
-		this.capacity = capacityPerNetworkCapcityPeriod;
-		this.calculateFlowCapacity();
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
+	public double getFlowCapacityPerSec() {
+		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
+	}
+	
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
+	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
+		return this.getCapacity(time) / network.getCapacityPeriod();
+	}
+	
+	double getCapacityPeriod() {
+		// since the link has a back pointer to network, we can as well provide this here (????)
+		// TimeVariantLinkImpl needs this ... but why?
+		return network.getCapacityPeriod() ;
 	}
 
+	// ---
+	
 	@Override
 	public double getFreespeed() {
 		return this.freespeed;
@@ -315,11 +320,6 @@ public class LinkImpl implements Link {
 		Coord fromXY = getFromNode().getCoord();
 		Coord toXY = getToNode().getCoord();
 		return new Coord((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
-	}
-
-	double getCapacityPeriod() {
-		// since the link has a back pointer to network, we can as well provide this here (????)
-		return network.getCapacityPeriod() ;
 	}
 
 	/*package*/ abstract static class HashSetCache {

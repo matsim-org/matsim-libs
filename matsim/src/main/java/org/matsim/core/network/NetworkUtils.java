@@ -20,18 +20,24 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import java.util.*;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -495,7 +501,7 @@ public class NetworkUtils {
 	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
-		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<Double, Link>();
+		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<>();
 
 		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
 			if (!(outLink.getToNode().equals(inLink.getFromNode()))){

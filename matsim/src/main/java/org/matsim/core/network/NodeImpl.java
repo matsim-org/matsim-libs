@@ -54,7 +54,7 @@ import org.matsim.core.utils.collections.IdentifiableArrayMap;
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected NodeImpl(final Id<Node> id, final Coord coord) {
+	NodeImpl(final Id<Node> id, final Coord coord) {
 		this(id, coord, null);
 	}
 

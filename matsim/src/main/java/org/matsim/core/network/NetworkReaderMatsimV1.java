@@ -20,12 +20,15 @@
 
 package org.matsim.core.network;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -34,16 +37,12 @@ import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
-
 /**
  * A reader for network-files of MATSim according to <code>network_v1.dtd</code>.
  *
  * @author mrieser
  */
-public class NetworkReaderMatsimV1 extends MatsimXmlParser {
+public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private final static String NETWORK = "network";
 	private final static String LINKS = "links";
@@ -55,7 +54,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	// final or settable?
 	private final CoordinateTransformation transformation;
 
-    private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
+	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
 	public NetworkReaderMatsimV1(Network network) {
 		this( new IdentityTransformation() , network );
@@ -144,17 +143,16 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 				this.network.getFactory().createNode(
 						Id.create(atts.getValue("id"), Node.class),
 						transformation.transform(
-							new Coord(
-									Double.parseDouble(atts.getValue("x")),
-									Double.parseDouble(atts.getValue("y")))) );
+								new Coord(
+										Double.parseDouble(atts.getValue("x")),
+										Double.parseDouble(atts.getValue("y")))) );
 		this.network.addNode(node);
-		if (node instanceof Node) {
-			Node r1 = ((Node) node);
-			NetworkUtils.setType(r1,atts.getValue("type"));
-			if (atts.getValue("origid") != null) {
-				Node r = ((Node) node);
-				NetworkUtils.setOrigId( r, atts.getValue("origid") ) ;
-			}
+
+		NetworkUtils.setType(node,atts.getValue("type"));
+		// (did not have a null check when I found it.  kai, jul'16) 
+
+		if (atts.getValue("origid") != null) {
+			NetworkUtils.setOrigId( node, atts.getValue("origid") ) ;
 		}
 	}
 
@@ -185,9 +183,9 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 				l.setAllowedModes(new HashSet<String>());
 			} else {
 				Set<String> modes = new HashSet<>();
-                for (String strMode : strModes) {
-                    modes.add(strMode.trim().intern());
-                }
+				for (String strMode : strModes) {
+					modes.add(strMode.trim().intern());
+				}
 				l.setAllowedModes(modes);
 			}
 		}

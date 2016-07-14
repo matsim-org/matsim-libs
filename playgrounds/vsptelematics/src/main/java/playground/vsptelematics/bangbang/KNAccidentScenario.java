@@ -40,7 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -55,16 +54,10 @@ import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.strategies.KeepLastExecuted;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.withinday.controller.ExecutedPlansService;
-import org.matsim.withinday.controller.ExecutedPlansServiceImpl;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 /**
@@ -74,6 +67,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 public class KNAccidentScenario {
 	private static final Logger log = Logger.getLogger(KNAccidentScenario.class) ;
 	
+	@SuppressWarnings("unused")
 	private static final String KEEP_LAST_EXECUTED = "keepLastExecuted" ;
 
 	static final class MyIterationCounter implements IterationStartsListener {
