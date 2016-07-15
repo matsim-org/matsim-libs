@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,7 +74,7 @@ public class NetworkCutter {
 
 	public Set<Id<Link>> cutNetworkToArea(String pathToOutputNetwork, Coord center, int radius) {
 		Network filteredNetwork = org.matsim.core.network.NetworkUtils.createNetwork();
-		NetworkFactoryImpl factory = org.matsim.core.network.NetworkUtils.createNetworkFactory(filteredNetwork);
+		NetworkFactory factory = filteredNetwork.getFactory();
 
 		log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
 		// Identify all nodes within area of interest:

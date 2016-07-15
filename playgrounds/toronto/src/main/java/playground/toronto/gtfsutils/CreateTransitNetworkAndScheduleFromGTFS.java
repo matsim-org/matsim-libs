@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -82,7 +82,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 		log.info("PROCESSING STOPS");
 		
 		this.network = NetworkUtils.createNetwork();
-		NetworkFactoryImpl netFact = this.network.getFactory();
+		NetworkFactory netFact = this.network.getFactory();
 		TransitScheduleFactory schedFact = new TransitScheduleFactoryImpl();
 		this.schedule = schedFact.createTransitSchedule();
 		
@@ -121,7 +121,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	private void processRoutes(Set<Service> services, boolean copyLinks){
 		log.info("PROCESSING ROUTES");
 		
-		NetworkFactoryImpl netFact = this.network.getFactory();
+		NetworkFactory netFact = this.network.getFactory();
 		TransitScheduleFactory schedFact = this.schedule.getFactory();
 		
 		int links = 0;

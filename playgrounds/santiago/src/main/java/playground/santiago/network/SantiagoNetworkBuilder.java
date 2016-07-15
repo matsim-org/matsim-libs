@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -222,7 +222,7 @@ public class SantiagoNetworkBuilder {
 
 	private void addSomeLinks(NetworkImpl network) {
 		//create connection links (according to e-mail from kt 2015-07-27)
-		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
+		NetworkFactory netFactory = (NetworkFactory) network.getFactory();
 		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
 		network.addNode(node);
 		final NetworkImpl network1 = network;

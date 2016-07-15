@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.Connection;
@@ -40,6 +39,7 @@ import org.matsim.contrib.wagonSim.production.ProductionDataContainer.Production
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RbNode;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RcpNode;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.SatNode;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 

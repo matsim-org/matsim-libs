@@ -21,7 +21,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 
@@ -76,7 +76,7 @@ public class DifferenceManager {
 
     public Link cloneLink(Link link) {
         final NetworkImpl network = net;
-	NetworkFactoryImpl r = net.getFactory();
+	NetworkFactory r = net.getFactory();
 	return NetworkUtils.createLink(link.getId(), link.getFromNode(), link.getToNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
     }
 

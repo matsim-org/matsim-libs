@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -420,7 +420,7 @@ public class Emme2MatsimConverter {
 		network = NetworkUtils.createNetwork();
 		//capperiod="1:00:00"
 		network.setCapacityPeriod(60 * 60); //1 hour, in sec
-		NetworkFactoryImpl factory = network.getFactory();
+		NetworkFactory factory = network.getFactory();
 		
 		
 		log.info("Reading file \"" + f + "\"...");

@@ -46,7 +46,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     
     		// create a network
     		final NetworkImpl network = NetworkUtils.createNetwork();
-    		NetworkFactoryImpl nf = NetworkUtils.createNetworkFactory(network);
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
     		network.setFactory(nf);
     		network.setCapacityPeriod(3600.0);
@@ -90,7 +90,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     
     		// create a network
     		final NetworkImpl network = NetworkUtils.createNetwork();
-    		NetworkFactoryImpl nf = NetworkUtils.createNetworkFactory(network);
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
     		network.setFactory(nf);
     		network.setCapacityPeriod(3600.0);

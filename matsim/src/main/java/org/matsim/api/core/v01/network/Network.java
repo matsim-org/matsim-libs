@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.network.NetworkFactory;
 
 /**
  * A topological network representation.

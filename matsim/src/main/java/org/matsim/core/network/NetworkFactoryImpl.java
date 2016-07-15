@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -32,10 +31,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author dgrether
  * @author mrieser
  */
-public final class NetworkFactoryImpl implements NetworkFactory {
+/*deliberately package*/ final class NetworkFactoryImpl implements NetworkFactory {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
+	private final static Logger log = Logger.getLogger(NetworkFactory.class);
 
 	private LinkFactory linkFactory = null;
 	

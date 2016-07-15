@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
@@ -13,13 +12,14 @@ import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 
 public class BikeNetworkFactoryImpl implements NetworkFactory {
 	
-	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
+	private final static Logger log = Logger.getLogger(NetworkFactory.class);
 
 	private LinkFactory linkFactory = null;
 	

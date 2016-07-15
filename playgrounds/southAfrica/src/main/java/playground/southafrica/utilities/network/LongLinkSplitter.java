@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkUtils;
 
 import playground.southafrica.utilities.Header;
@@ -70,7 +70,7 @@ public class LongLinkSplitter {
 	public static Network splitNetwork(Network network, double longestLink, boolean verbose){
 		Network newNetwork = null;
 		newNetwork = NetworkUtils.createNetwork();
-		NetworkFactory nf = NetworkUtils.createNetworkFactory(newNetwork);
+		NetworkFactory nf = newNetwork.getFactory();
 		
 		Map<Integer, Integer> splitCount = new TreeMap<Integer, Integer>();
 		splitCount.put(0, 0);

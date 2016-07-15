@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,7 +42,7 @@ public class StockholmP0Controller {
 		Map<String, List<Link>> outgoinglinks = sth.getOutLinksForJunctions(timednodes, network);
 		sth.writePretimedNodesCoordinates(nodesfile,pretimedxyxcords);
 		
-		NetworkFactoryImpl nf = network.getFactory();
+		NetworkFactory nf = network.getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		controler.addControlerListener(new StockholmP0ControlListener(scenario, (NetworkImpl) scenario.getNetwork(), incominglinks, outgoinglinks));
 		controler.setModules(new ControlerDefaultsWithRoadPricingModule());

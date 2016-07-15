@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -67,7 +67,7 @@ public class NetworkToolsTest {
 	@Before
 	public void prepare() {
 		network = NetworkUtils.createNetwork();
-		NetworkFactoryImpl networkFactory = NetworkUtils.createNetworkFactory(network);
+		NetworkFactory networkFactory = network.getFactory();
 
 		nodeA = networkFactory.createNode(Id.createNodeId("A"), coordA);
 		nodeB = networkFactory.createNode(Id.createNodeId("B"), coordB);

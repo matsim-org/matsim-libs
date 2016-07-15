@@ -753,9 +753,4 @@ public class NetworkUtils {
 			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork" ) ;
 		}
 	}
-
-
-	public static NetworkFactoryImpl createNetworkFactory(Network network) {
-		return new NetworkFactoryImpl(network);
-	}
 }

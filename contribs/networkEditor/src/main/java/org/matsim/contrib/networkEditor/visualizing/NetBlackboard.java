@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.networkEditor.utils.GeometryTools;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
@@ -990,7 +990,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(segment1.getToNode().getId().equals(segment2.getFromNode().getId()) == false)
 			return;
 		final NetworkImpl network = net;
-		NetworkFactoryImpl r = net.getFactory();
+		NetworkFactory r = net.getFactory();
 		Link newLink = NetworkUtils.createLink(this.getRandomLinkId(), segment1.getFromNode(), segment2.getToNode(), network, segment1.getLength()+segment2.getLength(), (segment1.getFreespeed()+segment2.getFreespeed())/2.0, (segment1.getCapacity()+segment2.getCapacity())/2.0, Math.min(segment1.getNumberOfLanes(), segment2.getNumberOfLanes()));
 		net.addLink(newLink);
 		net.removeLink(segment1.getId());
@@ -1305,7 +1305,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		final Node from1 = from;
 		final Node to1 = to;
 		final NetworkImpl network = net;
-		NetworkFactoryImpl r = net.getFactory();
+		NetworkFactory r = net.getFactory();
 		return NetworkUtils.createLink(id1, from1, to1, network, source.getLength()*distRelation, source.getFreespeed(), source.getCapacity(), source.getNumberOfLanes());
 	}
 

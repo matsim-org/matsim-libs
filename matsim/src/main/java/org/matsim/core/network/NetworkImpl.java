@@ -68,7 +68,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 
 	private double effectiveLaneWidth = 3.75;
 
-	private NetworkFactoryImpl factory;
+	private NetworkFactory factory;
 
 	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 
@@ -85,7 +85,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	private boolean locked = false ;
 
 	NetworkImpl() {
-		this.factory = NetworkUtils.createNetworkFactory(this);
+		this.factory = this.getFactory();
 	}
 
 	@Override
@@ -339,7 +339,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 		return this.networkChangeEvents;
 	}
 	@Override
-	public NetworkFactoryImpl getFactory() {
+	public NetworkFactory getFactory() {
 		return this.factory;
 	}
 
@@ -430,7 +430,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 		return Collections.unmodifiableMap(links);
 	}
 
-	void setFactory(final NetworkFactoryImpl networkFactory) {
+	void setFactory(final NetworkFactory networkFactory) {
 		this.factory = networkFactory;
 	}
 

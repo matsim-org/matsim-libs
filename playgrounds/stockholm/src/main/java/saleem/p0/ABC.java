@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -19,7 +19,7 @@ public class ABC {
 		Config config = ConfigUtils.loadConfig("H:\\Mike Work\\input\\config.xml");
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
+		NetworkFactory nf = (NetworkFactory) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network = (NetworkImpl) scenario.getNetwork();
 		Controler controler = new Controler( scenario ) ;
