@@ -75,14 +75,15 @@ public final class NetworkFactoryImpl implements NetworkFactory {
 	 *
 	 * @see #setNetworkChangeEventFactory(NetworkChangeEventFactory)
 	 */
+	@Override
 	public NetworkChangeEvent createNetworkChangeEvent(double time) {
 		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
 	}
-	
+	@Override
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
 	}
-
+	@Override
 	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
 		this.networkChangeEventFactory = networkChangeEventFactory;
 	}

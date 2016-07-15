@@ -70,6 +70,20 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 		this.linkFactory = factory;
 	}
 
+
+	@Override
+	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+
+	@Override
+	public NetworkChangeEvent createNetworkChangeEvent(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 //	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
 //		this.networkChangeEventFactory = networkChangeEventFactory;
 //	}
