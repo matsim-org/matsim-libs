@@ -77,7 +77,9 @@ public class BuslaneGenerator_fullPriority {
 						if (link.toString().equals(lastLinkId.toString())) {
 							newNodeId = network.getLinks().get(link).getToNode().getId();
 						} else {
-							network.createAndAddNode(newNodeId, newBusNodeCoord);
+							final Id<Node> id1 = newNodeId;
+							final Coord coord = newBusNodeCoord;
+							NetworkUtils.createAndAddNode2(network, id1, coord);
 						}
 						final Id<Link> id = newLinkId;
 						final double length1 = length;

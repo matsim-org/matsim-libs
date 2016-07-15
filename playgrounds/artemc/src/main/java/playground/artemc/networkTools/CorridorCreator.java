@@ -43,14 +43,16 @@ public class CorridorCreator {
 		int newLinkId = 1;
 		int newNodeId = 1;
 		Id<Node> fromNode = Id.create(newNodeId, Node.class);
-		network.createAndAddNode(fromNode, new Coord(10.0, 10.0));
+		final Id<Node> id = fromNode;
+		NetworkUtils.createAndAddNode2(network, id, new Coord(10.0, 10.0));
 
 		while (restLength > 0) {
 			newNodeId++;
 			Id<Node> toNode = Id.create(newNodeId, Node.class);
 
 			if (restLength > linkLength) {
-				network.createAndAddNode(toNode, new Coord(10.0 + totalLength - restLength + linkLength, 10.0));
+				final Id<Node> id1 = toNode;
+				NetworkUtils.createAndAddNode2(network, id1, new Coord(10.0 + totalLength - restLength + linkLength, 10.0));
 				final double length = linkLength;
 				final double freespeed1 = freespeed;
 				final double numLanes1 = numLanes;
@@ -61,7 +63,8 @@ public class CorridorCreator {
 				NetworkUtils.createAndAddLink(network,Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode), network.getNodes().get(fromNode), length1, freespeed2, capacity * numLanes, numLanes2 );
 
 			} else {
-				network.createAndAddNode(toNode, new Coord((double) totalLength, 10.0));
+				final Id<Node> id1 = toNode;
+				NetworkUtils.createAndAddNode2(network, id1, new Coord((double) totalLength, 10.0));
 				final double length = restLength;
 				final double freespeed1 = freespeed;
 				final double numLanes1 = numLanes;

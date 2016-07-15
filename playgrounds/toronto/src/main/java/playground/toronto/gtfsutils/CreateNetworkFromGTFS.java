@@ -50,7 +50,9 @@ public class CreateNetworkFromGTFS{
 		while (rdStops.next()){
 			Id<Node> StopID = Id.create(rdStops.current().get("stop_id").toString(), Node.class);
 			Coord StopCoord = new Coord(Double.parseDouble(rdStops.current().get("stop_lon").toString()), Double.parseDouble(rdStops.current().get("stop_lat").toString()));
-			network.createAndAddNode(StopID, StopCoord);
+			final Id<Node> id = StopID;
+			final Coord coord = StopCoord;
+			NetworkUtils.createAndAddNode2(network, id, coord);
 			StopAndCoordinates.put(StopID, StopCoord);	
 		}//end of while loop
 		

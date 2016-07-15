@@ -71,12 +71,12 @@ public class CorridorNetworkAndPlans {
 
 	public void createNetwork(){
 
-		Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-		Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 100, (double) 10));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
 		double y = -10;
-		Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, y));
-		Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 500, (double) 20));
-		Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord((double) 700, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord((double) 300, y));
+		Node node4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("4"), new Coord((double) 500, (double) 20));
+		Node node5 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("5"), new Coord((double) 700, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 

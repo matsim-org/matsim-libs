@@ -226,12 +226,12 @@ class CongestionPricingTestExample {
 
 		// nodes between o-d1 (all horizonal links)
 		double x = -100;
-		Node no = network.createAndAddNode(Id.createNodeId("o"), new Coord(x, (double) 0));
-		Node n1 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 0, (double) 0));
-		Node n2 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 1000, (double) 0));
-		Node n3 = network.createAndAddNode(Id.createNodeId(3), new Coord((double) 2000, (double) 0));
-		Node n4 = network.createAndAddNode(Id.createNodeId(4), new Coord((double) 3000, (double) 0));
-		Node nd1 = network.createAndAddNode(Id.createNodeId("d1"), new Coord((double) 3100, (double) 0));
+		Node no = NetworkUtils.createAndAddNode2(network, Id.createNodeId("o"), new Coord(x, (double) 0));
+		Node n1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(1), new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(2), new Coord((double) 1000, (double) 0));
+		Node n3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(3), new Coord((double) 2000, (double) 0));
+		Node n4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(4), new Coord((double) 3000, (double) 0));
+		Node nd1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("d1"), new Coord((double) 3100, (double) 0));
 		final Node fromNode = no;
 		final Node toNode = n1;
 
@@ -250,9 +250,9 @@ class CongestionPricingTestExample {
 		ld1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("d1"), fromNode4, toNode4, (double) 100, (double) 15, (double) 3600, (double) 1 );
 
 		double y1 = -1000;
-		Node n6 = network.createAndAddNode(Id.createNodeId(6), new Coord((double) 2000, y1));
+		Node n6 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(6), new Coord((double) 2000, y1));
 		double y = -1100;
-		Node nd2 = network.createAndAddNode(Id.createNodeId("d2"), new Coord((double) 2000, y));
+		Node nd2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("d2"), new Coord((double) 2000, y));
 		final Node fromNode5 = n3;
 		final Node toNode5 = n6;
 

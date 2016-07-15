@@ -645,16 +645,16 @@ public class CharyparNagelScoringFunctionTest {
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(500.0, 0.0));
-			Node node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord(5500.0, 0.0));
-			Node node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord(6000.0, 0.0));
-			Node node5 = this.network.createAndAddNode(Id.create("5", Node.class), new Coord(11000.0, 0.0));
-			Node node6 = this.network.createAndAddNode(Id.create("6", Node.class), new Coord(11500.0, 0.0));
-			Node node7 = this.network.createAndAddNode(Id.create("7", Node.class), new Coord(16500.0, 0.0));
-			Node node8 = this.network.createAndAddNode(Id.create("8", Node.class), new Coord(17000.0, 0.0));
-			Node node9 = this.network.createAndAddNode(Id.create("9", Node.class), new Coord(22000.0, 0.0));
-			Node node10 = this.network.createAndAddNode(Id.create("10", Node.class), new Coord(22500.0, 0.0));
+			Node node1 = NetworkUtils.createAndAddNode2(this.network, Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = NetworkUtils.createAndAddNode2(this.network, Id.create("2", Node.class), new Coord(500.0, 0.0));
+			Node node3 = NetworkUtils.createAndAddNode2(this.network, Id.create("3", Node.class), new Coord(5500.0, 0.0));
+			Node node4 = NetworkUtils.createAndAddNode2(this.network, Id.create("4", Node.class), new Coord(6000.0, 0.0));
+			Node node5 = NetworkUtils.createAndAddNode2(this.network, Id.create("5", Node.class), new Coord(11000.0, 0.0));
+			Node node6 = NetworkUtils.createAndAddNode2(this.network, Id.create("6", Node.class), new Coord(11500.0, 0.0));
+			Node node7 = NetworkUtils.createAndAddNode2(this.network, Id.create("7", Node.class), new Coord(16500.0, 0.0));
+			Node node8 = NetworkUtils.createAndAddNode2(this.network, Id.create("8", Node.class), new Coord(17000.0, 0.0));
+			Node node9 = NetworkUtils.createAndAddNode2(this.network, Id.create("9", Node.class), new Coord(22000.0, 0.0));
+			Node node10 = NetworkUtils.createAndAddNode2(this.network, Id.create("10", Node.class), new Coord(22500.0, 0.0));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 

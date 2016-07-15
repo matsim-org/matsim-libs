@@ -448,18 +448,18 @@ public abstract class AbstractNetworkRouteTest {
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
 		NetworkImpl network = NetworkUtils.createNetwork();
-		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new Coord((double) 0, (double) 500));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
-		Node node11 = network.createAndAddNode(Id.create("11", Node.class), new Coord((double) 0, (double) 1000));
-		Node node12 = network.createAndAddNode(Id.create("12", Node.class), new Coord((double) 1000, (double) 1000));
-		Node node13 = network.createAndAddNode(Id.create("13", Node.class), new Coord((double) 2000, (double) 1000));
-		Node node14 = network.createAndAddNode(Id.create("14", Node.class), new Coord((double) 3000, (double) 1000));
-		Node node15 = network.createAndAddNode(Id.create("15", Node.class), new Coord((double) 4000, (double) 1000));
-		Node node16 = network.createAndAddNode(Id.create("16", Node.class), new Coord((double) 5000, (double) 1000));
+		Node node0 = NetworkUtils.createAndAddNode2(network, Id.create("0", Node.class), new Coord((double) 0, (double) 500));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
+		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
+		Node node11 = NetworkUtils.createAndAddNode2(network, Id.create("11", Node.class), new Coord((double) 0, (double) 1000));
+		Node node12 = NetworkUtils.createAndAddNode2(network, Id.create("12", Node.class), new Coord((double) 1000, (double) 1000));
+		Node node13 = NetworkUtils.createAndAddNode2(network, Id.create("13", Node.class), new Coord((double) 2000, (double) 1000));
+		Node node14 = NetworkUtils.createAndAddNode2(network, Id.create("14", Node.class), new Coord((double) 3000, (double) 1000));
+		Node node15 = NetworkUtils.createAndAddNode2(network, Id.create("15", Node.class), new Coord((double) 4000, (double) 1000));
+		Node node16 = NetworkUtils.createAndAddNode2(network, Id.create("16", Node.class), new Coord((double) 5000, (double) 1000));
 		final Node fromNode = node0;
 		final Node toNode = node1;
 

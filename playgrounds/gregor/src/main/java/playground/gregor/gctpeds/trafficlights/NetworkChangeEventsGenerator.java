@@ -33,6 +33,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
@@ -92,7 +93,8 @@ public class NetworkChangeEventsGenerator {
 				events.add(e0);
 			}
 		}
-		((NetworkImpl)sc.getNetwork()).setNetworkChangeEvents(events);
+		final List<NetworkChangeEvent> events1 = events;
+		NetworkUtils.setNetworkChangeEvents(((NetworkImpl)sc.getNetwork()),events1);
 
 	}
 

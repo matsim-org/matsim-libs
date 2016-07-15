@@ -182,15 +182,15 @@ public class EquilTestSetUp {
 	public void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(1.0, 10000.0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(2500.0, 10000.0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(4500.0, 10000.0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(17500.0, 10000.0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord(19999.0, 10000.0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord(19999.0, 1500.0));
-		Node node7 = network.createAndAddNode(Id.create("7", Node.class), new Coord(1.0, 1500.0));
-		Node node8 = network.createAndAddNode(Id.create("8", Node.class), new Coord(12500.0, 12499.0));
-		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(12500.0, 7500.0));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(1.0, 10000.0));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(2500.0, 10000.0));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord(4500.0, 10000.0));
+		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord(17500.0, 10000.0));
+		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord(19999.0, 10000.0));
+		Node node6 = NetworkUtils.createAndAddNode2(network, Id.create("6", Node.class), new Coord(19999.0, 1500.0));
+		Node node7 = NetworkUtils.createAndAddNode2(network, Id.create("7", Node.class), new Coord(1.0, 1500.0));
+		Node node8 = NetworkUtils.createAndAddNode2(network, Id.create("8", Node.class), new Coord(12500.0, 12499.0));
+		Node node9 = NetworkUtils.createAndAddNode2(network, Id.create("9", Node.class), new Coord(12500.0, 7500.0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 
@@ -235,8 +235,8 @@ public class EquilTestSetUp {
 				double yCoord = 7188. + (j-1)*625;
 
 				// add a link for each person
-				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), new Coord(xCoord, yCoord));
-				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
+				Node nodeA = NetworkUtils.createAndAddNode2(network, Id.create("node_"+idpart+"A", Node.class), new Coord(xCoord, yCoord));
+				Node nodeB = NetworkUtils.createAndAddNode2(network, Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
 				final Node fromNode10 = nodeA;
 				final Node toNode10 = nodeB;
 				NetworkUtils.createAndAddLink(network,Id.create("link_p"+idpart, Link.class), fromNode10, toNode10, (double) 10, 30.0, (double) 3600, (double) 1 );

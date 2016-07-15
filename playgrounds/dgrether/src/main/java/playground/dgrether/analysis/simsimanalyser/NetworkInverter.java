@@ -36,7 +36,7 @@ public class NetworkInverter {
 		int numberOfLinksGenerated = 0;
 
 		for (Link link : this.originalNetwork.getLinks().values()) {
-			this.invertedNetwork.createAndAddNode(Id.create(link.getId(), Node.class), link.getCoord());
+			NetworkUtils.createAndAddNode2(this.invertedNetwork, Id.create(link.getId(), Node.class), link.getCoord());
 			numberOfNodesGenerated++;
 		}
 

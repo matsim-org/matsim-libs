@@ -89,7 +89,8 @@ public class ShapeConverterNetwork {
 				Node node1;
 				
 				if(!network.getNodes().containsKey(Id.create(fromNode, Node.class))){
-					node1 = network.createAndAddNode(Id.create(fromNode, Node.class), fromCoord);
+					final Coord coord = fromCoord;
+					node1 = NetworkUtils.createAndAddNode2(network, Id.create(fromNode, Node.class), coord);
 				}else{
 					node1=network.getNodes().get(Id.create(fromNode, Node.class));
 					
@@ -104,7 +105,8 @@ public class ShapeConverterNetwork {
 				Node node2;
 				
 				if(!network.getNodes().containsKey(Id.create(toNode, Node.class))){
-					node2 = network.createAndAddNode(Id.create(toNode, Node.class), toCoord);
+					final Coord coord = toCoord;
+					node2 = NetworkUtils.createAndAddNode2(network, Id.create(toNode, Node.class), coord);
 				}else{
 					node2 = network.getNodes().get(Id.create(toNode, Node.class));
 					

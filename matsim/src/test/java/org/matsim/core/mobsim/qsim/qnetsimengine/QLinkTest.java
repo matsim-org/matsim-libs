@@ -303,9 +303,9 @@ public final class QLinkTest extends MatsimTestCase {
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(1, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(2, 0));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(1, 0));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord(2, 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1.0, 1.0, 1.0, 1.0 );
@@ -498,9 +498,9 @@ public final class QLinkTest extends MatsimTestCase {
 		MatsimRandom.reset(4711); // yyyyyy !!!!!!
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(1, 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(1001, 0));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(1, 0));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord(1001, 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1.0, 1.0, 3600.0, 1.0 );
@@ -573,9 +573,9 @@ public final class QLinkTest extends MatsimTestCase {
 			
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
-			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
-			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(1, 0));
-			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(1001, 0));
+			Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
+			Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(1, 0));
+			Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord(1001, 0));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 			this.link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1.0, 1.0, 3600.0, 1.0 );

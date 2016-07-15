@@ -75,12 +75,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		NetworkImpl network = NetworkUtils.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord((double) 5000, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
+		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 4000, (double) 0));
+		Node node6 = NetworkUtils.createAndAddNode2(network, Id.create("6", Node.class), new Coord((double) 5000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1 );

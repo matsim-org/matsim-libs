@@ -1231,9 +1231,9 @@ public class QSimTest {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		/* enhance network */
-		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new Coord(3100, 0));
-		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new Coord(3200, 0));
-		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new Coord(3300, 0));
+		Node node5 = NetworkUtils.createAndAddNode2(f.network, Id.create("5", Node.class), new Coord(3100, 0));
+		Node node6 = NetworkUtils.createAndAddNode2(f.network, Id.create("6", Node.class), new Coord(3200, 0));
+		Node node7 = NetworkUtils.createAndAddNode2(f.network, Id.create("7", Node.class), new Coord(3300, 0));
 		final Node toNode = node5;
 		NetworkUtils.createAndAddLink(f.network,Id.create("4", Link.class), f.node4, toNode, (double) 1000, (double) 10, (double) 6000, (double) 2 );
 		final Node fromNode = node5;
@@ -1499,10 +1499,10 @@ public class QSimTest {
 			/* build network */
 			this.network = (NetworkImpl) this.scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			this.node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
-			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(100, 0));
-			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord(1100, 0));
-			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord(1200, 0));
+			this.node1 = NetworkUtils.createAndAddNode2(this.network, Id.create("1", Node.class), new Coord(0, 0));
+			this.node2 = NetworkUtils.createAndAddNode2(this.network, Id.create("2", Node.class), new Coord(100, 0));
+			this.node3 = NetworkUtils.createAndAddNode2(this.network, Id.create("3", Node.class), new Coord(1100, 0));
+			this.node4 = NetworkUtils.createAndAddNode2(this.network, Id.create("4", Node.class), new Coord(1200, 0));
 			this.link1 = NetworkUtils.createAndAddLink(this.network,Id.create("1", Link.class), this.node1, this.node2, (double) 100, (double) 100, (double) 60000, (double) 9 );
 			this.link2 = NetworkUtils.createAndAddLink(this.network,Id.create("2", Link.class), this.node2, this.node3, (double) 1000, (double) 100, (double) 6000, (double) 2 );
 			this.link3 = NetworkUtils.createAndAddLink(this.network,Id.create("3", Link.class), this.node3, this.node4, (double) 100, (double) 100, (double) 60000, (double) 9 );

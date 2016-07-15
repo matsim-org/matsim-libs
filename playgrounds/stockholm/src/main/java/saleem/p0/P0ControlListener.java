@@ -11,6 +11,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 public class P0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
 	public NetworkImpl network;
@@ -26,7 +27,7 @@ public class P0ControlListener implements StartupListener, IterationStartsListen
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		//handler = new P0QueueDelayControl(network, event.getIteration());
 		handler.initialise(event.getIteration());//To avoid creating objects every time, to save memory
-	    network.setNetworkChangeEvents(P0ControlHandler.events);
+	    NetworkUtils.setNetworkChangeEvents(network,P0ControlHandler.events);
 //	    P0ControlHandler.events.removeAll(P0ControlHandler.events);
 	    //event.getServices().getEvents().addHandler(handler);
 		

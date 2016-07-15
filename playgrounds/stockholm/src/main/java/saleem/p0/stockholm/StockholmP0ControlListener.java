@@ -15,6 +15,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import saleem.p0.GenericP0ControlHandler;
 
@@ -45,7 +46,8 @@ public class StockholmP0ControlListener implements StartupListener, IterationSta
 			allchangeevents.addAll(handler.getChangeEvents());
 			handler.initialise();
 		}
-	    network.setNetworkChangeEvents(allchangeevents);
+		final List<NetworkChangeEvent> events = allchangeevents;
+	    NetworkUtils.setNetworkChangeEvents(network,events);
 	    allchangeevents.removeAll(allchangeevents);
 	}
 	@Override

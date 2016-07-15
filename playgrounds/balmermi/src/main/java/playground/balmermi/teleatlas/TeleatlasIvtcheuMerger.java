@@ -120,7 +120,8 @@ public class TeleatlasIvtcheuMerger {
 		for (Node n : networkIvtcheu.getNodes().values()) {
 			if (!nodeMapping.containsKey(n.getId())) {
 				Node r = ((Node) n);
-				networkTeleatlas.createAndAddNode(n.getId(),n.getCoord(),NetworkUtils.getType( r ));
+				Node n1 = NetworkUtils.createAndAddNode2(networkTeleatlas, n.getId(), n.getCoord());
+				NetworkUtils.setType(n1,(String) NetworkUtils.getType( r ));
 			}
 			else { nodeMapCnt++; }
 		}

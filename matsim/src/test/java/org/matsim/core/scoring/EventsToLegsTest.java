@@ -90,10 +90,10 @@ public class EventsToLegsTest {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create("n1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("n2", Node.class), new Coord((double) 50, (double) 100));
-		Node node3 = network.createAndAddNode(Id.create("n3", Node.class), new Coord((double) 50, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create("n4", Node.class), new Coord((double) 100, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("n1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("n2", Node.class), new Coord((double) 50, (double) 100));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("n3", Node.class), new Coord((double) 50, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("n4", Node.class), new Coord((double) 100, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 

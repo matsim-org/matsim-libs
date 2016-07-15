@@ -96,7 +96,9 @@ public class DataPrepare {
 			public void handleRow(Map<String, String> row) {
 				Id<Node> id = Id.create(row.get("NR"), Node.class);
 				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
-				((NetworkImpl) network).createAndAddNode(id, coord);
+				final Id<Node> id1 = id;
+				final Coord coord1 = coord;
+				NetworkUtils.createAndAddNode2(((NetworkImpl) network), id1, coord1);
 			}
 
 		};

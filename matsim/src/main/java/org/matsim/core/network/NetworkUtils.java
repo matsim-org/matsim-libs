@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -687,5 +688,24 @@ public class NetworkUtils {
 		network.addLink( link ) ;
 	
 		return link;
+	}
+
+
+	public static void setNetworkChangeEvents(Network network, List<NetworkChangeEvent> events) {
+		if ( network instanceof TimeDependentNetwork ) {
+			((TimeDependentNetwork)network).setNetworkChangeEvents(events);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + "Network, TimeDependentNetwork" ) ;
+		}
+	}
+
+
+	public static Node createAndAddNode2(Network network, final Id<Node> id, final Coord coord) {
+		if (network.getNodes().containsKey(id)) {
+			throw new IllegalArgumentException(network + "[id=" + id + " already exists]");
+		}
+		Node n = network.getFactory().createNode(id, coord);
+		network.addNode(n) ;
+		return n;
 	}
 }

@@ -53,20 +53,20 @@ public class NetworkAngleUtilsTest {
 //                |     v
 //                5<----4
 
-            Node n0 = network.createAndAddNode(Id.createNodeId(0), new Coord((double) 0, (double) 0));
-            Node n1 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 0, (double) 1));
-            Node n2 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 1, (double) 1));
-            Node n3 = network.createAndAddNode(Id.createNodeId(3), new Coord((double) 1, (double) 0));
+            Node n0 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(0), new Coord((double) 0, (double) 0));
+            Node n1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(1), new Coord((double) 0, (double) 1));
+            Node n2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(2), new Coord((double) 1, (double) 1));
+            Node n3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(3), new Coord((double) 1, (double) 0));
             final double y1 = -1;
-            Node n4 = network.createAndAddNode(Id.createNodeId(4), new Coord((double) 1, y1));
+            Node n4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(4), new Coord((double) 1, y1));
             final double y = -1;
-            Node n5 = network.createAndAddNode(Id.createNodeId(5), new Coord((double) 0, y));
+            Node n5 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(5), new Coord((double) 0, y));
             final double x2 = -1;
-            Node n6 = network.createAndAddNode(Id.createNodeId(6), new Coord(x2, (double) 0));
+            Node n6 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(6), new Coord(x2, (double) 0));
             final double x1 = -2;
-            Node n7 = network.createAndAddNode(Id.createNodeId(7), new Coord(x1, (double) 0));
+            Node n7 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(7), new Coord(x1, (double) 0));
             final double x = -1;
-            Node n8 = network.createAndAddNode(Id.createNodeId(8), new Coord(x, (double) 1));
+            Node n8 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(8), new Coord(x, (double) 1));
 		final Node fromNode = n0;
 		final Node toNode = n1;
 

@@ -50,12 +50,12 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		NetworkImpl network = NetworkUtils.createNetwork();
-		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new Coord((double) 0, (double) 0));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 10, (double) 10));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 90, (double) 10));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 10, (double) 90));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 90, (double) 90));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 100, (double) 100));
+		Node node0 = NetworkUtils.createAndAddNode2(network, Id.create("0", Node.class), new Coord((double) 0, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 10, (double) 10));
+		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 90, (double) 10));
+		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 10, (double) 90));
+		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 90, (double) 90));
+		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 100, (double) 100));
 		final Node fromNode = node0;
 		final Node toNode = node1;
 		Link link0 = NetworkUtils.createAndAddLink(network,Id.create("0", Link.class), fromNode, toNode, (double) 20, (double) 20, (double) 100, (double) 1 );

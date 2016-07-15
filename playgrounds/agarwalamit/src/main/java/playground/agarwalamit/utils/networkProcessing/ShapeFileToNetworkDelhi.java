@@ -80,7 +80,8 @@ public class ShapeFileToNetworkDelhi {
 				Node node1;
 
 				if(!network.getNodes().containsKey((fromNodeId))){
-					node1 = ((NetworkImpl) network).createAndAddNode(fromNodeId, CT.transform(fromCoord));
+					final Id<Node> id = fromNodeId;
+					node1 = NetworkUtils.createAndAddNode2(((NetworkImpl) network), id, CT.transform(fromCoord));
 				}else{
 					node1=network.getNodes().get((fromNodeId));
 				}
@@ -104,7 +105,8 @@ public class ShapeFileToNetworkDelhi {
 				Node node2;
 
 				if(!network.getNodes().containsKey((toNodeId))){
-					node2 = ((NetworkImpl) network).createAndAddNode(toNodeId, CT.transform(toCoord));
+					final Id<Node> id = toNodeId;
+					node2 = NetworkUtils.createAndAddNode2(((NetworkImpl) network), id, CT.transform(toCoord));
 				}else{
 					node2 = network.getNodes().get((toNodeId));
 				}

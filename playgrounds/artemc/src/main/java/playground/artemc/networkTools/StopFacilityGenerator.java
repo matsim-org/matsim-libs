@@ -327,8 +327,10 @@ public class StopFacilityGenerator {
 									c++;
 								}while(network.getNodes().containsKey(newNodeId));
 
-								newNodeXY = convertDistanceToCoordinates(linkToEdit,nodeDistanceOnMap);	
-								network.createAndAddNode(newNodeId, newNodeXY);
+								newNodeXY = convertDistanceToCoordinates(linkToEdit,nodeDistanceOnMap);
+								final Id<Node> id2 = newNodeId;
+								final Coord coord = newNodeXY;	
+								NetworkUtils.createAndAddNode2(network, id2, coord);
 								nodes.add(network.getNodes().get(newNodeId));
 
 								//Create new Link

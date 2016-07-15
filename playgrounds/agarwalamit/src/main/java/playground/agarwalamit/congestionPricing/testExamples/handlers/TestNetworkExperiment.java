@@ -261,13 +261,13 @@ class TestNetworkExperiment {
 		}
 
 		private void createNetwork(){
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0));
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 100, (double) 100));
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, (double) 90));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 500, (double) 200));
-			Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord((double) 700, (double) 150));
-			Node node6 = network.createAndAddNode(Id.createNodeId("6"), new Coord((double) 500, (double) 20));
-			Node node7 = network.createAndAddNode(Id.createNodeId("7"), new Coord((double) 700, (double) 100));
+			Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+			Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord((double) 100, (double) 100));
+			Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord((double) 300, (double) 90));
+			Node node4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("4"), new Coord((double) 500, (double) 200));
+			Node node5 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("5"), new Coord((double) 700, (double) 150));
+			Node node6 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("6"), new Coord((double) 500, (double) 20));
+			Node node7 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("7"), new Coord((double) 700, (double) 100));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 

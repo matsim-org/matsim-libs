@@ -29,8 +29,8 @@ public interface TimeDependentNetwork {
 
 	Collection<NetworkChangeEvent> getNetworkChangeEvents();
 
-	void setNetworkChangeEvents(List<NetworkChangeEvent> events);
-
 	void addNetworkChangeEvent(NetworkChangeEvent event);
+
+	void setNetworkChangeEvents(List<NetworkChangeEvent> events);
 
 }

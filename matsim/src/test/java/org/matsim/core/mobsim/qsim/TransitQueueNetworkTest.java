@@ -1009,10 +1009,14 @@ public class TransitQueueNetworkTest extends TestCase {
 
             // setup: network
             NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-            Node node1 = network.createAndAddNode(nodeId1, new Coord((double) 0, (double) 0));
-            Node node2 = network.createAndAddNode(nodeId2, new Coord((double) 1000, (double) 0));
-            Node node3 = network.createAndAddNode(nodeId3, new Coord((double) 2000, (double) 0));
-            Node node4 = network.createAndAddNode(nodeId4, new Coord((double) 3000, (double) 0));
+		final Id<Node> id3 = nodeId1;
+            Node node1 = NetworkUtils.createAndAddNode2(network, id3, new Coord((double) 0, (double) 0));
+		final Id<Node> id4 = nodeId2;
+            Node node2 = NetworkUtils.createAndAddNode2(network, id4, new Coord((double) 1000, (double) 0));
+		final Id<Node> id5 = nodeId3;
+            Node node3 = NetworkUtils.createAndAddNode2(network, id5, new Coord((double) 2000, (double) 0));
+		final Id<Node> id6 = nodeId4;
+            Node node4 = NetworkUtils.createAndAddNode2(network, id6, new Coord((double) 3000, (double) 0));
             Link[] links = new Link[4];
 		final Id<Link> id = linkId1;
 		final Node fromNode = node1;

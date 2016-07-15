@@ -321,7 +321,7 @@ public class NetworkUtilsTest {
 		NetworkImpl network = NetworkUtils.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
-			nodes[i] = network.createAndAddNode(Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
+			nodes[i] = NetworkUtils.createAndAddNode2(network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 		}
 		for (int i = 0; i < numOfLinks; i++) {
 			NetworkUtils.createAndAddLink(network,Id.create(i, Link.class), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, (double) 1 );
@@ -336,7 +336,7 @@ public class NetworkUtilsTest {
 
 		public MultimodalFixture() {
 			for (int i = 0; i < this.nodes.length; i++) {
-				this.nodes[i] = this.network.createAndAddNode(Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
+				this.nodes[i] = NetworkUtils.createAndAddNode2(this.network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 			}
 			for (int i = 0; i < this.links.length; i++) {
 				this.links[i] = NetworkUtils.createAndAddLink(this.network,Id.create(i, Link.class), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, (double) 1 );

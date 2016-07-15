@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -259,10 +260,10 @@ public class Fcd {
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, create link
 				if(net.getNodes().get(currentEvent.getLinkId()) == null){
-					net.createAndAddNode(currentEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(currentEvent.getLinkId()).getCoord()));
+					NetworkUtils.createAndAddNode2(net, (Id<Node>) currentEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(currentEvent.getLinkId()).getCoord()));
 				}
 				if(net.getNodes().get(lastEvent.getLinkId()) == null){
-					net.createAndAddNode(lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
+					NetworkUtils.createAndAddNode2(net, (Id<Node>) lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
 				}
 				
 				Id<Link> newLinkId = Id.create(lastEvent.getLinkId().toString() + "-" + currentEvent.getLinkId().toString(), Link.class);

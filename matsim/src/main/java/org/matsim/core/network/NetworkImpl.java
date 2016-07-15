@@ -250,8 +250,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	 *
 	 * @param events a list of events.
 	 */
-	@Override
-	public void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
+	@Override public void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
 		this.networkChangeEvents.clear();
 		for(Link link : getLinks().values()) {
 			if (link instanceof TimeVariantLinkImpl) {
@@ -435,21 +434,6 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 
 	void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
-	}
-
-	public Node createAndAddNode(final Id<Node> id, final Coord coord) {
-		if (this.nodes.containsKey(id)) {
-			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
-		}
-		Node n = this.factory.createNode(id, coord);
-		this.addNode(n) ;
-		return n;
-	}
-
-	public Node createAndAddNode(final Id<Node> id, final Coord coord, final String nodeType) {
-		Node n = createAndAddNode(id, coord);
-		NetworkUtils.setType(n,nodeType);
-		return n;
 	}
 
 	@Override

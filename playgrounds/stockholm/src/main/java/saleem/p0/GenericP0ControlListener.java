@@ -16,6 +16,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 // For Generic Junctions
 
@@ -31,7 +32,7 @@ public class GenericP0ControlListener implements StartupListener, IterationStart
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		//handler = new P0QueueDelayControl(network, event.getIteration());
 		handler.initialise();//To avoid creating objects every time, to save memory
-	    network.setNetworkChangeEvents(handler.events);
+	    NetworkUtils.setNetworkChangeEvents(network,handler.events);
 //	    GenericP0ControlHandler.events.removeAll(GenericP0ControlHandler.events);
 		
 	}

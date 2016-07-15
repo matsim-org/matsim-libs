@@ -125,10 +125,10 @@ public class MatsimFreeSpeedTravelTimeTest {
 
 			network = (NetworkImpl) scenario.getNetwork();
 
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord(-100., -100.0));
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord(1000.0, 0.0));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord(1000.0, 100.0));
+			Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord(-100., -100.0));
+			Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord(0.0, 0.0));
+			Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord(1000.0, 0.0));
+			Node node4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("4"), new Coord(1000.0, 100.0));
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
 			final Node fromNode = node1;

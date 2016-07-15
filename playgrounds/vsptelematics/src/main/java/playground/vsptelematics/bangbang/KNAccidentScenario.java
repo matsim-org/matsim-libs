@@ -53,6 +53,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
@@ -211,7 +212,8 @@ public class KNAccidentScenario {
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
-		((NetworkImpl) scenario.getNetwork()).setNetworkChangeEvents(events);
+		final List<NetworkChangeEvent> events1 = events;
+		NetworkUtils.setNetworkChangeEvents(((NetworkImpl) scenario.getNetwork()),events1);
 	}
 
 	private static void preparePopulation(final Scenario scenario) {

@@ -175,9 +175,9 @@ public class TransitLeastCostPathTreeTest {
 
         public Fixture() {
             this.network = NetworkUtils.createNetwork();
-            Node linkStartNode = this.network.createAndAddNode(Id.create(0, Node.class), new Coord((double) 0, (double) 0));
+            Node linkStartNode = NetworkUtils.createAndAddNode2(this.network, Id.create(0, Node.class), new Coord((double) 0, (double) 0));
             for (int i = 1; i < count; i++) {
-                Node linkEndNode = this.network.createAndAddNode(Id.create(i, Node.class), new Coord((double) i, (double) 0));
+                Node linkEndNode = NetworkUtils.createAndAddNode2(this.network, Id.create(i, Node.class), new Coord((double) i, (double) 0));
 		final Node fromNode = linkStartNode;
 		final Node toNode = linkEndNode;
                 NetworkUtils.createAndAddLink(this.network,Id.create(i-1, Link.class), fromNode, toNode, 1000.0, 10.0, 2000.0, (double) 1 );

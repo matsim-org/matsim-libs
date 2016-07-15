@@ -423,14 +423,14 @@ public class MultiNodeDijkstraTest extends TestCase {
 
 		public Fixture() {
 			this.network = NetworkUtils.createNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 1000, (double) 0));
-			Node node2 = this.network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 500, (double) 0));
-			Node node3 = this.network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
-			Node node4 = this.network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 1000, (double) 2000));
-			Node node5 = this.network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 500, (double) 2000));
-			Node node6 = this.network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 0, (double) 2000));
-			Node node7 = this.network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 500, (double) 500));
-			Node node8 = this.network.createAndAddNode(Id.create(8, Node.class), new Coord((double) 500, (double) 1500));
+			Node node1 = NetworkUtils.createAndAddNode2(this.network, Id.create(1, Node.class), new Coord((double) 1000, (double) 0));
+			Node node2 = NetworkUtils.createAndAddNode2(this.network, Id.create(2, Node.class), new Coord((double) 500, (double) 0));
+			Node node3 = NetworkUtils.createAndAddNode2(this.network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+			Node node4 = NetworkUtils.createAndAddNode2(this.network, Id.create(4, Node.class), new Coord((double) 1000, (double) 2000));
+			Node node5 = NetworkUtils.createAndAddNode2(this.network, Id.create(5, Node.class), new Coord((double) 500, (double) 2000));
+			Node node6 = NetworkUtils.createAndAddNode2(this.network, Id.create(6, Node.class), new Coord((double) 0, (double) 2000));
+			Node node7 = NetworkUtils.createAndAddNode2(this.network, Id.create(7, Node.class), new Coord((double) 500, (double) 500));
+			Node node8 = NetworkUtils.createAndAddNode2(this.network, Id.create(8, Node.class), new Coord((double) 500, (double) 1500));
 			final Node fromNode = node1;
 			final Node toNode = node7;
 			NetworkUtils.createAndAddLink(this.network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 10.0, 2000.0, (double) 1 );

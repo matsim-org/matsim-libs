@@ -181,10 +181,10 @@ public class DeparturesOnSameLinkSameTimeTest {
 
 		private void createNetwork(double departureLinkCapacity){
 
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 100, (double) 10));
+			Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+			Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
 			double y = -10;
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, y));
+			Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord((double) 300, y));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 			final double capacity = departureLinkCapacity;

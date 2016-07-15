@@ -377,7 +377,7 @@ public class OsmNetworkReaderJohan {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				this.network.createAndAddNode(Id.create(node.id, Node.class), node.coord);
+				NetworkUtils.createAndAddNode2(this.network, Id.create(node.id, Node.class), node.coord);
 			}
 		}
 

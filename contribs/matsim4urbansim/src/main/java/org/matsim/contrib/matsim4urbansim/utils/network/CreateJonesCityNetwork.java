@@ -166,9 +166,10 @@ public class CreateJonesCityNetwork {
 			double y = Double.parseDouble( parts[indexYCoodinate] );
 
 			coord = new Coord(x, y);
+			final Coord coord1 = coord;
 
 			// create a new node
-			Node node = (Node)network.createAndAddNode(Id.create(zoneID, Node.class), coord);
+			Node node = (Node)NetworkUtils.createAndAddNode2(network, Id.create(zoneID, Node.class), coord1);
 			NetworkUtils.setOrigId( node, zoneID.toString() ) ;
 			NetworkUtils.setType(node,"unknownType");		
 		}

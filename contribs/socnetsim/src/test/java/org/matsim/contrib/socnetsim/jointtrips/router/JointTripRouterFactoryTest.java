@@ -93,10 +93,14 @@ public class JointTripRouterFactoryTest {
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();
-		Node node1inst = net.createAndAddNode( node1 , new Coord((double) 0, (double) 1));
-		Node node2inst = net.createAndAddNode( node2 , new Coord((double) 0, (double) 2));
-		Node node3inst = net.createAndAddNode( node3 , new Coord((double) 0, (double) 3));
-		Node node4inst = net.createAndAddNode( node4 , new Coord((double) 0, (double) 4));
+		final Id<Node> id5 = node1;
+		Node node1inst = NetworkUtils.createAndAddNode2(net, id5, new Coord((double) 0, (double) 1));
+		final Id<Node> id6 = node2;
+		Node node2inst = NetworkUtils.createAndAddNode2(net, id6, new Coord((double) 0, (double) 2));
+		final Id<Node> id7 = node3;
+		Node node3inst = NetworkUtils.createAndAddNode2(net, id7, new Coord((double) 0, (double) 3));
+		final Id<Node> id8 = node4;
+		Node node4inst = NetworkUtils.createAndAddNode2(net, id8, new Coord((double) 0, (double) 4));
 		final Id<Link> id2 = link1;
 		final Node fromNode = node1inst;
 		final Node toNode = node2inst;

@@ -65,11 +65,13 @@ public class TestXmls {
 			for(int j=0; j<10; j++ ){
 				Coord coordA = new Coord((double) (i * 10 + 5), (double) (j * 10 + 5));
 				String nodeAs = "Node "+i+"_"+j+"A";
+				final Coord coord = coordA;
 				//Node node1 = network.createAndAddNode(sc.createId("node 1"), sc.createCoord(-20000.0,     0.0));
-				Node nodeA = network.createAndAddNode(Id.create(nodeAs, Node.class), coordA);
+				Node nodeA = NetworkUtils.createAndAddNode2(network, Id.create(nodeAs, Node.class), coord);
 				Coord coordB = new Coord((double) (i * 10 + 6), (double) (j * 10 + 6));
 				String nodeBs = "Node "+i+"_"+j+"B";
-				Node nodeB = network.createAndAddNode(Id.create(nodeBs, Node.class), coordB);
+				final Coord coord1 = coordB;
+				Node nodeB = NetworkUtils.createAndAddNode2(network, Id.create(nodeBs, Node.class), coord1);
 				Id<Link> linkId = Id.create("link_"+i+"_"+j, Link.class);
 				final Id<Link> id = linkId;
 				final Node fromNode = nodeA;

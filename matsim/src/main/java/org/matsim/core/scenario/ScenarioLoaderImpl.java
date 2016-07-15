@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -140,7 +141,7 @@ class ScenarioLoaderImpl {
 	            NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 				parser.parse(this.config.network().getChangeEventsInputFile());
-				network.setNetworkChangeEvents(parser.getEvents());
+				NetworkUtils.setNetworkChangeEvents(network,parser.getEvents());
 			}
 		}
 	}

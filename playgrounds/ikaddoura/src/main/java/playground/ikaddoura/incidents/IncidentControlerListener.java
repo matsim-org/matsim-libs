@@ -28,6 +28,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 /**
 * @author ikaddoura
@@ -59,7 +60,8 @@ public class IncidentControlerListener implements IterationStartsListener {
 				
 		NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		network.getNetworkChangeEvents().clear();
-		network.setNetworkChangeEvents(networkChangeEvents);
+		final List<NetworkChangeEvent> events = networkChangeEvents;
+		NetworkUtils.setNetworkChangeEvents(network,events);
 		event.getServices().getConfig().network().setChangeEventsInputFile(nce);
 	}
 

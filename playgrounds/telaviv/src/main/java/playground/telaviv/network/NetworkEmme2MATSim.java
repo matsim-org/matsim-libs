@@ -168,7 +168,7 @@ public class NetworkEmme2MATSim {
 				String carAssignStr = parts[3];
 				
 				if (useWGS84) {
-					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new Coord(Double.parseDouble(xxStrWGS84), Double.parseDouble(yyStrWGS84)));
+					Node node = NetworkUtils.createAndAddNode2(network, Id.create(idStr, Node.class), new Coord(Double.parseDouble(xxStrWGS84), Double.parseDouble(yyStrWGS84)));
 				}
 				else {
 					double xx = Double.valueOf(xxStr);
@@ -182,7 +182,7 @@ public class NetworkEmme2MATSim {
 					xx = (xx + 50) * 1000;
 					yy = (yy + 500) * 1000;
 
-					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new Coord(xx, yy));
+					Node node = NetworkUtils.createAndAddNode2(network, Id.create(idStr, Node.class), new Coord(xx, yy));
 				}
 			}
 			
