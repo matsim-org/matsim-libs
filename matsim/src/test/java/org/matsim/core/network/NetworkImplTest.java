@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.api.core.v01.network.Node;
 
 /**
@@ -56,7 +57,9 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		net.addNode(node1);
 		net.addNode(node2);
-		Link link = net.getFactory().createLink(Id.create(1, Link.class), node1, node2);
+		final NetworkFactory nf = net.getFactory();
+		Gbl.assertNotNull(nf);
+		Link link = nf.createLink(Id.create(1, Link.class), node1, node2);
 		Assert.assertEquals(1, link.getAllowedModes().size());
 		Assert.assertEquals("car", link.getAllowedModes().iterator().next());
 	}

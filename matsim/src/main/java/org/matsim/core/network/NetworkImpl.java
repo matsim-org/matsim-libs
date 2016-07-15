@@ -84,7 +84,7 @@ import org.matsim.core.utils.collections.QuadTree;
 	private boolean locked = false ;
 
 	NetworkImpl() {
-		this.factory = this.getFactory();
+		this.factory = new NetworkFactoryImpl(this);
 	}
 
 	@Override

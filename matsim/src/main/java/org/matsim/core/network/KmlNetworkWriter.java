@@ -37,6 +37,7 @@ import java.io.IOException;
  * @author dgrether
  */
 public final class KmlNetworkWriter implements MatsimSomeWriter {
+	// yyyyyy move network io into separate package
 
 	private static final Logger log = Logger.getLogger(KmlNetworkWriter.class);
 
