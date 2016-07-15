@@ -181,6 +181,7 @@ public class ScenarioGenerator {
 		this.matsimConfig.travelTimeCalculator().setTravelTimeCalculatorType(
 				"TravelTimeCalculatorHashMap");
 
+        this.matsimConfig.removeModule("evacuation");
 		new ConfigWriter(this.matsimConfig).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(),
 				"scenario generation finished.");
