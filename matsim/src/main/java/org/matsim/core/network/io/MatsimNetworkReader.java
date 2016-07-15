@@ -18,12 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;

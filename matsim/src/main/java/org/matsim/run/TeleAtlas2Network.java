@@ -23,12 +23,12 @@ package org.matsim.run;
 import java.util.Iterator;
 
 import org.matsim.core.network.Network;
-import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTeleatlasAddManeuverRestrictions;
 import org.matsim.core.network.algorithms.NetworkTeleatlasAddSpeedRestrictions;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.network.io.NetworkReaderTeleatlas;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;

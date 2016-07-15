@@ -23,8 +23,8 @@ import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 
 public class VisumFile2MatsimNetwork {
 	

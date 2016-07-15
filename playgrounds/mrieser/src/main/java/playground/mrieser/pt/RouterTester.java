@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;

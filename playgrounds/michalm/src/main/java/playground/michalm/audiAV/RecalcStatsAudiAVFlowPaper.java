@@ -25,6 +25,7 @@ import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.schedule.reconstruct.ScheduleReconstructor;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
 
 public class RecalcStatsAudiAVFlowPaper

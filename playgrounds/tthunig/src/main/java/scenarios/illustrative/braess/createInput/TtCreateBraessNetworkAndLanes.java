@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.Lanes;

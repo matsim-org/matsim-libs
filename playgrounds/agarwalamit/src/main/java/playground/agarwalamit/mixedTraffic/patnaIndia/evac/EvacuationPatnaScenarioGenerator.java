@@ -44,7 +44,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.Dijkstra;

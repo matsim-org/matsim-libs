@@ -42,7 +42,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.population.StreamingUtils;

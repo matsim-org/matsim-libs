@@ -30,6 +30,7 @@ import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;

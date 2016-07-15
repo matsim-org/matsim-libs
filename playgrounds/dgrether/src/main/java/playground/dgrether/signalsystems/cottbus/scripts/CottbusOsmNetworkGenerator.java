@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;

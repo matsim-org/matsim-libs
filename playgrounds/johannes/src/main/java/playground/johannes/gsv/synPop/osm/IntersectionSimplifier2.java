@@ -28,6 +28,8 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 

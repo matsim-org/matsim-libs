@@ -42,8 +42,8 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheck
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.Network;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;

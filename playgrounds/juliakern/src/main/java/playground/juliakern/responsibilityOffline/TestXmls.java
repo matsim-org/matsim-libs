@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 

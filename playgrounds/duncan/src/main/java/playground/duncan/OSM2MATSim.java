@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.OsmNetworkReader;
 

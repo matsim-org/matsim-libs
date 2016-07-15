@@ -33,8 +33,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.network.Network;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 

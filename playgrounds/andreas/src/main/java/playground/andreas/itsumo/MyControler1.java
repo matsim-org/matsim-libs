@@ -47,7 +47,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;

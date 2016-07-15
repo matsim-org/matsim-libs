@@ -5,9 +5,9 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**

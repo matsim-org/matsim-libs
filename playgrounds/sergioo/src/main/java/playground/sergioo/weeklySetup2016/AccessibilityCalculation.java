@@ -22,10 +22,10 @@ import java.util.TreeSet;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;

@@ -22,10 +22,10 @@ package playground.jbischoff.av.preparation;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
 /**
  * @author  jbischoff

@@ -30,7 +30,7 @@ import org.matsim.contrib.util.random.*;
 import org.matsim.contrib.zone.*;
 import org.matsim.contrib.zone.util.SubzoneUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;

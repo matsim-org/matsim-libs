@@ -22,8 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.Network;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**

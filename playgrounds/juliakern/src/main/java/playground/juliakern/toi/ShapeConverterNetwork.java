@@ -35,8 +35,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 

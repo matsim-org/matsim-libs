@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 

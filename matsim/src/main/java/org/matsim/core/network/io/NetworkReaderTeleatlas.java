@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import java.io.IOException;
 
@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
