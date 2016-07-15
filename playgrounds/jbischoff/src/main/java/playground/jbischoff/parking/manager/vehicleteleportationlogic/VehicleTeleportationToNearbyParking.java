@@ -33,6 +33,7 @@ import org.matsim.vehicles.Vehicle;
 import com.google.inject.Inject;
 
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
+import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
 import playground.jbischoff.parking.manager.ParkingManager;
 
 /**
@@ -49,9 +50,8 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	@Inject
 	ParkingManager manager;
 	
-	@Inject
-	ParkingChoiceLogic choiceLogic;
-	
+	ParkingChoiceLogic parkingLogic;  
+
 	@Inject
 	Network network;
 	
@@ -62,7 +62,7 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	public VehicleTeleportationToNearbyParking(Config config) {
 		// TODO Auto-generated constructor stub
 		this.beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
-		
+		this.parkingLogic = new RandomParkingChoiceLogic(network);
 	}
 
 	/* (non-Javadoc)
@@ -76,7 +76,7 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 		} 
 		Id<Link> parkingLinkId = agentLinkId;
 		while (!this.manager.reserveSpaceIfVehicleCanParkHere(vehicleId, parkingLinkId)){
-			parkingLinkId = choiceLogic.getNextLink(parkingLinkId);
+			parkingLinkId = parkingLogic.getNextLink(parkingLinkId);
 		}
 		manager.parkVehicleHere(vehicleId, parkingLinkId, time);
 		return parkingLinkId;

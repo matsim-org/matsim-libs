@@ -25,7 +25,6 @@ package playground.jbischoff.parking.sim;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-
 import playground.jbischoff.parking.evaluation.ParkingListener;
 import playground.jbischoff.parking.manager.FacilityBasedParkingManager;
 import playground.jbischoff.parking.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
@@ -53,7 +52,6 @@ public class SetupParking {
 			@Override
 			public void install() {
 			bind(ParkingManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();;
-			
 			bind(WalkLegFactory.class).asEagerSingleton();
 			
 			this.install(new ParkingSearchQSimModule());

@@ -69,6 +69,7 @@ public class ParkingAgentFactory implements AgentFactory {
 	Network network;
 	@Inject
 	VehicleTeleportationLogic teleportationLogic;
+
 	private final QSim qsim;
 
 	/**
@@ -81,8 +82,7 @@ public class ParkingAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		ParkingChoiceLogic parkingLogic = new RandomParkingChoiceLogic(network);
-
+		ParkingChoiceLogic parkingLogic  = new RandomParkingChoiceLogic(network);
 		ParkingAgentLogic agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
 				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
