@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.ZoneObject;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -61,7 +62,8 @@ public class ZoneUtil {
 			assert (zone != null );
 			assert( zone.getCoord() != null );
 			Coord zoneCoordinate = zone.getCoord();
-			Node networkNode = network.getNearestNode( zoneCoordinate );
+			final Coord coord = zoneCoordinate;
+			Node networkNode = NetworkUtils.getNearestNode(network,coord);
 			assert( networkNode != null );
 				
 			zoneArray[counter] = new ZoneObject(zone.getId(), zoneCoordinate, networkNode);

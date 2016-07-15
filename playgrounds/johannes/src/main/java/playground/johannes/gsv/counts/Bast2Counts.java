@@ -168,7 +168,7 @@ public class Bast2Counts {
 			Point direct1 = factory.createPoint(new Coordinate(data.xDirection1, data.yDirection1));
 			Point direct2 = factory.createPoint(new Coordinate(data.xDirection2, data.yDirection2));
 			
-			Link link1 = network.getNearestLinkExactly(MatsimCoordUtils.pointToCoord(countPos));
+			Link link1 = NetworkUtils.getNearestLinkExactly(network,MatsimCoordUtils.pointToCoord(countPos));
 			Node toNode = link1.getToNode();
 			double dist1 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct1));
 			double dist2 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct2));
@@ -243,11 +243,13 @@ public class Bast2Counts {
 		double delta = 10;
 		double step = 10;
 		double minsize = 5;
+		final double distance = delta;
 		
-		Collection<Node> nodes = network.getNearestNodes(node.getCoord(), delta);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(network,node.getCoord(), distance);
 		while(nodes.size() < minsize) {
 			delta += step;
-			nodes = network.getNearestNodes(node.getCoord(), delta);
+			final double distance1 = delta;
+			nodes = NetworkUtils.getNearestNodes2(network,node.getCoord(), distance1);
 		}
 //		nodes.remove(node);
 		

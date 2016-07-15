@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.zone.util.RandomPointUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Point;
@@ -55,7 +56,7 @@ public class BarcelonaTaxiCreator
     {
         Id<Vehicle> vehId = Id.create("taxi" + currentVehicleId++, Vehicle.class);
         Point p = RandomPointUtils.getRandomPointInGeometry(preparedPolygon);
-        Link link = network.getNearestLinkExactly(MGC.point2Coord(p));
+        Link link = NetworkUtils.getNearestLinkExactly(network,MGC.point2Coord(p));
         return new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
     }
 }

@@ -65,7 +65,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(net,facility.getCoord()).getId());
         Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();

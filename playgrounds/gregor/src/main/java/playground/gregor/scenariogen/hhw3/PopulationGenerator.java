@@ -45,6 +45,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -127,7 +128,7 @@ public class PopulationGenerator {
 			MultiPolygon p = (MultiPolygon) ft.getDefaultGeometry();
 			Coordinate c = p.getCentroid().getCoordinate();
 
-			Link l = net.getNearestLinkExactly(new Coord(c.x, c.y));
+			Link l = NetworkUtils.getNearestLinkExactly(net,new Coord(c.x, c.y));
 			double dist = c.distance(new Coordinate(l.getCoord().getX(),l.getCoord().getY()));
 			if (dist > CUTOFF_DIST) {
 				continue;

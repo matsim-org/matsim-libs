@@ -89,7 +89,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		NetworkChangeEvent change = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(8*3600.0);
 		change.addLink(link2);
 		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-		((NetworkImpl)network).addNetworkChangeEvent(change);
+		final NetworkChangeEvent event = change;
+		NetworkUtils.addNetworkChangeEvent(((NetworkImpl)network),event);
 
 		// create a population
 		Population plans = scenario.getPopulation();
@@ -135,14 +136,16 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		NetworkChangeEvent change1 = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(0);
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
-		((NetworkImpl)network).addNetworkChangeEvent(change1);
+		final NetworkChangeEvent event = change1;
+		NetworkUtils.addNetworkChangeEvent(((NetworkImpl)network),event);
 		/*
 		 * Create a network event the restores the capacity to its original value.
 		 */
 		NetworkChangeEvent change2 = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(3600);
 		change2.addLink(link2);
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1/capacityFactor));
-		((NetworkImpl)network).addNetworkChangeEvent(change2);
+		final NetworkChangeEvent event1 = change2;
+		NetworkUtils.addNetworkChangeEvent(((NetworkImpl)network),event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
@@ -208,7 +211,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		NetworkChangeEvent change1 = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(0);
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
-		((NetworkImpl)network).addNetworkChangeEvent(change1);
+		final NetworkChangeEvent event1 = change1;
+		NetworkUtils.addNetworkChangeEvent(((NetworkImpl)network),event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */

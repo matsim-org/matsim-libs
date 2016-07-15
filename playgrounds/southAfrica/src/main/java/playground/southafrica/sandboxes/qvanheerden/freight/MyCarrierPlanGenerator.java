@@ -200,32 +200,36 @@ public class MyCarrierPlanGenerator {
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//morning peak ends
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//afternoon peak starts
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//afternoon peak ends
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 				}

@@ -86,7 +86,7 @@ public class IsochronesUI extends UI {
                 public void dragEnd(LMarker.DragEndEvent dragEndEvent) {
                     try {
                         Point point = (Point) JTS.transform(origin.getGeometry(), coordinateTransformation.inverse());
-                        Node nearestNode = ((NetworkImpl) network).getNearestNode(MGC.coordinate2Coord(point.getCoordinate()));
+                        Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl) network),MGC.coordinate2Coord(point.getCoordinate()));
                         compute(nearestNode);
                     } catch (TransformException e) {
                         throw new RuntimeException(e);

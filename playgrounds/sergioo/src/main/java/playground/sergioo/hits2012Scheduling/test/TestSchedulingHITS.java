@@ -101,7 +101,8 @@ public class TestSchedulingHITS {
 			super();
 			this.location = location;
 			this.coord = coordinateTransformation.transform(Household.LOCATIONS.get(location).getCoord());
-			this.node = net.getNearestNode(coord);
+			final Coord coord1 = coord;
+			this.node = NetworkUtils.getNearestNode(net,coord1);
 		}
 	}
 	private static class TypePlaceInfo {

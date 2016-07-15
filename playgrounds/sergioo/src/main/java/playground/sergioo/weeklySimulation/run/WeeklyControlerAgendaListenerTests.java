@@ -125,7 +125,7 @@ public class WeeklyControlerAgendaListenerTests implements StartupListener, Iter
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(((NetworkImpl)net).getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(((NetworkImpl)net),facility.getCoord()).getId());
 		ScenarioWeeklyPR scenario = new ScenarioWeeklyPR(Arrays.asList(new String[]{"shop"}));
 		preparePopulation(controler, scenario);
 		prepareFacilities(controler, scenario);

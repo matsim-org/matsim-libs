@@ -70,7 +70,8 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
     		change.addLink(link2);
     		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-    		network.addNetworkChangeEvent(change);
+		final NetworkChangeEvent event = change;
+    		NetworkUtils.addNetworkChangeEvent(network,event);
     
     		// create a travel time calculator object
     		TravelTime ttcalc = new TravelTimeCalculator(network,config.travelTimeCalculator()).getLinkTravelTimes();
@@ -113,7 +114,8 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
     		change.addLink(link2);
     		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-    		network.addNetworkChangeEvent(change);
+		final NetworkChangeEvent event = change;
+    		NetworkUtils.addNetworkChangeEvent(network,event);
     
     		// create a travel time calculator object
     		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, 15*60, 30*3600, config.travelTimeCalculator());

@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.FastAStarLandmarks;
@@ -77,8 +78,10 @@ class PlanFindLegDistances {
 
 	public double getShortestPathDistance(Coord startCoord, Coord endCoord) {
 		double distance = 0;
-		Node startNode = network.getNearestNode(startCoord);
-		Node endNode = network.getNearestNode(endCoord);
+		final Coord coord = startCoord;
+		Node startNode = NetworkUtils.getNearestNode(network,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(network,coord1);
 
 		Path path = leastCostPathCalculator.calcLeastCostPath(startNode,
 				endNode, 0, null, null);

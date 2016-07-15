@@ -109,4 +109,6 @@ public interface Network extends MatsimToplevelContainer {
 
 	String getName();
 
+	double getEffectiveCellSize();
+
 }

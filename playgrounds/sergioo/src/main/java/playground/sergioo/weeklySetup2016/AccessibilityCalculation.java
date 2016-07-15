@@ -502,8 +502,8 @@ public class AccessibilityCalculation extends Thread {
 						Location location = locations.get(trip.getEndPostalCode());
 						Location origin = fixed.get(trip.getStartPostalCode());
 						if(location!=null && origin!=null && (prevAct.equals(Purpose.HOME.text)||prevAct.equals(Purpose.WORK.text)||prevAct.equals(Purpose.EDU.text))) {
-							Node fromNode = ((NetworkImpl)network).getNearestNode(origin.coord);
-							Node toNode = ((NetworkImpl)network).getNearestNode(location.coord);
+							Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)network),origin.coord);
+							Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)network),location.coord);
 							Path pathCar = dijkstra.calcLeastCostPath(fromNode, toNode, 8*3600, null, null);
 							Path pathPt = transitRouter.calcPathRoute(origin.coord, location.coord, 8*3600, null);
 							double walkCar = config.plansCalcRoute().getBeelineDistanceFactors().get("walk")*CoordUtils.calcEuclideanDistance(origin.coord, fromNode.getCoord())/config.plansCalcRoute().getTeleportedModeSpeeds().get("walk");

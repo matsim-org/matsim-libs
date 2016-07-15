@@ -43,6 +43,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
@@ -260,7 +261,8 @@ public class WalkDistanceEstimator {
 		NetworkImpl ni = (NetworkImpl) sPt.getNetwork();
 		for(MyZone sp : spList){
 			Coord centroid = new Coord(sp.getCentroid().getX(), sp.getCentroid().getY());
-			Node closest = ni.getNearestNode(centroid);
+			final Coord coord = centroid;
+			Node closest = NetworkUtils.getNearestNode(ni,coord);
 			Double d = CoordUtils.calcEuclideanDistance(centroid, closest.getCoord());
 			distanceMap.put(sp.getId(), d);			
 			

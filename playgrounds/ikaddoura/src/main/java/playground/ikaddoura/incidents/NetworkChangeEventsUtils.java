@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
@@ -49,7 +50,7 @@ public class NetworkChangeEventsUtils {
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
-		for (NetworkChangeEvent nce : network.getNetworkChangeEvents()) {
+		for (NetworkChangeEvent nce : NetworkUtils.getNetworkChangeEvents(network)) {
 			for (Link link : nce.getLinks()) {
 				if (!incidentLinkIds.contains(link)) {
 					incidentLinkIds.add(link.getId());

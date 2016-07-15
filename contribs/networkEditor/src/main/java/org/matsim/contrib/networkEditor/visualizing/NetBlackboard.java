@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.networkEditor.utils.GeometryTools;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -853,7 +854,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 */
 	protected Link getNearestLinkImproved(Coord coord, double dist){
 		Link selectedLink = null;
-		Collection<Node> nodes = net.getNearestNodes(coord, dist);
+		final Coord coord2 = coord;
+		final double distance = dist;
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(net,coord2, distance);
 		double minDist = Double.MAX_VALUE;
 		for(Node node:nodes) {
 			for(Link link:node.getInLinks().values()) {
@@ -896,8 +899,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 		final double midY = (selectionSquare.start.getY()+selectionSquare.end.getY())/2.0;
 		Coord mid = inverseTransform(new Coord(midX, midY));
 		final double dist = CoordUtils.calcEuclideanDistance(mid, inverseTransform(selectionSquare.end));
+		final Coord coord = mid;
 		//System.out.println("mid = " + mid + ", dist = " + dist);
-		Collection<Node> nodes = net.getNearestNodes(mid, dist*8);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(net,coord, dist*8);
 		Coord start = new Coord(selectionSquare.start.getX(), selectionSquare.start.getY()), end = new Coord(selectionSquare.end.getX(), selectionSquare.end.getY());
 		for(Node node : nodes) {
 			for(Link l : node.getInLinks().values()) {
@@ -1025,7 +1029,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return The nearest node from the coordinates at a radius distance of dist
 	 */
 	protected Node getNearestNodes(Coord coord, double dist) {
-		Collection<Node> nodes = net.getNearestNodes(coord, dist);
+		final Coord coord1 = coord;
+		final double distance = dist;
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(net,coord1, distance);
 		double minDist = Double.MAX_VALUE;
 		Node selectedNode = null;
 		for(Node node:nodes) {            
@@ -1044,7 +1050,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return The nearest Node
 	 */
 	protected Node getNearestNode(Coord coord) {
-		return net.getNearestNode(coord);
+		final Coord coord1 = coord;
+		return NetworkUtils.getNearestNode(net,coord1);
 	}
 
 	/**
@@ -1616,7 +1623,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 			P2 = transform(link.getToNode().getCoord());
 		}
 		double dist1 = CoordUtils.distancePointLinesegment(P1, P2, Pos);
-		Node node = net.getNearestNode(transformed);
+		final Coord coord = transformed;
+		Node node = NetworkUtils.getNearestNode(net,coord);
 		if(node == null && link == null)
 			return new PairLinkNode(null, null);
 		Coord P3 = transform(node.getCoord());
@@ -1669,7 +1677,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(net==null) return;
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		Collection<Node> nodeList = net.getNearestNodes(getMidPoint(), getMidDistance());
+		Collection<Node> nodeList = NetworkUtils.getNearestNodes2(net,getMidPoint(), getMidDistance());
 		for(Node node: nodeList) {
 			paintNode(node, g2);
 			paintLinks(node.getOutLinks().values(), g2);

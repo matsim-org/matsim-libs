@@ -363,7 +363,7 @@ public class NetworkUtils {
         }
         Link nearestRightLink = null;
         Link nearestOverallLink = null;
-        Node nearestNode = ((NetworkImpl) network).getNearestNode(coord);
+        Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl) network),coord);
 
         double[] coordVector = new double[2];
         coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
@@ -436,7 +436,7 @@ public class NetworkUtils {
             throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
         }
         Link nearestLink = null;
-        Node nearestNode = ((NetworkImpl) network).getNearestNode(coord);
+        Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl) network),coord);
         if ( nearestNode == null ) {
             log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
             return null ;
@@ -707,5 +707,50 @@ public class NetworkUtils {
 		Node n = network.getFactory().createNode(id, coord);
 		network.addNode(n) ;
 		return n;
+	}
+
+
+	public static void addNetworkChangeEvent( Network network, NetworkChangeEvent event ) {
+		if ( network instanceof TimeDependentNetwork ) {
+			((TimeDependentNetwork) network).addNetworkChangeEvent(event);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork " ) ;
+		}
+	}
+
+
+	public static Collection<NetworkChangeEvent> getNetworkChangeEvents( Network network ) {
+		if ( network instanceof TimeDependentNetwork ) {
+			return ((TimeDependentNetwork) network).getNetworkChangeEvents() ;
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork " ) ;
+		}
+	}
+
+
+	public static Link getNearestLinkExactly(Network network, Coord coord) {
+		if ( network instanceof SearchableNetwork ) {
+			return ((SearchableNetwork) network).getNearestLinkExactly(coord) ;
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+		}
+	}
+
+
+	public static Node getNearestNode(Network network, final Coord coord) {
+		if ( network instanceof SearchableNetwork ) {
+			return ((SearchableNetwork)network).getNearestNode(coord);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+		}
+	}
+
+
+	public static Collection<Node> getNearestNodes2(Network network, final Coord coord, final double distance) {
+		if ( network instanceof SearchableNetwork ) {
+			return ((SearchableNetwork)network).getNearestNodes(coord, distance);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork" ) ;
+		}
 	}
 }

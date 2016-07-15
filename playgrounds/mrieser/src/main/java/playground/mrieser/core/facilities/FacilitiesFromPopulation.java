@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -142,7 +143,8 @@ public class FacilitiesFromPopulation {
 						ActivityFacility facility = null;
 
 						if (linkId == null && this.network != null) {
-							linkId = this.network.getNearestLinkExactly(c).getId();
+							final Coord coord = c;
+							linkId = NetworkUtils.getNearestLinkExactly(this.network,coord).getId();
 						}
 
 						if (this.oneFacilityPerLink && linkId != null) {

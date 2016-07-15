@@ -65,7 +65,8 @@ public class ChargerReader
                 Zone zone = zones.get(Id.create(id, Zone.class));
                 Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION
                         .transform(zone.getCoord());
-                Link link = network.getNearestLinkExactly(coord);
+		final Coord coord1 = coord;
+                Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
                 data.addCharger(
                         new ChargerImpl(Id.create(id, Charger.class), power, capacity, link));
             }

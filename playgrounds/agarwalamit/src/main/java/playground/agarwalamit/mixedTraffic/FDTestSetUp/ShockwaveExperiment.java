@@ -31,6 +31,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -79,13 +80,15 @@ public class ShockwaveExperiment {
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0)); 
 			event.addLink(desiredLink);
-			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
+			final NetworkChangeEvent event1 = event;
+			NetworkUtils.addNetworkChangeEvent(((NetworkImpl)sc.getNetwork()),event1);
 		}
 		{
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.+60*5) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(desiredLink);
-			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
+			final NetworkChangeEvent event1 = event;
+			NetworkUtils.addNetworkChangeEvent(((NetworkImpl)sc.getNetwork()),event1);
 		}
 		generateFDData.run();
 	}

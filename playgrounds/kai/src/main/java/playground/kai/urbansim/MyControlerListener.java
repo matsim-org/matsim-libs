@@ -27,6 +27,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
@@ -84,12 +85,14 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				cnt++ ;
 				Coord coord = fromZone.getCoord() ;
 				assert( coord != null ) ;
-				Node fromNode = network.getNearestNode( coord ) ;
+				final Coord coord1 = coord;
+				Node fromNode = NetworkUtils.getNearestNode(network,coord1) ;
 				assert( fromNode != null ) ;
 				st.calculate(network, fromNode, dpTime) ;
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
-					Node toNode = network.getNearestNode( toCoord ) ;
+					final Coord coord2 = toCoord;
+					Node toNode = NetworkUtils.getNearestNode(network,coord2) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();
 					double ttime = arrTime - dpTime ;
 					writer.write ( fromZone.getId().toString()

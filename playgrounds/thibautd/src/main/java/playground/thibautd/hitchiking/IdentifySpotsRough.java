@@ -28,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -110,7 +111,7 @@ public class IdentifySpotsRough {
 		Counter counter = new Counter( "choosing spot # " );
 
 		if (INCLUDE_CLOSEST_NODE_TO_CENTER) {
-			hhNodes.add( network.getNearestNode( CENTER ) );
+			hhNodes.add( NetworkUtils.getNearestNode(network,CENTER) );
 		}
 
 		for (Node n : hhNodes) {
@@ -119,10 +120,9 @@ public class IdentifySpotsRough {
 
 			double radius = SEARCH_RADIUS;
 			while (choiceSet.size() < 2) {
+				final double distance = radius;
 				Collection<Node> neighbors =
-					network.getNearestNodes(
-							n.getCoord(),
-							radius );
+					NetworkUtils.getNearestNodes2(network,n.getCoord(), distance);
 				radius += RADIUS_EXTENSION;
 
 				for (Node neighbor : neighbors) {

@@ -103,7 +103,7 @@ public class MyPersonPrepareForSim extends AbstractPersonAlgorithm {
 					Activity act = (Activity) pe;
 					if (act.getLinkId() == null) {
 						// use the exactly nearest link
-						act.setLinkId(((NetworkImpl) this.network).getNearestLinkExactly(act.getCoord()).getId());
+						act.setLinkId(NetworkUtils.getNearestLinkExactly(((NetworkImpl) this.network),act.getCoord()).getId());
 						needsReRoute = true;
 					}
 				} else if (pe instanceof Leg) {

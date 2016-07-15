@@ -261,7 +261,8 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 			// kai, jul'16
 		}
 		for (NetworkChangeEvent event : events) {
-			this.addNetworkChangeEvent(event);
+			final NetworkChangeEvent event1 = event;
+			NetworkUtils.addNetworkChangeEvent(this,event1);
 		}
 	}
 
@@ -288,7 +289,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	public double getCapacityPeriod() {
 		return this.capacityPeriod;
 	}
-
+	@Override
 	public double getEffectiveCellSize() {
 		return this.effectiveCellSize;
 	}
@@ -302,8 +303,8 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	public Map<Id<Node>, Node> getNodes() {
 		return this.nodes;
 	}
-	@Override
-	public Link getNearestLinkExactly(final Coord coord) {
+
+	@Override public Link getNearestLinkExactly(final Coord coord) {
 		if (this.linkQuadTree == null) {
 			buildLinkQuadTree();
 		}
@@ -316,8 +317,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	 * @param coord the coordinate to which the closest node should be found
 	 * @return the closest node found, null if none
 	 */
-	@Override
-	public Node getNearestNode(final Coord coord) {
+	@Override public Node getNearestNode(final Coord coord) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.getClosest(coord.getX(), coord.getY());
 	}
@@ -329,8 +329,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
 	 * @return all nodes within distance to <code>coord</code>
 	 */
-	@Override
-	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
+	@Override public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.getDisk(coord.getX(), coord.getY(), distance);
 	}
@@ -339,7 +338,6 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	public Collection<NetworkChangeEvent> getNetworkChangeEvents() {
 		return this.networkChangeEvents;
 	}
-
 	@Override
 	public NetworkFactoryImpl getFactory() {
 		return this.factory;

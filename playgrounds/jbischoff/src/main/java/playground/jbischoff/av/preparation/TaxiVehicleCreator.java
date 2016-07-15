@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -77,7 +78,7 @@ public class TaxiVehicleCreator
 	    
 		for (int i = 0 ; i< amount; i++){
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry);
-		Link link = ((NetworkImpl) scenario.getNetwork()).getNearestLinkExactly(MGC.point2Coord(p));
+		Link link = NetworkUtils.getNearestLinkExactly(((NetworkImpl) scenario.getNetwork()),MGC.point2Coord(p));
         Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(48*3600));
         vehicles.add(v);
 

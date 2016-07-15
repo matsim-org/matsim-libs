@@ -12,6 +12,7 @@ import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -53,9 +54,11 @@ private SpatialGrid freeSpeedGrid;
 			
 			Coord coord = MGC.point2Coord(measurePoint.getGeometry().getCentroid());
 			Point p = measurePoint.getGeometry().getCentroid();
+			final Coord coord1 = coord;
 			
-			Link nearestLink = network.getNearestLinkExactly(coord);
-			Node nearestNode = network.getNearestNode(coord);
+			Link nearestLink = NetworkUtils.getNearestLinkExactly(network,coord1);
+			final Coord coord2 = coord;
+			Node nearestNode = NetworkUtils.getNearestNode(network,coord2);
 			
 			Distances distance = NetworkUtil.getDistances2Node(coord, nearestLink, nearestNode);
 			double distanceMeasuringPoint2Road_meter 	= distance.getDistancePoint2Road();

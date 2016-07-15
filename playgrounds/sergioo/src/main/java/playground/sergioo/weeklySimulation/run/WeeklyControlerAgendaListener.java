@@ -83,7 +83,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(((NetworkImpl)net).getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(((NetworkImpl)net),facility.getCoord()).getId());
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());

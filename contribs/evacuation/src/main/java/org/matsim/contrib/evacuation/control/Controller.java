@@ -58,6 +58,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -1042,7 +1043,7 @@ public class Controller {
 
 	public boolean openNetworkChangeEvents() {
 		if (this.scenario != null) {
-			Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl) this.scenario.getNetwork()).getNetworkChangeEvents();
+			Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((NetworkImpl) this.scenario.getNetwork()));
 			int id = this.visualizer.getPrimaryShapeRenderLayer().getId();
 
 			if (changeEvents != null) {

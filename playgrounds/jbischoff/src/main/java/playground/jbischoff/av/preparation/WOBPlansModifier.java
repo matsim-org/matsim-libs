@@ -39,6 +39,7 @@ import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -101,8 +102,10 @@ public static void main(String[] args) throws IOException {
 						end = leg.getRoute().getEndLinkId();
 						}
 						else {
-							start = net.getNearestLinkExactly(previousCoord).getId();
-							end = net.getNearestLinkExactly(currentCoord).getId();
+							final Coord coord = previousCoord;
+							start = NetworkUtils.getNearestLinkExactly(net,coord).getId();
+							final Coord coord1 = currentCoord;
+							end = NetworkUtils.getNearestLinkExactly(net,coord1).getId();
 						}
 						
 						starts.add(previousCoord.getX()+";"+previousCoord.getY()+";"+Time.writeTime(leg.getDepartureTime()));

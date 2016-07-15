@@ -12,6 +12,7 @@ import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacility;
@@ -88,7 +89,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
-		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(((NetworkImpl)scenario.getNetwork()),origin.getCoord());
 
 		// === (1) ORIGIN FACILITY to LINK:
 		// captures the distance (as walk time) between the origin via the link to the node:

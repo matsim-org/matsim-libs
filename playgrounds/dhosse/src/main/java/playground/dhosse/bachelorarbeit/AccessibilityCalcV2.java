@@ -14,6 +14,7 @@ import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -55,8 +56,9 @@ public class AccessibilityCalcV2 {
 			
 			Coord coord = MGC.point2Coord(measurePoint.getGeometry().getCentroid());
 			Point p = measurePoint.getGeometry().getCentroid();
+			final Coord coord1 = coord;
 			
-			Link nearestLink = network.getNearestLinkExactly(coord);
+			Link nearestLink = NetworkUtils.getNearestLinkExactly(network,coord1);
 			
 			double distance_meter = CoordUtils.calcEuclideanDistance(coord, nearestLink.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;

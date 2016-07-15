@@ -262,7 +262,8 @@ public class CarSharingVehicles {
 		
 		public Link getClosestLink(Coord coord) {			
 
-		    return (Link)network.getNearestLinkExactly(coord);			
+		    final Coord coord1 = coord;
+		return (Link)NetworkUtils.getNearestLinkExactly(network,coord1);			
 			
 		}
 	}

@@ -127,7 +127,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			Object a1 = plan.getPlanElements().get(i);
 			Node fromNode = null;
 			if(a1 instanceof Activity){
-				fromNode = network.getNearestNode(((Activity) a1).getCoord());
+				fromNode = NetworkUtils.getNearestNode(network,((Activity) a1).getCoord());
 			} else{
 				LOG.error("Origin node not of type Activity.");
 			}
@@ -144,7 +144,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			Object a2 = plan.getPlanElements().get(i+2);
 			Node toNode = null;
 			if(a2 instanceof Activity){
-				toNode = network.getNearestNode(((Activity) a2).getCoord());
+				toNode = NetworkUtils.getNearestNode(network,((Activity) a2).getCoord());
 			} else{
 				LOG.error("Destination node not of type Activity.");
 			}

@@ -109,5 +109,11 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 
 }

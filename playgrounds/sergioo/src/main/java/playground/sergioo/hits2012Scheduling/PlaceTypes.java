@@ -171,9 +171,9 @@ public class PlaceTypes {
 						Location startLocation = Household.LOCATIONS.get(trip.getStartPostalCode());
 						Location endLocation = Household.LOCATIONS.get(trip.getEndPostalCode());
 						if(nodes.get(startLocation.getPostalCode())==null)
-							nodes.put(startLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(startLocation.getCoord())).getId().toString());
+							nodes.put(startLocation.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(startLocation.getCoord())).getId().toString());
 						if(nodes.get(endLocation.getPostalCode())==null)
-							nodes.put(endLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(endLocation.getCoord())).getId().toString());
+							nodes.put(endLocation.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(endLocation.getCoord())).getId().toString());
 					}
 		}
 		Map<DetailedType, Map<String, String>> locs = new HashMap<DetailedType, Map<String, String>>();
@@ -182,7 +182,7 @@ public class PlaceTypes {
 			locs.put(detailedType, los);
 			for(Location location:Household.LOCATIONS.values())
 				if(location.getDetailedTypes().contains(detailedType))
-					los.put(location.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(location.getCoord())).getId().toString());
+					los.put(location.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(location.getCoord())).getId().toString());
 		}
 		Map<String, Map<String, Double>> ttMap = new HashMap<String, Map<String, Double>>();
 		BufferedReader reader = new BufferedReader(new FileReader("./data/pairs.txt"));

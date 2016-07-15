@@ -38,7 +38,8 @@ public class DetermineZonesWithInfeasiblePT {
 	}
 	
 	private boolean isCoordinateFeasible(Coord coord){
-		Collection<Node> N = this.stops.getNearestNodes(coord, maxSearchRadius);
+		final Coord coord1 = coord;
+		Collection<Node> N = NetworkUtils.getNearestNodes2(this.stops,coord1, maxSearchRadius);
 		return (N.size() > 0);
 	}
 	

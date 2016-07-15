@@ -281,9 +281,9 @@ public class GeneticAlgorithmDC {
 		for(Person person:scenario.getPopulation().getPersons().values())
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
 				if(planElement instanceof Activity)
-					((Activity)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((Activity)planElement).getCoord()).getId());
+					((Activity)planElement).setLinkId(NetworkUtils.getNearestLinkExactly(justCarNetwork,((Activity)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(justCarNetwork,facility.getCoord()).getId());
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAlgorithm(Algotype.valueOf("bestResponse"));
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonDistribution("gumbel");
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setFlexibleTypes(actTypes);

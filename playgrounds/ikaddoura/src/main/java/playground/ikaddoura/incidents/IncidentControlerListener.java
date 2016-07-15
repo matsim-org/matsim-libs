@@ -59,7 +59,7 @@ public class IncidentControlerListener implements IterationStartsListener {
 		List<NetworkChangeEvent> networkChangeEvents = new NetworkChangeEventsParser(controler.getScenario().getNetwork()).parseEvents(nce);;
 				
 		NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
-		network.getNetworkChangeEvents().clear();
+		NetworkUtils.getNetworkChangeEvents(network).clear();
 		final List<NetworkChangeEvent> events = networkChangeEvents;
 		NetworkUtils.setNetworkChangeEvents(network,events);
 		event.getServices().getConfig().network().setChangeEventsInputFile(nce);

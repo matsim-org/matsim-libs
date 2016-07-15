@@ -217,9 +217,9 @@ public class GeneticAlgorithmMode {
 		for(Person person:scenario.getPopulation().getPersons().values())
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
 				if(planElement instanceof Activity)
-					((Activity)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((Activity)planElement).getCoord()).getId());
+					((Activity)planElement).setLinkId(NetworkUtils.getNearestLinkExactly(justCarNetwork,((Activity)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(justCarNetwork,facility.getCoord()).getId());
 		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		events.addHandler(travelTimeCalculator);

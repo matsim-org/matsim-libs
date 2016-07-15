@@ -47,6 +47,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -189,8 +190,9 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 
 	private Id<Link> convertLink(Id<Link> fromLinkId) {
 		try {Coord coord =dest.transform( this.oldNetwork.getLinks().get(fromLinkId).getCoord());
+		final Coord coord1 = coord;
 		
-		return network.getNearestLinkExactly(coord).getId();}
+		return NetworkUtils.getNearestLinkExactly(network,coord1).getId();}
 		catch (NullPointerException e){
 			System.err.println(fromLinkId.toString() + " doesnt exist in Network.");
 			return null;

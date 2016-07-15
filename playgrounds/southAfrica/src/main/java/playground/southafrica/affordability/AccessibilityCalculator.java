@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.AStarEuclidean;
@@ -654,18 +655,18 @@ public class AccessibilityCalculator {
 					/* Use the entire journey's travel time. */
 					time += leg.getTravelTime();
 				} else if(chosenMode.equalsIgnoreCase("pt1")){ /*TODO Change if "pt1" becomes "bus" */
-					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
-					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(busStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)sc.getNetwork()),act.getCoord());
+					Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)sc.getNetwork()),busStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
 					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
 					time += path.travelTime;
 				} else if(chosenMode.equalsIgnoreCase("pt2")){ /*TODO Change if "pt2" becomes "rail" */
-					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
-					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(railStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)sc.getNetwork()),act.getCoord());
+					Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)sc.getNetwork()),railStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
 					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
 					time += path.travelTime;
 				}else if(chosenMode.equalsIgnoreCase("taxi")){
-					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
-					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(taxiStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)sc.getNetwork()),act.getCoord());
+					Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)sc.getNetwork()),taxiStops.getClosest(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
 					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
 					time += path.travelTime;
 				}
@@ -710,7 +711,8 @@ public class AccessibilityCalculator {
 	
 	private boolean hasClosePrimaryActivity(Plan plan){
 		Coord homeCoord = ((Activity)plan.getPlanElements().get(0)).getCoord();
-		Node homeNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(homeCoord);
+		final Coord coord = homeCoord;
+		Node homeNode = NetworkUtils.getNearestNode(((NetworkImpl) sc.getNetwork()),coord);
 		
 		Activity primary = null;
 		Activity secondary = null;
@@ -736,7 +738,7 @@ public class AccessibilityCalculator {
 		}
 		
 		if(primary != null){
-			Node primaryNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(primary.getCoord());
+			Node primaryNode = NetworkUtils.getNearestNode(((NetworkImpl) sc.getNetwork()),primary.getCoord());
 			Path path = routerWalk.calcLeastCostPath(homeNode, primaryNode, 25200, null, null);
 			
 			double travelTime = path.travelTime;
@@ -751,7 +753,7 @@ public class AccessibilityCalculator {
 			}
 		} else if (secondary != null){
 			/* See if there is a shopping activity close by. */
-			Node secondaryNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(secondary.getCoord());
+			Node secondaryNode = NetworkUtils.getNearestNode(((NetworkImpl) sc.getNetwork()),secondary.getCoord());
 			Path path = routerWalk.calcLeastCostPath(homeNode, secondaryNode, 25200, null, null);
 			
 			double travelTime = path.travelTime;
@@ -771,8 +773,9 @@ public class AccessibilityCalculator {
 	
 	
 	private boolean hasTransitAccess(Coord coord, QuadTree<Coord> qt){
-		Node homeNode = ((NetworkImpl) transitNetwork).getNearestNode(coord);
-		Node transitNode = ((NetworkImpl) transitNetwork).getNearestNode(qt.getClosest(coord.getX(), coord.getY()));
+		final Coord coord1 = coord;
+		Node homeNode = NetworkUtils.getNearestNode(((NetworkImpl) transitNetwork),coord1);
+		Node transitNode = NetworkUtils.getNearestNode(((NetworkImpl) transitNetwork),qt.getClosest(coord.getX(), coord.getY()));
 		Path path = routerWalk.calcLeastCostPath(homeNode, transitNode, 25200, null, null);
 		if(path == null){
 			LOG.error("No route found!");
@@ -802,6 +805,7 @@ public class AccessibilityCalculator {
 		for(ActivityFacility af : ((ActivityFacilitiesImpl) this.sc.getActivityFacilities()).getFacilitiesForActivityType(activityType).values()) {
 			qt.put(af.getCoord().getX(), af.getCoord().getY(), af.getCoord());
 		}
+		final Coord coord1 = coord;
 		
 		/*TODO This can become much more comprehensive */
 //		double distance = ((CoordImpl)coord).calcDistance(qt.get(coord.getX(), coord.getY()));
@@ -812,8 +816,8 @@ public class AccessibilityCalculator {
 //		time = (distance * STRAIGHT_LINE_FACTOR) / speed;
 		
 		/* Or using the A*-Euclidean router. */
-		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
-		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(qt.getClosest(coord.getX(), coord.getY()));
+		Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord1);
+		Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),qt.getClosest(coord.getX(), coord.getY()));
 		Path path = routerDrive.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		time = path.travelTime;		
 
@@ -846,8 +850,10 @@ public class AccessibilityCalculator {
 		} else{
 			/* Using the A*-Euclidean router. */
 			Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
-			Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
-			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
+			final Coord coord1 = homeCoord;
+			Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord1);
+			final Coord coord2 = coord;
+			Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord2);
 			if(toNode != null){
 				Path path = routerDrive.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 				time = path.travelTime;		
@@ -913,10 +919,12 @@ public class AccessibilityCalculator {
 			noEducationCounter++;
 			coord = this.schoolQT.getClosest(homeCoord.getX(), homeCoord.getY()).getCoord();
 			educationType = "e1";
-		} 
+		}
+		final Coord coord1 = homeCoord; 
 		/* Using the A*-Euclidean router. */
-		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
-		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
+		Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord1);
+		final Coord coord2 = coord;
+		Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord2);
 
 		Path path = null;
 		if(educationType.equalsIgnoreCase("e1")){
@@ -956,12 +964,14 @@ public class AccessibilityCalculator {
 	 */
 	private double getTravelTimeToHealthcare(Person person){
 		Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
-		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
+		final Coord coord = homeCoord;
+		Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord);
 		
 		ActivityFacility healthCareFacility = healthcareQT.getClosest(homeCoord.getX(), homeCoord.getY());
 		if(healthCareFacility != null){
 			Coord healthcareCoord = healthCareFacility.getCoord();
-			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
+			final Coord coord1 = healthcareCoord;
+			Node toNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),coord1);
 			
 			Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 			
@@ -986,7 +996,7 @@ public class AccessibilityCalculator {
 //		System.exit(-1);
 		
 		final Coord homeCoord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
-		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
+		Node fromNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),homeCoord);
 		
 		/* New code. ====================== */
 		double searchDistance = 100.0;
@@ -1027,7 +1037,7 @@ public class AccessibilityCalculator {
 		Iterator<ActivityFacility> iterator = sortedFacilities.iterator();
 		while(iterator.hasNext() && numberOfElements++ < 5){
 			ActivityFacility shop = iterator.next();
-			Node shopNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(shop.getCoord());
+			Node shopNode = NetworkUtils.getNearestNode(((NetworkImpl)this.sc.getNetwork()),shop.getCoord());
 			Path shopPath = routerWalk.calcLeastCostPath(fromNode, shopNode, 25200, null, null);
 			
 			total += shopPath.travelTime;

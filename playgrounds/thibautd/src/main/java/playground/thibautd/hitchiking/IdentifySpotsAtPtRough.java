@@ -81,7 +81,8 @@ public class IdentifySpotsAtPtRough {
 		Collection<Link> hhLinks = new ArrayList<Link>();
 		for (Coord coord : ptStopsCoordParser.coords.coords) {
 			linkCounter.incCounter();
-			Node n = carNetwork.getNearestNode( coord );
+			final Coord coord1 = coord;
+			Node n = NetworkUtils.getNearestNode(carNetwork,coord1);
 
 			Link toAdd = null;
 			for ( Link l : n.getInLinks().values() ) {

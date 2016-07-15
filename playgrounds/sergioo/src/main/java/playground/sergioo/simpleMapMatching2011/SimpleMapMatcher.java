@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import others.sergioo.util.geometry.Line2D;
 import others.sergioo.util.geometry.Point2D;
@@ -70,8 +71,10 @@ public class SimpleMapMatcher extends Observable implements PointLines {
 			Coord point =  points.get(pointN);
 			if(newRouteCandidates.size()<2) {
 				Collection<Node> initialNodes=new ArrayList<Node>();
-				for(double addDistance=0;initialNodes.size()<MIN_NUMBER_START_NODES;addDistance+=SEARCH_RADIUS_INCREMENT)
-					initialNodes=((NetworkImpl)network).getNearestNodes(point, INITIAL_SEARCH_RADIUS+addDistance);
+				for(double addDistance=0;initialNodes.size()<MIN_NUMBER_START_NODES;addDistance+=SEARCH_RADIUS_INCREMENT) {
+					final Coord coord = point;
+					initialNodes=NetworkUtils.getNearestNodes2(((NetworkImpl)network),coord, INITIAL_SEARCH_RADIUS+addDistance);
+				}
 				for(Link link:((NetworkImpl)network).getLinks().values())
 					if(link.getAllowedModes().contains(mode)) {
 						boolean haveInitialNode = false;

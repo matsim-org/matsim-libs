@@ -337,9 +337,11 @@ public class TaxiDemandWriter
             return null;
         if (toCoord == null)
             return null;
+	final Coord coord = fromCoord;
 
-        Link fromLink = network.getNearestLinkExactly(fromCoord);
-        Link toLink = network.getNearestLinkExactly(toCoord);
+        Link fromLink = NetworkUtils.getNearestLinkExactly(network,coord);
+	final Coord coord1 = toCoord;
+        Link toLink = NetworkUtils.getNearestLinkExactly(network,coord1);
 
         double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
         //		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);

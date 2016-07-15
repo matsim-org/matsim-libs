@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -90,7 +91,9 @@ public class Main {
 			String[] parts=line.split(";");
 			Coord start = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
 			Coord end = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[5]), Double.parseDouble(parts[6])));
-			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getNetwork()).getNearestNode(start), ((NetworkImpl)scenario.getNetwork()).getNearestNode(end), 0, null, null);
+			final Coord coord = start;
+			final Coord coord1 = end;
+			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestNode(((NetworkImpl)scenario.getNetwork()),coord), NetworkUtils.getNearestNode(((NetworkImpl)scenario.getNetwork()),coord1), 0, null, null);
 			double distance = 0;
 			for(Link link:path.links)
 				distance+=link.getLength();

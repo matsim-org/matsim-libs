@@ -88,26 +88,31 @@ public class LinkStopsToNearestNode {
 			
 			// Get nearest node for the mode-filtered network (or base, if no mode is specified). This will be slow, but hopefully okay.
 			if (modes.isEmpty()){
-				N = (Node) noHighways.getNearestNode(new Coord(stopLon, stopLat));
+				N = (Node) NetworkUtils.getNearestNode(noHighways,new Coord(stopLon, stopLat));
 			}
 			else{
 
 				Coord c = new Coord(stopLon, stopLat);
 				
 				if (modes.equals("[Bus]")){
-					N = (Node) BusNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(BusNetwork,coord);
 				}
 				else if (modes.equals("[Streetcar]")){
-					N = (Node) StreetcarNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(StreetcarNetwork,coord);
 				}
 				else if (modes.equals("[Subway]")){
-					N = (Node) SubwayNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(SubwayNetwork,coord);
 				}
 				else if (modes.equals("[Train]")){
-					N = (Node) TrainNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(TrainNetwork,coord);
 				}
 				else if (modes.equals("[Streetcar; Bus]") || modes.equals("[Bus; Streetcar]")){
-					N = (Node) StreetcarNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(StreetcarNetwork,coord);
 				}
 				else{
 					System.err.println("Error: mode combination " + modes + " not supported!");

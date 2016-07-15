@@ -193,7 +193,7 @@ public class CreateJonesCityNetwork {
 			for(double y = minValue; y < maxValue; y = y+length){
 				System.out.println("Y-Coord:" + y);
 
-				Node currentNode = network.getNearestNode(new Coord(x, y));
+				Node currentNode = NetworkUtils.getNearestNode(network,new Coord(x, y));
 				// add link to above neighbor
 				linkID = addLink(network, maxValue, linkID, currentNode, new Coord(x, y + length));
 				// add link to left neighbor
@@ -215,7 +215,8 @@ public class CreateJonesCityNetwork {
 		if (neighbor.getX() < maxValue
 		 && neighbor.getY() < maxValue) {
 			
-			Node neighborNode = network.getNearestNode(neighbor);
+			final Coord coord = neighbor;
+			Node neighborNode = NetworkUtils.getNearestNode(network,coord);
 			if(neighborNode != currentNode){
 				final Node fromNode = currentNode;
 				final Node toNode = neighborNode;

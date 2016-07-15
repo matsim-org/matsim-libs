@@ -37,6 +37,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -218,7 +219,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpNetworkChangeEvents() {
 		if (config.network().isTimeVariantNetwork()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
-					((NetworkImpl) network).getNetworkChangeEvents());
+					NetworkUtils.getNetworkChangeEvents(((NetworkImpl) network)));
 		}
 	}
 

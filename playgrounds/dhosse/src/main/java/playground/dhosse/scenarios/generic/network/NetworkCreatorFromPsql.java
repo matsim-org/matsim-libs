@@ -360,11 +360,13 @@ public class NetworkCreatorFromPsql {
 			}
 
 			Coord fromCoord = this.transform.transform(MGC.coordinate2Coord(from));
-			Node closestFromNode = ((NetworkImpl)scenario.getNetwork()).getNearestNode(fromCoord);
+			final Coord coord = fromCoord;
+			Node closestFromNode = NetworkUtils.getNearestNode(((NetworkImpl)scenario.getNetwork()),coord);
 			Node fromNode = setNode(fromCoord, closestFromNode);
 			
 			Coord toCoord = this.transform.transform(MGC.coordinate2Coord(to));
-			Node closestToNode = ((NetworkImpl)scenario.getNetwork()).getNearestNode(toCoord);
+			final Coord coord1 = toCoord;
+			Node closestToNode = NetworkUtils.getNearestNode(((NetworkImpl)scenario.getNetwork()),coord1);
 			
 			Node toNode = setNode(toCoord, closestToNode);
 			

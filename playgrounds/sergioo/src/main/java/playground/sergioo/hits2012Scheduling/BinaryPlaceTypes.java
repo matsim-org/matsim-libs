@@ -130,9 +130,9 @@ public class BinaryPlaceTypes {
 						Location startLocation = Household.LOCATIONS.get(trip.getStartPostalCode());
 						Location endLocation = Household.LOCATIONS.get(trip.getEndPostalCode());
 						if(nodes.get(startLocation.getPostalCode())==null)
-							nodes.put(startLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(startLocation.getCoord())));
+							nodes.put(startLocation.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(startLocation.getCoord())));
 						if(nodes.get(endLocation.getPostalCode())==null)
-							nodes.put(endLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(endLocation.getCoord())));
+							nodes.put(endLocation.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(endLocation.getCoord())));
 						if(FLEX_ATIVITIES.contains(prevPurpose) && prevType!=null) {
 							long duration = (trip.getStartTime().getTime()-time)/1000;
 							if(duration<0)
@@ -180,7 +180,7 @@ public class BinaryPlaceTypes {
 			locs.put(detailedType, los);
 			for(Location location:Household.LOCATIONS.values())
 				if(location.getDetailedTypes().contains(detailedType))
-					los.put(location.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(location.getCoord())).getId().toString());
+					los.put(location.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(location.getCoord())).getId().toString());
 		}
 		Map<String, Map<String, Double>> ttMap = new HashMap<String, Map<String, Double>>();
 		BufferedReader reader = new BufferedReader(new FileReader("./data/pairs.txt"));

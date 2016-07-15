@@ -482,8 +482,10 @@ public class CopyOfHITSAnalyserPostgresqlSummary {
 
 	public static TimeAndDistance getCarFreeSpeedShortestPathTimeAndDistance(Coord startCoord, Coord endCoord) {
 		double distance = 0;
-		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
-		Node endNode = carFreeSpeedNetwork.getNearestNode(endCoord);
+		final Coord coord = startCoord;
+		Node startNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord1);
 
 		Path path = shortestCarNetworkPathCalculator.calcLeastCostPath(startNode, endNode, 0, null, null);
 		for (Link l : path.links) {
@@ -495,9 +497,11 @@ public class CopyOfHITSAnalyserPostgresqlSummary {
 
 	private static TimeAndDistance getCarCongestedShortestPathDistance(Coord startCoord, Coord endCoord, double time) {
 		double distance = 0;
+		final Coord coord = startCoord;
 
-		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
-		Node endNode = carFreeSpeedNetwork.getNearestNode(endCoord);
+		Node startNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord1);
 
 		Path path = carCongestedDijkstra.calcLeastCostPath(startNode, endNode, time, null, null);
 		for (Link l : path.links) {

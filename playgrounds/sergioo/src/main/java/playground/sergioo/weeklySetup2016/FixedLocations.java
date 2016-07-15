@@ -84,7 +84,8 @@ public class FixedLocations {
 			String id = result.getString("postcode");
 			if(!locs.contains(id)) {
 				Coord coord = coords.get(id);
-				Node carNode = ((NetworkImpl)network).getNearestNode(coord);
+				final Coord coord1 = coord;
+				Node carNode = NetworkUtils.getNearestNode(((NetworkImpl)network),coord1);
 				TransitRouterNetworkNode ptNode = networkPT.getNearestNode(coord);
 				writer.println(id+","+coord.getX()+","+coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, ptNode.getCoord())*WALK_BL/WALK_SPEED);
 				locs.add(id);
@@ -95,7 +96,8 @@ public class FixedLocations {
 			String id = result.getString("facility_id");
 			if(!locs.contains(id)) {
 				Coord coord = coords.get(id);
-				Node carNode = ((NetworkImpl)network).getNearestNode(coord);
+				final Coord coord1 = coord;
+				Node carNode = NetworkUtils.getNearestNode(((NetworkImpl)network),coord1);
 				TransitRouterNetworkNode ptNode = networkPT.getNearestNode(coord);
 				writer.println(id+","+coord.getX()+","+coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, ptNode.getCoord())*WALK_BL/WALK_SPEED);
 				locs.add(id);
@@ -106,7 +108,8 @@ public class FixedLocations {
 			String id = result.getString("schoolpostalcode");
 			if(!locs.contains(id)) {
 				Coord coord = coords.get(id);
-				Node carNode = ((NetworkImpl)network).getNearestNode(coord);
+				final Coord coord1 = coord;
+				Node carNode = NetworkUtils.getNearestNode(((NetworkImpl)network),coord1);
 				TransitRouterNetworkNode ptNode = networkPT.getNearestNode(coord);
 				writer.println(id+","+coord.getX()+","+coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, ptNode.getCoord())*WALK_BL/WALK_SPEED);
 				locs.add(id);

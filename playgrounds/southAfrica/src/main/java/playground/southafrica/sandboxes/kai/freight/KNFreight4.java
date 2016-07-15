@@ -56,6 +56,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -273,13 +274,15 @@ public class KNFreight4 {
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold/10 ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
 				}
 				{
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(11.5*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
 				}
 			}
 		}

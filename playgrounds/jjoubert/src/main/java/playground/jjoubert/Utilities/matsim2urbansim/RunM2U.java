@@ -94,7 +94,7 @@ public class RunM2U {
 		for(MyZone z : zones){
 			Node c = NetworkUtils.createNode(Id.create("dummy", Node.class));
 			c.setCoord(new Coord(z.getCentroid().getX(), z.getCentroid().getY()));
-			Node n = nPt.getNearestNode(c.getCoord());
+			Node n = NetworkUtils.getNearestNode(nPt,c.getCoord());
 			if(n != null){
 				Point p1 = gf.createPoint(new Coordinate(c.getCoord().getX(), c.getCoord().getY()));
 				Point p2 = gf.createPoint(new Coordinate(n.getCoord().getX(), n.getCoord().getY()));

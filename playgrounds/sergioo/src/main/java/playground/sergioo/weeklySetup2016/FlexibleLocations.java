@@ -256,7 +256,7 @@ public class FlexibleLocations {
 						simpleCategoryText = "SHOP_LOW";
 				}
 				if(!simpleCategoryText.equals("SHOP")) {
-					Node carNode = ((NetworkImpl)network).getNearestNode(location.coord);
+					Node carNode = NetworkUtils.getNearestNode(((NetworkImpl)network),location.coord);
 					TransitRouterNetworkNode ptNode = networkPT.getNearestNode(location.coord);
 					writer.println(location.postalCode+","+location.coord.getX()+","+location.coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(location.coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(location.coord, ptNode.getCoord())*WALK_BL/WALK_SPEED+","+simpleCategoryText+","+simpleCategory.getValue());
 				}

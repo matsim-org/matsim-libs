@@ -67,7 +67,7 @@ public class Stitcher {
 				System.out.println(tag);
 				Id<Node> nodeId = Id.create(tag.getValue(), Node.class);
 				if (!networkForThisRoute.getNodes().containsKey(nodeId)) {
-					Node nearestNode = (networkForThisRoute).getNearestNode(network.getNodes().get(nodeId).getCoord());
+					Node nearestNode = NetworkUtils.getNearestNode((networkForThisRoute),network.getNodes().get(nodeId).getCoord());
 					nodeId = nearestNode.getId();
 					System.out.println("  --> " + nodeId);
 				}
@@ -84,7 +84,7 @@ public class Stitcher {
 				System.out.println(tag);
 				Id<Node> nodeId = Id.create(tag.getValue(), Node.class);
 				if (!networkForThisRoute.getNodes().containsKey(nodeId)) {
-					nodeId = (networkForThisRoute).getNearestNode(network.getNodes().get(nodeId).getCoord()).getId();
+					nodeId = NetworkUtils.getNearestNode((networkForThisRoute),network.getNodes().get(nodeId).getCoord()).getId();
 					System.out.println("  --> " + nodeId);
 				}
 				backwardStops.add(nodeId);

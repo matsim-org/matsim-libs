@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -60,7 +61,8 @@ public class Facilities2Links {
 		logger.info("Conneting facilities...");
 		for(ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Coord coord = facility.getCoord();
-			Link link = network.getNearestLinkExactly(coord);
+			final Coord coord1 = coord;
+			Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 			((ActivityFacilityImpl)facility).setLinkId(link.getId());
 		}
 		

@@ -390,7 +390,7 @@ public class TransitQueryEngineForR implements Serializable {
         new MatsimFacilitiesReader(scenario).readFile(fileName);
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
         for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
-            ((ActivityFacilityImpl) facility).setLinkId(network.getNearestLinkExactly(facility.getCoord()).getId());
+            ((ActivityFacilityImpl) facility).setLinkId(NetworkUtils.getNearestLinkExactly(network,facility.getCoord()).getId());
         //create a lookup map that relates all facilities to links that provide access
         links2Facilities = new HashMap<>();
         int total = scenario.getActivityFacilities().getFacilities().size();
@@ -1278,7 +1278,8 @@ public class TransitQueryEngineForR implements Serializable {
             if (this.intDensities.get(toNode) == null) {
                 NetworkImpl net = (NetworkImpl) scenario.getNetwork();
                 Set<Node> nearestNodes = new HashSet<>();
-                nearestNodes.addAll(net.getNearestNodes(toNode.getCoord(), densityDistance));
+		final double distance = densityDistance;
+                nearestNodes.addAll(NetworkUtils.getNearestNodes2(net,toNode.getCoord(), distance));
 
                 double intersectionCount = nearestNodes.size();
                 density = intersectionCount / getDensityArea();

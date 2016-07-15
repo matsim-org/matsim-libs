@@ -190,13 +190,13 @@ public class NetworkImplTest extends AbstractNetworkTest {
 
 		network.addNode(node1);
 		Assert.assertEquals(1, network.getNodes().size());
-		Node n = network.getNearestNode(new Coord((double) 550, (double) 450));
+		Node n = NetworkUtils.getNearestNode(network,new Coord((double) 550, (double) 450));
 		Assert.assertEquals(node1, n);
 		
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
 
-		n = network.getNearestNode(new Coord((double) 590, (double) 490));
+		n = NetworkUtils.getNearestNode(network,new Coord((double) 590, (double) 490));
 		Assert.assertEquals(node2, n);
 	}
 
@@ -211,18 +211,18 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord((double) 500, (double) 400));
 		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord((double) 600, (double) 500));
 
-		Node n = network.getNearestNode(new Coord((double) 550, (double) 450));
+		Node n = NetworkUtils.getNearestNode(network,new Coord((double) 550, (double) 450));
 		Assert.assertNull(n);
 		
 		network.addNode(node1);
 		Assert.assertEquals(1, network.getNodes().size());
-		n = network.getNearestNode(new Coord((double) 550, (double) 450));
+		n = NetworkUtils.getNearestNode(network,new Coord((double) 550, (double) 450));
 		Assert.assertEquals(node1, n);
 		
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
 
-		n = network.getNearestNode(new Coord((double) 590, (double) 490));
+		n = NetworkUtils.getNearestNode(network,new Coord((double) 590, (double) 490));
 		Assert.assertEquals(node2, n);
 	}
 

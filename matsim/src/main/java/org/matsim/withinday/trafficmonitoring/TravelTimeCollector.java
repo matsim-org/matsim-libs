@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
@@ -146,7 +147,7 @@ public class TravelTimeCollector implements TravelTime,
 		 * according to the network change events.
 		 */
 		if (this.network instanceof NetworkImpl) {
-			Collection<NetworkChangeEvent> networkChangeEvents = ((NetworkImpl) this.network).getNetworkChangeEvents();
+			Collection<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(((NetworkImpl) this.network));
 			if (networkChangeEvents != null) {
 				for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
 					ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();

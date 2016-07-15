@@ -262,7 +262,8 @@ public class FacilitiesCreator {
 			int i = 0;
 			for (Coord coord : coordinates) {
 				Id<ActivityFacility> id = Id.create(taz + "_" + i, ActivityFacility.class);
-				Link link = network.getNearestLinkExactly(coord);
+				final Coord coord1 = coord;
+				Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 				ActivityFacility facility = factory.createActivityFacility(id, coord, link.getId());
 				createAndAddActivityOptions(scenario, facility, zonalAttributes.get(taz));
 				activityFacilities.addActivityFacility(facility);

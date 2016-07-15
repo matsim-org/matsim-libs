@@ -901,5 +901,11 @@ public class SchedulingNetwork implements Network {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
+
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 	
 }

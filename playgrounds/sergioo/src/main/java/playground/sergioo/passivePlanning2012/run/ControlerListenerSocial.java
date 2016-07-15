@@ -70,7 +70,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
 		for(ActivityFacility facility:((MutableScenario)event.getServices().getScenario()).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(net,facility.getCoord()).getId());
         Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		/*boolean fixedTypes = event.getServices().getConfig().findParam("locationchoice", "flexible_types")==null ||event.getServices().getConfig().findParam("locationchoice", "flexible_types").equals("");
