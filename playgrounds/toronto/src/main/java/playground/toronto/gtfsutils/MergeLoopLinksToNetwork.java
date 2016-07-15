@@ -55,14 +55,7 @@ public class MergeLoopLinksToNetwork {
 				Node tn = baseNetwork.getNodes().get(L.getToNode().getId());
 				
 				try {
-					Link newLink = (Link) factory.createLink(L.getId(), 
-							fn, 
-							tn, 
-							baseNetwork, 
-							L.getLength(), 
-							L.getFreespeed(),
-							L.getCapacity(), 
-							L.getNumberOfLanes());
+					Link newLink = (Link) NetworkUtils.createLink(L.getId(), fn, tn, baseNetwork, L.getLength(), L.getFreespeed(), L.getCapacity(), L.getNumberOfLanes());
 					NetworkUtils.setType( newLink, (String) "LOOP");
 					baseNetwork.addLink(newLink);
 					bw.write("\n" + fn.getId().toString());

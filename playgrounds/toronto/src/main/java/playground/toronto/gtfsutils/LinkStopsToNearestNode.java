@@ -122,7 +122,7 @@ public class LinkStopsToNearestNode {
 			}
 			
 			if(!loopedNodes.contains(N.getId())){//Loop link DNE
-				Link l = (Link) factory.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
+				Link l = (Link) NetworkUtils.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
 				NetworkUtils.setType( l, (String) "LOOP");
 				
 				/*if(!modes.isEmpty()){

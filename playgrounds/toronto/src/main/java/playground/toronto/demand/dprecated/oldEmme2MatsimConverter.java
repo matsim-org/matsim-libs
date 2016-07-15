@@ -290,10 +290,8 @@ public class oldEmme2MatsimConverter {
 				
 				LinkFactoryImpl factory = new LinkFactoryImpl();
 				
-				Link l = (Link) factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
-						i, j, network, length, speed, cap, lanes);
-				Link L = factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
-						i, j, network, length, speed, cap, lanes);
+				Link l = (Link) NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);
+				Link L = NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);
 				
 				L.setAllowedModes(convertMode(cells[4]));
 				NetworkUtils.setType( ((Link) L), (String) createType(cells));

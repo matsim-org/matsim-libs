@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -82,8 +83,7 @@ public class Network {
 	private Link generateReturnLink(Link link, String inout) {
 		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
 		
-		Link returnLink = linkFactory.createLink(Id.create(link.getId().toString() + inout +"_back", Link.class), link.getToNode(), link.getFromNode(), network, 
-				link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+		Link returnLink = NetworkUtils.createLink(Id.create(link.getId().toString() + inout +"_back", Link.class), link.getToNode(), link.getFromNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		
 		return returnLink;
 	}
@@ -120,48 +120,23 @@ public class Network {
 		// add 4 jelmoli links
 		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
 		Id<Link> id1 = Id.create("jelmoli-1", Link.class);
-		Link jLink1 = linkFactory.createLink(
-				id1, 
-				this.network.getNodes().get(Id.create("17560200460795", Node.class)),
-				this.network.getNodes().get(Id.create("17560200463426", Node.class)), 
-				network, 
-				1.0, 50.0 / 3.6, 1000.0, 1);
+		Link jLink1 = NetworkUtils.createLink(id1, this.network.getNodes().get(Id.create("17560200460795", Node.class)), this.network.getNodes().get(Id.create("17560200463426", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id1, jLink1);
 		
 		Id<Link> id2 = Id.create("jelmoli-2", Link.class);
-		Link jLink2 = linkFactory.createLink(
-				id2, 
-				this.network.getNodes().get(Id.create("17560200463426", Node.class)),
-				this.network.getNodes().get(Id.create("17560200460795", Node.class)), 
-				network, 
-				1.0, 50.0 / 3.6, 1000.0, 1);
+		Link jLink2 = NetworkUtils.createLink(id2, this.network.getNodes().get(Id.create("17560200463426", Node.class)), this.network.getNodes().get(Id.create("17560200460795", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id2, jLink2);
 		
 		Id<Link> id3 = Id.create("jelmoli-3", Link.class);
-		Link jLink3 = linkFactory.createLink(
-				id3, 
-				this.network.getNodes().get(Id.create("17560200454496", Node.class)),
-				this.network.getNodes().get(Id.create("17560200463426", Node.class)), 
-				network, 
-				1.0, 50.0 / 3.6, 1000.0, 1);
+		Link jLink3 = NetworkUtils.createLink(id3, this.network.getNodes().get(Id.create("17560200454496", Node.class)), this.network.getNodes().get(Id.create("17560200463426", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id3, jLink3);
 		
 		Id<Link> id4 = Id.create("jelmoli-4", Link.class);
-		Link jLink4 = linkFactory.createLink(
-				id4, 
-				this.network.getNodes().get(Id.create("17560200463426", Node.class)),
-				this.network.getNodes().get(Id.create("17560200454496", Node.class)), 
-				network, 
-				1.0, 50.0 / 3.6, 1000.0, 1);
+		Link jLink4 = NetworkUtils.createLink(id4, this.network.getNodes().get(Id.create("17560200463426", Node.class)), this.network.getNodes().get(Id.create("17560200454496", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id4, jLink4);
 		
 		Id<Link> id5 = Id.create("sihlbruecke-loop", Link.class);
-		Link jLink5 = linkFactory.createLink(
-				id5, 
-				this.network.getNodes().get(Id.create("17560200133695-3", Node.class)),
-				this.network.getNodes().get(Id.create("17560200133695-2", Node.class)), 
-				network, 
-				1.0, 50.0 / 3.6, 1000.0, 1);
+		Link jLink5 = NetworkUtils.createLink(id5, this.network.getNodes().get(Id.create("17560200133695-3", Node.class)), this.network.getNodes().get(Id.create("17560200133695-2", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id5, jLink5);				
 	}
 	

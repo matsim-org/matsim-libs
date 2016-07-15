@@ -90,7 +90,8 @@ public class LinkStops {
 			length=link.getLength()*CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		else
 			length = CoordUtils.calcEuclideanDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
-		Link newLink = new LinkFactoryImpl().createLink(Id.createLinkId(link.getId().toString()+"_"+i), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+		LinkFactoryImpl r = new LinkFactoryImpl();
+		Link newLink = NetworkUtils.createLink(Id.createLinkId(link.getId().toString()+"_"+i), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		if(NetworkUtils.getOrigId( ((Link)link) )!=null)
 			NetworkUtils.setOrigId( ((Link)newLink), (String) NetworkUtils.getOrigId( ((Link)link) ) ) ;
 		Set<String> modes = new HashSet<String>();

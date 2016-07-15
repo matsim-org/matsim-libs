@@ -52,14 +52,7 @@ public class RenameLoopLinks {
 			Node fn = outNetwork.getNodes().get(L.getFromNode().getId());
 			Node tn = outNetwork.getNodes().get(L.getToNode().getId());
 			
-			Link newLink = (Link) factory.createLink(linkId, 
-					fn, 
-					tn, 
-					outNetwork, 
-					L.getLength(), 
-					L.getFreespeed(),
-					L.getCapacity(), 
-					L.getNumberOfLanes());
+			Link newLink = (Link) NetworkUtils.createLink(linkId, fn, tn, outNetwork, L.getLength(), L.getFreespeed(), L.getCapacity(), L.getNumberOfLanes());
 			NetworkUtils.setType( newLink, (String) NetworkUtils.getType(L));
 			outNetwork.addLink(newLink);
 		}
