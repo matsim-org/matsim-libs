@@ -225,18 +225,24 @@ public class SantiagoNetworkBuilder {
 		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
 		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
 		network.addNode(node);
+		final NetworkImpl network1 = network;
 
-		Link link01 = netFactory.createLink(Id.createLinkId("l_add_01"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315588")), network, 50.2, 40/3.6, 600, 1);
+		Link link01 = NetworkUtils.createLink(Id.createLinkId("l_add_01"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315588")), network1, 50.2, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link01);
-		Link link02 = netFactory.createLink(Id.createLinkId("l_add_02"), network.getNodes().get(Id.createNodeId("267315588")), network.getNodes().get(Id.createNodeId("n_add_01")), network, 50.2, 40/3.6, 600, 1);
+		final NetworkImpl network2 = network;
+		Link link02 = NetworkUtils.createLink(Id.createLinkId("l_add_02"), network.getNodes().get(Id.createNodeId("267315588")), network.getNodes().get(Id.createNodeId("n_add_01")), network2, 50.2, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link02);
-		Link link03 = netFactory.createLink(Id.createLinkId("l_add_03"), network.getNodes().get(Id.createNodeId("267315579")), network.getNodes().get(Id.createNodeId("n_add_01")), network, 58.23, 40/3.6, 600, 1);
+		final NetworkImpl network3 = network;
+		Link link03 = NetworkUtils.createLink(Id.createLinkId("l_add_03"), network.getNodes().get(Id.createNodeId("267315579")), network.getNodes().get(Id.createNodeId("n_add_01")), network3, 58.23, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link03);
-		Link link04 = netFactory.createLink(Id.createLinkId("l_add_04"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315579")), network, 58.23, 40/3.6, 600, 1);
+		final NetworkImpl network4 = network;
+		Link link04 = NetworkUtils.createLink(Id.createLinkId("l_add_04"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315579")), network4, 58.23, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link04);
-		Link link05 = netFactory.createLink(Id.createLinkId("l_add_05"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315716")), network, 233.03, 40/3.6, 600, 1);
+		final NetworkImpl network5 = network;
+		Link link05 = NetworkUtils.createLink(Id.createLinkId("l_add_05"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315716")), network5, 233.03, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link05);
-		Link link06 = netFactory.createLink(Id.createLinkId("l_add_06"), network.getNodes().get(Id.createNodeId("267315716")), network.getNodes().get(Id.createNodeId("n_add_01")), network, 233.03, 40/3.6, 600, 1);
+		final NetworkImpl network6 = network;
+		Link link06 = NetworkUtils.createLink(Id.createLinkId("l_add_06"), network.getNodes().get(Id.createNodeId("267315716")), network.getNodes().get(Id.createNodeId("n_add_01")), network6, 233.03, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link06);
 	}
 

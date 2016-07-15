@@ -74,7 +74,7 @@ public class NetworkCutter {
 
 	public Set<Id<Link>> cutNetworkToArea(String pathToOutputNetwork, Coord center, int radius) {
 		Network filteredNetwork = org.matsim.core.network.NetworkUtils.createNetwork();
-		NetworkFactoryImpl factory = new NetworkFactoryImpl(filteredNetwork);
+		NetworkFactoryImpl factory = org.matsim.core.network.NetworkUtils.createNetworkFactory(filteredNetwork);
 
 		log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
 		// Identify all nodes within area of interest:
@@ -107,14 +107,7 @@ public class NetworkCutter {
 					Node newNode = factory.createNode(link.getFromNode().getId(), link.getFromNode().getCoord());
 					filteredNetwork.addNode(newNode);
 				}
-				Link newLink = factory.createLink(link.getId(),
-						filteredNetwork.getNodes().get(link.getFromNode().getId()),
-						filteredNetwork.getNodes().get(link.getToNode().getId()),
-						(NetworkImpl) filteredNetwork,
-						link.getLength(),
-						link.getFreespeed(),
-						link.getCapacity(),
-						link.getNumberOfLanes());
+				Link newLink = org.matsim.core.network.NetworkUtils.createLink(link.getId(), filteredNetwork.getNodes().get(link.getFromNode().getId()), filteredNetwork.getNodes().get(link.getToNode().getId()), (NetworkImpl) filteredNetwork, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 				newLink.setAllowedModes(link.getAllowedModes());
 				filteredNetwork.addLink(newLink);
 			}

@@ -85,7 +85,7 @@ public final class NetworkImpl implements Network, Lockable, TimeDependentNetwor
 	private boolean locked = false ;
 
 	NetworkImpl() {
-		this.factory = new NetworkFactoryImpl(this);
+		this.factory = NetworkUtils.createNetworkFactory(this);
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class BaseGridCreator implements ConvEvents.BaseGridCreator {
 	public Network createMutualBaseGrid(String path2ZonesFile) {
 
 		Network mutualRepresentation = NetworkUtils.createNetwork();
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(mutualRepresentation);
+		NetworkFactoryImpl networkFactory = NetworkUtils.createNetworkFactory(mutualRepresentation);
 		Long[] sides = boundingBoxOfZones(path2ZonesFile);
 
 		long maxLongitude = sides[1];

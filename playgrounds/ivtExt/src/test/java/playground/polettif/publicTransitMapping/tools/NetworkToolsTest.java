@@ -67,7 +67,7 @@ public class NetworkToolsTest {
 	@Before
 	public void prepare() {
 		network = NetworkUtils.createNetwork();
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
+		NetworkFactoryImpl networkFactory = NetworkUtils.createNetworkFactory(network);
 
 		nodeA = networkFactory.createNode(Id.createNodeId("A"), coordA);
 		nodeB = networkFactory.createNode(Id.createNodeId("B"), coordB);

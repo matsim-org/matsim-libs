@@ -68,7 +68,7 @@ public class TestNetworkMatcher {
 			@Override
 			protected Network providePreparedNetwork(String path2Network, String path2VissimZoneShp) {
 				Network network = NetworkUtils.createNetwork();
-				NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
+				NetworkFactoryImpl networkFactory = NetworkUtils.createNetworkFactory(network);
 				network.addNode(networkFactory.createNode(Id.create(1, Node.class), new Coord((double) 10, (double) 30)));
 				network.addNode(networkFactory.createNode(Id.create(2, Node.class), new Coord((double) 110, (double) 130)));
 				network.addLink(networkFactory.createLink(Id.create(101, Link.class),

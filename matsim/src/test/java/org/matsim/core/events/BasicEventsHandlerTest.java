@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -42,7 +43,11 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		NetworkImpl network = NetworkUtils.createNetwork();
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), node1, node2, network, 1000.0, 10.0, 3600.0, 0);
+		final Node from = node1;
+		final Node to = node2;
+		final NetworkImpl network1 = network;
+		NetworkFactoryImpl r = network.getFactory();
+		Link link1 = NetworkUtils.createLink(Id.create(1, Link.class), from, to, network1, 1000.0, 10.0, 3600.0, (double) 0);
 
 		events.processEvent(new LinkEnterEvent(8.0*3600, Id.create("veh", Vehicle.class), link1.getId()));
 		assertEquals("expected number of handled events wrong.", 1, handler.counter);

@@ -481,10 +481,16 @@ public class Emme2MatsimConverter {
 				double lanes = Double.parseDouble(cells[6]);
 				double cap = Double.parseDouble(cells[10]) * lanes;
 				String modes = cells[4];
-				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
+				if (lanes == 0.0) lanes = 1.0;
+				final Node from = i;
+				final Node to = j;
+				final NetworkImpl network1 = network;
+				final double length1 = length;
+				final double freespeedTT = speed;
+				final double capacity = cap;
+				final double lanes1 = lanes; //ensures that transit-only links have at least one lane.
 				
-				Link l = (Link) factory.createLink(Id.create(cells[1] + "-" + cells[2], Link.class), 
-						i, j, network, length, speed, cap, lanes);
+				Link l = (Link) NetworkUtils.createLink(Id.create(cells[1] + "-" + cells[2], Link.class), from, to, network1, length1, freespeedTT, capacity, lanes1);
 								
 				l.setAllowedModes(convertMode(modes));
 				NetworkUtils.setType( l, (String) createType(cells));
@@ -493,8 +499,12 @@ public class Emme2MatsimConverter {
 				
 				//Special handling of "l" and "q" modes (LRT/BRT ROW-B)
 				if (modes.contains("l") || modes.contains("q")){
-					l = (Link) factory.createLink(Id.create(cells[1] + "-" + cells[2] + "_TrROW", Link.class),
-							i, j, network, length, speed, 9999, 1.0); //Duplicate link for the ROW
+					final Node from1 = i;
+					final Node to1 = j;
+					final NetworkImpl network2 = network;
+					final double length2 = length;
+					final double freespeedTT1 = speed;
+					l = (Link) NetworkUtils.createLink(Id.create(cells[1] + "-" + cells[2] + "_TrROW", Link.class), from1, to1, network2, length2, freespeedTT1, (double) 9999, 1.0); //Duplicate link for the ROW
 					
 					HashSet<String> modeSet = new HashSet<String>();
 					if (modes.contains("l")) modeSet.add("Streetcar");

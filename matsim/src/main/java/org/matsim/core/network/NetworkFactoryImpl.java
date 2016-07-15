@@ -44,7 +44,7 @@ public final class NetworkFactoryImpl implements NetworkFactory {
 
 	private final Network network;
 
-	public NetworkFactoryImpl(final Network network) {
+	private NetworkFactoryImpl(final Network network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
 	}
@@ -61,13 +61,6 @@ public final class NetworkFactoryImpl implements NetworkFactory {
 		return this.linkFactory.createLink(id, fromNode, toNode, 
 				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
 	}
-
-	public Link createLink(final Id<Link> id, final Node from, final Node to,
-			final NetworkImpl network, final double length, final double freespeedTT, final double capacity,
-			final double lanes) {
-		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
-	}
-
 
 	/**
 	 * @param time the time when the NetworkChangeEvent occurs
