@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.tollSetting;
+package playground.ikaddoura.decongestion.tollSetting.old;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 
 /**
  * 

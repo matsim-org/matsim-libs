@@ -19,23 +19,18 @@
 
 package playground.ikaddoura.decongestion;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
-import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV4;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV6;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV8;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingBangBang;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
+import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV8;
 
 /**
 * @author ikaddoura
@@ -54,30 +49,22 @@ public class Decongestion {
 	}
 
 	private void prepare() {
-		
-		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(info.getScenario().getConfig().controler().getOutputDirectory());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		OutputDirectoryLogging.catchLogEntries();
-
-		log.info("DecongestionSettings: " + info.getDecongestionConfigGroup().toString());
-						
+								
 		DecongestionTollSetting tollSettingApproach = null;
 		
-		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V4)) {
-			tollSettingApproach = new DecongestionTollingV4(info);
-		
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V6)) {
-			tollSettingApproach = new DecongestionTollingV6(info);
-		
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V8)) {
+		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V8)) {
 			tollSettingApproach = new DecongestionTollingV8(info);
+			
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.BangBang)) {
+			tollSettingApproach = new DecongestionTollingBangBang(info);
 		
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.PID)) {
+			tollSettingApproach = new DecongestionTollingPID(info);	
+			
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.NoPricing)) {
 			
 			info.getDecongestionConfigGroup().setTOLL_ADJUSTMENT(0.0);
+			info.getDecongestionConfigGroup().setINITIAL_TOLL(0.0);
 			info.getDecongestionConfigGroup().setUPDATE_PRICE_INTERVAL(Integer.MAX_VALUE);
 			info.getDecongestionConfigGroup().setTOLERATED_AVERAGE_DELAY_SEC(Double.MAX_VALUE);			
 			tollSettingApproach = new DecongestionTollingV8(info);
@@ -108,41 +95,10 @@ public class Decongestion {
 
 	public void run() {	
 		
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		controler.run();
 		
 		log.info("Decongestion simulation run completed.");
-		
-		analyze();
-	}
-
-	private void analyze() {
-		
-		log.info("Analyzing the final iteration...");
-		
-		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(controler.getConfig().controler().getOutputDirectory());
-		analysis.run();
-		
-		try {
-			MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		try {
-			MATSimVideoUtils.createVideo(controler.getConfig().controler().getOutputDirectory(), this.info.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			MATSimVideoUtils.createVideo(controler.getConfig().controler().getOutputDirectory(), this.info.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			MATSimVideoUtils.createVideo(controler.getConfig().controler().getOutputDirectory(), this.info.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "weight_perLinkAndTimeBin");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public Controler getControler() {

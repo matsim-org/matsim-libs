@@ -58,7 +58,7 @@ public class LinkInfo {
 		this.time2avgDelay = time2avgDelay;
 	}
 
-	public Map<Integer, Double> getTime2weight() {
+	public Map<Integer, Double> getTime2value() {
 		return time2weight;
 	}
 

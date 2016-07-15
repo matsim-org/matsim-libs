@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.tollSetting;
+package playground.ikaddoura.decongestion.tollSetting.old;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +29,11 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 
 /**
+ * 
+ * And adaptive proportional controller.
  * 
  * Initial tolls
  * ... are set based on the average delay per link and time bin (= d).
@@ -89,7 +92,7 @@ public class DecongestionTollingV8 implements DecongestionTollSetting {
 						double previousDelay = linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);						
 //						log.info("Previous delay: " + previousDelay + " // Current delay: " + averageDelay);
 						
-						weight = this.congestionInfo.getlinkInfos().get(linkId).getTime2weight().get(intervalNr);
+						weight = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr);
 //						log.info("Previous weight: " + weight);
 
 						if (averageDelay >= previousDelay) {
@@ -108,7 +111,7 @@ public class DecongestionTollingV8 implements DecongestionTollSetting {
 				} else {
 					// initial toll per link and time interval, no need to adjust the weight		
 				}
-				this.congestionInfo.getlinkInfos().get(linkId).getTime2weight().put(intervalNr, weight);
+				this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, weight);
 								
 				double averageDelayBasedCostToll = (1 + weight) * averageDelay * vtts_hour / 3600.;
 

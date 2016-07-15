@@ -239,18 +239,20 @@ public class CongestionInfoWriter {
 			
 			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
 				
-				bw.write(linkId.toString());
-				
-				for (int i = 0; i < totalNumberOfTimeBins; i++) {
-										
-					double weight = 0.;
-					if (congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(i)) {
-						weight = congestionInfo.getlinkInfos().get(linkId).getTime2weight().get(i);
-					}
+				if (!congestionInfo.getlinkInfos().get(linkId).getTime2value().isEmpty()) {
+					bw.write(linkId.toString());
 					
-					bw.write(";" + weight);
+					for (int i = 0; i < totalNumberOfTimeBins; i++) {
+											
+						double weight = 0.;
+						if (congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(i)) {
+							weight = congestionInfo.getlinkInfos().get(linkId).getTime2value().get(i);
+						}
+						
+						bw.write(";" + weight);
+					}
+					bw.newLine();
 				}
-				bw.newLine();
 			}
 			
 			bw.close();
@@ -275,8 +277,8 @@ public class CongestionInfoWriter {
 			double[] values = new double[totalNumberOfTimeBins];	
 			boolean isEmpty = true;
 			
-			for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2weight().keySet()) {
-				values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2weight().get(i);
+			for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2value().keySet()) {
+				values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2value().get(i);
 				if (values[i] > 0.) {
 					isEmpty = false;
 				}
