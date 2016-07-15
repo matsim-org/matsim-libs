@@ -42,7 +42,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.MutableScenario;
@@ -222,7 +222,7 @@ class CongestionPricingTestExample {
 	 */
 	private void createTolledNetwork (){
 
-		NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		Network network = (Network) sc.getNetwork();
 
 		// nodes between o-d1 (all horizonal links)
 		double x = -100;

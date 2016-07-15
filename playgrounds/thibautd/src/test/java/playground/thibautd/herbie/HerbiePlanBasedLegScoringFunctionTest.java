@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
@@ -47,7 +46,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -296,7 +296,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 
 	private void initNetwork() {
-		NetworkImpl nImpl = (NetworkImpl) ScenarioUtils.createScenario( config ).getNetwork();
+		Network nImpl = (Network) ScenarioUtils.createScenario( config ).getNetwork();
 		Node n1 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 1, Node.class ), new Coord(0, 0));
 		Node n2 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 2, Node.class ), new Coord(1, 0));
 		Node n3 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 3, Node.class ), new Coord(1, 2));

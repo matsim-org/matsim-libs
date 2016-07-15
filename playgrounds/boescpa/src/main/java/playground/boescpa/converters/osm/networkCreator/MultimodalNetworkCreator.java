@@ -22,7 +22,7 @@
 package playground.boescpa.converters.osm.networkCreator;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 
 /**
  * Abstract contract for the creation of a multimodal network from an osmFile.

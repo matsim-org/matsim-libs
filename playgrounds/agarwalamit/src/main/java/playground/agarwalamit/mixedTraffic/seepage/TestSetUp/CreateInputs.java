@@ -39,7 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -100,7 +100,7 @@ public class CreateInputs {
 	}
 
 	private void createNetwork(){
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("1:00:00"));
 		double x = -100.0;
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord(x, 0.0));

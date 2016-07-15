@@ -31,7 +31,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,7 +39,8 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
@@ -243,7 +243,7 @@ public class ChoiceSet {
 				Link destinationLink;
 				if (linkId != null) {
 					destinationLink = this.network.getLinks().get(linkId);				
-				} else destinationLink = NetworkUtils.getNearestLink(((NetworkImpl) this.network), destinationFacility.getCoord());
+				} else destinationLink = NetworkUtils.getNearestLink(((Network) this.network), destinationFacility.getCoord());
 				
 				Node toNode = destinationLink.getToNode();
 				InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);

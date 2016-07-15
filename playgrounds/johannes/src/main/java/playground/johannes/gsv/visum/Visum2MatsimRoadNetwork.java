@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -47,7 +47,7 @@ public class Visum2MatsimRoadNetwork {
 	
 	public static void main(String args[]) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		final Network network = (Network) scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {

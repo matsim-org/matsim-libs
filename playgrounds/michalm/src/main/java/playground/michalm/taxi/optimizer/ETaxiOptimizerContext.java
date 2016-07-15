@@ -19,10 +19,10 @@
 
 package playground.michalm.taxi.optimizer;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.util.*;
 
 import playground.michalm.ev.data.EvData;

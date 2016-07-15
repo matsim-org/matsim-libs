@@ -21,10 +21,11 @@ package playground.johannes.studies.sbsurvey.analysis;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import org.matsim.api.core.v01.network.Network;
+
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskArray;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTaskComposite;
+import org.matsim.core.network.Network;
 
 import java.util.Set;
 

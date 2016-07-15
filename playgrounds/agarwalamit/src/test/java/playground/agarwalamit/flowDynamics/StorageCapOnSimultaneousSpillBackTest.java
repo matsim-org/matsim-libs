@@ -52,7 +52,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -199,7 +199,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 */
 		final Scenario scenario;
 		final Config config;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		Link link1;
 		Link link2;
@@ -212,7 +212,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 			config.global().setRandomSeed(2546);
 			config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (NetworkImpl) this.scenario.getNetwork();
+			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 

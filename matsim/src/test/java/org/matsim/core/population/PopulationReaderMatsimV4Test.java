@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,7 +40,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -192,7 +192,7 @@ public class PopulationReaderMatsimV4Test {
 	@Test
 	public void testReadActivity() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		final Network network = (Network) scenario.getNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(0, 1000));
 		final Node fromNode = node1;

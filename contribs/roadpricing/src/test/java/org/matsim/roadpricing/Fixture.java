@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,7 +37,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -71,7 +71,7 @@ import junit.framework.TestCase;
 		 */
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 100, (double) 0));
@@ -119,7 +119,7 @@ import junit.framework.TestCase;
 		 *
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node0 = NetworkUtils.createAndAddNode2(network, Id.create( "0", Node.class), new Coord((double) 0, (double) 10));
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create( "1", Node.class), new Coord((double) 0, (double) 100));
@@ -185,7 +185,7 @@ import junit.framework.TestCase;
 	 **/
 	static void createPopulation1(final MutableScenario scenario) {
 		Population population = scenario.getPopulation();
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		Link link0 = network.getLinks().get(Id.create(0, Link.class));
 		Link link1 = network.getLinks().get(Id.create(1, Link.class));

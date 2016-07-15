@@ -28,7 +28,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -179,8 +178,8 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 		log.info("done.");
 		// TODO balmermi: adding date and check if you get more info from the input
 		// files to include into the name
-		if (network instanceof NetworkImpl) {
-			((NetworkImpl) network).setName("teleatlas");
+		if (network instanceof Network) {
+			((Network) network).setName("teleatlas");
 		}
 	}
 
@@ -461,7 +460,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 		}
 		fIt.close();
 
-		((NetworkImpl) network).setCapacityPeriod(3600.0);
+		((Network) network).setCapacityPeriod(3600.0);
 
 		lCnt = network.getLinks().size() - lCnt;
 		log.info("  " + lCnt + " links added to the network layer.");

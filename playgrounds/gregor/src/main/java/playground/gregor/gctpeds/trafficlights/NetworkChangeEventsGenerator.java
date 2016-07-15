@@ -32,7 +32,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -94,7 +94,7 @@ public class NetworkChangeEventsGenerator {
 			}
 		}
 		final List<NetworkChangeEvent> events1 = events;
-		NetworkUtils.setNetworkChangeEvents(((NetworkImpl)sc.getNetwork()),events1);
+		NetworkUtils.setNetworkChangeEvents(((Network)sc.getNetwork()),events1);
 
 	}
 
@@ -108,7 +108,7 @@ public class NetworkChangeEventsGenerator {
 		new NetworkChangeEventsGenerator(sc).run();
 
 		c.network().setChangeEventsInputFile( "/Users/laemmel/devel/nyc/gct_vicinity/changeevents.xml.gz");
-		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFile(), NetworkUtils.getNetworkChangeEvents(((NetworkImpl)sc.getNetwork())));
+		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFile(), NetworkUtils.getNetworkChangeEvents(((Network)sc.getNetwork())));
 		new ConfigWriter(c).write("/Users/laemmel/devel/nyc/gct_vicinity/config.xml.gz");
 	}
 

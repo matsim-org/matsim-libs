@@ -43,7 +43,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -88,7 +88,7 @@ public class Simulator {
 
 	private static SocialGraph graph;
 	
-	private static NetworkImpl network;
+	private static Network network;
 	
 	private static ActivityFacilities facilities;
 	
@@ -232,7 +232,7 @@ public class Simulator {
 		LoggerUtils.setVerbose(false);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
-		network = (NetworkImpl) scenario.getNetwork();
+		network = (Network) scenario.getNetwork();
 		LoggerUtils.setVerbose(true);
 		logger.info(String.format("%1$s nodes, %2$s links.", network.getNodes().size(), network.getLinks().size()));
 		

@@ -9,7 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
@@ -32,7 +32,7 @@ public class StockholmP0Controller {
 		PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 		capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 		
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
 		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
 		String pretimedxyxcords = "./ihop2/matsim-input/pretimedxyxcords.xy";
@@ -44,7 +44,7 @@ public class StockholmP0Controller {
 		
 		NetworkFactory nf = network.getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-		controler.addControlerListener(new StockholmP0ControlListener(scenario, (NetworkImpl) scenario.getNetwork(), incominglinks, outgoinglinks));
+		controler.addControlerListener(new StockholmP0ControlListener(scenario, (Network) scenario.getNetwork(), incominglinks, outgoinglinks));
 		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		controler.run();
 		

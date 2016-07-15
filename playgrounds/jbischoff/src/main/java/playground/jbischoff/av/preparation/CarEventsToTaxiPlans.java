@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -46,7 +45,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -90,7 +90,7 @@ public class CarEventsToTaxiPlans {
 class ConverterEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	Population population;
-	NetworkImpl network;
+	Network network;
 	Network oldNetwork;
 	CoordinateTransformation dest = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4,"EPSG:25833");
 	Random rand = MatsimRandom.getRandom();
@@ -109,7 +109,7 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 
 	public ConverterEventHandler(Scenario scenario, Geometry shape, Network oldNetwork, boolean leaveCarTrips) {
 		this.population = scenario.getPopulation();
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = (Network) scenario.getNetwork();
 		this.shape = shape;
 		this.oldNetwork = oldNetwork;
 		this.leaveCarTrips = leaveCarTrips;

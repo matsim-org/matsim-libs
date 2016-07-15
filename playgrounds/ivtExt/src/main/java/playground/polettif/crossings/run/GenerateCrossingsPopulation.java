@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -15,6 +14,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.*;
+import org.matsim.core.network.Network;
 import org.matsim.core.scenario.*;
 import org.matsim.core.utils.geometry.CoordUtils;
 

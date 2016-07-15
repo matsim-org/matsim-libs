@@ -59,7 +59,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -314,7 +314,7 @@ public class SpaceTimeProbability {
 	}
 
 	private void createNetwork(Scenario scenario) {
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		double x7 = -26000.0;
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(x7, 0.0));

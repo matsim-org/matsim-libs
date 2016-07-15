@@ -3,9 +3,9 @@ package playground.dhosse.prt.router;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.*;
@@ -21,13 +21,13 @@ import playground.michalm.taxi.data.TaxiRank;
 public class PrtRouterWrapper implements RoutingModule {
 
 	private RoutingModule walkRouter;
-	private NetworkImpl network;
+	private Network network;
 	private PrtData data;
 	
 	public PrtRouterWrapper(final String mode, Network network, final PopulationFactory populationFactory, 
 			PrtData data, final RoutingModule routingModule){
 		this.walkRouter = routingModule;
-		this.network = (NetworkImpl) network;
+		this.network = (Network) network;
 		this.data = data;
 	}
 	

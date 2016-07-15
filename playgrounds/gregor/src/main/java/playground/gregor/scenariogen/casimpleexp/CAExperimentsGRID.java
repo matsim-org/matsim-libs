@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,8 +40,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -70,9 +70,9 @@ public class CAExperimentsGRID {
 
 		createNetwork(sc);
 
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(3600);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.26);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.71);
+		((Network) sc.getNetwork()).setCapacityPeriod(3600);
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 
@@ -298,9 +298,9 @@ public class CAExperimentsGRID {
 			}
 		}
 
-		((NetworkImpl) net).setCapacityPeriod(1);
-		((NetworkImpl) net).setEffectiveCellSize(.26);
-		((NetworkImpl) net).setEffectiveLaneWidth(.71);
+		((Network) net).setCapacityPeriod(1);
+		((Network) net).setEffectiveCellSize(.26);
+		((Network) net).setEffectiveLaneWidth(.71);
 	}
 
 	private static void createLink(NetworkFactory fac, Node n, Node nR,

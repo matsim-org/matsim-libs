@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -49,7 +49,7 @@ public class TransitSchedule2EMME {
 	
 	private static final Logger log = Logger.getLogger(TransitSchedule2EMME.class);
 	
-	private static NetworkImpl network;
+	private static Network network;
 	private static TransitSchedule schedule;
 	
 	private static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -378,7 +378,7 @@ public class TransitSchedule2EMME {
 		config.setParam("transit", "transitScheduleFile", scheduleFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		network = (NetworkImpl) scenario.getNetwork();
+		network = (Network) scenario.getNetwork();
 		network.setName(networkFile);
 		schedule = scenario.getTransitSchedule();
 		

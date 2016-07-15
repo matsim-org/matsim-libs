@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.zone.util.RandomPointUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -38,7 +38,7 @@ public class BarcelonaTaxiCreator
 {
     private static final int PAXPERCAR = 4;
 
-    private final NetworkImpl network;
+    private final Network network;
     private final PreparedPolygon preparedPolygon;
 
     private int currentVehicleId = 0;
@@ -46,7 +46,7 @@ public class BarcelonaTaxiCreator
 
     public BarcelonaTaxiCreator(Scenario scenario)
     {
-        network = (NetworkImpl)scenario.getNetwork();
+        network = (Network)scenario.getNetwork();
         preparedPolygon = new PreparedPolygon(BarcelonaZones.readAgglomerationArea());
     }
 

@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -45,7 +45,7 @@ public class Emme2MatsimConverter {
 	// ////////////////////////////////////////////////////////////////////
 	
 	private static CoordinateTransformation coordinateTransformation = null;
-	private static NetworkImpl network;
+	private static Network network;
 	
 	private static final Logger log = Logger.getLogger(Emme2MatsimConverter.class);
 	
@@ -395,7 +395,7 @@ public class Emme2MatsimConverter {
 	private static void filterModes(Set<String> modes){
 		
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		NetworkImpl filteredNetwork = NetworkUtils.createNetwork();
+		Network filteredNetwork = NetworkUtils.createNetwork();
 		filter.filter(filteredNetwork, modes);
 		
 		network = filteredNetwork;
@@ -484,7 +484,7 @@ public class Emme2MatsimConverter {
 				if (lanes == 0.0) lanes = 1.0;
 				final Node from = i;
 				final Node to = j;
-				final NetworkImpl network1 = network;
+				final Network network1 = network;
 				final double length1 = length;
 				final double freespeedTT = speed;
 				final double capacity = cap;
@@ -501,7 +501,7 @@ public class Emme2MatsimConverter {
 				if (modes.contains("l") || modes.contains("q")){
 					final Node from1 = i;
 					final Node to1 = j;
-					final NetworkImpl network2 = network;
+					final Network network2 = network;
 					final double length2 = length;
 					final double freespeedTT1 = speed;
 					l = (Link) NetworkUtils.createLink(Id.create(cells[1] + "-" + cells[2] + "_TrROW", Link.class), from1, to1, network2, length2, freespeedTT1, (double) 9999, 1.0); //Duplicate link for the ROW

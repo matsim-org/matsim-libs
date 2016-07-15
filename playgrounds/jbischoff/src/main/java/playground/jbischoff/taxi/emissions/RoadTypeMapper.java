@@ -41,8 +41,8 @@ public class RoadTypeMapper {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(dir+"berlin_brb.xml");
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		NetworkImpl net2 = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) scenario.getNetwork();
+		Network net2 = (Network) NetworkUtils.createNetwork();
 		
 		 for (Node n : network.getNodes().values()){
 	            Node newNode = n;
@@ -51,7 +51,7 @@ public class RoadTypeMapper {
 	            net2.addNode(newNode);
 	        }
 		
-		for (Entry<Id<Link>, Link> e :  network.getLinks().entrySet()){
+		for (Entry<Id<Link>, ? extends Link> e :  network.getLinks().entrySet()){
 			Link l = (Link) e.getValue();
 			double freespeed = l.getFreespeed();
 			if (freespeed<9)

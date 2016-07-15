@@ -22,12 +22,12 @@ package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
 
 public interface LinkFactory extends MatsimFactory {
 
 	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed, double capacity, double nOfLanes);
+	// yyyyyy reduce length of signature !!!!
 
 }

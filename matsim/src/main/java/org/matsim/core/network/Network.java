@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.core.v01.network;
+package org.matsim.core.network;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.core.network.NetworkFactory;
 
 /**
  * A topological network representation.

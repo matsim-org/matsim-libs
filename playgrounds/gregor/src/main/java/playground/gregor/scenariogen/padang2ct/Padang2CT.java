@@ -39,7 +39,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -69,9 +69,9 @@ public class Padang2CT {
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		loadAndModifyNetwork(sc);
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.26);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.71);
+		((Network) sc.getNetwork()).setCapacityPeriod(1);
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 

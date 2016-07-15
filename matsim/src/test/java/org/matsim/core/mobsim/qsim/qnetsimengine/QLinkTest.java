@@ -53,7 +53,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -301,7 +301,7 @@ public final class QLinkTest extends MatsimTestCase {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(1, 0));
@@ -496,7 +496,7 @@ public final class QLinkTest extends MatsimTestCase {
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 		MatsimRandom.reset(4711); // yyyyyy !!!!!!
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(1, 0));
@@ -571,7 +571,7 @@ public final class QLinkTest extends MatsimTestCase {
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			this.scenario.getConfig().qsim().setUsingFastCapacityUpdate(usingFastCapacityUpdate);
 			
-			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+			Network network = (Network) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
 			Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(1, 0));

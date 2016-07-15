@@ -45,7 +45,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationReader;
@@ -81,8 +81,8 @@ public class HITSAnalyser {
 
 	private HITSData hitsData;
 	static Scenario shortestPathCarNetworkOnlyScenario;
-	private static NetworkImpl carFreeSpeedNetwork;
-	private static NetworkImpl fullCongestedNetwork;
+	private static Network carFreeSpeedNetwork;
+	private static Network fullCongestedNetwork;
 	private static HashMap<Integer, Integer> zip2DGP;
     private static Connection conn;
 
@@ -204,7 +204,7 @@ public class HITSAnalyser {
 		HashSet<String> modeSet = new HashSet<>();
 		modeSet.add("car");
 		carCongestedDijkstra.setModeRestriction(modeSet);
-		fullCongestedNetwork = (NetworkImpl) scenario.getNetwork();
+		fullCongestedNetwork = (Network) scenario.getNetwork();
 		// add a free speed network that is car only, to assign the correct
 		// nodes to agents
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(

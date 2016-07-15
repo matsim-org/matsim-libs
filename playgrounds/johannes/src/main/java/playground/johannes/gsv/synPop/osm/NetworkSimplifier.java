@@ -24,11 +24,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -134,7 +134,7 @@ public class NetworkSimplifier {
 										Id<Link> id = Id.create(++maxId, Link.class);
 										final Id<Link> id1 = id;
 										
-										Link newLink = NetworkUtils.createAndAddLink(((NetworkImpl) network),id1, inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), (String) (NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink )), null);
+										Link newLink = NetworkUtils.createAndAddLink(((Network) network),id1, inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), (String) (NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink )), null);
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
 										network.removeLink(inLink.getId());

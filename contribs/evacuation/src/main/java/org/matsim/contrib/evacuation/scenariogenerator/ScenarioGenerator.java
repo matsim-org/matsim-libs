@@ -26,7 +26,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.evacuation.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.evacuation.experimental.CustomizedOsmNetworkReader;
 import org.matsim.contrib.evacuation.io.EvacuationConfigReader;
@@ -42,7 +41,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -334,15 +334,15 @@ public class ScenarioGenerator {
 			reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
 			reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
 			// max density is set to 5.4 p/m^2
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 			reader.setKeepPaths(true);
 			reader.parse(evacuationNetworkFile);
 		} else if (gcm.getMainTrafficType().equals("mixed")) {
 			// TODO OSMReader for mixed
 			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(
 					sc.getNetwork(), ct, true);
 			reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, 1);

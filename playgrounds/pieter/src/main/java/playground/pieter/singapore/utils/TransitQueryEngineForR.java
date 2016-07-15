@@ -41,7 +41,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -388,7 +388,7 @@ public class TransitQueryEngineForR implements Serializable {
 
     public void loadFacilities(String fileName) {
         new MatsimFacilitiesReader(scenario).readFile(fileName);
-        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+        Network network = (Network) scenario.getNetwork();
         for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
             ((ActivityFacilityImpl) facility).setLinkId(NetworkUtils.getNearestLinkExactly(network,facility.getCoord()).getId());
         //create a lookup map that relates all facilities to links that provide access
@@ -1276,7 +1276,7 @@ public class TransitQueryEngineForR implements Serializable {
             double density = 0;
             //prevent repeated calculation
             if (this.intDensities.get(toNode) == null) {
-                NetworkImpl net = (NetworkImpl) scenario.getNetwork();
+                Network net = (Network) scenario.getNetwork();
                 Set<Node> nearestNodes = new HashSet<>();
 		final double distance = densityDistance;
                 nearestNodes.addAll(NetworkUtils.getNearestNodes2(net,toNode.getCoord(), distance));

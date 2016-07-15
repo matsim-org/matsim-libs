@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
@@ -54,7 +54,7 @@ public class HITSToMATSim {
 	private Scenario scenario; // used if you want to generate matsim
 								// populations
 	private Population population;
-	private NetworkImpl network;
+	private Network network;
 	private HashMap<Integer, Integer> zip2DGP;
 	private HashMap<Integer, ArrayList<Integer>> DGP2Zip;
 	private HashMap<Integer, HashMap<String, ArrayList<Integer>>> DGP2Type2Zip;
@@ -70,7 +70,7 @@ public class HITSToMATSim {
 
 	private LeastCostPathCalculator leastCostPathCalculator;
 	private HashMap<String, Double> personShortestPathDayTotals;
-    private Map<Id<Link>, Link> links;
+    private Map<Id<Link>, ? extends Link> links;
 
 	private HITSToMATSim(HITSData h2, Connection conn2) throws ParseException {
 		this();
@@ -94,7 +94,7 @@ public class HITSToMATSim {
 		this.population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile("data/singapore1_no_rail_CLEAN.xml");
-		NetworkImpl subNet = NetworkUtils.createNetwork();
+		Network subNet = NetworkUtils.createNetwork();
 		TransportModeNetworkFilter t = new TransportModeNetworkFilter(scenario.getNetwork());
 		HashSet set = new HashSet<String>();
 		set.add("car");

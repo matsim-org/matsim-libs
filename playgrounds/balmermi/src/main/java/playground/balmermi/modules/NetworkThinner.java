@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -41,7 +41,7 @@ public class NetworkThinner {
 
 	private static final Logger log = Logger.getLogger(NetworkThinner.class);
 
-	private final void merge(List<Link> list, NetworkImpl network, Counts counts) {
+	private final void merge(List<Link> list, Network network, Counts counts) {
 		Link first = list.get(0);
 		Node fromNode = first.getFromNode();
 		Node toNode = list.get(list.size()-1).getToNode();
@@ -79,7 +79,7 @@ public class NetworkThinner {
 		}
 	}
 
-	public void run(final NetworkImpl network, Counts counts) {
+	public void run(final Network network, Counts counts) {
 		log.info("running "+this.getClass().getName()+" module...");
 		log.info("  init number of links: "+network.getLinks().size());
 		log.info("  init number of nodes: "+network.getNodes().size());

@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -336,7 +336,7 @@ public class NeighboursCreator {
 
 		List<Plan> newPlans = new LinkedList<Plan>();
 		PopulationFactory pf = scenario.getPopulation().getFactory();
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		Person person = plan.getPerson();
 
 		//get all the activity types that this person would like to do during the day
@@ -565,7 +565,7 @@ public class NeighboursCreator {
 		
 		double travelTime = 0.0;
 		if (mode.equals("car")) {
-			NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+			Network network = (Network)scenario.getNetwork();
 			final Coord coord = startCoord;
 			Link startLink = NetworkUtils.getNearestLinkExactly(network,coord);
 			final Coord coord1 = endCoord;

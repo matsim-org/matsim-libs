@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,7 +52,7 @@ public class CreateTestNetwork {
 	 * 
 	 * @return the created test network
 	 */
-	public static NetworkImpl createTestNetwork() {
+	public static Network createTestNetwork() {
 
 		/*
 		 * (2)		(5)------(8)
@@ -69,7 +69,7 @@ public class CreateTestNetwork {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		// add nodes
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 100));
@@ -289,7 +289,7 @@ public class CreateTestNetwork {
 	 * the path 1,2,4 has a total length of 1000m with a free speed travel time of 10m/s
 	 * the second path 1,3,4 has a total length of 100m but only a free speed travel time of 0.1m/s
 	 */
-	public static NetworkImpl createTriangularNetwork() {
+	public static Network createTriangularNetwork() {
 		/*
 		 * 			(2)
 		 *         /   \
@@ -304,7 +304,7 @@ public class CreateTestNetwork {
 		 */
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		// add nodes
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));

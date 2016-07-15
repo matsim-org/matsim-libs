@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -71,7 +71,7 @@ public class PlansAnalyzer {
 //			personDesires.put(entry.getKey().getPerson().getPerson(), entry.getValue());
 //		}
 		
-		FacilityValidator.generate(scenario.getActivityFacilities(), (NetworkImpl) scenario.getNetwork(), graph);
+		FacilityValidator.generate(scenario.getActivityFacilities(), (Network) scenario.getNetwork(), graph);
 		
 //		ParallelPseudoSim sim = new ParallelPseudoSim(1);
 		PhysicalEngine engine = new PhysicalEngine(scenario.getNetwork(), 3.0);

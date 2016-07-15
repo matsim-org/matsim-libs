@@ -12,12 +12,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationUtils;
@@ -88,12 +88,12 @@ public class MapMatching {
 			//TODO: Do I need to modify the network to include loops at stops?
 				
 			//filter the network by mode
-			NetworkImpl BusNetwork = NetworkUtils.createNetwork(); //for buses
-			NetworkImpl TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
-			NetworkImpl StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
-			NetworkImpl SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
-			NetworkImpl SRTNetwork = NetworkUtils.createNetwork(); //for Scarborough RT
-			NetworkImpl LRTNetwork = NetworkUtils.createNetwork(); //for dedicated-ROW streetcars
+			Network BusNetwork = NetworkUtils.createNetwork(); //for buses
+			Network TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
+			Network StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
+			Network SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
+			Network SRTNetwork = NetworkUtils.createNetwork(); //for Scarborough RT
+			Network LRTNetwork = NetworkUtils.createNetwork(); //for dedicated-ROW streetcars
 			//NetworkImpl GOBUSNetwork = NetworkImpl.createNetwork();
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.network);
 			//filter.filter(GOBUSNetwork, CollectionUtils.stringToSet("GO_Bus"));

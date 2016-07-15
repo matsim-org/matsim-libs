@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -49,7 +49,7 @@ public class RouteSetGenerator {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final NetworkImpl network;
+	private final Network network;
 	private final TravelTime timeFunction;
 	private final PreProcessLandmarks preProcessData;
 	private final AStarLandmarks router;
@@ -58,7 +58,7 @@ public class RouteSetGenerator {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public RouteSetGenerator(NetworkImpl network, Config config) {
+	public RouteSetGenerator(Network network, Config config) {
 		this.network = network;
 		this.timeFunction = new TravelTimeCalculator(network, config.travelTimeCalculator()).getLinkTravelTimes();
 		this.preProcessData = new PreProcessLandmarks(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));

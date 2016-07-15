@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -258,7 +258,7 @@ public class WalkDistanceEstimator {
 		spCounter = 0;
 		spMultiplier = 1;
 		log.info("Calculating sub-place distances.");
-		NetworkImpl ni = (NetworkImpl) sPt.getNetwork();
+		Network ni = (Network) sPt.getNetwork();
 		for(MyZone sp : spList){
 			Coord centroid = new Coord(sp.getCentroid().getX(), sp.getCentroid().getY());
 			final Coord coord = centroid;
@@ -305,8 +305,8 @@ public class WalkDistanceEstimator {
 		}
 	}
 	
-	public NetworkImpl getPtNetwork(){
-		return (NetworkImpl) this.sPt.getNetwork();
+	public Network getPtNetwork(){
+		return (Network) this.sPt.getNetwork();
 	}
 	
 }

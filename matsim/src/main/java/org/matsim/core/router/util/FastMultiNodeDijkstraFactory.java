@@ -23,7 +23,7 @@ package org.matsim.core.router.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastMultiNodeDijkstra;
 import org.matsim.core.router.FastRouterDelegateFactory;

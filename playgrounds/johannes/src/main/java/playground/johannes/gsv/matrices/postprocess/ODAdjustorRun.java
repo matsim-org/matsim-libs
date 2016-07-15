@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.TripRouter;
@@ -74,7 +74,7 @@ public class ODAdjustorRun {
 		popReader.readFile(args[2]);
 
 		logger.info("Connecting facilities to links...");
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Coord coord = facility.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);

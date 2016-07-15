@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -86,7 +86,7 @@ public class FacilitiesFileGenerator {
 		dataBaseFacilities.close();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
-		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (NetworkImpl)scenario.getNetwork());
+		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (Network)scenario.getNetwork());
 		new FacilitiesWriter(facilities).write(FACILITIES_FILE);
 	}
 	

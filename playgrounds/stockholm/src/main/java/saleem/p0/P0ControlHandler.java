@@ -18,13 +18,13 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class P0ControlHandler implements BasicEventHandler{
 	Link link2, link4, link5;
-	NetworkImpl network;
+	Network network;
 	int iter;
 	double capacity2, capacity4, satcapacity2, satcapacity4, satcapacity5, bintime=0;
 	public Map<Double, Double> capacitiesLink2 = new HashMap<Double, Double>();
@@ -47,7 +47,7 @@ public class P0ControlHandler implements BasicEventHandler{
 	double totaldelaylink2=0, totaldelaylink4=0, averagedelaylink2=0, averagedelaylink4=0;
 	int countvehlink2=0, countvehlink4=0;
 	int totalcountvehlink2=0, totalcountvehlink4=0;
-	public P0ControlHandler(NetworkImpl network) {
+	public P0ControlHandler(Network network) {
 		this.network=network;
 	}
 	public void initialise(int iter){

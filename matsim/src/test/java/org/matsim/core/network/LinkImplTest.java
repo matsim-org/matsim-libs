@@ -61,7 +61,7 @@ public class LinkImplTest {
 		 * The network contains an exactly horizontal, an exactly vertical, an exactly diagonal
 		 * and another link with no special slope to also test possible special cases.
 		 */
-		final NetworkImpl network = new NetworkImpl();
+		final Network network = new NetworkImpl();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
@@ -179,7 +179,7 @@ public class LinkImplTest {
 
 	@Test
 	public void testSetAttributes() {
-		NetworkImpl network = new NetworkImpl();
+		Network network = new NetworkImpl();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 50, (double) 50));
@@ -199,7 +199,7 @@ public class LinkImplTest {
 	 */
 	@Test
 	public void testAllowedModes() {
-		NetworkImpl network = new NetworkImpl();
+		Network network = new NetworkImpl();
 		Node n1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = n1;

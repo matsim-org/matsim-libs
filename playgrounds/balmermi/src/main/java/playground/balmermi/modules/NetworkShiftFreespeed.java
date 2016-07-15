@@ -22,7 +22,7 @@ package playground.balmermi.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public class NetworkShiftFreespeed {
@@ -46,7 +46,7 @@ public class NetworkShiftFreespeed {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
+	public void run(Network network) {
 		log.info("running "+this.getClass().getName()+" module...");
 		for (Link l : network.getLinks().values()) {
 			double fs = l.getFreespeed();

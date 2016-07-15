@@ -22,11 +22,11 @@ package playground.thibautd.router.multimodal;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -55,7 +55,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		Logger.getLogger(AccessEgressNetworkBasedTeleportationRoutingModule.class);
 
 	private final String mode;
-	private final NetworkImpl accessibleNetwork;
+	private final Network accessibleNetwork;
 	private final double crowFlyDistanceFactor;
 	private final double crowFlySpeed;
 	private final LeastCostPathCalculator routeAlgo;
@@ -67,7 +67,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 			final double crowFlySpeed,
 			final LeastCostPathCalculator routeAlgo) {
 		this.mode = mode;
-		this.accessibleNetwork = (NetworkImpl) accessibleNetwork;
+		this.accessibleNetwork = (Network) accessibleNetwork;
 		this.crowFlySpeed = crowFlySpeed;
 		this.crowFlyDistanceFactor = crowFlyDistanceFactor;
 		this.routeAlgo = routeAlgo;

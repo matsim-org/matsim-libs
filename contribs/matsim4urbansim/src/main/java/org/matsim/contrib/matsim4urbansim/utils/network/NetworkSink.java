@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -66,7 +66,7 @@ public class NetworkSink implements SinkSource {
 					throw new RuntimeException("Missing node: "+toNode.getNodeId());
 				}
 				double length = CoordUtils.calcEuclideanDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
-				createLink((NetworkImpl) this.network, entry, fromNode, toNode, length);
+				createLink((Network) this.network, entry, fromNode, toNode, length);
 				fromNode = toNode;
 			}
 		}
@@ -87,7 +87,7 @@ public class NetworkSink implements SinkSource {
 		sink.release();
 	}
 
-	private void createLink(final NetworkImpl network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
+	private void createLink(final Network network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
 		TagCollectionImpl tagCollection = new TagCollectionImpl(way.getTags());
 		Map<String, String> tags = tagCollection.buildMap();
 		String highway = tags.get("highway");

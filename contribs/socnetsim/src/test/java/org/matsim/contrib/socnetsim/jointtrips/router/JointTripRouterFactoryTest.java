@@ -49,7 +49,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -92,7 +92,7 @@ public class JointTripRouterFactoryTest {
 
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
-		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+		Network net = (Network) sc.getNetwork();
 		final Id<Node> id5 = node1;
 		Node node1inst = NetworkUtils.createAndAddNode2(net, id5, new Coord((double) 0, (double) 1));
 		final Id<Node> id6 = node2;

@@ -1,10 +1,10 @@
 package org.matsim.contrib;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.Network;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

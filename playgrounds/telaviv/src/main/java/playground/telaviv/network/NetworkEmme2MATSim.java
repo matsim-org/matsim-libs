@@ -36,11 +36,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -137,7 +137,7 @@ public class NetworkEmme2MATSim {
 	
 	private static String separator = ",";
 	
-	public static void readNetwork(NetworkImpl network, boolean useWGS84) {
+	public static void readNetwork(Network network, boolean useWGS84) {
 		network.setCapacityPeriod(3600.) ;
 		network.setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
@@ -270,8 +270,8 @@ public class NetworkEmme2MATSim {
 
 
 	public static void main(String[] args) {
-		NetworkImpl networkITM = NetworkUtils.createNetwork();
-		NetworkImpl networkWGS84 = NetworkUtils.createNetwork();
+		Network networkITM = NetworkUtils.createNetwork();
+		Network networkWGS84 = NetworkUtils.createNetwork();
 
 		log.info("reading network ...");
 		readNetwork(networkITM, false);

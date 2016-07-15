@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,7 +56,7 @@ public class Facilities2Links {
 		logger.info("Loading network...");
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		netReader.parse(args[1]);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		logger.info("Conneting facilities...");
 		for(ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {

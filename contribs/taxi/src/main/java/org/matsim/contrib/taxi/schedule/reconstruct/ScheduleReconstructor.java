@@ -29,6 +29,7 @@ import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
+import org.matsim.core.network.Network;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;

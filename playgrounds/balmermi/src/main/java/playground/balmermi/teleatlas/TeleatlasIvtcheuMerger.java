@@ -29,12 +29,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
@@ -88,7 +88,7 @@ public class TeleatlasIvtcheuMerger {
 		log.info("done.");
 	}
 
-	private static final void mergeNetworks(NetworkImpl networkTeleatlas, NetworkImpl networkIvtcheu, String i2tmappingfile) {
+	private static final void mergeNetworks(Network networkTeleatlas, Network networkIvtcheu, String i2tmappingfile) {
 		log.info("adapt mergeNetworks...");
 		log.info("  init number of links (networkTeleatlas): "+networkTeleatlas.getLinks().size());
 		log.info("  init number of nodes (networkTeleatlas): "+networkTeleatlas.getNodes().size());
@@ -167,11 +167,11 @@ public class TeleatlasIvtcheuMerger {
 		String outNetFile = args[4].trim();
 
 		MutableScenario taScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl networkTeleatlas = (NetworkImpl) taScenario.getNetwork();
+		Network networkTeleatlas = (Network) taScenario.getNetwork();
 		new MatsimNetworkReader(taScenario.getNetwork()).readFile(teleatlasfile);
 
 		MutableScenario ivtcheuScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl networkIvtcheu = (NetworkImpl) ivtcheuScenario.getNetwork();
+		Network networkIvtcheu = (Network) ivtcheuScenario.getNetwork();
 		new MatsimNetworkReader(ivtcheuScenario.getNetwork()).readFile(ivtcheufile);
 
 		deleteLinks(networkIvtcheu,il2deletefile);

@@ -23,7 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -42,7 +42,7 @@ public class P0Controller {
 		Controler controler = new Controler(scenario);
 		NetworkFactory nf = (NetworkFactory) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-		controler.addControlerListener(new GenericP0ControlListener(scenario, (NetworkImpl) scenario.getNetwork()));
+		controler.addControlerListener(new GenericP0ControlListener(scenario, (Network) scenario.getNetwork()));
 		controler.run();
 	}
 

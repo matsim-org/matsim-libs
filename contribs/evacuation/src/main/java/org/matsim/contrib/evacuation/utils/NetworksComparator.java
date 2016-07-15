@@ -22,12 +22,12 @@ package org.matsim.contrib.evacuation.utils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -74,7 +74,7 @@ public class NetworksComparator {
 		}
 
 		for (Node n0n : n0.getNodes().values()) {
-			Node n1n = NetworkUtils.getNearestNode(((NetworkImpl) n1),n0n.getCoord());
+			Node n1n = NetworkUtils.getNearestNode(((Network) n1),n0n.getCoord());
 			if (!aquivalentNodes(n0n, n1n)) {
 				log.warn("Nodes do not match. Their might be two or more nodes at the same coordinate! Performing a linear search.");
 				boolean found = false;

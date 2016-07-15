@@ -22,7 +22,6 @@ package playground.thibautd.scripts.scenariohandling;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -45,7 +44,8 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -285,7 +285,7 @@ public class GenerateScenarioForDetours {
 	}
 
 	private static void createNetwork(final Network network) {
-		((NetworkImpl) network).setCapacityPeriod( 1 );
+		((Network) network).setCapacityPeriod( 1 );
 
 		final UniqueIdFactory nodeIdFactory = new UniqueIdFactory( "node-" );
 		final UniqueIdFactory linkIdFactory = new UniqueIdFactory( "link-" );

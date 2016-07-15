@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
@@ -31,7 +30,8 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -93,8 +93,8 @@ public class TravelTimeTask extends AnalyzerTask {
 				e.printStackTrace();
 			}
 
-			Node n1 = NetworkUtils.getNearestNode(((NetworkImpl)network),new Coord(points1[0], points1[1]));
-			Node n2 = NetworkUtils.getNearestNode(((NetworkImpl)network),new Coord(points2[0], points2[1]));
+			Node n1 = NetworkUtils.getNearestNode(((Network)network),new Coord(points1[0], points1[1]));
+			Node n2 = NetworkUtils.getNearestNode(((Network)network),new Coord(points2[0], points2[1]));
 			
 			Path path = router.calcLeastCostPath(n1, n2, 0, null, null);
 			

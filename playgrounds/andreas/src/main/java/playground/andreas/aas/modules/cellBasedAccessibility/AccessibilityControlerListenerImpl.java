@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
@@ -206,7 +206,7 @@ public class AccessibilityControlerListenerImpl{
 	protected void accessibilityComputation(TravelTime ttc,
 			LeastCostPathTree lcptFreeSpeedCarTravelTime,
 			LeastCostPathTree lcptCongestedCarTravelTime,
-			LeastCostPathTree lcptTravelDistance, NetworkImpl network,
+			LeastCostPathTree lcptTravelDistance, Network network,
 			Iterator<Zone<Id>> measuringPointIterator,
 			int size, int mode) {
 

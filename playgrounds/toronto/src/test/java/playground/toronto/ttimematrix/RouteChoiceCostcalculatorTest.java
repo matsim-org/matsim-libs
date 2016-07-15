@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -126,7 +126,7 @@ public class RouteChoiceCostcalculatorTest {
 		 *(50m,0.1m/s)(50m,0.1m/s) 			
 		 */
 		
-		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+		Network network = (Network) this.scenario.getNetwork();
 		
 		// add nodes
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));

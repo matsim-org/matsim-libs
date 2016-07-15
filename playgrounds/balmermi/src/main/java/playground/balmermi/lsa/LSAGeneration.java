@@ -21,7 +21,7 @@
 package playground.balmermi.lsa;
 
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 
 public class LSAGeneration {
 
@@ -35,7 +35,7 @@ public class LSAGeneration {
 
 //		Scenario.setUpScenarioConfig();
 //		NetworkLayer network = Scenario.readNetwork();
-		NetworkImpl network = null;
+		Network network = null;
 
 		//////////////////////////////////////////////////////////////////////
 		

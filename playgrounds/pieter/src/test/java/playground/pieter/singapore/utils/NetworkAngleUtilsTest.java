@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -39,7 +39,7 @@ import java.util.Set;
  */
 public class NetworkAngleUtilsTest {
 
-    private final static NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+    private final static Network network = (Network) NetworkUtils.createNetwork();
 
     //static block
     {

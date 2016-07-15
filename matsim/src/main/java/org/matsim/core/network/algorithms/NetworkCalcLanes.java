@@ -21,8 +21,8 @@
 package org.matsim.core.network.algorithms;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
+import org.matsim.core.network.Network;
 
 /**
  * Calculates the number of lanes for each link, based on the capacity.

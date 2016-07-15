@@ -11,7 +11,7 @@ import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -44,7 +44,7 @@ private SpatialGrid freeSpeedGrid;
 	
 	public void runAccessibilityComputation(){
 		
-		final NetworkImpl network = (NetworkImpl)this.scenario.getNetwork();
+		final Network network = (Network)this.scenario.getNetwork();
 		
 		ProgressBar bar = new ProgressBar( this.measuringPoints.getZones().size() );
 		

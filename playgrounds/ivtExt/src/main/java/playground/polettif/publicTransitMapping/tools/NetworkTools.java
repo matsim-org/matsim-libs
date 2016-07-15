@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
@@ -86,7 +86,7 @@ public class NetworkTools {
 
 	/**
 	 * Returns the nearest link for the given coordinate.
-	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes},
+	 * Looks for nodes within search radius of coord (using {@link Network#getNearestNodes},
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
 	 * the coordinate on its right side is returned.<p/>
@@ -95,8 +95,8 @@ public class NetworkTools {
 	 * @param coord   the coordinate
 	 */
 	public static Link getNearestLink(Network network, Coord coord) {
-		if(network instanceof NetworkImpl) {
-			NetworkImpl networkImpl = (NetworkImpl) network;
+		if(network instanceof Network) {
+			Network networkImpl = (Network) network;
 			double nodeSearchRadius = 1000.0;
 
 			Link closestLink = null;
@@ -144,7 +144,7 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link NetworkImpl#getNearestNodes},
+	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link Network#getNearestNodes},
 	 * fetches all in- and outlinks and sorts them ascending by their
 	 * distance to the coordiantes given.
 	 * <p/>
@@ -154,7 +154,7 @@ public class NetworkTools {
 	 * <p/>
 	 * Distance Link to Coordinate is calculated using {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment}).
 
-	 * @param network               	The network (must be instance of {@link NetworkImpl})
+	 * @param network               	The network (must be instance of {@link Network})
 	 * @param coord                 	the coordinate from which the closest links are
 	 *                         			to be searched
 	 * @param nodeSearchRadius        	Only links from and to nodes within this radius are considered.
@@ -169,14 +169,14 @@ public class NetworkTools {
 	 * @return list of the closest links from coordinate <tt>coord</tt>.
 	 */
 	public static List<Link> findClosestLinks(Network network, Coord coord, double nodeSearchRadius, int maxNLinks, double toleranceFactor, Set<String> networkTransportModes, double maxLinkDistance) {
-		if(!(network instanceof NetworkImpl)) {
+		if(!(network instanceof Network)) {
 			throw new IllegalArgumentException("network is not an instance of NetworkImpl");
 		}
 
 		List<Link> closestLinks = new ArrayList<>();
 		final Coord coord1 = coord;
 		final double distance = nodeSearchRadius;
-		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes2(((NetworkImpl) network),coord1, distance);
+		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes2(((Network) network),coord1, distance);
 
 		if(nearestNodes.size() != 0) {
 			// fetch every in- and outlink of each node

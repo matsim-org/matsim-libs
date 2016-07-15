@@ -31,7 +31,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
@@ -65,7 +65,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 	@Override
 	public void notifyStartup(StartupEvent event) {
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(event.getServices().getScenario().getNetwork());
-		NetworkImpl net = NetworkUtils.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);

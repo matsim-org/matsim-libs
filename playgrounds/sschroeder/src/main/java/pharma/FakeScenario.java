@@ -7,11 +7,10 @@ package pharma;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 
 import org.matsim.core.scenario.ScenarioUtils;
@@ -41,7 +40,7 @@ public class FakeScenario {
         new NetworkReaderMatsimV1(scenario.getNetwork()).parse("/Users/schroeder/DLR/Pharma/data/network.xml");
         ActivityFacilities facilities = scenario.getActivityFacilities();
 
-        new WorldConnectLocations(config).connectFacilitiesWithLinks(facilities, (NetworkImpl) scenario.getNetwork());
+        new WorldConnectLocations(config).connectFacilitiesWithLinks(facilities, (Network) scenario.getNetwork());
 
         ActivityFacility dlr = facilities.getFacilitiesForActivityType("pickup").values().iterator().next();
 

@@ -37,10 +37,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.Network;
 
 import playground.gregor.casim.monitoring.Monitor;
 import playground.gregor.casim.simulation.CANetsimEngine;

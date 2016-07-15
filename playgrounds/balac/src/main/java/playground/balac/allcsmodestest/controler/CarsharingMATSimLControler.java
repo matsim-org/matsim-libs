@@ -15,7 +15,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -171,7 +171,7 @@ public class CarsharingMATSimLControler {
 		private static void connectFacilitiesWithNetwork(MatsimServices controler) {
 	        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 			//log.warn("number of facilities: " +facilities.getFacilities().size());
-	        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+	        Network network = (Network) controler.getScenario().getNetwork();
 			//log.warn("number of links: " +network.getLinks().size());
 
 			WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());

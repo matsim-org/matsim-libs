@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -66,8 +66,8 @@ public class RouterFilter implements TripFlowSink {
 
 	@Override
 	public void process(ActivityFacility quelle, ActivityFacility ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
-		Node quellNode = NetworkUtils.getNearestNode(((NetworkImpl) network),quelle.getCoord());
-		Node zielNode = NetworkUtils.getNearestNode(((NetworkImpl) network),ziel.getCoord());
+		Node quellNode = NetworkUtils.getNearestNode(((Network) network),quelle.getCoord());
+		Node zielNode = NetworkUtils.getNearestNode(((Network) network),ziel.getCoord());
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
 		ActivityFacilitiesFactory factory = ((MutableScenario)sc).getActivityFacilities().getFactory() ;
 		if (isInteresting(path)) {

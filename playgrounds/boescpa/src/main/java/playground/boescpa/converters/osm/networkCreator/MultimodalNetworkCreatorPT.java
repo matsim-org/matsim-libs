@@ -21,7 +21,7 @@
 
 package playground.boescpa.converters.osm.networkCreator;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.boescpa.converters.osm.networkCreator.osmWithPT.OsmNetworkReaderWithPT;
 

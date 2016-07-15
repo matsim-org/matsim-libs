@@ -2,9 +2,9 @@ package playground.wrashid.tryouts.processing;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.network.Network;
 
 import processing.core.*;
 

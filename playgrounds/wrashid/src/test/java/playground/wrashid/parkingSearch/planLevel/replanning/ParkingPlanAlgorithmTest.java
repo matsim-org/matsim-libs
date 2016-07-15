@@ -9,7 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -55,7 +55,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 				.get(Id.create("35", ActivityFacility.class));
 
         ParkingPlanAlgorithm.replaceParking(plan, (Activity) plan.getPlanElements().get(6), newParking,
-				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getScenario().getNetwork());
+				GlobalRegistry.controler, (Network) GlobalRegistry.controler.getScenario().getNetwork());
 
 		assertEquals("35", ((Activity) plan.getPlanElements().get(4)).getFacilityId().toString());
 		assertEquals("35", ((Activity) plan.getPlanElements().get(8)).getFacilityId().toString());
@@ -66,7 +66,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 		// change the parking for the home activity to facility 35, instead of 36
 
         ParkingPlanAlgorithm.replaceParking(plan, (Activity) plan.getPlanElements().get(0), newParking,
-				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getScenario().getNetwork());
+				GlobalRegistry.controler, (Network) GlobalRegistry.controler.getScenario().getNetwork());
 
 		assertEquals("35", ((Activity) plan.getPlanElements().get(2)).getFacilityId().toString());
 		assertEquals("35", ((Activity) plan.getPlanElements().get(10)).getFacilityId().toString());

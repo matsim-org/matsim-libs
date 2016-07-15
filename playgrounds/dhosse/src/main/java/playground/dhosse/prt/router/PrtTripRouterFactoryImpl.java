@@ -5,12 +5,12 @@ import java.util.Collections;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.*;

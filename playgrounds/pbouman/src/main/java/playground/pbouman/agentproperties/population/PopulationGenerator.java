@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import playground.pbouman.agentproperties.ActivityProperties;
@@ -34,7 +34,7 @@ public class PopulationGenerator
 	{
 		Population pop = scen.getPopulation();
 		PopulationFactory factory = pop.getFactory();
-		NetworkImpl network = (NetworkImpl) scen.getNetwork();
+		Network network = (Network) scen.getNetwork();
 		
 		for (String s : properties.keySet())
 		{
@@ -138,7 +138,7 @@ public class PopulationGenerator
 		return null;
 	}
 	
-	private static Link findLink(String name, NetworkImpl net)
+	private static Link findLink(String name, Network net)
 	{
 		for (Link l : net.getLinks().values())
 			if (l.getId().toString().equals(name))

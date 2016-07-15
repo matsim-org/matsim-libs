@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -55,7 +54,7 @@ public class NetworkUtils {
 
 
     public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
-        NetworkImpl network = new NetworkImpl();
+        Network network = new NetworkImpl();
         
         if (networkConfigGroup.isTimeVariantNetwork()) {
             network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
@@ -358,12 +357,12 @@ public class NetworkUtils {
     // which returns either the nearest 'left' or 'right' entry link, based on a global
     // config param.
     public static Link getNearestRightEntryLink(Network network, final Coord coord) {
-        if (!(network instanceof NetworkImpl)) {
+        if (!(network instanceof Network)) {
             throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
         }
         Link nearestRightLink = null;
         Link nearestOverallLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl) network),coord);
+        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
 
         double[] coordVector = new double[2];
         coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
@@ -432,11 +431,11 @@ public class NetworkUtils {
      * @return the link found closest to coord
      */
     public static Link getNearestLink(Network network, final Coord coord) {
-        if (!(network instanceof NetworkImpl)) {
+        if (!(network instanceof Network)) {
             throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
         }
         Link nearestLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl) network),coord);
+        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
         if ( nearestNode == null ) {
             log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
             return null ;
@@ -657,7 +656,7 @@ public class NetworkUtils {
 	}
 
 
-	public static NetworkImpl createNetwork() {
+	public static Network createNetwork() {
 		return new NetworkImpl();
 	}
 
@@ -752,5 +751,10 @@ public class NetworkUtils {
 		} else {
 			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork" ) ;
 		}
+	}
+
+
+	public static LinkFactoryImpl createLinkFactory() {
+		return new LinkFactoryImpl();
 	}
 }

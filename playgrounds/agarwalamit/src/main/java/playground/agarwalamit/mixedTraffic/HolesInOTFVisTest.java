@@ -46,7 +46,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -125,7 +125,7 @@ public class HolesInOTFVisTest {
 
 		final Config config;
 		final Scenario scenario ;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		final Link link1;
 		final Link link2;
@@ -144,7 +144,7 @@ public class HolesInOTFVisTest {
 			config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
-			network = (NetworkImpl) scenario.getNetwork();
+			network = (Network) scenario.getNetwork();
 
 			Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord(-100., -100.0));
 			Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord(0.0, 0.0));

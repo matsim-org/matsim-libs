@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -36,7 +35,8 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -139,7 +139,7 @@ public class ParkingManagerZH {
 		parkingFacilitiesOnLinkMapping = new HashMap<>();
 
 		for (PParking parking : this.getParkings()) {
-			Id<Link> linkId = NetworkUtils.getNearestLink(((NetworkImpl) this.network), parking.getCoord()).getId();
+			Id<Link> linkId = NetworkUtils.getNearestLink(((Network) this.network), parking.getCoord()).getId();
 			assignFacilityToLink(linkId, parking.getId());
 
 			parkingIdToLinkIdMapping.put(parking.getId(), linkId);

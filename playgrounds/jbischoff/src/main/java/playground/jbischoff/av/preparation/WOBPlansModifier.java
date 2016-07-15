@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
@@ -60,7 +60,7 @@ public static void main(String[] args) throws IOException {
 	new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.output_plansNoPTRoutes.xml.gz");
 	Geometry geometry = ScenarioPreparator.readShapeFileAndExtractGeometry("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/onezone.shp");
 	new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/scenario/networkpt-feb.xml.gz");
-	NetworkImpl net = (NetworkImpl) scenario.getNetwork();
+	Network net = (Network) scenario.getNetwork();
 	Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 	List<String> starts = new ArrayList<>();
 	List<String> ends = new ArrayList<>();

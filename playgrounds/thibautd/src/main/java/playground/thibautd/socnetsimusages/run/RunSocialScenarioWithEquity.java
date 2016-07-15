@@ -40,7 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.analysis.IvtAnalysisModule;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
@@ -104,7 +104,7 @@ public class RunSocialScenarioWithEquity {
 
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks(
 				scenario.getActivityFacilities(),
-				(NetworkImpl) scenario.getNetwork() );
+				(Network) scenario.getNetwork() );
 
 		controller.run();
 	}

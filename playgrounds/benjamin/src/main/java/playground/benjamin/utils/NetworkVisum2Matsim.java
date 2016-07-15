@@ -30,11 +30,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -86,7 +86,7 @@ public class NetworkVisum2Matsim {
 	}
 
 	private void convertNetwork() {
-		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		final Network network = (Network) scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		final Collection<SimpleFeature> featuresInShape = ShapeFileReader.getAllFeatures(DetailedAreaShape);

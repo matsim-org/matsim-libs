@@ -22,10 +22,11 @@ package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 public final class LinkFactoryImpl implements LinkFactory {
+	
+	/*deliberately package*/ LinkFactoryImpl() {}
 
 	@Override
 	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,

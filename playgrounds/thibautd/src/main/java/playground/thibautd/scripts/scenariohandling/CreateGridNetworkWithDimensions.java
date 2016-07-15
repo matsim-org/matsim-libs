@@ -22,12 +22,12 @@ package playground.thibautd.scripts.scenariohandling;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
@@ -78,7 +78,7 @@ public class CreateGridNetworkWithDimensions {
 		meta.append( " on the " );
 		meta.append( new Date().toString() );
 
-		((NetworkImpl) network).setName( meta.toString() );
+		((Network) network).setName( meta.toString() );
 
 		new NetworkWriter( network ).write( outFile );
 	}

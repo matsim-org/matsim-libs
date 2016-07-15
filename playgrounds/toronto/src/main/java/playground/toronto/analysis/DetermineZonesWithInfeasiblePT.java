@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -31,7 +31,7 @@ public class DetermineZonesWithInfeasiblePT {
 
 	//private static TransitSchedule schedule;
 	private HashSet<Node> zones;
-	private NetworkImpl stops;
+	private Network stops;
 	private static final double maxSearchRadius = 1500.0; //1.5 km radius		
 		
 	public DetermineZonesWithInfeasiblePT(){

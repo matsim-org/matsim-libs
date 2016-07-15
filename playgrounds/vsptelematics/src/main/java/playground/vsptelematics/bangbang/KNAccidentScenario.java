@@ -52,7 +52,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
@@ -213,7 +213,7 @@ public class KNAccidentScenario {
 			events.add(event) ;
 		}
 		final List<NetworkChangeEvent> events1 = events;
-		NetworkUtils.setNetworkChangeEvents(((NetworkImpl) scenario.getNetwork()),events1);
+		NetworkUtils.setNetworkChangeEvents(((Network) scenario.getNetwork()),events1);
 	}
 
 	private static void preparePopulation(final Scenario scenario) {

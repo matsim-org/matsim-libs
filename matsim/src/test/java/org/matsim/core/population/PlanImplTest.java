@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -217,7 +217,7 @@ public class PlanImplTest {
 
 	@Test
 	public void testCopyPlan_NetworkRoute() {
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord(2000, 0));
@@ -248,7 +248,7 @@ public class PlanImplTest {
 
 	@Test
 	public void testCopyPlan_GenericRoute() {
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord(2000, 0));

@@ -30,14 +30,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -175,7 +175,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		String tmpOutputLocation = TempDirectoryUtil.createCustomTempDirectory("test");
 		
 		// create network
-		NetworkImpl network = LeastCostPathTreeExtended.createTriangularNetwork();
+		Network network = LeastCostPathTreeExtended.createTriangularNetwork();
 		// create scenario
 		Config config = ConfigUtils.createConfig();
 		// set last iteration and output
@@ -192,7 +192,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(controler.getLinkTravelTimes(), controler.createTravelDisutilityCalculator(), (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		
 		// contains all network nodes
-		Map<Id<Node>, Node> networkNodesMap = network.getNodes();
+		Map<Id<Node>, ? extends Node> networkNodesMap = network.getNodes();
 		Id<Node> originNodeID = Id.create(1, Node.class);
 		Id<Node> destinationNodeId = Id.create(4, Node.class);
 		// run lcpte
@@ -215,7 +215,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * the path 1,2,4 has a total length of 1000m with a free speed travel time of 10m/s
 	 * the second path 1,3,4 has a total length of 100m but only a free speed travel time of 0.1m/s
 	 */
-	private static NetworkImpl createTriangularNetwork() {
+	private static Network createTriangularNetwork() {
 		/*
 		 * 			(2)
 		 *         /   \
@@ -230,7 +230,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		 */
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		// add nodes
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord(0, 0));

@@ -51,7 +51,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -376,7 +376,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void createNetwork() {
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		double x8 = -20000.0;
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(x8, 0.0));

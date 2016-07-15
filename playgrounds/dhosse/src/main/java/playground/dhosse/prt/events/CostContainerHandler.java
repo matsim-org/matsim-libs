@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.core.network.Network;
 
 public class CostContainerHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 	LinkEnterEventHandler {

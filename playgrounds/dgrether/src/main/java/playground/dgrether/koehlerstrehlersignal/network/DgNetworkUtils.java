@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.network;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.core.network.Network;
 import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.dgrether.utils.DgNet2Shape;

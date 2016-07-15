@@ -51,7 +51,6 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -79,7 +78,8 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -1476,7 +1476,7 @@ public class QSimTest {
 	private static final class Fixture {
 		final Config config;
 		final Scenario scenario;
-		final NetworkImpl network;
+		final Network network;
 		final Node node1;
 		final Node node2;
 		final Node node3;
@@ -1497,7 +1497,7 @@ public class QSimTest {
 			this.config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 			/* build network */
-			this.network = (NetworkImpl) this.scenario.getNetwork();
+			this.network = (Network) this.scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			this.node1 = NetworkUtils.createAndAddNode2(this.network, Id.create("1", Node.class), new Coord(0, 0));
 			this.node2 = NetworkUtils.createAndAddNode2(this.network, Id.create("2", Node.class), new Coord(100, 0));

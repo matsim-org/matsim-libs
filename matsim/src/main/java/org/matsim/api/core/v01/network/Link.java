@@ -22,7 +22,7 @@ package org.matsim.api.core.v01.network;
 import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -89,7 +89,7 @@ public interface Link extends BasicLocation<Link> {
 	 * in the network file (the capperiod attribute).
 	 * @return the capacity per network's capperiod timestep
 	 *
-	 * @see NetworkImpl#getCapacityPeriod()
+	 * @see Network#getCapacityPeriod()
 	 */
 	public double getCapacity();
 
@@ -100,7 +100,7 @@ public interface Link extends BasicLocation<Link> {
 	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 *
-	 * @see NetworkImpl#getCapacityPeriod()
+	 * @see Network#getCapacityPeriod()
 	 */
 	public double getCapacity(double time);
 

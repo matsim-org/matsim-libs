@@ -5,11 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -46,7 +46,7 @@ public class MergeLoopLinksToNetwork {
 		
 		int loopsAdded = 0;
 		int errorCount = 0;
-		LinkFactoryImpl factory = new LinkFactoryImpl();
+		LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
 		for (Link l : updatedNetwork.getLinks().values()){
 			Link L = (Link) l;
 			if (NetworkUtils.getType(L).equals("LOOP")){

@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -88,7 +88,7 @@ public class RunM2U {
 		 * Calculate, for each zone, the distance to the closest transit node.
 		 */
 		log.info("Calculating the distance to the closest transit node.");
-		NetworkImpl nPt = (NetworkImpl) sPt.getNetwork();
+		Network nPt = (Network) sPt.getNetwork();
 		Map<Id,Double> distanceToPt = new TreeMap<Id, Double>();
 		GeometryFactory gf = new GeometryFactory();
 		for(MyZone z : zones){

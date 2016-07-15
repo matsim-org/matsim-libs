@@ -22,12 +22,12 @@ package playground.thibautd.hitchiking;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -76,7 +76,7 @@ public class IdentifySpotsRough {
 
 		List<Node> hhNodes = getHhNodes( network );
 		pruneCloseNodes( hhNodes );
-		Collection<Link> hhLinks = getHhLinks( (NetworkImpl) network , hhNodes );
+		Collection<Link> hhLinks = getHhLinks( (Network) network , hhNodes );
 		HitchHikingUtils.writeFile(
 				new HitchHikingSpots( hhLinks ),
 				outFile);
@@ -103,7 +103,7 @@ public class IdentifySpotsRough {
 	}
 
 	private static Collection<Link> getHhLinks(
-			final NetworkImpl network,
+			final Network network,
 			final List<Node> hhNodes) {
 		Random rand = new Random( 4375692 );
 		List<Link> links = new ArrayList<Link>();

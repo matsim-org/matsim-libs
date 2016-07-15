@@ -20,9 +20,9 @@
 package playground.gregor.casim.simulation.physics;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.network.Network;
 
 import playground.gregor.casim.simulation.CANetsimEngine;
 

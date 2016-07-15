@@ -48,8 +48,8 @@ import javax.swing.border.TitledBorder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Network;
 
 import others.sergioo.util.geometry.Point2D;
 import playground.sergioo.gtfs2PTSchedule2011.Stop;

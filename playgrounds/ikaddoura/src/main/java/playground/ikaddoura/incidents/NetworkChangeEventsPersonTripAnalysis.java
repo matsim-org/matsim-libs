@@ -40,7 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
@@ -162,7 +162,7 @@ public class NetworkChangeEventsPersonTripAnalysis {
 		
 		Set<Id<Link>> incidentLinkIds = new HashSet<>(); 
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		for (NetworkChangeEvent nce : NetworkUtils.getNetworkChangeEvents(network)) {
 			for (Link link : nce.getLinks()) {

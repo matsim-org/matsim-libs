@@ -22,7 +22,7 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;

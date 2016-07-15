@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
@@ -100,7 +100,7 @@ public class PopulationGenerator {
 		}
 
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
-		NetworkImpl carNetwork = NetworkUtils.createNetwork();
+		Network carNetwork = NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(sc.getNetwork()).filter(carNetwork, CollectionUtils.stringToSet(TransportMode.car));
 		new XY2Links(carNetwork, null).run(pop);
 

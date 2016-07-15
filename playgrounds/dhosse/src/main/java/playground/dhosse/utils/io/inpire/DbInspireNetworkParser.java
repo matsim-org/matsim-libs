@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -391,8 +391,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			Id<Node> fromNodeId = Id.createNodeId(link.fromNodeId);
 			Id<Node> toNodeId = Id.createNodeId(link.toNodeId + "_2");
 			
-			List<Node> nodes = (List<Node>) NetworkUtils.getNearestNodes2(((NetworkImpl)this.network),link.fromCoord, (double) 0);
-			List<Node> nodes2 = (List<Node>) NetworkUtils.getNearestNodes2(((NetworkImpl)this.network),link.toCoord, (double) 0);
+			List<Node> nodes = (List<Node>) NetworkUtils.getNearestNodes2(((Network)this.network),link.fromCoord, (double) 0);
+			List<Node> nodes2 = (List<Node>) NetworkUtils.getNearestNodes2(((Network)this.network),link.toCoord, (double) 0);
 			
 			Node fromNode = nodes.size() > 0 ? nodes.get(0) : null;
 			if(fromNode == null){
@@ -551,7 +551,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			Coord coord = s.coord;
 			final Coord coord1 = coord;
 			
-			Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl)this.network),coord1);
+			Node nearestNode = NetworkUtils.getNearestNode(((Network)this.network),coord1);
 			
 			int i = 0;
 			

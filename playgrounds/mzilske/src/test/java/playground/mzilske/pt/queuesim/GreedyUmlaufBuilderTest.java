@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -154,7 +154,7 @@ public class GreedyUmlaufBuilderTest {
 		 *                    1
 		 *
 		 */
-		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+		Network network = (Network) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		double x3 = -2000;
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord(x3, (double) 0));

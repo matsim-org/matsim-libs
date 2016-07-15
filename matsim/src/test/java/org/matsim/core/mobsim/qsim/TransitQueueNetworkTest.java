@@ -59,7 +59,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -1008,7 +1008,7 @@ public class TransitQueueNetworkTest extends TestCase {
             Id<Link> linkId3 = Id.create("3", Link.class);
 
             // setup: network
-            NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+            Network network = (Network) scenario.getNetwork();
 		final Id<Node> id3 = nodeId1;
             Node node1 = NetworkUtils.createAndAddNode2(network, id3, new Coord((double) 0, (double) 0));
 		final Id<Node> id4 = nodeId2;

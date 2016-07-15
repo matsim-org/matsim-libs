@@ -56,7 +56,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -162,7 +162,7 @@ public class VehVsLinkSpeedTest {
 	private static final class SimpleNetwork{
 		final Config config;
 		final Scenario scenario ;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		final Link link1;
 		final Link link2;
@@ -177,7 +177,7 @@ public class VehVsLinkSpeedTest {
 			config.qsim().setMainModes(Arrays.asList("car","bike"));
 			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
-			network = (NetworkImpl) scenario.getNetwork();
+			network = (Network) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			double x = -100.0;
 			Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(x, 0.0));

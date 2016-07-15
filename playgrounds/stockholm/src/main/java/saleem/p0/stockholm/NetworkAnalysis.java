@@ -20,7 +20,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -39,7 +39,7 @@ public class NetworkAnalysis {
 		String path = "./ihop2/matsim-input/config - P0.xml";
 		final Config config = ConfigUtils.loadConfig(path);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
 		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
 		List<String> timednodes = sth.getPretimedNodes(nodesfile);
@@ -125,7 +125,7 @@ public class NetworkAnalysis {
 		Population population = scenario.getPopulation();
 		ArrayList<Person> persons = cutil.toArrayList((Iterator<Person>) population.getPersons().values().iterator());
 		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
 		List<String> timednodes = sth.getPretimedNodes(nodesfile);
 		Map<String, List<Link>> inlinksforjunctions = sth.getInLinksForJunctions(timednodes, network);

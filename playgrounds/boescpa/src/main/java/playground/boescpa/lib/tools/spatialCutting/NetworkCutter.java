@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -107,7 +107,7 @@ public class NetworkCutter {
 					Node newNode = factory.createNode(link.getFromNode().getId(), link.getFromNode().getCoord());
 					filteredNetwork.addNode(newNode);
 				}
-				Link newLink = org.matsim.core.network.NetworkUtils.createLink(link.getId(), filteredNetwork.getNodes().get(link.getFromNode().getId()), filteredNetwork.getNodes().get(link.getToNode().getId()), (NetworkImpl) filteredNetwork, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+				Link newLink = org.matsim.core.network.NetworkUtils.createLink(link.getId(), filteredNetwork.getNodes().get(link.getFromNode().getId()), filteredNetwork.getNodes().get(link.getToNode().getId()), (Network) filteredNetwork, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 				newLink.setAllowedModes(link.getAllowedModes());
 				filteredNetwork.addLink(newLink);
 			}

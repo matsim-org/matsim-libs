@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -92,7 +92,7 @@ import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 public class oldEmme2MatsimConverter {
 
 	private static CoordinateTransformation coordinateTransformation;
-	private static NetworkImpl network;
+	private static Network network;
 	
 	
 	public static void main(String[] args) throws Exception{
@@ -288,7 +288,7 @@ public class oldEmme2MatsimConverter {
 				double lanes = Double.parseDouble(cells[6]);
 				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
 				
-				LinkFactoryImpl factory = new LinkFactoryImpl();
+				LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
 				
 				Link l = (Link) NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);
 				Link L = NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);

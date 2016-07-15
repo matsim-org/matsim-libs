@@ -20,10 +20,11 @@
 package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.network.Network;
+
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.network.Network;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;

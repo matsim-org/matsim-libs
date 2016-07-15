@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
@@ -53,12 +52,13 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -486,28 +486,28 @@ public class KTFreight_v3 {
 					event.setFreespeedChange(new ChangeValue( ChangeType.FACTOR,  0.5 )); 
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(10*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(16.5*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.FACTOR,  0.5 )); 
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(19*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 			}
 		}

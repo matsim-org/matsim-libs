@@ -31,13 +31,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -87,7 +87,7 @@ public class SantiagoNetworkBuilder {
 		double[] boundingBox2 = new double[]{-70.9, -33.67, -70.47, -33.27};
 		double[] boundingBox3 = new double[]{-71.0108, -33.5274, -70.9181, -33.4615};
 		
-		NetworkImpl network = (NetworkImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+		Network network = (Network) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		OsmNetworkReader onr = new OsmNetworkReader(network, ct);
 		onr.setHierarchyLayer(boundingBox1[3], boundingBox1[0], boundingBox1[1], boundingBox1[2], 4);
 		onr.setHierarchyLayer(boundingBox2[3], boundingBox2[0], boundingBox2[1], boundingBox2[2], 5);
@@ -112,7 +112,7 @@ public class SantiagoNetworkBuilder {
 		log.info("Finished network creation.");
 	}
 
-	private void mergeWithTransitNetwork(NetworkImpl network) {
+	private void mergeWithTransitNetwork(Network network) {
 		Scenario ptScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ptScenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.ignore);
 		new MatsimNetworkReader(ptScenario.getNetwork()).readFile(transitNetworkFile);
@@ -126,7 +126,7 @@ public class SantiagoNetworkBuilder {
 		new MergeNetworks().merge(network, "", ptScenario.getNetwork());
 	}
 
-	private void changeNumberOfLanes(NetworkImpl network) {
+	private void changeNumberOfLanes(Network network) {
 		//change number of lanes according to kt's e-mail
 		int newNLanes = 2;
 		network.getLinks().get(Id.createLinkId("10308")).setCapacity(network.getLinks().get(Id.createLinkId("10308")).getCapacity() * newNLanes / network.getLinks().get(Id.createLinkId("10308")).getNumberOfLanes());
@@ -214,39 +214,39 @@ public class SantiagoNetworkBuilder {
 		network.getLinks().get(Id.createLinkId("19485")).setNumberOfLanes(newNLanes);
 	}
 
-	private void removeSomeLinks(NetworkImpl network) {
+	private void removeSomeLinks(Network network) {
 		//remove small streets in the south-west of the network
 		network.removeLink(Id.createLinkId("4978"));
 		network.removeLink(Id.createLinkId("9402"));
 	}
 
-	private void addSomeLinks(NetworkImpl network) {
+	private void addSomeLinks(Network network) {
 		//create connection links (according to e-mail from kt 2015-07-27)
 		NetworkFactory netFactory = (NetworkFactory) network.getFactory();
 		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
 		network.addNode(node);
-		final NetworkImpl network1 = network;
+		final Network network1 = network;
 
 		Link link01 = NetworkUtils.createLink(Id.createLinkId("l_add_01"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315588")), network1, 50.2, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link01);
-		final NetworkImpl network2 = network;
+		final Network network2 = network;
 		Link link02 = NetworkUtils.createLink(Id.createLinkId("l_add_02"), network.getNodes().get(Id.createNodeId("267315588")), network.getNodes().get(Id.createNodeId("n_add_01")), network2, 50.2, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link02);
-		final NetworkImpl network3 = network;
+		final Network network3 = network;
 		Link link03 = NetworkUtils.createLink(Id.createLinkId("l_add_03"), network.getNodes().get(Id.createNodeId("267315579")), network.getNodes().get(Id.createNodeId("n_add_01")), network3, 58.23, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link03);
-		final NetworkImpl network4 = network;
+		final Network network4 = network;
 		Link link04 = NetworkUtils.createLink(Id.createLinkId("l_add_04"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315579")), network4, 58.23, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link04);
-		final NetworkImpl network5 = network;
+		final Network network5 = network;
 		Link link05 = NetworkUtils.createLink(Id.createLinkId("l_add_05"), network.getNodes().get(Id.createNodeId("n_add_01")), network.getNodes().get(Id.createNodeId("267315716")), network5, 233.03, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link05);
-		final NetworkImpl network6 = network;
+		final Network network6 = network;
 		Link link06 = NetworkUtils.createLink(Id.createLinkId("l_add_06"), network.getNodes().get(Id.createNodeId("267315716")), network.getNodes().get(Id.createNodeId("n_add_01")), network6, 233.03, 40/3.6, (double) 600, (double) 1);
 		network.addLink(link06);
 	}
 
-	private void createRoadTypeMappingForHBEFA(NetworkImpl network) {
+	private void createRoadTypeMappingForHBEFA(Network network) {
 		for(Link ll : network.getLinks().values()){
 			double fs = ll.getFreespeed();
 			// TODO: rural areas might not be not considered; count the cases and decide...
@@ -317,7 +317,7 @@ public class SantiagoNetworkBuilder {
 		}
 	}
 
-	private void changeFreespeedInSecondaryNetwork(NetworkImpl network) {
+	private void changeFreespeedInSecondaryNetwork(Network network) {
 		for(Link ll : network.getLinks().values()){
 			double fs = ll.getFreespeed();
 			if(fs <= 8.333333334){ //30kmh
@@ -354,7 +354,7 @@ public class SantiagoNetworkBuilder {
 		}
 	}
 
-	private void addNetworkModes(NetworkImpl network) {
+	private void addNetworkModes(Network network) {
 		Set<String> allowedModes = new HashSet<>();
 		allowedModes.add(TransportMode.car);
 		allowedModes.add(TransportMode.ride);

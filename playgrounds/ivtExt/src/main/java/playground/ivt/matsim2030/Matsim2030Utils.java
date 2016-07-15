@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -42,8 +41,9 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -338,7 +338,7 @@ public class Matsim2030Utils {
 		// allocate a link here (before loading the PT part of the network)
 		for ( ActivityFacility fac : sc.getActivityFacilities().getFacilities().values() ) {
 			if ( fac.getLinkId() == null ) {
-				final NetworkImpl net = (NetworkImpl) sc.getNetwork();
+				final Network net = (Network) sc.getNetwork();
 				((ActivityFacilityImpl) fac).setLinkId( NetworkUtils.getNearestLink(net, fac.getCoord()).getId() );
 			}
 		}

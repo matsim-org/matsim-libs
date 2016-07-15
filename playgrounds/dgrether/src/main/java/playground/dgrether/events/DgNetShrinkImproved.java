@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.events;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.filter.NetworkFilterManager;
 
 import playground.dgrether.EnvelopeLinkStartEndFilter;

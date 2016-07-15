@@ -23,10 +23,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -55,14 +55,14 @@ public class KtiPtRoutingModule implements RoutingModule {
 	private final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 
 	private final  PlansCalcRouteConfigGroup config;
-	private final NetworkImpl network;
+	private final Network network;
 	private final KtiPtRoutingModuleInfo info;
 
 	public KtiPtRoutingModule(
 			final PlansCalcRouteConfigGroup config,
 			final KtiPtRoutingModuleInfo info,
 			final Network network) {
-		this.network = (NetworkImpl) network;
+		this.network = (Network) network;
 		this.config = config;
 		this.info = info;
 	}

@@ -21,8 +21,8 @@ package playground.ikaddoura.optimization.scoring;
  * *********************************************************************** */
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.Network;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;

@@ -21,6 +21,7 @@ package org.matsim.contrib.zone;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
+import org.matsim.core.network.Network;
 
 
 public class SquareGrid

@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
@@ -30,7 +30,7 @@ public class RemovePlansNotRelatedToStudyArea {
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile,
 				inputNetworkFile, inputFacilities);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		HashSet<Id> isRelevantForStudy = new HashSet<Id>();
 		HashSet<Id> notRelevantForStudy = new HashSet<Id>();

@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -87,7 +86,7 @@ public class MyCarrierPlanGenerator {
 		/* Set coordinate and linkId of depot */
 		depotCoord = new Coord(depotLong, depotLat);
 		//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
-		depotLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), depotCoord).getId();
+		depotLink = NetworkUtils.getNearestLink(((Network) scenario.getNetwork()), depotCoord).getId();
 
 		MyFileSampler mfs = new MyFileSampler(demandInputDir);
 		List<File> files = mfs.sampleFiles(Integer.MAX_VALUE, new MyFileFilter(".csv"));
@@ -202,7 +201,7 @@ public class MyCarrierPlanGenerator {
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//morning peak ends
@@ -211,7 +210,7 @@ public class MyCarrierPlanGenerator {
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//afternoon peak starts
@@ -220,7 +219,7 @@ public class MyCarrierPlanGenerator {
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//afternoon peak ends
@@ -229,7 +228,7 @@ public class MyCarrierPlanGenerator {
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 				}
@@ -279,7 +278,7 @@ public class MyCarrierPlanGenerator {
 				double end = Double.parseDouble(array[8]);
 
 				Coord coord = new Coord(longi, lati);
-				Id<Link> linkId = NetworkUtils.getNearestLink(((NetworkImpl) network), coord).getId();
+				Id<Link> linkId = NetworkUtils.getNearestLink(((Network) network), coord).getId();
 
 				CarrierService serv = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), linkId).
 						setCapacityDemand((int) mass).

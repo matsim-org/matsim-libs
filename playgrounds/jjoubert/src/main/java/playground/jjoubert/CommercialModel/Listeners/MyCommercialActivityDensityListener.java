@@ -20,11 +20,11 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.network.Network;
 
 import java.io.BufferedWriter;
 import java.io.File;

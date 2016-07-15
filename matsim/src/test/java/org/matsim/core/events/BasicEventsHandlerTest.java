@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -40,12 +40,12 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);
 
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node from = node1;
 		final Node to = node2;
-		final NetworkImpl network1 = network;
+		final Network network1 = network;
 		NetworkFactory r = network.getFactory();
 		Link link1 = NetworkUtils.createLink(Id.create(1, Link.class), from, to, network1, 1000.0, 10.0, 3600.0, (double) 0);
 

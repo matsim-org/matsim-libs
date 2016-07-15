@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -41,7 +41,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_shortLink() {
 
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
 		final Node fromNode = node1;
@@ -66,7 +66,7 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_longLink() {
 
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
 		final Node fromNode = node1;

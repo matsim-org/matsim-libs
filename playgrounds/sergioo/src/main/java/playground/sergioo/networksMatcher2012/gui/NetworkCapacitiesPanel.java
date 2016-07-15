@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Network;
 
 import playground.sergioo.networkBusLaneAdder2012.gui.NetworkTwoNodesPainter;
 import playground.sergioo.networksMatcher2012.gui.DoubleNetworkCapacitiesWindow.Labels;

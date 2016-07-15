@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -90,21 +89,21 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which " +
 					"transportation mode is allowed to use it (for the future)");
 		}
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setName(atts.getValue("name"));
+		if (this.network instanceof Network) {
+			((Network) this.network).setName(atts.getValue("name"));
 			if (atts.getValue("capDivider") != null) {
 				log.warn("capDivider defined. it will be used but should be gone eventually. " +
 						"-- This is a weird comment, since the matsim public api tells to put this into the network rather than" +
 						" into the ``links''.  kai, jun'11");
 				String capperiod = atts.getValue("capDivider") + ":00:00";
-				((NetworkImpl) this.network).setCapacityPeriod(Time.parseTime(capperiod));
+				((Network) this.network).setCapacityPeriod(Time.parseTime(capperiod));
 			}
 		}
 	}
 
 	private void startLinks(final Attributes atts) {
 		double capacityPeriod = 3600.0; //the default of one hour
-		if (this.network instanceof NetworkImpl) {
+		if (this.network instanceof Network) {
 			String capperiod = atts.getValue("capperiod");
 			if (capperiod != null) {
 				capacityPeriod = Time.parseTime(capperiod);
@@ -112,20 +111,20 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			else {
 				log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
 			}
-			((NetworkImpl) this.network).setCapacityPeriod(capacityPeriod);
+			((Network) this.network).setCapacityPeriod(capacityPeriod);
 
 			String effectivecellsize = atts.getValue("effectivecellsize");
 			if (effectivecellsize == null){
-				((NetworkImpl) this.network).setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
+				((Network) this.network).setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
 			} else {
-				((NetworkImpl) this.network).setEffectiveCellSize(Double.parseDouble(effectivecellsize));
+				((Network) this.network).setEffectiveCellSize(Double.parseDouble(effectivecellsize));
 			}
 
 			String effectivelanewidth = atts.getValue("effectivelanewidth");
 			if (effectivelanewidth == null) {
-				((NetworkImpl) this.network).setEffectiveLaneWidth(3.75); // the default lane width is 3.75
+				((Network) this.network).setEffectiveLaneWidth(3.75); // the default lane width is 3.75
 			} else {
-				((NetworkImpl) this.network).setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
+				((Network) this.network).setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
 			}
 
 			if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {

@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -518,7 +518,7 @@ public class TeleatlasConverter45v101 {
 		new NetworkWriteAsTable(outputDir.toString()).run(scenario.getNetwork());
 
 		log.info("fix double links...");
-		new NetworkDoubleLinks("d").run((NetworkImpl)scenario.getNetwork());
+		new NetworkDoubleLinks("d").run((Network)scenario.getNetwork());
 
 		log.info("write final version of network...");
 		outputDir = new File(outdir+"/final");

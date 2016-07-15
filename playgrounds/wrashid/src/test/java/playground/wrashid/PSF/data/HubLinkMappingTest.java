@@ -3,8 +3,8 @@ package playground.wrashid.PSF.data;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.Network;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import junit.framework.TestCase;

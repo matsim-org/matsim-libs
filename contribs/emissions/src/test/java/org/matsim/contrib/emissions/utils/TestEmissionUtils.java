@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -35,7 +34,8 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -833,7 +833,7 @@ public class TestEmissionUtils {
 	
 	private void addLinksToNetwork(Scenario sc) {
 		//intern method to set up a network with nodes and links
-		NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		Network network = (Network) sc.getNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("node1", Node.class), new Coord(.0, .0));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("node2", Node.class), new Coord(.0, 1000.));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("node3", Node.class), new Coord(1000., .0));

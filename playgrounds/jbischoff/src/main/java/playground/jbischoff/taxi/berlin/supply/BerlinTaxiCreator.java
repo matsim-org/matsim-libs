@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.contrib.zone.Zone;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
@@ -47,7 +47,7 @@ public class BerlinTaxiCreator
     private static final double PAXPERCAR = 4;
 
     private final Map<Id<Zone>, Zone> zones;
-    private final NetworkImpl network;
+    private final Network network;
     private final WeightedRandomSelection<Id<Zone>> lorSelection;
     private final double evShare;
 
@@ -61,7 +61,7 @@ public class BerlinTaxiCreator
         this.lorSelection = lorSelection;
         this.evShare = evShare;
 
-        network = (NetworkImpl)scenario.getNetwork();
+        network = (Network)scenario.getNetwork();
     }
 
 

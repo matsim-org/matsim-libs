@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,7 +51,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	 * @param network
 	 * @param filename
 	 */
-	protected abstract void writeNetwork(final NetworkImpl network, final String filename);
+	protected abstract void writeNetwork(final Network network, final String filename);
 
 	/**
 	 * Reads a network from the specified file into the given network data structure.
@@ -75,7 +74,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	}
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
-		NetworkImpl network1 = NetworkUtils.createNetwork();
+		Network network1 = NetworkUtils.createNetwork();
 		Node n1 = NetworkUtils.createAndAddNode2(network1, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode2(network1, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = n1;

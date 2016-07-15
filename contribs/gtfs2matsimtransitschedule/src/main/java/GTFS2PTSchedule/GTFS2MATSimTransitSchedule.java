@@ -45,14 +45,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -178,7 +178,7 @@ public class GTFS2MATSimTransitSchedule {
 				}
 			reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE));
 			line = reader.readLine();
-			LinkFactory linkFactory = new LinkFactoryImpl();
+			LinkFactory linkFactory = NetworkUtils.createLinkFactory();
 			while(line!=null) {
 				Node fromNode = network.getNodes().get(Id.create(reader.readLine(), Node.class));
 				Node toNode = network.getNodes().get(Id.create(reader.readLine(), Node.class));
@@ -528,7 +528,7 @@ public class GTFS2MATSimTransitSchedule {
 		//Convert
 		(new TransitScheduleWriter(g2m.getTransitSchedule())).writeFile(args[0]);
 		//Write modified network
-		((NetworkImpl)network).setName(args[3]);
+		((Network)network).setName(args[3]);
 		NetworkWriter networkWriter =  new NetworkWriter(network);
 		networkWriter.write(args[2]);
 	}

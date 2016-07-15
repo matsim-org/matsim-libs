@@ -44,7 +44,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -155,7 +155,7 @@ public class MyCarrierSimulation {
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 //					events.add(event);
 				}
 				{//morning peak ends
@@ -180,7 +180,7 @@ public class MyCarrierSimulation {
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 //					events.add(event);
 				}
 			}

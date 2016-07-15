@@ -28,7 +28,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -61,14 +61,14 @@ public class RunTimeDependentNetworkExample {
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold/10 ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(11.5*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(((NetworkImpl)scenario.getNetwork()),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 			}
 		}

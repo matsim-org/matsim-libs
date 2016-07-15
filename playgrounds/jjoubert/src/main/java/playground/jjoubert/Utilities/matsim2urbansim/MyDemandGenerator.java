@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -110,7 +110,7 @@ public class MyDemandGenerator {
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario.getNetwork());
 		nr.parse(networkFile.getAbsolutePath());
-		NetworkImpl ni = (NetworkImpl) scenario.getNetwork(); 
+		Network ni = (Network) scenario.getNetwork(); 
 		
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(inputFile.getAbsolutePath());

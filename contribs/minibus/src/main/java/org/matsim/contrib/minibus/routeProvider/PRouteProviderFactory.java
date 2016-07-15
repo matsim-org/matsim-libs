@@ -20,10 +20,10 @@
 package org.matsim.contrib.minibus.routeProvider;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**

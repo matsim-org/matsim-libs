@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
@@ -46,7 +45,8 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -624,13 +624,13 @@ public class TransitQueueSimulationTest {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
       
         // build simple network with 2 links
-        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+        Network network = (Network) scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
         Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
         Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(2000.0, 0.0));
-        network.getNodes().put(node1.getId(), node1);
-        network.getNodes().put(node2.getId(), node2);
-        network.getNodes().put(node3.getId(), node3);
+        network.addNode( node1);
+        network.addNode( node2);
+        network.addNode( node3);
         Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
         link1.setFreespeed(10.0);
         link1.setCapacity(2000.0);
@@ -714,13 +714,13 @@ public class TransitQueueSimulationTest {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
      
         // build simple network with 2 links
-        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+        Network network = (Network) scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
         Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
         Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(2000.0, 0.0));
-        network.getNodes().put(node1.getId(), node1);
-        network.getNodes().put(node2.getId(), node2);
-        network.getNodes().put(node3.getId(), node3);
+        network.addNode(  node1);
+        network.addNode( node2);
+        network.addNode(  node3 );
         Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
         link1.setFreespeed(10.0);
         link1.setCapacity(2000.0);

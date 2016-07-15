@@ -21,10 +21,10 @@ package playground.thibautd.herbie;
 
 import herbie.running.config.HerbieConfigGroup;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.Network;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;

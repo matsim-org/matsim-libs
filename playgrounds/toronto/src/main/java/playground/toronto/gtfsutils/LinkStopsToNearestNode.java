@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -33,11 +33,11 @@ public class LinkStopsToNearestNode {
 
 		//Create base network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInFile);
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl noHighways = (NetworkImpl) scenario.getNetwork();
+		Network noHighways = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario2.getNetwork()).readFile(networkInFile);
 		
 		//Remove highways and on/off ramps. Should not affect routes which travel on highways since transit lines don't stop ON highways.	
@@ -49,10 +49,10 @@ public class LinkStopsToNearestNode {
 		for (Id<Link> i : linksToRemove) noHighways.removeLink(i);
 		
 		// Create filtered networks, one for each of the four main modes.
-		NetworkImpl BusNetwork = NetworkUtils.createNetwork(); //for buses
-		NetworkImpl TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
-		NetworkImpl StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
-		NetworkImpl SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
+		Network BusNetwork = NetworkUtils.createNetwork(); //for buses
+		Network TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
+		Network StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
+		Network SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(noHighways);
 		filter.filter(SubwayNetwork, CollectionUtils.stringToSet("Subway"));
 		filter.filter(StreetcarNetwork, CollectionUtils.stringToSet("Streetcar"));
@@ -72,7 +72,7 @@ public class LinkStopsToNearestNode {
 		
 		String line;
 		ArrayList<Id> loopedNodes = new ArrayList<Id>();
-		LinkFactoryImpl factory = new LinkFactoryImpl();
+		LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
 		while ((line = reader.readLine()) != null){
 			String[] cells = line.split(",");
 			double stopLon = Double.parseDouble(cells[loncol]);

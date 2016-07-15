@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,7 +81,7 @@ public class ShapeFileToNetworkDelhi {
 
 				if(!network.getNodes().containsKey((fromNodeId))){
 					final Id<Node> id = fromNodeId;
-					node1 = NetworkUtils.createAndAddNode2(((NetworkImpl) network), id, CT.transform(fromCoord));
+					node1 = NetworkUtils.createAndAddNode2(((Network) network), id, CT.transform(fromCoord));
 				}else{
 					node1=network.getNodes().get((fromNodeId));
 				}
@@ -106,7 +106,7 @@ public class ShapeFileToNetworkDelhi {
 
 				if(!network.getNodes().containsKey((toNodeId))){
 					final Id<Node> id = toNodeId;
-					node2 = NetworkUtils.createAndAddNode2(((NetworkImpl) network), id, CT.transform(toCoord));
+					node2 = NetworkUtils.createAndAddNode2(((Network) network), id, CT.transform(toCoord));
 				}else{
 					node2 = network.getNodes().get((toNodeId));
 				}
@@ -134,7 +134,7 @@ public class ShapeFileToNetworkDelhi {
 					final double freespeed = freeSpeed;
 					final double capacity1 = capacity;
 					final double numLanes = numberOfLanes;
-					NetworkUtils.createAndAddLink(((NetworkImpl) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
+					NetworkUtils.createAndAddLink(((Network) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
 				}
 
 				if (!network.getLinks().containsKey(linkId2)) {
@@ -145,7 +145,7 @@ public class ShapeFileToNetworkDelhi {
 					final double freespeed = freeSpeed;
 					final double capacity1 = capacity;
 					final double numLanes = numberOfLanes;
-					NetworkUtils.createAndAddLink(((NetworkImpl) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
+					NetworkUtils.createAndAddLink(((Network) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
 				}
 			}
 		}

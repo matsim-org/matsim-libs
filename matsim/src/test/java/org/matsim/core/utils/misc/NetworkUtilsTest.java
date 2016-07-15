@@ -34,9 +34,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.fakes.FakeLink;
@@ -52,7 +52,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetNodes_Empty() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "");
 		assertEquals(0, nodes.size());
 
@@ -65,14 +65,14 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetNodes_Null() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, null);
 		assertEquals(0, nodes.size());
 	}
 
 	@Test
 	public void testGetNodes_mixedDelimiters() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
 		assertEquals(network.getNodes().get(Id.create(1, Node.class)), nodes.get(0));
@@ -84,7 +84,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetNodes_NonExistant() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		try {
 			NetworkUtils.getNodes(network, "1 3 ab 5");
 			fail("expected Exception, but didn't happen.");
@@ -95,7 +95,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinks_Empty() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "");
 		assertEquals(0, links.size());
 
@@ -108,14 +108,14 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinks_StringNull() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
 
 	@Test
 	public void testGetLinks_mixedDelimiters() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
 		assertEquals(network.getLinks().get(Id.create(1, Link.class)), links.get(0));
@@ -126,7 +126,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinks_NonExistant() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		try {
 			NetworkUtils.getLinks(network, "1 3 ab 4");
 			fail("expected Exception, but didn't happen.");
@@ -315,10 +315,10 @@ public class NetworkUtilsTest {
 		}
 	}
 
-	private NetworkImpl getTestNetwork() {
+	private Network getTestNetwork() {
 		int numOfLinks = 5;
 
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
 			nodes[i] = NetworkUtils.createAndAddNode2(network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
@@ -330,7 +330,7 @@ public class NetworkUtilsTest {
 	}
 
 	private static class MultimodalFixture {
-		/*package*/ final NetworkImpl network = NetworkUtils.createNetwork();
+		/*package*/ final Network network = NetworkUtils.createNetwork();
 		Node[] nodes = new Node[6];
 		Link[] links = new Link[this.nodes.length - 1];
 

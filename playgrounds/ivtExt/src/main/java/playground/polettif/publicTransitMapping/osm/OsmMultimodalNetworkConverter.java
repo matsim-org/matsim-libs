@@ -25,10 +25,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -160,8 +160,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Converts the parsed osm data to MATSim nodes and links.
 	 */
 	private void convertToNetwork() {
-		if(this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if(this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		// store of which relation a way is part of

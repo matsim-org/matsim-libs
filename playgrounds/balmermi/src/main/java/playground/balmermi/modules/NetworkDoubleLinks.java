@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public class NetworkDoubleLinks {
@@ -54,7 +54,7 @@ public class NetworkDoubleLinks {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void handleDoubleLink(Link l, NetworkImpl network) {
+	private final void handleDoubleLink(Link l, Network network) {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
 		Coord nc = new Coord(0.5 * (fn.getCoord().getX() + tn.getCoord().getX()), 0.5 * (fn.getCoord().getY() + tn.getCoord().getY()));
@@ -75,7 +75,7 @@ public class NetworkDoubleLinks {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
+	public void run(Network network) {
 		log.info("running "+this.getClass().getName()+" module...");
 		log.info("  init number of links: "+network.getLinks().size());
 		log.info("  init number of nodes: "+network.getNodes().size());

@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
@@ -48,7 +47,7 @@ import org.matsim.core.utils.collections.QuadTree;
  * @author nagel
  * @author mrieser
  */
-public final class NetworkImpl implements Network, Lockable, TimeDependentNetwork, SearchableNetwork {
+/*deliberately package*/ final class NetworkImpl implements Network, Lockable, TimeDependentNetwork, SearchableNetwork {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 

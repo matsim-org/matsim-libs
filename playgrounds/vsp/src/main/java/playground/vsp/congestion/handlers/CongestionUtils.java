@@ -23,8 +23,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 
 /**
  * @author nagel
@@ -52,7 +52,7 @@ public final class CongestionUtils {
 			builder.setMarginalDelayPerLeavingVehicle_sec(marginalDelay_sec);
 		
 			double storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) 
-					/ ((NetworkImpl)network).getEffectiveCellSize()) * scenario.getConfig().qsim().getStorageCapFactor() );
+					/ ((Network)network).getEffectiveCellSize()) * scenario.getConfig().qsim().getStorageCapFactor() );
 			builder.setStorageCapacityCars(storageCapacity_cars);
 			
 			linkInfo = builder.build() ;

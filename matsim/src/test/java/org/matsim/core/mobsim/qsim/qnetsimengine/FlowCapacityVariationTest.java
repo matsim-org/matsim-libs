@@ -52,7 +52,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -141,7 +141,7 @@ public class FlowCapacityVariationTest {
 
 		final Config config;
 		final Scenario scenario ;
-		NetworkImpl network;
+		Network network;
 		final Population population;
 		Link link1;
 		Link link2;
@@ -162,7 +162,7 @@ public class FlowCapacityVariationTest {
 
 		private void createNetwork(double linkCapacity){
 
-			network = (NetworkImpl) scenario.getNetwork();
+			network = (Network) scenario.getNetwork();
 
 			double x = -100.0;
 			Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(x, 0.0));

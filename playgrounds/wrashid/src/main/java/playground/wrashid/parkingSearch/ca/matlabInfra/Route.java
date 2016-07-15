@@ -3,7 +3,7 @@ package playground.wrashid.parkingSearch.ca.matlabInfra;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 
 /**
  * route starts from ToNode of first link and goes to ToNode of last link.
@@ -22,7 +22,7 @@ class Route {
 		}
 	}
 	
-	public String getNodeString(NetworkImpl network){
+	public String getNodeString(Network network){
 		StringBuffer stringBuffer = new StringBuffer();
 		
 		for (Link link:links){

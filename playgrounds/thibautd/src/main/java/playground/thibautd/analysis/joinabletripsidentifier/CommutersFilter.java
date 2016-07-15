@@ -1,7 +1,8 @@
 package playground.thibautd.analysis.joinabletripsidentifier;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
+
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.PassengerFilter;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 

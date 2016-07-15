@@ -22,9 +22,9 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.core.network.Network;
 
 public class TTMatrixFromStoredTable extends TTMatrix {
 	

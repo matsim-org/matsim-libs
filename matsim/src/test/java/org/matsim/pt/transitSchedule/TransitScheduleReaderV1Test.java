@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -89,7 +89,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		final Node fromNode = node1;
@@ -121,7 +121,7 @@ public class TransitScheduleReaderV1Test {
 	@Test
 	public void testStopFacility_withBadLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		final Node fromNode = node1;
@@ -742,7 +742,7 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_OneLink() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
@@ -809,7 +809,7 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_TwoLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));
@@ -878,7 +878,7 @@ public class TransitScheduleReaderV1Test {
 	public void testRouteProfileRoute_MoreLinks() {
 		TransitSchedule schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 5, (double) 11));
 		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord((double) 5, (double) 11));

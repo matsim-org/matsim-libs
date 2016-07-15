@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -60,7 +60,7 @@ public class TestXmls {
 		
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		Network network = (Network) sc.getNetwork();
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++ ){
 				Coord coordA = new Coord((double) (i * 10 + 5), (double) (j * 10 + 5));

@@ -21,11 +21,11 @@ package playground.benjamin.scoring.income.old;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.network.Network;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;

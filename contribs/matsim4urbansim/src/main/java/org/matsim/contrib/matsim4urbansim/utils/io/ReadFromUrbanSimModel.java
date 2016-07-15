@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
@@ -31,7 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -996,7 +996,7 @@ public class ReadFromUrbanSimModel {
 						
 						{ // aggregating persons to nearest network nodes
 							assert( homeLocation.getCoord() != null );
-							Node nearestNode = NetworkUtils.getNearestNode(((NetworkImpl)network),homeLocation.getCoord());
+							Node nearestNode = NetworkUtils.getNearestNode(((Network)network),homeLocation.getCoord());
 							assert( nearestNode != null );
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){

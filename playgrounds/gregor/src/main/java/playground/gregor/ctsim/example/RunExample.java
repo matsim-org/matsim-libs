@@ -23,7 +23,6 @@ import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -31,8 +30,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -64,9 +64,9 @@ public class RunExample {
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		int destination = createNetwork(sc);
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.26);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.71);
+		((Network) sc.getNetwork()).setCapacityPeriod(1);
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 

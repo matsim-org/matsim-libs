@@ -4,17 +4,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkFactory;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public class BikeNetworkFactoryImpl implements NetworkFactory {
@@ -30,7 +29,7 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 
 	public BikeNetworkFactoryImpl(final Network network) {
 		this.network = network;
-		this.linkFactory = new LinkFactoryImpl();
+		this.linkFactory = NetworkUtils.createLinkFactory();
 	}
 
 	
@@ -50,7 +49,7 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 
 	
 	public Link createLink(final Id<Link> id, final Node from, final Node to,
-			final NetworkImpl network, final double length, final double freespeedTT, final double capacity,
+			final Network network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}

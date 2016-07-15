@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +70,7 @@ public class IdentifySpotsAtPtRough {
 			final String scheduleFile,
 			final String spotsOutFile) {
 		// we need the impl to have the "getNearest..." methods
-		NetworkImpl carNetwork = getCarNetwork( networkFile );
+		Network carNetwork = getCarNetwork( networkFile );
 
 		log.info( "parse pt stops coordinates from "+scheduleFile );
 		Parser ptStopsCoordParser = new Parser();
@@ -113,11 +113,11 @@ public class IdentifySpotsAtPtRough {
 		}
 	}
 
-	private static NetworkImpl getCarNetwork( final String netFile ) {
+	private static Network getCarNetwork( final String netFile ) {
 		log.info( "read network from "+netFile );
 		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
-		NetworkImpl net = NetworkUtils.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 
 		log.info( "filter network" );
 		new TransportModeNetworkFilter( sc.getNetwork() ).filter(

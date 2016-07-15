@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -121,7 +121,7 @@ public class MyZoneToZoneRouter {
 		log.info("Processing zone-to-zone travel times.");
 		this.odMatrix = matrix;
 		GeometryFactory gf = new GeometryFactory();
-		NetworkImpl ni = (NetworkImpl) scenario.getNetwork();
+		Network ni = (Network) scenario.getNetwork();
 		int total = odMatrix.rows()*odMatrix.columns();
 		int counter = 0;
 		int multiplier = 1;

@@ -10,9 +10,9 @@ import java.util.Observable;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import others.sergioo.util.geometry.Line2D;
@@ -73,9 +73,9 @@ public class SimpleMapMatcher extends Observable implements PointLines {
 				Collection<Node> initialNodes=new ArrayList<Node>();
 				for(double addDistance=0;initialNodes.size()<MIN_NUMBER_START_NODES;addDistance+=SEARCH_RADIUS_INCREMENT) {
 					final Coord coord = point;
-					initialNodes=NetworkUtils.getNearestNodes2(((NetworkImpl)network),coord, INITIAL_SEARCH_RADIUS+addDistance);
+					initialNodes=NetworkUtils.getNearestNodes2(((Network)network),coord, INITIAL_SEARCH_RADIUS+addDistance);
 				}
-				for(Link link:((NetworkImpl)network).getLinks().values())
+				for(Link link:((Network)network).getLinks().values())
 					if(link.getAllowedModes().contains(mode)) {
 						boolean haveInitialNode = false;
 						for(Iterator<Node> iNode = initialNodes.iterator();iNode.hasNext()&&!haveInitialNode;) {
@@ -95,7 +95,7 @@ public class SimpleMapMatcher extends Observable implements PointLines {
 				for(RouteCandidate routeCandidate:routeCandidates.get(routeCandidates.size()-1))
 					if(!(routeCandidate.getLinks().size()==1 && this.reachedStartOfLastLink(routeCandidate, point)))
 						if(this.reachedEndOfLastLink(routeCandidate,pointN)) {
-							for(Link link:((NetworkImpl)network).getLinks().values())
+							for(Link link:((Network)network).getLinks().values())
 								if(link.getAllowedModes().contains(mode) && link.getFromNode().equals(routeCandidate.getLastLink().getLink().getToNode())) {
 									RouteCandidate newRouteCandidate = routeCandidate.clone();
 									if(newRouteCandidate.addLink(link, pointN, points))

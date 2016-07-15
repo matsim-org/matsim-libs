@@ -30,11 +30,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -98,7 +98,7 @@ public class DataPrepare {
 				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				final Id<Node> id1 = id;
 				final Coord coord1 = coord;
-				NetworkUtils.createAndAddNode2(((NetworkImpl) network), id1, coord1);
+				NetworkUtils.createAndAddNode2(((Network) network), id1, coord1);
 			}
 
 		};
@@ -150,7 +150,7 @@ public class DataPrepare {
 						final double freespeed1 = freespeed;
 						final double capacity1 = capacity;
 						final String type = edgeTypeIdString;
-						NetworkUtils.createAndAddLink(((NetworkImpl) network),id1, fromNode1, toNode1, length1, freespeed1, capacity1, (double) 1, null, type);
+						NetworkUtils.createAndAddLink(((Network) network),id1, fromNode1, toNode1, length1, freespeed1, capacity1, (double) 1, null, type);
 						usedIds.add(edgeTypeIdString);
 					}
 					// kick out all edges in periphery that are irrelevant only there
@@ -164,7 +164,7 @@ public class DataPrepare {
 							final double freespeed1 = freespeed;
 							final double capacity1 = capacity;
 							final String type = edgeTypeIdString;
-							NetworkUtils.createAndAddLink(((NetworkImpl) network),id1, fromNode1, toNode1, length1, freespeed1, capacity1, (double) 1, null, type);
+							NetworkUtils.createAndAddLink(((Network) network),id1, fromNode1, toNode1, length1, freespeed1, capacity1, (double) 1, null, type);
 							usedIds.add(edgeTypeIdString);
 						}
 					}
@@ -175,7 +175,7 @@ public class DataPrepare {
 		};
 		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
 		streamingVisumNetworkReader.read(InVisumNetFile);
-		((NetworkImpl) network).setCapacityPeriod(16*3600);
+		((Network) network).setCapacityPeriod(16*3600);
 	}
 
 	private boolean isEdgeTypeRelevant(Id<EdgeType> edgeTypeId) {

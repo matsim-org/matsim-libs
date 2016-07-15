@@ -44,7 +44,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -210,7 +210,7 @@ public class CorridorNetworkTest {
 		 */
 		Scenario scenario;
 		Config config;
-		NetworkImpl network;
+		Network network;
 		Population population;
 
 		Link link0;
@@ -221,7 +221,7 @@ public class CorridorNetworkTest {
 		CorridorNetworkAndPlans(){
 			config=ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (NetworkImpl) this.scenario.getNetwork();
+			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 

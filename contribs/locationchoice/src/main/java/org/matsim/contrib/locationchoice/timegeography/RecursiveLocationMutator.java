@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
@@ -176,7 +176,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 			final ActivityFacility facility = choiceSet.get(super.random.nextInt(choiceSet.size()));
 
 			act.setFacilityId(facility.getId());
-       		act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
+       		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.scenario.getNetwork()), facility.getCoord()).getId());
        		act.setCoord(facility.getCoord());
        		return true;
 		}

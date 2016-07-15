@@ -21,7 +21,7 @@
 
 package playground.boescpa.converters.osm;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreator;
 import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorStreets;

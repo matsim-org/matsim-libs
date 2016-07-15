@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -38,9 +37,10 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
@@ -146,8 +146,8 @@ public class TravelTimeCollector implements TravelTime,
 		 * If the network is time variant, we have to update the link parameters
 		 * according to the network change events.
 		 */
-		if (this.network instanceof NetworkImpl) {
-			Collection<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(((NetworkImpl) this.network));
+		if (this.network instanceof Network) {
+			Collection<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(((Network) this.network));
 			if (networkChangeEvents != null) {
 				for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
 					ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();

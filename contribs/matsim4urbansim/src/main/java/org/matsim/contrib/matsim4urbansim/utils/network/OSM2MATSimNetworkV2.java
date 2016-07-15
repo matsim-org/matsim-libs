@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,7 +78,7 @@ public class OSM2MATSimNetworkV2 {
 				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(OUTFILE.split(".xml")[0]
 				+ "_clean.xml.gz");
-		network = (NetworkImpl) scenario.getNetwork();
+		network = (Network) scenario.getNetwork();
 
 		// simplifying the cleaned network
 		NetworkSimplifier simplifier = new NetworkSimplifier();

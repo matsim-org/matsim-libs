@@ -50,7 +50,7 @@ public class TaxiDemandWriter
     private static final Logger log = Logger.getLogger(TaxiDemandWriter.class);
     private Map<String, Geometry> municipalityMap;
     private Population population;
-    private NetworkImpl network;
+    private Network network;
     private Scenario scenario;
 
     private Random rnd = new Random(17);
@@ -141,7 +141,7 @@ public class TaxiDemandWriter
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ;
         new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
-        this.network = (NetworkImpl)scenario.getNetwork();
+        this.network = (Network)scenario.getNetwork();
     }
 
 

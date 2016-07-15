@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -61,7 +61,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  class DivergingNetworkAndPlans {
 	Scenario scenario;
 	Config config;
-	NetworkImpl network;
+	Network network;
 	Population population;
 	Link link0;
 	Link link1;
@@ -73,7 +73,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 	 DivergingNetworkAndPlans(){
 		config=ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.loadScenario(config);
-		network =  (NetworkImpl) this.scenario.getNetwork();
+		network =  (Network) this.scenario.getNetwork();
 		population = this.scenario.getPopulation();
 	}
 

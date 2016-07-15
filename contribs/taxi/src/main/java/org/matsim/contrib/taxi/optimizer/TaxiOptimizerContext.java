@@ -1,9 +1,9 @@
 package org.matsim.contrib.taxi.optimizer;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.util.*;
 
 

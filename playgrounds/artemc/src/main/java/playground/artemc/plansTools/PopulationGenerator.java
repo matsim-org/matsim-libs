@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -51,7 +51,7 @@ public class PopulationGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading network...");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
-		NetworkImpl net = (NetworkImpl) scenario.getNetwork();
+		Network net = (Network) scenario.getNetwork();
 		
 		log.info("Reading work areas...");
 		Collection<SimpleFeature> fts = new ShapeFileReader().readFileAndInitialize(areaShape); 
@@ -144,7 +144,7 @@ public class PopulationGenerator {
 	}
 
 	
-	private static Coord[] getDimensions(NetworkImpl network) {
+	private static Coord[] getDimensions(Network network) {
 		
 	    Double xMin = 0.0;
 	    Double yMin = 0.0;

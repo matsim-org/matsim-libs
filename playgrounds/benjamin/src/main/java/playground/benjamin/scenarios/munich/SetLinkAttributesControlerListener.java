@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -60,7 +60,7 @@ public class SetLinkAttributesControlerListener implements StartupListener {
         Network network = event.getServices().getScenario().getNetwork();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl zone30Links = (NetworkImpl) sc.getNetwork();
+		Network zone30Links = (Network) sc.getNetwork();
 
 		for(Link link : network.getLinks().values()){
 			Id linkId = link.getId();

@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -211,7 +211,7 @@ public class FacilitiesCreator {
 				if (!validLinkTypes.contains(type)) linksToRemove.add(link.getId());
 			}
 			log.info("\tfound " + linksToRemove.size() + " links which do not match the criteria");
-			for (Id<Link> linkId : linksToRemove) ((NetworkImpl) scenario.getNetwork()).removeLink(linkId);
+			for (Id<Link> linkId : linksToRemove) ((Network) scenario.getNetwork()).removeLink(linkId);
 			log.info("\tprocessed network contains " + scenario.getNetwork().getLinks().size() + 
 					" valid links");
 			log.info("done.\n");
@@ -247,7 +247,7 @@ public class FacilitiesCreator {
 			index++;
 		}
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
 		ObjectAttributes facilitiesAttributes = activityFacilities.getFacilityAttributes();

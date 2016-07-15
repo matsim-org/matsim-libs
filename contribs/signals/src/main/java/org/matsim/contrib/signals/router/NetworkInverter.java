@@ -7,9 +7,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
@@ -30,7 +30,7 @@ class NetworkInverter {
 
 	private Network originalNetwork;
 
-	private NetworkImpl invertedNetwork = null;
+	private Network invertedNetwork = null;
 
 	private Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap = null;
 

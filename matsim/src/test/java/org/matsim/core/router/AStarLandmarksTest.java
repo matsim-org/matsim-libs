@@ -20,8 +20,8 @@
 
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessLandmarks;

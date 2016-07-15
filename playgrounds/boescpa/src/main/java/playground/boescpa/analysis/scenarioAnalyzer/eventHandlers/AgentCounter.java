@@ -24,7 +24,8 @@ package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
+
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 

@@ -10,17 +10,17 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public class P0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
-	public NetworkImpl network;
+	public Network network;
 	P0ControlHandler handler;
 	public ArrayList<Double> avgabsolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
 	public ArrayList<Double> initialabsolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
 	public ArrayList<Double> iters = new ArrayList<Double>();//To check the convergence quality
 	public ArrayList<Double> itersscaled = new ArrayList<Double>();
-	public P0ControlListener(NetworkImpl network){
+	public P0ControlListener(Network network){
 		this.network = network;
 	}
 	@Override

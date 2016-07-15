@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -60,9 +60,9 @@ public class StopFacilityGenerator {
 	
 	TransitStopFacility lastStopFacility = null;
 
-	private NetworkImpl network;
+	private Network network;
 
-	public NetworkImpl getNetwork() {
+	public Network getNetwork() {
 		return network;
 	}
 
@@ -198,7 +198,7 @@ public class StopFacilityGenerator {
 		this.sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		prepareConfig();
 		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
-		this.network = (NetworkImpl) sc.getNetwork();
+		this.network = (Network) sc.getNetwork();
 		this.stopDistance = distanceBetweenStops;	
 		this.allowedModes.add("car");
 		this.allowedModes.add("pt");

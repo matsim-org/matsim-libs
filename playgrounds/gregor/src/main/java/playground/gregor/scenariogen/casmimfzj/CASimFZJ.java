@@ -43,7 +43,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -138,7 +138,7 @@ public class CASimFZJ {
 		for (Id<Link> r : rm) {
 			sc.getNetwork().removeLink(r);
 		}
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
+		((Network) sc.getNetwork()).setCapacityPeriod(1);
 
 	}
 

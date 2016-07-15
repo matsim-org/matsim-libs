@@ -26,7 +26,7 @@ package playground.ikaddoura.analysis;
 
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 
 /**
  * @author Ihab

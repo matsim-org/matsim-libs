@@ -22,11 +22,11 @@ package playground.meisterk.org.matsim.population.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.facilities.ActivityFacilities;

@@ -44,7 +44,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -116,7 +116,7 @@ public class PopulationGenerator {
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
-		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+		Network net = (Network) sc.getNetwork();
 		String crs = conf.global().getCoordinateSystem();
 		transformCRS(r, crs);
 		

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -67,8 +66,9 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.Builder;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -140,7 +140,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 						this.mobsimTimer = mobsimTimer1 ;
 						this.netsimEngine = netsimEngine1 ;
 
-						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+						double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
 
 						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
@@ -223,7 +223,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 						this.mobsimTimer = mobsimTimer1 ;
 						this.netsimEngine = netsimEngine1 ;
 
-						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+						double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
 
 						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);

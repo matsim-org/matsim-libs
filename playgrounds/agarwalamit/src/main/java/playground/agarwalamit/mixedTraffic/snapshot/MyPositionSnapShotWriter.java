@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -65,7 +65,7 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 	
 		// first check if easting northing is free from any correction due to placement on 2d space
 		if (scenario.getConfig().qsim().getLinkWidthForVis() !=  0. || 
-				( (NetworkImpl) scenario.getNetwork() ).getEffectiveLaneWidth() != 0.) 
+				( (Network) scenario.getNetwork() ).getEffectiveLaneWidth() != 0.) 
 		{
 			throw new RuntimeException("This snapshot writer is useful if plotting the positions of the vehicles in one-dimensitonal space."
 					+ "Either of link width for vis in qsim or effective lane width in the network is not zero.");

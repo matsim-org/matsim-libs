@@ -26,13 +26,13 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
@@ -103,7 +103,7 @@ public class MyPersonPrepareForSim extends AbstractPersonAlgorithm {
 					Activity act = (Activity) pe;
 					if (act.getLinkId() == null) {
 						// use the exactly nearest link
-						act.setLinkId(NetworkUtils.getNearestLinkExactly(((NetworkImpl) this.network),act.getCoord()).getId());
+						act.setLinkId(NetworkUtils.getNearestLinkExactly(((Network) this.network),act.getCoord()).getId());
 						needsReRoute = true;
 					}
 				} else if (pe instanceof Leg) {

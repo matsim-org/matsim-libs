@@ -49,7 +49,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -192,7 +192,7 @@ public class CombinedFlowAndStorageDelayTest {
 	private class createPseudoInputs {
 		Scenario scenario;
 		Config config;
-		NetworkImpl network;
+		Network network;
 		Population population;
 		Link link1;
 		Link link2;
@@ -203,7 +203,7 @@ public class CombinedFlowAndStorageDelayTest {
 		public createPseudoInputs(){
 			config=ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (NetworkImpl) this.scenario.getNetwork();
+			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -41,9 +41,9 @@ import org.xml.sax.XMLReader;
 
 public class ITSUMONetworkReader {
 
-	private final NetworkImpl network;
+	private final Network network;
 
-	public ITSUMONetworkReader(final NetworkImpl network) {
+	public ITSUMONetworkReader(final Network network) {
 		this.network = network;
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		System.out.println("\n##################################################################################################\n" +

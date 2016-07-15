@@ -36,10 +36,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -313,8 +313,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if (this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
@@ -564,7 +564,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					double fc = 1.3 * mw; //1.3 persons/m/s
 					capacity = network.getCapacityPeriod() * fc;
 					
-					double cellSize = ((NetworkImpl)network).getEffectiveCellSize();
+					double cellSize = ((Network)network).getEffectiveCellSize();
 					double maxDensity = 5.4;
 					nofLanes = mw * maxDensity * cellSize;
 				}

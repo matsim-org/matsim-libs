@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -84,7 +84,7 @@ public class CreateJonesCityNetwork {
 		scenario.getConfig().global().setCoordinateSystem(defaultCRS);
 		
 		// create empty network
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(filename);
@@ -124,7 +124,7 @@ public class CreateJonesCityNetwork {
 	/**
 	 * @param network
 	 */
-	private static void concistencyCheck(NetworkImpl network) {
+	private static void concistencyCheck(Network network) {
 		int nodeSize = network.getNodes().values().size();
 		int linkSize = network.getLinks().values().size();
 		int steps = (int)Math.sqrt(nodeSize);
@@ -143,7 +143,7 @@ public class CreateJonesCityNetwork {
 	 * @throws IOException
 	 * @throws NumberFormatException
 	 */
-	private static Iterator<Node> addNodes2Network(NetworkImpl network,
+	private static Iterator<? extends Node> addNodes2Network(Network network,
 			BufferedReader reader, final int indexXCoodinate,
 			final int indexYCoodinate, final int indexZoneID)
 			throws IOException, NumberFormatException {
@@ -179,7 +179,7 @@ public class CreateJonesCityNetwork {
 	/**
 	 * @param network
 	 */
-	private static void addLinks2Network(NetworkImpl network) {
+	private static void addLinks2Network(Network network) {
 		
 		int zones = network.getNodes().size();
 		int steps = (int)Math.sqrt(zones)-1;
@@ -209,7 +209,7 @@ public class CreateJonesCityNetwork {
 	 * @param currentNode
 	 * @param neighbor
 	 */
-	private static long addLink(NetworkImpl network, double maxValue,
+	private static long addLink(Network network, double maxValue,
 								long linkID, Node currentNode, Coord neighbor) {
 		
 		if (neighbor.getX() < maxValue

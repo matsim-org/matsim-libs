@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
@@ -169,7 +169,7 @@ public class TransitLeastCostPathTreeTest {
      * @author gthunig
      */
 	/*package*/ static class Fixture {
-        /*package*/ NetworkImpl network;
+        /*package*/ Network network;
 
         int count = 10000;
 

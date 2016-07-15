@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
@@ -38,8 +37,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -73,9 +73,9 @@ public class BypassTest extends MatsimTestCase {
 
 		createNetwork(sc);
 
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(3600);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.26);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.71);
+		((Network) sc.getNetwork()).setCapacityPeriod(3600);
 
 		// c.strategy().addParam("Module_1",
 		// "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
@@ -325,9 +325,9 @@ public class BypassTest extends MatsimTestCase {
 		net.addLink(l3Rev);
 		net.addLink(l4Rev);
 
-		((NetworkImpl) net).setCapacityPeriod(1);
-		((NetworkImpl) net).setEffectiveCellSize(.26);
-		((NetworkImpl) net).setEffectiveLaneWidth(.71);
+		((Network) net).setCapacityPeriod(1);
+		((Network) net).setEffectiveCellSize(.26);
+		((Network) net).setEffectiveLaneWidth(.71);
 
 	}
 

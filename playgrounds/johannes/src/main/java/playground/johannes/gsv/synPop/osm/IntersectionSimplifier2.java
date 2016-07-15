@@ -39,7 +39,7 @@ import java.util.*;
  */
 public class IntersectionSimplifier2 {
 
-	private NetworkImpl network;
+	private Network network;
 
 	private final double maxSearchRadius = 50;
 
@@ -62,7 +62,7 @@ public class IntersectionSimplifier2 {
 		reader.parse("/home/johannes/gsv/osm/network/germany-20140909.3.xml");
 		
 		IntersectionSimplifier2 simplifier = new IntersectionSimplifier2();
-		simplifier.network = (NetworkImpl) scenario.getNetwork();
+		simplifier.network = (Network) scenario.getNetwork();
 		
 		simplifier.maxNodeId = Long.MIN_VALUE;
 		for(Node node : scenario.getNetwork().getNodes().values()) {

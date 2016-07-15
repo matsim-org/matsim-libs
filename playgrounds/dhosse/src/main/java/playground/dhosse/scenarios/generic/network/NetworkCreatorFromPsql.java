@@ -15,9 +15,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -36,7 +36,7 @@ import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * 
- * This class provides functionalities to create and modify a {@link org.matsim.api.core.v01.network.Network}
+ * This class provides functionalities to create and modify a {@link org.matsim.core.network.Network}
  * by using OpenStreetMap data stored in a postgreSQL database.
  * 
  * @author dhosse
@@ -361,12 +361,12 @@ public class NetworkCreatorFromPsql {
 
 			Coord fromCoord = this.transform.transform(MGC.coordinate2Coord(from));
 			final Coord coord = fromCoord;
-			Node closestFromNode = NetworkUtils.getNearestNode(((NetworkImpl)scenario.getNetwork()),coord);
+			Node closestFromNode = NetworkUtils.getNearestNode(((Network)scenario.getNetwork()),coord);
 			Node fromNode = setNode(fromCoord, closestFromNode);
 			
 			Coord toCoord = this.transform.transform(MGC.coordinate2Coord(to));
 			final Coord coord1 = toCoord;
-			Node closestToNode = NetworkUtils.getNearestNode(((NetworkImpl)scenario.getNetwork()),coord1);
+			Node closestToNode = NetworkUtils.getNearestNode(((Network)scenario.getNetwork()),coord1);
 			
 			Node toNode = setNode(toCoord, closestToNode);
 			

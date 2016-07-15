@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -34,7 +34,7 @@ import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class LinkParkingFacilityAssociation extends LinkFacilityAssociation {
 
-	public LinkParkingFacilityAssociation(ActivityFacilities facilities, NetworkImpl network) {
+	public LinkParkingFacilityAssociation(ActivityFacilities facilities, Network network) {
 		this.network=network;
 		
 		for (ActivityFacility facility: facilities.getFacilities().values()){

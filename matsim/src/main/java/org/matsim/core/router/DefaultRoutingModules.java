@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 /**

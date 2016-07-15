@@ -2,7 +2,7 @@ package playground.dhosse.gap.scenario.counts;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 

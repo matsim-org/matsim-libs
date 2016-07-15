@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -40,7 +39,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -83,7 +83,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		this.runDemo((NetworkImpl) network);
+		this.runDemo((Network) network);
 	}
 	
 	public void testFacilitiesBased() {
@@ -95,7 +95,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void runDemo(NetworkImpl network) {
+	protected void runDemo(Network network) {
 		String UNDEFINED_UNDEFINED_UNDEFINED = Integer
 				.toString(PlanAnalyzeSubtours.UNDEFINED)
 				+ " "
@@ -154,7 +154,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		doTest(facilities, "1 2 3 4 2 5 3 6 1", "1 0 0 0 1 1 1 1", 2, map(1,NULL).map(0,1));
 	}
 	
-	private void doTest(NetworkImpl network,
+	private void doTest(Network network,
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
 		Plan plan = createPlan(network, facString);
@@ -208,7 +208,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		}
 	}
 
-	private Plan createPlan(NetworkImpl network, String facString) {
+	private Plan createPlan(Network network, String facString) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		return createPlanFromLinks(network, person, TransportMode.car, facString);
 	}
@@ -243,7 +243,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		return plan;
 	}
 
-	static Plan createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
+	static Plan createPlanFromLinks(Network layer, Person person, String mode, String linkString) {
 		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {

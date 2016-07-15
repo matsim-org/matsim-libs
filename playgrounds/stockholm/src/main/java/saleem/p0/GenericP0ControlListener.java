@@ -15,16 +15,16 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 // For Generic Junctions
 
 public class GenericP0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
-	public NetworkImpl network;
+	public Network network;
 	GenericP0ControlHandler handler;
 	Scenario scenario;
-	public GenericP0ControlListener(Scenario scenario, NetworkImpl network){
+	public GenericP0ControlListener(Scenario scenario, Network network){
 		this.network = network;
 		this.scenario=scenario;
 	}
@@ -57,7 +57,7 @@ public class GenericP0ControlListener implements StartupListener, IterationStart
 	public void notifyStartup(StartupEvent event) {
 		ArrayList<Link> inLinks = new ArrayList<Link>();
 		ArrayList<Link> outLinks = new ArrayList<Link>();
-		Map<Id<Link>,Link> links = network.getLinks();
+		Map<Id<Link>,? extends Link> links = network.getLinks();
 		Iterator iterator = links.keySet().iterator();
 		while(iterator.hasNext()){
 			Link link = links.get(iterator.next());

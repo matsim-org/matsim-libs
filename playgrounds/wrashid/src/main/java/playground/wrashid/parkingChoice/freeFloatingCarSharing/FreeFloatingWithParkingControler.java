@@ -13,7 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +70,7 @@ public static void main(final String[] args) throws IOException {
 		    	
 		    	
 		    	
-                Link l = NetworkUtils.getNearestLinkExactly(((NetworkImpl)controler.getScenario().getNetwork()),coord1);
+                Link l = NetworkUtils.getNearestLinkExactly(((Network)controler.getScenario().getNetwork()),coord1);
 		    	
 		    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
 		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(Id.create(Integer.toString(i), Vehicle.class), l.getCoord());

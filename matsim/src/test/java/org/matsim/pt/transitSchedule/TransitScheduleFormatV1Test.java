@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -59,7 +59,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 
 	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
-		NetworkImpl network = NetworkUtils.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node n1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node n2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 0, (double) 0));
 		Node n3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 0, (double) 0));

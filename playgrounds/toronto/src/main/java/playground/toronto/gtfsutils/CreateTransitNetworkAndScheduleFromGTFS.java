@@ -16,10 +16,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -61,7 +61,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	
 	private static final Logger log = Logger.getLogger(CreateTransitNetworkAndScheduleFromGTFS.class);
 	
-	private NetworkImpl network;
+	private Network network;
 	private TransitSchedule schedule;
 	private GTFSSystem gtfs;
 	private Vehicles vehicles;
@@ -100,7 +100,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 			this.network.addNode(n);
 			final Node from = n;
 			final Node to = n;
-			final NetworkImpl network1 = network;
+			final Network network1 = network;
 			
 			//Create loop link at node
 			Link loopLink = (Link) NetworkUtils.createLink(Id.create(stopId +"_LOOP", Link.class), from, to, network1, 0.0, (double) 9999, (double) 9999, 1.0);
@@ -186,7 +186,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 							
 							final Node from = fromNode;
 							final Node to = toNode;
-							final NetworkImpl network1 = network;
+							final Network network1 = network;
 							final double length = dist;
 							final double freespeedTT = freespeed;
 							Link l = NetworkUtils.createLink(Id.create(links++, Link.class), from, to, network1, length, freespeedTT, (double) 9999, 1.0);
@@ -205,7 +205,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 								final Id<Link> id = linkId;
 								final Node from = fromNode;
 								final Node to = toNode;
-								final NetworkImpl network1 = network;
+								final Network network1 = network;
 								final double length = dist;
 								final double freespeedTT = freespeed;
 								l = NetworkUtils.createLink(id, from, to, network1, length, freespeedTT, (double) 9999, 1.0);

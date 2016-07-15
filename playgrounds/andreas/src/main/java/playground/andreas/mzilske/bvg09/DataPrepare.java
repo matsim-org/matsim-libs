@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -38,7 +37,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationReader;
@@ -97,7 +97,7 @@ public class DataPrepare {
 	private final MutableScenario scenario;
 	private final Config config;
 
-	private NetworkImpl pseudoNetwork;
+	private Network pseudoNetwork;
 
 	public DataPrepare() {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -153,7 +153,7 @@ public class DataPrepare {
 		Network streetNetwork = streetScenario.getNetwork();
 		new MatsimNetworkReader(transitScenario.getNetwork()).parse(IntermediateTransitNetworkFile);
 		new MatsimNetworkReader(streetScenario.getNetwork()).parse(InNetworkFile);
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (Network) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(OutMultimodalNetworkFile);
 	}
 

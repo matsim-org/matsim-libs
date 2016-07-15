@@ -31,7 +31,7 @@ import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -149,7 +149,7 @@ public class Bast2Counts {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		
 		logger.info("Linking bast counts...");
@@ -223,7 +223,7 @@ public class Bast2Counts {
 		}
 	}
 	
-	private static Link getReturnLink(Link link, NetworkImpl network) {
+	private static Link getReturnLink(Link link, Network network) {
 		Collection<Node> fromNodes = getNearestNodes(link.getToNode(), network);
 		Collection<Node> toNodes = getNearestNodes(link.getFromNode(), network);
 		
@@ -239,7 +239,7 @@ public class Bast2Counts {
 		return null;
 	}
 	
-	private static Collection<Node> getNearestNodes(Node node, NetworkImpl network) {
+	private static Collection<Node> getNearestNodes(Node node, Network network) {
 		double delta = 10;
 		double step = 10;
 		double minsize = 5;

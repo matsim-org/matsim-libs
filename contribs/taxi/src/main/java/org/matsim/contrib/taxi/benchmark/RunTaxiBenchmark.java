@@ -89,7 +89,7 @@ public class RunTaxiBenchmark
         Scenario scenario = new ScenarioBuilder(config).build();
 
         if (config.network().isTimeVariantNetwork()) {
-            ((NetworkImpl)scenario.getNetwork()).getFactory()
+            ((Network)scenario.getNetwork()).getFactory()
                     .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
         }
 

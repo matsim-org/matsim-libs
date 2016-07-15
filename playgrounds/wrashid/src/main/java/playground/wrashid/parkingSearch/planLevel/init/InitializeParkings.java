@@ -21,7 +21,7 @@ package playground.wrashid.parkingSearch.planLevel.init;
 
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import playground.wrashid.lib.GlobalRegistry;
@@ -30,7 +30,7 @@ public class InitializeParkings implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
 		GlobalRegistry.controler=event.getServices();
-        ParkingRoot.init((ActivityFacilitiesImpl) event.getServices().getScenario().getActivityFacilities(), (NetworkImpl) event.getServices().getScenario().getNetwork(), event.getServices());
+        ParkingRoot.init((ActivityFacilitiesImpl) event.getServices().getScenario().getActivityFacilities(), (Network) event.getServices().getScenario().getNetwork(), event.getServices());
 		
 		//ParkingRoot.getParkingOccupancyMaintainer().performInitializationsAfterLoadingControlerData();
 		

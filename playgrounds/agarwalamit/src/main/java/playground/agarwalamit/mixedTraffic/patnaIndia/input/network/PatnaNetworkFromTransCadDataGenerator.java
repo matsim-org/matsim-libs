@@ -32,11 +32,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
@@ -269,10 +269,10 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Node oc4Node = network.getFactory().createNode(Id.createNodeId("OC4_node"), oc4NodeCoord); network.addNode(oc4Node);
 		final Node fromNode = oc4Node;
 		final Node toNode = oc4NearestNode;
-		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC4_in"), fromNode, toNode, 500., 60./3.6, 1500., (double) 2 );
+		NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC4_in"), fromNode, toNode, 500., 60./3.6, 1500., (double) 2 );
 		final Node fromNode1 = oc4NearestNode;
 		final Node toNode1 = oc4Node;
-		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC4_out"), fromNode1, toNode1, 500., 60./3.6, 1500., (double) 2 );
+		NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC4_out"), fromNode1, toNode1, 500., 60./3.6, 1500., (double) 2 );
 		network.getLinks().get(Id.createLinkId("OC4_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC4_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
@@ -283,10 +283,10 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Node oc2Node = network.getFactory().createNode(Id.createNodeId("OC2_node"), oc2NodeCoord); network.addNode(oc2Node);
 		final Node fromNode2 = oc2Node;
 		final Node toNode2 = oc2NearestNode;
-		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC2_in"), fromNode2, toNode2, 500., 60./3.6, 1500., (double) 2 );
+		NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC2_in"), fromNode2, toNode2, 500., 60./3.6, 1500., (double) 2 );
 		final Node fromNode3 = oc2NearestNode;
 		final Node toNode3 = oc2Node;
-		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC2_out"), fromNode3, toNode3, 500., 60./3.6, 1500., (double) 2 );
+		NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC2_out"), fromNode3, toNode3, 500., 60./3.6, 1500., (double) 2 );
 		network.getLinks().get(Id.createLinkId("OC2_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC2_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
@@ -296,10 +296,10 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Node oc5Node = network.getFactory().createNode(Id.createNodeId("OC5_node"), oc5NodeCoord); network.addNode(oc5Node);
 		final Node fromNode4 = oc5Node;
 		final Node toNode4 = oc5NearestNode;
-		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC5_in"), fromNode4, toNode4, 500., 60./3.6, 1500., (double) 2 );
+		NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC5_in"), fromNode4, toNode4, 500., 60./3.6, 1500., (double) 2 );
 		final Node fromNode5 = oc5NearestNode;
 		final Node toNode5 = oc5Node;
-		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC5_out"), fromNode5, toNode5, 500., 60./3.6, 1500., (double) 2 );
+		NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC5_out"), fromNode5, toNode5, 500., 60./3.6, 1500., (double) 2 );
 		network.getLinks().get(Id.createLinkId("OC5_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC5_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 	}

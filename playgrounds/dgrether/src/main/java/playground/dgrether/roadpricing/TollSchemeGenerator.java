@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -194,7 +194,7 @@ public class TollSchemeGenerator {
 
 		//do something
 		//filter the network with polygon
-		NetworkImpl tollNetwork = this.createTollScheme(this.config);
+		Network tollNetwork = this.createTollScheme(this.config);
 		//filter the highway links explicitly
 //		tollNetwork = this.applyLinkIdFilter(tollNetwork, linkIdsToFilter);
 		//filter the highways by capacity
@@ -213,7 +213,7 @@ public class TollSchemeGenerator {
 
 	}
 
-	private void writeShapeFile(NetworkImpl network, Coord [] coords) {
+	private void writeShapeFile(Network network, Coord [] coords) {
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
 		new DgNet2Shape().write(network, usedGisOut + "Network.shp", crs);
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut + "MoutArea.shp");
@@ -242,11 +242,11 @@ public class TollSchemeGenerator {
 		return tollNetwork;
 	}
 
-	private NetworkImpl createTollScheme(Config config) {
+	private Network createTollScheme(Config config) {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		this.network = sc.getNetwork();
 
-		NetworkImpl net = filterNetwork(this.network, false);
+		Network net = filterNetwork(this.network, false);
 		log.info("Filtered the network, filtered network layer contains "
 				+ net.getLinks().size() + " links.");
 		return net;
@@ -259,7 +259,7 @@ public class TollSchemeGenerator {
 		log.info("RoadPricingScheme written to: "  + this.usedSchemeOut);
 	}
 
-	private RoadPricingScheme createRoadPricingScheme(NetworkImpl tollNetwork) {
+	private RoadPricingScheme createRoadPricingScheme(Network tollNetwork) {
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		for (Link l : tollNetwork.getLinks().values()) {
 			scheme.addLink(l.getId());
@@ -296,7 +296,7 @@ public class TollSchemeGenerator {
 
 
 
-	private void writeKml(NetworkImpl net, String filename) {
+	private void writeKml(Network net, String filename) {
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KmlType mainKml;
@@ -360,8 +360,8 @@ public class TollSchemeGenerator {
 		log.info("Network written to kmz!");
 	}
 
-	private NetworkImpl filterNetwork(final Network net, boolean full) {
-		NetworkImpl n = NetworkUtils.createNetwork();
+	private Network filterNetwork(final Network net, boolean full) {
+		Network n = NetworkUtils.createNetwork();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];
 		int i = 0;
@@ -382,7 +382,7 @@ public class TollSchemeGenerator {
 					new Coordinate[] { fromCord }), geofac))
 					&& ppp.contains(new Point(new CoordinateArraySequence(
 							new Coordinate[] { toCord }), geofac))) {
-				n.getLinks().put(l.getId(), l);
+				n.addLink( l);
 			}
 		}
 		return n;

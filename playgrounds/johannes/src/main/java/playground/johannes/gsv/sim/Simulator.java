@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -46,7 +45,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
@@ -181,7 +181,7 @@ public class Simulator {
 			 * connect facilities to links
 			 */
             logger.info("Connecting facilities to links...");
-            NetworkImpl network = (NetworkImpl) event.getServices().getScenario().getNetwork();
+            Network network = (Network) event.getServices().getScenario().getNetwork();
             for (ActivityFacility facility : event.getServices().getScenario().getActivityFacilities().getFacilities().values()) {
                 Coord coord = facility.getCoord();
                 Link link = NetworkUtils.getNearestLink(network, coord);

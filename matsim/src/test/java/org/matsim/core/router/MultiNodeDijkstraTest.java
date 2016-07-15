@@ -31,10 +31,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -627,10 +627,10 @@ public class MultiNodeDijkstraTest {
 	 * @author mrieser
 	 */
 	/*package*/ static class Fixture {
-		/*package*/ NetworkImpl network;
+		/*package*/ Network network;
 
 		public Fixture() {
-			this.network = (NetworkImpl) NetworkUtils.createNetwork();
+			this.network = (Network) NetworkUtils.createNetwork();
 			Node node1 = NetworkUtils.createAndAddNode2(this.network, Id.create(1, Node.class), new Coord((double) 1000, (double) 0));
 			Node node2 = NetworkUtils.createAndAddNode2(this.network, Id.create(2, Node.class), new Coord((double) 500, (double) 0));
 			Node node3 = NetworkUtils.createAndAddNode2(this.network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));

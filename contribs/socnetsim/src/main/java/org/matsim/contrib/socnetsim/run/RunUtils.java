@@ -32,7 +32,7 @@ import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -203,7 +203,7 @@ public class RunUtils {
 		if ( scenario.getActivityFacilities() != null ) {
 			new WorldConnectLocations( scenario.getConfig() ).connectFacilitiesWithLinks(
 					scenario.getActivityFacilities(),
-					(NetworkImpl) scenario.getNetwork() );
+					(Network) scenario.getNetwork() );
 		}
 	}
 }

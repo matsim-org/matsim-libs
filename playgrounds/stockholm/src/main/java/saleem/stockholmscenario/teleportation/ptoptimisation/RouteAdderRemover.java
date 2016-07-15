@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -231,10 +231,10 @@ public class RouteAdderRemover {
 	public void createDestination(Scenario scenario, TransitSchedule schedule,  Map<Id<TransitStopFacility>, TransitRouteStop> stops, List<TransitRouteStop> stopsfornewroute,
 								List<Id<Link>> linksfornewroute, TransitRouteStop origin){
 		NetworkFactory factory = scenario.getNetwork().getFactory();
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		int numofstops = 1 + (int)Math.ceil((24*Math.random()));
 		double distancefromorigin = 0;//Euclidean distance from origin must keep increasing
-		Map<Id<Node>, Node>  allnodes = network.getNodes();
+		Map<Id<Node>, ? extends Node>  allnodes = network.getNodes();
 		String idorigstr = "tr_"+origin.getStopFacility().getId().toString();
 		 if(idorigstr.indexOf('.')!=-1){
 			 idorigstr = idorigstr.substring(0,idorigstr.indexOf('.'));

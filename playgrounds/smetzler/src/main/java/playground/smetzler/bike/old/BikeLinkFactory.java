@@ -3,9 +3,9 @@ package playground.smetzler.bike.old;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.network.Network;
 
 public interface BikeLinkFactory extends MatsimFactory {
 

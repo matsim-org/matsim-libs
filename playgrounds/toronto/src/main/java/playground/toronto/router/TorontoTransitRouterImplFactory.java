@@ -20,7 +20,8 @@
 package playground.toronto.router;
 
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.network.Network;
+
+import org.matsim.core.network.Network;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.toronto.exceptions.NetworkFormattingException;

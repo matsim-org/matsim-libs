@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -48,7 +48,7 @@ import org.matsim.core.utils.misc.Counter;
 public class PlanVktCalculatorRunnable implements Runnable {
 	private final Logger LOG = Logger.getLogger(PlanVktCalculatorRunnable.class);
 	private Plan plan;
-	private NetworkImpl network;
+	private Network network;
 	private AStarLandmarks router;
 	private String filename;
 	private Map<RoadType, Double> typeVkmTotal;

@@ -11,22 +11,22 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
 
 
-public class Network {
+public class RWNetworkImpl {
 	
 	private TreeMap<Id, Link> selectedLinks = new TreeMap<Id, Link>();
 	private LinkedList<Node> uniqueNodes;
-	private NetworkImpl network;
-	private final static Logger log = Logger.getLogger(Network.class);
+	private Network network;
+	private final static Logger log = Logger.getLogger(RWNetworkImpl.class);
 
 	public static void main(String[] args) {
-		Network network = new Network();
+		RWNetworkImpl network = new RWNetworkImpl();
 		network.run();
 	}
 	
@@ -81,7 +81,7 @@ public class Network {
 	}
 	
 	private Link generateReturnLink(Link link, String inout) {
-		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
+		LinkFactoryImpl linkFactory = NetworkUtils.createLinkFactory();
 		
 		Link returnLink = NetworkUtils.createLink(Id.create(link.getId().toString() + inout +"_back", Link.class), link.getToNode(), link.getFromNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		
@@ -118,7 +118,7 @@ public class Network {
 		}
 		
 		// add 4 jelmoli links
-		LinkFactoryImpl linkFactory = new LinkFactoryImpl();
+		LinkFactoryImpl linkFactory = NetworkUtils.createLinkFactory();
 		Id<Link> id1 = Id.create("jelmoli-1", Link.class);
 		Link jLink1 = NetworkUtils.createLink(id1, this.network.getNodes().get(Id.create("17560200460795", Node.class)), this.network.getNodes().get(Id.create("17560200463426", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id1, jLink1);
