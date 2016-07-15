@@ -44,7 +44,7 @@ public final class NetworkFactoryImpl implements NetworkFactory {
 
 	private final Network network;
 
-	private NetworkFactoryImpl(final Network network) {
+	NetworkFactoryImpl(final Network network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
 	}
