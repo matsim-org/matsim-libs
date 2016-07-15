@@ -23,11 +23,16 @@ package playground.southafrica.freight.digicore.analysis.postClustering;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -86,6 +91,7 @@ public class FacilityEntropyDataExtractor {
 	public static void extract(DigicoreVehicles vehicles, String output){
 		LOG.info("Extracting facility entropy data...");
 		Map<Id<Vehicle>, Map<Id<ActivityFacility>, Integer>> map = new TreeMap<Id<Vehicle>, Map<Id<ActivityFacility>, Integer>>();
+		Map<Id<ActivityFacility>, Coord> coordMap = new HashMap<Id<ActivityFacility>, Coord>();
 		Counter counter = new Counter("  vehicles # ");
 		for(Id<Vehicle> vid : vehicles.getVehicles().keySet()) {
 //			map.put(vid, new TreeMap<>());
@@ -101,6 +107,7 @@ public class FacilityEntropyDataExtractor {
 							vehicleMap.put(fid, oldValue+1);
 						} else{
 							vehicleMap.put(fid, 1);
+							coordMap.put(fid, activity.getCoord());
 						}
 					}
 				}
@@ -115,17 +122,21 @@ public class FacilityEntropyDataExtractor {
 		counter.printCounter();
 		LOG.info("Done extracting.");
 		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
+		
 		LOG.info("Writing outpout to file...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);
 		try{
-			bw.write("truckId,facilityId,visits");
+			bw.write("truckId,facilityId,visits,lon,lat");
 			bw.newLine();
 			for(Id<Vehicle> vid : map.keySet()){
 				for(Id<ActivityFacility> fid : map.get(vid).keySet()){
-					String entry = String.format("%s,%s,%d\n", 
+					Coord c = ct.transform(coordMap.get(fid));
+					String entry = String.format("%s,%s,%d,%.6f,%.6f\n", 
 							vid.toString(), 
 							fid.toString(), 
-							map.get(vid).get(fid));
+							map.get(vid).get(fid),
+							c.getX(), c.getY());
 					bw.write(entry);
 				}
 			}
