@@ -1,4 +1,4 @@
-package playground.santiago.landuse.trying;
+package playground.santiago.landuse;
 
 
 import java.io.BufferedReader;
