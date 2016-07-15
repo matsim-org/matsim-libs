@@ -52,6 +52,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -400,23 +401,49 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		double x = -7500.0;
 		double y = -5000.0;
 		Node node10 = network.createAndAddNode(Id.create("10", Node.class), new Coord(x, y));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 
 
-		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 2000, 27.78, 3600, 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 2000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode2 = node4;
+		final Node toNode2 = node5;
 		//      network.createAndAddLink(Id.create("3", Link.class), node3, node4, 75000, 10.42, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("5", Link.class), node5, node6, 1000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("6", Link.class), node6, node7, 1000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("7", Link.class), node7, node1, 1000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("8", Link.class), node3, node8, 5000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("10", Link.class), node3, node9, 5000, 27.78, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("12", Link.class), node3, node10, 5000, 27.78, 3600, 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode2, toNode2, (double) 2000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode3 = node5;
+		final Node toNode3 = node6;
+		NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode3, toNode3, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode4 = node6;
+		final Node toNode4 = node7;
+		NetworkUtils.createAndAddLink(network,Id.create("6", Link.class), fromNode4, toNode4, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode5 = node7;
+		final Node toNode5 = node1;
+		NetworkUtils.createAndAddLink(network,Id.create("7", Link.class), fromNode5, toNode5, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode6 = node3;
+		final Node toNode6 = node8;
+		NetworkUtils.createAndAddLink(network,Id.create("8", Link.class), fromNode6, toNode6, (double) 5000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode7 = node3;
+		final Node toNode7 = node9;
+		NetworkUtils.createAndAddLink(network,Id.create("10", Link.class), fromNode7, toNode7, (double) 5000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode8 = node3;
+		final Node toNode8 = node10;
+		NetworkUtils.createAndAddLink(network,Id.create("12", Link.class), fromNode8, toNode8, (double) 5000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode9 = node8;
+		final Node toNode9 = node4;
 
 		//link 9 time, link 11 distance, link 13 time AND distance, link 14 time AND distance AND emissions
-		network.createAndAddLink(Id.create("9", Link.class), node8, node4, 5000, 50.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("11", Link.class), node9, node4, 2500, 10.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("13", Link.class), node10, node4, 2600, 21.67, 3600, 1, null, "85");
-		network.createAndAddLink(Id.create("14", Link.class), node10, node4, 2600, 21.65, 3600, 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("9", Link.class), fromNode9, toNode9, (double) 5000, 50.00, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode10 = node9;
+		final Node toNode10 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("11", Link.class), fromNode10, toNode10, (double) 2500, 10.00, (double) 3600, (double) 1, null, (String) "22");
+		final Node fromNode11 = node10;
+		final Node toNode11 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("13", Link.class), fromNode11, toNode11, (double) 2600, 21.67, (double) 3600, (double) 1, null, (String) "85");
+		final Node fromNode12 = node10;
+		final Node toNode12 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("14", Link.class), fromNode12, toNode12, (double) 2600, 21.65, (double) 3600, (double) 1, null, (String) "22");
 	}
 }

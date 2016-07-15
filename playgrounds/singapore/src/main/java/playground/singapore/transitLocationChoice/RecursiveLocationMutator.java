@@ -49,7 +49,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
-	private NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
+	private NetworkImpl justCarNetwork = NetworkUtils.createNetwork();
 	private TripRouter router;
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,

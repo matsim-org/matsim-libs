@@ -48,11 +48,6 @@ public class NetworkUtils {
 
     private static Logger log = Logger.getLogger(NetworkUtils.class);
 
-    public static Network createNetwork() {
-        return new NetworkImpl() ;
-    }
-
-
     public static Network createNetwork(Config config) {
         return createNetwork(config.network());
     }
@@ -658,5 +653,39 @@ public class NetworkUtils {
 	public static Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
 			double capacity, double lanes) {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
+	}
+
+
+	public static NetworkImpl createNetwork() {
+		return new NetworkImpl();
+	}
+
+
+	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
+			final double capacity, final double numLanes) {
+		return createAndAddLink(network, id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null ) ;
+	}
+	
+	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
+				final double capacity, final double numLanes, final String origId, final String type) {
+		if (network.getNodes().get(fromNode.getId()) == null) {
+			throw new IllegalArgumentException(network+"[from="+fromNode+" does not exist]");
+		}
+	
+		if (network.getNodes().get(toNode.getId()) == null) {
+			throw new IllegalArgumentException(network+"[to="+toNode+" does not exist]");
+		}
+	
+		Link link = network.getFactory().createLink(id, fromNode, toNode) ;
+		link.setLength(length);
+		link.setFreespeed(freespeed);
+		link.setCapacity(capacity);
+		link.setNumberOfLanes(numLanes);
+		setType( link, type);
+		setOrigId( link, origId ) ;
+	
+		network.addLink( link ) ;
+	
+		return link;
 	}
 }

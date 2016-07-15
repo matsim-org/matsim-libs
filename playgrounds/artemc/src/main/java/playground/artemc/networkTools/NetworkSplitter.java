@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -95,9 +96,10 @@ public class NetworkSplitter {
 					System.out.println("   Adding new node: " + newNodeId.toString() + " with coord: "
 							+ network.getNodes().get(newNodeId).getCoord());
 				}
+				final Id<Link> id = newLinkId;
+				final double length = newLinkLength;
 
-				network.createAndAddLink(newLinkId, nodes.get(nodes.size() - 2), nodes.get(nodes.size() - 1), newLinkLength,
-						linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
+				NetworkUtils.createAndAddLink(network,id, nodes.get(nodes.size() - 2), nodes.get(nodes.size() - 1), length, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes() );
 				network.getLinks().get(newLinkId).setAllowedModes(linkToEdit.getAllowedModes());
 				newLinks.add(network.getLinks().get(newLinkId));
 				count++;

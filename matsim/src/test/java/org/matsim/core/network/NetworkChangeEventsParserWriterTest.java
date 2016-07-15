@@ -34,15 +34,19 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 	public void testChangeEventsParserWriter(){
 		String input = getInputDirectory() + "testNetworkChangeEvents.xml";
 		String output  = getOutputDirectory() + "outputTestNetworkChangeEvents.xml";
-		final NetworkImpl network = NetworkImpl.createNetwork();
+		final NetworkImpl network = NetworkUtils.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
-		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1.667, 3600, 1);
-		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1.667, 3600, 1);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, 1.667, (double) 3600, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1500, 1.667, (double) 3600, (double) 1 );
 
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 		parser.parse(input);

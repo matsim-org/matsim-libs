@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -194,7 +195,9 @@ public class PopulationReaderMatsimV4Test {
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(0, 1000));
-		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node1, node2, 1000.0, 10.0, 2000.0, 1);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode, toNode, 1000.0, 10.0, 2000.0, (double) 1 );
 		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);

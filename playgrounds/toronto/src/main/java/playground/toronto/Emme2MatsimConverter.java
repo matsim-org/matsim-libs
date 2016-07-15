@@ -395,7 +395,7 @@ public class Emme2MatsimConverter {
 	private static void filterModes(Set<String> modes){
 		
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		NetworkImpl filteredNetwork = NetworkImpl.createNetwork();
+		NetworkImpl filteredNetwork = NetworkUtils.createNetwork();
 		filter.filter(filteredNetwork, modes);
 		
 		network = filteredNetwork;
@@ -417,7 +417,7 @@ public class Emme2MatsimConverter {
 	
 	private static void readNetwork(File f) throws IOException{
 		
-		network = NetworkImpl.createNetwork();
+		network = NetworkUtils.createNetwork();
 		//capperiod="1:00:00"
 		network.setCapacityPeriod(60 * 60); //1 hour, in sec
 		NetworkFactoryImpl factory = network.getFactory();

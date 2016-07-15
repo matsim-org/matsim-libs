@@ -54,6 +54,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
@@ -284,7 +285,9 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
 		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 0, (double) 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
 		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 0, (double) 400));

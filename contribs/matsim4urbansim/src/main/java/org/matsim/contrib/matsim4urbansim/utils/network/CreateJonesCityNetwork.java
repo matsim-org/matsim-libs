@@ -216,8 +216,20 @@ public class CreateJonesCityNetwork {
 			
 			Node neighborNode = network.getNearestNode(neighbor);
 			if(neighborNode != currentNode){
-				network.createAndAddLink(Id.create(linkID++, Link.class), currentNode, neighborNode, length, freeSpeed, capacity, lanes);
-				network.createAndAddLink(Id.create(linkID++, Link.class), neighborNode, currentNode, length, freeSpeed, capacity, lanes);
+				final Node fromNode = currentNode;
+				final Node toNode = neighborNode;
+				final double length1 = length;
+				final double freespeed = freeSpeed;
+				final double capacity1 = capacity;
+				final double numLanes = lanes;
+				NetworkUtils.createAndAddLink(network,Id.create(linkID++, Link.class), fromNode, toNode, length1, freespeed, capacity1, numLanes );
+				final Node fromNode1 = neighborNode;
+				final Node toNode1 = currentNode;
+				final double length2 = length;
+				final double freespeed1 = freeSpeed;
+				final double capacity2 = capacity;
+				final double numLanes1 = lanes;
+				NetworkUtils.createAndAddLink(network,Id.create(linkID++, Link.class), fromNode1, toNode1, length2, freespeed1, capacity2, numLanes1 );
 			}
 		}
 		else

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -333,7 +334,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		//              |7
 		//             (5)
 
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 		Node n1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 10));
 		Node n2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 3, (double) 2));
 		Node n3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
@@ -341,13 +342,27 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		final double y = -1;
 		Node n5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 0, y));
 		Node n6 = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 0, (double) 11));
-		network.createAndAddLink(Id.create(1, Link.class), n1, n3, 10, 1, 10, 1);
-		network.createAndAddLink(Id.create(2, Link.class), n1, n2, 8, 1, 10, 1);
-		network.createAndAddLink(Id.create(3, Link.class), n2, n3, 2, 1, 10, 1);
-		network.createAndAddLink(Id.create(4, Link.class), n2, n4, 1, 1, 10, 1);
-		network.createAndAddLink(Id.create(5, Link.class), n4, n3, 1, 1, 10, 1);
-		network.createAndAddLink(Id.create(6, Link.class), n6, n1, 1, 1, 10, 1);
-		network.createAndAddLink(Id.create(7, Link.class), n3, n5, 1, 1, 10, 1);
+		final Node fromNode = n1;
+		final Node toNode = n3;
+		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 10, (double) 1, (double) 10, (double) 1 );
+		final Node fromNode1 = n1;
+		final Node toNode1 = n2;
+		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, (double) 8, (double) 1, (double) 10, (double) 1 );
+		final Node fromNode2 = n2;
+		final Node toNode2 = n3;
+		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode2, toNode2, (double) 2, (double) 1, (double) 10, (double) 1 );
+		final Node fromNode3 = n2;
+		final Node toNode3 = n4;
+		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), fromNode3, toNode3, (double) 1, (double) 1, (double) 10, (double) 1 );
+		final Node fromNode4 = n4;
+		final Node toNode4 = n3;
+		NetworkUtils.createAndAddLink(network,Id.create(5, Link.class), fromNode4, toNode4, (double) 1, (double) 1, (double) 10, (double) 1 );
+		final Node fromNode5 = n6;
+		final Node toNode5 = n1;
+		NetworkUtils.createAndAddLink(network,Id.create(6, Link.class), fromNode5, toNode5, (double) 1, (double) 1, (double) 10, (double) 1 );
+		final Node fromNode6 = n3;
+		final Node toNode6 = n5;
+		NetworkUtils.createAndAddLink(network,Id.create(7, Link.class), fromNode6, toNode6, (double) 1, (double) 1, (double) 10, (double) 1 );
 
 		return network;
 	}

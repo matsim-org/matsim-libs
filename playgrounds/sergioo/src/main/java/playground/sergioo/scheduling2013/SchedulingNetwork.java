@@ -275,7 +275,7 @@ public class SchedulingNetwork implements Network {
 	
 	}
 
-	private static final Map<String, Double> FACTORS = new HashMap<String, Double>();
+	private static final Map<String, Double> FACTORS = new HashMap<>();
 	{
 		FACTORS.put("car", 2.0);
 		FACTORS.put("pt", 2.0);
@@ -285,7 +285,7 @@ public class SchedulingNetwork implements Network {
 	private static final double MAX_ACTIVITY_UTILITY = 60.0/3600;
 	private static final double MAX_FREQUENCY = 1.0/3600;
 	
-	private static final Map<String, Double> SPEEDS = new HashMap<String, Double>();
+	private static final Map<String, Double> SPEEDS = new HashMap<>();
 	private static final int MAX_PLACES = 22;
 	private static final int MAX_DEPTH = 10;
 	{
@@ -876,6 +876,30 @@ public class SchedulingNetwork implements Network {
         mainApplet.init();
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		frame.setVisible(true);*/
+	}
+
+	public void setCapacityPeriod(double capPeriod) {
+		this.delegate.setCapacityPeriod(capPeriod);
+	}
+
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		this.delegate.setEffectiveCellSize(effectiveCellSize);
+	}
+
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		this.delegate.setEffectiveLaneWidth(effectiveLaneWidth);
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 	
 }

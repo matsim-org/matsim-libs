@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -115,7 +116,7 @@ public class IdentifySpotsAtPtRough {
 		log.info( "read network from "+netFile );
 		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
-		NetworkImpl net = NetworkImpl.createNetwork();
+		NetworkImpl net = NetworkUtils.createNetwork();
 
 		log.info( "filter network" );
 		new TransportModeNetworkFilter( sc.getNetwork() ).filter(

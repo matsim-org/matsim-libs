@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.scenario.MutableScenario;
@@ -22,7 +23,7 @@ public class OSM2MATSim {
 
 	public static void main(final String[] args) {
 
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,

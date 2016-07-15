@@ -54,6 +54,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.Dijkstra;
@@ -216,7 +217,7 @@ public class HITSAnalyserPostgresqlSummary {
 		// add a free speed network that is car only, to assign the correct
 		// nodes to agents
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		HITSAnalyserPostgresqlSummary.carFreeSpeedNetwork = NetworkImpl.createNetwork();
+		HITSAnalyserPostgresqlSummary.carFreeSpeedNetwork = NetworkUtils.createNetwork();
 		HashSet<String> modes = new HashSet<>();
 		modes.add(TransportMode.car);
 		filter.filter(carFreeSpeedNetwork, modes);

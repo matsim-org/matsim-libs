@@ -152,14 +152,18 @@ public final class NetworkUtil {
 		 * and another link with no special slope to also test possible special cases.
 		 */
 		
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 //		Node node4 = network.createAndAddNode(Id.create("4", Node.cla)s, new CoordImpl(2000, 2000));
 //		Node node5 = network.createAndAddNode(Id.create("5", Node.cla)s, new CoordImpl(1000, 0));
-		Link link1 = (Link) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
-		Link link2 = (Link) network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1, 3600, 1);
+		Link link1 = (Link) NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 1, (double) 3600, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		Link link2 = (Link) NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1500, (double) 1, (double) 3600, (double) 1 );
 //		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
 //		LinkImpl link4 = (LinkImpl) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
 

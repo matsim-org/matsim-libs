@@ -249,8 +249,17 @@ public class NetworkEmme2MATSim {
 
 				Id<Link> id = Id.create(String.valueOf(linkCnt), Link.class);
 				linkCnt++;
+				final Id<Link> id1 = id;
+				final Node fromNode1 = fromNode;
+				final Node toNode1 = toNode;
+				final double length1 = length;
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = permlanes;
+				final String origId = oridId;
+				final String type1 = type;
 
-				network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, permlanes, oridId, type);
+				NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, length1, freespeed1, capacity1, numLanes, origId, type1);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -261,8 +270,8 @@ public class NetworkEmme2MATSim {
 
 
 	public static void main(String[] args) {
-		NetworkImpl networkITM = NetworkImpl.createNetwork();
-		NetworkImpl networkWGS84 = NetworkImpl.createNetwork();
+		NetworkImpl networkITM = NetworkUtils.createNetwork();
+		NetworkImpl networkWGS84 = NetworkUtils.createNetwork();
 
 		log.info("reading network ...");
 		readNetwork(networkITM, false);

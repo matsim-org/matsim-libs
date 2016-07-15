@@ -40,6 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -108,10 +109,16 @@ public class CreateInputs {
 		Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord(100.0, 1000.0));
 
 		Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","walk"));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 
-		 link1 = network.createAndAddLink(Id.createLinkId("-1"), node1, node2, 1000, 25, 6000, 1, null, "22"); 
-		 link2 = network.createAndAddLink(Id.createLinkId("1"), node2, node3, 1000, 25, 100, 1, null, "22");	
-		 link3 = network.createAndAddLink(Id.createLinkId("2"), node3, node4, 1000, 25, 6000, 1, null, "22");
+		 link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("-1"), fromNode, toNode, (double) 1000, (double) 25, (double) 6000, (double) 1, null, (String) "22");
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3; 
+		 link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode1, toNode1, (double) 1000, (double) 25, (double) 100, (double) 1, null, (String) "22");
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;	
+		 link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode2, toNode2, (double) 1000, (double) 25, (double) 6000, (double) 1, null, (String) "22");
 		 link1.setAllowedModes(allowedModes);link2.setAllowedModes(allowedModes);link3.setAllowedModes(allowedModes);
 		new NetworkWriter(network).write(outputDir+"/network.xml");
 	}

@@ -46,6 +46,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.algorithms.XY2Links;
@@ -208,7 +209,7 @@ public class HITSAnalyser {
 		// nodes to agents
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(
 				scenario.getNetwork());
-		HITSAnalyser.carFreeSpeedNetwork = NetworkImpl.createNetwork();
+		HITSAnalyser.carFreeSpeedNetwork = NetworkUtils.createNetwork();
 		HashSet<String> modes = new HashSet<>();
 		modes.add(TransportMode.car);
 		filter.filter(carFreeSpeedNetwork, modes);

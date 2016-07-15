@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -132,12 +133,26 @@ public class ShapeConverterNetwork {
 					Double capacityb = numLanesBackwards * freeSpeed * 29;
 					if (!network.getLinks().containsKey(linkId1)) {
 						if(numLanesForwards>0.0){
-							network.createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacityf,numLanesForwards);
+							final Id<Link> id = linkId1;
+							final Node fromNode1 = node1;
+							final Node toNode1 = node2;
+							final double length = linkLength;
+							final double freespeed = freeSpeed;
+							final double capacity = capacityf;
+							final double numLanes = numLanesForwards;
+							NetworkUtils.createAndAddLink(network,id, fromNode1, toNode1, length, freespeed, capacity, numLanes );
 						}
 					}
 					if (!network.getLinks().containsKey(linkId2)) {
 						if(numLanesBackwards>0.0){
-							network.createAndAddLink(linkId2, node2, node1,	linkLength, freeSpeed, capacityb,numLanesBackwards);
+							final Id<Link> id = linkId2;
+							final Node fromNode1 = node2;
+							final Node toNode1 = node1;
+							final double length = linkLength;
+							final double freespeed = freeSpeed;
+							final double capacity = capacityb;
+							final double numLanes = numLanesBackwards;
+							NetworkUtils.createAndAddLink(network,id, fromNode1, toNode1, length, freespeed, capacity, numLanes );
 						}
 					}
 					

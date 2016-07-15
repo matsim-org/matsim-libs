@@ -84,9 +84,9 @@ public final class MatsimNetworkReader extends MatsimXmlParser implements Matsim
 	 */
 	public void readFile(final String filename) {
 		parse(filename);
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) network).connect();
-		}
+//		if (this.network instanceof NetworkImpl) {
+//			((NetworkImpl) network).connect();
+//		}
 	}
 
 	@Override

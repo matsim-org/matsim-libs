@@ -390,7 +390,7 @@ public class QSimTest {
 	@Test
 	public void testSingleAgent_LastLinkIsLoop() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		Link loopLink = f.network.createAndAddLink(Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1);
+		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, (double) 500, (double) 1 );
 
 		// add a single person with leg from link1 to loop-link
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -1026,7 +1026,7 @@ public class QSimTest {
 	@Test
 	public void testCircleAsRoute() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, (double) 6000, 1.0 ); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -1083,7 +1083,7 @@ public class QSimTest {
 	@Test
 	public void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
+		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, (double) 6000, 1.0 ); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -1234,9 +1234,14 @@ public class QSimTest {
 		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new Coord(3100, 0));
 		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new Coord(3200, 0));
 		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new Coord(3300, 0));
-		f.network.createAndAddLink(Id.create("4", Link.class), f.node4, node5, 1000, 10, 6000, 2);
-		Link link5 = f.network.createAndAddLink(Id.create("5", Link.class), node5, node6, 100, 10, 60000, 9);
-		Link link6 = f.network.createAndAddLink(Id.create("6", Link.class), node6, node7, 100, 10, 60000, 9);
+		final Node toNode = node5;
+		NetworkUtils.createAndAddLink(f.network,Id.create("4", Link.class), f.node4, toNode, (double) 1000, (double) 10, (double) 6000, (double) 2 );
+		final Node fromNode = node5;
+		final Node toNode1 = node6;
+		Link link5 = NetworkUtils.createAndAddLink(f.network,Id.create("5", Link.class), fromNode, toNode1, (double) 100, (double) 10, (double) 60000, (double) 9 );
+		final Node fromNode1 = node6;
+		final Node toNode2 = node7;
+		Link link6 = NetworkUtils.createAndAddLink(f.network,Id.create("6", Link.class), fromNode1, toNode2, (double) 100, (double) 10, (double) 60000, (double) 9 );
 
 		((PopulationFactory) f.scenario.getPopulation().getFactory()).getRouteFactories().setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
 
@@ -1498,9 +1503,9 @@ public class QSimTest {
 			this.node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(100, 0));
 			this.node3 = this.network.createAndAddNode(Id.create("3", Node.class), new Coord(1100, 0));
 			this.node4 = this.network.createAndAddNode(Id.create("4", Node.class), new Coord(1200, 0));
-			this.link1 = this.network.createAndAddLink(Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9);
-			this.link2 = this.network.createAndAddLink(Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2);
-			this.link3 = this.network.createAndAddLink(Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9);
+			this.link1 = NetworkUtils.createAndAddLink(this.network,Id.create("1", Link.class), this.node1, this.node2, (double) 100, (double) 100, (double) 60000, (double) 9 );
+			this.link2 = NetworkUtils.createAndAddLink(this.network,Id.create("2", Link.class), this.node2, this.node3, (double) 1000, (double) 100, (double) 6000, (double) 2 );
+			this.link3 = NetworkUtils.createAndAddLink(this.network,Id.create("3", Link.class), this.node3, this.node4, (double) 100, (double) 100, (double) 60000, (double) 9 );
 
 			/* build plans */
 			this.plans = scenario.getPopulation();

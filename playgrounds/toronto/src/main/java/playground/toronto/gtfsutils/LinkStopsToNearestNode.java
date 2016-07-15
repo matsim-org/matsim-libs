@@ -49,10 +49,10 @@ public class LinkStopsToNearestNode {
 		for (Id<Link> i : linksToRemove) noHighways.removeLink(i);
 		
 		// Create filtered networks, one for each of the four main modes.
-		NetworkImpl BusNetwork = NetworkImpl.createNetwork(); //for buses
-		NetworkImpl TrainNetwork = NetworkImpl.createNetwork(); //for GO trains
-		NetworkImpl StreetcarNetwork = NetworkImpl.createNetwork(); //for mixed-ROW streetcars
-		NetworkImpl SubwayNetwork = NetworkImpl.createNetwork(); //for underground heavy rail
+		NetworkImpl BusNetwork = NetworkUtils.createNetwork(); //for buses
+		NetworkImpl TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
+		NetworkImpl StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
+		NetworkImpl SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(noHighways);
 		filter.filter(SubwayNetwork, CollectionUtils.stringToSet("Subway"));
 		filter.filter(StreetcarNetwork, CollectionUtils.stringToSet("Streetcar"));

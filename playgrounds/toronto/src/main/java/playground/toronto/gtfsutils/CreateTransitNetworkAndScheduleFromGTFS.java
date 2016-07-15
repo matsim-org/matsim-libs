@@ -81,7 +81,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	private void processStops(){
 		log.info("PROCESSING STOPS");
 		
-		this.network = NetworkImpl.createNetwork();
+		this.network = NetworkUtils.createNetwork();
 		NetworkFactoryImpl netFact = this.network.getFactory();
 		TransitScheduleFactory schedFact = new TransitScheduleFactoryImpl();
 		this.schedule = schedFact.createTransitSchedule();

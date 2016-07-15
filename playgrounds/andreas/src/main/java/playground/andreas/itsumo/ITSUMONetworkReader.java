@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -151,9 +152,11 @@ public class ITSUMONetworkReader {
 
 			} else if (lname.equals("laneset")) {
 				double length = CoordUtils.calcEuclideanDistance(ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)).getCoord(), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)).getCoord());
-				double capacity = 3600.0; // TODO calculate capacity from speed
-				ITSUMONetworkReader.this.network.createAndAddLink(Id.create(this.lanesetId, Link.class), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)),
-						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);
+				double capacity = 3600.0;
+				final double length1 = length;
+				final double capacity1 = capacity;
+				final double numLanes = this.lanesCount; // TODO calculate capacity from speed
+				NetworkUtils.createAndAddLink(ITSUMONetworkReader.this.network,Id.create(this.lanesetId, Link.class), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)), length1, this.laneSpeed / this.lanesCount, capacity1, numLanes );
 			} else if (lname.equals("laneset_id")) {
 				this.lanesetId = content.trim();
 			} else if (lname.equals("start_node")) {

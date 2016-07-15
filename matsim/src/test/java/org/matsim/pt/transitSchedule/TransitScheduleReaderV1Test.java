@@ -92,7 +92,9 @@ public class TransitScheduleReaderV1Test {
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
-		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link3 = NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode, toNode, (double) 1000, 10.0, 2000.0, 1.0 );
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new RouteFactories());
 		Stack<String> context = new Stack<String>();
@@ -122,7 +124,9 @@ public class TransitScheduleReaderV1Test {
 		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 10, (double) 5));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 5, (double) 11));
-		network.createAndAddLink(Id.create(3, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode, toNode, (double) 1000, 10.0, 2000.0, 1.0 );
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new RouteFactories());
 		Stack<String> context = new Stack<String>();
@@ -744,10 +748,18 @@ public class TransitScheduleReaderV1Test {
 		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 5, (double) 11));
 		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 5, (double) 11));
 		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 5, (double) 11));
-		/*Link link1 =*/ network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		/*Link link3 =*/network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		/*Link link4 =*/network.createAndAddLink(Id.create(4, Link.class), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		/*Link link1 =*/ NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		Link link2 = NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		/*Link link3 =*/NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode2, toNode2, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode3 = node4;
+		final Node toNode3 = node5;
+		/*Link link4 =*/NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), fromNode3, toNode3, (double) 1000, 10.0, 2000.0, 1.0 );
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new RouteFactories());
 		Stack<String> context = new Stack<String>();
@@ -803,10 +815,18 @@ public class TransitScheduleReaderV1Test {
 		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 5, (double) 11));
 		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 5, (double) 11));
 		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 5, (double) 11));
-		/*Link link1 =*/network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		/*Link link2 =*/network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		Link link4 = network.createAndAddLink(Id.create(4, Link.class), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		/*Link link1 =*/NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		/*Link link2 =*/NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		Link link3 = NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode2, toNode2, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode3 = node4;
+		final Node toNode3 = node5;
+		Link link4 = NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), fromNode3, toNode3, (double) 1000, 10.0, 2000.0, 1.0 );
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new RouteFactories());
 		Stack<String> context = new Stack<String>();
@@ -864,10 +884,18 @@ public class TransitScheduleReaderV1Test {
 		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 5, (double) 11));
 		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 5, (double) 11));
 		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 5, (double) 11));
-		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10.0, 2000.0, 1.0);
-		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000, 10.0, 2000.0, 1.0);
-		Link link3 = network.createAndAddLink(Id.create(3, Link.class), node3, node4, 1000, 10.0, 2000.0, 1.0);
-		Link link4 = network.createAndAddLink(Id.create(4, Link.class), node4, node5, 1000, 10.0, 2000.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		Link link2 = NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		Link link3 = NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode2, toNode2, (double) 1000, 10.0, 2000.0, 1.0 );
+		final Node fromNode3 = node4;
+		final Node toNode3 = node5;
+		Link link4 = NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), fromNode3, toNode3, (double) 1000, 10.0, 2000.0, 1.0 );
 
 		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(schedule, new RouteFactories());
 		Stack<String> context = new Stack<String>();

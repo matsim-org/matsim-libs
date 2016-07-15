@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlanRouter;
@@ -129,7 +130,7 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
 		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
 		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -140,14 +141,28 @@ public class DataPrepare {
 						else{
 							freespeed = getFreespeedTravelTime(edgeTypeId);
 						}
-						((NetworkImpl) network).createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
+						final Id<Link> id1 = id;
+						final Node fromNode1 = fromNode;
+						final Node toNode1 = toNode;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						final double capacity1 = capacity;
+						final String type = edgeTypeIdString;
+						NetworkUtils.createAndAddLink(((NetworkImpl) network),id1, fromNode1, toNode1, length1, freespeed1, capacity1, (double) 1, null, type);
 						usedIds.add(edgeTypeIdString);
 					}
 					// kick out all edges in periphery that are irrelevant only there
 					else {
 						if(isEdgeTypeRelevantForPeriphery(edgeTypeIdString)){
 							freespeed = getFreespeedTravelTime(edgeTypeId);
-							((NetworkImpl) network).createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
+							final Id<Link> id1 = id;
+							final Node fromNode1 = fromNode;
+							final Node toNode1 = toNode;
+							final double length1 = length;
+							final double freespeed1 = freespeed;
+							final double capacity1 = capacity;
+							final String type = edgeTypeIdString;
+							NetworkUtils.createAndAddLink(((NetworkImpl) network),id1, fromNode1, toNode1, length1, freespeed1, capacity1, (double) 1, null, type);
 							usedIds.add(edgeTypeIdString);
 						}
 					}

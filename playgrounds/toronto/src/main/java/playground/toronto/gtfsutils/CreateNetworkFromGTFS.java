@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -98,7 +99,14 @@ public class CreateNetworkFromGTFS{
 					linklength = CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord());
 					//System.out.println(linklength);
 					if (linklength <= 2){
-						network.createAndAddLink(linkID, fromNode, toNode, linklength,linkspeed, linkcapacity, numlanes);
+						final Id<Link> id = linkID;
+						final Node fromNode1 = fromNode;
+						final Node toNode1 = toNode;
+						final double length = linklength;
+						final double freespeed = linkspeed;
+						final double capacity = linkcapacity;
+						final double numLanes = numlanes;
+						NetworkUtils.createAndAddLink(network,id, fromNode1, toNode1, length, freespeed, capacity, numLanes );
 						ListofLinks.add(linkID);
 						//System.out.println(ListofLinks);
 					}

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkParseETNet {
@@ -90,8 +91,11 @@ public class NetworkParseETNet {
 					double freespeed = Double.parseDouble(entries[5])/3.6;
 					double capacity = Double.parseDouble(entries[6]);
 					double nofLanes = Double.parseDouble(entries[7]);
-					network.createAndAddLink(Id.create(entries[1], Link.class), network.getNodes().get(Id.create(entries[2], Node.class)), network.getNodes().get(Id.create(entries[3], Node.class)),
-					                   length, freespeed, capacity, nofLanes, entries[8], entries[9]);
+					final double length1 = length;
+					final double freespeed1 = freespeed;
+					final double capacity1 = capacity;
+					final double numLanes = nofLanes;
+					NetworkUtils.createAndAddLink(network,Id.create(entries[1], Link.class), network.getNodes().get(Id.create(entries[2], Node.class)), network.getNodes().get(Id.create(entries[3], Node.class)), length1, freespeed1, capacity1, numLanes, (String) entries[8], (String) entries[9]);
 				}
 			}
 			buffered_reader.close();

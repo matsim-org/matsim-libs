@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.RoutingModule;
@@ -74,13 +75,13 @@ public class WalkBikeRouting {
 		
 		final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/walkbike_wave1_sexyage_1008.txt");
 
-		NetworkImpl subNetworkWalk = NetworkImpl.createNetwork();
+		NetworkImpl subNetworkWalk = NetworkUtils.createNetwork();
 		Set<String> restrictions = new HashSet<>();
 		restrictions.add("walk");
 		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(scenario.getNetwork());
 		networkFilter.filter(subNetworkWalk, restrictions);
 		
-		NetworkImpl subNetworkBike = NetworkImpl.createNetwork();
+		NetworkImpl subNetworkBike = NetworkUtils.createNetwork();
 		restrictions = new HashSet<>();
 		restrictions.add("bike");
 		 networkFilter = new TransportModeNetworkFilter(scenario.getNetwork());

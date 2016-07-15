@@ -111,7 +111,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	private void initLocal() {
 		this.flexibleTypes = this.lcContext.getFlexibleTypes();		
-		((NetworkImpl) this.scenario.getNetwork()).connect();
+//		((NetworkImpl) this.scenario.getNetwork()).connect();
 		this.initTrees(this.scenario.getActivityFacilities(), this.dccg);
 		this.sampler = new DestinationSampler(
 				this.lcContext.getPersonsKValuesArray(), 

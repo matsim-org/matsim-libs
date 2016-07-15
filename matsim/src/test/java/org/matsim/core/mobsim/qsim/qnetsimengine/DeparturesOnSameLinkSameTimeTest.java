@@ -50,6 +50,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -184,9 +185,14 @@ public class DeparturesOnSameLinkSameTimeTest {
 			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 100, (double) 10));
 			double y = -10;
 			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, y));
+			final Node fromNode = node1;
+			final Node toNode = node2;
+			final double capacity = departureLinkCapacity;
 
-			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,departureLinkCapacity,1,null,"7");
-			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,1000.0,20.0,3600,1,null,"7");
+			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, capacity, (double) 1, null, "7");
+			final Node fromNode1 = node2;
+			final Node toNode1 = node3;
+			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 1000.0, 20.0, (double) 3600, (double) 1, null, "7");
 		}
 
 		private void createPopulation(){

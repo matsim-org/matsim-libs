@@ -142,16 +142,7 @@ public class TeleatlasIvtcheuMerger {
 			else if (!nodeMapping.keySet().contains(fromNodeId) && !nodeMapping.keySet().contains(toNodeId)) {
 			}
 			else { throw new RuntimeException("HAEH?"); }
-			networkTeleatlas.createAndAddLink(
-					l.getId(),
-					networkTeleatlas.getNodes().get(fromNodeId),
-					networkTeleatlas.getNodes().get(toNodeId),
-					l.getLength(),
-					l.getFreespeed(),
-					l.getCapacity()/10.0,
-					l.getNumberOfLanes(),
-					NetworkUtils.getOrigId( ((Link) l) ),
-					NetworkUtils.getType(((Link) l)));
+			NetworkUtils.createAndAddLink(networkTeleatlas,l.getId(), networkTeleatlas.getNodes().get(fromNodeId), networkTeleatlas.getNodes().get(toNodeId), l.getLength(), l.getFreespeed(), l.getCapacity()/10.0, l.getNumberOfLanes(), (String) NetworkUtils.getOrigId( ((Link) l) ), (String) NetworkUtils.getType(((Link) l)));
 		}
 
 		log.info("  number of lines processed: "+lineCnt);

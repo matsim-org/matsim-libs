@@ -50,6 +50,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
@@ -96,10 +97,19 @@ public class JointTripRouterFactoryTest {
 		Node node2inst = net.createAndAddNode( node2 , new Coord((double) 0, (double) 2));
 		Node node3inst = net.createAndAddNode( node3 , new Coord((double) 0, (double) 3));
 		Node node4inst = net.createAndAddNode( node4 , new Coord((double) 0, (double) 4));
+		final Id<Link> id2 = link1;
+		final Node fromNode = node1inst;
+		final Node toNode = node2inst;
 
-		net.createAndAddLink( link1 , node1inst , node2inst , 1 , 1 , 1 , 1 );
-		net.createAndAddLink( link2 , node2inst , node3inst , 1 , 1 , 1 , 1 );
-		net.createAndAddLink( link3 , node3inst , node4inst , 1 , 1 , 1 , 1 );
+		NetworkUtils.createAndAddLink(net,id2, fromNode, toNode, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Id<Link> id3 = link2;
+		final Node fromNode1 = node2inst;
+		final Node toNode1 = node3inst;
+		NetworkUtils.createAndAddLink(net,id3, fromNode1, toNode1, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Id<Link> id4 = link3;
+		final Node fromNode2 = node3inst;
+		final Node toNode2 = node4inst;
+		NetworkUtils.createAndAddLink(net,id4, fromNode2, toNode2, (double) 1, (double) 1, (double) 1, (double) 1 );
 
 		Population pop = sc.getPopulation();
 		Id<Person> driverId = Id.create( "driver" , Person.class );

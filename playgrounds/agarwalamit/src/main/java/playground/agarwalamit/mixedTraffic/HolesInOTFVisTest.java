@@ -47,6 +47,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -151,10 +152,16 @@ public class HolesInOTFVisTest {
 			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord(1000.0, 100.0));
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
+			final Node fromNode = node1;
+			final Node toNode = node2;
 
-			link1 = network.createAndAddLink(Id.createLinkId("1"), node1, node2, 10000, 25, 3600, 1, null, "22"); 
-			link2 = network.createAndAddLink(Id.createLinkId("2"), node2, node3, 1000, 15, 360, 1, null, "22");	//flow capacity is 1 PCU per min.
-			link3 = network.createAndAddLink(Id.createLinkId("3"), node3, node4, 10000, 25, 3600, 1, null, "22");
+			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode, toNode, (double) 10000, (double) 25, (double) 3600, (double) 1, null, (String) "22");
+			final Node fromNode1 = node2;
+			final Node toNode1 = node3; 
+			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode1, toNode1, (double) 1000, (double) 15, (double) 360, (double) 1, null, (String) "22");
+			final Node fromNode2 = node3;
+			final Node toNode2 = node4;	//flow capacity is 1 PCU per min.
+			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), fromNode2, toNode2, (double) 10000, (double) 25, (double) 3600, (double) 1, null, (String) "22");
 
 			population = scenario.getPopulation();
 		}

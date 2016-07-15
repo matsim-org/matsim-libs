@@ -31,7 +31,7 @@ public class NetworkInverter {
 	}
 
 	private void invertNetwork(){
-		this.invertedNetwork = NetworkImpl.createNetwork();
+		this.invertedNetwork = NetworkUtils.createNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
@@ -52,12 +52,7 @@ public class NetworkInverter {
 	}
 
 	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated){
-		Link link = this.invertedNetwork.createAndAddLink(Id.create(inLink.getId().toString() + "zzz" + outLink.getId().toString(), Link.class), // start counting link ids with 1 instead of 0
-				this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
-				outLink.getLength(),
-				outLink.getFreespeed(),
-				outLink.getCapacity(),
-				outLink.getNumberOfLanes());
+		Link link = NetworkUtils.createAndAddLink(this.invertedNetwork,Id.create(inLink.getId().toString() + "zzz" + outLink.getId().toString(), Link.class), this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()), outLink.getLength(), outLink.getFreespeed(), outLink.getCapacity(), outLink.getNumberOfLanes() );
 		NetworkUtils.setType( ((Link) link), (String) NetworkUtils.getType(((Link) outLink)));
 		return numberOfLinksGenerated + 1;
 	}

@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -216,12 +217,16 @@ public class PlanImplTest {
 
 	@Test
 	public void testCopyPlan_NetworkRoute() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord(2000, 0));
-		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
-		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 3600.0, 1.0 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		Link link2 = NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, 1000.0, 100.0, 3600.0, 1.0 );
 
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
@@ -243,12 +248,16 @@ public class PlanImplTest {
 
 	@Test
 	public void testCopyPlan_GenericRoute() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord(1000, 0));
 		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord(2000, 0));
-		Link link1 = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
-		Link link2 = network.createAndAddLink(Id.create(2, Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1.0);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 3600.0, 1.0 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		Link link2 = NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, 1000.0, 100.0, 3600.0, 1.0 );
 
 		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));

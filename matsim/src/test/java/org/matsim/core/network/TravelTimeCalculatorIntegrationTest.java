@@ -45,7 +45,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		Config config = loadConfig(null);
     
     		// create a network
-    		final NetworkImpl network = NetworkImpl.createNetwork();
+    		final NetworkImpl network = NetworkUtils.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
     		network.setFactory(nf);
@@ -56,9 +56,15 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
     		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
     		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
-    		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
-    		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
-    		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+    		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+    		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// add a freespeed change to 20 at 8am.
     		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
@@ -82,7 +88,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		Config config = loadConfig(null);
     
     		// create a network
-    		final NetworkImpl network = NetworkImpl.createNetwork();
+    		final NetworkImpl network = NetworkUtils.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
     		network.setFactory(nf);
@@ -93,9 +99,15 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
     		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
     		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
-    		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
-    		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
-    		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+    		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+    		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// add a freespeed change to 20 at 8am.
     		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);

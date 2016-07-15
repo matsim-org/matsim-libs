@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,7 +35,7 @@ public class RenameLoopLinks {
 		new TransitScheduleReaderV1(scenario).readFile(scheduleFile);
 		TransitSchedule inSchedule = scenario.getTransitSchedule();
 		
-		Network outNetwork = NetworkImpl.createNetwork();
+		Network outNetwork = NetworkUtils.createNetwork();
 		for (Node n : baseNetwork.getNodes().values()) outNetwork.addNode(n);
 		
 		HashMap<Id, Id> loopNamesMap = new HashMap<Id, Id>();

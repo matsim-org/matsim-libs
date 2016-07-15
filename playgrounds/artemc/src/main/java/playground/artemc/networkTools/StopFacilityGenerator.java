@@ -17,6 +17,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -331,8 +332,10 @@ public class StopFacilityGenerator {
 								nodes.add(network.getNodes().get(newNodeId));
 
 								//Create new Link
-								newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()-1), Link.class);									
-								network.createAndAddLink(newLinkId, nodes.get(nodes.size()-2), nodes.get(nodes.size()-1), stopDistance, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
+								newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()-1), Link.class);
+								final Id<Link> id1 = newLinkId;
+								final double length = stopDistance;									
+								NetworkUtils.createAndAddLink(network,id1, nodes.get(nodes.size()-2), nodes.get(nodes.size()-1), length, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes() );
 								network.getLinks().get(newLinkId).setAllowedModes(allowedModes);
 								links.add(network.getLinks().get(newLinkId));
 								removedLinks.get(linkToEdit.getId()).add(newLinkId);
@@ -343,8 +346,10 @@ public class StopFacilityGenerator {
 								//Check if new links have been created
 								if(nodes.size()>1){
 									//Create last new Link
-									newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()), Link.class);									
-									network.createAndAddLink(newLinkId, nodes.get(nodes.size()-1), linkToEdit.getToNode(), restLinkLengthFromStop, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
+									newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()), Link.class);
+									final Id<Link> id1 = newLinkId;
+									final double length = restLinkLengthFromStop;									
+									NetworkUtils.createAndAddLink(network,id1, nodes.get(nodes.size()-1), linkToEdit.getToNode(), length, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes() );
 									network.getLinks().get(newLinkId).setAllowedModes(allowedModes);									
 									links.add(network.getLinks().get(newLinkId));	
 									removedLinks.get(linkToEdit.getId()).add(newLinkId);

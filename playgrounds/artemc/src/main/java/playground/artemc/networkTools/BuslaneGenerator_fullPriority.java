@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,8 +79,11 @@ public class BuslaneGenerator_fullPriority {
 						} else {
 							network.createAndAddNode(newNodeId, newBusNodeCoord);
 						}
-						network.createAndAddLink(newLinkId, network.getNodes().get(fromNodeId),
-								network.getNodes().get(newNodeId), length, freespeed, laneCapacity, 1);
+						final Id<Link> id = newLinkId;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						final double capacity = laneCapacity;
+						NetworkUtils.createAndAddLink(network,id, network.getNodes().get(fromNodeId), network.getNodes().get(newNodeId), length1, freespeed1, capacity, (double) 1 );
 						network.getLinks().get(newLinkId).setAllowedModes(allowedModesPT);
 						busLinksList.add(newLinkId);
 						transitSchedule.getFacilities().get(link).setLinkId(newLinkId);

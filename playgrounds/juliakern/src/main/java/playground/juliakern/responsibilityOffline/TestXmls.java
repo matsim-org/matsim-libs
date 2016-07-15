@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +71,10 @@ public class TestXmls {
 				String nodeBs = "Node "+i+"_"+j+"B";
 				Node nodeB = network.createAndAddNode(Id.create(nodeBs, Node.class), coordB);
 				Id<Link> linkId = Id.create("link_"+i+"_"+j, Link.class);
-				network.createAndAddLink(linkId, nodeA, nodeB, 20., 30., 3600, 1, null, null);
+				final Id<Link> id = linkId;
+				final Node fromNode = nodeA;
+				final Node toNode = nodeB;
+				NetworkUtils.createAndAddLink(network,id, fromNode, toNode, 20., 30., (double) 3600, (double) 1, null, null);
 			}
 		}
 		

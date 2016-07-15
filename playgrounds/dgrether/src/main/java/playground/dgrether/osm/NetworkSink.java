@@ -166,7 +166,11 @@ public class NetworkSink implements SinkSource {
 		if (!onewayReverse) {
 			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber), Link.class);
 			if (!network.getLinks().containsKey(id)) {
-				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
+				final Id<Link> id2 = id;
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,id2, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed1, capacity1, numLanes );
 				final String id1 = origId;
 				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				tagWayForward(way, l);
@@ -177,7 +181,11 @@ public class NetworkSink implements SinkSource {
 		if (!oneway) {
 			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R", Link.class);
 			if (!network.getLinks().containsKey(id)) {
-				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
+				final Id<Link> id2 = id;
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,id2, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed1, capacity1, numLanes );
 				final String id1 = origId;
 				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				tagWayBackward(way, l);

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -266,8 +267,12 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Node oc4NearestNode = network.getNodes().get(Id.createNodeId("14653"));
 		Coord oc4NodeCoord = new Coord(oc4NearestNode.getCoord().getX() + 500, oc4NearestNode.getCoord().getY() + 500);
 		Node oc4Node = network.getFactory().createNode(Id.createNodeId("OC4_node"), oc4NodeCoord); network.addNode(oc4Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), oc4Node, oc4NearestNode, 500., 60./3.6, 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), oc4NearestNode, oc4Node, 500., 60./3.6, 1500., 2);
+		final Node fromNode = oc4Node;
+		final Node toNode = oc4NearestNode;
+		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC4_in"), fromNode, toNode, 500., 60./3.6, 1500., (double) 2 );
+		final Node fromNode1 = oc4NearestNode;
+		final Node toNode1 = oc4Node;
+		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC4_out"), fromNode1, toNode1, 500., 60./3.6, 1500., (double) 2 );
 		network.getLinks().get(Id.createLinkId("OC4_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC4_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
@@ -276,8 +281,12 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Node oc2NearestNode = network.getNodes().get(Id.createNodeId("16224"));
 		Coord oc2NodeCoord = new Coord(oc2NearestNode.getCoord().getX() + 500, oc2NearestNode.getCoord().getY() - 500);
 		Node oc2Node = network.getFactory().createNode(Id.createNodeId("OC2_node"), oc2NodeCoord); network.addNode(oc2Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2NearestNode, 500., 60./3.6, 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2NearestNode, oc2Node, 500., 60./3.6, 1500., 2);
+		final Node fromNode2 = oc2Node;
+		final Node toNode2 = oc2NearestNode;
+		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC2_in"), fromNode2, toNode2, 500., 60./3.6, 1500., (double) 2 );
+		final Node fromNode3 = oc2NearestNode;
+		final Node toNode3 = oc2Node;
+		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC2_out"), fromNode3, toNode3, 500., 60./3.6, 1500., (double) 2 );
 		network.getLinks().get(Id.createLinkId("OC2_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC2_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
@@ -285,8 +294,12 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Node oc5NearestNode = network.getNodes().get(Id.createNodeId("2426"));
 		Coord oc5NodeCoord = new Coord(oc5NearestNode.getCoord().getX() - 500, oc5NearestNode.getCoord().getY() + 100);
 		Node oc5Node = network.getFactory().createNode(Id.createNodeId("OC5_node"), oc5NodeCoord); network.addNode(oc5Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_in"), oc5Node, oc5NearestNode, 500., 60./3.6, 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_out"), oc5NearestNode, oc5Node, 500., 60./3.6, 1500., 2);
+		final Node fromNode4 = oc5Node;
+		final Node toNode4 = oc5NearestNode;
+		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC5_in"), fromNode4, toNode4, 500., 60./3.6, 1500., (double) 2 );
+		final Node fromNode5 = oc5NearestNode;
+		final Node toNode5 = oc5Node;
+		NetworkUtils.createAndAddLink(((NetworkImpl)network),Id.createLinkId("OC5_out"), fromNode5, toNode5, 500., 60./3.6, 1500., (double) 2 );
 		network.getLinks().get(Id.createLinkId("OC5_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC5_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 	}

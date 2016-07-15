@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,9 +57,10 @@ public class BuslaneGenerator {
 						network.getLinks().get(link).setCapacity(laneCapacity);
 						network.getLinks().get(link).setNumberOfLanes(1.0);
 						network.getLinks().get(link).setAllowedModes(allowedModesPT);
-						network.createAndAddLink(newLinkId, network.getLinks().get(link).getFromNode(),
-								network.getLinks().get(link).getToNode(), length, freespeed, laneCapacity * (numLanes - 1),
-								(numLanes - 1));
+						final Id<Link> id = newLinkId;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						NetworkUtils.createAndAddLink(network,id, network.getLinks().get(link).getFromNode(), network.getLinks().get(link).getToNode(), length1, freespeed1, laneCapacity * (numLanes - 1), (numLanes - 1) );
 						network.getLinks().get(newLinkId).setAllowedModes(allowedModesPrivate);
 					}
 

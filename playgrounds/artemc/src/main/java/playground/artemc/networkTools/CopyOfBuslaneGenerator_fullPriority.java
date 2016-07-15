@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,11 +75,15 @@ public class CopyOfBuslaneGenerator_fullPriority {
 						} else {
 							network.createAndAddNode(newNodeId, newBusNodeCoord);
 						}
-						network.createAndAddLink(newLinkId, network.getNodes().get(fromNodeId),
-								network.getNodes().get(newNodeId), length, freespeed, laneCapacity * (numLanes - 1),
-								(numLanes - 1));
-						network.createAndAddLink(reverseLinkId, network.getNodes().get(newNodeId),
-								network.getNodes().get(fromNodeId), length, freespeed, laneCapacity * numLanes, numLanes);
+						final Id<Link> id = newLinkId;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						NetworkUtils.createAndAddLink(network,id, network.getNodes().get(fromNodeId), network.getNodes().get(newNodeId), length1, freespeed1, laneCapacity * (numLanes - 1), (numLanes - 1) );
+						final Id<Link> id1 = reverseLinkId;
+						final double length2 = length;
+						final double freespeed2 = freespeed;
+						final double numLanes1 = numLanes;
+						NetworkUtils.createAndAddLink(network,id1, network.getNodes().get(newNodeId), network.getNodes().get(fromNodeId), length2, freespeed2, laneCapacity * numLanes, numLanes1 );
 						network.getLinks().get(newLinkId).setAllowedModes(allowedModesPrivate);
 						fromNodeId = newNodeId;
 					}

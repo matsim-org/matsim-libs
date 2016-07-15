@@ -228,7 +228,7 @@ public class oldEmme2MatsimConverter {
 	
 	private static void readNetwork(String filename) throws IOException{
 		
-		network = NetworkImpl.createNetwork();
+		network = NetworkUtils.createNetwork();
 		//capperiod="1:00:00"
 		network.setCapacityPeriod(60 * 60); //1 hour, in sec
 		

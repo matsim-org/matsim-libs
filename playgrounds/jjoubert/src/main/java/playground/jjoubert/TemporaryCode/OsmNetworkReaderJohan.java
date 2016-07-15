@@ -507,13 +507,19 @@ public class OsmNetworkReaderJohan {
 		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
 
 			if (!onewayReverse) {
-				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed1, capacity1, numLanes );
 				final String id1 = origId;
 				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed1, capacity1, numLanes );
 				final String id1 = origId;
 				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				this.id++;

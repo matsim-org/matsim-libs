@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -141,7 +142,7 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		this.pseudoNetwork = NetworkImpl.createNetwork();
+		this.pseudoNetwork = NetworkUtils.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.pseudoNetwork, "tr_").createNetwork();
 	}
 

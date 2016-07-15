@@ -38,6 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
@@ -236,12 +237,20 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord(50, 100));
 		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord(50, 0));
 		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord(100, 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 
 		// add links
-		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(Id.create(2, Link.class), node2, node4, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(Id.create(3, Link.class), node1, node3, 50.0, 0.1, 3600.0, 1);
-		network.createAndAddLink(Id.create(4, Link.class), node3, node4, 50.0, 0.1, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 500.0, 10.0, 3600.0, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, 500.0, 10.0, 3600.0, (double) 1 );
+		final Node fromNode2 = node1;
+		final Node toNode2 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode2, toNode2, 50.0, 0.1, 3600.0, (double) 1 );
+		final Node fromNode3 = node3;
+		final Node toNode3 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), fromNode3, toNode3, 50.0, 0.1, 3600.0, (double) 1 );
 		
 		return network;
 	}

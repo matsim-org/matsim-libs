@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,17 +51,25 @@ public class CorridorCreator {
 
 			if (restLength > linkLength) {
 				network.createAndAddNode(toNode, new Coord(10.0 + totalLength - restLength + linkLength, 10.0));
-				network.createAndAddLink(Id.create(newLinkId, Link.class), network.getNodes().get(fromNode), network.getNodes().get(toNode),
-						linkLength, freespeed, capacity * numLanes, numLanes);
-				network.createAndAddLink(Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode),
-						network.getNodes().get(fromNode), linkLength, freespeed, capacity * numLanes, numLanes);
+				final double length = linkLength;
+				final double freespeed1 = freespeed;
+				final double numLanes1 = numLanes;
+				NetworkUtils.createAndAddLink(network,Id.create(newLinkId, Link.class), network.getNodes().get(fromNode), network.getNodes().get(toNode), length, freespeed1, capacity * numLanes, numLanes1 );
+				final double length1 = linkLength;
+				final double freespeed2 = freespeed;
+				final double numLanes2 = numLanes;
+				NetworkUtils.createAndAddLink(network,Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode), network.getNodes().get(fromNode), length1, freespeed2, capacity * numLanes, numLanes2 );
 
 			} else {
 				network.createAndAddNode(toNode, new Coord((double) totalLength, 10.0));
-				network.createAndAddLink(Id.create(newLinkId, Link.class), network.getNodes().get(fromNode), network.getNodes().get(toNode),
-						restLength, freespeed, capacity * numLanes, numLanes);
-				network.createAndAddLink(Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode),
-						network.getNodes().get(fromNode), restLength, freespeed, capacity * numLanes, numLanes);
+				final double length = restLength;
+				final double freespeed1 = freespeed;
+				final double numLanes1 = numLanes;
+				NetworkUtils.createAndAddLink(network,Id.create(newLinkId, Link.class), network.getNodes().get(fromNode), network.getNodes().get(toNode), length, freespeed1, capacity * numLanes, numLanes1 );
+				final double length1 = restLength;
+				final double freespeed2 = freespeed;
+				final double numLanes2 = numLanes;
+				NetworkUtils.createAndAddLink(network,Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode), network.getNodes().get(fromNode), length1, freespeed2, capacity * numLanes, numLanes2 );
 
 			}
 			

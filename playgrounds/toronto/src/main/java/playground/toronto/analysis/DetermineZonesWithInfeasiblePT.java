@@ -57,7 +57,7 @@ public class DetermineZonesWithInfeasiblePT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		this.stops = NetworkImpl.createNetwork();
+		this.stops = NetworkUtils.createNetwork();
 		for (TransitStopFacility stop : schedule.getFacilities().values()){
 			Id<TransitStopFacility> stopId = stop.getId();
 			Node n = NetworkUtils.createNode(Id.create(stopId, Node.class));

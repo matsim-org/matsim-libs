@@ -49,7 +49,10 @@ public class NetworkThinner {
 		for (Link l : list) { network.removeLink(l.getId()); }
 		// add a new link
 		double length = 0.0; for (Link l : list) { length += l.getLength(); }
-		Link newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(),first.getCapacity(),first.getNumberOfLanes());
+		final Node fromNode1 = fromNode;
+		final Node toNode1 = toNode;
+		final double length1 = length;
+		Link newLink = NetworkUtils.createAndAddLink(network,first.getId(), fromNode1, toNode1, length1, first.getFreespeed(), first.getCapacity(), first.getNumberOfLanes() );
 		NetworkUtils.setType( ((Link) newLink), (String) NetworkUtils.getType(((Link) first)));
 		// always assign the origId of the first link (for convenience)
 		NetworkUtils.setOrigId( ((Link) newLink), (String) NetworkUtils.getOrigId( ((Link) first) ) ) ;

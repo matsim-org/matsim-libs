@@ -245,7 +245,7 @@ public class Fcd {
 	
 	private void writeNetworkFromEvents(String netOutFile) {
 		log.info("Creating network from fcd events...");
-		NetworkImpl net = NetworkImpl.createNetwork();
+		NetworkImpl net = NetworkUtils.createNetwork();
 		
 		FcdEvent lastEvent = null;
 		for (Iterator<FcdEvent> iterator = this.fcdEventsList.iterator(); iterator.hasNext();) {
@@ -267,7 +267,8 @@ public class Fcd {
 				
 				Id<Link> newLinkId = Id.create(lastEvent.getLinkId().toString() + "-" + currentEvent.getLinkId().toString(), Link.class);
 				if(net.getLinks().get(newLinkId) == null){
-					net.createAndAddLink(newLinkId, net.getNodes().get(lastEvent.getLinkId()), net.getNodes().get(currentEvent.getLinkId()), 999.9, 9.9, 9999.9, 9.9);
+					final Id<Link> id = newLinkId;
+					NetworkUtils.createAndAddLink(net,id, net.getNodes().get(lastEvent.getLinkId()), net.getNodes().get(currentEvent.getLinkId()), 999.9, 9.9, 9999.9, 9.9 );
 				}
 			}			
 

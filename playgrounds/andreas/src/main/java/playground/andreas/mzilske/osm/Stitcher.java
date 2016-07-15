@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -42,7 +43,7 @@ public class Stitcher {
 
 	private Network network;
 
-	private NetworkImpl networkForThisRoute = NetworkImpl.createNetwork();
+	private NetworkImpl networkForThisRoute = NetworkUtils.createNetwork();
 
 	private LinkedList<Id<Node>> forwardStops = new LinkedList<>();
 

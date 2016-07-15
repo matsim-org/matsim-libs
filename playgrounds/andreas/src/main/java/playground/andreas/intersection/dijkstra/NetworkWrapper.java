@@ -43,7 +43,7 @@ public class NetworkWrapper {
 	 */
 	public static NetworkImpl wrapNetwork(Network networkLayer) {
 
-		NetworkImpl wrappedNetwork = NetworkImpl.createNetwork();
+		NetworkImpl wrappedNetwork = NetworkUtils.createNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
@@ -55,12 +55,7 @@ public class NetworkWrapper {
 		for (Node node : networkLayer.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
-					Link link = wrappedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated, Link.class),
-							wrappedNetwork.getNodes().get(inLink.getId()), wrappedNetwork.getNodes().get(Id.create(outLink.getId().toString(), Node.class)),
-							outLink.getLength(),
-							outLink.getFreespeed(),
-							outLink.getCapacity(),
-							outLink.getNumberOfLanes());
+					Link link = NetworkUtils.createAndAddLink(wrappedNetwork,Id.create(numberOfLinksGenerated, Link.class), wrappedNetwork.getNodes().get(inLink.getId()), wrappedNetwork.getNodes().get(Id.create(outLink.getId().toString(), Node.class)), outLink.getLength(), outLink.getFreespeed(), outLink.getCapacity(), outLink.getNumberOfLanes() );
 					NetworkUtils.setType( ((Link) link), (String) NetworkUtils.getType(((Link) outLink)));
 					numberOfLinksGenerated++;
 				}

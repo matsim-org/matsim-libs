@@ -137,16 +137,7 @@ public class NetworkSimplifier {
 
 									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
-										Link newLink = ((NetworkImpl) network).createAndAddLink(
-												Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
-												inLink.getFromNode(),
-												outLink.getToNode(),
-												inLink.getLength() + outLink.getLength(),
-												inLink.getFreespeed(),
-												inLink.getCapacity(),
-												outLink.getNumberOfLanes(),
-												null,
-												NetworkUtils.getType(outLink));
+										Link newLink = NetworkUtils.createAndAddLink(((NetworkImpl) network),Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), outLink.getNumberOfLanes(), null, (String) NetworkUtils.getType(outLink));
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 

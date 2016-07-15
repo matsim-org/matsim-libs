@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,7 +35,7 @@ public class TransitSheduleToNetwork {
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[0]);
 		scenario.getConfig().transit().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[1]);
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory =  new NetworkFactoryImpl(network);
 		Set<String> modes = new HashSet<String>(Arrays.asList("pt"));
 		for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values()) {

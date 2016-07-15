@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -360,7 +361,7 @@ public class TollSchemeGenerator {
 	}
 
 	private NetworkImpl filterNetwork(final Network net, boolean full) {
-		NetworkImpl n = NetworkImpl.createNetwork();
+		NetworkImpl n = NetworkUtils.createNetwork();
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate[] geoToolCoords = new Coordinate[this.usedCoords.length];
 		int i = 0;

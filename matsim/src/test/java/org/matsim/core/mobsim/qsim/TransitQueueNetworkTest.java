@@ -60,6 +60,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -1013,9 +1014,18 @@ public class TransitQueueNetworkTest extends TestCase {
             Node node3 = network.createAndAddNode(nodeId3, new Coord((double) 2000, (double) 0));
             Node node4 = network.createAndAddNode(nodeId4, new Coord((double) 3000, (double) 0));
             Link[] links = new Link[4];
-            links[1] = network.createAndAddLink(linkId1, node1, node2, 1000.0, 10.0, 3600.0, 1);
-            links[2] = network.createAndAddLink(linkId2, node2, node3, 1000.0, 10.0, 3600.0, 1);
-            links[3] = network.createAndAddLink(linkId3, node3, node4, 1000.0, 10.0, 3600.0, 1);
+		final Id<Link> id = linkId1;
+		final Node fromNode = node1;
+		final Node toNode = node2;
+            links[1] = NetworkUtils.createAndAddLink(network,id, fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1 );
+		final Id<Link> id1 = linkId2;
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+            links[2] = NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1 );
+		final Id<Link> id2 = linkId3;
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+            links[3] = NetworkUtils.createAndAddLink(network,id2, fromNode2, toNode2, 1000.0, 10.0, 3600.0, (double) 1 );
 
             // setup: population
             Population population = scenario.getPopulation();

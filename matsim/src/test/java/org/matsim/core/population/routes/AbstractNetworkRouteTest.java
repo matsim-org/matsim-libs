@@ -328,9 +328,7 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_circleInRoute() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
-				1000.0, 100.0, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id11 = Id.create("11", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id11, id15, network);
@@ -353,9 +351,7 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_startInCircle() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
-				1000.0, 100.0, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id11 = Id.create("11", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id11, id15, network);
@@ -375,9 +371,7 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_startInCircle_CircleInEnd() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
-				1000.0, 100.0, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id11 = Id.create("11", Link.class);
 		Id<Link> id13 = Id.create("13", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id11, id13, network);
@@ -396,9 +390,7 @@ public abstract class AbstractNetworkRouteTest {
 	@Test
 	public void testGetSubRoute_CircleAtStart() {
 		NetworkImpl network = createTestNetwork();
-		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
-				1000.0, 100.0, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create(-3, Link.class), network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)), 1000.0, 100.0, 3600.0, (double) 1 );
 		Id<Link> id13 = Id.create("13", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(id13, id15, network);
@@ -455,7 +447,7 @@ public abstract class AbstractNetworkRouteTest {
 		 *    v             v|             v|             v|
 		 *  ( 1)-----1---->( 2)-----2---->( 3)-----3---->( 4)-----4---->( 5)
 		 */
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = NetworkUtils.createNetwork();
 		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new Coord((double) 0, (double) 500));
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
@@ -468,23 +460,55 @@ public abstract class AbstractNetworkRouteTest {
 		Node node14 = network.createAndAddNode(Id.create("14", Node.class), new Coord((double) 3000, (double) 1000));
 		Node node15 = network.createAndAddNode(Id.create("15", Node.class), new Coord((double) 4000, (double) 1000));
 		Node node16 = network.createAndAddNode(Id.create("16", Node.class), new Coord((double) 5000, (double) 1000));
+		final Node fromNode = node0;
+		final Node toNode = node1;
 
-		network.createAndAddLink(Id.create("0", Link.class), node0, node1,  500.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("4", Link.class), node4, node5, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("11", Link.class), node11, node12, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("12", Link.class), node12, node13, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("13", Link.class), node13, node14, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("14", Link.class), node14, node15, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("15", Link.class), node15, node16, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("22", Link.class), node2, node12, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("23", Link.class), node3, node13, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("24", Link.class), node4, node14, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("-22", Link.class), node12, node2, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("-23", Link.class), node13, node3, 1000.0, 100.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("-24", Link.class), node14, node4, 1000.0, 100.0, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create("0", Link.class), fromNode, toNode, 500.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode1 = node1;
+		final Node toNode1 = node2;
+		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode1, toNode1, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode2 = node2;
+		final Node toNode2 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode2, toNode2, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode3 = node3;
+		final Node toNode3 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode3, toNode3, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode4 = node4;
+		final Node toNode4 = node5;
+		NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode4, toNode4, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode5 = node11;
+		final Node toNode5 = node12;
+		NetworkUtils.createAndAddLink(network,Id.create("11", Link.class), fromNode5, toNode5, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode6 = node12;
+		final Node toNode6 = node13;
+		NetworkUtils.createAndAddLink(network,Id.create("12", Link.class), fromNode6, toNode6, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode7 = node13;
+		final Node toNode7 = node14;
+		NetworkUtils.createAndAddLink(network,Id.create("13", Link.class), fromNode7, toNode7, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode8 = node14;
+		final Node toNode8 = node15;
+		NetworkUtils.createAndAddLink(network,Id.create("14", Link.class), fromNode8, toNode8, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode9 = node15;
+		final Node toNode9 = node16;
+		NetworkUtils.createAndAddLink(network,Id.create("15", Link.class), fromNode9, toNode9, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode10 = node2;
+		final Node toNode10 = node12;
+		NetworkUtils.createAndAddLink(network,Id.create("22", Link.class), fromNode10, toNode10, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode11 = node3;
+		final Node toNode11 = node13;
+		NetworkUtils.createAndAddLink(network,Id.create("23", Link.class), fromNode11, toNode11, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode12 = node4;
+		final Node toNode12 = node14;
+		NetworkUtils.createAndAddLink(network,Id.create("24", Link.class), fromNode12, toNode12, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode13 = node12;
+		final Node toNode13 = node2;
+		NetworkUtils.createAndAddLink(network,Id.create("-22", Link.class), fromNode13, toNode13, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode14 = node13;
+		final Node toNode14 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("-23", Link.class), fromNode14, toNode14, 1000.0, 100.0, 3600.0, (double) 1 );
+		final Node fromNode15 = node14;
+		final Node toNode15 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("-24", Link.class), fromNode15, toNode15, 1000.0, 100.0, 3600.0, (double) 1 );
 
 		return network;
 	}

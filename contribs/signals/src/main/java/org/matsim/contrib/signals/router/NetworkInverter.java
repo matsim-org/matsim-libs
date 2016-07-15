@@ -47,7 +47,7 @@ class NetworkInverter {
 	}
 
 	private void invertNetwork(){
-		this.invertedNetwork = NetworkImpl.createNetwork();
+		this.invertedNetwork = NetworkUtils.createNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
@@ -78,12 +78,7 @@ class NetworkInverter {
 	}
 
 	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated, Set<String> modes){
-		Link link = this.invertedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated + 1, Link.class), // start counting link ids with 1 instead of 0
-				this.invertedNetwork.getNodes().get(Id.create(inLink.getId(), Node.class)), this.invertedNetwork.getNodes().get(Id.create(outLink.getId(), Node.class)),
-				outLink.getLength(),
-				outLink.getFreespeed(),
-				outLink.getCapacity(),
-				outLink.getNumberOfLanes());
+		Link link = NetworkUtils.createAndAddLink(this.invertedNetwork,Id.create(numberOfLinksGenerated + 1, Link.class), this.invertedNetwork.getNodes().get(Id.create(inLink.getId(), Node.class)), this.invertedNetwork.getNodes().get(Id.create(outLink.getId(), Node.class)), outLink.getLength(), outLink.getFreespeed(), outLink.getCapacity(), outLink.getNumberOfLanes() );
 		link.setAllowedModes(modes);
 //		log.error("created inverted link " + link.getId() + " from " + inLink.getId() + " to " + outLink.getId() + " with modes " + modes);
 		NetworkUtils.setType( ((Link) link), NetworkUtils.getType(((Link) outLink)));

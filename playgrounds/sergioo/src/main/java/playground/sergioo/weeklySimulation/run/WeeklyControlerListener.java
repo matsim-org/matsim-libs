@@ -29,6 +29,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,7 +57,7 @@ public class WeeklyControlerListener {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 		final Controler controler = new Controler(scenario);
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
-		NetworkImpl net = NetworkImpl.createNetwork();
+		NetworkImpl net = NetworkUtils.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);

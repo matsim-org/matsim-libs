@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -76,11 +77,19 @@ public class CorridorNetworkAndPlans {
 		Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, y));
 		Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 500, (double) 20));
 		Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord((double) 700, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 
-		link0 = network.createAndAddLink(Id.createLinkId(String.valueOf("0")), node1, node2, 1000.0, 20.0, 3600.,1,null,"7");
-		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node2, node3, 100.0, 40.0, 3600.,1,null,"7");
-		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node3, node4, 10.0, 9.0, 900.,1,null,"7");
-		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node4, node5, 1000.0, 20.0, 3600.,1,null,"7");
+		link0 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("0")), fromNode, toNode, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode1, toNode1, 100.0, 40.0, 3600., (double) 1, null, (String) "7");
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode2, toNode2, 10.0, 9.0, 900., (double) 1, null, (String) "7");
+		final Node fromNode3 = node4;
+		final Node toNode3 = node5;
+		link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode3, toNode3, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
 	}
 
 	public void createPopulation(int numberOfPersons){

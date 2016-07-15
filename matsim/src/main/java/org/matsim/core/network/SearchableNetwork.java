@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * OSM2MATSim.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.network;
 
-package playground.duncan;
+import java.util.Collection;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
-import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
+/**
+ * @author nagel
+ *
+ */
+public interface SearchableNetwork {
 
-public class OSM2MATSim {
-	private static final Logger log = Logger.getLogger(OSM2MATSim.class);
+	Link getNearestLinkExactly(Coord coord);
 
-	public static void main(final String[] args) {
+	Node getNearestNode(Coord coord);
 
-		log.error( "This still doesn't have the coordinate transform problem fixed.  kai, jan09" ) ;
-
-		Gbl.startMeasurement();
-		NetworkImpl network = NetworkUtils.createNetwork();
-		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03()); // wrong coordinate system! that's for Switzerland
-		//			osmReader.parse("../mystudies/zueri.osm");
-		osmReader.parse("../shared-svn/studies/north-america/ca/vancouver/network/osm/map.osm");
-//		new NetworkWriter(network, "../mystudies/zueri-net.xml").write();
-		new NetworkWriter(network).write("../shared-svn/studies/north-america/ca/vancouver/network/net.xml");
-		Gbl.printElapsedTime();
-	}
+	Collection<Node> getNearestNodes(Coord coord, double distance);
 
 }

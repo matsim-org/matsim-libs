@@ -448,4 +448,34 @@ public final class TransitRouterNetwork implements Network {
 
 		return network;
 	}
+
+	@Override
+	public void setCapacityPeriod(double capPeriod) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 }

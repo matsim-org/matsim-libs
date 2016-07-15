@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -93,7 +94,7 @@ public class HITSToMATSim {
 		this.population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile("data/singapore1_no_rail_CLEAN.xml");
-		NetworkImpl subNet = NetworkImpl.createNetwork();
+		NetworkImpl subNet = NetworkUtils.createNetwork();
 		TransportModeNetworkFilter t = new TransportModeNetworkFilter(scenario.getNetwork());
 		HashSet set = new HashSet<String>();
 		set.add("car");

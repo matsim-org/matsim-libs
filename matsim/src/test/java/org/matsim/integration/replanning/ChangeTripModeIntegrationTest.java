@@ -40,6 +40,7 @@ import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModu
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
@@ -77,7 +78,9 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
 
 		// setup population with one person
 		Population population = scenario.getPopulation();

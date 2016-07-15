@@ -73,7 +73,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	private void initLocal() {
 		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
-		((NetworkImpl) this.scenario.getNetwork()).connect();
+//		((NetworkImpl) this.scenario.getNetwork()).connect();
 
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
 		this.initTrees(this.scenario.getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
