@@ -101,17 +101,16 @@ public class KNAccidentScenario {
 
 		// ===
 
-		final Config config = ConfigUtils.loadConfig("/Users/nagel/kairuns/telematics/baseconfig.xml") ;
+		final Config config = ConfigUtils.loadConfig("../../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/baseconfig.xml") ;
 
-		config.network().setInputFile("/Users/nagel/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
+		config.network().setInputFile("../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
 		config.network().setTimeVariantNetwork(true);
 
-		//		config.plans().setInputFile("/Users/nagel/kairuns/a100/7dec13-base/output_plans.xml.gz");
-		config.plans().setInputFile("/Users/nagel/kairuns/telematics/reduced-plans.xml.gz");
+		config.plans().setInputFile("../../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/reduced-plans.xml.gz");
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 
 		config.controler().setLastIteration(10);
-		config.controler().setOutputDirectory("/Users/nagel/kairuns/telematics/output");
+		config.controler().setOutputDirectory("./output/telematics/funkturm-example");
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 

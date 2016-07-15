@@ -231,7 +231,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				scenario.getConfig(),
 				AccessibilityConfigGroup.GROUP_NAME,
 				AccessibilityConfigGroup.class);
-		accessibilityCalculator.computeAccessibilities(scenario, moduleAPCM.getTimeOfDay(), opportunities);
+		accessibilityCalculator.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
 		
 		//
 		// do calculation of aggregate index values, e.g. gini coefficient
@@ -277,7 +277,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// write header
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
-		writer.writeField(Labels.TIME);
+//		writer.writeField(Labels.TIME);
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			writer.writeField(mode.toString() + "_accessibility");
 		}
@@ -293,7 +293,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				writer.writeField( x + 0.5*spatialGrid.getResolution());
 				writer.writeField( y + 0.5*spatialGrid.getResolution());
 				
-				writer.writeField(time);
+//				writer.writeField(time);
 				
 				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 					if ( accessibilityCalculator.getIsComputingMode().contains(mode) ) {

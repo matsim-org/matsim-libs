@@ -44,19 +44,19 @@ public class ModalTravelDistance {
 
 	public static void main(String[] args) {
 
-		String dir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String runCases[] ={"baseCaseCtd","ei","ci","eci"};
+		String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/c1/";
+//		String runCases[] ={"baseCaseCtd","ei","ci","eci"};
 
-		for(String runCase : runCases){
-			new ModalTravelDistance().run(dir+runCase+"/ITERS/it.1500/1500.events.xml.gz", dir+runCase);
-		}
+//		for(String runCase : runCases){
+			new ModalTravelDistance().run(dir+"/ITERS/it.100/100.events.xml.gz", dir);
+//		}
 	}
 
 	private  void run(String eventsFile, String outputDir){
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(outputDir+"/output_network.xml.gz", outputDir+"/output_config.xml");
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(outputDir+"/output_network.xml.gz", outputDir+"/output_config.xml.gz");
 		
 		LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
 		events.addHandler(distHandler);
@@ -73,7 +73,7 @@ public class ModalTravelDistance {
 			int modeLegs = 0;
 			for(Id<Person> p : mode2Person2TripDistances.get(mode).keySet()){
 				modeLegs += mode2Person2TripDistances.get(mode).get(p).size();
-				modeSum = ListUtils.doubleSum(mode2Person2TripDistances.get(mode).get(p));
+				modeSum += ListUtils.doubleSum(mode2Person2TripDistances.get(mode).get(p));
 			}
 			mode2TotalTripDists.put(mode, modeSum);
 			mode2NoOfLegs.put(mode, modeLegs);

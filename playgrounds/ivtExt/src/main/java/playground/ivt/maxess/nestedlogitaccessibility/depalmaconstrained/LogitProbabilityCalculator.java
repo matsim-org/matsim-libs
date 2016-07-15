@@ -21,11 +21,13 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 
 /**
  * @author thibautd
  */
 class LogitProbabilityCalculator {
+	private static final Logger log = Logger.getLogger( LogitProbabilityCalculator.class );
 	private double numeratorUtility;
 	private final TDoubleList denominatorUtilities = new TDoubleArrayList();
 
@@ -56,6 +58,13 @@ class LogitProbabilityCalculator {
 			denominator += Math.exp( iterator.next() - max );
 		}
 
-		return Math.exp( numeratorUtility - max ) / denominator;
+		final double numerator = Math.exp( numeratorUtility - max );
+
+		if ( numerator > denominator ) {
+			log.error( numerator+" > "+denominator );
+			throw new IllegalStateException( "numerator of logit probability is greater than denominator. Please check the inputs.");
+		}
+
+		return numerator / denominator;
 	}
 }

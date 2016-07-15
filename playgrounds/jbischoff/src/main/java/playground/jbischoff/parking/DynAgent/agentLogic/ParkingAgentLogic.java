@@ -244,7 +244,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			return new StaticPassengerDynLeg(currentLeg.getRoute(), currentLeg.getMode());
 		}
 		
-	}else throw new RuntimeException("no more leg to follow but activity is ending");
+	}else throw new RuntimeException("no more leg to follow but activity is ending\nLastPlanElement: "+currentPlanElement.toString()+"\n Agent "+this.agent.getId()+"\nTime: "+Time.writeTime(now));
 	}
 
 }

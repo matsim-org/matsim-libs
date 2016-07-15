@@ -131,15 +131,15 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	}
 
 	private static <N extends Enum<N>> double computeExpectedMaximumUtility(
-			final ConcurrentStopWatch<Measurement> stopWatch, final Person p,
+			final ConcurrentStopWatch<Measurement> stopWatch,
+			final Person p,
 			final NestedLogitModel<N> model,
 			final NestedChoiceSet<N> choiceSet ) {
 		stopWatch.startMeasurement( Measurement.logsumComputation );
 		final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 		for ( Nest<N> nest : choiceSet.getNests() ) {
 			if ( nest.getAlternatives().isEmpty() ) continue;
-			calculator.addTerm( logSumNestUtilities( p , model, nest ) );
-		}
+			calculator.addTerm( logSumNestUtilities( p , model, nest ) );}
 
 		final double r = calculator.computeLogsumExp() / model.getMu();
 		stopWatch.endMeasurement( Measurement.logsumComputation );
@@ -153,11 +153,17 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
 		assert !nest.getAlternatives().isEmpty();
 		for ( Alternative<N> alternative : nest.getAlternatives() ) {
-			calculator.addTerm( nest.getMu_n() *
-					model.getUtility().calcUtility(
-							p,
-							alternative ) );
+			try {
+				calculator.addTerm( nest.getMu_n() *
+						model.getUtility().calcUtility(
+								p,
+								alternative ) );
+			}
+			catch (Exception e){
+				throw new RuntimeException( "Problem with utility of alternative "+alternative , e );
+			}
 		}
 
 		return ( model.getMu() / nest.getMu_n() ) * calculator.computeLogsumExp();
-	}}
+	}
+}

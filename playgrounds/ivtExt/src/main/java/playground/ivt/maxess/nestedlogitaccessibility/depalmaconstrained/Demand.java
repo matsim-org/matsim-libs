@@ -170,12 +170,13 @@ class Demand<N extends Enum<N>> {
 		}
 
 		final TObjectDoubleMap<Id<ActivityFacility>> probabilities = new TObjectDoubleHashMap<>();
+		double sum = 0;
 		for ( Nest<N> nest : choiceSet.getNests() ) {
 			final LogitProbabilityCalculator nestProbabilityCalculator = new LogitProbabilityCalculator();
 			nestProbabilityCalculator.setNumeratorUtility( nestLogsums.get( nest.getNestId() ) );
 			choiceSet.getNests().stream()
-					.mapToDouble( a -> nestLogsums.get( nest.getNestId() ) )
-					.forEach( u -> nestProbabilityCalculator.addDenominatorUtility( u ) );
+					.mapToDouble( n -> nestLogsums.get( n.getNestId() ) )
+					.forEach( nestProbabilityCalculator::addDenominatorUtility );
 			final double nestProba = nestProbabilityCalculator.calcProbability();
 
 			for ( Alternative<N> alternative : nest.getAlternatives() ) {
@@ -183,15 +184,16 @@ class Demand<N extends Enum<N>> {
 				inNestProbabilityCalculator.setNumeratorUtility( nest.getMu_n() * utilities.get( alternative.getAlternativeId() ) );
 				nest.getAlternatives().stream()
 						.mapToDouble( a -> nest.getMu_n() * utilities.get( a.getAlternativeId() ) )
-						.forEach( u -> inNestProbabilityCalculator.addDenominatorUtility( u ) );
-
+						.forEach( inNestProbabilityCalculator::addDenominatorUtility );
 				final double prob = nestProba * inNestProbabilityCalculator.calcProbability();
 				probabilities.adjustOrPutValue(
 						alternative.getAlternative().getDestination().getId(),
 						prob , prob );
+				sum += prob;
 			}
 		}
 
+		assert Math.abs( sum - 1 ) < 1E-9 : sum;
 		return probabilities;
 	}
 }

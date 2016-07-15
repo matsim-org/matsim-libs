@@ -92,7 +92,7 @@ public class ComputationTimeCalculator {
 		sc.getConfig().qsim().setLinkDynamics(ld);
 		
 		if(ld.equals(LinkDynamics.SeepageQ.name())){
-			sc.getConfig().qsim().setSeepMode("bike");
+			sc.getConfig().qsim().setSeepModes(Arrays.asList("bike"));
 			sc.getConfig().qsim().setSeepModeStorageFree(false);
 			sc.getConfig().qsim().setRestrictingSeepage(true);
 		}

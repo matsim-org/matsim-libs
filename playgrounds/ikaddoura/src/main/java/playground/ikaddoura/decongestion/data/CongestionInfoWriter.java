@@ -31,6 +31,7 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -53,7 +54,7 @@ public class CongestionInfoWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			int totalNumberOfTimeBins = (int) ((3600. * 30) / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 			
 			bw.write("Link Id");
 			for (int i = 0; i < totalNumberOfTimeBins; i++) {
@@ -90,6 +91,76 @@ public class CongestionInfoWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void writeTolls(DecongestionInfo congestionInfo, int iteration, String outputPath) {
+		
+		String outputPathCongestionInfo = outputPath;
+		File dir = new File(outputPathCongestionInfo);
+		dir.mkdirs();
+		
+		String fileName2 = outputPathCongestionInfo + "tollPerLinkAndTimeBin.csv";
+		File file2 = new File(fileName2);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+			
+			bw.write("Link Id");
+			for (int i = 0; i < totalNumberOfTimeBins; i++) {
+				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+				bw.write(";" + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			}
+			bw.newLine();
+			
+			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+				
+				bw.write(linkId.toString());
+				
+				for (int i = 0; i < totalNumberOfTimeBins; i++) {
+										
+					double toll = 0.;
+					if (congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(i)) {
+						toll = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i);
+					}
+					
+					bw.write(";" + toll);
+				}
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName2);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Toll [monetary units]");
+		
+		int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+						
+		double[] timeBins = new double[totalNumberOfTimeBins];
+		for (int i = 0; i < totalNumberOfTimeBins; i++) {
+			double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+			timeBins[i] = timeInterval / 3600.;
+		}
+		
+		for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+			
+			double[] values = new double[totalNumberOfTimeBins];	
+			boolean isEmpty = true;
+			
+			for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2toll().keySet()) {
+				values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i);
+				if (values[i] > 0.) {
+					isEmpty = false;
+				}
+			}
+			if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
+		}
+		chart.saveAsPng(outputPathCongestionInfo + "tolls.png", 800, 600);
 	}
 	
 	public static void writeIterationStats(

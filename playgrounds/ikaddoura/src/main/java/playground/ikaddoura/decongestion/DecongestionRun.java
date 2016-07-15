@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
+import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -61,7 +62,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/decongestion/output_test/";
+			outputBaseDirectory = "../../../runs-svn/decongestion/output_final/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -69,7 +70,7 @@ public class DecongestionRun {
 		
 	}
 
-	private void run() {
+	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		
@@ -77,7 +78,9 @@ public class DecongestionRun {
 		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
 				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
 				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
-				"tollBlendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + "/");
+				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() +
+				"_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
+				+ "_0.3_7200_5plans_test/");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
@@ -87,6 +90,9 @@ public class DecongestionRun {
 		log.info("Analyzing the final iteration...");
 		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());
 		analysis.run();
+		
+		MATSimVideoUtils.createLegHistogramVideo(config.controler().getOutputDirectory());
+		MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), decongestionSettings.getWRITE_OUTPUT_ITERATION(), "tolls");
 	}
 }
 

@@ -26,10 +26,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,13 +39,15 @@ import org.matsim.vehicles.Vehicle;
 
 
 /**
+ * calculates the delay per link for all links of the given network
+ * 
  * @author tthunig
  *
  */
-public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler{
+public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler{
 
 	private Network network;
-	private Map<Id<Vehicle>, LinkEnterEvent> linkEnterPerVehicle;
+	private Map<Id<Vehicle>, Double> earliestLinkExitTimePerVehicle;
 	private Map<Id<Link>, Double> delayPerLink;
 
 	public TtDelayPerLink(Network network) {
@@ -53,44 +57,47 @@ public class TtDelayPerLink implements LinkEnterEventHandler, LinkLeaveEventHand
 
 	@Override
 	public void reset(int iteration) {
-		this.linkEnterPerVehicle = new HashMap<>();
+		this.earliestLinkExitTimePerVehicle = new HashMap<>();
 		this.delayPerLink = new HashMap<>();
 	}
 
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		//calculate delay for signalized links, so the delay caused by the signals
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			LinkEnterEvent linkEnterEvent = this.linkEnterPerVehicle.remove(event.getVehicleId());
-			Id<Link> linkId = event.getLinkId();
-			Link link = this.network.getLinks().get(linkId);
-			double freespeedTravelTime = link.getLength()/link.getFreespeed();
-			
-			if (linkEnterEvent != null) {
-				if (!this.delayPerLink.containsKey(linkId))
-					this.delayPerLink.put(linkId, 0.0);
-				
-				this.delayPerLink.put(linkId, this.delayPerLink.get(linkId) + 
-						(event.getTime() - linkEnterEvent.getTime() - freespeedTravelTime));
-			}
+			this.earliestLinkExitTimePerVehicle.put(event.getVehicleId(), event.getTime() + 1);
 		}
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			this.linkEnterPerVehicle.put(event.getVehicleId(), event);
+		public void handleEvent(LinkEnterEvent event) {
+			if (this.network.getLinks().containsKey(event.getLinkId())) {
+				Link link = this.network.getLinks().get(event.getLinkId());
+				double freespeedTT = link.getLength()/link.getFreespeed();
+				// this is the earliest time where matsim sets the agent to the next link
+				double matsimFreespeedTT = Math.floor(freespeedTT + 1);
+				this.earliestLinkExitTimePerVehicle.put(event.getVehicleId(), event.getTime() + matsimFreespeedTT);
+			}
 		}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {		
+		double earliestLinkExitTime = this.earliestLinkExitTimePerVehicle.remove(event.getVehicleId());
+		if (!this.delayPerLink.containsKey(event.getLinkId())){
+			this.delayPerLink.put(event.getLinkId(), 0.0);
+		}
+		// add the number of seconds the agent is later as the earliest link exit time as delay
+		double formerLinkDelay = this.delayPerLink.get(event.getLinkId());
+		this.delayPerLink.put(event.getLinkId(), formerLinkDelay + event.getTime() - earliestLinkExitTime);
 	}
 
 	@Override
 	public void handleEvent(VehicleAbortsEvent event) {
-		this.linkEnterPerVehicle.remove(event.getVehicleId());
+		this.earliestLinkExitTimePerVehicle.remove(event.getVehicleId());
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.linkEnterPerVehicle.remove(event.getVehicleId());		
+		this.earliestLinkExitTimePerVehicle.remove(event.getVehicleId());
 	}
 
 	

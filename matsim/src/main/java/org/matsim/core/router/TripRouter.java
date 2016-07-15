@@ -294,7 +294,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			}
 			if (pe == destination) {
 				indexOfDestination = currentIndex;
-				if ( indexOfOrigin < 0 ) {
+				if (indexOfDestination < indexOfOrigin ) {
 					throw new RuntimeException(
 							"destination "+destination+" found before origin "+
 							origin+" in "+plan );

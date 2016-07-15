@@ -76,7 +76,7 @@ public class RunTaxiBenchmark
             @Override
             public void install()
             {
-                addControlerListenerBinding().to(TaxiBenchmarkStats.class);
+                addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
             };
         });
 

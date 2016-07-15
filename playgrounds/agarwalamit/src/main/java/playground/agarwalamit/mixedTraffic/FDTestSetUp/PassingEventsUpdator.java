@@ -37,7 +37,10 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 import playground.agarwalamit.utils.ListUtils;
 
@@ -46,87 +49,83 @@ import playground.agarwalamit.utils.ListUtils;
  */
 
 public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	private final Map<Id<Person>, Double> personId2LinkEnterTime;
+	
+	@Inject
+	private QSimConfigGroup qsimConfigGroup;
+	
+	private final Map<Id<Person>, Double> personId2TrackEnterTime;
+	
+	/**
+	 * Along with personId2TrackEnterTime, this is also required, to identify the agents which enter at the same time 
+	 * but leave one after other. Without this, it could also return that a bike is passing another bike.
+	 */
+	private final Map<Id<Person>, Double> personId2LinkEnterTime; 
 	private final Map<Id<Person>, String> personId2LegMode;
 
 	private final List<Double> bikesPassedByEachCarPerKm;
-	private final List<Double> bikesPassedByAllCarPerKm;
+	
 	private final List<Double> carsPerKm;
 
 	private final static Id<Link> TRACKING_START_LINK = Id.createLinkId(0);
 	private final static Id<Link> TRACKING_END_LINK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR*3-1);
 	private boolean isFirstBikeLeavingTrack = false;
-	private Id<Person> firstCarId ;
-	private double noOfCycles = 0;
 
 	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
 	
 	public PassingEventsUpdator() {
+		this.personId2TrackEnterTime = new HashMap<>();
 		this.personId2LinkEnterTime = new HashMap<>();
 		this.personId2LegMode = new HashMap<>();
 		this.bikesPassedByEachCarPerKm = new ArrayList<Double>();
-		this.bikesPassedByAllCarPerKm = new ArrayList<Double>();
 		this.carsPerKm = new ArrayList<Double>();
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		this.personId2LinkEnterTime.clear();
+		this.personId2TrackEnterTime.clear();
 		this.personId2LegMode.clear();
 		this.bikesPassedByEachCarPerKm.clear();
-		this.bikesPassedByAllCarPerKm.clear();
 		this.carsPerKm.clear();
-		driverAgents.clear();
+		this.driverAgents.clear();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id<Person> personId = this.driverAgents.get(event.getVehicleId());
+		
+		this.personId2LinkEnterTime.put( personId, event.getTime() );
+		
 		if(event.getLinkId().equals(TRACKING_START_LINK)){
-			this.personId2LinkEnterTime.put(personId, event.getTime());
+			this.personId2TrackEnterTime.put(personId, event.getTime());
 		}
 	}
 
-	private List<Double> tempAvgBikePassedPerCar  = new ArrayList<Double>();
 	@Override 
 	public void handleEvent(LinkLeaveEvent event){
 		Id<Person> personId = this.driverAgents.get(event.getVehicleId());
 
 		if (event.getLinkId().equals(TRACKING_END_LINK)){
 			// startsAveraging when first bike leaves test track
-			if(this.personId2LegMode.get(personId).equals(TransportMode.bike) && !isFirstBikeLeavingTrack) isFirstBikeLeavingTrack = true;
+			if(this.personId2LegMode.get(personId).equals(TransportMode.bike) && !this.isFirstBikeLeavingTrack) this.isFirstBikeLeavingTrack = true;
 			
-			//start counting cycles when first bike leaves test track
-			if(!this.personId2LegMode.get(personId).equals(TransportMode.bike) && isFirstBikeLeavingTrack && noOfCycles==0) {
-				firstCarId = personId;
-			}
-
-			if(isFirstBikeLeavingTrack && !this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
-				double numberOfBicyclesOvertaken = getNumberOfBicycleOvertaken(personId);
-				double noOfBikesPerCarPerKm = numberOfBicyclesOvertaken *1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
-				this.bikesPassedByEachCarPerKm.add(noOfBikesPerCarPerKm);
-				this.tempAvgBikePassedPerCar.add(noOfBikesPerCarPerKm);
-
-				if(firstCarId.equals(personId)) {
-					noOfCycles ++;
-					double noOfPassedBikesByAllCars =0;
-//					for (double d : this.bikesPassedByEachCarPerKm){
-//						noOfPassedBikesByAllCars += d;
-//					}
-//					noOfPassedBikesByAllCars = noOfPassedBikesByAllCars/noOfCycles;
-					for (double d : this.tempAvgBikePassedPerCar){
-						noOfPassedBikesByAllCars += d;
-					}
-					double noOfPassedBikesByAllCarsPerKm = noOfPassedBikesByAllCars*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
-					this.bikesPassedByAllCarPerKm.add(noOfPassedBikesByAllCarsPerKm);
-					this.tempAvgBikePassedPerCar = new ArrayList<Double>();
+			if( isFirstBikeLeavingTrack ) {
+				double numberOfBicyclesOvertaken = 0;
+				if( qsimConfigGroup.getSeepModes().contains( this.personId2LegMode.get(personId)) ){
+//						this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
+					numberOfBicyclesOvertaken = - getNumberOfOvertakenVehicles(personId); // this means bike is overtaking cars (seepage)
+				} else if ( this.personId2LegMode.get(personId).equals(TransportMode.car)){ 
+					numberOfBicyclesOvertaken = getNumberOfOvertakenVehicles(personId); // this means car is overtaking bikes
 				}
 				
+				double noOfBikesPerCarPerKm = numberOfBicyclesOvertaken *1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
+				this.bikesPassedByEachCarPerKm.add(noOfBikesPerCarPerKm);
+
 				double noOfCars = getCars();
 				double noOfCarsPerkm = noOfCars*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
 				this.carsPerKm.add(noOfCarsPerkm);
-//				this.bikesPassedByAllCarPerKm.add(noOfBikesPerCarPerKm*noOfCarsPerkm);
+				
 			}
+			this.personId2TrackEnterTime.remove(personId);
 			this.personId2LinkEnterTime.remove(personId);
 		}
 	}
@@ -140,15 +139,31 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 
-	private double getNumberOfBicycleOvertaken(Id<Person> leavingPersonId) {
+	private double getNumberOfOvertakenVehicles(Id<Person> leavingPersonId) {
 		double overtakenBicycles =0;
 		/* Simply, on a race track, enter time at start of track and leave time at end of track are recoreded, 
-		 * Thus, if an agent is leaving, and leaving agent's enter time is more than 5 (for e.g.) vehicles, then
-		 * total number of overtaken bikes are 5 
+		 * Thus, if an agent is leaving, and leaving agent's enter time is more than n (for e.g. 5) vehicles, then
+		 * total number of overtaken bikes are n (5). 
 		 */
-		for(Id<Person> personId:this.personId2LinkEnterTime.keySet()){
-			if(this.personId2LinkEnterTime.get(leavingPersonId) > this.personId2LinkEnterTime.get(personId)){
-				overtakenBicycles++;
+		for(Id<Person> personId:this.personId2TrackEnterTime.keySet()){
+			if(this.personId2TrackEnterTime.get(leavingPersonId) > this.personId2TrackEnterTime.get(personId)){
+				// check if overtaking is occured between same vehicle type
+				if (personId2LegMode.get(personId).equals(this.personId2LegMode.get(leavingPersonId))) {
+					// if so, check their enter time on the current link ( could be same or "leavingPersonId" may have entered one sec before "personId"
+					if( this.personId2LinkEnterTime.get(leavingPersonId) > this.personId2LinkEnterTime.get(personId)  ){ // excluding same enter time and minor changes due to rouding errors.
+						throw new RuntimeException(
+								"Overtaking should not happen between same vehicle types. Persons "+ personId+"("+this.personId2LegMode.get(personId)+")"+", "+leavingPersonId
+								+"("+this.personId2LegMode.get(leavingPersonId)+")"+" have entered the track at "+ this.personId2TrackEnterTime.get(personId)+ ", "
+								+ this.personId2TrackEnterTime.get(leavingPersonId)+" respectively. However, the later agent is leaving first. These persons entered on the current link at "
+								+ this.personId2LinkEnterTime.get(personId) + ", "+ this.personId2LinkEnterTime.get(leavingPersonId) +" respectively." );
+					} else {
+						// do nothing.
+					}
+				} else {
+					overtakenBicycles++;	
+				}
+			} else {
+				// do nothing; no overtaking occured.
 			}
 		}
 		return overtakenBicycles;
@@ -173,16 +188,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		return ListUtils.doubleMean(this.bikesPassedByEachCarPerKm);
 	}
 
-	public double getTotalBikesPassedByAllCarsPerKm(){
-//		for(double d:this.bikesPassedByEachCarPerKm){
-//			sum += d;
-//		}
-//		return (sum/noOfCycles)*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
-		return ListUtils.doubleMean(this.bikesPassedByAllCarPerKm);
-	}
-	
 	public double getNoOfCarsPerKm(){
 		return ListUtils.doubleMean(this.carsPerKm);
 	}
-
 }

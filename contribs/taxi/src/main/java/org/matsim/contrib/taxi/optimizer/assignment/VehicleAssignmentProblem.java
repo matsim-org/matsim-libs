@@ -46,9 +46,27 @@ public class VehicleAssignmentProblem<D>
 
     public static class PathData
     {
-        protected Node node;//destination
-        protected double delay;//at both the first and last link
-        protected Path path;//shortest path
+        private Node node;//destination
+        private double delay;//at both the first and last link
+        private Path path;//shortest path
+
+
+        public Node getNode()
+        {
+            return node;
+        }
+
+
+        public double getDelay()
+        {
+            return delay;
+        }
+
+
+        public Path getPath()
+        {
+            return path;
+        }
     }
 
 
@@ -98,8 +116,8 @@ public class VehicleAssignmentProblem<D>
     }
 
 
-    private static int calcPathsForVehiclesCount = 0;
-    private static int calcPathsForDestinationsCount = 0;
+//    private static int calcPathsForVehiclesCount = 0;
+//    private static int calcPathsForDestinationsCount = 0;
 
 
     private PathData[][] createPathDataMatrix()
@@ -109,19 +127,19 @@ public class VehicleAssignmentProblem<D>
 
         if (dData.getSize() > vData.getSize()) {
             calcPathsForVehicles(pathDataMatrix);
-            calcPathsForVehiclesCount++;
+//            calcPathsForVehiclesCount++;
         }
         else {
             calcPathsForDestinations(pathDataMatrix);
-            calcPathsForDestinationsCount++;
+//            calcPathsForDestinationsCount++;
         }
 
-        if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
-            System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
-                    + " PathsForVehicles = " + calcPathsForVehiclesCount);
-            System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
-                    + " idleVehs = " + vData.getIdleCount());
-        }
+//        if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
+//            System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
+//                    + " PathsForVehicles = " + calcPathsForVehiclesCount);
+//            System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
+//                    + " idleVehs = " + vData.getIdleCount());
+//        }
 
         return pathDataMatrix;
     }

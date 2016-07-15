@@ -58,9 +58,9 @@ public class TaxiToRequestAssignmentCostProvider
     {
         final Mode currentMode = getCurrentMode(rData, vData);
         return new AssignmentCost<TaxiRequest>() {
-            public double calc(Entry departure, DestEntry<TaxiRequest> dest, PathData pathData)
+            public double calc(Entry departure, DestEntry<TaxiRequest> reqEntry, PathData pathData)
             {
-                double pickupBeginTime = calcPickupBeginTime(departure, dest, pathData);
+                double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
                 switch (currentMode) {
                     case PICKUP_TIME:
                         //this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
@@ -73,7 +73,7 @@ public class TaxiToRequestAssignmentCostProvider
                     case TOTAL_WAIT_TIME:
                         //more fairness, lower throughput
                         //this will work different than than ARRIVAL_TIME at undersupply -> will reduce unfairness and throughput 
-                        return pickupBeginTime - dest.destination.getT0();
+                        return pickupBeginTime - reqEntry.destination.getT0();
 
                     default:
                         throw new IllegalStateException();
@@ -89,19 +89,18 @@ public class TaxiToRequestAssignmentCostProvider
             return params.mode;
         }
         else {
-            return rData.getUrgentReqCount() > vData.getIdleCount() ? Mode.PICKUP_TIME : //we have too few vehicles
-                    Mode.ARRIVAL_TIME; //we have too many vehicles
+            return rData.getUrgentReqCount() > vData.getIdleCount() ? Mode.PICKUP_TIME : //undersupply
+                    Mode.ARRIVAL_TIME; //oversupply
         }
     }
 
 
-    private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<TaxiRequest> dest,
+    private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<TaxiRequest> reqEntry,
             PathData pathData)
     {
         double travelTime = pathData == null ? //
                 params.nullPathCost : // no path (too far away)
-                pathData.delay + pathData.path.travelTime;
-
-        return Math.max(dest.destination.getT0(), departure.time + travelTime);
+                pathData.getDelay() + pathData.getPath().travelTime;
+        return Math.max(reqEntry.destination.getT0(), departure.time + travelTime);
     }
 }

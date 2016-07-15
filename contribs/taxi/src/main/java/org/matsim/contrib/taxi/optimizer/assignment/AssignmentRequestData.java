@@ -27,21 +27,14 @@ class AssignmentRequestData
     extends AssignmentDestinationData<TaxiRequest>
 {
     private int urgentReqCount = 0;
-    private final double currTime;
-    private final double maxT0;
 
 
     AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon,
             Iterable<TaxiRequest> unplannedRequests)
     {
-        currTime = optimContext.timer.getTimeOfDay();
-        maxT0 = currTime + planningHorizon;
-        init(unplannedRequests);
-    }
+        double currTime = optimContext.timer.getTimeOfDay();
+        double maxT0 = currTime + planningHorizon;
 
-
-    private void init(Iterable<TaxiRequest> unplannedRequests)
-    {
         int idx = 0;
         for (TaxiRequest r : unplannedRequests) {
             double t0 = r.getT0();

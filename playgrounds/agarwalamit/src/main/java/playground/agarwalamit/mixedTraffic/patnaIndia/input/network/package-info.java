@@ -19,8 +19,9 @@
 /**
  * @author amit
  * 
- * Though, the network shape file is available, but, it looks the links have capacity mismatch and 
- * many important links are not joined together. 
+ * Though, the network shape file from TransCAD is available, but, it looks the links have capacity mismatch and 
+ * many important links are not joined together. Thus, now there are two networks, one from shape and other 
+ * generated from osm.
  *
  */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.network;

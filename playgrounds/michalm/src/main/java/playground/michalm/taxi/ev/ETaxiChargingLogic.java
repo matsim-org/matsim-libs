@@ -37,7 +37,7 @@ public class ETaxiChargingLogic
     //fast charging up to 80% of the battery capacity
     private static final double MAX_RELATIVE_SOC = 0.8;
 
-    protected final Map<Id<Vehicle>, ElectricVehicle> dispatchedVehicles = new HashMap<>();
+    private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new HashMap<>();
     private final double effectivePower;
 
 
@@ -49,16 +49,16 @@ public class ETaxiChargingLogic
 
 
     //at this point ETaxiChargingTask should point to Charger
-    public void addDispatchedVehicle(ElectricVehicle vehicle)
+    public void addAssignedVehicle(ElectricVehicle ev)
     {
-        dispatchedVehicles.put(vehicle.getId(), vehicle);
+        assignedVehicles.put(ev.getId(), ev);
     }
 
 
     //on deleting ETaxiChargingTask or vehicle arrival (the veh becomes plugged or queued)
-    public void removeDispatchedVehicle(ElectricVehicle vehicle)
+    public void removeAssignedVehicle(ElectricVehicle ev)
     {
-        if (dispatchedVehicles.remove(vehicle.getId()) == null) {
+        if (assignedVehicles.remove(ev.getId()) == null) {
             throw new IllegalArgumentException();
         }
     }
@@ -72,39 +72,46 @@ public class ETaxiChargingLogic
     }
 
 
-    private ETaxiAtChargerActivity getActivity(ElectricVehicle vehicle)
+    private ETaxiAtChargerActivity getActivity(ElectricVehicle ev)
     {
-        EvrpVehicle evrpVehicle = ((Ev)vehicle).getEvrpVehicle();
+        EvrpVehicle evrpVehicle = ((Ev)ev).getEvrpVehicle();
         return (ETaxiAtChargerActivity)evrpVehicle.getAgentLogic().getDynAgent().getCurrentAction();
     }
 
 
     @Override
-    protected void notifyChargingStarted(ElectricVehicle vehicle)
+    protected void notifyVehicleQueued(ElectricVehicle ev, double now)
     {
-        getActivity(vehicle).notifyChargingStarted();
+        getActivity(ev).vehicleQueued(now);
     }
 
 
     @Override
-    protected void notifyChargingEnded(ElectricVehicle vehicle)
+    protected void notifyChargingStarted(ElectricVehicle ev, double now)
     {
-        getActivity(vehicle).notifyChargingEnded();
+        getActivity(ev).chargingStarted(now);
     }
 
 
-    public double getEnergyToCharge(ElectricVehicle vehicle)
+    @Override
+    protected void notifyChargingEnded(ElectricVehicle ev, double now)
     {
-        Battery b = vehicle.getBattery();
+        getActivity(ev).chargingEnded(now);
+    }
+
+
+    public double getEnergyToCharge(ElectricVehicle ev)
+    {
+        Battery b = ev.getBattery();
         return Math.max(0, MAX_RELATIVE_SOC * b.getCapacity() - b.getSoc());
     }
 
 
-    public double estimateChargeTime(ElectricVehicle vehicle)
+    public double estimateChargeTime(ElectricVehicle ev)
     {
-//        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
-//        System.err.println("effectivePower = " + effectivePower);
-        return getEnergyToCharge(vehicle) / effectivePower;
+        //        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
+        //        System.err.println("effectivePower = " + effectivePower);
+        return getEnergyToCharge(ev) / effectivePower;
     }
 
     //TODO using task timing from schedules will be more accurate in predicting charge demand
@@ -126,9 +133,9 @@ public class ETaxiChargingLogic
     //does not include further demand (AUX for queued vehs; AUX+driving for dispatched vehs)
     public double estimateAssignedWorkload()
     {
-        double total = sumEnergyToCharge(pluggedVehicles.values())
-                + sumEnergyToCharge(queuedVehicles)
-                + sumEnergyToCharge(dispatchedVehicles.values());
+        double total = sumEnergyToCharge(pluggedVehicles.values()) //
+                + sumEnergyToCharge(queuedVehicles) //
+                + sumEnergyToCharge(assignedVehicles.values());
         return total / effectivePower;
     }
 
@@ -155,8 +162,8 @@ public class ETaxiChargingLogic
     }
 
 
-    public int getDispatchedCount()
+    public int getAssignedCount()
     {
-        return dispatchedVehicles.size();
+        return assignedVehicles.size();
     }
 }

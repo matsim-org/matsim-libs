@@ -509,37 +509,12 @@ public class TaxiScheduler
 
                 int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + unremovableTasksCount;
                 removePlannedTasks(schedule, newLastTaskIdx);
-
-                TaxiTask lastTask = schedule.getTasks().get(newLastTaskIdx);
-                double tBegin = schedule.getEndTime();
-                double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
-
-                switch (lastTask.getTaxiTaskType()) {
-                    case STAY:
-                        lastTask.setEndTime(tEnd);
-                        return;
-
-                    case DROPOFF:
-                        Link link = Schedules.getLastLinkInSchedule(schedule);
-                        schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
-                        return;
-
-                    case EMPTY_DRIVE:
-                        if (!params.vehicleDiversion) {
-                            throw new RuntimeException("Currently won't happen");
-                        }
-
-                        //if diversion -- no STAY afterwards
-                        return;
-
-                    default:
-                        throw new RuntimeException();
-                }
+                cleanupScheduleAfterTaskRemoval(schedule);
+                return;
 
             case PLANNED:
                 removePlannedTasks(schedule, -1);
-                Vehicle veh = schedule.getVehicle();
-                schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+                cleanupScheduleAfterTaskRemoval(schedule);
                 return;
 
             case COMPLETED:
@@ -601,11 +576,49 @@ public class TaxiScheduler
     {
         if (task instanceof TaxiTaskWithRequest) {
             TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-            taskWithReq.removeFromRequest();
+            taskWithReq.disconnectFromRequest();
 
             if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 removedRequests.add(taskWithReq.getRequest());
             }
+        }
+    }
+    
+    
+    //only for planned/started schedule
+    private void cleanupScheduleAfterTaskRemoval(Schedule<TaxiTask> schedule)
+    {
+        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
+            Vehicle veh = schedule.getVehicle();
+            schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+            return;
+        }
+        //else: PLANNED, STARTED
+        
+        TaxiTask lastTask = Schedules.getLastTask(schedule);
+        double tBegin = schedule.getEndTime();
+        double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
+
+        switch (lastTask.getTaxiTaskType()) {
+            case STAY:
+                lastTask.setEndTime(tEnd);
+                return;
+
+            case DROPOFF:
+                Link link = Schedules.getLastLinkInSchedule(schedule);
+                schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
+                return;
+
+            case EMPTY_DRIVE:
+                if (!params.vehicleDiversion) {
+                    throw new RuntimeException("Currently won't happen");
+                }
+
+                //if diversion -- no STAY afterwards
+                return;
+
+            default:
+                throw new RuntimeException();
         }
     }
 }

@@ -64,8 +64,8 @@ public class IntervalBasedCongestionPricingRun {
 			log.info("output directory: "+ outputDirectory);
 
 		} else {
-			configFile = "../../../runs-svn/intervalBasedCongestionPricing/input/config.xml";
-			outputDirectory = "../../../runs-svn/intervalBasedCongestionPricing/output/intervalBasedInternalization_800/";
+			configFile = "../../../runs-svn/decongestion/input/config.xml";
+			outputDirectory = "../../../runs-svn/decongestion/output_test/intervalBasedCongestionPricing/";
 		}
 
 		IntervalBasedCongestionPricingRun main = new IntervalBasedCongestionPricingRun();

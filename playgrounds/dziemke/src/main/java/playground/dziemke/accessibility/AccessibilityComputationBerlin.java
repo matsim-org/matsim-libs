@@ -159,7 +159,7 @@ public class AccessibilityComputationBerlin {
 
 						@Override
 						public ControlerListener get() {
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario, ConfigUtils.addOrGetModule((Config) config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2((double) 4574000, (double) 5802000, (double) 4620000, (double) 5839000, cellSize));
 							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes,
 							travelDisutilityFactories, 4574000, 5802000, 4620000, 5839000, cellSize);
