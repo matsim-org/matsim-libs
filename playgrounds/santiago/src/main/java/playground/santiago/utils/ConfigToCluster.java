@@ -1,5 +1,7 @@
 package playground.santiago.utils;
 
+import java.io.File;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -9,14 +11,16 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 
-public class ChangeConfigToCluster {
+public class ConfigToCluster {
 	
-	final static String pathForCluster = "/net/ils4/lcamus/runs-svn/santiago/basecase1/";
-	final static String randomizedConfigFile = "../../../runs-svn/santiago/basecase1/input/new-input/";
+	final static String pathForCluster = "/net/ils4/lcamus/runs-svn/santiago/BASE10/";
+	
+	final static String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
+	final static String runsExpandedDir = "../../../runs-svn/santiago/BASE10/";
 	
 	public static void main(String args[]){
 		
-		Config config = ConfigUtils.loadConfig(randomizedConfigFile + "randomized_expanded_config_final.xml");
+		Config config = ConfigUtils.loadConfig(svnWorkingDir + "inputForMATSim/randomized_expanded_config.xml");
 
 		ControlerConfigGroup cc = config.controler();
 		cc.setOutputDirectory(pathForCluster + "output/" );
@@ -29,13 +33,16 @@ public class ChangeConfigToCluster {
 		
 		PlansConfigGroup plans = config.plans();
 		plans.setInputPersonAttributeFile(pathForCluster + "input/agentAttributes.xml" );
-		plans.setInputFile(pathForCluster + "input/new-input/randomized_expanded_plans_final.xml.gz" );
+		plans.setInputFile(pathForCluster + "input/randomized_expanded_plans.xml.gz" );
 		
 		TransitConfigGroup transit = config.transit();
 		transit.setTransitScheduleFile(pathForCluster + "input/transitschedule_simplified.xml" );
 		transit.setVehiclesFile(pathForCluster + "input/transitvehicles.xml" );
 		
-		new ConfigWriter(config).write(randomizedConfigFile + "cluster_randomized_expanded_config_final.xml");
+		File file = new File(runsExpandedDir+"input/");
+		if(!file.exists())	file.mkdirs();
+		
+		new ConfigWriter(config).write(runsExpandedDir + "input/cluster_randomized_expanded_config.xml");
 		
 		
 		
