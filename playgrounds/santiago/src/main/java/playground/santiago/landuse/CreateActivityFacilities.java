@@ -1,4 +1,4 @@
-package playground.santiago.landuse.trying;
+package playground.santiago.landuse;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,14 +23,14 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class CreateActivityFacilitiesTry {
+public class CreateActivityFacilities {
 	
 	
 	final String STGO_SHAPE_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/4_finalShapeSantiago/finalShapeSantiago.shp" ;
 	final String OUTPUT_FACILITIES_FILE = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/";
 
 	
-	private CreateActivityFacilitiesTry() {
+	private CreateActivityFacilities() {
 		
 }
 	
@@ -53,7 +53,7 @@ public class CreateActivityFacilitiesTry {
 	
 	
 	public static void main(String[] args) {
-		 CreateActivityFacilitiesTry createActivityFacilitiesTry = new CreateActivityFacilitiesTry();
+		 CreateActivityFacilities createActivityFacilitiesTry = new CreateActivityFacilities();
 		 createActivityFacilitiesTry.Run();
 	}
 	
