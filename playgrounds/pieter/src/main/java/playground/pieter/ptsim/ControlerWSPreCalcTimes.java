@@ -110,12 +110,12 @@ public class ControlerWSPreCalcTimes {
         final StopStopTimeCalculator stopStopTimeCalculatorSerializable = new StopStopTimeCalculator(
                 controler.getScenario().getTransitSchedule(),
                 controler.getScenario().getConfig());
-
-
-        final MyAfterMobsimAnalyses analyses = new MyAfterMobsimAnalyses(controler);
-
-        controler.addControlerListener(analyses);
-
+        //optional analysis, not for performance runs
+        MyAfterMobsimAnalyses analyses = null;
+        if(args.length > 2 && args[2].equals("analyse")) {
+            analyses = new MyAfterMobsimAnalyses(controler);
+            controler.addControlerListener(analyses);
+        }
 
         controler.getEvents().addHandler(
                 waitTimeStuckCalculator
@@ -137,14 +137,16 @@ public class ControlerWSPreCalcTimes {
         }
         final PTLinkSpeedCalculatorWithPreCalcTimes linkSpeedCalculatorWithPreCalcTimes = new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes, true);
         controler.addControlerListener(linkSpeedCalculatorWithPreCalcTimes);
+        TransitRouterEventsWSFactory transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(controler.getScenario(),
+                waitTimeStuckCalculator.getWaitTimes(), stopStopTimeCalculatorSerializable.getStopStopTimes());
         //
         controler.addOverridingModule(new AbstractModule() {
 
             @Override
 
             public void install() {
-                bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
-                        waitTimeStuckCalculator.getWaitTimes(), stopStopTimeCalculatorSerializable.getStopStopTimes()));
+
+                bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
 
                 bindMobsim().toProvider(new Provider<Mobsim>() {
 
@@ -164,10 +166,13 @@ public class ControlerWSPreCalcTimes {
                         qSim.addMobsimEngine(activityEngine);
                         qSim.addActivityHandler(activityEngine);
                         //
-                        ConfigurableQNetworkFactory netsimEngineFactory = new ConfigurableQNetworkFactory(controler.getEvents(), controler.getScenario() ) ;
-                        netsimEngineFactory.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
-				//
-                        QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimEngineFactory );
+                        EventsManager events = controler.getEvents() ;
+                        Scenario scenario = controler.getScenario() ;
+                        Network network = scenario.getNetwork() ;
+                        ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario ) ;
+                        factory.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
+                        QNetsimEngine netsimEngine = new QNetsimEngine(qSim, factory);
+
                         qSim.addMobsimEngine(netsimEngine);
                         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
                         //
