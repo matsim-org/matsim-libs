@@ -17,6 +17,7 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerial
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
+import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.config.Config;
@@ -79,6 +80,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
+    private TransitRouterEventsWSFactory transitRouterEventsWSFactory;
 
     private void printHelp(Options options) {
         String header = "The MasterControler takes the following options:\n\n";
@@ -182,8 +184,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         fullTransitPerformanceTransmission = reader.readBoolean();
         boolean trackGenome = reader.readBoolean();
         IntelligentRouters = reader.readBoolean();
-        boolean diversityGeneratingPlanSelection = false;
-//        boolean diversityGeneratingPlanSelection = reader.readBoolean();
+        boolean diversityGeneratingPlanSelection = reader.readBoolean();
 
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
 
@@ -219,11 +220,20 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
                         OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
         matsimControler.addControlerListener(this);
-        linkTravelTimes = new FreeSpeedTravelTime();
+
+//        init traveltime for when non yet has been received from master
         travelTime = new ReplaceableTravelTime();
+        linkTravelTimes = new FreeSpeedTravelTime();
         travelTime.setTravelTime(linkTravelTimes);
+
         pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
-//        new Thread(new TimesReceiver()).start();
+        matsimControler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindMobsim().toProvider(pSimFactory);
+            }
+        });
+
         if (config.transit().isUseTransit()) {
 
             stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
@@ -234,7 +244,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
                     .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
 
-            //tell PlanSerializable to record transit routes
+            // tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
 
         }
@@ -242,9 +252,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+                     transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(matsimControler.getScenario(),
                             waitTimes,
-                            stopStopTimes));
+                            stopStopTimes);
+                    bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
                 }
             });
 
@@ -345,11 +356,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
             pSimFactory.setTransitPerformance(transitPerformance);
-//            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
-//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
-//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
-//            }
-            throw new RuntimeException();
+            if (transitRouterEventsWSFactory != null) {
+                transitRouterEventsWSFactory.setStopStopTime(stopStopTimes);
+                transitRouterEventsWSFactory.setWaitTime(waitTimes);
+            }
         }
         plancatcher.init();
         numberOfIterations++;
@@ -554,9 +564,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         communications();
     }
 
-    public MatsimServices getMATSimControler() {
-        return matsimControler;
-    }
 
     public void addPlansForPsim(Plan plan) {
 
