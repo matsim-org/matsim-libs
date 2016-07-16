@@ -15,7 +15,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;

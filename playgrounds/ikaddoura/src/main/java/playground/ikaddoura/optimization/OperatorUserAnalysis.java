@@ -28,11 +28,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.Network;
 
 import playground.ikaddoura.optimization.operator.OperatorCostHandler;
 import playground.ikaddoura.optimization.users.CarCongestionHandlerAdvanced;

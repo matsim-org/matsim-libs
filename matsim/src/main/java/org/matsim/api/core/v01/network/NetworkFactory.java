@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.api.core.v01.network;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.network.LinkFactory;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEventFactory;
 
 /**
  * @author dgrether

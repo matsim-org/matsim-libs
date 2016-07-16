@@ -1,10 +1,10 @@
 package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;

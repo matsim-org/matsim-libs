@@ -20,9 +20,9 @@
 package playground.mrieser;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;

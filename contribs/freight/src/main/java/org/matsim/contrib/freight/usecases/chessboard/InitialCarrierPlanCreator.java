@@ -15,6 +15,7 @@ import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.util.Solutions;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -27,7 +28,6 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 

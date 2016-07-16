@@ -3,6 +3,7 @@ package org.matsim.contrib.matsim4urbansim.matsim4urbansim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
@@ -12,7 +13,6 @@ import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWrite
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 

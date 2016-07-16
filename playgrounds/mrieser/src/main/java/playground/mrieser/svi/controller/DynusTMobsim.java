@@ -28,12 +28,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.network.Network;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;

@@ -21,9 +21,9 @@ package org.matsim.contrib.dynagent.examples.random;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.Network;
 
 import com.google.common.collect.Iterators;
 

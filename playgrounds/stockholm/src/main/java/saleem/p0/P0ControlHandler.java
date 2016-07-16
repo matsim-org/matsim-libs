@@ -14,11 +14,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.Network;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
 

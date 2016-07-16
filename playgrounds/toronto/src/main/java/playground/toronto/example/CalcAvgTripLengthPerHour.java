@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.Network;
 
 /**
  * Calculates the average length of all trips started in a hour.

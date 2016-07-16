@@ -22,7 +22,7 @@
 package playground.boescpa.converters.osm.scheduleCreator;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.Vehicles;

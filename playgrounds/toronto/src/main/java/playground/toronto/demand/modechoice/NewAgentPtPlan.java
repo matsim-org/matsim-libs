@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationUtils;
 
 /**

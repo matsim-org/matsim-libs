@@ -3,9 +3,8 @@ package playground.dhosse.prt.router;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.network.Network;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.*;

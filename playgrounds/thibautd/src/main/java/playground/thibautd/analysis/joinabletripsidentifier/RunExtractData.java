@@ -20,13 +20,13 @@
 package playground.thibautd.analysis.joinabletripsidentifier;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.Network;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.ivt.utils.MoreIOUtils;
 import playground.ivt.utils.PassengerTracker;

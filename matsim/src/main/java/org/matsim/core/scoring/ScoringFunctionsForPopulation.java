@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -37,7 +38,6 @@ import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;

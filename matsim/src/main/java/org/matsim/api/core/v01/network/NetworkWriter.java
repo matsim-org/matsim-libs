@@ -21,7 +21,6 @@
 package org.matsim.api.core.v01.network;
 
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.network.Network;
 
 /**
  * @author nagel

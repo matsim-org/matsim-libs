@@ -19,11 +19,11 @@
 package saleem.p0;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 

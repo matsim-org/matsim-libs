@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,7 +44,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 

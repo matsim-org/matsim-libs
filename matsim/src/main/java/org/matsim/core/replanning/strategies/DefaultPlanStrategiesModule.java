@@ -24,12 +24,12 @@ package org.matsim.core.replanning.strategies;
 
 import com.google.inject.TypeLiteral;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.network.Network;
 import org.matsim.core.replanning.selectors.*;
 
 import javax.inject.Inject;

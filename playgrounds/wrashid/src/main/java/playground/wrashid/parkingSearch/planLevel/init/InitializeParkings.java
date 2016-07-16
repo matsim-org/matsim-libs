@@ -19,9 +19,9 @@
 
 package playground.wrashid.parkingSearch.planLevel.init;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.Network;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import playground.wrashid.lib.GlobalRegistry;

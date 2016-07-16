@@ -3,10 +3,10 @@ package playground.balac.twowaycarsharingredisigned.scoring;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 

@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 

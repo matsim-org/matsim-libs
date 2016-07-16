@@ -21,9 +21,9 @@ package playground.johannes.gsv.gis;
 
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
-import org.matsim.core.network.Network;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;

@@ -21,8 +21,8 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.FastRouterDelegateFactory;

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -14,7 +15,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import saleem.p0.GenericP0ControlHandler;

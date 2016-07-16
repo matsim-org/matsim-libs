@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
@@ -27,7 +28,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;

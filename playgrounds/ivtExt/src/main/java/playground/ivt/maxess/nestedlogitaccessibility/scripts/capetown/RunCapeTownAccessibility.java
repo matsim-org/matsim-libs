@@ -20,10 +20,9 @@ package playground.ivt.maxess.nestedlogitaccessibility.scripts.capetown;
 
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;

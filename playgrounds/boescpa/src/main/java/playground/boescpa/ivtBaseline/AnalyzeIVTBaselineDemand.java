@@ -1,9 +1,9 @@
 package playground.boescpa.ivtBaseline;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.Network;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.boescpa.analysis.ActivityAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;

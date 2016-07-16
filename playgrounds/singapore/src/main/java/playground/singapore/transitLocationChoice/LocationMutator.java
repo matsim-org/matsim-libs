@@ -24,12 +24,12 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;

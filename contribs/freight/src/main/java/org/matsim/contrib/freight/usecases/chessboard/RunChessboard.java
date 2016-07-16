@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -29,7 +30,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;

@@ -48,7 +48,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;

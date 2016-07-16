@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 public class MyCommercialActivityDensityWriter implements ActivityStartEventHandler{
 	

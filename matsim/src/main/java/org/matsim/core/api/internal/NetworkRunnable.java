@@ -20,7 +20,7 @@
 
 package org.matsim.core.api.internal;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * standardization interface

@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;

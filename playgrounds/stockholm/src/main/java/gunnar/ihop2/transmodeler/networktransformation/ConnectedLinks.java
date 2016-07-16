@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * 

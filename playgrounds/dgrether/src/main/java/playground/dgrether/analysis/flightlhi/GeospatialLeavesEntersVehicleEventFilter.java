@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 import playground.dgrether.events.filters.EventFilter;
 

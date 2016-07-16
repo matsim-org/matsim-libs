@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 public class Dummy_WorstScore extends Dummy_OptimalScore {
 

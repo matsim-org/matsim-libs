@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 
 /**

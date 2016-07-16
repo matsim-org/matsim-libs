@@ -3,8 +3,8 @@ package playground.sergioo.networksMatcher2012.kernel;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Network;
 
 import playground.sergioo.networksMatcher2012.kernel.core.ComposedLink;
 import playground.sergioo.networksMatcher2012.kernel.core.ComposedNode;

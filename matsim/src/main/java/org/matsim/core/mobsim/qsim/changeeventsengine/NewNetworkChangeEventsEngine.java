@@ -1,15 +1,14 @@
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import javax.inject.Inject;

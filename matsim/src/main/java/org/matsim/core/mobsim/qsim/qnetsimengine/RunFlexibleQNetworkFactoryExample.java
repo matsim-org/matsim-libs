@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -32,8 +33,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.core.network.Network;
-import org.matsim.core.network.Network;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 

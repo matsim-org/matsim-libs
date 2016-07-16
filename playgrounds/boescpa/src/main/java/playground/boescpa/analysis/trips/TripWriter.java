@@ -20,7 +20,7 @@
 package playground.boescpa.analysis.trips;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 

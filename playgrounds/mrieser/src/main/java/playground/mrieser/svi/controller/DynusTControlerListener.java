@@ -22,6 +22,7 @@ package playground.mrieser.svi.controller;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -32,7 +33,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.NetworkWriter;
 import org.opengis.feature.simple.SimpleFeature;
 

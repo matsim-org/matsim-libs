@@ -22,7 +22,6 @@ import java.util.TreeSet;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -49,6 +48,7 @@ import playground.sergioo.hits2012Scheduling.IncomeEstimation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.eventsBasedPTRouter.SerializableLinkTravelTimes;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;

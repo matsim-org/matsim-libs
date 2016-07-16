@@ -23,9 +23,9 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.network.Network;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 

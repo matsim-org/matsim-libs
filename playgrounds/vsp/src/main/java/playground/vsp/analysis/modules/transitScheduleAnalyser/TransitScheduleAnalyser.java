@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;

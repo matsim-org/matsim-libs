@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;

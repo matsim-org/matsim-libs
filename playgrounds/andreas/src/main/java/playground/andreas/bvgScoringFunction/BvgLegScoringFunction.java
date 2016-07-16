@@ -21,12 +21,12 @@ package playground.andreas.bvgScoringFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.Network;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;

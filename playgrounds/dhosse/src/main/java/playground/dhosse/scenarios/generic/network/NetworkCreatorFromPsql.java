@@ -15,9 +15,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Network;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
@@ -36,7 +35,7 @@ import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * 
- * This class provides functionalities to create and modify a {@link org.matsim.core.network.Network}
+ * This class provides functionalities to create and modify a {@link org.matsim.api.core.v01.network.Network}
  * by using OpenStreetMap data stored in a postgreSQL database.
  * 
  * @author dhosse

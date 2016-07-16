@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.vsptelematics.common;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 import javax.inject.Inject;

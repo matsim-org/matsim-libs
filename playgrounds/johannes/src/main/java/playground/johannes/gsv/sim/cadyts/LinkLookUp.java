@@ -21,8 +21,8 @@ package playground.johannes.gsv.sim.cadyts;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
-import org.matsim.core.network.Network;
 
 /**
  * @author nagel

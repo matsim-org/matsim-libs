@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.eventsBasedPTRouter;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.network.Network;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;

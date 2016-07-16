@@ -20,10 +20,10 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausen
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.Network;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;

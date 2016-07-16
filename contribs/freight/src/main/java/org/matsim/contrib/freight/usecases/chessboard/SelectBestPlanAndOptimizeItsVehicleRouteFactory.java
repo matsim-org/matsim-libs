@@ -12,13 +12,13 @@ import jsprit.core.problem.solution.route.activity.TourActivity;
 import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.util.Solutions;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.core.network.Network;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;

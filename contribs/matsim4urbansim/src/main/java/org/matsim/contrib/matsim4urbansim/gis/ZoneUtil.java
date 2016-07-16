@@ -26,9 +26,9 @@ package org.matsim.contrib.matsim4urbansim.gis;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.ZoneObject;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;

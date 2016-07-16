@@ -2,6 +2,7 @@ package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -10,7 +11,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;

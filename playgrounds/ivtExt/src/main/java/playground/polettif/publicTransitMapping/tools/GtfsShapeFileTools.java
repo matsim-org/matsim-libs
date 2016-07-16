@@ -21,7 +21,7 @@ package playground.polettif.publicTransitMapping.tools;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;

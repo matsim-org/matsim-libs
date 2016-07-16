@@ -21,6 +21,7 @@ package org.matsim.contrib.socnetsim.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,6 @@ import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.network.Network;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;

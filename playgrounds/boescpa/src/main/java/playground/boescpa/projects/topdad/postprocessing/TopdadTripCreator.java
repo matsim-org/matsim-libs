@@ -29,7 +29,7 @@ import playground.boescpa.lib.tools.NetworkUtils;
 import java.util.HashMap;
 import java.util.List;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Creates and evaluates trips for topdad-postprocessing.

@@ -10,11 +10,11 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.network.Network;
 
 import java.util.HashMap;
 

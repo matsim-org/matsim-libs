@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -13,7 +14,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;

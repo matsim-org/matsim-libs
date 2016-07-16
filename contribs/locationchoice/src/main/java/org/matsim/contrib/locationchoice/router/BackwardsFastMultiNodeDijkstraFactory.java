@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.locationchoice.router;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.util.*;

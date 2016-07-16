@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.Network;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.VehicleReaderV1;

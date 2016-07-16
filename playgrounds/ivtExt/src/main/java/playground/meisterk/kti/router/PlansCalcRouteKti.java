@@ -21,8 +21,8 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;

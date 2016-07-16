@@ -22,7 +22,6 @@ package org.matsim.api.core.v01.network;
 import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.misc.Time;
 
 /**

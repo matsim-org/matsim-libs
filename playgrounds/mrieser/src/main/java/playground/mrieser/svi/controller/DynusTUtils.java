@@ -20,11 +20,11 @@
 package playground.mrieser.svi.controller;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.StringUtils;

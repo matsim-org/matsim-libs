@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -33,7 +34,6 @@ import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.network.Network;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**

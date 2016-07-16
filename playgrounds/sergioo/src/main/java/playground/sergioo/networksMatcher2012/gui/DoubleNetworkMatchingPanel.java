@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 import playground.sergioo.networkBusLaneAdder2012.gui.NetworkTwoNodesPainter;
 import playground.sergioo.networksMatcher2012.gui.DoubleNetworkMatchingWindow.Labels;

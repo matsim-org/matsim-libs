@@ -36,10 +36,10 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 
 public class AdvancedDemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,PersonDepartureEventHandler {

@@ -6,9 +6,9 @@ import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
 

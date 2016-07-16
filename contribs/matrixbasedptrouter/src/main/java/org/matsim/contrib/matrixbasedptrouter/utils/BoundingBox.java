@@ -1,6 +1,6 @@
 package org.matsim.contrib.matrixbasedptrouter.utils;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public final class BoundingBox {

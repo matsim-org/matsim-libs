@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;

@@ -22,11 +22,10 @@ package playground.andreas.mzilske.bvg09;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Network;
-import org.matsim.core.network.NetworkFactory;
-import org.matsim.core.network.Network;
 
 /**
  * Merges two networks into one, by copying all nodes and links from the two

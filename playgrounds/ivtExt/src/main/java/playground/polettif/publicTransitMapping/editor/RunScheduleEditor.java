@@ -20,7 +20,7 @@ package playground.polettif.publicTransitMapping.editor;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -79,7 +79,7 @@ public class RunScheduleEditor {
 
 	private static void setLogLevels() {
 		Logger.getLogger(org.matsim.core.router.Dijkstra.class).setLevel(Level.ERROR); // suppress no route found warnings
-		Logger.getLogger(org.matsim.core.network.Network.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.api.core.v01.network.Network.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.api.core.v01.network.Node.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.api.core.v01.network.Link.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.network.io.MatsimNetworkReader.class).setLevel(Level.WARN);

@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
@@ -33,7 +34,6 @@ import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;

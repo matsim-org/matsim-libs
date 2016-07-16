@@ -18,10 +18,9 @@
 package org.matsim.contrib.networkEditor.visualizing;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;

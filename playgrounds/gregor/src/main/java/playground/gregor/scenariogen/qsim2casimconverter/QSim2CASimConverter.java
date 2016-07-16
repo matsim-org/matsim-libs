@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,7 +38,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationReader;

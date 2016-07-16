@@ -20,10 +20,10 @@
 package playground.boescpa.analysis.trips;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.Network;
 
 import playground.boescpa.lib.tools.NetworkUtils;
 

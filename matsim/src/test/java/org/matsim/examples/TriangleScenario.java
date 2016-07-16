@@ -20,10 +20,10 @@
 
 package org.matsim.examples;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;

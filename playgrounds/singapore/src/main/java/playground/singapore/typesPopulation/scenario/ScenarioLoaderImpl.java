@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -33,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.network.io.MatsimNetworkReader;

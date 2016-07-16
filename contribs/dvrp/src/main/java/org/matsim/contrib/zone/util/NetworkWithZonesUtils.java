@@ -24,7 +24,6 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.zone.Zone;
-import org.matsim.core.network.Network;
 
 
 public class NetworkWithZonesUtils

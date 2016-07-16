@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.parking.PC2.scoring;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;

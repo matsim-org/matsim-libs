@@ -28,12 +28,12 @@ import javax.inject.Singleton;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;

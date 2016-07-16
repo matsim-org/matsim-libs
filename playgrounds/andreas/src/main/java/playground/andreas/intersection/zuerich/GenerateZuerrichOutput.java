@@ -2,6 +2,7 @@ package playground.andreas.intersection.zuerich;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
@@ -11,7 +12,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitions11;

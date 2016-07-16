@@ -20,8 +20,8 @@
 package playground.gregor.sim2d_v4.trafficmonitoring;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.core.trafficmonitoring.OptimisticTravelTimeAggregator;
 import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;

@@ -20,7 +20,7 @@
 package playground.dgrether.signalsystems.data.consistency;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.Lanes;
 
 import playground.dgrether.designdrafts.consistency.ConsistencyChecker;

@@ -26,12 +26,12 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer;
 import org.matsim.contrib.wagonSim.production.ProductionParser;
 import org.matsim.contrib.wagonSim.production.ProductionToMATSimNetworkConverter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;

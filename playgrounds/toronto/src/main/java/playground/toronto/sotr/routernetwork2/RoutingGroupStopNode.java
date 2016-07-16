@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;

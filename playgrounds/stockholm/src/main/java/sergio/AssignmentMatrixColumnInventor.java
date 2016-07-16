@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 import floetteroed.utilities.Tuple;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;

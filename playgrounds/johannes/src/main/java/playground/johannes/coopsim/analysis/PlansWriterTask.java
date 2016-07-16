@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;

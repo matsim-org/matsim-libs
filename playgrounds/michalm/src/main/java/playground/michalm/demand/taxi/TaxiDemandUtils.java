@@ -24,7 +24,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 

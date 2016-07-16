@@ -1,8 +1,8 @@
 package playground.vsp.pipeline;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.StreamingPopulationReader;
 import org.matsim.core.population.StreamingUtils;

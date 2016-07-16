@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.router;
 
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.Network;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.vehicles.Vehicle;

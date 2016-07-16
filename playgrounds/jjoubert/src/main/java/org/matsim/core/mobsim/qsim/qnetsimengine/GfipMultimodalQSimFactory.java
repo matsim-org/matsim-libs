@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -48,7 +49,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.network.Network;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;

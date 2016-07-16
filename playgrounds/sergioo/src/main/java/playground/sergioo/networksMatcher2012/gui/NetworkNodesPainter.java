@@ -6,8 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.Network;
 
 import playground.sergioo.networksMatcher2012.gui.NetworkNodesPainterManager;
 import playground.sergioo.visualizer2D2012.LayersPanel;

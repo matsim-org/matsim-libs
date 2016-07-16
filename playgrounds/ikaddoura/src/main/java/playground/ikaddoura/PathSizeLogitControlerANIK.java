@@ -25,11 +25,11 @@ package playground.ikaddoura;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemoverANIK;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemoverANIK.Builder;

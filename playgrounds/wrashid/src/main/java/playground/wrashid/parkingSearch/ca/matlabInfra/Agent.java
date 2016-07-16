@@ -31,7 +31,7 @@ public class Agent {
 		this.routeAway = routeAway;		
 	}
 	
-	public String getXMLString(org.matsim.core.network.Network network){
+	public String getXMLString(org.matsim.api.core.v01.network.Network network){
 		Random rand=new Random();
 		
 		StringBuffer stringBuffer = new StringBuffer();

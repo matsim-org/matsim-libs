@@ -40,10 +40,10 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.network.Network;
 import org.matsim.vehicles.Vehicle;
 
 /**

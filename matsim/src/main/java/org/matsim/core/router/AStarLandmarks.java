@@ -23,9 +23,9 @@ package org.matsim.core.router;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.Network;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;

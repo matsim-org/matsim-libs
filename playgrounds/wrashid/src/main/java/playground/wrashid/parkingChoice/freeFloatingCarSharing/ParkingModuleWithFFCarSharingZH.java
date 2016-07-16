@@ -2,6 +2,7 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -20,7 +21,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 

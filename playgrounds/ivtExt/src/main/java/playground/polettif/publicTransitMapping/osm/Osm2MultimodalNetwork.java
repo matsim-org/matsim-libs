@@ -18,9 +18,9 @@
 
 package playground.polettif.publicTransitMapping.osm;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import playground.polettif.publicTransitMapping.config.CreateDefaultOsmConfig;
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;

@@ -22,8 +22,8 @@ import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.network.Network;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;

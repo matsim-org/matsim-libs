@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
 import org.matsim.core.network.io.MatsimNetworkReader;

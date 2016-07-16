@@ -18,7 +18,7 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.CollectionUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;

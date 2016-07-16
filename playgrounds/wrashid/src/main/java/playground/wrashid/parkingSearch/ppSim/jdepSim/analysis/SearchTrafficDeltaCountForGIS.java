@@ -29,13 +29,13 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.Network;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 

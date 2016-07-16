@@ -22,9 +22,9 @@ package playground.meisterk.org.matsim.run.portland;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.MatsimPopulationReader;

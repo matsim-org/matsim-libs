@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -27,7 +28,6 @@ import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.router.PlanRouter;

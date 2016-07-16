@@ -20,9 +20,9 @@
 package playground.mrieser;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.Network;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;

@@ -2,10 +2,10 @@ package playground.singapore.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.Network;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.pt.transitSchedule.api.TransitLine;

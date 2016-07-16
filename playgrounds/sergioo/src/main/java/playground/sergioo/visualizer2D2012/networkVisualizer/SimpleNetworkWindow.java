@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 import playground.sergioo.visualizer2D2012.LayersWindow;
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainter;

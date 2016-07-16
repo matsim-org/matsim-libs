@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.Network;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * This class computes the summary of co2 emissions per link over the day.

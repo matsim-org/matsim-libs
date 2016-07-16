@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.minibus.schedule;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.core.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**

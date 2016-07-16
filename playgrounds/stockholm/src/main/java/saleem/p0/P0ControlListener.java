@@ -2,6 +2,7 @@ package saleem.p0;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -10,7 +11,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
 public class P0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
