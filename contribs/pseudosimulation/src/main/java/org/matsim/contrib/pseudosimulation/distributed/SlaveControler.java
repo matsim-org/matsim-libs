@@ -205,8 +205,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         scenario = ScenarioUtils.loadScenario(config);
 
-
+        //experimental, not to be used
         DistributedPlanStrategyTranslationAndRegistration.TrackGenome = trackGenome;
+//        strategy substitution: mainly to register whether the option for quick replanning is to be used,
+//        as its original function is to mark plans for execution by PSim. But here, all plans are executed by PSim
+//        should rather be that PSim marks activities for execution in some other way
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
@@ -244,6 +247,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                             stopStopTimes));
                 }
             });
+
         else {
             final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
                     new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
@@ -267,25 +271,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         });
 
 
-//        if (IntelligentRouters) {
-//            matsimControler.addOverridingModule(new AbstractModule() {
-//                @Override
-//                public void install() {
-//                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
-//                }
-//            });
-//        } else {
-//            final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-//                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
-//            matsimControler.addOverridingModule(new AbstractModule() {
-//                @Override
-//                public void install() {
-//                    bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
-//                }
-//            });
-//            disutilityFactory.setSigma(0.1);
-//            matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
-//        }
         if (trackGenome) {
 
         }
@@ -612,15 +597,3 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 }
 
-class ReplaceableTravelTime implements TravelTime {
-    private TravelTime delegate;
-
-    @Override
-    public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-        return this.delegate.getLinkTravelTime(link, time, person, vehicle);
-    }
-
-    public void setTravelTime(TravelTime linkTravelTimes) {
-        this.delegate = linkTravelTimes;
-    }
-}

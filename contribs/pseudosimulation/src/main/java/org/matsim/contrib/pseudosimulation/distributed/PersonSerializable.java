@@ -18,10 +18,7 @@ public class PersonSerializable implements Serializable {
     public PersonSerializable(Person p) {
         this.id = p.getId().toString();
         Person person = p;
-        this.sex = PersonUtils.getSex(person);
-        this.age = PersonUtils.getAge(person);
-        this.hasLicense = PersonUtils.getLicense(person);
-        this.carAvail = PersonUtils.getCarAvail(person);
+
         for (Plan plan : person.getPlans()) {
             PlanSerializable planSerializable = new PlanSerializable(plan);
             plans.add(planSerializable);
@@ -31,10 +28,7 @@ public class PersonSerializable implements Serializable {
     }
 
     protected String id;
-    private String sex;
-    private int age = Integer.MIN_VALUE;
-    private String hasLicense;
-    private String carAvail;
+
     PlanSerializable selectedPlan = null;
     private TreeSet<String> travelcards = null;
 

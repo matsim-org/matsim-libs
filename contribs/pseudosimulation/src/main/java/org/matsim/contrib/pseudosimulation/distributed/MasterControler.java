@@ -161,7 +161,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         options.addOption("m", "mode", false, "A switch to change SimulationMode from PARALLEL (PSim execution during QSim execution) " +
                 "to SERIAL (PSim waits for QSim to finish and vice-versa.)");
-        options.addOption("s", "singapore", false, "Switch to indicate if this is the Singapore scenario, i.e. special scoring function");
         options.addOption("r", "routeOnSlaves", false, "Perform initial routing of plans on slaves.");
         options.addOption("f", "fullTransit", false, "Full transit performance transmission (more complete meta-model, more expensive)");
         options.addOption("q", "quickReplanning", false, "Quick replanning: each replanning strategy operates at 1/(number of PSim iters),  " +
@@ -256,7 +255,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     public MasterControler(String[] args) throws NumberFormatException, IOException, InterruptedException {
-        long startMillis = System.currentTimeMillis();
 
         if (commandLine.hasOption("c")) {
             config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
@@ -265,6 +263,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             printHelp();
             System.exit(1);
         }
+
         int numSlaves = 1;
         if (commandLine.hasOption("n"))
             numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
