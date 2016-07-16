@@ -116,7 +116,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private static final String SEEP_MODE = "seepMode";
 	private static final String IS_SEEP_MODE_STORAGE_FREE = "isSeepModeStorageFree";
 	private static final String IS_RESTRICTING_SEEPAGE = "isRestrictingSeepage";
-	private String seepMode = "bike";
+	
+	private Collection<String> seepModes = Arrays.asList(TransportMode.bike);;
 	private boolean isSeepModeStorageFree = false;
 	private boolean isRestrictingSeepage = true;
 
@@ -535,14 +536,23 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	}
 
 	// ---
+	
 	@StringGetter(SEEP_MODE)
-	public String getSeepMode() {
-		return seepMode;
+	private String getSeepModesAsString() {
+		return CollectionUtils.setToString(new HashSet<>(getSeepModes()));
 	}
 	@StringSetter(SEEP_MODE)
-	public void setSeepMode(String seepMode) {
-		this.seepMode = seepMode;
+	private void setSeepModes(String value) {
+		setSeepModes(Arrays.asList(value.split(",")));
 	}
+	
+	public Collection<String> getSeepModes() {
+		return seepModes;
+	}
+	public void setSeepModes(Collection<String> seepModes) {
+		this.seepModes = seepModes;
+	}
+	
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
 		return isSeepModeStorageFree;

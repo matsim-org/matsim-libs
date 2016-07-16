@@ -10,6 +10,14 @@
 	<artifactId>taxi</artifactId>
 	<name>taxi</name>
 
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 
 		<dependency>

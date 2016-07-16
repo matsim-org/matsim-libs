@@ -72,6 +72,8 @@ public class SimpleUtility implements Utility<SingleNest> {
 			}
 		}
 
+		assert tt >= 0 : tt;
+
 		switch ( configGroup.getFunctionalForm() ) {
 			case linear:
 				return tt;

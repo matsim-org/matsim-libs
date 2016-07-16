@@ -21,7 +21,7 @@ public class NPersonsDropoffStayTask extends TaxiDropoffTask {
 	}
 	
 	@Override
-    public void removeFromRequest()
+    public void disconnectFromRequest()
     {
 		for(TaxiRequest request : this.requests){
 			request.setDropoffTask(null);

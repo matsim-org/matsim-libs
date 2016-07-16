@@ -62,6 +62,13 @@ public class CSVLineBuilder
         Collections.addAll(line, cells);
         return this;
     }
+    
+    
+    public CSVLineBuilder addBuilder(CSVLineBuilder builder)
+    {
+        line.addAll(builder.line);
+        return this;
+    }
 
 
     public String[] build()

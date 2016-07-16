@@ -22,12 +22,17 @@
  */
 package playground.jbischoff.parking.sim;
 
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
+import playground.jbischoff.parking.evaluation.ParkingListener;
+import playground.jbischoff.parking.manager.FacilityBasedParkingManager;
 import playground.jbischoff.parking.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
 import playground.jbischoff.parking.manager.ParkingManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
+import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
+import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationToNearbyParking;
 import playground.jbischoff.parking.routing.ParkingRouter;
 import playground.jbischoff.parking.routing.WithinDayParkingRouter;
 
@@ -39,17 +44,22 @@ import playground.jbischoff.parking.routing.WithinDayParkingRouter;
  *
  */
 public class SetupParking {
-
+//TODO: create config group and make this all configurable
 	static public void installParkingModules(Controler controler){
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
 		controler.addOverridingModule(new AbstractModule() {
 			
 			
 			@Override
 			public void install() {
+			bind(ParkingManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();;
+			
 			bind(WalkLegFactory.class).asEagerSingleton();
-			bind(ParkingManager.class).to(LinkLengthBasedParkingManagerWithRandomInitialUtilisation.class);
+			
 			this.install(new ParkingSearchQSimModule());
+			addControlerListenerBinding().to(ParkingListener.class);
 			bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
+			bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
 			}
 		});
 		

@@ -123,14 +123,14 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
-			String outFolder ="/car/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
+			String outFolder ="/carMotorbikeBikeSeepage_bikeSeep/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car"; // travel (main) modes
-			args[2] = "5.0"; // modal split in pcu
-			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
-			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[1] = "car,motorbike,bike"; // travel (main) modes
+			args[2] = "1.0,1.0,1.0"; // modal split in pcu
+			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
+			args[4] = LinkDynamics.SeepageQ.toString(); // isPassingAllowed
 			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}
@@ -372,7 +372,6 @@ public class GenerateFundamentalDiagramData {
 
 		events.addHandler(globalFlowDynamicsUpdator);
 		
-		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
 		
@@ -395,8 +394,10 @@ public class GenerateFundamentalDiagramData {
 			@Override
 			public void install() {
 				this.bindMobsim().toInstance( qSim );
+				if(travelModes.length > 1) this.addEventHandlerBinding().toInstance(passingEventsUpdator);
 			}
 		});
+		
 		controler.run();
 		
 		if(! inputs.getSnapshotFormats().isEmpty()) {
@@ -459,8 +460,6 @@ public class GenerateFundamentalDiagramData {
 			if( travelModes.length > 1 ) {
 
 				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
-
-				writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
 
 				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			}
@@ -590,8 +589,6 @@ public class GenerateFundamentalDiagramData {
 		
 		if( travelModes.length > 1 ) {
 			writer.print("noOfCarsPerkm \t");
-
-			writer.print("totalBikesPassedByAllCarsPerKm \t");
 
 			writer.print("avgBikePassingRatePerkm \t");
 		}
@@ -792,13 +789,11 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}

@@ -199,6 +199,28 @@ public class TransitRouterImplTest {
 				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
+	
+	@Test
+	public void testTransferWalkDistance(){
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
+		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		Coord fromCoord = new Coord((double) 3800, (double) 5100);
+		Coord toCoord = new Coord((double) 16100, (double) 10050);
+		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null);
+		Leg leg1 = legs.get(1);
+		ExperimentalTransitRoute route1 = (ExperimentalTransitRoute) leg1.getRoute();
+		Coord coord1 = f.schedule.getFacilities().get(route1.getEgressStopId()).getCoord();
+		Leg leg3 = legs.get(3);
+		ExperimentalTransitRoute route3 = (ExperimentalTransitRoute) leg3.getRoute();
+		Coord coord3 = f.schedule.getFacilities().get(route3.getAccessStopId()).getCoord();
+		double beelineFactor = f.scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
+		assertEquals(CoordUtils.calcEuclideanDistance(coord1, coord3) * beelineFactor, 
+							legs.get(2).getRoute().getDistance(), MatsimTestCase.EPSILON);
+	}
 
 	@Test
 	public void testFasterAlternative() {

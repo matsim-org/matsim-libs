@@ -483,7 +483,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			addToBuffer(veh);
 			removeVehicleFromQueue(veh);
-			if(context.qsimConfig.isRestrictingSeepage() && context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ && veh.getDriver().getMode().equals(context.qsimConfig.getSeepMode())) {
+			if(context.qsimConfig.isRestrictingSeepage() 
+					&& context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
+					&& context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 				noOfSeepModeBringFwd++;
 			}
 		} // end while
@@ -500,7 +502,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if(context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
 				&& context.qsimConfig.isSeepModeStorageFree() 
-				&& veh.getVehicle().getType().getId().toString().equals(context.qsimConfig.getSeepMode()) ){
+				&& context.qsimConfig.getSeepModes().contains(veh.getVehicle().getType().getId().toString()) ){
 			// do nothing
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -727,7 +729,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// activate link since there is now action on it:
 		qLink.activateLink();
 
-		if(context.qsimConfig.isSeepModeStorageFree() && veh.getVehicle().getType().getId().toString().equals(context.qsimConfig.getSeepMode()) ){
+		if(context.qsimConfig.isSeepModeStorageFree() && context.qsimConfig.getSeepModes().contains( veh.getVehicle().getType().getId().toString() ) ){
 			// do nothing
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
@@ -905,7 +907,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			while(it.hasNext()){
 				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals( context.qsimConfig.getSeepMode() ) ) {
+				if( veh.getEarliestLinkExitTime()<=now && context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 					returnVeh = veh;
 					break;
 				}

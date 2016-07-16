@@ -22,7 +22,7 @@ public class NPersonsPickupStayTask extends TaxiPickupTask {
 	}
 	
 	@Override
-    public void removeFromRequest()
+    public void disconnectFromRequest()
     {
 		for(TaxiRequest request : this.requests){
 			request.setPickupTask(null);

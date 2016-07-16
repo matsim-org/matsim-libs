@@ -19,12 +19,9 @@
 
 package playground.jbischoff.parking.routing;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -32,52 +29,51 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import com.google.inject.name.Named;
 
-import playground.jbischoff.parking.ParkingUtils;
-
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 public class WithinDayParkingRouter implements ParkingRouter {
 
-	private LeastCostPathCalculator pathCalculator; 
-	@Inject
 	private Network network;
-	
+
 	private TravelTime travelTime;
+	private TravelDisutility travelDisutility;
+	private LeastCostPathCalculator pathCalculator;
+
 	@Inject
-	WithinDayParkingRouter(@Named(TransportMode.car) TravelTime travelTime) {
-	this.travelTime = travelTime;
+	WithinDayParkingRouter(@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, Network network) {
+		this.travelTime = travelTime;
+		travelDisutility = new TimeAsTravelDisutility(this.travelTime);
+		this.network = network;
+		pathCalculator = new Dijkstra(network, travelDisutility, this.travelTime);
 	}
 
 	@Override
-	public NetworkRoute getRouteFromParkingToDestination(NetworkRoute originalIntendedRoute, double departureTime, Id<Link> startLinkId) {
-		 ;
-		TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-		pathCalculator = new Dijkstra(network, travelDisutility, travelTime);
+	public NetworkRoute getRouteFromParkingToDestination(NetworkRoute originalIntendedRoute, double departureTime,
+			Id<Link> startLinkId) {
+
+		
 		Link startLink = this.network.getLinks().get(startLinkId);
 		Link endLink = this.network.getLinks().get(originalIntendedRoute.getEndLinkId());
-		
-		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), 
-				departureTime, null, null) ;
+
+		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), departureTime,
+				null, null);
 		NetworkRoute carRoute = new LinkNetworkRouteImpl(startLinkId, endLink.getId());
-		carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds( path.links), endLink.getId());
-		carRoute.setTravelTime( path.travelTime );
+		carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
+		carRoute.setTravelTime(path.travelTime);
 		double distance = RouteUtils.calcDistance(carRoute, 1.0, 1.0, network);
 		carRoute.setDistance(distance);
-		
+
 		return carRoute;
 	}
 

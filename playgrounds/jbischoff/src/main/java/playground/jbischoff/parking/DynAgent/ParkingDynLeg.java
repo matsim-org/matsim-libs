@@ -46,6 +46,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 	private ParkingChoiceLogic logic;
 	private MobsimTimer timer;
 	private EventsManager events;
+	private boolean hasFoundParking = false;
 
 	public ParkingDynLeg(String mode, NetworkRoute route, ParkingChoiceLogic logic, ParkingManager parkingManager,
 			Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
@@ -64,14 +65,16 @@ public class ParkingDynLeg implements DriverDynLeg {
 	public void movedOverNode(Id<Link> newLinkId) {
 		currentLinkIdx++;
 		currentLinkId = newLinkId;
-		
-		if (currentLinkId.equals(this.getDestinationLinkId())) {
-			this.parkingMode = true;
-			this.events.processEvent(
-							new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
-				}
-			
-		
+		if (!parkingMode) {
+			if (currentLinkId.equals(this.getDestinationLinkId())) {
+				this.parkingMode = true;
+				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
+			}
+		} else {
+			hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
+
+		}
+
 	}
 
 	@Override
@@ -86,7 +89,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 			return linkIds.get(currentLinkIdx + 1);
 
 		} else {
-			if (parkingManager.canVehicleParkHere(vehicleId, currentLinkId)) {
+			if (hasFoundParking) {
 				// easy, we can just park where at our destination link
 				return null;
 			} else {

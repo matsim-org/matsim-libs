@@ -2,6 +2,7 @@ package playground.singapore.springcalibration.preprocess;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,6 +46,10 @@ public class PlanAdapter {
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					leg.setRoute(null);
+ 				}
+				if(pe instanceof Activity){
+					Activity act = (Activity)pe;
+					act.setEndTime(act.getEndTime() + 3600.0);
  				}
 			}
 			p.getPlans().clear();

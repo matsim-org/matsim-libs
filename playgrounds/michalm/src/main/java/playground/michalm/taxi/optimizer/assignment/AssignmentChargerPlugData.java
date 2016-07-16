@@ -44,23 +44,15 @@ class AssignmentChargerPlugData
     }
 
 
-    private final double currTime;
-
-
     AssignmentChargerPlugData(TaxiOptimizerContext optimContext, Iterable<Charger> chargers)
     {
-        currTime = optimContext.timer.getTimeOfDay();
-        init(chargers);
-    }
+        double currTime = optimContext.timer.getTimeOfDay();
 
-
-    private void init(Iterable<Charger> chargers)
-    {
         int idx = 0;
         for (Charger c : chargers) {
             ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
 
-            int dispatched = logic.getDispatchedCount();
+            int dispatched = logic.getAssignedCount();
             int queued = logic.getQueuedCount();
             int plugged = logic.getPluggedCount();
 
@@ -82,7 +74,12 @@ class AssignmentChargerPlugData
             //moreover, in a single run we can assign up to one veh to each plug
             //(sequencing is not possible with AP)
             int assignableVehicles = Math.min(2 * c.getPlugs() - assignedVehicles, c.getPlugs());
-            double chargeStart = currTime + logic.estimateAssignedWorkload() / plugged;
+            if (assignableVehicles == unassignedPlugs) {
+                continue;
+            }
+
+            double chargeStart = currTime
+                    + logic.estimateAssignedWorkload() / (c.getPlugs() - unassignedPlugs);
             for (int p = unassignedPlugs; p < assignableVehicles; p++) {
                 ChargerPlug plug = new ChargerPlug(c, p);
                 entries.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), chargeStart));

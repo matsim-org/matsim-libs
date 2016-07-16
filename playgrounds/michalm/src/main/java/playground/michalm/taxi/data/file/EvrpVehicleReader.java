@@ -44,7 +44,7 @@ public class EvrpVehicleReader
     {
         double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
                 * UnitConversionRatios.J_PER_kWh;
-        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * 20)
+        double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * batteryCapacity)
                 * UnitConversionRatios.J_PER_kWh;
         return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity, initialSoc);
     }

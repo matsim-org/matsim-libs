@@ -21,5 +21,5 @@ package playground.michalm.ev.discharging;
 
 public interface AuxEnergyConsumption
 {
-    void consumeEnergy(double period);
+    double calcEnergyConsumption(double period);
 }
