@@ -48,6 +48,8 @@ public interface NetworkFactory extends MatsimFactory {
 	void setLinkFactory(LinkFactory factory);
 
 	void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory);
+	// yyyyyy i think that the settable factory can go: (1) returns class instead of interface; (2) is
+	// not consistently used in code.  kai, jul'16
 
 	NetworkChangeEvent createNetworkChangeEvent(double time);
 
