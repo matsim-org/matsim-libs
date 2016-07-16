@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 
-public class VariableIntervalTimeVariantAttribute
+final class VariableIntervalTimeVariantAttribute
     implements TimeVariantAttribute
 {
     private int aEvents = 1;
