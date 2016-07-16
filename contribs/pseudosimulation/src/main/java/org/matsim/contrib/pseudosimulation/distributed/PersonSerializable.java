@@ -42,12 +42,7 @@ public class PersonSerializable implements Serializable {
 
     public Person getPerson() {
         Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(id));
-        PersonUtils.setAge(person, age);
-        PersonUtils.setCarAvail(person, carAvail);
 
-        PersonUtils.setEmployed(person, isEmployed);
-        PersonUtils.setLicence(person, hasLicense);
-        PersonUtils.setSex(person, sex);
         for (PlanSerializable planSer : plans) {
             Plan plan = planSer.getPlan(person);
             person.addPlan(plan);

@@ -375,6 +375,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 (IntelligentRouters? "_I" : "")+
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
+        matsimControler.getConfig().controler().setOverwriteFileSetting(
+                OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+//                true ?
+//                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+//                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
         if (TrackGenome) {
             matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));
         }

@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterFactory;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
@@ -380,7 +379,7 @@ public class RunPSim {
 
 
         public MobSimSwitcher(int overridingRate) {
-            pSimFactory = new PSimFactory();
+            pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
             currentRate = overridingRate;
             endRate = overridingRate;
             endIter = matsimControler.getConfig().controler().getLastIteration();
@@ -389,7 +388,7 @@ public class RunPSim {
 
         //TODO: add a config group to enable all this stuff again
         private MobSimSwitcher() {
-            pSimFactory = new PSimFactory();
+            pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
             int startRate = 0;
             if (matsimControler.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
                 startRate = Math.max(
