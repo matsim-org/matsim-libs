@@ -141,10 +141,14 @@ class PlanSerializable implements Serializable {
             departureTime = leg.getDepartureTime();
             mode = leg.getMode();
             travelTime = leg.getTravelTime();
-            if (mode.equals(TransportMode.pt))
-                System.out.print("");
-            if (leg.getRoute() != null)
-                route = new GenericRouteSerializable(leg.getRoute());
+
+            if (leg.getRoute() != null) {
+                if (leg.getMode().equals(TransportMode.car))
+                    route = new NetworkRouteSerializable((NetworkRoute) leg.getRoute());
+                else
+                    route = new GenericRouteSerializable(leg.getRoute());
+
+            }
 
 
         }

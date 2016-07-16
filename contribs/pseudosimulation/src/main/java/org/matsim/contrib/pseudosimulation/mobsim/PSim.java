@@ -337,8 +337,7 @@ public class PSim implements Mobsim {
         }
 
         private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id agentId) {
-            if (agentId.toString().equals("141"))
-                System.out.println();
+
             double tt = 0;
             if (route.getStartLinkId() != route.getEndLinkId()) {
                 Id<Link> startLink = route.getStartLinkId();
