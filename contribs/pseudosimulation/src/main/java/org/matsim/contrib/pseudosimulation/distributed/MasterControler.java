@@ -82,7 +82,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private static int numberOfPSimIterations = 5;
     private Config config;
     private Controler matsimControler;
-    private TreeMap<Integer, Slave> slaves;
+    private TreeMap<Integer, SlaveHandler> slaveHandlerTreeMap;
     private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private TransitPerformanceRecorder transitPerformanceRecorder;
@@ -118,7 +118,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         formatter.printHelp("MasterControler", header, options, footer, true);
     }
 
-    private static void parseCommandLineOptions(String[] args){
+    private static void parseCommandLineOptions(String[] args) {
         System.setProperty("matsim.preferLocalDtds", "true");
         options = new Options();
         options.addOption(OptionBuilder.withLongOpt("config")
@@ -176,10 +176,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             printHelp();
             System.exit(1);
         }
-        appendString=(commandLine.hasOption("appendString")||commandLine.hasOption("a"))?commandLine.getOptionValue("a"):"";
+        appendString = (commandLine.hasOption("appendString") || commandLine.hasOption("a")) ? commandLine.getOptionValue("a") : "";
 
         masterInitialLogString = new StringBuilder();
-        if (commandLine.hasOption("f")||commandLine.hasOption("fullTransit")) {
+        if (commandLine.hasOption("f") || commandLine.hasOption("fullTransit")) {
             FullTransitPerformanceTransmission = true;
             masterInitialLogString.append("Transmitting full transit performance to slaves.\n");
         } else {
@@ -280,18 +280,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterInitialLogString.append("Will use the interval from the config " + writeFullPlansInterval + "\n");
         }
 
-        slaves = new TreeMap<>();
+        slaveHandlerTreeMap = new TreeMap<>();
         slaveScoreStats = new SlaveScoreStats(config);
 
-//        register initial number of slaves
+//        register initial number of slaveHandlerTreeMap
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
-            masterInitialLogString.append("Slave " + (i + 1) + " out of an initial " + numSlaves + " accepted.\n");
-            Slave slave = new Slave(socket, slaveUniqueNumber);
-            slaves.put(slaveUniqueNumber, slave);
+            masterInitialLogString.append("SlaveHandler " + (i + 1) + " out of an initial " + numSlaves + " accepted.\n");
+            SlaveHandler slaveHandler = new SlaveHandler(socket, slaveUniqueNumber);
+            slaveHandlerTreeMap.put(slaveUniqueNumber, slaveHandler);
             //order is important
-            initializeSlave(slave, slaveUniqueNumber++, initialRoutingOnSlaves);
+            initializeSlave(slaveHandler, slaveUniqueNumber++, initialRoutingOnSlaves);
             Thread.sleep(1000);
         }
         writeServer.close();
@@ -313,30 +313,30 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         matsimControler = new Controler(scenario);
         matsimControler.addControlerListener(new SlaveScoreWriter(this));
 
-        //split the population to be sent to the slaves
+        //split the population to be sent to the slaveHandlers
 
         double[] totalIterationTime = new double[numSlaves];
         int[] personsPerSlave = new int[numSlaves];
         long[] usedMemoryPerSlave = new long[numSlaves];
         long[] maxMemoryPerSlave = new long[numSlaves];
         int j = 0;
-        for (int i : slaves.keySet()) {
-            totalIterationTime[j] = 1 / (double) slaves.get(i).numThreadsOnSlave;
+        for (int i : slaveHandlerTreeMap.keySet()) {
+            totalIterationTime[j] = 1 / (double) slaveHandlerTreeMap.get(i).numThreadsOnSlave;
             personsPerSlave[j] = scenario.getPopulation().getPersons().size() / numSlaves;
-            usedMemoryPerSlave[j] = slaves.get(i).usedMemory;
-            maxMemoryPerSlave[j] = slaves.get(i).maxMemory;
+            usedMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).usedMemory;
+            maxMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).maxMemory;
             j++;
         }
         int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
                 bytesPerPlan, bytesPerPerson, 0.0, scenario.getPopulation().getPersons().size());
         List<Person>[] personSplit = (List<Person>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
         j = 0;
-        for (int i : slaves.keySet()) {
+        for (int i : slaveHandlerTreeMap.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
             for (Person p : personSplit[j]) {
-                    personsToSend.add(new PersonSerializable( p));
+                personsToSend.add(new PersonSerializable(p));
             }
-            slaves.get(i).slavePersonPool = personsToSend;
+            slaveHandlerTreeMap.get(i).slavePersonPool = personsToSend;
             j++;
         }
 
@@ -371,7 +371,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 (FullTransitPerformanceTransmission ? "_f" : "") +
                 (TrackGenome ? "_g" : "") +
                 (QuickReplanning ? "_q" : "") +
-                (IntelligentRouters? "_I" : "")+
+                (IntelligentRouters ? "_I" : "") +
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
         matsimControler.getConfig().controler().setOverwriteFileSetting(
@@ -388,8 +388,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     private int getTotalNumberOfPlansFromSlaves() {
         int total = 0;
-        for (Slave slave : slaves.values()) {
-            total += slave.numberOfPlans;
+        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
+            total += slaveHandler.numberOfPlans;
         }
         return total;
     }
@@ -419,14 +419,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         matsimControler.run();
     }
 
-    public void startSlavesInMode(CommunicationsMode mode) {
+    public void startSlaveHandlersInMode(CommunicationsMode mode) {
         if (numThreads.get() > 0)
-            masterLogger.warn("All slaves have not finished previous operation but they are being asked to " + mode.toString());
-        numThreads = new AtomicInteger(slaves.size());
-        for (Slave slave : slaves.values()) {
-            slave.communicationsMode = mode;
-            Thread slaveThread = new Thread(slave);
-            slaveThread.setName("slave_" + slave.myNumber + ":" + mode.toString());
+            masterLogger.warn("All slaveHandlers have not finished previous operation but they are being asked to " + mode.toString());
+        numThreads = new AtomicInteger(slaveHandlerTreeMap.size());
+        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
+            slaveHandler.communicationsMode = mode;
+            Thread slaveThread = new Thread(slaveHandler);
+            slaveThread.setName("slave_" + slaveHandler.myNumber + ":" + mode.toString());
             slaveThread.start();
 
         }
@@ -434,7 +434,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     public void waitForSlaveThreads() {
         masterLogger.warn("Waiting for " + numThreads.get() +
-                " slaves");
+                " slaveHandlers");
         while (numThreads.get() > 0)
             try {
                 Thread.sleep(10);
@@ -446,15 +446,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterLogger.error("Something went wrong. Exiting.");
             throw new RuntimeException();
         }
-        masterLogger.warn("All slaves done.");
+        masterLogger.warn("All slaveHandlers done.");
     }
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        startSlavesInMode(CommunicationsMode.TRANSMIT_SCENARIO);
+        startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCENARIO);
         if (initialRoutingOnSlaves) {
             waitForSlaveThreads();
-            startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
             waitForSlaveThreads();
             mergePlansFromSlaves();
             //this code is a copy of the replanning strategy
@@ -464,11 +464,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 person.addPlan(plan);
                 person.setSelectedPlan(plan);
             }
-            if (slaves.size() > 1 || slavesHaveRequestedShutdown() || hydra.hydraSlaves.size() > 0)
+            if (slaveHandlerTreeMap.size() > 1 || slavesHaveRequestedShutdown() || hydra.hydraSlaves.size() > 0)
                 loadBalance();
             if (SelectedSimulationMode.equals(SimulationMode.PARALLEL)) {
                 waitForSlaveThreads();
-                startSlavesInMode(CommunicationsMode.CONTINUE);
+                startSlaveHandlersInMode(CommunicationsMode.CONTINUE);
             }
         }
     }
@@ -479,18 +479,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         this.currentIteration = event.getIteration();
         //wait for previous transmissions to complete, if necessary
         waitForSlaveThreads();
-        //start receiving plans from slaves as the QSim runs
+        //start receiving plans from slaveHandlerTreeMap as the QSim runs
         int firstIteration = config.controler().getFirstIteration();
         if (SelectedSimulationMode.equals(SimulationMode.PARALLEL))
-            startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
         IterationStopWatch stopwatch = event.getServices().getStopwatch();
         if ((writeFullPlansInterval > 0) &&
                 ((event.getIteration() % writeFullPlansInterval == 0) && event.getIteration() > 0)) {
-            masterLogger.warn("Dumping plans on slaves. Can be re-assembled into monolithic plans file afterwards.");
+            masterLogger.warn("Dumping plans on slaveHandlerTreeMap. Can be re-assembled into monolithic plans file afterwards.");
             waitForSlaveThreads();
-            startSlavesInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
+            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
             waitForSlaveThreads();
-            startSlavesInMode(CommunicationsMode.DUMP_PLANS);
+            startSlaveHandlersInMode(CommunicationsMode.DUMP_PLANS);
         }
     }
 
@@ -500,7 +500,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             waitForSlaveThreads();
             mergePlansFromSlaves();
             waitForSlaveThreads();
-            startSlavesInMode(CommunicationsMode.TRANSMIT_SCORES);
+            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCORES);
             waitForSlaveThreads();
         }
         boolean isLoadBalanceIteration = event.getIteration() > config.controler().getFirstIteration() &&
@@ -516,21 +516,21 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 config.travelTimeCalculator().getTraveltimeBinSize(),
                 config.qsim().getEndTime(),
                 scenario.getNetwork().getLinks().values());
-        startSlavesInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
+        startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
         if (SelectedSimulationMode.equals(SimulationMode.SERIAL)) {
             waitForSlaveThreads();
-            startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
             waitForSlaveThreads();
             mergePlansFromSlaves();
             waitForSlaveThreads();
-            startSlavesInMode(CommunicationsMode.TRANSMIT_SCORES);
+            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCORES);
             waitForSlaveThreads();
         }
     }
 
     private boolean slavesHaveRequestedShutdown() {
-        for (Slave slave : slaves.values()) {
-            if (!slave.isOkForNextIter)
+        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
+            if (!slaveHandler.isOkForNextIter)
                 return true;
         }
         return false;
@@ -538,17 +538,17 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-        //start receiving plans from slaves as the QSim runs
-        startSlavesInMode(CommunicationsMode.DIE);
+        //start receiving plans from slaveHandlerTreeMap as the QSim runs
+        startSlaveHandlersInMode(CommunicationsMode.DIE);
     }
 
     private void loadBalance() {
         waitForSlaveThreads();
-        //add any newly registered slaves
-        slaves.putAll(hydra.getNewSlaves());
-        if (slaves.size() < 2)
+        //add any newly registered slaveHandlerTreeMap
+        slaveHandlerTreeMap.putAll(hydra.getNewSlaves());
+        if (slaveHandlerTreeMap.size() < 2)
             return;
-        startSlavesInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
+        startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
         waitForSlaveThreads();
         if (getTotalNumberOfPlansFromSlaves() > 0) {
             bytesPerPlan = getTotalSlavePopulationMemoryUse() / getTotalNumberOfPlansFromSlaves();
@@ -558,12 +558,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         masterLogger.warn("About to start load balancing.");
         Set<Integer> validSlaves = new TreeSet<>();
         Set<Integer> inValidSlaves = new TreeSet<>();
-        validSlaves.addAll(slaves.keySet());
-        for (Slave slave : slaves.values()) {
-            if (!slave.isOkForNextIter) {
-                validSlaves.remove(slave.myNumber);
-                inValidSlaves.add(slave.myNumber);
-                slave.targetPopulationSize = 0;
+        validSlaves.addAll(slaveHandlerTreeMap.keySet());
+        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
+            if (!slaveHandler.isOkForNextIter) {
+                validSlaves.remove(slaveHandler.myNumber);
+                inValidSlaves.add(slaveHandler.myNumber);
+                slaveHandler.targetPopulationSize = 0;
             }
         }
 
@@ -573,33 +573,33 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         long[] maxMemoryPerSlave = new long[validSlaves.size()];
         int j = 0;
         for (int i : validSlaves) {
-            totalIterationTime[j] = slaves.get(i).totalIterationTime;
-            personsPerSlave[j] = slaves.get(i).currentPopulationSize;
-            usedMemoryPerSlave[j] = slaves.get(i).usedMemory;
-            maxMemoryPerSlave[j] = slaves.get(i).maxMemory;
+            totalIterationTime[j] = slaveHandlerTreeMap.get(i).totalIterationTime;
+            personsPerSlave[j] = slaveHandlerTreeMap.get(i).currentPopulationSize;
+            usedMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).usedMemory;
+            maxMemoryPerSlave[j] = slaveHandlerTreeMap.get(i).maxMemory;
             j++;
         }
 
         setSlaveTargetPopulationSizes(validSlaves,
                 getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
                         bytesPerPlan, bytesPerPerson, loadBalanceDampeningFactor, scenario.getPopulation().getPersons().size()));
-        startSlavesInMode(CommunicationsMode.POOL_PERSONS);
+        startSlaveHandlersInMode(CommunicationsMode.POOL_PERSONS);
         waitForSlaveThreads();
         mergePersonsFromSlaves();
-        masterLogger.warn("Distributing persons between  slaves");
-        //kill slaves that are not ok for another round
+        masterLogger.warn("Distributing persons between  slaveHandlerTreeMap");
+        //kill slaveHandlerTreeMap that are not ok for another round
         for (int i : inValidSlaves) {
-            slaves.get(i).communicationsMode = CommunicationsMode.DIE;
-            new Thread(slaves.get(i)).start();
-            slaves.remove(i);
+            slaveHandlerTreeMap.get(i).communicationsMode = CommunicationsMode.DIE;
+            new Thread(slaveHandlerTreeMap.get(i)).start();
+            slaveHandlerTreeMap.remove(i);
         }
-        startSlavesInMode(CommunicationsMode.DISTRIBUTE_PERSONS);
+        startSlaveHandlersInMode(CommunicationsMode.DISTRIBUTE_PERSONS);
     }
 
     private long getTotalSlavePopulationMemoryUse() {
         long total = 0;
-        for (Slave slave : slaves.values()) {
-            total += (slave.usedMemory - scenarioMemoryUse);
+        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
+            total += (slaveHandler.usedMemory - scenarioMemoryUse);
         }
         return total;
     }
@@ -607,15 +607,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private void setSlaveTargetPopulationSizes(Set<Integer> keys, int[] slaveTargetPopulationSizes) {
         int j = 0;
         for (int i : keys) {
-            slaves.get(i).targetPopulationSize = slaveTargetPopulationSizes[j];
+            slaveHandlerTreeMap.get(i).targetPopulationSize = slaveTargetPopulationSizes[j];
             j++;
         }
     }
 
     private void mergePlansFromSlaves() {
         newPlans.clear();
-        for (Slave slave : slaves.values()) {
-            newPlans.putAll(slave.plans);
+        for (SlaveHandler slaveHandler : slaveHandlerTreeMap.values()) {
+            newPlans.putAll(slaveHandler.plans);
         }
 
     }
@@ -633,12 +633,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     private void mergePersonsFromSlaves() {
         personPool.clear();
-        for (Slave loadBalanceThread : slaves.values()) {
+        for (SlaveHandler loadBalanceThread : slaveHandlerTreeMap.values()) {
             personPool.addAll(loadBalanceThread.getPersons());
         }
     }
 
-    private static Map<Integer, Integer> getOptimalNumbers(int popSize, double[] timesPerPlan, Set<Integer> validSlaveIndices) {
+    private static Map<Integer, Integer> getOptimalNumbers(int popSize, double[] timesPerPlan,
+                                                           Set<Integer> validSlaveIndices) {
         Map<Integer, Integer> output = new HashMap<>();
         double sumOfReciprocals = 0.0;
         for (int i : validSlaveIndices) {
@@ -663,7 +664,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     public static int[] getSlaveTargetPopulationSizes(double[] totalIterationTime, int[] personsPerSlave,
-                                                      long[] maxMemory, long[] usedMemory, long bytesPerPlan, long bytesPerPerson,
+                                                      long[] maxMemory, long[] usedMemory, long bytesPerPlan,
+                                                      long bytesPerPerson,
                                                       double dampeningFactor, int popSize) {
         int numSlaves = totalIterationTime.length;
         StringBuffer sb = new StringBuffer();
@@ -724,7 +726,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         fastestTimePerPlan = fastestTimePerPlan > 0 && !new Double(fastestTimePerPlan).equals(Double.POSITIVE_INFINITY) ? fastestTimePerPlan : 1;
         for (int i : newSlaves)
             timesPerPlan[i] = fastestTimePerPlan;
-//        adjust numbers taking account of memory avail on slaves
+//        adjust numbers taking account of memory avail on slaveHandlerTreeMap
         boolean allGood = false;
         int remainder = popSize;
         while (remainder > 0 && validSlaveIndices.size() > 0) {
@@ -835,7 +837,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
 
-    private class Slave implements Runnable {
+    private class SlaveHandler implements Runnable {
         final Logger slaveLogger = Logger.getLogger(this.getClass());
         final Map<String, Plan> plans = new HashMap<>();
         ObjectInputStream reader;
@@ -853,7 +855,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         private int numThreadsOnSlave;
         private boolean isOkForNextIter = true;
 
-        public Slave(Socket socket, int i) throws IOException {
+        public SlaveHandler(Socket socket, int i) throws IOException {
             super();
             myNumber = i;
             this.writer = new ObjectOutputStream(socket.getOutputStream());
@@ -921,7 +923,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         @Override
         public void run() {
             try {
-                slaveLogger.warn("Slave " + myNumber + " entering comms mode: " + communicationsMode.toString());
+                slaveLogger.warn("SlaveHandler " + myNumber + " entering comms mode: " + communicationsMode.toString());
                 writer.writeObject(communicationsMode);
                 writer.flush();
                 switch (communicationsMode) {
@@ -970,7 +972,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             //end of a successful Thread.run()
             numThreads.decrementAndGet();
-            slaveLogger.warn("Slave " + myNumber + " leaving comms mode: " + communicationsMode.toString());
+            slaveLogger.warn("SlaveHandler " + myNumber + " leaving comms mode: " + communicationsMode.toString());
         }
 
         private void transmitScores() throws IOException, ClassNotFoundException {
@@ -979,17 +981,17 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
             Population temp = (Population) PopulationUtils.createPopulation(config);
-            StreamingUtils.setIsStreaming(temp, true);
+
             OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
             PopulationWriter pw = new PopulationWriter(
                     temp, scenario.getNetwork());
-            pw.startStreaming(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
+            pw.write(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
             slaveLogger.warn("Dumping population of " + currentPopulationSize + " agents on slave number " + myNumber);
             List<PersonSerializable> tempPax = (List<PersonSerializable>) reader.readObject();
             for (PersonSerializable p : tempPax) {
                 pw.writePerson(p.getPerson());
             }
-            pw.closeStreaming();
+
             slaveLogger.warn("Done writing on slave number " + myNumber);
         }
 
@@ -1025,7 +1027,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     private class Hydra implements Runnable {
-        TreeMap<Integer, Slave> hydraSlaves = new TreeMap<>();
+        TreeMap<Integer, SlaveHandler> hydraSlaves = new TreeMap<>();
         AtomicBoolean accessingMap = new AtomicBoolean(false);
 
         public void run() {
@@ -1036,16 +1038,16 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     Socket socket = writeServer.accept();
                     int i = slaveUniqueNumber++;
                     masterLogger.warn("Slave accepted.");
-                    Slave slave = new Slave(socket, i);
+                    SlaveHandler slaveHandler = new SlaveHandler(socket, i);
                     while (accessingMap.get()) {
 //                    wait for the other process to finish modifying the map
                         Thread.sleep(10);
                     }
                     accessingMap.set(true);
-                    hydraSlaves.put(i, slave);
+                    hydraSlaves.put(i, slaveHandler);
                     //order is important
-                    initializeSlave(slave, i, false);
-                    slave.slavePersonPool = new ArrayList<>();
+                    initializeSlave(slaveHandler, i, false);
+                    slaveHandler.slavePersonPool = new ArrayList<>();
                     accessingMap.set(false);
                     Thread.sleep(1000);
                 }
@@ -1056,8 +1058,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
         }
 
-        public TreeMap<Integer, Slave> getNewSlaves() {
-            TreeMap<Integer, Slave> slaveBatch;
+        public TreeMap<Integer, SlaveHandler> getNewSlaves() {
+            TreeMap<Integer, SlaveHandler> slaveBatch;
             while (accessingMap.get()) {
                 try {
 //                    wait for the other process to finish modifying the map
@@ -1068,8 +1070,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             accessingMap.set(true);
             List<Integer> slavesToDrop = new ArrayList<>();
-            for (Slave slave : hydraSlaves.values()) {
-                if (!slave.isOkForNextIter) slavesToDrop.add(slave.myNumber);
+            for (SlaveHandler slaveHandler : hydraSlaves.values()) {
+                if (!slaveHandler.isOkForNextIter) slavesToDrop.add(slaveHandler.myNumber);
             }
             for (int i : slavesToDrop) hydraSlaves.remove(i);
             slaveBatch = hydraSlaves;
@@ -1079,18 +1081,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
     }
 
-    private void initializeSlave(Slave slave, int i, boolean initialRoutingOnSlaves) throws IOException {
-        slave.sendNumber(i);
-        slave.sendNumber(numberOfPSimIterations);
-        slave.sendNumber(config.controler().getLastIteration() * numberOfPSimIterations);
-        slave.sendBoolean(initialRoutingOnSlaves);
-        slave.sendBoolean(QuickReplanning);
-        slave.sendBoolean(FullTransitPerformanceTransmission);
-        slave.sendBoolean(TrackGenome);
-        slave.sendBoolean(IntelligentRouters);
-        slave.sendBoolean(false); //for diversity generation;
-        slave.readMemoryStats();
-        slave.readNumberOfThreadsOnSlave();
+    private void initializeSlave(SlaveHandler slaveHandler, int i, boolean initialRoutingOnSlaves) throws IOException {
+        slaveHandler.sendNumber(i);
+        slaveHandler.sendNumber(numberOfPSimIterations);
+        slaveHandler.sendNumber(config.controler().getLastIteration() * numberOfPSimIterations);
+        slaveHandler.sendBoolean(initialRoutingOnSlaves);
+        slaveHandler.sendBoolean(QuickReplanning);
+        slaveHandler.sendBoolean(FullTransitPerformanceTransmission);
+        slaveHandler.sendBoolean(TrackGenome);
+        slaveHandler.sendBoolean(IntelligentRouters);
+        slaveHandler.sendBoolean(false); //for diversity generation;
+        slaveHandler.readMemoryStats();
+        slaveHandler.readNumberOfThreadsOnSlave();
     }
 
 }

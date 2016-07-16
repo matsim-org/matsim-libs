@@ -48,7 +48,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 		if(idx<2){
 			return;
 		}
-		XYLineChart chart = new XYLineChart("Slave Score Statistics",
+		XYLineChart chart = new XYLineChart("SlaveHandler Score Statistics",
 				"iteration", "score");
 		double[] iterations = new double[idx];
 		for (int i = 0; i < idx; i++) {
