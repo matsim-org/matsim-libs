@@ -47,7 +47,7 @@ public class NetworkWrapper {
 		int numberOfLinksGenerated = 0;
 
 		for (Link link : networkLayer.getLinks().values()) {
-			NetworkUtils.createAndAddNode2(wrappedNetwork, Id.create(link.getId(), Node.class), link.getToNode().getCoord());
+			NetworkUtils.createAndAddNode(wrappedNetwork, Id.create(link.getId(), Node.class), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
 

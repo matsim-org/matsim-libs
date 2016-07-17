@@ -833,10 +833,10 @@ public class TestEmissionUtils {
 	private void addLinksToNetwork(Scenario sc) {
 		//intern method to set up a network with nodes and links
 		Network network = (Network) sc.getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("node1", Node.class), new Coord(.0, .0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("node2", Node.class), new Coord(.0, 1000.));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("node3", Node.class), new Coord(1000., .0));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("node4", Node.class), new Coord(1000., 1000.));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("node1", Node.class), new Coord(.0, .0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("node2", Node.class), new Coord(.0, 1000.));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("node3", Node.class), new Coord(1000., .0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("node4", Node.class), new Coord(1000., 1000.));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		

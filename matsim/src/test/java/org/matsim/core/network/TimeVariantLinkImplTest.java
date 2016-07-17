@@ -44,10 +44,10 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
     		((NetworkImpl)network).setFactory(nf);
-    		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
-    		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
-    		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+    		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
+    		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
 		final Node fromNode = node1;
 		final Node toNode = node2;
     		final Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, 1.667, (double) 3600, (double) 1 );
@@ -88,8 +88,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		nf.setLinkFactory(lf);
     		((NetworkImpl)network).setFactory(nf);
     
-    		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
     		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
@@ -133,8 +133,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		nf.setLinkFactory(lf);
     		((NetworkImpl)network).setFactory(nf);
     
-    		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
     		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
@@ -178,8 +178,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		nf.setLinkFactory(lf);
     		((NetworkImpl)network).setFactory(nf);
     
-    		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
     		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
@@ -278,8 +278,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		((NetworkImpl)network).setFactory(nf);
     		network.setCapacityPeriod(3600.0);
     
-    		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
     		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
@@ -317,8 +317,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		((NetworkImpl)network).setFactory(nf);
     		network.setCapacityPeriod(3600.0);
     
-    		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
     		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );

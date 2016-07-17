@@ -192,8 +192,8 @@ public class PopulationReaderMatsimV4Test {
 	public void testReadActivity() {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = (Network) scenario.getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord(0, 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord(0, 1000));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0, 1000));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode, toNode, 1000.0, 10.0, 2000.0, (double) 1 );

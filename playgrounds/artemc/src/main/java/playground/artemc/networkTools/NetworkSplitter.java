@@ -92,7 +92,7 @@ public class NetworkSplitter {
 					newNodeXY = convertDistanceToCoordinates(linkToEdit, nodeDistanceOnMap);
 					final Id<Node> id1 = newNodeId;
 					final Coord coord = newNodeXY;
-					NetworkUtils.createAndAddNode2(network, id1, coord);
+					NetworkUtils.createAndAddNode(network, id1, coord);
 					nodes.add(network.getNodes().get(newNodeId));
 					nodeDistanceOnMap = nodeDistanceOnMap + totalLinkLengthOnMap / newNumberOfLinks;
 					System.out.println("   Adding new node: " + newNodeId.toString() + " with coord: "

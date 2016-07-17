@@ -75,7 +75,7 @@ public class CopyOfBuslaneGenerator_fullPriority {
 						} else {
 							final Id<Node> id2 = newNodeId;
 							final Coord coord = newBusNodeCoord;
-							NetworkUtils.createAndAddNode2(network, id2, coord);
+							NetworkUtils.createAndAddNode(network, id2, coord);
 						}
 						final Id<Link> id = newLinkId;
 						final double length1 = length;

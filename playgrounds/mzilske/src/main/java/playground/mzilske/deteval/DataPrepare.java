@@ -97,7 +97,7 @@ public class DataPrepare {
 				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				final Id<Node> id1 = id;
 				final Coord coord1 = coord;
-				NetworkUtils.createAndAddNode2(((Network) network), id1, coord1);
+				NetworkUtils.createAndAddNode(((Network) network), id1, coord1);
 			}
 
 		};

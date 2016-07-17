@@ -700,7 +700,7 @@ public class NetworkUtils {
 	}
 
 
-	public static Node createAndAddNode2(Network network, final Id<Node> id, final Coord coord) {
+	public static Node createAndAddNode(Network network, final Id<Node> id, final Coord coord) {
 		if (network.getNodes().containsKey(id)) {
 			throw new IllegalArgumentException(network + "[id=" + id + " already exists]");
 		}

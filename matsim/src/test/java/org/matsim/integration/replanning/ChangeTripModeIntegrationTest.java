@@ -76,8 +76,8 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		Network network = (Network) scenario.getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );

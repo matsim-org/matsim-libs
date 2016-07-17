@@ -296,10 +296,10 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 	private void initNetwork() {
 		Network nImpl = (Network) ScenarioUtils.createScenario( config ).getNetwork();
-		Node n1 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 1, Node.class ), new Coord(0, 0));
-		Node n2 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 2, Node.class ), new Coord(1, 0));
-		Node n3 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 3, Node.class ), new Coord(1, 2));
-		Node n4 = NetworkUtils.createAndAddNode2(nImpl, Id.create( 4, Node.class ), new Coord(4, 2));
+		Node n1 = NetworkUtils.createAndAddNode(nImpl, Id.create( 1, Node.class ), new Coord(0, 0));
+		Node n2 = NetworkUtils.createAndAddNode(nImpl, Id.create( 2, Node.class ), new Coord(1, 0));
+		Node n3 = NetworkUtils.createAndAddNode(nImpl, Id.create( 3, Node.class ), new Coord(1, 2));
+		Node n4 = NetworkUtils.createAndAddNode(nImpl, Id.create( 4, Node.class ), new Coord(4, 2));
 		final Node fromNode = n1;
 		final Node toNode = n2;
 

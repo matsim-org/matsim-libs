@@ -66,7 +66,7 @@ public class NetworkParseETNet {
 				String[] entries = curr_line.split("\t", -1);
 				// ID  X  Y
 				// 0   1  2
-				NetworkUtils.createAndAddNode2(network, Id.create(entries[0], Node.class), new Coord(Double.parseDouble(entries[1]), Double.parseDouble(entries[2])));
+				NetworkUtils.createAndAddNode(network, Id.create(entries[0], Node.class), new Coord(Double.parseDouble(entries[1]), Double.parseDouble(entries[2])));
 			}
 			buffered_reader.close();
 			file_reader.close();

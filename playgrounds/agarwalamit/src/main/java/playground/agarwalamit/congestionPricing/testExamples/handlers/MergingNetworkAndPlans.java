@@ -68,11 +68,11 @@ class MergingNetworkAndPlans {
 
 	void createNetwork(){
 
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord((double) 0, (double) 100));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord((double) 500, (double) 150));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
-		Node node5 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 0, (double) 100));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 500, (double) 150));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 

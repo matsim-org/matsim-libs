@@ -58,7 +58,7 @@ public class Visum2MatsimRoadNetwork {
 				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				final Id<Node> id1 = id;
 				final Coord coord1 = coord;
-				NetworkUtils.createAndAddNode2(network, id1, coord1);
+				NetworkUtils.createAndAddNode(network, id1, coord1);
 			}
 
 		};

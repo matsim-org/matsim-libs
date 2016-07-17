@@ -76,8 +76,8 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
 		Network network1 = NetworkUtils.createNetwork();
-		Node n1 = NetworkUtils.createAndAddNode2(network1, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node n2 = NetworkUtils.createAndAddNode2(network1, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node n1 = NetworkUtils.createAndAddNode(network1, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createAndAddNode(network1, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = n1;
 		final Node toNode = n2;
 		Link l1 = NetworkUtils.createAndAddLink(network1,Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, 1.0 );

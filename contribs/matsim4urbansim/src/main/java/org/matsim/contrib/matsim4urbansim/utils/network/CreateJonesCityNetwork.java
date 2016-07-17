@@ -169,7 +169,7 @@ public class CreateJonesCityNetwork {
 			final Coord coord1 = coord;
 
 			// create a new node
-			Node node = (Node)NetworkUtils.createAndAddNode2(network, Id.create(zoneID, Node.class), coord1);
+			Node node = (Node)NetworkUtils.createAndAddNode(network, Id.create(zoneID, Node.class), coord1);
 			NetworkUtils.setOrigId( node, zoneID.toString() ) ;
 			NetworkUtils.setType(node,"unknownType");		
 		}

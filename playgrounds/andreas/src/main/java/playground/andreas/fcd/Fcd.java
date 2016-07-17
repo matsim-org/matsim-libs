@@ -260,10 +260,10 @@ public class Fcd {
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, create link
 				if(net.getNodes().get(currentEvent.getLinkId()) == null){
-					NetworkUtils.createAndAddNode2(net, (Id<Node>) currentEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(currentEvent.getLinkId()).getCoord()));
+					NetworkUtils.createAndAddNode(net, (Id<Node>) currentEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(currentEvent.getLinkId()).getCoord()));
 				}
 				if(net.getNodes().get(lastEvent.getLinkId()) == null){
-					NetworkUtils.createAndAddNode2(net, (Id<Node>) lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
+					NetworkUtils.createAndAddNode(net, (Id<Node>) lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
 				}
 				
 				Id<Link> newLinkId = Id.create(lastEvent.getLinkId().toString() + "-" + currentEvent.getLinkId().toString(), Link.class);

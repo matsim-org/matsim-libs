@@ -27,13 +27,13 @@ public class CreateTestNetwork {
 		//	|													|
 		// (6)-------------------------------------------------(7)
 
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 150));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 150, (double) 150));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord((double) 300, (double) 150));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create(4, Node.class), new Coord((double) 450, (double) 150));
-		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create(5, Node.class), new Coord((double) 600, (double) 150));
-		Node node6 = NetworkUtils.createAndAddNode2(network, Id.create(6, Node.class), new Coord((double) 0, (double) 0));
-		Node node7 = NetworkUtils.createAndAddNode2(network, Id.create(7, Node.class), new Coord((double) 600, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 150));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 150, (double) 150));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 300, (double) 150));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 450, (double) 150));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord((double) 600, (double) 150));
+		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 0, (double) 0));
+		Node node7 = NetworkUtils.createAndAddNode(network, Id.create(7, Node.class), new Coord((double) 600, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		final double freespeed = speed50;

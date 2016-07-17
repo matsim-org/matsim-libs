@@ -284,8 +284,8 @@ public class OptimalWalkPlanFinderTest {
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (Network) this.scenario.getNetwork();
-			Node node1 = NetworkUtils.createAndAddNode2(this.network, Id.create("1", Node.class), new Coord(0.0, 0.0));
-			Node node2 = NetworkUtils.createAndAddNode2(this.network, Id.create("2", Node.class), new Coord(1000.0, 0.0));
+			Node node1 = NetworkUtils.createAndAddNode(this.network, Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = NetworkUtils.createAndAddNode(this.network, Id.create("2", Node.class), new Coord(1000.0, 0.0));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 

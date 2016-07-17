@@ -334,13 +334,13 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		//             (5)
 
 		Network network = NetworkUtils.createNetwork();
-		Node n1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 10));
-		Node n2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 3, (double) 2));
-		Node n3 = NetworkUtils.createAndAddNode2(network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));
-		Node n4 = NetworkUtils.createAndAddNode2(network, Id.create(4, Node.class), new Coord((double) 4, (double) 1));
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 10));
+		Node n2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 3, (double) 2));
+		Node n3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+		Node n4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 4, (double) 1));
 		final double y = -1;
-		Node n5 = NetworkUtils.createAndAddNode2(network, Id.create(5, Node.class), new Coord((double) 0, y));
-		Node n6 = NetworkUtils.createAndAddNode2(network, Id.create(6, Node.class), new Coord((double) 0, (double) 11));
+		Node n5 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord((double) 0, y));
+		Node n6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 0, (double) 11));
 		final Node fromNode = n1;
 		final Node toNode = n3;
 		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 10, (double) 1, (double) 10, (double) 1 );

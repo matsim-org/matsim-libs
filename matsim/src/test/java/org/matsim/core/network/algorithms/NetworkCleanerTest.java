@@ -41,11 +41,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testSink() {
 		// create a simple network
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
-		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 100, (double) 100, (double) 1 );
@@ -76,11 +76,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testDoubleSink() {
 		// create a simple network
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
-		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 100, (double) 100, (double) 1 );
@@ -114,11 +114,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testSource() {
 		// create a simple network
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
-		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 100, (double) 100, (double) 1 );
@@ -149,11 +149,11 @@ public class NetworkCleanerTest extends TestCase {
 	public void testDoubleSource() {
 		// create a simple network
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
-		Node node4 = NetworkUtils.createAndAddNode2(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
-		Node node5 = NetworkUtils.createAndAddNode2(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 100, (double) 100));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 200, (double) 200));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 100, (double) 100, (double) 1 );

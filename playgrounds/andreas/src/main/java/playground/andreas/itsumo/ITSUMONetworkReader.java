@@ -141,7 +141,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("network_name")) {
 
 			} else if (lname.equals("node")) {
-				NetworkUtils.createAndAddNode2(ITSUMONetworkReader.this.network, Id.create(this.nodeId, Node.class), new Coord(Double.parseDouble(this.xCoord), Double.parseDouble(this.yCoord)));
+				NetworkUtils.createAndAddNode(ITSUMONetworkReader.this.network, Id.create(this.nodeId, Node.class), new Coord(Double.parseDouble(this.xCoord), Double.parseDouble(this.yCoord)));
 			} else if (lname.equals("node_id")) {
 				this.nodeId = content.trim();
 			} else if (lname.equals("x_coord")) {

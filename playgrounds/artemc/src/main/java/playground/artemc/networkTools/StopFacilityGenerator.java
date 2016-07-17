@@ -330,7 +330,7 @@ public class StopFacilityGenerator {
 								newNodeXY = convertDistanceToCoordinates(linkToEdit,nodeDistanceOnMap);
 								final Id<Node> id2 = newNodeId;
 								final Coord coord = newNodeXY;	
-								NetworkUtils.createAndAddNode2(network, id2, coord);
+								NetworkUtils.createAndAddNode(network, id2, coord);
 								nodes.add(network.getNodes().get(newNodeId));
 
 								//Create new Link

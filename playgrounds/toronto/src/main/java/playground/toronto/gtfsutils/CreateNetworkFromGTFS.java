@@ -52,7 +52,7 @@ public class CreateNetworkFromGTFS{
 			Coord StopCoord = new Coord(Double.parseDouble(rdStops.current().get("stop_lon").toString()), Double.parseDouble(rdStops.current().get("stop_lat").toString()));
 			final Id<Node> id = StopID;
 			final Coord coord = StopCoord;
-			NetworkUtils.createAndAddNode2(network, id, coord);
+			NetworkUtils.createAndAddNode(network, id, coord);
 			StopAndCoordinates.put(StopID, StopCoord);	
 		}//end of while loop
 		

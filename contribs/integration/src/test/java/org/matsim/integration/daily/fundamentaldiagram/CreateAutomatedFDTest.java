@@ -489,11 +489,11 @@ public class CreateAutomatedFDTest {
 		Network network = (Network) scenario.getNetwork();
 
 		double x = -50;
-		Node nodeHome = NetworkUtils.createAndAddNode2(network, Id.createNodeId("home"), new Coord(x, (double) 0));
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(0), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(1), new Coord((double) 1000, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId(2), new Coord((double) 500, 866.0));
-		Node nodeWork = NetworkUtils.createAndAddNode2(network, Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
+		Node nodeHome = NetworkUtils.createAndAddNode(network, Id.createNodeId("home"), new Coord(x, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(0), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord((double) 1000, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord((double) 500, 866.0));
+		Node nodeWork = NetworkUtils.createAndAddNode(network, Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
 
 		double freeSpeedOnLink = 60/3.6;
 		final Node fromNode = nodeHome;

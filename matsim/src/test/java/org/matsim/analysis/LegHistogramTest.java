@@ -49,8 +49,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testDeparturesMiscModes() {
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 1.0, (double) 1 );
@@ -103,8 +103,8 @@ public class LegHistogramTest extends MatsimTestCase {
 	 */
 	public void testNofBins() {
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 1.0, (double) 1 );
@@ -144,8 +144,8 @@ public class LegHistogramTest extends MatsimTestCase {
 
 	public void testReset() {
 		Network network = NetworkUtils.createNetwork();
-		Node node1 = NetworkUtils.createAndAddNode2(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode2(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 1.0, (double) 1 );

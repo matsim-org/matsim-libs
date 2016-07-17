@@ -60,7 +60,7 @@ public class NetworkDoubleLinks {
 		Coord nc = new Coord(0.5 * (fn.getCoord().getX() + tn.getCoord().getX()), 0.5 * (fn.getCoord().getY() + tn.getCoord().getY()));
 		Node r = ((Node) fn);
 		final Coord coord = nc;
-		Node n1 = NetworkUtils.createAndAddNode2(network, Id.create(l.getId()+this.suffix, Node.class), coord);
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(l.getId()+this.suffix, Node.class), coord);
 		NetworkUtils.setType(n1,(String) NetworkUtils.getType( r ));
 		Node n = n1;
 		network.removeLink(l.getId());

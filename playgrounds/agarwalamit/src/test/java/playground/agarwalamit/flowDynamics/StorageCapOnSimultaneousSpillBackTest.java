@@ -218,14 +218,14 @@ public class StorageCapOnSimultaneousSpillBackTest {
 
 		private void createNetwork(){
 
-			Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
 			double y1 = -10;
-			Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord((double) 300, y1));
-			Node node4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("4"), new Coord((double) 500, (double) 20));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 300, y1));
+			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 500, (double) 20));
 			double x = -10;
 			double y = -200;
-			Node node5 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("5"), new Coord(x, y));
+			Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord(x, y));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 
