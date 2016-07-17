@@ -73,7 +73,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     private static boolean TrackGenome;
     private static boolean IntelligentRouters;
-    private int writeFullPlansInterval;
     private long bytesPerPerson;
     private Scenario scenario;
     private long scenarioMemoryUse;
@@ -165,7 +164,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("f", "fullTransit", false, "Full transit performance transmission (more complete meta-model, more expensive)");
         options.addOption("q", "quickReplanning", false, "Quick replanning: each replanning strategy operates at 1/(number of PSim iters),  " +
                 "effectively producing the same number of new plans per QSim iteration as a normal MATSim run," +
-                "but having a multinomial distribution");
+                "but having more mutations per plan on average");
         options.addOption("g", "genomeTracking", false, "Track plan genomes");
         options.addOption("I", "IntelligentRouters", false, "Intelligent routers");
         CommandLineParser parser = new BasicParser();
@@ -271,14 +270,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterInitialLogString.append("Unspecified number of slaves. Will start with the default of a single slave.\n");
         }
 
-        this.writeFullPlansInterval = config.controler().getWritePlansInterval();
-        if (commandLine.hasOption("d")) {
-            writeFullPlansInterval = Integer.parseInt(commandLine.getOptionValue("d"));
-            masterInitialLogString.append("Will dump all plans from all slaves every  " + writeFullPlansInterval + " cycles.\n");
-        } else {
-            masterInitialLogString.append("No interval defined for writing all plans from all slaves to disk.\n");
-            masterInitialLogString.append("Will use the interval from the config " + writeFullPlansInterval + "\n");
-        }
 
         slaveHandlerTreeMap = new TreeMap<>();
         slaveScoreStats = new SlaveScoreStats(config);
@@ -484,14 +475,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         if (SelectedSimulationMode.equals(SimulationMode.PARALLEL))
             startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
         IterationStopWatch stopwatch = event.getServices().getStopwatch();
-        if ((writeFullPlansInterval > 0) &&
-                ((event.getIteration() % writeFullPlansInterval == 0) && event.getIteration() > 0)) {
-            masterLogger.warn("Dumping plans on slaveHandlerTreeMap. Can be re-assembled into monolithic plans file afterwards.");
-            waitForSlaveThreads();
-            startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
-            waitForSlaveThreads();
-            startSlaveHandlersInMode(CommunicationsMode.DUMP_PLANS);
-        }
+
     }
 
     @Override
@@ -951,9 +935,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     case TRANSMIT_PERFORMANCE:
                         transmitPerformance();
                         break;
-                    case DUMP_PLANS:
-                        dumpPlans(matsimControler.getIterationNumber());
-                        break;
                     case TRANSMIT_SCENARIO:
                         transmitInitialPlans();
                         reader.readBoolean();
@@ -979,21 +960,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             slaveScoreStats.insertEntry(currentIteration, currentPopulationSize, scenario.getPopulation().getPersons().size(), (double[]) reader.readObject());
         }
 
-        private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
-            Population temp = (Population) PopulationUtils.createPopulation(config);
-
-            OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
-            PopulationWriter pw = new PopulationWriter(
-                    temp, scenario.getNetwork());
-            pw.write(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
-            slaveLogger.warn("Dumping population of " + currentPopulationSize + " agents on slave number " + myNumber);
-            List<PersonSerializable> tempPax = (List<PersonSerializable>) reader.readObject();
-            for (PersonSerializable p : tempPax) {
-                pw.writePerson(p.getPerson());
-            }
-
-            slaveLogger.warn("Done writing on slave number " + myNumber);
-        }
 
         private void slaveIsOKForNextIter() throws IOException {
             this.isOkForNextIter = reader.readBoolean();

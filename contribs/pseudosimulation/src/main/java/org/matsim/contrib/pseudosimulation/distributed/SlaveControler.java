@@ -526,9 +526,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         slaveLogger.error("Got the kill signal from MASTER. Bye.");
                         Runtime.getRuntime().halt(0);
                         break;
-                    case DUMP_PLANS:
-                        dumpPlans();
-                        break;
+
                 }
                 // sending a boolean forces the thread on the master to wait
                 writer.writeBoolean(true);
@@ -546,13 +544,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     private void transmitScores() throws IOException {
         writer.writeObject(new SlaveScoreStatsCalculator().calculateScoreStats(scenario.getPopulation()));
-    }
-
-    private void dumpPlans() throws IOException {
-        List<PersonSerializable> temp = new ArrayList<>();
-        for (Person p : scenario.getPopulation().getPersons().values())
-            temp.add(new PersonSerializable(p));
-        writer.writeObject(temp);
     }
 
     private void slaveIsOKForNextIter() throws IOException {
