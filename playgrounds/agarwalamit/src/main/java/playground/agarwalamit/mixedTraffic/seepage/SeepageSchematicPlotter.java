@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -51,7 +52,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -94,7 +95,7 @@ public class SeepageSchematicPlotter {
 		sc.getConfig().planCalcScore().addActivityParams(workAct);
 
 		sc.getConfig().qsim().setLinkWidthForVis((float)0);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(0.);	
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(0.);	
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
@@ -187,7 +188,7 @@ public class SeepageSchematicPlotter {
 
 		final Config config;
 		final Scenario scenario ;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		final Link link1;
 		final Link link2;
@@ -206,18 +207,18 @@ public class SeepageSchematicPlotter {
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 
-			network = (NetworkImpl) scenario.getNetwork();
+			network = (Network) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord(0.0, 0.0));
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord(0.0, 100.0));
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord(0.0, 1100.0));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord(0.0, 1200.0));
+			Node node1 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("1"), new Coord(0.0, 0.0));
+			Node node2 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("2"), new Coord(0.0, 100.0));
+			Node node3 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("3"), new Coord(0.0, 1100.0));
+			Node node4 = NetworkUtils.createAndAddNode2(network, Id.createNodeId("4"), new Coord(0.0, 1200.0));
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.bike,"motorbike"));
 
-			link1 = network.createAndAddLink(Id.createLinkId("1"), node1, node2, 100, 25, 36000, 1, null, "22"); 
-			link2 = network.createAndAddLink(Id.createLinkId("2"), node2, node3, 1000, 25, 60, 1, null, "22");	//flow capacity is 1 PCU per min.
-			link3 = network.createAndAddLink(Id.createLinkId("3"), node3, node4, 100, 25, 36000, 1, null, "22");
+			link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("1"), node1, node2, 100, 25, 36000, 1, null, "22"); 
+			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("2"), node2, node3, 1000, 25, 60, 1, null, "22");	//flow capacity is 1 PCU per min.
+			link3 = NetworkUtils.createAndAddLink(network, Id.createLinkId("3"), node3, node4, 100, 25, 36000, 1, null, "22");
 
 			for(Link l :network.getLinks().values()){
 				l.setAllowedModes(allowedModes);
