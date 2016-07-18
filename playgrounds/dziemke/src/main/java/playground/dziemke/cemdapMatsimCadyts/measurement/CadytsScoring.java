@@ -34,7 +34,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * @author nagel
- *
  */
 public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	@SuppressWarnings("unused")
@@ -69,5 +68,4 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	public double getScore() {
 		return weight * score;
 	}
-
 }
