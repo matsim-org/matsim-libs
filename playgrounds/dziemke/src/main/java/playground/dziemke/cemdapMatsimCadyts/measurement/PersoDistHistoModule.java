@@ -1,6 +1,10 @@
 package playground.dziemke.cemdapMatsimCadyts.measurement;
 
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.ExperiencedPlanElementsModule;
 import org.matsim.core.scoring.PersonExperiencedLeg;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 public class PersoDistHistoModule extends AbstractModule {
 
@@ -96,7 +101,7 @@ public class PersoDistHistoModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
-			FileIO.writeToFile(controlerIO.getIterationPath(iterationEndsEvent.getIteration())+"/perso-dist-histo.txt", pw -> {
+			writeToFile(controlerIO.getIterationPath(iterationEndsEvent.getIteration())+"/perso-dist-histo.txt", pw -> {
 				pw.printf("person\tdistance\n");
 				for (Map.Entry<Id<Person>, Double> entry : distances.entrySet()) {
 					String personId = entry.getKey().toString();
@@ -111,6 +116,14 @@ public class PersoDistHistoModule extends AbstractModule {
 			return distances;
 		}
 
+	}
+	
+	public static void writeToFile(String string, StreamingOutput so) {
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(string)))) {
+            so.write(pw);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 	}
 
 }

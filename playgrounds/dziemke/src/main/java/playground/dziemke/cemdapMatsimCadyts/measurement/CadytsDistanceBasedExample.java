@@ -23,7 +23,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -35,13 +34,15 @@ import cadyts.demand.PlanBuilder;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.supply.SimResults;
 
-public class RunSimulationDZAdapted {
-	private static final Logger log = Logger.getLogger(RunSimulationDZAdapted.class ) ;
+/**
+ * @author dziemke, mzilske
+ */
+public class CadytsDistanceBasedExample {
+	private static final Logger log = Logger.getLogger(CadytsDistanceBasedExample.class ) ;
 
 	enum HistogramBin {
 		B89000, B89200, B89400, B89600, B89800, B90000, B90200, B90400, B90600, B90800, B91000;
 	}	
-
 
 	public static void main(String[] args) {
 		String inputNetworkFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/network_diff_lengths2-inv.xml";
@@ -63,18 +64,12 @@ public class RunSimulationDZAdapted {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.counts().setCountsFileName(countsFileName);
-		// new new
 //		config.plans().setInputFile(inputPlansFile);
 //		config.network().setInputFile(inputNetworkFile);
-		// end new new
 		
-		// new new
-		// Set monetary distance rate
 //		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0002);
-		//
 //		config.planCalcScore().setPerforming_utils_hr(0.);
 //		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.);
-		// end new new
 		
 		log.info("----- Car: MarginalUtilityOfTraveling = " + config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
 		log.info("----- Performing_utils = " + config.planCalcScore().getPerforming_utils_hr());
@@ -95,23 +90,19 @@ public class RunSimulationDZAdapted {
 //            stratSets.setWeight(0.2);
 //            stratSets.setDisableAfter(70);
 //            config.strategy().addStrategySettings(stratSets);
-//        }
-
+//		}
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 		new PopulationReader(scenario).readFile(inputPlansFile);
 
-
-		final Counts<Link> someCounts = new Counts<>();
-		new CountsReaderMatsimV1(someCounts).parse(countsFileName);
-
-		scenario.addScenarioElement("calibrationCounts", someCounts);
-
+		final Counts<Link> counts = new Counts<>();
+		new CountsReaderMatsimV1(counts).parse(countsFileName);
+		scenario.addScenarioElement("calibrationCounts", counts);
 
 		Controler controler = new Controler(scenario);
 		
-		// new -- Randomizing router
+		// Randomizing router
 //		final RandomizingTimeDistanceTravelDisutilityFactory builder =
 //				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 //		builder.setSigma(sigma);
@@ -121,14 +112,12 @@ public class RunSimulationDZAdapted {
 //				bindCarTravelDisutilityFactory().toInstance(builder);
 //			}
 //		});
-		// end new 
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				install(new CadytsModule());
 				install(new PersoDistHistoModule());
-
 			}
 		});
 
@@ -152,13 +141,14 @@ public class RunSimulationDZAdapted {
 			startupEvent.getServices().addControlerListener((BeforeMobsimListener) beforeMobsimEvent -> {
 				for (Person person : beforeMobsimEvent.getServices().getScenario().getPopulation().getPersons().values()) {
 					PlanBuilder<HistogramBin> planBuilder = new PlanBuilder<>();
+					// TODO implement this also for distance checks for single trips 
 					double totalPlannedDistance = 0.0;
 					for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 						if (planElement instanceof Leg) {
+							// TODO check if using these distances makes sense
 							totalPlannedDistance += ((Leg) planElement).getRoute().getDistance();
 						}
 					}
-//					HistogramBin bin = HistogramBin.values()[(int) (Math.min(totalPlannedDistance, 260000) / 20000.0)];
 					HistogramBin bin = HistogramBin.values()[(int) ((Math.min(totalPlannedDistance, 91000) - 89000) / 200)];
 					planBuilder.addTurn(bin, 0);
 					calibrator.addToDemand(planBuilder.getResult());
@@ -174,7 +164,6 @@ public class RunSimulationDZAdapted {
 				}
 				HashMap<Id<Person>, Double> distances = distService.getDistances();
 				distances.values().forEach(v -> {
-//					HistogramBin bin = HistogramBin.values()[(int) (Math.min(v, 260000) / 20000.0)];
 					HistogramBin bin = HistogramBin.values()[(int) ((Math.min(v, 91000) - 89000)/ 200)];
 					frequencies.put(bin, frequencies.get(bin) + 1);
 				});
@@ -186,17 +175,13 @@ public class RunSimulationDZAdapted {
 				});
 				distances.forEach((personId, v) -> {
 					PlanBuilder<HistogramBin> planBuilder = new PlanBuilder<>();
-//					planBuilder.addTurn(HistogramBin.values()[(int) (Math.min(v, 260000) / 20000.0)], 0);
 					planBuilder.addTurn(HistogramBin.values()[(int) ((Math.min(v, 91000) - 89000) / 200)], 0);
 					double offset = calibrator.calcLinearPlanEffect(planBuilder.getResult());
-//					System.out.println("########## Offset = " + offset + " -- personId = " + personId + " -- v = " + v);
+//					log.info("########## Offset = " + offset + " -- personId = " + personId + " -- v = " + v);
 					afterMobsimEvent.getServices().getEvents().processEvent(new PersonMoneyEvent(Time.UNDEFINED_TIME, personId, cadytsWeightHistogram * offset));
 				});
 			});
-
-
 		});
-
 
 		CadytsAndCloneScoringFunctionFactory factory = new CadytsAndCloneScoringFunctionFactory();
 		factory.setCadytsweight(cadytsWeightLinks);

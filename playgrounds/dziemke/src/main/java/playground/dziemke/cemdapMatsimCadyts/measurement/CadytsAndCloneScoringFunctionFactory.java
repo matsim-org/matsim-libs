@@ -35,26 +35,13 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import playground.dziemke.cemdapMatsimCadyts.measurement.RunSimulationDZAdapted.HistogramBin;
 
 public class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
 
-    @Inject
-    Config config;
-
-    @Inject
-    Scenario scenario;
-
-    @Inject
-    AnalyticalCalibrator cadyts;
-//    AnalyticalCalibrator<HistogramBin> cadyts;
-
-    @Inject
-    PlansTranslator ptStep;
-//    PlansTranslator<HistogramBin> ptStep;
-
-//    @Inject
-//    CloneService cloneService;
+    @Inject Config config;
+    @Inject Scenario scenario;
+    @Inject AnalyticalCalibrator cadyts;
+    @Inject PlansTranslator ptStep;
 
     private double cadytsweight = 1.0;
 
@@ -65,9 +52,7 @@ public class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFact
         CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
         scoringFunction.setWeight(cadytsweight);
         sumScoringFunction.addScoringFunction(scoringFunction);
-
-        // prior
-//        sumScoringFunction.addScoringFunction(cloneService.createNewScoringFunction(person));
+        
         sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(1.0));
 
         return sumScoringFunction;
@@ -76,6 +61,4 @@ public class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFact
     public void setCadytsweight(double cadytsweight) {
         this.cadytsweight = cadytsweight;
     }
-
-
 }

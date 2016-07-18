@@ -54,7 +54,6 @@ class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListen
 
     private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 
-
     @Inject
     PlansTranslatorBasedOnEvents ptStep;
 
@@ -120,5 +119,4 @@ class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListen
 	private boolean isActiveInThisIteration(final int iter) {
 		return (iter > 0 && iter % scenario.getConfig().counts().getWriteCountsInterval() == 0);
 	}
-
 }
