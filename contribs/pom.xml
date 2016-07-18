@@ -252,7 +252,7 @@
 		<profile>
 			<id>release</id>
 			<build>
-				<defaultGoal>assembly:assembly</defaultGoal>
+				<defaultGoal>package</defaultGoal>
 				<pluginManagement>
 					<plugins>
 						<plugin>
