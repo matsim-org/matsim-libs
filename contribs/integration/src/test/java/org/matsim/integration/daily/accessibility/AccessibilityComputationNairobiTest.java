@@ -88,8 +88,8 @@ public class AccessibilityComputationNairobiTest {
 		final boolean includeDensityLayer = true;
 		final Double lowerBound = -7.; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 0.0;
-		final Integer range = 9; // in the current implementation, this must always be 9
-		final int symbolSize = 510;
+		final Integer range = 9; // In the current implementation, this must always be 9
+		final int symbolSize = 510; // Usually chosen a little bit larger than cellSize
 		final int populationThreshold = (int) (1 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -99,9 +99,7 @@ public class AccessibilityComputationNairobiTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		
-		// new
-		config.planCalcScore().setBrainExpBeta(200);
+		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
 		
 		// Choose modes for accessibility computation
 		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
