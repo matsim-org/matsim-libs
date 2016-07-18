@@ -51,7 +51,7 @@ public class CemdapMatsimCadytsControllerConfig {
 		controler.addOverridingModule(new CadytsCarModule());
 
 
-		/* Add Cadyts component to scoring function */
+		// Add Cadyts component to scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject private CadytsContext cadytsContext;
 			@Inject CharyparNagelScoringParametersForPerson parameters;
@@ -65,7 +65,7 @@ public class CemdapMatsimCadytsControllerConfig {
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
-				final double cadytsScoringWeight = Double.parseDouble(args[1]);
+				final double cadytsScoringWeight = Double.parseDouble(args[1]) * config.planCalcScore().getBrainExpBeta();
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 

@@ -117,7 +117,7 @@ public class CemdapMatsimCadytsController {
 //		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00"); // TODO reactivate
 //		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
 
-		/* Add Cadyts component to scoring function */
+		// Add Cadyts component to scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject private CadytsContext cadytsContext;
 			@Inject CharyparNagelScoringParametersForPerson parameters;

@@ -3,14 +3,18 @@ package playground.dziemke.cemdapMatsimCadyts.measurement;
 import java.util.EnumMap;
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -25,6 +29,10 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -49,7 +57,7 @@ public class CadytsDistanceBasedExample {
 //		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
 		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000_routes5.xml";
 		String countsFileName = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/counts100-200_full.xml";
-		String runId = "selectR+hist1000-nwInv-ref";
+		String runId = "selectR+hist1000-nwInv-ref2";
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "";
 		
 		// Sigma for the randomized router; the higher the more randomness; 0.0 results in no randomness.)
@@ -182,10 +190,27 @@ public class CadytsDistanceBasedExample {
 				});
 			});
 		});
+		
+		// Add counts-based cadyts scoring
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			@Inject Config config;
+		    @Inject AnalyticalCalibrator cadyts;
+		    @Inject PlansTranslator ptStep;
 
-		CadytsScoringFunctionFactory factory = new CadytsScoringFunctionFactory();
-		factory.setCadytsweight(cadytsWeightLinks);
-		controler.setScoringFunctionFactory(factory);
+		    @Override
+		    public ScoringFunction createNewScoringFunction(Person person) {
+
+		        SumScoringFunction sumScoringFunction = new SumScoringFunction();
+		        CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
+		        scoringFunction.setWeight(cadytsWeightLinks);
+		        sumScoringFunction.addScoringFunction(scoringFunction);
+		        
+		        sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(1.0));
+
+		        return sumScoringFunction;
+		    }
+		});
+		
 		controler.run();
 	}
 }
