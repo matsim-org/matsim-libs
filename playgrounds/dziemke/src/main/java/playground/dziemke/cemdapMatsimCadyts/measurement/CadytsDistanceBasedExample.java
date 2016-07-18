@@ -49,7 +49,7 @@ public class CadytsDistanceBasedExample {
 //		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
 		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000_routes5.xml";
 		String countsFileName = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/counts100-200_full.xml";
-		String runId = "selectR+hist1000-nwInv";
+		String runId = "selectR+hist1000-nwInv-ref";
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "";
 		
 		// Sigma for the randomized router; the higher the more randomness; 0.0 results in no randomness.)
@@ -80,16 +80,16 @@ public class CadytsDistanceBasedExample {
 		{
             StrategySettings stratSets = new StrategySettings();
             stratSets.setStrategyName("ChangeExpBeta");
-//            stratSets.setStrategyName("SelectRandom");
+//			stratSets.setStrategyName("SelectRandom");
             stratSets.setWeight(0.8);
             config.strategy().addStrategySettings(stratSets);
         }
 //		{
-//            StrategySettings stratSets = new StrategySettings();
-//            stratSets.setStrategyName("ReRoute");
-//            stratSets.setWeight(0.2);
-//            stratSets.setDisableAfter(70);
-//            config.strategy().addStrategySettings(stratSets);
+//			StrategySettings stratSets = new StrategySettings();
+//			stratSets.setStrategyName("ReRoute");
+//			stratSets.setWeight(0.2);
+//			stratSets.setDisableAfter(70);
+//			config.strategy().addStrategySettings(stratSets);
 //		}
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
@@ -113,7 +113,7 @@ public class CadytsDistanceBasedExample {
 //			}
 //		});
 		
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {			
 			@Override
 			public void install() {
 				install(new CadytsModule());
@@ -123,7 +123,7 @@ public class CadytsDistanceBasedExample {
 
 		// Add StartUpListener
 		controler.addControlerListener((StartupListener) startupEvent -> {
-			AnalyticalCalibrator<HistogramBin> calibrator = new AnalyticalCalibrator<>(startupEvent.getServices().getConfig().controler().getOutputDirectory() + "/cadyts-histogram.txt", MatsimRandom.getRandom().nextLong(), 24*60*60);
+			AnalyticalCalibrator<HistogramBin> calibrator = new AnalyticalCalibrator<>(startupEvent.getServices().getConfig().controler().getOutputDirectory() + "/cadyts-histogram.txt", MatsimRandom.getRandom().nextLong(), 24*60*60);			
 			calibrator.setStatisticsFile(startupEvent.getServices().getControlerIO().getOutputFilename("histogram-calibration-stats.txt"));
 			calibrator.addMeasurement(HistogramBin.B89000, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
 			calibrator.addMeasurement(HistogramBin.B89200, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
@@ -183,7 +183,7 @@ public class CadytsDistanceBasedExample {
 			});
 		});
 
-		CadytsAndCloneScoringFunctionFactory factory = new CadytsAndCloneScoringFunctionFactory();
+		CadytsScoringFunctionFactory factory = new CadytsScoringFunctionFactory();
 		factory.setCadytsweight(cadytsWeightLinks);
 		controler.setScoringFunctionFactory(factory);
 		controler.run();

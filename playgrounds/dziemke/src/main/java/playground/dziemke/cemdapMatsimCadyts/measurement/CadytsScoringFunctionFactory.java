@@ -36,7 +36,7 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
-public class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
+public class CadytsScoringFunctionFactory implements ScoringFunctionFactory {
 
     @Inject Config config;
     @Inject Scenario scenario;

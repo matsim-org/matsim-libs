@@ -61,10 +61,8 @@ public class CadytsModule extends AbstractModule {
 
     static class CalibratorProvider implements Provider<AnalyticalCalibrator<Link>> {
 
-        @Inject
-        Scenario scenario;
-        @Inject
-        Set<MeasurementLoader<Link>> measurementLoaders;
+        @Inject Scenario scenario;
+        @Inject Set<MeasurementLoader<Link>> measurementLoaders;
 
         @Override
         public AnalyticalCalibrator<Link> get() {
