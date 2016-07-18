@@ -78,6 +78,8 @@ public class KNTransitControler {
 			visConfig.setDrawNonMovingItems(true);
 			visConfig.setAgentSize(125);
 			visConfig.setLinkWidth(10);
+			
+//			visConfig.setMapOverlayMode(true);
 		}
 
 		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.teleport ) ;
