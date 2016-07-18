@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
@@ -33,10 +32,10 @@ public class LinksCSReader
   public static final String CONFIG_LINKS_PAR = "freeLinksParameter";
   public static final String CONFIG_GROUP = "CsPreprocess";
   private String linkIdFile;
-  protected TreeMap<Id<Link>, LinkImpl> allLinks = new TreeMap<>();
+  protected TreeMap<Id<Link>, Link> allLinks = new TreeMap<>();
   //protected TreeMap<Id, LinkImpl> freeLinks = new TreeMap();
-  protected ArrayList<LinkImpl> freeLinks = new ArrayList<LinkImpl>();
-  private ArrayList<LinkImpl> currentLinks = new ArrayList<LinkImpl>();
+  protected ArrayList<Link> freeLinks = new ArrayList<>();
+  private ArrayList<Link> currentLinks = new ArrayList<>();
   private MutableScenario scenario;
   private CarSharingStations carSharingStations;
   private QuadTree<Person> personQuadTree;
@@ -87,10 +86,10 @@ public class LinksCSReader
   }
 
   private void detectCSActualLinks() {
-	  ArrayList<LinkImpl> links = new ArrayList<LinkImpl>();
+	  ArrayList<Link> links = new ArrayList<>();
 
     for (CarSharingStation af : this.carSharingStations.getStationsArr()) {
-      LinkImpl fLink = (LinkImpl)this.scenario.getNetwork().getLinks().get(af.getLinkId());
+      Link fLink = (Link)this.scenario.getNetwork().getLinks().get(af.getLinkId());
       links.add( fLink);
     }
 
@@ -115,7 +114,7 @@ public class LinksCSReader
       
     	 
     	  rd++;
-    	  LinkImpl link = (LinkImpl)list.get(rd);
+    	  Link link = (Link)list.get(rd);
     	  
         if (this.currentLinks.contains((link))) {
         	log.info("On the link " + link.getId() + " there is already a Station"); 
@@ -139,12 +138,12 @@ public class LinksCSReader
     }
   }
 
-  public ArrayList<LinkImpl> getFreeLinks()
+  public ArrayList<Link> getFreeLinks()
   {
     return this.freeLinks;
   }
 
-  public ArrayList<LinkImpl> getCurrentLinks()
+  public ArrayList<Link> getCurrentLinks()
   {
     return this.currentLinks;
   }

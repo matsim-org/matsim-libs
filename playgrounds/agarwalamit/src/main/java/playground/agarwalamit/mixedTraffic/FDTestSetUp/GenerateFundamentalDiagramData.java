@@ -38,6 +38,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -58,7 +59,6 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -258,7 +258,7 @@ public class GenerateFundamentalDiagramData {
 		}
 		
 		//set up number of Points to run.
-		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
 	
@@ -299,7 +299,7 @@ public class GenerateFundamentalDiagramData {
 		this.startingPoint = new Integer[] {1,1};
 
 		maxAgentDistribution = new Integer [travelModes.length];
-		double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) this.scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		for(int ii=0;ii<maxAgentDistribution.length;ii++){
@@ -368,10 +368,9 @@ public class GenerateFundamentalDiagramData {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData);
-		passingEventsUpdator  = new PassingEventsUpdator();
+		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes());
 
 		events.addHandler(globalFlowDynamicsUpdator);
-		
 		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
@@ -397,6 +396,7 @@ public class GenerateFundamentalDiagramData {
 				this.bindMobsim().toInstance( qSim );
 			}
 		});
+		
 		controler.run();
 		
 		if(! inputs.getSnapshotFormats().isEmpty()) {
@@ -430,7 +430,7 @@ public class GenerateFundamentalDiagramData {
 		if(!globalFlowDynamicsUpdator.isPermanent()) stableState=false;
 
 		// sometimes higher density points are also executed (stuck time), to exclude them density check.
-		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		if(stableState){
@@ -459,8 +459,6 @@ public class GenerateFundamentalDiagramData {
 			if( travelModes.length > 1 ) {
 
 				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
-
-				writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
 
 				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			}
@@ -590,8 +588,6 @@ public class GenerateFundamentalDiagramData {
 		
 		if( travelModes.length > 1 ) {
 			writer.print("noOfCarsPerkm \t");
-
-			writer.print("totalBikesPassedByAllCarsPerKm \t");
 
 			writer.print("avgBikePassingRatePerkm \t");
 		}
@@ -792,13 +788,11 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}

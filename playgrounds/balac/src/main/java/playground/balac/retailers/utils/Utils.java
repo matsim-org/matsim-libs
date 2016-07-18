@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -139,7 +139,7 @@ public abstract class Utils
 
     QuadTree<ActivityFacility> facilityQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
       for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
-          ((ActivityFacilityImpl) f).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), f.getCoord()).getId());
+          ((ActivityFacilityImpl) f).setLinkId(NetworkUtils.getNearestLink(((Network) controler.getScenario().getNetwork()), f.getCoord()).getId());
       Coord c = f.getCoord();
       facilityQuadTree.put(c.getX(), c.getY(), f);
     }
@@ -358,7 +358,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
             if (act.getType().equals("home")) {
               if (!(hasHome)) {
                   c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                  activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), act.getCoord())).getId();
+                  activityLink = (NetworkUtils.getNearestLink(((Network) controler.getScenario().getNetwork()), act.getCoord())).getId();
                 //activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
@@ -444,7 +444,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
             	if (!previousActivity.getType().startsWith("shopgrocery")) {
 
                     c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                    activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), act.getCoord())).getId();
+                    activityLink = (NetworkUtils.getNearestLink(((Network) controler.getScenario().getNetwork()), act.getCoord())).getId();
                      ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                      ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
                      personPrimaryActivityQuadTree.put(c.getX(), c.getY(), ppa);                    
@@ -454,7 +454,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
             }
             else if (previousActivity != null && previousActivity.getType().equals("shopgrocery")) {
                 c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), act.getCoord())).getId();
+                activityLink = (NetworkUtils.getNearestLink(((Network) controler.getScenario().getNetwork()), act.getCoord())).getId();
             	 	ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
             	 	ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
             	 	personPrimaryActivityQuadTree.put(c.getX(), c.getY(), ppa);                    

@@ -30,8 +30,7 @@ import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -345,7 +344,7 @@ public class NetworkAnalyzer extends AbstractAnalysisModule{
 		log.info("analyzing network links...");
 		
 		//the space needed to store a vehicle (+ additional space for the gaps to the vehicle ahead and the one following
-		double cellWidth = ((NetworkImpl)this.network).getEffectiveCellSize();
+		double cellWidth = ((Network)this.network).getEffectiveCellSize();
 		int writerIndex = 0;
 		
 		//iterate over all links
@@ -631,7 +630,7 @@ public class NetworkAnalyzer extends AbstractAnalysisModule{
 		File file = new File(outputFolder+"storageCapacityWarning"+this.TXTfile);
 		FileWriter writer;
 
-		double cellWidth = ((NetworkImpl)this.network).getEffectiveCellSize();
+		double cellWidth = ((Network)this.network).getEffectiveCellSize();
 		
 			writer = new FileWriter(file);
 			for(Link link : this.lengthBelowStorageCapacity){

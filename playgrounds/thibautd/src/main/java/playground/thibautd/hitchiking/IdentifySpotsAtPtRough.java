@@ -24,11 +24,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -69,7 +70,7 @@ public class IdentifySpotsAtPtRough {
 			final String scheduleFile,
 			final String spotsOutFile) {
 		// we need the impl to have the "getNearest..." methods
-		NetworkImpl carNetwork = getCarNetwork( networkFile );
+		Network carNetwork = getCarNetwork( networkFile );
 
 		log.info( "parse pt stops coordinates from "+scheduleFile );
 		Parser ptStopsCoordParser = new Parser();
@@ -80,7 +81,8 @@ public class IdentifySpotsAtPtRough {
 		Collection<Link> hhLinks = new ArrayList<Link>();
 		for (Coord coord : ptStopsCoordParser.coords.coords) {
 			linkCounter.incCounter();
-			Node n = carNetwork.getNearestNode( coord );
+			final Coord coord1 = coord;
+			Node n = NetworkUtils.getNearestNode(carNetwork,coord1);
 
 			Link toAdd = null;
 			for ( Link l : n.getInLinks().values() ) {
@@ -111,11 +113,11 @@ public class IdentifySpotsAtPtRough {
 		}
 	}
 
-	private static NetworkImpl getCarNetwork( final String netFile ) {
+	private static Network getCarNetwork( final String netFile ) {
 		log.info( "read network from "+netFile );
 		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
-		NetworkImpl net = NetworkImpl.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 
 		log.info( "filter network" );
 		new TransportModeNetworkFilter( sc.getNetwork() ).filter(

@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -36,7 +36,7 @@ public class TestBestTravelTimeRouter {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
-		NetworkFactory factory = new NetworkFactoryImpl(scenario.getNetwork());
+		NetworkFactory factory = scenario.getNetwork().getFactory();
 		//Add travel links
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values())

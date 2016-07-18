@@ -23,8 +23,8 @@ package playground.southafrica.population.analysis.vkt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
@@ -79,8 +79,8 @@ public class DigicoreNetworkRouterFactory {
 	}
 	
 	
-	public NetworkImpl getNetwork(){
-		return (NetworkImpl) this.sc.getNetwork();
+	public Network getNetwork(){
+		return (Network) this.sc.getNetwork();
 	}
 
 }

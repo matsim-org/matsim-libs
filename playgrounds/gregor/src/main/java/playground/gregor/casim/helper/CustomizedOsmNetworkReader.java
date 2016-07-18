@@ -39,8 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -313,8 +312,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if (this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
@@ -564,7 +563,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					double fc = 1.3 * mw; //1.3 persons/m/s
 					capacity = network.getCapacityPeriod() * fc;
 					
-					double cellSize = ((NetworkImpl)network).getEffectiveCellSize();
+					double cellSize = ((Network)network).getEffectiveCellSize();
 					double maxDensity = 5.4;
 					nofLanes = mw * maxDensity * cellSize;
 				}
@@ -594,8 +593,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				l.setAllowedModes(modes);
 				network.addLink(l);
@@ -607,8 +607,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				l.setAllowedModes(modes);
 				network.addLink(l);

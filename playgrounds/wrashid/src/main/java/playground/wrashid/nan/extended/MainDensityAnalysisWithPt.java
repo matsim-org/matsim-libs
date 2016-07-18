@@ -40,11 +40,11 @@ public class MainDensityAnalysisWithPt {
 		
 		
 				
-		Map<Id<Link>, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id<Link>, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		//Map<Id, Link> borderLinks = findBorderLinks.getNetworkLinks(networkFile, center, radiusInMeters);
 		
 		InFlowInfoCollectorWithPt inflowHandler=new InFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
-		OutFlowInfoCollectorWithPt outflowHandler=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds);// "links" makes run faster
+		OutFlowInfoCollectorWithPt outflowHandler=new OutFlowInfoCollectorWithPt((Map<Id<Link>, Link>) links,isOldEventFile,binSizeInSeconds);// "links" makes run faster
 		
 		inflowHandler.reset(0);
 		outflowHandler.reset(0);
@@ -62,9 +62,9 @@ public class MainDensityAnalysisWithPt {
 		HashMap<Id<Link>, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();	
 		
 		HashMap<Id<Link>, int[]> deltaFlow = deltaFlow(linkInFlow, linkOutFlow);
-		HashMap<Id<Link>, double[]> density = calculateDensity(deltaFlow,links);
+		HashMap<Id<Link>, double[]> density = calculateDensity(deltaFlow,(Map<Id<Link>, Link>) links);
 		
-		printDensity(density,links);
+		printDensity(density,(Map<Id<Link>, Link>) links);
 		//printBorderLinks(borderLinks);
 		
 

@@ -8,11 +8,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -168,16 +169,18 @@ public class TransitLeastCostPathTreeTest {
      * @author gthunig
      */
 	/*package*/ static class Fixture {
-        /*package*/ NetworkImpl network;
+        /*package*/ Network network;
 
         int count = 10000;
 
         public Fixture() {
-            this.network = NetworkImpl.createNetwork();
-            Node linkStartNode = this.network.createAndAddNode(Id.create(0, Node.class), new Coord((double) 0, (double) 0));
+            this.network = NetworkUtils.createNetwork();
+            Node linkStartNode = NetworkUtils.createAndAddNode(this.network, Id.create(0, Node.class), new Coord((double) 0, (double) 0));
             for (int i = 1; i < count; i++) {
-                Node linkEndNode = this.network.createAndAddNode(Id.create(i, Node.class), new Coord((double) i, (double) 0));
-                this.network.createAndAddLink(Id.create(i-1, Link.class), linkStartNode, linkEndNode, 1000.0, 10.0, 2000.0, 1);
+                Node linkEndNode = NetworkUtils.createAndAddNode(this.network, Id.create(i, Node.class), new Coord((double) i, (double) 0));
+		final Node fromNode = linkStartNode;
+		final Node toNode = linkEndNode;
+                NetworkUtils.createAndAddLink(this.network,Id.create(i-1, Link.class), fromNode, toNode, 1000.0, 10.0, 2000.0, (double) 1 );
                 linkStartNode = linkEndNode;
             }
 

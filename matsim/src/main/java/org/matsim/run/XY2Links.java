@@ -22,17 +22,17 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.io.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -108,7 +108,7 @@ public class XY2Links {
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(this.config);
 //		scenario.setPopulation( PopulationUtils.createStreamingPopulation( config.plans(), null)) ;
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		this.config = scenario.getConfig();
 
 //		final Population plans = (Population) scenario.getPopulation();

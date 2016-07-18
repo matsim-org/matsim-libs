@@ -536,12 +536,23 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	}
 
 	// ---
+	
+	@StringGetter(SEEP_MODE)
+	private String getSeepModesAsString() {
+		return CollectionUtils.setToString(new HashSet<>(getSeepModes()));
+	}
+	@StringSetter(SEEP_MODE)
+	private void setSeepModes(String value) {
+		setSeepModes(Arrays.asList(value.split(",")));
+	}
+	
 	public Collection<String> getSeepModes() {
 		return seepModes;
 	}
 	public void setSeepModes(Collection<String> seepModes) {
 		this.seepModes = seepModes;
 	}
+	
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
 		return isSeepModeStorageFree;

@@ -20,17 +20,20 @@
 package playground.sergioo.weeklySimulation.scenario;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -169,7 +172,7 @@ public class ScenarioLoaderImpl {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();
 			log.info("loading network from " + networkFileName);
-			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+			Network network = (Network) this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
@@ -179,7 +182,7 @@ public class ScenarioLoaderImpl {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 				parser.parse(this.config.network().getChangeEventsInputFile());
-				network.setNetworkChangeEvents(parser.getEvents());
+				NetworkUtils.setNetworkChangeEvents(network,(List<NetworkChangeEvent>) parser.getEvents());
 			}
 		}
 	}

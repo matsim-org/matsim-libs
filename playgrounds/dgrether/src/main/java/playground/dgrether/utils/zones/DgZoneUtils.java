@@ -28,7 +28,8 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -64,10 +65,11 @@ public class DgZoneUtils {
 	}
 
 	
-	public static void createZoneCenter2LinkMapping(DgZones zones, NetworkImpl network){
+	public static void createZoneCenter2LinkMapping(DgZones zones, Network network){
 		for (DgZone zone : zones.values()){
 			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
-			Link link = network.getNearestLinkExactly(coord);
+			final Coord coord1 = coord;
+			Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 			if (link == null) throw new IllegalStateException("No nearest link found");
 			zone.setZoneNetworkConnectionLink(link);
 		}

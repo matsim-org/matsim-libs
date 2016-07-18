@@ -22,11 +22,11 @@ package playground.wrashid.artemis.parkingPostprocessing;
 import org.geotools.math.Statistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
@@ -40,7 +40,7 @@ public class AssignParkingLinkIds {
 
 	// key: personId
 	private static LinkedListValueHashMap<Id<Person>, ParkingInfo> parkingInfo;
-	private static NetworkImpl network;
+	private static Network network;
 	private static HashMap<Id<PParking>, PParking> parkings;
 	private static TxtConfig config;
 
@@ -54,7 +54,7 @@ public class AssignParkingLinkIds {
 		parkingInfo = ParkingInfo.readParkingInfo(parkingLogInfoFileName);
 
 		String networkFilePath = config.getParameterValue("networkFilePath");
-		network = (NetworkImpl) GeneralLib.readNetwork(networkFilePath);
+		network = (Network) GeneralLib.readNetwork(networkFilePath);
 
 		parkings = readParkings();
 

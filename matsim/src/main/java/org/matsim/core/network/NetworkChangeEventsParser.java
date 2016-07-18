@@ -46,7 +46,7 @@ import java.util.Stack;
  * @author illenberger
  * 
  */
-public class NetworkChangeEventsParser extends MatsimXmlParser {
+public final class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	// ========================================================================
 	// static fields
@@ -202,7 +202,7 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 		
 	}
 
-	private ChangeValue newNetworkChangeType(String typeStr, String valueStr) {
+	private static ChangeValue newNetworkChangeType(String typeStr, String valueStr) {
 		if(typeStr != null && valueStr != null) {
 			double value = Double.parseDouble(valueStr);
 			if(typeStr.equalsIgnoreCase(ABSOLUTE_VALUE))

@@ -21,8 +21,6 @@ import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.FreeFloatingVehiclesLocation;
 import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
 import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.io.IOUtils;
@@ -246,11 +244,11 @@ public class CarSharingVehicles {
 		
 	private class LinkUtils {
 		
-		NetworkImpl network;
+		Network network;
 		
 		public LinkUtils(Network network) {
 			
-			this.network = (NetworkImpl) NetworkUtils.createNetwork();
+			this.network = (Network) NetworkUtils.createNetwork();
 			Set<String> restrictions = new HashSet<>();
 			restrictions = new HashSet<>();
 			restrictions.add("car");
@@ -261,9 +259,10 @@ public class CarSharingVehicles {
 			
 		}
 		
-		public LinkImpl getClosestLink(Coord coord) {			
+		public Link getClosestLink(Coord coord) {			
 
-		    return (LinkImpl)network.getNearestLinkExactly(coord);			
+		    final Coord coord1 = coord;
+		return (Link)NetworkUtils.getNearestLinkExactly(network,coord1);			
 			
 		}
 	}

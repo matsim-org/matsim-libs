@@ -47,8 +47,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
@@ -136,9 +135,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		this.testSubTourMutationToCar((NetworkImpl) network);
-		this.testSubTourMutationToPt((NetworkImpl) network);
-		this.testUnknownModeDoesntMutate((NetworkImpl) network);
+		this.testSubTourMutationToCar((Network) network);
+		this.testSubTourMutationToPt((Network) network);
+		this.testUnknownModeDoesntMutate((Network) network);
 	}
 
 	@Test
@@ -158,8 +157,8 @@ public class ChooseRandomLegModeForSubtourTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		testCarDoesntTeleport((NetworkImpl) network, TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport((NetworkImpl) network, TransportMode.pt, TransportMode.car);
+		testCarDoesntTeleport((Network) network, TransportMode.car, TransportMode.pt);
+		testCarDoesntTeleport((Network) network, TransportMode.pt, TransportMode.car);
 	}
 
 	@Test
@@ -248,7 +247,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 
-	private void testSubTourMutationToCar(NetworkImpl network) {
+	private void testSubTourMutationToCar(Network network) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -282,7 +281,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 	
-	private void testUnknownModeDoesntMutate(NetworkImpl network) {
+	private void testUnknownModeDoesntMutate(Network network) {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
@@ -331,7 +330,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 	
-	private void testSubTourMutationToPt(NetworkImpl network) {
+	private void testSubTourMutationToPt(Network network) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -348,7 +347,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		}
 	}
 	
-	private void testCarDoesntTeleport(NetworkImpl network, String originalMode, String otherMode) {
+	private void testCarDoesntTeleport(Network network, String originalMode, String otherMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
@@ -485,7 +484,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		return plan;
 	}
 
-	private static Plan createPlan(NetworkImpl network, String facString, String mode) {
+	private static Plan createPlan(Network network, String facString, String mode) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create("1000", Person.class));
 		Plan plan = TestsUtil.createPlanFromLinks(network, person, mode, facString);
 		return plan;

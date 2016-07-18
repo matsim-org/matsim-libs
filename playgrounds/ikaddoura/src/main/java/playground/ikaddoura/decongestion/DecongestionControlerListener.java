@@ -24,6 +24,7 @@
 
 package playground.ikaddoura.decongestion;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -37,10 +38,12 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -50,6 +53,8 @@ import org.matsim.core.utils.charts.XYLineChart;
 
 import com.google.inject.Inject;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
+import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.data.CongestionInfoWriter;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
@@ -65,7 +70,7 @@ import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV1;
  * 
  * (1) Identify congested links and time intervals and set an initial toll for these links and time intervals.
  * (2) Let the demand adjust for x iterations.
- * (3) Increase the toll for congested links and time intervals. Reduce the toll for congested links and time intervals.
+ * (3) Adjust the tolls (different implementations of {@link DecongestionTollSetting})
  * (4) GOTO (2)
  * 
  * All relevant parameters are specified in {@link DecongestionInfo}.
@@ -75,7 +80,7 @@ import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV1;
  *
  */
 
-public class DecongestionControlerListener implements StartupListener, AfterMobsimListener, IterationStartsListener, IterationEndsListener {
+public class DecongestionControlerListener implements StartupListener, AfterMobsimListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 		
 	private static final Logger log = Logger.getLogger(DecongestionControlerListener.class);
 
@@ -108,6 +113,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
+		log.info("decongestion settings: " + congestionInfo.getDecongestionConfigGroup().toString());
+		
 		// required by the pricing approach:
 		this.intervalBasedTolling = new IntervalBasedTolling(congestionInfo, event.getServices().getEvents());
 		event.getServices().getEvents().addHandler(this.intervalBasedTolling);
@@ -131,7 +138,10 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		} else if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() == 0.) {			
 			
 			int totalNumberOfIterations = this.congestionInfo.getScenario().getConfig().controler().getLastIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
-			if (event.getIteration() < this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
+			int iterationCounter = event.getIteration() - this.congestionInfo.getScenario().getConfig().controler().getFirstIteration();
+			
+			if (iterationCounter < this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() * totalNumberOfIterations
+					&& iterationCounter > this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
 				
 				log.info("+++ Iteration " + event.getIteration() + ". Update tolls per link and time bin.");
 				tollComputation.updateTolls();
@@ -139,8 +149,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		}
 		
 		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0.) {
-			CongestionInfoWriter.writeCongestionInfoTimeInterval(congestionInfo, this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/");
-			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/");
+			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/");
+			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/");
 		}
 	}
 
@@ -156,7 +166,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			
 			int timeBinCounter = 0;
 			for (int endTime = timeBinSize ; endTime <= this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
-				double avgDelay = travelTime.getLinkTravelTime(link, endTime, null, null) - freespeedTravelTime;
+				double avgDelay = travelTime.getLinkTravelTime(link, (endTime - timeBinSize/2.), null, null) - freespeedTravelTime;
 				time2avgDelay.put(timeBinCounter, avgDelay);				
 				timeBinCounter++;
 			}
@@ -311,6 +321,31 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		log.info("Innovative: " + innovative);
 		
 		return innovative;
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		
+		log.info("Simulation is shut down. Running final analysis...");
+		
+		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(event.getServices().getConfig().controler().getOutputDirectory());
+		analysis.run();
+		
+		try {
+			MATSimVideoUtils.createLegHistogramVideo(event.getServices().getConfig().controler().getOutputDirectory());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

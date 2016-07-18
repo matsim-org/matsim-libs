@@ -32,7 +32,7 @@ import org.matsim.contrib.wagonSim.production.ProductionDataContainer;
 import org.matsim.contrib.wagonSim.production.ProductionParser;
 import org.matsim.contrib.wagonSim.production.ProductionToMATSimNetworkConverter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;

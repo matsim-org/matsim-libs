@@ -32,11 +32,12 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
@@ -86,19 +87,27 @@ public class EventsToLegsTest {
 	private static Scenario createTriangularNetwork() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create("n1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("n2", Node.class), new Coord((double) 50, (double) 100));
-		Node node3 = network.createAndAddNode(Id.create("n3", Node.class), new Coord((double) 50, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create("n4", Node.class), new Coord((double) 100, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("n1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("n2", Node.class), new Coord((double) 50, (double) 100));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("n3", Node.class), new Coord((double) 50, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("n4", Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 
 		// add links
-		network.createAndAddLink(Id.create("l1", Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("l2", Link.class), node2, node3, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(Id.create("l3", Link.class), node3, node4, 50.0, 0.1, 3600.0, 1);
-		network.createAndAddLink(Id.create("l4", Link.class), node4, node1, 50.0, 0.1, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create("l1", Link.class), fromNode, toNode, 500.0, 10.0, 3600.0, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("l2", Link.class), fromNode1, toNode1, 500.0, 10.0, 3600.0, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("l3", Link.class), fromNode2, toNode2, 50.0, 0.1, 3600.0, (double) 1 );
+		final Node fromNode3 = node4;
+		final Node toNode3 = node1;
+		NetworkUtils.createAndAddLink(network,Id.create("l4", Link.class), fromNode3, toNode3, 50.0, 0.1, 3600.0, (double) 1 );
 		
 		return scenario;
 	}

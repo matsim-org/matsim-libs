@@ -21,16 +21,14 @@
  */
 package scenarios.illustrative.analysis;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
 import com.google.inject.Inject;
+
+import playground.dziemke.analysis.GnuplotUtils;
 
 /**
  * Class to bind the analyze tool (given in the constructor) and the writing
@@ -77,25 +75,27 @@ public class TtListenerToBindAndWriteAnalysis implements IterationEndsListener {
 		log.info("execute command: cd " + pathToSpecificAnalysisDir);
 		log.info("and afterwards: gnuplot " + relativePathToGnuplotScript);
 		
-		try {
-			// "&" splits different commands in one line in windows. Use ";" if you are a linux user.
-			ProcessBuilder builder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", relativePathToGnuplotScript);
-			Process p = builder.start();
-
-			// print command line infos and errors:
-			BufferedReader read = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String zeile;
-			while ((zeile = read.readLine()) != null) {
-				log.error("input stream: " + zeile);
-			}			
-			read = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while ((zeile = read.readLine()) != null) {
-				log.error("error: " + zeile);
-			}
-		} catch (IOException e) {
-			log.error("ERROR while executing gnuplot command.");
-			e.printStackTrace();
-		}
+		GnuplotUtils.runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript);
+		
+//		try {
+//			// "&" splits different commands in one line in windows. Use ";" if you are a linux user.
+//			ProcessBuilder builder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", relativePathToGnuplotScript);
+//			Process p = builder.start();
+//
+//			// print command line infos and errors:
+//			BufferedReader read = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//			String zeile;
+//			while ((zeile = read.readLine()) != null) {
+//				log.error("input stream: " + zeile);
+//			}			
+//			read = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+//			while ((zeile = read.readLine()) != null) {
+//				log.error("error: " + zeile);
+//			}
+//		} catch (IOException e) {
+//			log.error("ERROR while executing gnuplot command.");
+//			e.printStackTrace();
+//		}
 	}
 
 }

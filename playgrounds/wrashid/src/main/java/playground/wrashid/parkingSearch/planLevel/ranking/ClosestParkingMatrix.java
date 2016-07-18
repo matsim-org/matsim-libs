@@ -2,9 +2,9 @@ package playground.wrashid.parkingSearch.planLevel.ranking;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -26,10 +26,10 @@ import java.util.PriorityQueue;
  */
 public class ClosestParkingMatrix {
 
-	private NetworkImpl network;
+	private Network network;
 	LinkParkingFacilityAssociation parkingAssociations;
 
-	public ClosestParkingMatrix(ActivityFacilities facilities, NetworkImpl network) {
+	public ClosestParkingMatrix(ActivityFacilities facilities, Network network) {
 		this.network = network;
 		this.parkingAssociations = new LinkParkingFacilityAssociation(facilities, network);
 	}

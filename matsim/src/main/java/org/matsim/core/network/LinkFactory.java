@@ -29,5 +29,6 @@ import org.matsim.core.api.internal.MatsimFactory;
 public interface LinkFactory extends MatsimFactory {
 
 	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed, double capacity, double nOfLanes);
+	// yyyyyy reduce length of signature !!!!
 
 }

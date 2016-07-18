@@ -30,10 +30,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
-import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -62,7 +63,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/decongestion/output_final/";
+			outputBaseDirectory = "../../../runs-svn/decongestion/output/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -73,24 +74,50 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		String outputDirectory = outputBaseDirectory +
+				"total" + config.controler().getLastIteration() + "it" + 
+				"_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() +
+				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() +
+				"_timeMutation" + config.timeAllocationMutator().getMutationRange() +
+				"_" + decongestionSettings.getTOLLING_APPROACH();
 		
-		Config config = ConfigUtils.loadConfig(configFile);	
-		config.controler().setOutputDirectory(outputBaseDirectory + "decongestion_total" + config.controler().getLastIteration() +
-				"it_" + decongestionSettings.getTOLLING_APPROACH() + "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() +
-				"it_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() + "_adjustment" + decongestionSettings.getTOLL_ADJUSTMENT() +
-				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() + "_7200/");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.NoPricing.toString())) {
+			// no relevant parameters
+		
+		} else {
+			
+			outputDirectory = outputDirectory
+					+ "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() + "_it"
+					+ "_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
+					+ "_start" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT()
+					+ "_end" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT();
+			
+			if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.BangBang.toString())) {			
+				outputDirectory = outputDirectory + 
+						"_init" + decongestionSettings.getINITIAL_TOLL() +
+						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
+			
+			} else if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.PID.toString())) {
+				outputDirectory = outputDirectory +
+						"_Kp" + decongestionSettings.getKp() +
+						"_Ki" + decongestionSettings.getKi() +
+						"_Kd" + decongestionSettings.getKd();
+			}
+		}
+			
+		log.info("Output directory: " + outputDirectory);
+		
+		config.controler().setOutputDirectory(outputDirectory + "/");
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		Decongestion decongestion = new Decongestion(info);
-		decongestion.run();
+		final Decongestion decongestion = new Decongestion(info);
 		
-		log.info("Analyzing the final iteration...");
-		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());
-		analysis.run();
-		
-		MATSimVideoUtils.createLegHistogramVideo(config.controler().getOutputDirectory());
-		MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), decongestionSettings.getWRITE_OUTPUT_ITERATION(), "tolls");
+		final Controler controler = decongestion.getControler();
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+        controler.run();        
 	}
 }
 

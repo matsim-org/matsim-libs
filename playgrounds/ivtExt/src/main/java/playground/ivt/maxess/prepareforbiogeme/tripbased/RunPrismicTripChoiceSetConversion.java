@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
@@ -62,7 +61,7 @@ public class RunPrismicTripChoiceSetConversion {
 		final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(sc.getNetwork());
 		final Network carNetwork = NetworkUtils.createNetwork();
 		filter.filter(carNetwork, Collections.singleton("car"));
-		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (NetworkImpl) carNetwork);
+		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (Network) carNetwork);
 
 		new XY2Links( sc ).run(sc.getPopulation());
 

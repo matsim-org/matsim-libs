@@ -32,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMultiLaneMonitor;
@@ -120,7 +119,7 @@ public class LongChannelBiMultiLane {
 //				sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
 
 				Network net = sc.getNetwork();
-				((NetworkImpl) net).setCapacityPeriod(1);
+				((Network) net).setCapacityPeriod(1);
 				NetworkFactory fac = net.getFactory();
 
 				double l = s.sideLength;

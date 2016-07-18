@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -16,7 +17,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -335,7 +336,7 @@ public class NeighboursCreator {
 
 		List<Plan> newPlans = new LinkedList<Plan>();
 		PopulationFactory pf = scenario.getPopulation().getFactory();
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		Person person = plan.getPerson();
 
 		//get all the activity types that this person would like to do during the day
@@ -375,7 +376,7 @@ public class NeighboursCreator {
 					ActivityFacility actFacility = findActivityLocation(actType, 
 							t.get(index - 1).getCoord(), t.get(index).getCoord());					
 					
-					startLink = network.getNearestLinkExactly(actFacility.getCoord());
+					startLink = NetworkUtils.getNearestLinkExactly(network,actFacility.getCoord());
 					newActivityCoord = actFacility.getCoord();
 					Id<ActivityFacility> facilityId = actFacility.getId();
 					Id<Link> startLinkId =startLink.getId();
@@ -564,9 +565,11 @@ public class NeighboursCreator {
 		
 		double travelTime = 0.0;
 		if (mode.equals("car")) {
-			NetworkImpl network = (NetworkImpl)scenario.getNetwork();
-			Link startLink = network.getNearestLinkExactly(startCoord);
-			Link endLink = network.getNearestLinkExactly(endCoord);
+			Network network = (Network)scenario.getNetwork();
+			final Coord coord = startCoord;
+			Link startLink = NetworkUtils.getNearestLinkExactly(network,coord);
+			final Coord coord1 = endCoord;
+			Link endLink = NetworkUtils.getNearestLinkExactly(network,coord1);
 			Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), 
 					now, person, null ) ;
 			travelTime = path.travelTime;

@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -35,7 +35,7 @@ import org.matsim.testcases.fakes.FakeLink;
 public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final NetworkImpl network) {
+	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network) {
 		return new LinkNetworkRouteImpl(fromLinkId, toLinkId);
 	}
 

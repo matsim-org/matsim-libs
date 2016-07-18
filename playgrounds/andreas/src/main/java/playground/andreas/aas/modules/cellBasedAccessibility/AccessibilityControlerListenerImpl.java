@@ -7,8 +7,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -205,7 +206,7 @@ public class AccessibilityControlerListenerImpl{
 	protected void accessibilityComputation(TravelTime ttc,
 			LeastCostPathTree lcptFreeSpeedCarTravelTime,
 			LeastCostPathTree lcptCongestedCarTravelTime,
-			LeastCostPathTree lcptTravelDistance, NetworkImpl network,
+			LeastCostPathTree lcptTravelDistance, Network network,
 			Iterator<Zone<Id>> measuringPointIterator,
 			int size, int mode) {
 
@@ -228,11 +229,12 @@ public class AccessibilityControlerListenerImpl{
 			// get coordinate from origin (start point)
 			Coord coordFromZone = new Coord(point.getX(), point.getY());
 			assert( coordFromZone!=null );
+			final Coord coord = coordFromZone;
 			
 			// from here: accessibility computation for current starting point ("fromNode")
 			
 			// captures the distance (as walk time) between a cell centroid and the road network
-			Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+			Link nearestLink = NetworkUtils.getNearestLinkExactly(network,coord);
 
 			// determine nearest network node (from- or toNode) based on the link 
 			Node fromNode = NetworkUtil.getNearestNode(coordFromZone, nearestLink);

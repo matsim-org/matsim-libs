@@ -39,7 +39,7 @@ import java.util.Collection;
  * @author illenberger
  *
  */
-public class NetworkChangeEventsWriter extends MatsimXmlWriter implements MatsimSomeWriter {
+public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements MatsimSomeWriter {
 	// yy uses syntax 
 	//   write( filename, container ) 
 	// rather than the matsim standard

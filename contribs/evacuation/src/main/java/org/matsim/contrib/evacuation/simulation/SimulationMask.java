@@ -130,10 +130,8 @@ public class SimulationMask extends JPanel {
 					Scenario scenario = SimulationMask.this.controller
 							.getScenario();
 					Config config = scenario.getConfig();
-					String outdir = config.getParam("evacuation", "outputDir")
-							+ "/output";
-					;
-					outdir = config.getParam("controler", "outputDirectory");
+
+					String outdir = config.getParam("controler", "outputDirectory");
 					File file = new File(outdir);
 					int a = 0;
 					if (file.exists()) {

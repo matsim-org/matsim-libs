@@ -38,10 +38,10 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
 
 import processing.core.PConstants;
 import processing.core.PVector;
@@ -72,7 +72,7 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, PersonDeparture
 		dy /= length;
 		LinkInfo info = new LinkInfo();
 		info.id = l.getId();
-		info.slots = (int) ((l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes());
+		info.slots = (int) ((l.getLength()/((Network)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes());
 		info.lanes = (int) l.getNumberOfLanes();
 		info.cellSize = l.getLength()/(info.slots/info.lanes);
 		info.laneWidth = width/info.lanes;

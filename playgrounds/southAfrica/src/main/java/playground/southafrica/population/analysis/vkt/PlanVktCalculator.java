@@ -34,12 +34,13 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -85,10 +86,10 @@ public class PlanVktCalculator {
 		LOG.info("Updating road types... (" + scenario.getNetwork().getLinks().size() + " links)");
 		Counter linkCounter = new Counter("  links # ");
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()){
-			LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(linkId);
-			link.setType(roadTypeMap.get(Long.parseLong(link.getOrigId())));
-			if(link.getType() == null){
-				LOG.warn("Couldn't change the road type of link " + link.getOrigId());
+			Link link = (Link) scenario.getNetwork().getLinks().get(linkId);
+			NetworkUtils.setType( link, (String) roadTypeMap.get(Long.parseLong(NetworkUtils.getOrigId( link ))));
+			if(NetworkUtils.getType(link) == null){
+				LOG.warn("Couldn't change the road type of link " + NetworkUtils.getOrigId( link ));
 			}
 			linkCounter.incCounter();
 		}

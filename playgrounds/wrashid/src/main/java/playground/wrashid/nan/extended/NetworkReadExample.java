@@ -5,22 +5,22 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
 public class NetworkReadExample {
 
 	public static void main(String[] args) {
 		//getFilteredEquilNetLinks();
 	}
-	public static Map<Id<Link>, Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
+	public static Map<Id<Link>, ? extends Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
 		// read the network file
-		NetworkImpl network=(NetworkImpl) GeneralLib.readNetwork(networkFile);
+		Network network=(Network) GeneralLib.readNetwork(networkFile);
 		
 		
 		if (center==null){
 			return network.getLinks(); //return all links without filtering, do it later
 		} else {
-			return getLinksWithinRadius(network.getLinks(),radius,center); //set radius of the targeted area
+			return getLinksWithinRadius((Map<Id<Link>, Link>) network.getLinks(),radius,center); //set radius of the targeted area
 		}
 		
 	}

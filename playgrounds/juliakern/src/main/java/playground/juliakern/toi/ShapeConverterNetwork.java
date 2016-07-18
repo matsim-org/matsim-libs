@@ -29,13 +29,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -60,7 +61,7 @@ public class ShapeConverterNetwork {
 		ShapeFileReader sfr = new ShapeFileReader();
 		Collection<SimpleFeature> features = sfr.readFileAndInitialize(shapeFile);
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		//Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0.0, 10000.0));
 		
@@ -88,7 +89,8 @@ public class ShapeConverterNetwork {
 				Node node1;
 				
 				if(!network.getNodes().containsKey(Id.create(fromNode, Node.class))){
-					node1 = network.createAndAddNode(Id.create(fromNode, Node.class), fromCoord);
+					final Coord coord = fromCoord;
+					node1 = NetworkUtils.createAndAddNode(network, Id.create(fromNode, Node.class), coord);
 				}else{
 					node1=network.getNodes().get(Id.create(fromNode, Node.class));
 					
@@ -103,7 +105,8 @@ public class ShapeConverterNetwork {
 				Node node2;
 				
 				if(!network.getNodes().containsKey(Id.create(toNode, Node.class))){
-					node2 = network.createAndAddNode(Id.create(toNode, Node.class), toCoord);
+					final Coord coord = toCoord;
+					node2 = NetworkUtils.createAndAddNode(network, Id.create(toNode, Node.class), coord);
 				}else{
 					node2 = network.getNodes().get(Id.create(toNode, Node.class));
 					
@@ -132,12 +135,26 @@ public class ShapeConverterNetwork {
 					Double capacityb = numLanesBackwards * freeSpeed * 29;
 					if (!network.getLinks().containsKey(linkId1)) {
 						if(numLanesForwards>0.0){
-							network.createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacityf,numLanesForwards);
+							final Id<Link> id = linkId1;
+							final Node fromNode1 = node1;
+							final Node toNode1 = node2;
+							final double length = linkLength;
+							final double freespeed = freeSpeed;
+							final double capacity = capacityf;
+							final double numLanes = numLanesForwards;
+							NetworkUtils.createAndAddLink(network,id, fromNode1, toNode1, length, freespeed, capacity, numLanes );
 						}
 					}
 					if (!network.getLinks().containsKey(linkId2)) {
 						if(numLanesBackwards>0.0){
-							network.createAndAddLink(linkId2, node2, node1,	linkLength, freeSpeed, capacityb,numLanesBackwards);
+							final Id<Link> id = linkId2;
+							final Node fromNode1 = node2;
+							final Node toNode1 = node1;
+							final double length = linkLength;
+							final double freespeed = freeSpeed;
+							final double capacity = capacityb;
+							final double numLanes = numLanesBackwards;
+							NetworkUtils.createAndAddLink(network,id, fromNode1, toNode1, length, freespeed, capacity, numLanes );
 						}
 					}
 					

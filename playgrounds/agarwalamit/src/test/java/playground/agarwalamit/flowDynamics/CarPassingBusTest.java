@@ -61,7 +61,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -141,7 +140,7 @@ public class CarPassingBusTest {
 
 	private void createNetwork() {
 		Network network = this.scenario.getNetwork();
-		((NetworkImpl) network).setCapacityPeriod(3600.0);
+		((Network) network).setCapacityPeriod(3600.0);
 
 		Node n01, n10, n11, n12, n13, n14;
 		double x1 = -500;

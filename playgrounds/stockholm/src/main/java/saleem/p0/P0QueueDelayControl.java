@@ -15,15 +15,14 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
 
 
 public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler{
-	NetworkImpl network;
+	Network network;
 	double lastarrivaltime;
 	Link link2, link4, link5;
 	double delaylink2, delaylink4;
@@ -45,7 +44,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	String str="";
 	public static List<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>() ;
 	int iter;
-	P0QueueDelayControl(NetworkImpl network, int iter){
+	P0QueueDelayControl(Network network, int iter){
 		this.iter=iter;
 		this.network=network;
 		 link2 = network.getLinks().get(Id.create("2", Link.class));
@@ -227,7 +226,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	   capacity4 = link4.getCapacity();
 	   //double factor = 200/(iter+1);//To make the capacity change dependent on number of day/iteration
 	   double factor = 200;
-	   ((LinkImpl)link4).getFlowCapacityPerSec();
+	   ((Link)link4).getFlowCapacityPerSec();
 	   double abs = Math.abs(p2-p4);
 	   //-100 for starting from start of time bin,  (iter+1)/1000 + Math.random()/10000 for ordering the events based on iteration number as well as limiting it from exceptions due to two events on same time
 	   if (p2>p4 && factor2<0.8 && ctevents<iter){

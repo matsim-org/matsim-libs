@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;
@@ -119,7 +119,7 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
         	
 			Network subNetwork = multimodalSubNetworks.get(mode);
 			if (subNetwork == null) {
-				subNetwork = NetworkImpl.createNetwork();
+				subNetwork = NetworkUtils.createNetwork();
 				Set<String> restrictions = new HashSet<>();
 				restrictions.add(mode);
 				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
@@ -171,7 +171,7 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
         	
 			Network subNetwork = multimodalSubNetworks.get(mode);
 			if (subNetwork == null) {
-				subNetwork = NetworkImpl.createNetwork();
+				subNetwork = NetworkUtils.createNetwork();
 				Set<String> restrictions = new HashSet<>();
 				restrictions.add(mode);
 				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);

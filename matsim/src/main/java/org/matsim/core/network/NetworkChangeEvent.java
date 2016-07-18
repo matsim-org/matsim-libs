@@ -33,7 +33,7 @@ import java.util.*;
  * @author illenberger
  * 
  */
-public class NetworkChangeEvent {
+public final class NetworkChangeEvent {
 
 	public static enum ChangeType {
 		ABSOLUTE, FACTOR
@@ -112,10 +112,10 @@ public class NetworkChangeEvent {
 	
 	/**
 	 * 
-	 * @param links a collection of links affected by this event.
+	 * @param links1 a collection of links affected by this event.
 	 */
-	public void addLinks(Collection<? extends Link> links) {
-		this.links.addAll(links);
+	public void addLinks(Collection<? extends Link> links1) {
+		this.links.addAll(links1);
 	}
 	
 	/**

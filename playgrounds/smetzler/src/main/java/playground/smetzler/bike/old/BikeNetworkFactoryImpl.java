@@ -8,19 +8,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
-//import org.matsim.core.network.TimeVariantLinkFactory;
 
 public class BikeNetworkFactoryImpl implements NetworkFactory {
 	
-	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
+	private final static Logger log = Logger.getLogger(NetworkFactory.class);
 
 	private LinkFactory linkFactory = null;
 	
@@ -31,14 +26,14 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 
 	public BikeNetworkFactoryImpl(final Network network) {
 		this.network = network;
-		this.linkFactory = new LinkFactoryImpl();
+		this.linkFactory = NetworkUtils.createLinkFactory();
 	}
 
 	
 	// like in NetworkFactoryImpl
 	@Override
-	public NodeImpl createNode(final Id<Node> id, final Coord coord) {
-		NodeImpl node = NetworkUtils.createNode(id);
+	public Node createNode(final Id<Node> id, final Coord coord) {
+		Node node = NetworkUtils.createNode(id);
 		node.setCoord(coord) ;
 		return node ;
 	}
@@ -51,7 +46,7 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 
 	
 	public Link createLink(final Id<Link> id, final Node from, final Node to,
-			final NetworkImpl network, final double length, final double freespeedTT, final double capacity,
+			final Network network, final double length, final double freespeedTT, final double capacity,
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
@@ -67,8 +62,23 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 //		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
 //	}
 	
+	@Override
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
+	}
+
+
+	@Override
+	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+
+	@Override
+	public NetworkChangeEvent createNetworkChangeEvent(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 //	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {

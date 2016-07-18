@@ -76,6 +76,8 @@ public class RunETaxiBenchmark
             public void install()
             {
                 addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+                //override the binding in RunTaxiBenchmark
+                bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }
         });
 
@@ -85,7 +87,8 @@ public class RunETaxiBenchmark
 
     public static void main(String[] args)
     {
-        String configFile = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_benchmark_config.xml";
-        run(configFile, 1);
+        String cfg = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/" + //
+                "mielec_etaxi_benchmark_config.xml";
+        run(cfg, 1);
     }
 }

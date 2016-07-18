@@ -23,6 +23,7 @@ package org.matsim.api.core.v01.network;
 import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
@@ -84,6 +85,8 @@ public interface Node extends BasicLocation<Node>, Identifiable<Node> {
 	Link removeInLink(Id<Link> linkId);
 
 	Link removeOutLink(Id<Link> outLinkId);
+
+	void setCoord(Coord coord);
 
 
 }

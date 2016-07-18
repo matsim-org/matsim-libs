@@ -25,12 +25,12 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -58,7 +58,7 @@ import org.matsim.vehicles.VehiclesFactory;
 @Deprecated
 public class CreateInitialTimeSchedule {
 	
-	private NetworkImpl net;
+	private Network net;
 	private Vehicles veh;
 	private TransitSchedule tS;
 	private int numberOfAgents;
@@ -73,7 +73,7 @@ public class CreateInitialTimeSchedule {
 		cITS.writeVehicles(pConfig.getCurrentOutputBase() + "transitVehicles.xml");
 	}
 	
-	public static TransitLine createSingleTransitLine(NetworkImpl net, TransitSchedule transitSchedule, Id<Vehicle> driverId){
+	public static TransitLine createSingleTransitLine(Network net, TransitSchedule transitSchedule, Id<Vehicle> driverId){
 		CreateInitialTimeSchedule cITS = new CreateInitialTimeSchedule(net, transitSchedule);
 		return cITS.createSingleTransitLine(driverId);
 	}
@@ -82,14 +82,14 @@ public class CreateInitialTimeSchedule {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc.getNetwork());
 		netReader.readFile(networkInFile);		
-		this.net = (NetworkImpl) sc.getNetwork();
+		this.net = (Network) sc.getNetwork();
 		
 		this.tS = CreateStops.createStops(this.net, gridDistance, minXY, maxXY);
 		this.veh = VehicleUtils.createVehiclesContainer();
 		this.numberOfAgents = numberOfAgents;
 	}
 
-	public CreateInitialTimeSchedule(NetworkImpl net, TransitSchedule transitSchedule) {
+	public CreateInitialTimeSchedule(Network net, TransitSchedule transitSchedule) {
 		this.net = net;
 		this.tS = transitSchedule;
 	}

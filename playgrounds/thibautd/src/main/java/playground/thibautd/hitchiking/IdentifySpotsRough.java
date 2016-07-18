@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -75,7 +75,7 @@ public class IdentifySpotsRough {
 
 		List<Node> hhNodes = getHhNodes( network );
 		pruneCloseNodes( hhNodes );
-		Collection<Link> hhLinks = getHhLinks( (NetworkImpl) network , hhNodes );
+		Collection<Link> hhLinks = getHhLinks( (Network) network , hhNodes );
 		HitchHikingUtils.writeFile(
 				new HitchHikingSpots( hhLinks ),
 				outFile);
@@ -102,7 +102,7 @@ public class IdentifySpotsRough {
 	}
 
 	private static Collection<Link> getHhLinks(
-			final NetworkImpl network,
+			final Network network,
 			final List<Node> hhNodes) {
 		Random rand = new Random( 4375692 );
 		List<Link> links = new ArrayList<Link>();
@@ -110,7 +110,7 @@ public class IdentifySpotsRough {
 		Counter counter = new Counter( "choosing spot # " );
 
 		if (INCLUDE_CLOSEST_NODE_TO_CENTER) {
-			hhNodes.add( network.getNearestNode( CENTER ) );
+			hhNodes.add( NetworkUtils.getNearestNode(network,CENTER) );
 		}
 
 		for (Node n : hhNodes) {
@@ -119,10 +119,9 @@ public class IdentifySpotsRough {
 
 			double radius = SEARCH_RADIUS;
 			while (choiceSet.size() < 2) {
+				final double distance = radius;
 				Collection<Node> neighbors =
-					network.getNearestNodes(
-							n.getCoord(),
-							radius );
+					NetworkUtils.getNearestNodes2(network,n.getCoord(), distance);
 				radius += RADIUS_EXTENSION;
 
 				for (Node neighbor : neighbors) {

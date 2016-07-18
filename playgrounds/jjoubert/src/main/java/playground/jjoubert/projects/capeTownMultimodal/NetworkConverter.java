@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -62,7 +62,7 @@ public class NetworkConverter {
 		Counter counter = new Counter("  node # ");
 		
 		for(Node node : sc.getNetwork().getNodes().values()){
-			((NodeImpl)node).setCoord(ct.transform(node.getCoord()));
+			((Node)node).setCoord(ct.transform(node.getCoord()));
 			counter.incCounter();
 		}
 		counter.printCounter();

@@ -20,7 +20,7 @@
 
 package org.matsim.core.network;
 
-public class NetworkChangeEventFactoryImpl implements NetworkChangeEventFactory {
+public final class NetworkChangeEventFactoryImpl implements NetworkChangeEventFactory {
 
 	@Override
 	public NetworkChangeEvent createNetworkChangeEvent(double time) {

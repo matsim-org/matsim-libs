@@ -16,6 +16,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -44,7 +45,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -152,8 +153,9 @@ public class MyCarrierSimulation {
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
 					event.addLink(link);
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 //					events.add(event);
 				}
 				{//morning peak ends
@@ -176,8 +178,9 @@ public class MyCarrierSimulation {
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
 					event.addLink(link);
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 //					events.add(event);
 				}
 			}

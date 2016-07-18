@@ -19,11 +19,11 @@
 package saleem.p0;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -40,9 +40,9 @@ public class P0Controller {
 		config.network().setTimeVariantNetwork(true);
         Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
+		NetworkFactory nf = (NetworkFactory) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-		controler.addControlerListener(new GenericP0ControlListener(scenario, (NetworkImpl) scenario.getNetwork()));
+		controler.addControlerListener(new GenericP0ControlListener(scenario, (Network) scenario.getNetwork()));
 		controler.run();
 	}
 

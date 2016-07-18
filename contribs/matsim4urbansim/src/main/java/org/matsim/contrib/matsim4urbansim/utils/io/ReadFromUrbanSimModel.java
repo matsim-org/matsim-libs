@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -995,7 +995,7 @@ public class ReadFromUrbanSimModel {
 						
 						{ // aggregating persons to nearest network nodes
 							assert( homeLocation.getCoord() != null );
-							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
+							Node nearestNode = NetworkUtils.getNearestNode(((Network)network),homeLocation.getCoord());
 							assert( nearestNode != null );
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){

@@ -23,9 +23,10 @@ package org.matsim.vis.snapshotwriters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PositionInfoTest extends MatsimTestCase {
@@ -40,10 +41,12 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_shortLink() {
 
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
-		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 10, 9999, 1);
+		Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 9999, (double) 1 );
 
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -63,10 +66,12 @@ public class PositionInfoTest extends MatsimTestCase {
 	 */
 	public void testDistanceOnLink_longLink() {
 
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
-		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 2000, 10, 9999, 1);
+		Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 1000));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 2000, (double) 10, (double) 9999, (double) 1 );
 
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

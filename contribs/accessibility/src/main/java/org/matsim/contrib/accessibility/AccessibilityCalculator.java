@@ -13,7 +13,6 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -168,7 +167,7 @@ public final class AccessibilityCalculator {
 		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
 			bar.update();
 
-			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
+			Node nearestNode = NetworkUtils.getNearestNode(((Network)network),opportunity.getCoord());
 
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
@@ -223,7 +222,7 @@ public final class AccessibilityCalculator {
 		for ( ActivityFacility aFac : measuringPoints.getFacilities().values() ) {
 
 			// determine nearest network node (from- or toNode) based on the link
-			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(aFac.getCoord()));
+			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),aFac.getCoord()));
 
 			// this is used as a key for hash map lookups
 			Id<Node> nodeId = fromNode.getId();

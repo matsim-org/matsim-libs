@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkSummary implements NetworkRunnable {
@@ -65,8 +64,8 @@ public class NetworkSummary implements NetworkRunnable {
 		}
 
 		double cellSize = 7.5;
-		if (network instanceof NetworkImpl) {
-			cellSize = ((NetworkImpl) network).getEffectiveCellSize();
+		if (network instanceof Network) {
+			cellSize = ((Network) network).getEffectiveCellSize();
 		}
 		for (Link link : network.getLinks().values()) {
 			link_cnt++;

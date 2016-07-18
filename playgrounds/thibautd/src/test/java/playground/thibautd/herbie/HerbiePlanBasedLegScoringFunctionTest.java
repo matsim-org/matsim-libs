@@ -47,7 +47,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -295,18 +295,30 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 
 	private void initNetwork() {
-		NetworkImpl nImpl = (NetworkImpl) ScenarioUtils.createScenario( config ).getNetwork();
-		Node n1 = nImpl.createAndAddNode( Id.create( 1, Node.class ) , new Coord(0, 0));
-		Node n2 = nImpl.createAndAddNode( Id.create( 2, Node.class ) , new Coord(1, 0));
-		Node n3 = nImpl.createAndAddNode( Id.create( 3, Node.class ) , new Coord(1, 2));
-		Node n4 = nImpl.createAndAddNode( Id.create( 4, Node.class ) , new Coord(4, 2));
+		Network nImpl = (Network) ScenarioUtils.createScenario( config ).getNetwork();
+		Node n1 = NetworkUtils.createAndAddNode(nImpl, Id.create( 1, Node.class ), new Coord(0, 0));
+		Node n2 = NetworkUtils.createAndAddNode(nImpl, Id.create( 2, Node.class ), new Coord(1, 0));
+		Node n3 = NetworkUtils.createAndAddNode(nImpl, Id.create( 3, Node.class ), new Coord(1, 2));
+		Node n4 = NetworkUtils.createAndAddNode(nImpl, Id.create( 4, Node.class ), new Coord(4, 2));
+		final Node fromNode = n1;
+		final Node toNode = n2;
 
-		nImpl.createAndAddLink( Id.create( 12 , Link.class ) , n1 , n2 , 1 , 1 , 1 , 1 );
-		nImpl.createAndAddLink( Id.create( 13 , Link.class ) , n1 , n3 , 1 , 1 , 1 , 1 );
-		nImpl.createAndAddLink( Id.create( 23 , Link.class ) , n2 , n3 , 1 , 1 , 1 , 1 );
-		nImpl.createAndAddLink( Id.create( 43 , Link.class ) , n4 , n3 , 1 , 1 , 1 , 1 );
-		nImpl.createAndAddLink( Id.create( 42 , Link.class ) , n4 , n2 , 1 , 1 , 1 , 1 );
-		nImpl.createAndAddLink( Id.create( 34 , Link.class ) , n3 , n4 , 1 , 1 , 1 , 1 );
+		NetworkUtils.createAndAddLink(nImpl,Id.create( 12 , Link.class ), fromNode, toNode, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Node fromNode1 = n1;
+		final Node toNode1 = n3;
+		NetworkUtils.createAndAddLink(nImpl,Id.create( 13 , Link.class ), fromNode1, toNode1, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Node fromNode2 = n2;
+		final Node toNode2 = n3;
+		NetworkUtils.createAndAddLink(nImpl,Id.create( 23 , Link.class ), fromNode2, toNode2, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Node fromNode3 = n4;
+		final Node toNode3 = n3;
+		NetworkUtils.createAndAddLink(nImpl,Id.create( 43 , Link.class ), fromNode3, toNode3, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Node fromNode4 = n4;
+		final Node toNode4 = n2;
+		NetworkUtils.createAndAddLink(nImpl,Id.create( 42 , Link.class ), fromNode4, toNode4, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Node fromNode5 = n3;
+		final Node toNode5 = n4;
+		NetworkUtils.createAndAddLink(nImpl,Id.create( 34 , Link.class ), fromNode5, toNode5, (double) 1, (double) 1, (double) 1, (double) 1 );
 
 		network = nImpl;
 	}

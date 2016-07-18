@@ -23,10 +23,9 @@
 package org.matsim.contrib.cadyts.general;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
+import org.matsim.core.scoring.SumScoringFunction;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
@@ -34,7 +33,7 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
  * @author nagel
  *
  */
-public class CadytsScoring<T> implements ArbitraryEventScoring , org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
+public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CadytsScoring.class);
 
@@ -64,18 +63,7 @@ public class CadytsScoring<T> implements ArbitraryEventScoring , org.matsim.core
 		return score ;
 	}
 
-	@Override
-	public void reset() {
-		score = 0. ;
-	}
-
-	@Override
-	public void handleEvent(Event event) {
-		
-	}
-
 	public void setWeightOfCadytsCorrection(double weightOfCadytsCorrection) {
 		this.weightOfCadytsCorrection = weightOfCadytsCorrection;
 	}
-
 }

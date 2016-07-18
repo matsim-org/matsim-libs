@@ -2,6 +2,7 @@ package saleem.p0;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -10,23 +11,23 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 public class P0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
-	public NetworkImpl network;
+	public Network network;
 	P0ControlHandler handler;
 	public ArrayList<Double> avgabsolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
 	public ArrayList<Double> initialabsolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
 	public ArrayList<Double> iters = new ArrayList<Double>();//To check the convergence quality
 	public ArrayList<Double> itersscaled = new ArrayList<Double>();
-	public P0ControlListener(NetworkImpl network){
+	public P0ControlListener(Network network){
 		this.network = network;
 	}
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		//handler = new P0QueueDelayControl(network, event.getIteration());
 		handler.initialise(event.getIteration());//To avoid creating objects every time, to save memory
-	    network.setNetworkChangeEvents(P0ControlHandler.events);
+	    NetworkUtils.setNetworkChangeEvents(network,P0ControlHandler.events);
 //	    P0ControlHandler.events.removeAll(P0ControlHandler.events);
 	    //event.getServices().getEvents().addHandler(handler);
 		

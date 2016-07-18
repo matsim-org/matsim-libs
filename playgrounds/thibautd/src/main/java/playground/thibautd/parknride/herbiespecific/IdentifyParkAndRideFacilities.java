@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.RouteFactories;
@@ -69,7 +69,7 @@ public class IdentifyParkAndRideFacilities {
 		final double minDist = CoordUtils.calcEuclideanDistance( CENTER , BOUNDARY_POINT ) * factor;
 		final PnrIds ids = new PnrIds();
 
-		NetworkImpl network = readNetwork( networkFile );
+		Network network = readNetwork( networkFile );
 		TransitSchedule schedule = readSchedule( scheduleFile );
 		ParkAndRideFacilities facilities = new ParkAndRideFacilities( "train stations, except "+minDist+" around Hbf" );
 		RelevantStops stops = new RelevantStops();
@@ -106,7 +106,7 @@ public class IdentifyParkAndRideFacilities {
 		(new ParkAndRideFacilitiesXmlWriter( facilities )).write( outputFile );
 	}
 
-	private static NetworkImpl readNetwork(final String networkFile) {
+	private static Network readNetwork(final String networkFile) {
 		Config config = new Config();
 		config.addCoreModules();
 		config.network().setInputFile( networkFile );
@@ -114,7 +114,7 @@ public class IdentifyParkAndRideFacilities {
 		//MatsimNetworkReader reader = new MatsimNetworkReader( scenario );
 		//reader.readFile( networkFile );
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		Collection<Link> links = new ArrayList<Link>( network.getLinks().values() );
 

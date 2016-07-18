@@ -45,10 +45,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -63,7 +61,7 @@ public class MyControler1 {
 
 	private static final Logger log = Logger.getLogger(MyControler1.class);
 
-	protected int[] generateDistribution(final LinkImpl[] netLinks, final int popSize, final LinkImpl[] givenLinks, final double[] probs) {
+	protected int[] generateDistribution(final Link[] netLinks, final int popSize, final Link[] givenLinks, final double[] probs) {
 
 		int[] quant = new int[netLinks.length];
 		boolean[] aux = new boolean[netLinks.length];
@@ -277,7 +275,7 @@ public class MyControler1 {
 		log.info("  done");
 
 		log.info("  reading network xml file... ");
-		ITSUMONetworkReader reader = new ITSUMONetworkReader((NetworkImpl) network);
+		ITSUMONetworkReader reader = new ITSUMONetworkReader((Network) network);
 		reader.read(scenario.getConfig().getParam(ItsumoSim.CONFIG_MODULE, "itsumoInputNetworkFile"));
 
 		NetworkWriter network_writer = new NetworkWriter(network);

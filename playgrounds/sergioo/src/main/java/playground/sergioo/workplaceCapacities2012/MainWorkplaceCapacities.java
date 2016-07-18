@@ -61,8 +61,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
@@ -1131,7 +1131,7 @@ public class MainWorkplaceCapacities {
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
 			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new Coord(buildingsR.getDouble(2), buildingsR.getDouble(3)));
-			building.setLinkId(((NetworkImpl)network).getNearestLinkExactly(building.getCoord()).getId());
+			building.setLinkId(NetworkUtils.getNearestLinkExactly(((Network)network),building.getCoord()).getId());
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double proportion = buildingsR.getDouble(4);
 			for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {

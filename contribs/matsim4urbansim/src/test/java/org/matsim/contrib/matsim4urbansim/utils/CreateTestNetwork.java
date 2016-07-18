@@ -29,10 +29,11 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -51,7 +52,7 @@ public class CreateTestNetwork {
 	 * 
 	 * @return the created test network
 	 */
-	public static NetworkImpl createTestNetwork() {
+	public static Network createTestNetwork() {
 
 		/*
 		 * (2)		(5)------(8)
@@ -68,36 +69,116 @@ public class CreateTestNetwork {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 100));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 0, (double) 200));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 100, (double) 100));
-		Node node5 = network.createAndAddNode(Id.create(5, Node.class), new Coord((double) 100, (double) 200));
-		Node node6 = network.createAndAddNode(Id.create(6, Node.class), new Coord((double) 100, (double) 0));
-		Node node7 = network.createAndAddNode(Id.create(7, Node.class), new Coord((double) 200, (double) 100));
-		Node node8 = network.createAndAddNode(Id.create(8, Node.class), new Coord((double) 200, (double) 200));
-		Node node9 = network.createAndAddNode(Id.create(9, Node.class), new Coord((double) 200, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 100));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 0, (double) 200));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 100, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord((double) 100, (double) 200));
+		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 100, (double) 0));
+		Node node7 = NetworkUtils.createAndAddNode(network, Id.create(7, Node.class), new Coord((double) 200, (double) 100));
+		Node node8 = NetworkUtils.createAndAddNode(network, Id.create(8, Node.class), new Coord((double) 200, (double) 200));
+		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 200, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		final double freespeed1 = freespeed;
+		final double capacity1 = capacity;
+		final double numLanes1 = numLanes;
 
 		// add links (bi-directional)
-		network.createAndAddLink(Id.create( 1, Link.class), node1, node2, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 2, Link.class), node2, node1, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 3, Link.class), node1, node3, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 4, Link.class), node3, node1, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 5, Link.class), node1, node4, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 6, Link.class), node4, node1, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 7, Link.class), node4, node5, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 8, Link.class), node5, node4, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create( 9, Link.class), node4, node6, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(10, Link.class), node6, node4, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(11, Link.class), node4, node7, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(12, Link.class), node7, node4, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(13, Link.class), node5, node8, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(14, Link.class), node8, node5, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(15, Link.class), node6, node9, 100, freespeed, capacity, numLanes);
-		network.createAndAddLink(Id.create(16, Link.class), node9, node6, 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create( 1, Link.class), fromNode, toNode, (double) 100, freespeed1, capacity1, numLanes1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node1;
+		final double freespeed2 = freespeed;
+		final double capacity2 = capacity;
+		final double numLanes2 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 2, Link.class), fromNode1, toNode1, (double) 100, freespeed2, capacity2, numLanes2 );
+		final Node fromNode2 = node1;
+		final Node toNode2 = node3;
+		final double freespeed3 = freespeed;
+		final double capacity3 = capacity;
+		final double numLanes3 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 3, Link.class), fromNode2, toNode2, (double) 100, freespeed3, capacity3, numLanes3 );
+		final Node fromNode3 = node3;
+		final Node toNode3 = node1;
+		final double freespeed4 = freespeed;
+		final double capacity4 = capacity;
+		final double numLanes4 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 4, Link.class), fromNode3, toNode3, (double) 100, freespeed4, capacity4, numLanes4 );
+		final Node fromNode4 = node1;
+		final Node toNode4 = node4;
+		final double freespeed5 = freespeed;
+		final double capacity5 = capacity;
+		final double numLanes5 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 5, Link.class), fromNode4, toNode4, (double) 100, freespeed5, capacity5, numLanes5 );
+		final Node fromNode5 = node4;
+		final Node toNode5 = node1;
+		final double freespeed6 = freespeed;
+		final double capacity6 = capacity;
+		final double numLanes6 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 6, Link.class), fromNode5, toNode5, (double) 100, freespeed6, capacity6, numLanes6 );
+		final Node fromNode6 = node4;
+		final Node toNode6 = node5;
+		final double freespeed7 = freespeed;
+		final double capacity7 = capacity;
+		final double numLanes7 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 7, Link.class), fromNode6, toNode6, (double) 100, freespeed7, capacity7, numLanes7 );
+		final Node fromNode7 = node5;
+		final Node toNode7 = node4;
+		final double freespeed8 = freespeed;
+		final double capacity8 = capacity;
+		final double numLanes8 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 8, Link.class), fromNode7, toNode7, (double) 100, freespeed8, capacity8, numLanes8 );
+		final Node fromNode8 = node4;
+		final Node toNode8 = node6;
+		final double freespeed9 = freespeed;
+		final double capacity9 = capacity;
+		final double numLanes9 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create( 9, Link.class), fromNode8, toNode8, (double) 100, freespeed9, capacity9, numLanes9 );
+		final Node fromNode9 = node6;
+		final Node toNode9 = node4;
+		final double freespeed10 = freespeed;
+		final double capacity10 = capacity;
+		final double numLanes10 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(10, Link.class), fromNode9, toNode9, (double) 100, freespeed10, capacity10, numLanes10 );
+		final Node fromNode10 = node4;
+		final Node toNode10 = node7;
+		final double freespeed11 = freespeed;
+		final double capacity11 = capacity;
+		final double numLanes11 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(11, Link.class), fromNode10, toNode10, (double) 100, freespeed11, capacity11, numLanes11 );
+		final Node fromNode11 = node7;
+		final Node toNode11 = node4;
+		final double freespeed12 = freespeed;
+		final double capacity12 = capacity;
+		final double numLanes12 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(12, Link.class), fromNode11, toNode11, (double) 100, freespeed12, capacity12, numLanes12 );
+		final Node fromNode12 = node5;
+		final Node toNode12 = node8;
+		final double freespeed13 = freespeed;
+		final double capacity13 = capacity;
+		final double numLanes13 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(13, Link.class), fromNode12, toNode12, (double) 100, freespeed13, capacity13, numLanes13 );
+		final Node fromNode13 = node8;
+		final Node toNode13 = node5;
+		final double freespeed14 = freespeed;
+		final double capacity14 = capacity;
+		final double numLanes14 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(14, Link.class), fromNode13, toNode13, (double) 100, freespeed14, capacity14, numLanes14 );
+		final Node fromNode14 = node6;
+		final Node toNode14 = node9;
+		final double freespeed15 = freespeed;
+		final double capacity15 = capacity;
+		final double numLanes15 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(15, Link.class), fromNode14, toNode14, (double) 100, freespeed15, capacity15, numLanes15 );
+		final Node fromNode15 = node9;
+		final Node toNode15 = node6;
+		final double freespeed16 = freespeed;
+		final double capacity16 = capacity;
+		final double numLanes16 = numLanes;
+		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), fromNode15, toNode15, (double) 100, freespeed16, capacity16, numLanes16 );
 
 		return network;
 	}
@@ -208,7 +289,7 @@ public class CreateTestNetwork {
 	 * the path 1,2,4 has a total length of 1000m with a free speed travel time of 10m/s
 	 * the second path 1,3,4 has a total length of 100m but only a free speed travel time of 0.1m/s
 	 */
-	public static NetworkImpl createTriangularNetwork() {
+	public static Network createTriangularNetwork() {
 		/*
 		 * 			(2)
 		 *         /   \
@@ -223,19 +304,27 @@ public class CreateTestNetwork {
 		 */
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 50, (double) 100));
-		Node node3 = network.createAndAddNode(Id.create(3, Node.class), new Coord((double) 50, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create(4, Node.class), new Coord((double) 100, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 50, (double) 100));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 50, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 
 		// add links
-		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(Id.create(2, Link.class), node2, node4, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(Id.create(3, Link.class), node1, node3, 50.0, 0.1, 3600.0, 1);
-		network.createAndAddLink(Id.create(4, Link.class), node3, node4, 50.0, 0.1, 3600.0, 1);
+		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 500.0, 10.0, 3600.0, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), fromNode1, toNode1, 500.0, 10.0, 3600.0, (double) 1 );
+		final Node fromNode2 = node1;
+		final Node toNode2 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), fromNode2, toNode2, 50.0, 0.1, 3600.0, (double) 1 );
+		final Node fromNode3 = node3;
+		final Node toNode3 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), fromNode3, toNode3, 50.0, 0.1, 3600.0, (double) 1 );
 		
 		return network;
 	}

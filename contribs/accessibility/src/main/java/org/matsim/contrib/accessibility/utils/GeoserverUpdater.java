@@ -64,7 +64,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		builder.add("the_geom", Point.class);
 		builder.add("x", Double.class);
 		builder.add("y", Double.class);
-		builder.add("time", Double.class); // new since 2015-12-02
+//		builder.add("time", Double.class); // new since 2015-12-02
 
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			builder.add(mode.toString(), Double.class);
@@ -92,7 +92,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			featureBuilder.add(geometryFactory.createPoint(MGC.coord2Coordinate(transformation.transform(coord))));
 			featureBuilder.add(coord.getX());
 			featureBuilder.add(coord.getY());
-			featureBuilder.add(timeOfDay);
+//			featureBuilder.add(timeOfDay);
 
 			Map<Modes4Accessibility, Double> accessibilities = entry.getValue();
 			for (Modes4Accessibility mode : Modes4Accessibility.values()) {

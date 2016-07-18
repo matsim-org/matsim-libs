@@ -37,12 +37,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -207,11 +207,11 @@ public class FacilitiesCreator {
 			log.info("removing links from network where no facilities should be attached to ...");
 			List<Id<Link>> linksToRemove = new ArrayList<Id<Link>>();
 			for (Link link : scenario.getNetwork().getLinks().values()) {
-				String type = ((LinkImpl) link).getType();
+				String type = NetworkUtils.getType(((Link) link));
 				if (!validLinkTypes.contains(type)) linksToRemove.add(link.getId());
 			}
 			log.info("\tfound " + linksToRemove.size() + " links which do not match the criteria");
-			for (Id<Link> linkId : linksToRemove) ((NetworkImpl) scenario.getNetwork()).removeLink(linkId);
+			for (Id<Link> linkId : linksToRemove) ((Network) scenario.getNetwork()).removeLink(linkId);
 			log.info("\tprocessed network contains " + scenario.getNetwork().getLinks().size() + 
 					" valid links");
 			log.info("done.\n");
@@ -247,7 +247,7 @@ public class FacilitiesCreator {
 			index++;
 		}
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
 		ObjectAttributes facilitiesAttributes = activityFacilities.getFacilityAttributes();
@@ -262,7 +262,8 @@ public class FacilitiesCreator {
 			int i = 0;
 			for (Coord coord : coordinates) {
 				Id<ActivityFacility> id = Id.create(taz + "_" + i, ActivityFacility.class);
-				Link link = network.getNearestLinkExactly(coord);
+				final Coord coord1 = coord;
+				Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 				ActivityFacility facility = factory.createActivityFacility(id, coord, link.getId());
 				createAndAddActivityOptions(scenario, facility, zonalAttributes.get(taz));
 				activityFacilities.addActivityFacility(facility);

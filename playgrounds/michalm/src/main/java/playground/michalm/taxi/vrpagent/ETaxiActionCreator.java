@@ -32,14 +32,10 @@ import playground.michalm.taxi.schedule.ETaxiChargingTask;
 public class ETaxiActionCreator
     extends TaxiActionCreator
 {
-    private final MobsimTimer timer;
-
-
     public ETaxiActionCreator(PassengerEngine passengerEngine, LegCreator legCreator,
             double pickupDuration, MobsimTimer timer)
     {
         super(passengerEngine, legCreator, pickupDuration);
-        this.timer = timer;
     }
 
 
@@ -47,7 +43,7 @@ public class ETaxiActionCreator
     public DynAction createAction(Task task, double now)
     {
         if (task instanceof ETaxiChargingTask) {
-            return new ETaxiAtChargerActivity((ETaxiChargingTask)task, timer);
+            return new ETaxiAtChargerActivity((ETaxiChargingTask)task);
         }
 
         return super.createAction(task, now);

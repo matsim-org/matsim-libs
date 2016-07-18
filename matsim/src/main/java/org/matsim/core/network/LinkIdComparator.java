@@ -33,7 +33,7 @@ import org.matsim.core.api.internal.MatsimComparator;
  *
  * @author mrieser
  */
-public class LinkIdComparator implements Comparator<Link>, Serializable, MatsimComparator {
+public final class LinkIdComparator implements Comparator<Link>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 

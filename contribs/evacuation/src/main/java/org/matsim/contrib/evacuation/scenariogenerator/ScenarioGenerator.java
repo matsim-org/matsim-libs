@@ -42,9 +42,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -181,6 +180,7 @@ public class ScenarioGenerator {
 		this.matsimConfig.travelTimeCalculator().setTravelTimeCalculatorType(
 				"TravelTimeCalculatorHashMap");
 
+        this.matsimConfig.removeModule("evacuation");
 		new ConfigWriter(this.matsimConfig).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(),
 				"scenario generation finished.");
@@ -334,15 +334,15 @@ public class ScenarioGenerator {
 			reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
 			reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
 			// max density is set to 5.4 p/m^2
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 			reader.setKeepPaths(true);
 			reader.parse(evacuationNetworkFile);
 		} else if (gcm.getMainTrafficType().equals("mixed")) {
 			// TODO OSMReader for mixed
 			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(
 					sc.getNetwork(), ct, true);
 			reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, 1);

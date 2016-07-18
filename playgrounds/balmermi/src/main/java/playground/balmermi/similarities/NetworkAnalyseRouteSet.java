@@ -32,8 +32,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 
 public class NetworkAnalyseRouteSet {
 
@@ -72,7 +72,7 @@ public class NetworkAnalyseRouteSet {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readNodeHeight(String inputfile, NetworkImpl network) {
+	private final void readNodeHeight(String inputfile, Network network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -100,7 +100,7 @@ public class NetworkAnalyseRouteSet {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readLinkAtts(String inputfile, NetworkImpl network) {
+	private final void readLinkAtts(String inputfile, Network network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -132,7 +132,7 @@ public class NetworkAnalyseRouteSet {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private final void readRoutes(String inputfile, NetworkImpl network) {
+	private final void readRoutes(String inputfile, Network network) {
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -295,7 +295,7 @@ public class NetworkAnalyseRouteSet {
 		System.out.print(formatter.format(ampel_nofl) + "\n");
 	}
 
-	private final void analysis(NetworkImpl network) {
+	private final void analysis(Network network) {
 		double length = 0.0;
 		double rise_av = 0.0;
 		double rise_min = 0.0;
@@ -434,7 +434,7 @@ public class NetworkAnalyseRouteSet {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		System.out.println("      reading in heights of the nodes...");

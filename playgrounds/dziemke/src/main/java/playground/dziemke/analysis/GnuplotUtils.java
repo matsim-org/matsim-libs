@@ -1,46 +1,65 @@
 package playground.dziemke.analysis;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import org.apache.log4j.Logger;
 
 /**
  * @author dziemke, tthunig
  */
 public class GnuplotUtils {
 	public static final Logger log = Logger.getLogger(GnuplotUtils.class);
-	
-	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript, String... gnuplotArguments){
+
+	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript) {
+		runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript, "");
+	}
+
+	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript, String gnuplotArgument){
+		/*
+			right now this only works with one argument
+			if you need to pass more then one change "String gnuplotArgument" to "String... gnuplotArguments"
+			also you have to think about a way to pass the multiple arguments dynamicly to the ProcessBuilder
+			(you could also just implement the specific case for yourself)
+
+			a fine testscript for gnuplot would be:
+				#!/usr/local/bin/gnuplot --persist
+				print "script name        : ", ARG0
+				print "first argument     : ", ARG1
+				print "second argument    : ", ARG2
+				print "third argument     : ", ARG3
+				print "number of arguments: ", ARGC
+		*/
 		log.info("Analysis directory is = " + pathToSpecificAnalysisDir);
 		log.info("Relative path from analysis directory to directory with gnuplot script is = " + relativePathToGnuplotScript);
 		
 		String osName = System.getProperty("os.name");
 		log.info("OS name is = " + osName);
 		
-		String allArgumentsAsString = gnuplotArguments[0];
-		for (int i=1; i < gnuplotArguments.length ; i++) {
-			allArgumentsAsString.concat(" " + gnuplotArguments[i]);
-		}
-		
+		/*String allArgumentsAsString = "";
+		for (int i=0; i < gnuplotArguments.length ; i++) {
+			allArgumentsAsString = allArgumentsAsString.concat(gnuplotArguments[i] + " ");
+		}*/
+
 		try {
 			ProcessBuilder processBuilder = null;
 			
-			// if OS is Windows --- example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
-			if ( osName.contains("Win") || osName.contains("win")) {
-				processBuilder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", relativePathToGnuplotScript);
+			// If OS is Windows --- example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
+			if (osName.contains("Win") || osName.contains("win")) {
+				String[] args = {"one", "two", "three", "four", "five"};
+				processBuilder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", "-c", relativePathToGnuplotScript, gnuplotArgument);
 			
-				// if OS is Macintosh --- example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
+			// If OS is Macintosh --- example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 			} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-				processBuilder = new ProcessBuilder("bash", "-c", "(cd " + pathToSpecificAnalysisDir + " && /usr/local/bin/gnuplot -c " + relativePathToGnuplotScript + " " + allArgumentsAsString + ")");
+				processBuilder = new ProcessBuilder("bash", "-c", "(cd " + pathToSpecificAnalysisDir + " && /usr/local/bin/gnuplot -c " + relativePathToGnuplotScript + " " + gnuplotArgument + ")");
 			
-				// if OS is Linux --- example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
+			// If OS is Linux --- example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
 			} else if ( osName.contains("Lin") || osName.contains("lin") ) {
 				log.warn("This implemenation has not yet been tested for Linux. Please report if you use this.");
 				processBuilder = new ProcessBuilder("bash", "-c", "(cd " + pathToSpecificAnalysisDir + " && /usr/local/bin/gnuplot " + relativePathToGnuplotScript + ")");
 			
-				// if OS is neither Win nor Mac nor Linux
+			// If OS is neither Win nor Mac nor Linux
 			} else {
 				log.error("Not implemented for os.arch=" + System.getProperty("os.arch") );
 			}

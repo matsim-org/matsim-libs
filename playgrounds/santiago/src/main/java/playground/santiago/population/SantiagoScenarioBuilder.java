@@ -75,7 +75,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/policy1/";
+	final String pathForMatsim = "../../../runs-svn/santiago/BASE10/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;

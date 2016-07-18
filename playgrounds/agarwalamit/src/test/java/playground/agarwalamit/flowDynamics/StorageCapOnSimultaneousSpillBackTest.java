@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -52,7 +53,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -198,7 +199,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 */
 		final Scenario scenario;
 		final Config config;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		Link link1;
 		Link link2;
@@ -211,25 +212,33 @@ public class StorageCapOnSimultaneousSpillBackTest {
 			config.global().setRandomSeed(2546);
 			config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (NetworkImpl) this.scenario.getNetwork();
+			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 
 		private void createNetwork(){
 
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 100, (double) 10));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
 			double y1 = -10;
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 300, y1));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 500, (double) 20));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 300, y1));
+			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 500, (double) 20));
 			double x = -10;
 			double y = -200;
-			Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord(x, y));
+			Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord(x, y));
+			final Node fromNode = node1;
+			final Node toNode = node2;
 
-			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,3600.,1,null,"7");
-			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,5.0,20.0,360.,1,null,"7");
-			link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,1000.0,20.0,3600.,1,null,"7");
-			link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node5, node2,1000.0,20.0,3600.,1,null,"7");
+			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
+			final Node fromNode1 = node2;
+			final Node toNode1 = node3;
+			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 5.0, 20.0, 360., (double) 1, null, (String) "7");
+			final Node fromNode2 = node3;
+			final Node toNode2 = node4;
+			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
+			final Node fromNode3 = node5;
+			final Node toNode3 = node2;
+			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
 		}
 
 		private void createPopulation(final Tuple<Id<Link>, Id<Link>> startLinkIds){

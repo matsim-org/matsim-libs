@@ -25,13 +25,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -137,10 +138,10 @@ class ScenarioLoaderImpl {
 
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
-	            NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+	            Network network = (Network) this.scenario.getNetwork();
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
 				parser.parse(this.config.network().getChangeEventsInputFile());
-				network.setNetworkChangeEvents(parser.getEvents());
+				NetworkUtils.setNetworkChangeEvents(network,parser.getEvents());
 			}
 		}
 	}

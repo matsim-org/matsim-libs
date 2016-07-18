@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -48,7 +48,7 @@ public class ComposedNode implements Node {
 	}
 	private static boolean inOutNode(Set<Node> nodes, String mode) {
 		//Create sub-network and determine incident links
-		Network subNetwork = NetworkImpl.createNetwork();
+		Network subNetwork = NetworkUtils.createNetwork();
 		Set<Link> inLinks = new HashSet<Link>();
 		Set<Link> outLinks = new HashSet<Link>();
 		for(Node node:nodes) {
@@ -166,6 +166,11 @@ public class ComposedNode implements Node {
 	}
 	@Override
 	public Link removeOutLink(Id<Link> outLinkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+	@Override
+	public void setCoord(Coord coord) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

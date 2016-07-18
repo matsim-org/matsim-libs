@@ -24,13 +24,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -81,15 +82,21 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	 */
 	private void runMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
 		// setup network
-		NetworkImpl network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
-		Link link1 = network.createAndAddLink(Id.create("0", Link.class), node1, node2, 100, 5, 100, 1);
-		network.createAndAddLink(Id.create("1", Link.class), node2, node3, 100, 5, 100, 1);
-		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 300, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("0", Link.class), fromNode, toNode, (double) 100, (double) 5, (double) 100, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode1, toNode1, (double) 100, (double) 5, (double) 100, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode2, toNode2, (double) 100, (double) 5, (double) 100, (double) 1 );
 
 		// setup person
 		Plan plan;
@@ -160,15 +167,21 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	 */
 	private void runSimplifiedMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
 		// setup network
-		NetworkImpl network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
-		Link link1 = network.createAndAddLink(Id.create("0", Link.class), node1, node2, 100, 5, 100, 1);
-		network.createAndAddLink(Id.create("1", Link.class), node2, node3, 100, 5, 100, 1);
-		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 300, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("0", Link.class), fromNode, toNode, (double) 100, (double) 5, (double) 100, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode1, toNode1, (double) 100, (double) 5, (double) 100, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode2, toNode2, (double) 100, (double) 5, (double) 100, (double) 1 );
 
 		// setup person
 		Plan plan;
