@@ -37,6 +37,16 @@ public class PatnaPersonFilter{
 		if ( personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum") ) return true;
 		else return false;
 	}
+	
+	public static boolean isPersonBelongsToSlum(Id<Person> personId){
+		if ( personId.toString().startsWith("slum") ) return true;
+		else return false;
+	}
+	
+	public static boolean isPersonBelongsToNonSlum(Id<Person> personId){
+		if ( personId.toString().startsWith("nonsSum") ) return true;
+		else return false;
+	}
 
 	public static boolean isPersonBelongsToCommuter(Id<Person> personId){
 		if( Arrays.asList( personId.toString().split("_") ).contains("E2I") ) return true;

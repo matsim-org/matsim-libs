@@ -21,7 +21,12 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 import java.io.File;
 import java.util.Arrays;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -37,6 +42,16 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.StatsWriter;
@@ -51,6 +66,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
@@ -137,6 +153,41 @@ public class JointCalibrationControler {
 				this.addEventHandlerBinding().to(PtFareEventHandler.class);
 			}
 		});
+		
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			@Inject Network network;
+			@Inject Population population;
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+
+				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+				
+				if (! PatnaPersonFilter.isPersonBelongsToUrban(person.getId())) { // inc is not available for commuters and through traffic
+					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+					return sumScoringFunction;
+				}
+				
+				Double monthlyInc = (Double) population.getPersonAttributes().getAttribute(person.getId().toString(), "monthlyIncome");
+				Double avgInc = Double.NEGATIVE_INFINITY;
+				
+				if ( PatnaPersonFilter.isPersonBelongsToSlum(person.getId())) {
+					avgInc = 3109.0;// sec 5.2.4, Patna CMP 
+				} else {
+					avgInc = 7175.0;// sec 5.2.4, Patna CMP
+				}
+				double marginalUtilMoney = avgInc/monthlyInc;
+				
+				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(marginalUtilMoney));
+
+				return sumScoringFunction;
+			}
+		}) ;
 		
 		// for above make sure that util_dist and monetary dist rate for pt are zero.
 		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
