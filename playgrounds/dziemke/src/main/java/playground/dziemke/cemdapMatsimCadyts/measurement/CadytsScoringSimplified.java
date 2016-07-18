@@ -17,10 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.cadyts.general;
+package playground.dziemke.cemdapMatsimCadyts.measurement;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.SumScoringFunction;
 
@@ -29,9 +30,9 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 /**
  * @author nagel
  */
-public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
+public class CadytsScoringSimplified<T> implements SumScoringFunction.BasicScoring {
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CadytsScoring.class);
+	private static final Logger log = Logger.getLogger(CadytsScoringSimplified.class);
 
 	private double score = 0.;
 	private PlansTranslator<T> plansTranslator;
@@ -40,9 +41,9 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	private final double beta;
 	private double weightOfCadytsCorrection = 1.;
 
-	public CadytsScoring(final Plan plan, Config config, final CadytsContextI<T> context) {
-		this.plansTranslator = context.getPlansTranslator();
-		this.matsimCalibrator = context.getCalibrator();
+	public CadytsScoringSimplified(final Plan plan, Config config, PlansTranslator<T> plansTranslator, AnalyticalCalibrator<T> matsimCalibrator) {
+		this.plansTranslator = plansTranslator;
+		this.matsimCalibrator = matsimCalibrator;
 		this.plan = plan;
 		this.beta = config.planCalcScore().getBrainExpBeta();
 	}

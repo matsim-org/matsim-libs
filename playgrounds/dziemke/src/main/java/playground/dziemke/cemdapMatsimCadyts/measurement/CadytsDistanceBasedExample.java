@@ -13,6 +13,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
+import org.matsim.contrib.cadyts.car.CadytsContext;
+// import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -126,13 +129,12 @@ public class CadytsDistanceBasedExample {
 		Controler controler = new Controler(scenario);
 		
 		// Randomizing router: Randomizes relation of time- and distance-based disutilities
-//		final RandomizingTimeDistanceTravelDisutilityFactory builder =
-//				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
-//		builder.setSigma(sigma);
+//		final RandomizingTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
+//		travelDisutilityFactory.setSigma(sigma);
 //		controler.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
-//				bindCarTravelDisutilityFactory().toInstance(builder);
+//				bindCarTravelDisutilityFactory().toInstance(travelDisutilityFactory);
 //			}
 //		});
 		
@@ -143,6 +145,8 @@ public class CadytsDistanceBasedExample {
 				install(new PersoDistHistoModule());
 			}
 		});
+		
+		controler.addOverridingModule(new CadytsCarModule()); // required if org.matsim.contrib.cadyts.general.CadytsScoring is used
 
 		// Add StartUpListener
 		controler.addControlerListener((StartupListener) startupEvent -> {
@@ -210,7 +214,8 @@ public class CadytsDistanceBasedExample {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject Config config;
 		    @Inject AnalyticalCalibrator cadyts;
-		    @Inject PlansTranslator ptStep;
+		    @Inject PlansTranslator plansTranslator;
+//		    @Inject CadytsContext cadytsContext; // alternative
 //		    @Inject CharyparNagelScoringParametersForPerson parameters;
 
 		    @Override
@@ -224,8 +229,9 @@ public class CadytsDistanceBasedExample {
 //				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 		        
 		        // Counts-based scoring
-		        final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
-		        scoringFunction.setWeight(cadytsWeightLinks);
+		        final CadytsScoringSimplified<Link> scoringFunction = new CadytsScoringSimplified<Link>(person.getSelectedPlan(), config, plansTranslator, cadyts);
+//		        final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext); // alternative
+		        scoringFunction.setWeightOfCadytsCorrection(cadytsWeightLinks);
 		        sumScoringFunction.addScoringFunction(scoringFunction);
 		        
 		        // Distribution-based scoring (currently implemented via money events)
