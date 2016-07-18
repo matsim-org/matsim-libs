@@ -19,6 +19,7 @@
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +38,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
 
 import playground.agarwalamit.utils.ListUtils;
 
@@ -49,9 +47,6 @@ import playground.agarwalamit.utils.ListUtils;
  */
 
 public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	
-	@Inject
-	private QSimConfigGroup qsimConfigGroup;
 	
 	private final Map<Id<Person>, Double> personId2TrackEnterTime;
 	
@@ -65,6 +60,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private final List<Double> bikesPassedByEachCarPerKm;
 	
 	private final List<Double> carsPerKm;
+	private final Collection<String> seepModes;
 
 	private final static Id<Link> TRACKING_START_LINK = Id.createLinkId(0);
 	private final static Id<Link> TRACKING_END_LINK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR*3-1);
@@ -72,12 +68,16 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 
 	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
 	
-	public PassingEventsUpdator() {
+	public PassingEventsUpdator(final Collection<String> seepModes) {
+		this.seepModes = seepModes;
 		this.personId2TrackEnterTime = new HashMap<>();
 		this.personId2LinkEnterTime = new HashMap<>();
 		this.personId2LegMode = new HashMap<>();
 		this.bikesPassedByEachCarPerKm = new ArrayList<Double>();
 		this.carsPerKm = new ArrayList<Double>();
+	}
+	public PassingEventsUpdator() {
+		this(new ArrayList<>()); //no seepage
 	}
 	
 	@Override
@@ -110,7 +110,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 			
 			if( isFirstBikeLeavingTrack ) {
 				double numberOfBicyclesOvertaken = 0;
-				if( qsimConfigGroup.getSeepModes().contains( this.personId2LegMode.get(personId)) ){
+				if( this.seepModes.contains( this.personId2LegMode.get(personId)) ){
 //						this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
 					numberOfBicyclesOvertaken = - getNumberOfOvertakenVehicles(personId); // this means bike is overtaking cars (seepage)
 				} else if ( this.personId2LegMode.get(personId).equals(TransportMode.car)){ 

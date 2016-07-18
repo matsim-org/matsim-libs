@@ -368,10 +368,10 @@ public class GenerateFundamentalDiagramData {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData);
-		passingEventsUpdator  = new PassingEventsUpdator();
+		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes());
 
 		events.addHandler(globalFlowDynamicsUpdator);
-		
+		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
 		
@@ -394,7 +394,6 @@ public class GenerateFundamentalDiagramData {
 			@Override
 			public void install() {
 				this.bindMobsim().toInstance( qSim );
-				if(travelModes.length > 1) this.addEventHandlerBinding().toInstance(passingEventsUpdator);
 			}
 		});
 		
