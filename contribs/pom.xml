@@ -258,7 +258,7 @@
 		<profile>
 			<id>release</id>
 			<build>
-				<defaultGoal>assembly:single</defaultGoal>
+				<defaultGoal>package</defaultGoal>
 				<pluginManagement>
 					<plugins>
 						<plugin>
