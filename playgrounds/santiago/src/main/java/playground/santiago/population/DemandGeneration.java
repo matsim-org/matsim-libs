@@ -1,7 +1,9 @@
 package playground.santiago.population;
 
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -456,7 +458,7 @@ public class DemandGeneration {
 		readPersonas(personasFile);
 		readPlans(clonedPlans);
 		
-
+		LinkedList<String> agentsWithCar = new LinkedList<>(); 
 		
 		this.agentAttributes = new ObjectAttributes();
 		
@@ -464,6 +466,7 @@ public class DemandGeneration {
 			
 			if(persona.hasCar() && persona.hasDrivingLicence()){
 				String id = persona.getId();
+				agentsWithCar.add(id);
 				int start = originalAgentIds.indexOf(id);
 				int end = originalAgentIds.lastIndexOf(id);
 				/*Avoid the case in which, because of the sampling, the ID doesn't exist in the synthetic population*/
@@ -474,6 +477,19 @@ public class DemandGeneration {
 				}
 
 			}		
+		}
+		
+		
+		try {
+			
+			PrintWriter pw = new PrintWriter (new FileWriter ( svnWorkingDir + "inputForMATSim/plans/agentsWithCar.txt" ));
+			for (String agent : agentsWithCar) {
+				pw.println(agent);
+
+			}
+			pw.close();
+		} catch (IOException e) {
+			log.error(new Exception(e));
 		}
 		
 		new ObjectAttributesXmlWriter(agentAttributes).writeFile(expandedAgentAttributes);
