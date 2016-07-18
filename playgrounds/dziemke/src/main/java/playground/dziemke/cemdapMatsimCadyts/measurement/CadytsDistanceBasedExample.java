@@ -7,7 +7,6 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -17,6 +16,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -32,7 +32,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -53,19 +58,23 @@ public class CadytsDistanceBasedExample {
 	}	
 
 	public static void main(String[] args) {
-		String inputNetworkFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/network_diff_lengths2-inv.xml";
+		// Input and output
+		String inputNetworkFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/network_diff_lengths2.xml";
 //		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
 		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000_routes5.xml";
 		String countsFileName = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/counts100-200_full.xml";
-		String runId = "selectR+hist1000-nwInv-ref2";
+		String runId = "selectR+hist1000-2";
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "";
 		
-		// Sigma for the randomized router; the higher the more randomness; 0.0 results in no randomness.)
-//		final double sigma = 10.0;
-
+		// Parameters
 		final double cadytsWeightLinks = 0.;
 		final double cadytsWeightHistogram = 1000.;
+		
+		// ... for randomizing router
+//		final double sigma = 10.0; // The higher, the more randomness; 0.0 = no randomness
+//		final double monetaryDistanceRate = -0.0002;
 
+		// Config
 		Config config = ConfigUtils.createConfig();
 		config.controler().setLastIteration(100);
 		config.controler().setWritePlansInterval(10);
@@ -74,10 +83,7 @@ public class CadytsDistanceBasedExample {
 		config.counts().setCountsFileName(countsFileName);
 //		config.plans().setInputFile(inputPlansFile);
 //		config.network().setInputFile(inputNetworkFile);
-		
-//		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0002);
-//		config.planCalcScore().setPerforming_utils_hr(0.);
-//		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.);
+//		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRate);
 		
 		log.info("----- Car: MarginalUtilityOfTraveling = " + config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling());
 		log.info("----- Performing_utils = " + config.planCalcScore().getPerforming_utils_hr());
@@ -99,6 +105,15 @@ public class CadytsDistanceBasedExample {
 //			stratSets.setDisableAfter(70);
 //			config.strategy().addStrategySettings(stratSets);
 //		}
+		
+		// In case behavioral scoring is to be included, activities need to be defined
+//		ActivityParams homeActivity = new ActivityParams("h");
+//		homeActivity.setTypicalDuration(12*60*60);
+//		config.planCalcScore().addActivityParams(homeActivity);
+//		
+//		ActivityParams workActivity = new ActivityParams("w");
+//		workActivity.setTypicalDuration(0.5*60*60);
+//		config.planCalcScore().addActivityParams(workActivity);
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
@@ -110,7 +125,7 @@ public class CadytsDistanceBasedExample {
 
 		Controler controler = new Controler(scenario);
 		
-		// Randomizing router
+		// Randomizing router: Randomizes relation of time- and distance-based disutilities
 //		final RandomizingTimeDistanceTravelDisutilityFactory builder =
 //				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 //		builder.setSigma(sigma);
@@ -191,22 +206,31 @@ public class CadytsDistanceBasedExample {
 			});
 		});
 		
-		// Add counts-based cadyts scoring
+		// Scoring
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject Config config;
 		    @Inject AnalyticalCalibrator cadyts;
 		    @Inject PlansTranslator ptStep;
+//		    @Inject CharyparNagelScoringParametersForPerson parameters;
 
 		    @Override
 		    public ScoringFunction createNewScoringFunction(Person person) {
-
 		        SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		        CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
+		        
+		        // Behavioral scoring
+//		    	final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+//		        sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+//				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+//				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		        
+		        // Counts-based scoring
+		        final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
 		        scoringFunction.setWeight(cadytsWeightLinks);
 		        sumScoringFunction.addScoringFunction(scoringFunction);
 		        
+		        // Distribution-based scoring (currently implemented via money events)
 		        sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(1.0));
-
+		        
 		        return sumScoringFunction;
 		    }
 		});
