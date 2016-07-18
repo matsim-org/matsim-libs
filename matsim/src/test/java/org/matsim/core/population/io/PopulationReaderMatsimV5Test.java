@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReaderMatsimV5;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;

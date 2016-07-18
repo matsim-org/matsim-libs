@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;

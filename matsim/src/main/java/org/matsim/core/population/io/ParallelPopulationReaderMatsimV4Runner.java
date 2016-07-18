@@ -18,17 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.io;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4.EndProcessingTag;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4.EndTag;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4.PersonTag;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4.StartTag;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4.Tag;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.ParallelPopulationReaderMatsimV4.EndProcessingTag;
+import org.matsim.core.population.io.ParallelPopulationReaderMatsimV4.EndTag;
+import org.matsim.core.population.io.ParallelPopulationReaderMatsimV4.PersonTag;
+import org.matsim.core.population.io.ParallelPopulationReaderMatsimV4.StartTag;
+import org.matsim.core.population.io.ParallelPopulationReaderMatsimV4.Tag;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.xml.sax.Attributes;
 

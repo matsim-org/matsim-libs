@@ -42,7 +42,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.ExeRunner;
 

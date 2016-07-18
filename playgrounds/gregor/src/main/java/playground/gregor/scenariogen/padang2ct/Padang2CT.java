@@ -41,8 +41,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.ctsim.run.CTRunner;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.io;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordinateTransformation;

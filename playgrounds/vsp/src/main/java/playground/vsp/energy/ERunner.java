@@ -28,7 +28,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.energy.trafficstate.TrafficStateControlerListener;

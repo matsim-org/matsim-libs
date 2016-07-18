@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * PlansWriterHandler.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.core.population;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-
 /**
- * @author mrieser
+ * @author nagel
+ *
  */
-public interface PopulationWriterHandler {
-
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
-
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException;
-
-	public void writePerson(final Person person, final BufferedWriter out) throws IOException;
-
-	public void endPlans(final BufferedWriter out) throws IOException;
-	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
-}
+package org.matsim.core.population.io;

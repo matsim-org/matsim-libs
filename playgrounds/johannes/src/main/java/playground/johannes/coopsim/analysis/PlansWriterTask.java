@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 

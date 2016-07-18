@@ -35,10 +35,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 

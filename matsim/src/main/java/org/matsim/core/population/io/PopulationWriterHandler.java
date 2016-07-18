@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansReaderI.java
+ * PlansWriterHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,18 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.io;
 
-import org.matsim.core.api.internal.MatsimSomeReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 
-public interface MatsimPopulationReader extends MatsimSomeReader {
+/**
+ * @author mrieser
+ */
+public interface PopulationWriterHandler {
+
+	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException;
+
+	public void startPlans(final Population plans, final BufferedWriter out) throws IOException;
+
+	public void writePerson(final Person person, final BufferedWriter out) throws IOException;
+
+	public void endPlans(final BufferedWriter out) throws IOException;
 	
-	/**
-	 * read plans from the specified file.
-	 * 
-	 * @param filename name of the file to read plans from.
-	 */
-	void readFile(String filename);
-
+	public void writeSeparator(final BufferedWriter out) throws IOException;
 }

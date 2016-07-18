@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansReaderMatsimV1.java
+ * PlansReaderMatsimV0.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.io;
 
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -45,15 +47,18 @@ import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
 /**
- * A reader for plans files of MATSim according to <code>plans_v1.dtd</code>.
+ * A reader for plans files of MATSim according to <code>plans_v0.dtd</code>.
  *
  * @author mrieser
  * @author balmermi
  */
-/*package*/ class PopulationReaderMatsimV1 extends MatsimXmlParser implements
-		MatsimPopulationReader {
+/*package*/ class PopulationReaderMatsimV0 extends MatsimXmlParser implements MatsimPopulationReader {
 
 	private final static String PLANS = "plans";
+	private final static String DEMAND = "demand";
+	private final static String SEGMENT = "segment";
+	private final static String MODEL = "model";
+	private final static String PARAM = "param";
 	private final static String PERSON = "person";
 	private final static String PLAN = "plan";
 	private final static String ACT = "act";
@@ -67,23 +72,22 @@ import org.xml.sax.Attributes;
 
 	private final Population plans;
 	private final Network network;
-
 	private Person currperson = null;
-
 	private Plan currplan = null;
-
 	private Leg currleg = null;
-
 	private NetworkRoute currroute = null;
-	private String routeNodes = null;
 
 	private Activity prevAct = null;
+	private String routeNodes = null;
 
-	public PopulationReaderMatsimV1(final Scenario scenario) {
+	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
+
+	protected PopulationReaderMatsimV0(
+			final Scenario scenario) {
 		this( new IdentityTransformation() , scenario );
 	}
 
-	public PopulationReaderMatsimV1(
+	protected PopulationReaderMatsimV0(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
 		this.coordinateTransformation = coordinateTransformation;
@@ -92,81 +96,51 @@ import org.xml.sax.Attributes;
 	}
 
 	@Override
-	public void startTag(final String name, final Attributes atts,
-			final Stack<String> context) {
-		if (PLANS.equals(name)) {
-			startPlans(atts);
-		}
-		else if (PERSON.equals(name)) {
+	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+		if (PERSON.equals(name)) {
 			startPerson(atts);
-		}
-		else if (PLAN.equals(name)) {
+		} else if (PLAN.equals(name)) {
 			startPlan(atts);
-		}
-		else if (ACT.equals(name)) {
+		} else if (ACT.equals(name)) {
 			startAct(atts);
-		}
-		else if (LEG.equals(name)) {
+		} else if (LEG.equals(name)) {
 			startLeg(atts);
-		}
-		else if (ROUTE.equals(name)) {
-			startRoute(atts);
-		}
-		else {
+		} else if (ROUTE.equals(name)) {
+			startRoute();
+		} else if (DEMAND.equals(name)) {
+			log.info("The tag <demand> is not supported");
+		} else if (!SEGMENT.equals(name) && !MODEL.equals(name) && !PARAM.equals(name) && !PLANS.equals(name)) {
 			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 
 	@Override
-	public void endTag(final String name, final String content,
-			final Stack<String> context) {
+	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
 			this.plans.addPerson(this.currperson);
 			this.currperson = null;
-		}
-		else if (PLAN.equals(name)) {
-			if (this.currplan.getPlanElements() instanceof ArrayList) {
-				((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
-			}
+		} else if (PLAN.equals(name)) {
 			this.currplan = null;
-		}
-		else if (LEG.equals(name)) {
+		} else if (LEG.equals(name)) {
 			this.currleg = null;
-		}
-		else if (ROUTE.equals(name)) {
+		} else if (ROUTE.equals(name)) {
 			this.routeNodes = content;
 		}
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}.
+	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
+	 * possible exceptions on its own.
 	 *
-	 * @param filename
-	 *          The name of the file to parse.
+	 * @param filename The name of the file to parse.
 	 */
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
 		parse(filename);
 	}
 
-	private void startPlans(final Attributes atts) {
-		this.plans.setName(atts.getValue("name"));
-	}
-
 	private void startPerson(final Attributes atts) {
-		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
-		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
-		
-		PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
-		
-		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
-		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
-		String employed = atts.getValue("employed");
-		if (employed == null) {
-			PersonUtils.setEmployed(this.currperson, null);
-		} else {
-			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
-		}
+		this.currperson = this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 	}
 
 	private void startPlan(final Attributes atts) {
@@ -179,8 +153,7 @@ import org.xml.sax.Attributes;
 			selected = false;
 		}
 		else {
-			throw new NumberFormatException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+			throw new NumberFormatException("Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 		this.routeNodes = null;
@@ -194,10 +167,15 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startAct(final Attributes atts) {
-		Activity act = null;
+		if (atts.getValue("zone") != null) {
+			log.info("The attribute 'zone' of <act> will be ignored");
+		}
+
+		Activity act;
 		if (atts.getValue("link") != null) {
-			final Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
-			act = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue("type"), linkId);
+			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
+			final Id<Link> linkId1 = linkId;
+			act = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue("type"), linkId1);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
 				final Coord coord = parseCoord( atts );
 				act.setCoord(coord);
@@ -236,15 +214,9 @@ import org.xml.sax.Attributes;
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 	}
 
-	private void startRoute(final Attributes atts) {
+	private void startRoute() {
 		this.currroute = this.plans.getFactory().getRouteFactories().createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
-		if (atts.getValue("dist") != null) {
-			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));
-		}
-		if (atts.getValue("trav_time") != null) {
-			this.currroute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
-		}
 	}
 
 }
