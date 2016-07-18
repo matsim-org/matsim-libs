@@ -17,6 +17,7 @@ public interface ChargingQueue {
 	boolean addVehicle(ChargingPlugType plugType, Vehicle vehicle);
 	boolean isQueueFull();
 	Vehicle dequeueVehicle(ChargingPlugType plugType);
+	Vehicle peek(ChargingPlugType chargingPlugType);
 	int size();
 	boolean removeVehicle(Vehicle vehicle);
 
