@@ -21,6 +21,7 @@
 
 package playground.boescpa.ivtBaseline;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;

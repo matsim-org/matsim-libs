@@ -107,12 +107,9 @@ public class CorrectedUtilityCreatorTest {
 	}
 
 	private Scenario loadScenario() {
+		final Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml");
 		final ConstrainedAccessibilityConfigGroup configGroup = new ConstrainedAccessibilityConfigGroup();
-		final Config config = ConfigUtils.createConfig( configGroup );
-
-		config.plans().setInputFile( "test/scenarios/chessboard/plans.xml" );
-		config.facilities().setInputFile( "test/scenarios/chessboard/facilities.xml" );
-		config.network().setInputFile( "test/scenarios/chessboard/network.xml" );
+		config.addModule(configGroup);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
