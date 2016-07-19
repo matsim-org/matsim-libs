@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -73,22 +74,49 @@ public class MatsimTestUtils extends TestWatchman {
 		MatsimRandom.reset();
 	}
 
-	public Config createConfigWithTestInputResourcePathAsContext() {
+	public Config createConfigWithInputResourcePathAsContext() {
 		Config config = ConfigUtils.createConfig();
-		config.setContext(testInputResourcePath());
+		config.setContext(inputResourcePath());
 		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
-	public URL testInputResourcePath() {
-		return this.testClass.getResource("/" + getClassInputDirectory() + getMethodName() + "/.");
+	public Config createConfigWithClassInputResourcePathAsContext() {
+		Config config = ConfigUtils.createConfig();
+		config.setContext(classInputResourcePath());
+		this.outputDirectory = getOutputDirectory();
+		config.controler().setOutputDirectory(this.outputDirectory);
+		return config;
 	}
 
-	public URL testClassInputResourcePath() {
-		return this.testClass.getResource("/" + getClassInputDirectory() + "/.");
+	public Config createConfigWithPackageInputResourcePathAsContext() {
+		Config config = ConfigUtils.createConfig();
+		config.setContext(packageInputResourcePath());
+		this.outputDirectory = getOutputDirectory();
+		config.controler().setOutputDirectory(this.outputDirectory);
+		return config;
 	}
 
+	public URL inputResourcePath() {
+		return getResourceNotNull("/" + getClassInputDirectory() + getMethodName() + "/.");
+	}
+
+	public URL classInputResourcePath() {
+		return getResourceNotNull("/" + getClassInputDirectory() + "/.");
+	}
+
+	public URL packageInputResourcePath() {
+		return getResourceNotNull("/" + getPackageInputDirectory() + "/.");
+	}
+
+	private URL getResourceNotNull(String pathString) {
+		URL resource = this.testClass.getResource(pathString);
+		if (resource == null) {
+			throw new UncheckedIOException("Not found: "+pathString);
+		}
+		return resource;
+	}
 
 	public Config createConfigWithTestInputFilePathAsContext() {
 		try {

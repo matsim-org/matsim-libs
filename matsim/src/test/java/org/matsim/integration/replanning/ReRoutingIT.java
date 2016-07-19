@@ -45,7 +45,7 @@ public class ReRoutingIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Scenario loadScenario() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.testClassInputResourcePath(), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
 		config.qsim().setTimeStepSize(10.0);
         config.qsim().setStuckTime(100.0);
         config.qsim().setRemoveStuckVehicles(true);
@@ -110,11 +110,11 @@ public class ReRoutingIT {
 	}
 	
 	private void evaluate() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.testClassInputResourcePath(), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
 
 		Scenario referenceScenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(referenceScenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
-		new PopulationReader(referenceScenario).parse(IOUtils.newUrl(utils.testInputResourcePath(), "1.plans.xml.gz"));
+		new PopulationReader(referenceScenario).parse(IOUtils.newUrl(utils.inputResourcePath(), "1.plans.xml.gz"));
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new PopulationReader(scenario).readFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").getAbsolutePath());

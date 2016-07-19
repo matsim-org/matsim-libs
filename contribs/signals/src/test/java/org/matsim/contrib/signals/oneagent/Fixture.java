@@ -59,7 +59,7 @@ public class Fixture {
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		Config conf = ConfigUtils.createConfig(testUtils.testClassInputResourcePath());
+		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		conf.controler().setMobsim("qsim");
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);

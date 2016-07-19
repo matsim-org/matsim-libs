@@ -42,7 +42,7 @@ public class NetworkUtilsTest {
 	@Test
 	public final void testIsMultimodal() {
 
-		Config config = utils.createConfigWithTestInputResourcePathAsContext();
+		Config config = utils.createConfigWithInputResourcePathAsContext();
 		config.network().setInputFile("network.xml" );
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
