@@ -28,6 +28,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
@@ -45,9 +46,25 @@ public class KNTaxibusExample {
 
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
+		// all vehicles start at same place; all passengers start at same place:
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
+		
+		// passengers live in larger area and want to go to railway station:
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/config.xml", new TaxibusConfigGroup());
+		
+		// passengers live in larger area and have distributed destinations (which are, however, all called "train" :-( ):
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+		
+		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+//		visConfig.setMapOverlayMode(true);
+		visConfig.setAgentSize(250);
+		visConfig.setLinkWidth(5);
+		visConfig.setDrawNonMovingItems(true);
+		visConfig.setDrawTime(true);
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
@@ -56,17 +73,15 @@ public class KNTaxibusExample {
 		final TaxiBusTravelTimesAnalyzer taxibusTravelTimesAnalyzer = new TaxiBusTravelTimesAnalyzer();
 		final TraveltimeAndDistanceEventHandler ttEventHandler = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
 		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
+			@Override public void install() {
 				addEventHandlerBinding().toInstance(taxibusTravelTimesAnalyzer);
 				addEventHandlerBinding().toInstance(ttEventHandler);
 			}
 		});
-		
 		controler.addOverridingModule( new OTFVisLiveModule() );
 		
 		controler.run();
+
 		taxibusTravelTimesAnalyzer.printOutput();
 		ttEventHandler.printOutput();
 	}

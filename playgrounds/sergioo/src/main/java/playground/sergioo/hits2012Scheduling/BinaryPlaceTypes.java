@@ -19,12 +19,12 @@ import java.util.TreeMap;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -112,7 +112,7 @@ public class BinaryPlaceTypes {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/network/network100.xml.gz");
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		NetworkImpl net = (NetworkImpl) NetworkUtils.createNetwork();
+		Network net = (Network) NetworkUtils.createNetwork();
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
@@ -130,9 +130,9 @@ public class BinaryPlaceTypes {
 						Location startLocation = Household.LOCATIONS.get(trip.getStartPostalCode());
 						Location endLocation = Household.LOCATIONS.get(trip.getEndPostalCode());
 						if(nodes.get(startLocation.getPostalCode())==null)
-							nodes.put(startLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(startLocation.getCoord())));
+							nodes.put(startLocation.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(startLocation.getCoord())));
 						if(nodes.get(endLocation.getPostalCode())==null)
-							nodes.put(endLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(endLocation.getCoord())));
+							nodes.put(endLocation.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(endLocation.getCoord())));
 						if(FLEX_ATIVITIES.contains(prevPurpose) && prevType!=null) {
 							long duration = (trip.getStartTime().getTime()-time)/1000;
 							if(duration<0)
@@ -180,7 +180,7 @@ public class BinaryPlaceTypes {
 			locs.put(detailedType, los);
 			for(Location location:Household.LOCATIONS.values())
 				if(location.getDetailedTypes().contains(detailedType))
-					los.put(location.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(location.getCoord())).getId().toString());
+					los.put(location.getPostalCode(), NetworkUtils.getNearestNode(net,coordinateTransformation.transform(location.getCoord())).getId().toString());
 		}
 		Map<String, Map<String, Double>> ttMap = new HashMap<String, Map<String, Double>>();
 		BufferedReader reader = new BufferedReader(new FileReader("./data/pairs.txt"));

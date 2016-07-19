@@ -8,9 +8,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -36,32 +35,25 @@ public class RenameLoopLinks {
 		new TransitScheduleReaderV1(scenario).readFile(scheduleFile);
 		TransitSchedule inSchedule = scenario.getTransitSchedule();
 		
-		Network outNetwork = NetworkImpl.createNetwork();
+		Network outNetwork = NetworkUtils.createNetwork();
 		for (Node n : baseNetwork.getNodes().values()) outNetwork.addNode(n);
 		
 		HashMap<Id, Id> loopNamesMap = new HashMap<Id, Id>();
 		
-		LinkFactoryImpl factory = new LinkFactoryImpl();
+		LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
 		for (Link l : baseNetwork.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
+			Link L = (Link) l;
 			
 			Id<Link> linkId;
-			if (L.getType().equals("LOOP")){
+			if (NetworkUtils.getType(L).equals("LOOP")){
 				linkId = Id.create(L.getFromNode().getId().toString() + "_LOOP", Link.class);
 				loopNamesMap.put(L.getId(), linkId);
 			}else linkId = L.getId();
 			Node fn = outNetwork.getNodes().get(L.getFromNode().getId());
 			Node tn = outNetwork.getNodes().get(L.getToNode().getId());
 			
-			LinkImpl newLink = (LinkImpl) factory.createLink(linkId, 
-					fn, 
-					tn, 
-					outNetwork, 
-					L.getLength(), 
-					L.getFreespeed(),
-					L.getCapacity(), 
-					L.getNumberOfLanes());
-			newLink.setType(L.getType());
+			Link newLink = (Link) NetworkUtils.createLink(linkId, fn, tn, outNetwork, L.getLength(), L.getFreespeed(), L.getCapacity(), L.getNumberOfLanes());
+			NetworkUtils.setType( newLink, (String) NetworkUtils.getType(L));
 			outNetwork.addLink(newLink);
 		}
 		TransitScheduleFactoryImpl tsFactory = new TransitScheduleFactoryImpl();

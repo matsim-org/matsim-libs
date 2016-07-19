@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
@@ -245,7 +245,7 @@ public final class TtAnalyzedGeneralResultsWriter {
 		attribs.add(link.getFreespeed());
 		attribs.add(link.getCapacity());
 		attribs.add(link.getNumberOfLanes());
-		attribs.add(((LinkImpl) link).getType());
+		attribs.add(NetworkUtils.getType(((Link) link)));
 		attribs.add(linkTotalDelay);
 		attribs.add(linkAvgDelay);
 		attribs.add(linkNumberOfVeh);

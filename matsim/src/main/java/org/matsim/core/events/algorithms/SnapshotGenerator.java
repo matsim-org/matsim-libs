@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -149,8 +148,8 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
 			final double effectiveCellSize;
-			if (this.network instanceof NetworkImpl) {
-				effectiveCellSize = ((NetworkImpl)this.network).getEffectiveCellSize();
+			if (this.network instanceof Network) {
+				effectiveCellSize = ((Network)this.network).getEffectiveCellSize();
 			} else {
 				effectiveCellSize = 7.5;
 			}

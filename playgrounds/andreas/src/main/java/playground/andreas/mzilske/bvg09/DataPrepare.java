@@ -37,11 +37,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -96,7 +96,7 @@ public class DataPrepare {
 	private final MutableScenario scenario;
 	private final Config config;
 
-	private NetworkImpl pseudoNetwork;
+	private Network pseudoNetwork;
 
 	public DataPrepare() {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -141,7 +141,7 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		this.pseudoNetwork = NetworkImpl.createNetwork();
+		this.pseudoNetwork = NetworkUtils.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.pseudoNetwork, "tr_").createNetwork();
 	}
 
@@ -152,7 +152,7 @@ public class DataPrepare {
 		Network streetNetwork = streetScenario.getNetwork();
 		new MatsimNetworkReader(transitScenario.getNetwork()).parse(IntermediateTransitNetworkFile);
 		new MatsimNetworkReader(streetScenario.getNetwork()).parse(InNetworkFile);
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (Network) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(OutMultimodalNetworkFile);
 	}
 

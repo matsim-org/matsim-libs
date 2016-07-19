@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import javax.inject.Inject;
 import java.util.LinkedList;
@@ -44,11 +44,10 @@ public class IncidentGenerator implements BeforeMobsimListener {
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 		if (events != null) {
-            ((NetworkImpl) event.getServices().getScenario().getNetwork()).setNetworkChangeEvents(events);
-		}
-		else
-            ((NetworkImpl) event.getServices().getScenario().getNetwork())
-                    .setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
+            final List<NetworkChangeEvent> events1 = events;
+		NetworkUtils.setNetworkChangeEvents(((Network) event.getServices().getScenario().getNetwork()),events1);
+		} else
+			NetworkUtils.setNetworkChangeEvents(((Network) event.getServices().getScenario().getNetwork()),(List<NetworkChangeEvent>) new LinkedList<NetworkChangeEvent>());
 	}
 
 }

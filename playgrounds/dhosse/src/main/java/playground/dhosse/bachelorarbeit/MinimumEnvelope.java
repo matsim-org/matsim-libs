@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -69,7 +69,8 @@ public class MinimumEnvelope {
 		}
 		
 		for(Coord coord : coordinates){
-			Id nodeId = ((NetworkImpl) this.net).getNearestNode(coord).getId();
+			final Coord coord1 = coord;
+			Id nodeId = NetworkUtils.getNearestNode(((Network) this.net),coord1).getId();
 			if(!outerNodes.contains(nodeId)){
 				outerNodes.add(nodeId);
 			}

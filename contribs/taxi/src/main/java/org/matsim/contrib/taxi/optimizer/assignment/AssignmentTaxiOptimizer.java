@@ -107,6 +107,7 @@ public class AssignmentTaxiOptimizer
                 TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
         double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
                 params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-        return new VehicleData(optimContext, vehPlanningHorizon);
+        return new VehicleData(optimContext, optimContext.taxiData.getVehicles().values(),
+                vehPlanningHorizon);
     }
 }

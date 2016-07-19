@@ -167,9 +167,9 @@ public class QNetsimEngine implements MobsimEngine {
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
-			log.info("Seepage is allowed. Seep mode is " + qSimConfigGroup.getSeepMode() + ".");
+			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
 			if(qSimConfigGroup.isSeepModeStorageFree()) {
-				log.warn("Seep mode " + qSimConfigGroup.getSeepMode() + " does not take storage space thus only considered for flow capacities.");
+				log.warn("Seep mode(s) " + qSimConfigGroup.getSeepModes() + " does not take storage space thus only considered for flow capacities.");
 			}
 		}
 		

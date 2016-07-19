@@ -20,6 +20,7 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
@@ -39,7 +41,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.osgeo.proj4j.parser.Proj4Keyword.f;
 
 /**
  * @author thibautd
@@ -54,12 +60,26 @@ public class CorrectedUtilityCreatorTest {
 	@Test
 	public void simpleTest() {
 		final Scenario scenario = loadScenario();
+		runSimpleTest( scenario , p -> createChoiceSet( 1 , p , scenario ) );
+	}
+
+	@Test
+	@Ignore( "needs some theoretical work to be solved" )
+	public void simpleTestWithPartialChoiceSet() {
+		final Scenario scenario = loadScenario();
+		runSimpleTest( scenario ,
+				p -> createChoiceSet( 0.8 , p , scenario ) );
+	}
+
+	private void runSimpleTest(
+			final Scenario scenario,
+			final ChoiceSetIdentifier<NestId> choiceSetIdentifier ) {
 
 		final NestedLogitModel<NestId> model =
 				new NestedLogitModel<>(
 						// "random" utilities, identical for all agents to foster competition
 						( p, a ) -> Double.parseDouble( a.getAlternative().getDestination().getId().toString() ),
-						p -> createChoiceSet( p , scenario ) );
+						choiceSetIdentifier );
 
 		final CorrectedUtilityCreator.CorrectedUtility<NestId> correctedUtil =
 				new CorrectedUtilityCreator<NestId>( scenario , "work" ).createCorrectedUtility( model );
@@ -68,7 +88,7 @@ public class CorrectedUtilityCreatorTest {
 				new Demand<>(
 						new NestedLogitModel<>(
 								correctedUtil,
-								p -> createChoiceSet( p , scenario ) ),
+								choiceSetIdentifier ),
 						scenario );
 
 		final ConstrainedAccessibilityConfigGroup configGroup = (ConstrainedAccessibilityConfigGroup) scenario.getConfig().getModule( ConstrainedAccessibilityConfigGroup.GROUP_NAME );
@@ -82,12 +102,16 @@ public class CorrectedUtilityCreatorTest {
 	}
 
 	private Map<String,NestedChoiceSet<NestId>> createChoiceSet(
-			final Person person,
+			final double samplingRate,
+			final Person p,
 			final Scenario scenario ) {
 		final List<Alternative<NestId>> firstList = new ArrayList<>(  );
 
+		final Random r = new Random( p.getId().toString().hashCode() );
+
 		scenario.getActivityFacilities().getFacilities().values().stream()
 				.filter( f -> f.getActivityOptions().containsKey( "work" ) )
+				.filter( f -> r.nextDouble() <= samplingRate )
 				.forEach( f -> {
 					firstList.add(
 							new Alternative<>(

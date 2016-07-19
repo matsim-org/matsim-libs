@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -95,7 +95,7 @@ public class TaxiStatsDumper
     }
 
 
-    private void writeDetailedStats(Map<String, TaxiStats> taxiStats, AfterMobsimEvent event)
+    private void writeDetailedStats(List<TaxiStats> taxiStats, AfterMobsimEvent event)
     {
         String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
 

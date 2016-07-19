@@ -17,11 +17,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -360,11 +359,13 @@ public class NetworkCreatorFromPsql {
 			}
 
 			Coord fromCoord = this.transform.transform(MGC.coordinate2Coord(from));
-			Node closestFromNode = ((NetworkImpl)scenario.getNetwork()).getNearestNode(fromCoord);
+			final Coord coord = fromCoord;
+			Node closestFromNode = NetworkUtils.getNearestNode(((Network)scenario.getNetwork()),coord);
 			Node fromNode = setNode(fromCoord, closestFromNode);
 			
 			Coord toCoord = this.transform.transform(MGC.coordinate2Coord(to));
-			Node closestToNode = ((NetworkImpl)scenario.getNetwork()).getNearestNode(toCoord);
+			final Coord coord1 = toCoord;
+			Node closestToNode = NetworkUtils.getNearestNode(((Network)scenario.getNetwork()),coord1);
 			
 			Node toNode = setNode(toCoord, closestToNode);
 			
@@ -378,10 +379,11 @@ public class NetworkCreatorFromPsql {
 				link.setLength(length);
 				link.setNumberOfLanes(lanesPerDirection);
 				
-				if(link instanceof LinkImpl){
+				if(link instanceof Link){
 					
-					((LinkImpl)link).setOrigId(origId);
-					((LinkImpl)link).setType(entry.highwayTag);
+					final String id = origId;
+					NetworkUtils.setOrigId( ((Link)link), id ) ;
+					NetworkUtils.setType( ((Link)link), (String) entry.highwayTag);
 					
 				}
 				
@@ -398,10 +400,11 @@ public class NetworkCreatorFromPsql {
 				link.setLength(length);
 				link.setNumberOfLanes(lanesPerDirection);
 				
-				if(link instanceof LinkImpl){
+				if(link instanceof Link){
 					
-					((LinkImpl)link).setOrigId(origId);
-					((LinkImpl)link).setType(entry.highwayTag);
+					final String id = origId;
+					NetworkUtils.setOrigId( ((Link)link), id ) ;
+					NetworkUtils.setType( ((Link)link), (String) entry.highwayTag);
 					
 				}
 				

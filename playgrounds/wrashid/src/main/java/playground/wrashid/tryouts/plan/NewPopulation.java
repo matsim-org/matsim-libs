@@ -21,8 +21,8 @@ package playground.wrashid.tryouts.plan;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.io.PopulationWriter;
 
 /**
  * Helper class, for handling plansfiles *

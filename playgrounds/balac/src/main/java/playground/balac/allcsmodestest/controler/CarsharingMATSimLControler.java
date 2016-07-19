@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
@@ -15,7 +16,6 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -171,7 +171,7 @@ public class CarsharingMATSimLControler {
 		private static void connectFacilitiesWithNetwork(MatsimServices controler) {
 	        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 			//log.warn("number of facilities: " +facilities.getFacilities().size());
-	        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+	        Network network = (Network) controler.getScenario().getNetwork();
 			//log.warn("number of links: " +network.getLinks().size());
 
 			WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());

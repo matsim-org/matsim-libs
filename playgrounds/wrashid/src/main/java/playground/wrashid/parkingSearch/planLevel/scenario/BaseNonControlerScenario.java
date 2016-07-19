@@ -1,9 +1,9 @@
 package playground.wrashid.parkingSearch.planLevel.scenario;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.MatsimFacilitiesReader;
 

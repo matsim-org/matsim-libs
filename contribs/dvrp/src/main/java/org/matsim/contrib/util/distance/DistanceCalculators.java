@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
@@ -64,9 +64,11 @@ public class DistanceCalculators
             @Override
             public double calcDistance(Coord from, Coord to)
             {
-                NetworkImpl networkImpl = (NetworkImpl)network;
-                Node fromNode = networkImpl.getNearestNode(from);
-                Node toNode = networkImpl.getNearestNode(to);
+                Network networkImpl = (Network)network;
+		final Coord coord = from;
+                Node fromNode = NetworkUtils.getNearestNode(networkImpl,coord);
+		final Coord coord1 = to;
+                Node toNode = NetworkUtils.getNearestNode(networkImpl,coord1);
                 return dijkstraTree.calcLeastCostPath(fromNode, toNode, 0, null, null).travelCost;
             }
         };

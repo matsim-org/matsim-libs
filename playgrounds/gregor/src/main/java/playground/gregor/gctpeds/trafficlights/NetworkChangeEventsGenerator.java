@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -32,7 +33,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
@@ -92,7 +93,8 @@ public class NetworkChangeEventsGenerator {
 				events.add(e0);
 			}
 		}
-		((NetworkImpl)sc.getNetwork()).setNetworkChangeEvents(events);
+		final List<NetworkChangeEvent> events1 = events;
+		NetworkUtils.setNetworkChangeEvents(((Network)sc.getNetwork()),events1);
 
 	}
 
@@ -106,7 +108,7 @@ public class NetworkChangeEventsGenerator {
 		new NetworkChangeEventsGenerator(sc).run();
 
 		c.network().setChangeEventsInputFile( "/Users/laemmel/devel/nyc/gct_vicinity/changeevents.xml.gz");
-		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFile(), ((NetworkImpl)sc.getNetwork()).getNetworkChangeEvents());
+		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFile(), NetworkUtils.getNetworkChangeEvents(((Network)sc.getNetwork())));
 		new ConfigWriter(c).write("/Users/laemmel/devel/nyc/gct_vicinity/config.xml.gz");
 	}
 

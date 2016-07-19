@@ -22,7 +22,7 @@ package playground.toronto.example;
 
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Calculates the distance all vehicles travel per hour
@@ -35,9 +35,9 @@ public class CalcVehicleKilometerTraveled implements LinkEnterEventHandler {
 
 	private double[] travelDistanceSum = new double[NUM_OF_HOURS];
 
-	private final NetworkImpl network;
+	private final Network network;
 	
-	public CalcVehicleKilometerTraveled(final NetworkImpl network) {
+	public CalcVehicleKilometerTraveled(final Network network) {
 		this.network = network;
 	}
 	

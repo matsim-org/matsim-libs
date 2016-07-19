@@ -28,8 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -160,8 +159,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Converts the parsed osm data to MATSim nodes and links.
 	 */
 	private void convertToNetwork() {
-		if(this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if(this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		// store of which relation a way is part of
@@ -494,8 +493,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if(l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;
@@ -507,8 +507,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if(l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;

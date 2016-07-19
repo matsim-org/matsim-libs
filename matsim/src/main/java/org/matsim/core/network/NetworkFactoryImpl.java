@@ -32,9 +32,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author dgrether
  * @author mrieser
  */
-public class NetworkFactoryImpl implements NetworkFactory {
+/*deliberately package*/ final class NetworkFactoryImpl implements NetworkFactory {
 
-	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
+	@SuppressWarnings("unused")
+	private final static Logger log = Logger.getLogger(NetworkFactory.class);
 
 	private LinkFactory linkFactory = null;
 	
@@ -43,14 +44,14 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	private final Network network;
 
-	public NetworkFactoryImpl(final Network network) {
+	NetworkFactoryImpl(final Network network) {
 		this.network = network;
-		this.linkFactory = new LinkFactoryImpl();
+		this.linkFactory = NetworkUtils.createLinkFactory();
 	}
 
 	@Override
-	public NodeImpl createNode(final Id<Node> id, final Coord coord) {
-		NodeImpl node = NetworkUtils.createNode(id);
+	public Node createNode(final Id<Node> id, final Coord coord) {
+		Node node = NetworkUtils.createNode(id);
 		node.setCoord(coord) ;
 		return node ;
 	}
@@ -61,27 +62,21 @@ public class NetworkFactoryImpl implements NetworkFactory {
 				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
 	}
 
-	public Link createLink(final Id<Link> id, final Node from, final Node to,
-			final NetworkImpl network, final double length, final double freespeedTT, final double capacity,
-			final double lanes) {
-		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
-	}
-
-
 	/**
 	 * @param time the time when the NetworkChangeEvent occurs
 	 * @return a new NetworkChangeEvent
 	 *
 	 * @see #setNetworkChangeEventFactory(NetworkChangeEventFactory)
 	 */
+	@Override
 	public NetworkChangeEvent createNetworkChangeEvent(double time) {
 		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
 	}
-	
+	@Override
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
 	}
-
+	@Override
 	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
 		this.networkChangeEventFactory = networkChangeEventFactory;
 	}

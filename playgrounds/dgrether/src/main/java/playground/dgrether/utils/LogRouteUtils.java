@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -42,7 +42,7 @@ public class LogRouteUtils {
 		return buffer.toString();
 	}
 
-	public static String getNodeRoute(final ArrayList<NodeImpl> l) {
+	public static String getNodeRoute(final ArrayList<Node> l) {
 		StringBuffer buffer = new StringBuffer();
 		for (Node n : l) {
 			buffer.append(n.getId().toString());

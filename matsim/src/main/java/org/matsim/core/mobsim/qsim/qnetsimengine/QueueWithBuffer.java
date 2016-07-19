@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.Lane;
@@ -91,7 +90,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			if ( id==null ) { id = Id.create( qLink.getLink().getId() , Lane.class ) ; } 
 			if ( length==null ) { length = qLink.getLink().getLength() ; }
 			if ( effectiveNumberOfLanes==null ) { effectiveNumberOfLanes = qLink.getLink().getNumberOfLanes() ; }
-			if ( flowCapacity_s==null ) { flowCapacity_s = ((LinkImpl)qLink.getLink()).getFlowCapacityPerSec() ; }
+			if ( flowCapacity_s==null ) { flowCapacity_s = ((Link)qLink.getLink()).getFlowCapacityPerSec() ; }
 			return new QueueWithBuffer( qLink, vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s, context, linkSpeedCalculator ) ;
 		}
 		void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) { this.vehicleQueue = vehicleQueue; }
@@ -484,7 +483,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			addToBuffer(veh);
 			removeVehicleFromQueue(veh);
-			if(context.qsimConfig.isRestrictingSeepage() && context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ && veh.getDriver().getMode().equals(context.qsimConfig.getSeepMode())) {
+			if(context.qsimConfig.isRestrictingSeepage() 
+					&& context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
+					&& context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 				noOfSeepModeBringFwd++;
 			}
 		} // end while
@@ -501,7 +502,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if(context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
 				&& context.qsimConfig.isSeepModeStorageFree() 
-				&& veh.getVehicle().getType().getId().toString().equals(context.qsimConfig.getSeepMode()) ){
+				&& context.qsimConfig.getSeepModes().contains(veh.getVehicle().getType().getId().toString()) ){
 			// do nothing
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -728,7 +729,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// activate link since there is now action on it:
 		qLink.activateLink();
 
-		if(context.qsimConfig.isSeepModeStorageFree() && veh.getVehicle().getType().getId().toString().equals(context.qsimConfig.getSeepMode()) ){
+		if(context.qsimConfig.isSeepModeStorageFree() && context.qsimConfig.getSeepModes().contains( veh.getVehicle().getType().getId().toString() ) ){
 			// do nothing
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
@@ -906,7 +907,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			while(it.hasNext()){
 				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals( context.qsimConfig.getSeepMode() ) ) {
+				if( veh.getEarliestLinkExitTime()<=now && context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 					returnVeh = veh;
 					break;
 				}

@@ -23,12 +23,12 @@ package playground.pieter.balmermi.world;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.ActivityFacilityImpl;
 
 /**
  * Basic geographical class in MATSim.
- * @see LinkImpl
+ * @see Link
  * @see ActivityFacilityImpl
  * @see Zone
  * @author Michael Balmer

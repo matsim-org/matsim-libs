@@ -24,7 +24,6 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -126,7 +125,7 @@ public class Road extends SimUnit {
 		double maxInverseInFlowCapacity = 3600 / (config.getMinimumInFlowCapacity()
 				* config.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
-		this.inverseOutFlowCapacity = 1 / (((LinkImpl) link).getFlowCapacityPerSec() * config.getFlowCapacityFactor());
+		this.inverseOutFlowCapacity = 1 / (((Link) link).getFlowCapacityPerSec() * config.getFlowCapacityFactor());
 
 		if (this.inverseOutFlowCapacity > maxInverseInFlowCapacity) {
 			this.inverseInFlowCapacity = maxInverseInFlowCapacity;

@@ -27,17 +27,56 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	private TollingApproach TOLLING_APPROACH = TollingApproach.V4;
-	private double TOLL_ADJUSTMENT = 0.0;
-	private int UPDATE_PRICE_INTERVAL = 10;
+	// No pricing
+//	private TollingApproach TOLLING_APPROACH = TollingApproach.NoPricing;
+
+	// BangBang approach
+	private TollingApproach TOLLING_APPROACH = TollingApproach.BangBang;
+	private double INITIAL_TOLL = 10.0;
+	private double TOLL_ADJUSTMENT = 0.1; // default: 0.1
+
+	// PID approach
+//	private TollingApproach TOLLING_APPROACH = TollingApproach.PID;
+	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
+	private double Kp = 0.0;
+	private double Ki = 1.0;
+	private double Kd = 1.0;
 	
-	private double TOLL_BLEND_FACTOR = 0.1;
-	private int WRITE_OUTPUT_ITERATION = 10;
-	private double TOLERATED_AVERAGE_DELAY_SEC = 1.;
-	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0;
+	// General parameters
+	private int UPDATE_PRICE_INTERVAL = 1; // default: 1
+	private int WRITE_OUTPUT_ITERATION = 1; // default: 1
+	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // default: 1.0
+	private double FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = 0.1; // default: 0.1
+	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 0.9; // default: 0.9
 	
 	public enum TollingApproach {
-        NoPricing, V0, V1, V2, V3, V4   
+        NoPricing, V8, BangBang, PID
+	}
+	
+	// ######################################################################################
+	
+	public double getKp() {
+		return Kp;
+	}
+
+	public void setKp(double kp) {
+		Kp = kp;
+	}
+
+	public double getKi() {
+		return Ki;
+	}
+
+	public void setKi(double ki) {
+		Ki = ki;
+	}
+
+	public double getKd() {
+		return Kd;
+	}
+
+	public void setKd(double kd) {
+		Kd = kd;
 	}
 	
 	public int getWRITE_OUTPUT_ITERATION() {
@@ -95,6 +134,34 @@ public class DecongestionConfigGroup {
 	public void setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(double fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT) {
 		FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT;
 	}
-		
+
+	public double getINITIAL_TOLL() {
+		return INITIAL_TOLL;
+	}
+
+	public void setINITIAL_TOLL(double iNITIAL_TOLL) {
+		INITIAL_TOLL = iNITIAL_TOLL;
+	}
+
+	public double getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT() {
+		return FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT;
+	}
+
+	public void setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(
+			double fRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT) {
+		FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT;
+	}
+
+	@Override
+	public String toString() {
+		return "DecongestionConfigGroup [INITIAL_TOLL=" + INITIAL_TOLL + ", TOLL_ADJUSTMENT=" + TOLL_ADJUSTMENT
+				+ ", TOLLING_APPROACH=" + TOLLING_APPROACH + ", TOLL_BLEND_FACTOR=" + TOLL_BLEND_FACTOR + ", Kp=" + Kp
+				+ ", Ki=" + Ki + ", Kd=" + Kd + ", UPDATE_PRICE_INTERVAL=" + UPDATE_PRICE_INTERVAL
+				+ ", WRITE_OUTPUT_ITERATION=" + WRITE_OUTPUT_ITERATION + ", TOLERATED_AVERAGE_DELAY_SEC="
+				+ TOLERATED_AVERAGE_DELAY_SEC + ", FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT="
+				+ FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT + ", FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT="
+				+ FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT + "]";
+	}
+			
 }
 

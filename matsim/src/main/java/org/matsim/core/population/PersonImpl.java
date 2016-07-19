@@ -136,6 +136,7 @@ import org.matsim.core.scenario.Lockable;
 	@Override
 	public final void setLocked() {
 		this.locked = true ;
+		// we are not locking anything in the plans
 	}
 
 	private void testForLocked() {

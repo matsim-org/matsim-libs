@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainterManager;
 
@@ -25,7 +25,9 @@ public class CarNetworkPainterManager extends NetworkPainterManager  {
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Link link: network.getLinks().values()) {
-			double distance = ((LinkImpl) link).calcDistance(coord); 
+			final Coord coord1 = coord;
+			Link r = ((Link) link);
+			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1); 
 			if(link.getAllowedModes().contains("car") && distance<nearestDistance) {
 				nearest = link;
 				nearestDistance = distance;

@@ -34,10 +34,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -129,7 +129,7 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
 		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
 		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
@@ -142,7 +142,7 @@ public class DataPrepare {
 		Network streetNetwork = streetScenario.getNetwork();
 		new MatsimNetworkReader(transitScenario.getNetwork()).parse(TRANSIT_NETWORK_FILE);
 		new MatsimNetworkReader(streetScenario.getNetwork()).parse(NETWORK_FILE);
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (Network) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(MULTIMODAL_NETWORK_FILE);
 	}
 

@@ -17,11 +17,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -61,7 +60,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	
 	private static final Logger log = Logger.getLogger(CreateTransitNetworkAndScheduleFromGTFS.class);
 	
-	private NetworkImpl network;
+	private Network network;
 	private TransitSchedule schedule;
 	private GTFSSystem gtfs;
 	private Vehicles vehicles;
@@ -81,8 +80,8 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	private void processStops(){
 		log.info("PROCESSING STOPS");
 		
-		this.network = NetworkImpl.createNetwork();
-		NetworkFactoryImpl netFact = this.network.getFactory();
+		this.network = NetworkUtils.createNetwork();
+		NetworkFactory netFact = this.network.getFactory();
 		TransitScheduleFactory schedFact = new TransitScheduleFactoryImpl();
 		this.schedule = schedFact.createTransitSchedule();
 		
@@ -98,10 +97,13 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 			Coord coord = this.converter.transform(stop.getPoint());
 			Node n = netFact.createNode(Id.create(stopId, Node.class), coord);
 			this.network.addNode(n);
+			final Node from = n;
+			final Node to = n;
+			final Network network1 = network;
 			
 			//Create loop link at node
-			LinkImpl loopLink = (LinkImpl) netFact.createLink(Id.create(stopId +"_LOOP", Link.class), n, n, network, 0.0, 9999, 9999, 1.0);
-			loopLink.setType("LOOP");
+			Link loopLink = (Link) NetworkUtils.createLink(Id.create(stopId +"_LOOP", Link.class), from, to, network1, 0.0, (double) 9999, (double) 9999, 1.0);
+			NetworkUtils.setType( loopLink, (String) "LOOP");
 			this.network.addLink(loopLink);
 			
 			//Create TransitStop, link it to the loop link
@@ -118,7 +120,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	private void processRoutes(Set<Service> services, boolean copyLinks){
 		log.info("PROCESSING ROUTES");
 		
-		NetworkFactoryImpl netFact = this.network.getFactory();
+		NetworkFactory netFact = this.network.getFactory();
 		TransitScheduleFactory schedFact = this.schedule.getFactory();
 		
 		int links = 0;
@@ -181,7 +183,12 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 						if (copyLinks){
 							//Have a link for each line
 							
-							Link l = netFact.createLink(Id.create(links++, Link.class), fromNode, toNode, network, dist, freespeed, 9999, 1.0);
+							final Node from = fromNode;
+							final Node to = toNode;
+							final Network network1 = network;
+							final double length = dist;
+							final double freespeedTT = freespeed;
+							Link l = NetworkUtils.createLink(Id.create(links++, Link.class), from, to, network1, length, freespeedTT, (double) 9999, 1.0);
 							l.setAllowedModes(Collections.singleton(mode.toString()));
 							this.network.addLink(l);
 							
@@ -194,7 +201,13 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 							
 							if (l == null){
 								//Need a new link
-								l = netFact.createLink(linkId, fromNode, toNode, network, dist, freespeed, 9999, 1.0);
+								final Id<Link> id = linkId;
+								final Node from = fromNode;
+								final Node to = toNode;
+								final Network network1 = network;
+								final double length = dist;
+								final double freespeedTT = freespeed;
+								l = NetworkUtils.createLink(id, from, to, network1, length, freespeedTT, (double) 9999, 1.0);
 								l.setAllowedModes(Collections.singleton(mode.toString()));
 								
 								HashSet<Id<TransitRoute>> s = new HashSet<>();

@@ -45,7 +45,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -285,7 +284,7 @@ public class GenerateScenarioForDetours {
 	}
 
 	private static void createNetwork(final Network network) {
-		((NetworkImpl) network).setCapacityPeriod( 1 );
+		((Network) network).setCapacityPeriod( 1 );
 
 		final UniqueIdFactory nodeIdFactory = new UniqueIdFactory( "node-" );
 		final UniqueIdFactory linkIdFactory = new UniqueIdFactory( "link-" );

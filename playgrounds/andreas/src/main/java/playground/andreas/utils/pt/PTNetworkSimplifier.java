@@ -36,10 +36,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -124,12 +124,12 @@ public class PTNetworkSimplifier {
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
 				for (Link iL : iLinks) {
-					LinkImpl inLink = (LinkImpl) iL;
+					Link inLink = (Link) iL;
 
 					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
 
 					for (Link oL : oLinks) {
-						LinkImpl outLink = (LinkImpl) oL;
+						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
 
@@ -153,7 +153,7 @@ public class PTNetworkSimplifier {
 										// freespeed depends on total length and time needed for inLink and outLink
 										link.setFreespeed(
 												(inLink.getLength() + outLink.getLength()) /
-												(inLink.getFreespeedTravelTime() + outLink.getFreespeedTravelTime())
+												(NetworkUtils.getFreespeedTravelTime(inLink) + NetworkUtils.getFreespeedTravelTime(outLink))
 										);
 
 										// the capacity and the new links end is important, thus it will be set to the minimum
@@ -240,7 +240,7 @@ public class PTNetworkSimplifier {
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);
 	}
 
-	private boolean removeLinksFromTransitSchedule(Link link, LinkImpl inLink, LinkImpl outLink) {
+	private boolean removeLinksFromTransitSchedule(Link link, Link inLink, Link outLink) {
 		// first test - links must not be changed if, only one link is part of a route, but the other one not
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
@@ -303,7 +303,7 @@ public class PTNetworkSimplifier {
 		return true;
 	}
 
-	private boolean linkNeededByTransitStop(LinkImpl inLink, LinkImpl outLink) {
+	private boolean linkNeededByTransitStop(Link inLink, Link outLink) {
 
 		if(this.linksNeededByTransitSchedule == null){
 			this.linksNeededByTransitSchedule = new TreeSet<String>();
@@ -347,7 +347,7 @@ public class PTNetworkSimplifier {
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
+	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
 
 		boolean bothLinksHaveSameLinkStats = true;
 

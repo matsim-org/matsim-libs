@@ -20,8 +20,10 @@ package org.matsim.contrib.networkEditor.visualizing;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 /**
  *
@@ -30,14 +32,14 @@ import org.matsim.core.network.NetworkImpl;
 public class DifferenceManager {
     
     private Stack<Difference> back, front;
-    NetworkImpl net;
+    Network net;
     public enum type{CREATE, EDIT, DELETE, SPLIT};
     
     DifferenceManager() {
         back = new Stack<Difference>();
         front = new Stack<Difference>();
     }
-    DifferenceManager(NetworkImpl net) {
+    DifferenceManager(Network net) {
         back = new Stack<Difference>();
         front = new Stack<Difference>();
         this.net = net;
@@ -73,12 +75,14 @@ public class DifferenceManager {
     }
 
     public Link cloneLink(Link link) {
-        return net.getFactory().createLink(link.getId(), link.getFromNode(), link.getToNode(), net, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+        final Network network = net;
+	NetworkFactory r = net.getFactory();
+	return NetworkUtils.createLink(link.getId(), link.getFromNode(), link.getToNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
     }
 
     class Difference {        
         public Link link;
-        public NetworkImpl net;
+        public Network net;
         public Node nodeAtStart, nodeAtEnd;
         public Link linkAtStartAdded1, linkAtStartAdded2;
         public Link linkAtEndAdded1, linkAtEndAdded2;
@@ -86,7 +90,7 @@ public class DifferenceManager {
         public type currentType;
 
         Difference() {}
-        Difference(Link link, type currentType, NetworkImpl net, Node nAS, Node nAE, Link lASA1, Link lASA2, Link lAEA1, Link lAEA2, Link lASD, Link lAED) {
+        Difference(Link link, type currentType, Network net, Node nAS, Node nAE, Link lASA1, Link lASA2, Link lAEA1, Link lAEA2, Link lASD, Link lAED) {
             this.link = link;
             this.net = net;
             this.currentType = currentType;
@@ -100,7 +104,7 @@ public class DifferenceManager {
             linkAtEndDeleted = lAED;
         }
         
-        Difference(NetworkImpl net) {
+        Difference(Network net) {
             this.net = net;
         }
         public void revert() {

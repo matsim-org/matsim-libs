@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -106,13 +106,14 @@ public class LinkStops {
 		if(network.getNodes().get(Id.create(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i, Node.class))==null)
 			network.addNode(toNode);
 		double length = -1;
-		if(((LinkImpl)link).getOrigId()!=null)
+		if(NetworkUtils.getOrigId( ((Link)link) )!=null)
 			length=link.getLength()*CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		else
 			length = CoordUtils.calcEuclideanDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
-		Link newLink = new LinkFactoryImpl().createLink(Id.create(link.getId().toString()+"_"+i, Link.class), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
-		if(((LinkImpl)link).getOrigId()!=null)
-			((LinkImpl)newLink).setOrigId(((LinkImpl)link).getOrigId());
+		LinkFactoryImpl r = NetworkUtils.createLinkFactory();
+		Link newLink = NetworkUtils.createLink(Id.create(link.getId().toString()+"_"+i, Link.class), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+		if(NetworkUtils.getOrigId( ((Link)link) )!=null)
+			NetworkUtils.setOrigId( ((Link)newLink), NetworkUtils.getOrigId( ((Link)link) ) ) ;
 		Set<String> modes = new HashSet<String>();
 		for(String mode:link.getAllowedModes())
 			modes.add(mode);

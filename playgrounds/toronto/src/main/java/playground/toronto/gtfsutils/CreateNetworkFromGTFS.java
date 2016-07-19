@@ -11,11 +11,12 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -36,7 +37,7 @@ public class CreateNetworkFromGTFS{
         HashMap<Id<Link>,Link> RemoveLinks = new HashMap<>();
         
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+        Network network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NetworkFile);
 		
 		/*read the stops file
@@ -49,7 +50,9 @@ public class CreateNetworkFromGTFS{
 		while (rdStops.next()){
 			Id<Node> StopID = Id.create(rdStops.current().get("stop_id").toString(), Node.class);
 			Coord StopCoord = new Coord(Double.parseDouble(rdStops.current().get("stop_lon").toString()), Double.parseDouble(rdStops.current().get("stop_lat").toString()));
-			network.createAndAddNode(StopID, StopCoord);
+			final Id<Node> id = StopID;
+			final Coord coord = StopCoord;
+			NetworkUtils.createAndAddNode(network, id, coord);
 			StopAndCoordinates.put(StopID, StopCoord);	
 		}//end of while loop
 		
@@ -98,7 +101,14 @@ public class CreateNetworkFromGTFS{
 					linklength = CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord());
 					//System.out.println(linklength);
 					if (linklength <= 2){
-						network.createAndAddLink(linkID, fromNode, toNode, linklength,linkspeed, linkcapacity, numlanes);
+						final Id<Link> id = linkID;
+						final Node fromNode1 = fromNode;
+						final Node toNode1 = toNode;
+						final double length = linklength;
+						final double freespeed = linkspeed;
+						final double capacity = linkcapacity;
+						final double numLanes = numlanes;
+						NetworkUtils.createAndAddLink(network,id, fromNode1, toNode1, length, freespeed, capacity, numLanes );
 						ListofLinks.add(linkID);
 						//System.out.println(ListofLinks);
 					}

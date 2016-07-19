@@ -28,4 +28,8 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	void handleBeginChargeEvent();
 
 	void handleEndChargingSession();
+
+	void registerPlugInaccessible();
+
+	void registerPlugAccessible();
 }

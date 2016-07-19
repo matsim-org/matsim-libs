@@ -19,15 +19,15 @@
 
 package playground.wrashid.parkingSearch.planLevel.initDemand;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -40,7 +40,7 @@ import java.util.List;
 public class PlanGeneratorWithParkingActivities {
 
 	ClosestParkingMatrix closestParkingMatrix;
-	NetworkImpl network;
+	Network network;
 	MutableScenario scenario;
 
 	public MutableScenario getScenario() {
@@ -52,7 +52,7 @@ public class PlanGeneratorWithParkingActivities {
 
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilePath);
 
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 
 		this.closestParkingMatrix = new ClosestParkingMatrix(scenario.getActivityFacilities(), network);

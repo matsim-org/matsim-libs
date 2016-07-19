@@ -11,10 +11,10 @@ import org.matsim.contrib.transEnergySim.chargingInfrastructure.management.Charg
 
 public interface ChargingSite extends Identifiable<ChargingSite> {
 
-	abstract Collection<ChargingPlug> getAvailableChargingPlugsOfChargingPlugType(ChargingPlugType desiredType);
+	abstract Collection<ChargingPlug> getAccessibleChargingPlugsOfChargingPlugType(ChargingPlugType desiredType);
 	
 	abstract Collection<ChargingPlug> getAllChargingPlugs();
-	abstract Collection<ChargingPlug> getAllAvailableChargingPlugs();
+	abstract Collection<ChargingPlug> getAllAccessibleChargingPlugs();
 	
 	abstract Collection<ChargingPoint> getAllChargingPoints();
 	
@@ -25,8 +25,8 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract void addChargingPoint(ChargingPoint chargingPoint);
 	abstract void addChargingPlug(ChargingPlug plug);
 	
-	void registerPlugAvailable(ChargingPlug plug);
-	void registerPlugOccupied(ChargingPlug plug);
+	void registerPlugAccessible(ChargingPlug plug);
+	void registerPlugInaccessible(ChargingPlug plug);
 	
 	// this property can be used for applications where the grid operation/simulation is integrated
 	// each Utility Operator can be modelled as a separate entity which drives the prices of its
@@ -54,5 +54,4 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract void handleBeginChargingSession(ChargingPlug plug,VehicleAgent agent);
 
 	abstract void handleEndChargingSession(ChargingPlug plug, VehicleAgent agent);
-
 }

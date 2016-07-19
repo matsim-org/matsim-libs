@@ -15,9 +15,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -74,7 +74,7 @@ public class NetworkStructureSolver {
 		}
 		reader.close();
 		Map<Id<Node>, Integer> nodesCount = new HashMap<Id<Node>, Integer>();
-		NetworkFactory factory = new NetworkFactoryImpl(scenario.getNetwork());
+		NetworkFactory factory = scenario.getNetwork().getFactory();
 		Set<Node> specialNodes = new HashSet<Node>();
 		specialNodes.add(scenario.getNetwork().getNodes().get(Id.createNodeId("1380007282")));
 		specialNodes.add(scenario.getNetwork().getNodes().get(Id.createNodeId("1380001447")));

@@ -26,46 +26,36 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 public interface TimeVariantAttribute
 {
-    interface ChangeValueGetter
-    {
-        ChangeValue getChangeValue(NetworkChangeEvent event);
-    }
+	interface ChangeValueGetter {
+		ChangeValue getChangeValue(NetworkChangeEvent event);
+	}
 
 
-    static ChangeValueGetter FREESPEED_GETTER = new ChangeValueGetter() {
-        public ChangeValue getChangeValue(NetworkChangeEvent event)
-        {
-            return event.getFreespeedChange();
-        }
-    };
+	static ChangeValueGetter FREESPEED_GETTER = new ChangeValueGetter() {
+		@Override public ChangeValue getChangeValue(NetworkChangeEvent event) {
+			return event.getFreespeedChange();
+		}
+	};
 
-    static ChangeValueGetter FLOW_CAPACITY_GETTER = new ChangeValueGetter() {
-        public ChangeValue getChangeValue(NetworkChangeEvent event)
-        {
-            return event.getFlowCapacityChange();
-        }
-    };
+	static ChangeValueGetter FLOW_CAPACITY_GETTER = new ChangeValueGetter() {
+		@Override public ChangeValue getChangeValue(NetworkChangeEvent event) {
+			return event.getFlowCapacityChange();
+		}
+	};
 
-    static ChangeValueGetter LANES_GETTER = new ChangeValueGetter() {
-        public ChangeValue getChangeValue(NetworkChangeEvent event)
-        {
-            return event.getLanesChange();
-        }
-    };
+	static ChangeValueGetter LANES_GETTER = new ChangeValueGetter() {
+		@Override public ChangeValue getChangeValue(NetworkChangeEvent event) {
+			return event.getLanesChange();
+		}
+	};
 
+	double getValue(final double time);
 
-    double getValue(final double time);
+	boolean isRecalcRequired();
 
+	void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter, double baseValue);
 
-    boolean isRecalcRequired();
+	void incChangeEvents();
 
-
-    void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter,
-            double baseValue);
-
-
-    void incChangeEvents();
-
-
-    void clearEvents();
+	void clearEvents();
 }

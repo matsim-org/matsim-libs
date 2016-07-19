@@ -23,7 +23,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -41,7 +41,7 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 	public void testGeneralFacility() {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
 
-		NetworkImpl net = (NetworkImpl) BaseNonControlerScenario.loadNetwork(sc);
+		Network net = (Network) BaseNonControlerScenario.loadNetwork(sc);
 
 		LinkFacilityAssociation lfa = new LinkFacilityAssociation(sc.getActivityFacilities(), net);
 
@@ -76,7 +76,7 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 	public void testParkingFacility() {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
 
-		NetworkImpl net = (NetworkImpl) BaseNonControlerScenario.loadNetwork(sc);
+		Network net = (Network) BaseNonControlerScenario.loadNetwork(sc);
 
 		LinkParkingFacilityAssociation lpfa = new LinkParkingFacilityAssociation(sc.getActivityFacilities(), net);
 

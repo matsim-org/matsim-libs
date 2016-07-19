@@ -6,8 +6,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -39,7 +39,7 @@ public class RetailerStrategyImpl
 	    int intCount = 0;
 	    for (ActivityFacilityImpl af : this.retailerFacilities.values())
 	    {
-            locations.put(Integer.valueOf(intCount), NetworkUtils.getNearestLink(((NetworkImpl) this.controler.getScenario().getNetwork()), af.getCoord()).getId().toString());
+            locations.put(Integer.valueOf(intCount), NetworkUtils.getNearestLink(((Network) this.controler.getScenario().getNetwork()), af.getCoord()).getId().toString());
 	      ++intCount;
 	      log.info("The facility with Id: " + af.getId() + " has been added, this is located on the link: " + af.getLinkId());
 	    }

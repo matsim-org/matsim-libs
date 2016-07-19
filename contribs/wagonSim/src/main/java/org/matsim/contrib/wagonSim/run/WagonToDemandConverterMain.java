@@ -40,7 +40,7 @@ import org.matsim.contrib.wagonSim.demand.WagonDataContainer;
 import org.matsim.contrib.wagonSim.demand.WagonDataParser;
 import org.matsim.contrib.wagonSim.demand.WagonToMatsimDemandConverter;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;

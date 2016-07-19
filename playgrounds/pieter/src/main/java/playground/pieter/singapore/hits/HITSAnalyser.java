@@ -38,17 +38,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -80,8 +81,8 @@ public class HITSAnalyser {
 
 	private HITSData hitsData;
 	static Scenario shortestPathCarNetworkOnlyScenario;
-	private static NetworkImpl carFreeSpeedNetwork;
-	private static NetworkImpl fullCongestedNetwork;
+	private static Network carFreeSpeedNetwork;
+	private static Network fullCongestedNetwork;
 	private static HashMap<Integer, Integer> zip2DGP;
     private static Connection conn;
 
@@ -203,12 +204,12 @@ public class HITSAnalyser {
 		HashSet<String> modeSet = new HashSet<>();
 		modeSet.add("car");
 		carCongestedDijkstra.setModeRestriction(modeSet);
-		fullCongestedNetwork = (NetworkImpl) scenario.getNetwork();
+		fullCongestedNetwork = (Network) scenario.getNetwork();
 		// add a free speed network that is car only, to assign the correct
 		// nodes to agents
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(
 				scenario.getNetwork());
-		HITSAnalyser.carFreeSpeedNetwork = NetworkImpl.createNetwork();
+		HITSAnalyser.carFreeSpeedNetwork = NetworkUtils.createNetwork();
 		HashSet<String> modes = new HashSet<>();
 		modes.add(TransportMode.car);
 		filter.filter(carFreeSpeedNetwork, modes);
@@ -294,8 +295,10 @@ public class HITSAnalyser {
 	private static TimeAndDistance getCarFreeSpeedShortestPathTimeAndDistance(
             Coord startCoord, Coord endCoord) {
 		double distance = 0;
-		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
-		Node endNode = carFreeSpeedNetwork.getNearestNode(endCoord);
+		final Coord coord = startCoord;
+		Node startNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord1);
 
 		Path path = shortestCarNetworkPathCalculator.calcLeastCostPath(
 				startNode, endNode, 0, null, null);
@@ -309,9 +312,11 @@ public class HITSAnalyser {
 	private static TimeAndDistance getCarCongestedShortestPathDistance(
             Coord startCoord, Coord endCoord, double time) {
 		double distance = 0;
+		final Coord coord = startCoord;
 
-		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
-		Node endNode = carFreeSpeedNetwork.getNearestNode(endCoord);
+		Node startNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(carFreeSpeedNetwork,coord1);
 
 		Path path = carCongestedDijkstra.calcLeastCostPath(startNode, endNode,
 				time, null, null);

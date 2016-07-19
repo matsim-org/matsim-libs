@@ -11,14 +11,14 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -33,26 +33,26 @@ public class LinkStopsToNearestNode {
 
 		//Create base network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInFile);
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl noHighways = (NetworkImpl) scenario.getNetwork();
+		Network noHighways = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario2.getNetwork()).readFile(networkInFile);
 		
 		//Remove highways and on/off ramps. Should not affect routes which travel on highways since transit lines don't stop ON highways.	
 		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();
 		for (Link l : noHighways.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
-			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") || L.getType().equals("On/Off Ramp")) linksToRemove.add(L.getId());
+			Link L = (Link) l;
+			if (NetworkUtils.getType(L).equals("Highway") || NetworkUtils.getType(L).equals("Toll Highway") || NetworkUtils.getType(L).equals("On/Off Ramp")) linksToRemove.add(L.getId());
 		}
 		for (Id<Link> i : linksToRemove) noHighways.removeLink(i);
 		
 		// Create filtered networks, one for each of the four main modes.
-		NetworkImpl BusNetwork = NetworkImpl.createNetwork(); //for buses
-		NetworkImpl TrainNetwork = NetworkImpl.createNetwork(); //for GO trains
-		NetworkImpl StreetcarNetwork = NetworkImpl.createNetwork(); //for mixed-ROW streetcars
-		NetworkImpl SubwayNetwork = NetworkImpl.createNetwork(); //for underground heavy rail
+		Network BusNetwork = NetworkUtils.createNetwork(); //for buses
+		Network TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
+		Network StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
+		Network SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(noHighways);
 		filter.filter(SubwayNetwork, CollectionUtils.stringToSet("Subway"));
 		filter.filter(StreetcarNetwork, CollectionUtils.stringToSet("Streetcar"));
@@ -72,7 +72,7 @@ public class LinkStopsToNearestNode {
 		
 		String line;
 		ArrayList<Id> loopedNodes = new ArrayList<Id>();
-		LinkFactoryImpl factory = new LinkFactoryImpl();
+		LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
 		while ((line = reader.readLine()) != null){
 			String[] cells = line.split(",");
 			double stopLon = Double.parseDouble(cells[loncol]);
@@ -83,31 +83,36 @@ public class LinkStopsToNearestNode {
 				modes = cells[modCol];
 			}
 			
-			NodeImpl N;
+			Node N;
 			fixedStopsWriter.write(id + "\n");
 			
 			// Get nearest node for the mode-filtered network (or base, if no mode is specified). This will be slow, but hopefully okay.
 			if (modes.isEmpty()){
-				N = (NodeImpl) noHighways.getNearestNode(new Coord(stopLon, stopLat));
+				N = (Node) NetworkUtils.getNearestNode(noHighways,new Coord(stopLon, stopLat));
 			}
 			else{
 
 				Coord c = new Coord(stopLon, stopLat);
 				
 				if (modes.equals("[Bus]")){
-					N = (NodeImpl) BusNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(BusNetwork,coord);
 				}
 				else if (modes.equals("[Streetcar]")){
-					N = (NodeImpl) StreetcarNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(StreetcarNetwork,coord);
 				}
 				else if (modes.equals("[Subway]")){
-					N = (NodeImpl) SubwayNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(SubwayNetwork,coord);
 				}
 				else if (modes.equals("[Train]")){
-					N = (NodeImpl) TrainNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(TrainNetwork,coord);
 				}
 				else if (modes.equals("[Streetcar; Bus]") || modes.equals("[Bus; Streetcar]")){
-					N = (NodeImpl) StreetcarNetwork.getNearestNode(c);
+					final Coord coord = c;
+					N = (Node) NetworkUtils.getNearestNode(StreetcarNetwork,coord);
 				}
 				else{
 					System.err.println("Error: mode combination " + modes + " not supported!");
@@ -117,8 +122,8 @@ public class LinkStopsToNearestNode {
 			}
 			
 			if(!loopedNodes.contains(N.getId())){//Loop link DNE
-				LinkImpl l = (LinkImpl) factory.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
-				l.setType("LOOP");
+				Link l = (Link) NetworkUtils.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
+				NetworkUtils.setType( l, (String) "LOOP");
 				
 				/*if(!modes.isEmpty()){
 					l.setAllowedModes(modes);

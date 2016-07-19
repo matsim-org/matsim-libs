@@ -19,23 +19,18 @@
 
 package playground.ikaddoura.decongestion;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV0;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV1;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV2;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV3;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingV4;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingBangBang;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
+import playground.ikaddoura.decongestion.tollSetting.old.DecongestionTollingV8;
 
 /**
 * @author ikaddoura
@@ -54,33 +49,25 @@ public class Decongestion {
 	}
 
 	private void prepare() {
-		
-		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(info.getScenario().getConfig().controler().getOutputDirectory());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		OutputDirectoryLogging.catchLogEntries();
-
-		log.info("DecongestionSettings: " + info.getDecongestionConfigGroup().toString());
-						
+								
 		DecongestionTollSetting tollSettingApproach = null;
 		
-		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V0)) {
-			tollSettingApproach = new DecongestionTollingV0(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V1)) {
-			tollSettingApproach = new DecongestionTollingV1(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V2)) {
-			tollSettingApproach = new DecongestionTollingV2(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V3)) {
-			tollSettingApproach = new DecongestionTollingV3(info);
-		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V4)) {
-			tollSettingApproach = new DecongestionTollingV4(info);
+		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.V8)) {
+			tollSettingApproach = new DecongestionTollingV8(info);
+			
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.BangBang)) {
+			tollSettingApproach = new DecongestionTollingBangBang(info);
+		
+		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.PID)) {
+			tollSettingApproach = new DecongestionTollingPID(info);	
+			
 		} else if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.NoPricing)) {
-			if (info.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() < info.getScenario().getConfig().controler().getLastIteration()) {
-				throw new RuntimeException("If you want to disable pricing, please set the update price interval to a larger number than the number of iterations. Aborting...");
-			}
-			tollSettingApproach = new DecongestionTollingV0(info);
+			
+			info.getDecongestionConfigGroup().setTOLL_ADJUSTMENT(0.0);
+			info.getDecongestionConfigGroup().setINITIAL_TOLL(0.0);
+			info.getDecongestionConfigGroup().setUPDATE_PRICE_INTERVAL(Integer.MAX_VALUE);
+			info.getDecongestionConfigGroup().setTOLERATED_AVERAGE_DELAY_SEC(Double.MAX_VALUE);			
+			tollSettingApproach = new DecongestionTollingV8(info);
 			
 		} else {
 			throw new RuntimeException("Unknown decongestion toll setting approach. Aborting...");
@@ -106,9 +93,12 @@ public class Decongestion {
 		});		
 	}
 
-	public void run() {		
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+	public void run() {	
+		
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		controler.run();
+		
+		log.info("Decongestion simulation run completed.");
 	}
 
 	public Controler getControler() {

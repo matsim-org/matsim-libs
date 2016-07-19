@@ -417,7 +417,7 @@ class MATSim4UrbanSimParcel{
 								double yMin = env.getMinY();
 								double yMax = env.getMaxY();
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
 
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, xMin, xMax, yMin, yMax, cellSizeInMeter);
@@ -434,7 +434,7 @@ class MATSim4UrbanSimParcel{
 								}
 							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
 
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
@@ -450,7 +450,7 @@ class MATSim4UrbanSimParcel{
 								}
 							} else {
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
 
 								log.info("Using the boundary of the network file to determine the area for accessibility computation.");

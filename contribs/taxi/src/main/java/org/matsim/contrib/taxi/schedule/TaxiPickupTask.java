@@ -40,7 +40,7 @@ public class TaxiPickupTask
 
 
     @Override
-    public void removeFromRequest()
+    public void disconnectFromRequest()
     {
         request.setPickupTask(null);
     }

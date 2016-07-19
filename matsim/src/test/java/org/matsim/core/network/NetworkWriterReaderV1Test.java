@@ -21,6 +21,9 @@
 package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 
 /**
  * @author mrieser
@@ -28,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 
 	@Override
-	protected void writeNetwork(final NetworkImpl network, final String filename) {
+	protected void writeNetwork(final Network network, final String filename) {
 		new NetworkWriter(network).write(filename);
 	}
 	

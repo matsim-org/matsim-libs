@@ -126,7 +126,7 @@ public class MIPProblem
 
     private boolean initDataAndCheckIfSchedulingRequired()
     {
-        vData = new VehicleData(optimContext);
+        vData = new VehicleData(optimContext, optimContext.taxiData.getVehicles().values());
         if (vData.getSize() == 0) {
             return false;
         }

@@ -10,10 +10,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -195,7 +194,7 @@ public class LinksRetailerReaderV2
     while (this.freeLinks.size() < newLinksMax.intValue()) {
     	
       int rd = MatsimRandom.getRandom().nextInt(numberLinks);
-        LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl) this.controler.getScenario().getNetwork().getLinks().values().toArray()[rd], (NetworkImpl) this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+        LinkRetailersImpl link = new LinkRetailersImpl((Link) this.controler.getScenario().getNetwork().getLinks().values().toArray()[rd], (Network) this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       if (this.currentLinks.containsKey(link.getId())) { log.info("On the link " + link.getId() + " there is already a facility");
       }
       else if (this.freeLinks.containsKey(link.getId())) { log.info("The link " + link.getId() + " is already in the list");

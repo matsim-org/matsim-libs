@@ -8,7 +8,14 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>locationchoice</artifactId>
   <name>locationchoice</name>
-  <dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>otfvis</artifactId>

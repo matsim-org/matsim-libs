@@ -31,9 +31,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -136,37 +135,37 @@ public class ManteuffelRoadTypeMapper {
 		
 		double fs = link.getFreespeed();
 		if(fs <= 8.333333333){ //30kmh
-			((LinkImpl) ll).setType("01");
+			NetworkUtils.setType( ((Link) ll), (String) "01");
 		} else if(fs <= 11.111111111){ //40kmh
-			((LinkImpl) ll).setType("02");
+			NetworkUtils.setType( ((Link) ll), (String) "02");
 		} else if(fs <= 13.888888889){ //50kmh
 			double lanes = ll.getNumberOfLanes();
 			if(lanes <= 1.0){
-				((LinkImpl) ll).setType("031");
+				NetworkUtils.setType( ((Link) ll), (String) "031");
 			} else if(lanes <= 2.0){
-				((LinkImpl) ll).setType("032");
+				NetworkUtils.setType( ((Link) ll), (String) "032");
 			} else if(lanes > 2.0){
-				((LinkImpl) ll).setType("033");
+				NetworkUtils.setType( ((Link) ll), (String) "033");
 			} else{
 				throw new RuntimeException("NoOfLanes not properly defined");
 			}
 		} else if(fs <= 16.666666667){ //60kmh
 			double lanes = ll.getNumberOfLanes();
 			if(lanes <= 1.0){
-				((LinkImpl) ll).setType("041");
+				NetworkUtils.setType( ((Link) ll), (String) "041");
 			} else if(lanes <= 2.0){
-				((LinkImpl) ll).setType("042");
+				NetworkUtils.setType( ((Link) ll), (String) "042");
 			} else if(lanes > 2.0){
-				((LinkImpl) ll).setType("043");
+				NetworkUtils.setType( ((Link) ll), (String) "043");
 			} else{
 				throw new RuntimeException("NoOfLanes not properly defined");
 			}
 		} else if(fs <= 19.444444444){ //70kmh
-			((LinkImpl) ll).setType("05");
+			NetworkUtils.setType( ((Link) ll), (String) "05");
 		} else if(fs <= 22.222222222){ //80kmh
-			((LinkImpl) ll).setType("06");
+			NetworkUtils.setType( ((Link) ll), (String) "06");
 		} else if(fs > 22.222222222){ //faster
-			((LinkImpl) ll).setType("07");
+			NetworkUtils.setType( ((Link) ll), (String) "07");
 		} else{
 			throw new RuntimeException("Link not considered...");
 		}

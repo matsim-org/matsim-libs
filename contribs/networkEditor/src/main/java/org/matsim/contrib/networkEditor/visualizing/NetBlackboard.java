@@ -41,10 +41,11 @@ import javax.swing.SwingUtilities;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.networkEditor.utils.GeometryTools;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -63,7 +64,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The working network
 	 */
-	protected NetworkImpl net;
+	protected Network net;
 	/**
 	 * The counts for validation
 	 */
@@ -83,7 +84,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The active link to be marked when painting
 	 */
-	protected LinkImpl activeLink;
+	protected Link activeLink;
 	/**
 	 * The active node to be marked when painting
 	 */
@@ -151,7 +152,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Creates a new form NetBlackboard from a net
 	 * @param Net
 	 */
-	public NetBlackboard(NetworkImpl Net) {
+	public NetBlackboard(Network Net) {
 		initVars();
 		setNetwork(Net);
 		initComponents();
@@ -208,7 +209,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Sets the network to the board
 	 * @param Net
 	 */
-	public void setNetwork(NetworkImpl Net) {
+	public void setNetwork(Network Net) {
 		net = Net;
 		diffManager = new DifferenceManager(net);
 		controls.setDifferenceManager(diffManager);
@@ -650,7 +651,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			javax.swing.JOptionPane.showMessageDialog(this, "El enlace ya es doble vía", "", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		activeLink = (LinkImpl)makeDoubleWay(activeLink);
+		activeLink = (Link)makeDoubleWay(activeLink);
 		controls.updateTable();
 		repaint();
 	}//GEN-LAST:event_jButton2ActionPerformed
@@ -833,7 +834,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 		Link selected = null;
 		double minDist = Double.MAX_VALUE;
 		for(Link link:net.getLinks().values()){
-			double thisDist = ((LinkImpl) link).calcDistance(coord);
+			final Coord coord1 = coord;
+			Link r = ((Link) link);
+			double thisDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if(thisDist < minDist) {
 				minDist = thisDist;
 				selected = link;
@@ -852,18 +855,24 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 */
 	protected Link getNearestLinkImproved(Coord coord, double dist){
 		Link selectedLink = null;
-		Collection<Node> nodes = net.getNearestNodes(coord, dist);
+		final Coord coord2 = coord;
+		final double distance = dist;
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(net,coord2, distance);
 		double minDist = Double.MAX_VALUE;
 		for(Node node:nodes) {
 			for(Link link:node.getInLinks().values()) {
-				double curDist = ((LinkImpl) link).calcDistance(coord);
+				final Coord coord1 = coord;
+				Link r = ((Link) link);
+				double curDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
 					minDist = curDist;
 				}
 			}
 			for(Link link:node.getOutLinks().values()) {
-				double curDist = ((LinkImpl) link).calcDistance(coord);
+				final Coord coord1 = coord;
+				Link r = ((Link) link);
+				double curDist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
 					minDist = curDist;
@@ -891,8 +900,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 		final double midY = (selectionSquare.start.getY()+selectionSquare.end.getY())/2.0;
 		Coord mid = inverseTransform(new Coord(midX, midY));
 		final double dist = CoordUtils.calcEuclideanDistance(mid, inverseTransform(selectionSquare.end));
+		final Coord coord = mid;
 		//System.out.println("mid = " + mid + ", dist = " + dist);
-		Collection<Node> nodes = net.getNearestNodes(mid, dist*8);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(net,coord, dist*8);
 		Coord start = new Coord(selectionSquare.start.getX(), selectionSquare.start.getY()), end = new Coord(selectionSquare.end.getX(), selectionSquare.end.getY());
 		for(Node node : nodes) {
 			for(Link l : node.getInLinks().values()) {
@@ -929,7 +939,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			//System.out.println("Adding link " + link.getId());
 			selectedLinkList.add(link);
 		}
-		activeLink = (LinkImpl)link;
+		activeLink = (Link)link;
 		return true;
 	}
 
@@ -979,12 +989,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private void unifyLinks(Link segment1, Link segment2) {
 		if(segment1.getToNode().getId().equals(segment2.getFromNode().getId()) == false)
 			return;
-		Link newLink = net.getFactory().createLink(this.getRandomLinkId(),
-				segment1.getFromNode(), segment2.getToNode(), net,
-				segment1.getLength()+segment2.getLength(),
-				(segment1.getFreespeed()+segment2.getFreespeed())/2.0,
-				(segment1.getCapacity()+segment2.getCapacity())/2.0,
-				Math.min(segment1.getNumberOfLanes(), segment2.getNumberOfLanes()));
+		final Network network = net;
+		NetworkFactory r = net.getFactory();
+		Link newLink = NetworkUtils.createLink(this.getRandomLinkId(), segment1.getFromNode(), segment2.getToNode(), network, segment1.getLength()+segment2.getLength(), (segment1.getFreespeed()+segment2.getFreespeed())/2.0, (segment1.getCapacity()+segment2.getCapacity())/2.0, Math.min(segment1.getNumberOfLanes(), segment2.getNumberOfLanes()));
 		net.addLink(newLink);
 		net.removeLink(segment1.getId());
 		net.removeLink(segment2.getId());
@@ -1020,7 +1027,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return The nearest node from the coordinates at a radius distance of dist
 	 */
 	protected Node getNearestNodes(Coord coord, double dist) {
-		Collection<Node> nodes = net.getNearestNodes(coord, dist);
+		final Coord coord1 = coord;
+		final double distance = dist;
+		Collection<Node> nodes = NetworkUtils.getNearestNodes2(net,coord1, distance);
 		double minDist = Double.MAX_VALUE;
 		Node selectedNode = null;
 		for(Node node:nodes) {            
@@ -1039,7 +1048,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return The nearest Node
 	 */
 	protected Node getNearestNode(Coord coord) {
-		return net.getNearestNode(coord);
+		final Coord coord1 = coord;
+		return NetworkUtils.getNearestNode(net,coord1);
 	}
 
 	/**
@@ -1170,7 +1180,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}
 
 	public Link makeDoubleWay(Link link){
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
+		Link newLink = (Link)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
 		newLink.setCapacity(link.getCapacity());
 		newLink.setLength(link.getLength());
 		newLink.setFreespeed(link.getFreespeed());
@@ -1204,8 +1214,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 			endAdded = true;
 		}
 		Id<Link> id = getRandomLinkId();
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(id, start, end);
-		newLink.setLength(newLink.getEuklideanLength());
+		Link newLink = (Link)net.getFactory().createLink(id, start, end);
+		newLink.setLength(CoordUtils.calcEuclideanDistance(newLink.getFromNode().getCoord(), newLink.getToNode().getCoord()));
 		newLink.setCapacity(600.0);
 		newLink.setFreespeed(8.3333);
 		net.addLink(newLink);
@@ -1291,7 +1301,12 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return
 	 */
 	private Link createLinkFromExistent(Link source, double distRelation, Id<Link> id, Node from, Node to) {
-		return net.getFactory().createLink(id, from, to, net, source.getLength()*distRelation, source.getFreespeed(), source.getCapacity(), source.getNumberOfLanes());
+		final Id<Link> id1 = id;
+		final Node from1 = from;
+		final Node to1 = to;
+		final Network network = net;
+		NetworkFactory r = net.getFactory();
+		return NetworkUtils.createLink(id1, from1, to1, network, source.getLength()*distRelation, source.getFreespeed(), source.getCapacity(), source.getNumberOfLanes());
 	}
 
 	/**
@@ -1611,7 +1626,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 			P2 = transform(link.getToNode().getCoord());
 		}
 		double dist1 = CoordUtils.distancePointLinesegment(P1, P2, Pos);
-		Node node = net.getNearestNode(transformed);
+		final Coord coord = transformed;
+		Node node = NetworkUtils.getNearestNode(net,coord);
 		if(node == null && link == null)
 			return new PairLinkNode(null, null);
 		Coord P3 = transform(node.getCoord());
@@ -1664,7 +1680,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(net==null) return;
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		Collection<Node> nodeList = net.getNearestNodes(getMidPoint(), getMidDistance());
+		Collection<Node> nodeList = NetworkUtils.getNearestNodes2(net,getMidPoint(), getMidDistance());
 		for(Node node: nodeList) {
 			paintNode(node, g2);
 			paintLinks(node.getOutLinks().values(), g2);

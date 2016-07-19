@@ -94,17 +94,15 @@ public class ScheduleImpl<T extends AbstractTask>
 
     private void validateArgsBeforeAddingTask(int taskIdx, Task task)
     {
-        double beginTime = task.getBeginTime();
-        double endTime = task.getEndTime();
-        Link beginLink = Tasks.getBeginLink(task);
-        Link endLink = Tasks.getEndLink(task);
-
         failIfCompleted();
-
         if (status == ScheduleStatus.STARTED && taskIdx <= currentTask.getTaskIdx()) {
             throw new IllegalStateException();
         }
 
+        double beginTime = task.getBeginTime();
+        double endTime = task.getEndTime();
+        Link beginLink = Tasks.getBeginLink(task);
+        Link endLink = Tasks.getEndLink(task);
         int taskCount = tasks.size();
 
         if (taskIdx < 0 || taskIdx > taskCount) {

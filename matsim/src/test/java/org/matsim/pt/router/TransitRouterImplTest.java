@@ -35,13 +35,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -199,6 +198,28 @@ public class TransitRouterImplTest {
 		double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
 				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+	}
+	
+	@Test
+	public void testTransferWalkDistance(){
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
+		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		Coord fromCoord = new Coord((double) 3800, (double) 5100);
+		Coord toCoord = new Coord((double) 16100, (double) 10050);
+		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null);
+		Leg leg1 = legs.get(1);
+		ExperimentalTransitRoute route1 = (ExperimentalTransitRoute) leg1.getRoute();
+		Coord coord1 = f.schedule.getFacilities().get(route1.getEgressStopId()).getCoord();
+		Leg leg3 = legs.get(3);
+		ExperimentalTransitRoute route3 = (ExperimentalTransitRoute) leg3.getRoute();
+		Coord coord3 = f.schedule.getFacilities().get(route3.getAccessStopId()).getCoord();
+		double beelineFactor = f.scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
+		assertEquals(CoordUtils.calcEuclideanDistance(coord1, coord3) * beelineFactor, 
+							legs.get(2).getRoute().getDistance(), MatsimTestCase.EPSILON);
 	}
 
 	@Test
@@ -611,14 +632,14 @@ public class TransitRouterImplTest {
 			this.coord7 = new Coord(x, (double) 0);
 
 			// network
-			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
-			NodeImpl node1 = network.getFactory().createNode(Id.create("1", Node.class), this.coord1);
-			NodeImpl node2 = network.getFactory().createNode(Id.create("2", Node.class), this.coord2);
-			NodeImpl node3 = network.getFactory().createNode(Id.create("3", Node.class), this.coord3);
-			NodeImpl node4 = network.getFactory().createNode(Id.create("4", Node.class), this.coord4);
-			NodeImpl node5 = network.getFactory().createNode(Id.create("5", Node.class), this.coord5);
-			NodeImpl node6 = network.getFactory().createNode(Id.create("6", Node.class), this.coord6);
-			NodeImpl node7 = network.getFactory().createNode(Id.create("7", Node.class), this.coord7);
+			Network network = (Network) this.scenario.getNetwork();
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), this.coord1);
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), this.coord2);
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), this.coord3);
+			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), this.coord4);
+			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), this.coord5);
+			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), this.coord6);
+			Node node7 = network.getFactory().createNode(Id.create("7", Node.class), this.coord7);
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);

@@ -23,6 +23,9 @@ package org.matsim.api.core.v01.network;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.network.LinkFactory;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEventFactory;
 
 /**
  * @author dgrether
@@ -41,5 +44,13 @@ public interface NetworkFactory extends MatsimFactory {
 	 * @return the newly created link
 	 */
 	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode);
+
+	void setLinkFactory(LinkFactory factory);
+
+	void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory);
+	// yyyyyy i think that the settable factory can go: (1) returns class instead of interface; (2) is
+	// not consistently used in code.  kai, jul'16
+
+	NetworkChangeEvent createNetworkChangeEvent(double time);
 
 }

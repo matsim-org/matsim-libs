@@ -33,7 +33,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
@@ -53,7 +52,7 @@ public class RunFlexibleQNetworkFactoryExample {
 		private NetsimInternalInterface netsimEngine;
 
 		@Override void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
-			double effectiveCellSize = ((NetworkImpl)network).getEffectiveCellSize() ;
+			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
 			
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 			linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );

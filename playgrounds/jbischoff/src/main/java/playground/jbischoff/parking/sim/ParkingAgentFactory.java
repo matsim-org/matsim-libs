@@ -43,6 +43,7 @@ import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
 import playground.jbischoff.parking.manager.ParkingManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
+import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
 
 /**
@@ -66,6 +67,8 @@ public class ParkingAgentFactory implements AgentFactory {
 	ParkingRouter parkingRouter;
 	@Inject
 	Network network;
+	@Inject
+	VehicleTeleportationLogic teleportationLogic;
 	private final QSim qsim;
 
 	/**
@@ -81,7 +84,7 @@ public class ParkingAgentFactory implements AgentFactory {
 		ParkingChoiceLogic parkingLogic = new RandomParkingChoiceLogic(network);
 
 		ParkingAgentLogic agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
-				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer() );
+				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 		if (startLinkId == null) {
 			throw new NullPointerException(" No start link found. Should not happen.");

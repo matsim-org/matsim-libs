@@ -13,9 +13,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -231,10 +231,10 @@ public class RouteAdderRemover {
 	public void createDestination(Scenario scenario, TransitSchedule schedule,  Map<Id<TransitStopFacility>, TransitRouteStop> stops, List<TransitRouteStop> stopsfornewroute,
 								List<Id<Link>> linksfornewroute, TransitRouteStop origin){
 		NetworkFactory factory = scenario.getNetwork().getFactory();
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		int numofstops = 1 + (int)Math.ceil((24*Math.random()));
 		double distancefromorigin = 0;//Euclidean distance from origin must keep increasing
-		Map<Id<Node>, Node>  allnodes = network.getNodes();
+		Map<Id<Node>, ? extends Node>  allnodes = network.getNodes();
 		String idorigstr = "tr_"+origin.getStopFacility().getId().toString();
 		 if(idorigstr.indexOf('.')!=-1){
 			 idorigstr = idorigstr.substring(0,idorigstr.indexOf('.'));
@@ -274,7 +274,7 @@ public class RouteAdderRemover {
 		Node tonode = null;
 		int i=0;
 		while(i++<numofstops){
-				Collection<Node> nodes = network.getNearestNodes(fromnode.getCoord(), 1000);//Nodes within a 1000 meters
+				Collection<Node> nodes = NetworkUtils.getNearestNodes2(network,fromnode.getCoord(), (double) 1000);//Nodes within a 1000 meters
 				tonode = getNextNode(distancefromorigin, origincords, nodes);//Get next node to the current node out of the neighboring nodes
 																		  //such that the overall distance to the node from origin keeps increasing to avoid weird detours
 				distancefromorigin = NetworkUtils.getEuclideanDistance(origincords, tonode.getCoord());

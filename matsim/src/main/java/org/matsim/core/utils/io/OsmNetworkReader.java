@@ -39,8 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
@@ -306,8 +305,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 	
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if (this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		log.info("Remove ways that have at least one node that was not read previously ...");
@@ -564,9 +563,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
-					((LinkImpl) l).setType( highway );
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
+					final String type = highway;
+					NetworkUtils.setType( ((Link) l), type);
 				}
 				network.addLink(l);
 				this.id++;
@@ -577,9 +578,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
-					((LinkImpl) l).setType( highway );
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
+					final String type = highway;
+					NetworkUtils.setType( ((Link) l), type);
 				}
 				network.addLink(l);
 				this.id++;

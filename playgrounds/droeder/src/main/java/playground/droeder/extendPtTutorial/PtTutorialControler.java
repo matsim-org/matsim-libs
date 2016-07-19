@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -88,7 +88,7 @@ class PtTutorialControler {
 	}
 	
 	private static Network removeNonCarLinks(Network network){
-		Network net =  NetworkImpl.createNetwork();
+		Network net =  NetworkUtils.createNetwork();
 		for(Node n: network.getNodes().values()){
 			for(Link l: n.getOutLinks().values()){
 				if(l.getAllowedModes().contains(TransportMode.car)){

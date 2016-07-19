@@ -24,9 +24,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.berlin.BerlinZoneUtils;
@@ -35,7 +37,7 @@ import playground.michalm.ev.data.*;
 
 public class ChargerReader
 {
-    private final NetworkImpl network;
+    private final Network network;
     private final EvData data;
     private final Map<Id<Zone>, Zone> zones;
     private final double power;
@@ -43,7 +45,7 @@ public class ChargerReader
 
     public ChargerReader(Scenario scenario, EvData data, Map<Id<Zone>, Zone> zones, double power)
     {
-        this.network = (NetworkImpl)scenario.getNetwork();
+        this.network = (Network)scenario.getNetwork();
         this.data = data;
         this.zones = zones;
         this.power = power;
@@ -65,7 +67,8 @@ public class ChargerReader
                 Zone zone = zones.get(Id.create(id, Zone.class));
                 Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION
                         .transform(zone.getCoord());
-                Link link = network.getNearestLinkExactly(coord);
+		final Coord coord1 = coord;
+                Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
                 data.addCharger(
                         new ChargerImpl(Id.create(id, Charger.class), power, capacity, link));
             }

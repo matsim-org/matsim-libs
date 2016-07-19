@@ -14,10 +14,10 @@ import org.jdom.output.XMLOutputter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -32,15 +32,15 @@ public class LSANode2KML {
 		
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("/home/jbischoff/m44_344_big.xml");
 		List<LSA> ampelliste = new ArrayList<LSA>();
-		Map<Id<Node>, Node> nodeList = new HashMap<Id<Node>, Node>();
+		Map<Id<Node>, ? extends Node> nodeList = new HashMap<Id<Node>, Node>();
 		nodeList=network.getNodes();
 		CoordinateTransformation ct = 
 			TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4,TransformationFactory.WGS84);
 		
-		for (Map.Entry<Id<Node>,Node> entry: nodeList.entrySet()){
+		for (Map.Entry<Id<Node>,? extends Node> entry: nodeList.entrySet()){
 			LSA ampel = new LSA();
 			Node current = entry.getValue();
 			ampel.setLongName(current.getId().toString());

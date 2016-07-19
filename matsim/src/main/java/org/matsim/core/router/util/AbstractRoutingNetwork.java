@@ -92,5 +92,28 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	public Link removeLink(Id<Link> linkId) {
 		throw new RuntimeException("Not supported operation!");
 	}
+	@Override
+	public void setCapacityPeriod(double capPeriod) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 
 }

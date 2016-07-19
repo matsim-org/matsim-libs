@@ -14,11 +14,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.Vehicle;
 
 import saleem.p0.PlotStatistics;
@@ -28,10 +28,10 @@ import saleem.stockholmscenario.utils.CollectionUtil;
 //For Generic Junctions
 
 public class StockholmP0Handler implements BasicEventHandler{
-	NetworkImpl network;int iteration;double bintime=0;
+	Network network;int iteration;double bintime=0;
 	List<Link> inLinks = new ArrayList<Link>();//Incoming links
 	List<Link> outLinks = new ArrayList<Link>();//Outgoing links
-	Map<Id<Link>, Link> allLinks = new HashMap<Id<Link>, Link>();//Both incoming and outgoing links in the junction
+	Map<Id<Link>, ? extends Link> allLinks = new HashMap<Id<Link>, Link>();//Both incoming and outgoing links in the junction
 	Map<Id<Link>, Double> satCapacities = new LinkedHashMap<Id<Link>, Double>();//Saturation Capacities for Links
 	Map<Id<Link>, Double> capacitiesLinks = new LinkedHashMap<Id<Link>, Double>();//Flow capacities in current bin 
 	Map<Id<Link>, Map<Double, Double>> capacities = new LinkedHashMap<Id<Link>, Map<Double, Double>>();//Flow capacities all links, all bins
@@ -53,7 +53,7 @@ public class StockholmP0Handler implements BasicEventHandler{
 	Map<Id<Link>, Double> vehCountsLinks = new LinkedHashMap<Id<Link>, Double>();//Per Current Bin
 	Map<Id<Link>, Double> totalVehCountsLinks = new LinkedHashMap<Id<Link>, Double>();//Per day
 	Scenario scenario;
-	public StockholmP0Handler(Scenario scenario, List<Link> inLinks, List<Link> outLinks, NetworkImpl network) {
+	public StockholmP0Handler(Scenario scenario, List<Link> inLinks, List<Link> outLinks, Network network) {
 		this.network=network;
 		this.inLinks=inLinks;
 		this.outLinks=outLinks;

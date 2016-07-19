@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -152,7 +152,7 @@ public class InvertedNetworkSimSimAnalyser {
 		attribs[5] = link.getCapacity();
 		attribs[6] = link.getNumberOfLanes();
 		attribs[7] = link.getNumberOfLanes();
-		attribs[8] = ((LinkImpl) link).getType();
+		attribs[8] = NetworkUtils.getType(((Link) link));
 		attribs[9] = countBc;
 		attribs[10] = countP;
 		attribs[11] = countP - countBc;

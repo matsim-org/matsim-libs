@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,10 +43,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -115,7 +116,7 @@ public class PopulationGenerator {
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
-		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+		Network net = (Network) sc.getNetwork();
 		String crs = conf.global().getCoordinateSystem();
 		transformCRS(r, crs);
 		
@@ -127,7 +128,7 @@ public class PopulationGenerator {
 			MultiPolygon p = (MultiPolygon) ft.getDefaultGeometry();
 			Coordinate c = p.getCentroid().getCoordinate();
 
-			Link l = net.getNearestLinkExactly(new Coord(c.x, c.y));
+			Link l = NetworkUtils.getNearestLinkExactly(net,new Coord(c.x, c.y));
 			double dist = c.distance(new Coordinate(l.getCoord().getX(),l.getCoord().getY()));
 			if (dist > CUTOFF_DIST) {
 				continue;

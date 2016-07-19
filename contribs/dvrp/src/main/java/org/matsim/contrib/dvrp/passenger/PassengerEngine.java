@@ -38,7 +38,7 @@ public class PassengerEngine
 {
     private final String mode;
 
-    private EventsManager eventsManager;
+    protected EventsManager eventsManager;
     private InternalInterface internalInterface;
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;

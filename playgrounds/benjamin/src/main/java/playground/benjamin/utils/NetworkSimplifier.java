@@ -32,11 +32,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -90,12 +89,12 @@ public class NetworkSimplifier {
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
 				for (Link iL : iLinks) {
-					LinkImpl inLink = (LinkImpl) iL;
+					Link inLink = (Link) iL;
 
 					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
 
 					for (Link oL : oLinks) {
-						LinkImpl outLink = (LinkImpl) oL;
+						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
@@ -103,7 +102,7 @@ public class NetworkSimplifier {
 								if(this.mergeLinkStats){
 
 									// Try to merge both links by guessing the resulting links attributes
-									LinkImpl link = (LinkImpl) network.getFactory().createLink(
+									Link link = (Link) network.getFactory().createLink(
 											Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
 											inLink.getFromNode(),
 											outLink.getToNode()
@@ -115,7 +114,7 @@ public class NetworkSimplifier {
 									// freespeed depends on total length and time needed for inLink and outLink
 									link.setFreespeed(
 											(inLink.getLength() + outLink.getLength()) /
-											(inLink.getFreespeedTravelTime() + outLink.getFreespeedTravelTime())
+											(NetworkUtils.getFreespeedTravelTime(inLink) + NetworkUtils.getFreespeedTravelTime(outLink))
 											);
 
 									// the capacity and the new links end is important, thus it will be set to the minimum
@@ -126,8 +125,8 @@ public class NetworkSimplifier {
 													+ outLink.getLength() * outLink.getNumberOfLanes())
 													/ (inLink.getLength() + outLink.getLength())
 													);
-									link.setOrigId(null);
-									link.setType(outLink.getType());
+									NetworkUtils.setOrigId( link, null ) ;
+									NetworkUtils.setType( link, (String) NetworkUtils.getType(outLink));
 									
 									network.addLink(link);
 									network.removeLink(inLink.getId());
@@ -137,16 +136,7 @@ public class NetworkSimplifier {
 
 									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
-										LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-												Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
-												inLink.getFromNode(),
-												outLink.getToNode(),
-												inLink.getLength() + outLink.getLength(),
-												inLink.getFreespeed(),
-												inLink.getCapacity(),
-												outLink.getNumberOfLanes(),
-												null,
-												outLink.getType());
+										Link newLink = NetworkUtils.createAndAddLink(((Network) network),Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), outLink.getNumberOfLanes(), null, (String) NetworkUtils.getType(outLink));
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
@@ -177,7 +167,7 @@ public class NetworkSimplifier {
 	/**
 		 * Compare link attributes. Return whether they are the same or not.
 		 */
-		private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
+		private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
 	
 			boolean bothLinksHaveSameLinkStats = true;
 	

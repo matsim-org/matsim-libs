@@ -75,7 +75,6 @@ public class RuleBasedETaxiOptimizer
         for (Vehicle v : vehicles) {
             Dispatch<Charger> eDispatch = eDispatchFinder.findBestChargerForVehicle(v,
                     evData.getChargers().values());
-
             eScheduler.scheduleCharging((EvrpVehicle)v, eDispatch.destination, eDispatch.path);
         }
     }

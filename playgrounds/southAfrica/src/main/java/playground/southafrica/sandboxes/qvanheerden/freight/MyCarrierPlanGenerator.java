@@ -87,7 +87,7 @@ public class MyCarrierPlanGenerator {
 		/* Set coordinate and linkId of depot */
 		depotCoord = new Coord(depotLong, depotLat);
 		//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
-		depotLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), depotCoord).getId();
+		depotLink = NetworkUtils.getNearestLink(((Network) scenario.getNetwork()), depotCoord).getId();
 
 		MyFileSampler mfs = new MyFileSampler(demandInputDir);
 		List<File> files = mfs.sampleFiles(Integer.MAX_VALUE, new MyFileFilter(".csv"));
@@ -200,32 +200,36 @@ public class MyCarrierPlanGenerator {
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//morning peak ends
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//afternoon peak starts
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 					{//afternoon peak ends
 						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
+						final NetworkChangeEvent event1 = event;
 						//					ni.addNetworkChangeEvent(event);
-						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 						//					events.add(event);
 					}
 				}
@@ -275,7 +279,7 @@ public class MyCarrierPlanGenerator {
 				double end = Double.parseDouble(array[8]);
 
 				Coord coord = new Coord(longi, lati);
-				Id<Link> linkId = NetworkUtils.getNearestLink(((NetworkImpl) network), coord).getId();
+				Id<Link> linkId = NetworkUtils.getNearestLink(((Network) network), coord).getId();
 
 				CarrierService serv = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), linkId).
 						setCapacityDemand((int) mass).

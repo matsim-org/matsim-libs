@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
@@ -76,7 +77,7 @@ public class RunTaxiBenchmark
             @Override
             public void install()
             {
-                addControlerListenerBinding().to(TaxiBenchmarkStats.class);
+                addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
             };
         });
 
@@ -89,7 +90,7 @@ public class RunTaxiBenchmark
         Scenario scenario = new ScenarioBuilder(config).build();
 
         if (config.network().isTimeVariantNetwork()) {
-            ((NetworkImpl)scenario.getNetwork()).getFactory()
+            ((Network)scenario.getNetwork()).getFactory()
                     .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
         }
 

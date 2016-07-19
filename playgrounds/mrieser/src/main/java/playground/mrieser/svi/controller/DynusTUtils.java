@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
@@ -74,7 +74,7 @@ public abstract class DynusTUtils {
 		final DynamicTravelTimeMatrix ttMatrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
 		
 		log.info("Reading DynusT-network..." + dc.getModelDirectory());
-		final Network dynusTNetwork = NetworkImpl.createNetwork();
+		final Network dynusTNetwork = NetworkUtils.createNetwork();
 		new DynusTNetworkReader(dynusTNetwork).readFiles(dc.getModelDirectory() + "/xy.dat", dc.getModelDirectory()+ "/network.dat");
 		
 		controler.addControlerListener(new DynusTControlerListener(dc, ttMatrix, dynusTNetwork));

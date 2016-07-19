@@ -14,11 +14,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.Vehicle;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
@@ -26,7 +26,7 @@ import saleem.stockholmscenario.utils.CollectionUtil;
 //For Generic Junctions
 
 public class GenericP0ControlHandler implements BasicEventHandler{
-	NetworkImpl network;int iteration;double bintime=0;double totalincap=0;
+	Network network;int iteration;double bintime=0;double totalincap=0;
 	List<Link> inLinks = new ArrayList<Link>();//Incoming links
 	List<Link> outLinks = new ArrayList<Link>();//Outgoing links
 	Map<Id<Link>, Link> allLinks = new HashMap<Id<Link>, Link>();//Both incoming and outgoing links in the junction
@@ -52,7 +52,7 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 	Map<Id<Link>, Double> totalVehCountsLinks = new LinkedHashMap<Id<Link>, Double>();//Per day
 	Scenario scenario;
 	public static List<Double> changeeventtimes= new ArrayList<Double>();//To keep track of all event times added so that times of two events dont concide.
-	public GenericP0ControlHandler(Scenario scenario, List<Link> inLinks, List<Link> outLinks, NetworkImpl network) {
+	public GenericP0ControlHandler(Scenario scenario, List<Link> inLinks, List<Link> outLinks, Network network) {
 		this.network=network;
 		this.inLinks=inLinks;
 		this.outLinks=outLinks;

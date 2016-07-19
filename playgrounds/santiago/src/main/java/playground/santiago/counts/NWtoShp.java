@@ -27,12 +27,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -130,7 +129,7 @@ public class NWtoShp {
 			Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((Link)link)), link.getCapacity(), link.getFreespeed()}, null);
 			features.add(ft);
 		}   
 		ShapeFileWriter.writeGeometries(features, outputDir + NETFILE_NAME + "_Links.shp");
@@ -157,7 +156,7 @@ public class NWtoShp {
 
 		for(Node node : net.getNodes().values()){
 			Coord newCoord = ct.transform(node.getCoord());
-			((NodeImpl)node).setCoord(newCoord);
+			((Node)node).setCoord(newCoord);
 		}
 
 		return net;
