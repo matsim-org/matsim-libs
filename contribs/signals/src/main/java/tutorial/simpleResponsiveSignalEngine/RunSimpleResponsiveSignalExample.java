@@ -70,7 +70,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author tthunig
  *
  */
-public class RunSimpleResponsiveSignal {
+public class RunSimpleResponsiveSignalExample {
 
 	public static void main(String[] args) {
 		final Config config = defineConfig();
