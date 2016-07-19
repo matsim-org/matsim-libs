@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.trafficsignals;
+package tutorial.fixedTimeSignals;
 
 import java.io.IOException;
 import java.nio.file.Files;
