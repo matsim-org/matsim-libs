@@ -143,14 +143,11 @@ public class GeneralLib {
 	 */
 	@Deprecated // use centralized infrastructure
 	public static Network readNetwork(String networkFile) {
-		MutableScenario sc = (MutableScenario) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 
-		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
-
-		ScenarioUtils.loadScenario(sc);
-
-		return sc.getNetwork();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		return scenario.getNetwork();
 	}
 
 	public static void writeNetwork(Network network,

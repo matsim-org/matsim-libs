@@ -19,13 +19,15 @@
 
 package org.matsim.core.scenario;
 
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -39,8 +41,7 @@ public class ScenarioLoaderImplTest {
 	public void testLoadScenario_loadTransitData() {
 		// test the create/load sequence:
 		{
-			//			Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
-			ScenarioBuilder builder = new ScenarioBuilder( this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml") ) ;
+			ScenarioBuilder builder = new ScenarioBuilder(ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "transitConfig.xml")));
 			// facilities is there by default????
 			Scenario scenario = builder.build() ;
 			Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
@@ -52,7 +53,7 @@ public class ScenarioLoaderImplTest {
 
 		// load directly:
 		{
-			Scenario scenario = ScenarioUtils.loadScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
+			Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "transitConfig.xml")));
 			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
 			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
 		}
@@ -60,15 +61,15 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadPersonAttributes() {
-		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "personAttributesConfig.xml");
-		config.plans().addParam("inputPersonAttributesFile", this.util.getClassInputDirectory() + "personAttributes.xml");
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "personAttributesConfig.xml"));
+		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getPopulation().getPersonAttributes().getAttribute("1", "hello"));
 	}
 
 	@Test
 	public void testLoadScenario_loadTransitLinesAttributes() {
-		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml");
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "transitConfig.xml"));
 		config.transit().setTransitLinesAttributesFile(this.util.getClassInputDirectory() + "transitLinesAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getTransitSchedule().getTransitLinesAttributes().getAttribute("Blue Line", "hello"));
@@ -76,7 +77,7 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitStopsAttributes() {
-		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml");
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "transitConfig.xml"));
 		config.transit().setTransitStopsAttributesFile(this.util.getClassInputDirectory() + "transitStopsAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals(Boolean.TRUE, scenario.getTransitSchedule().getTransitStopsAttributes().getAttribute("1", "hasP+R"));
@@ -84,7 +85,7 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadFacilitiesAttributes() {
-		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "facilityAttributesConfig.xml");
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "facilityAttributesConfig.xml"));
 		config.facilities().addParam("inputFacilityAttributesFile", this.util.getClassInputDirectory() + "facilityAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getActivityFacilities().getFacilityAttributes().getAttribute("1", "hello"));
@@ -92,8 +93,7 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadHouseholdAttributes() {
-		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "householdAttributesConfig.xml");
-//		config.scenario().setUseHouseholds(true);
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.testClassInputResourcePath(), "householdAttributesConfig.xml"));
 		config.households().addParam("inputHouseholdAttributesFile", this.util.getClassInputDirectory() + "householdAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));

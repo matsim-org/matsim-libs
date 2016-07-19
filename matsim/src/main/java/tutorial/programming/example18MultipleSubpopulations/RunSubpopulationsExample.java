@@ -40,6 +40,8 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import java.io.File;
+
 /**
  * This example illustrates how to go about modelling subpopulations, 
  * and specifically dealing with the replanning strategies for the different
@@ -62,9 +64,9 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  *  @author nagel, jwjoubert
  */
 public class RunSubpopulationsExample {
-	final static String EQUIL_NETWORK = "./examples/equil/network.xml";
-	final static String PLANS = "./examples/tutorial/programming/multipleSubpopulations/plans.xml";
-	final static String OBJECT_ATTRIBUTES = "./examples/tutorial/programming/multipleSubpopulations/personAtrributes.xml";
+	final static String EQUIL_NETWORK = new File("./examples/equil/network.xml").getAbsolutePath();
+	final static String PLANS = new File("./examples/tutorial/programming/multipleSubpopulations/plans.xml").getAbsolutePath();
+	final static String OBJECT_ATTRIBUTES = new File("./examples/tutorial/programming/multipleSubpopulations/personAtrributes.xml").getAbsolutePath();
 	final static String CONFIG = "./examples/tutorial/programming/multipleSubpopulations/config.xml";
 	final static String OUTPUT = "./output/";
 

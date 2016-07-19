@@ -20,8 +20,9 @@
 
 package org.matsim.integration.replanning;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -32,17 +33,19 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.util.EnumSet;
 
-public class ReRoutingIT extends MatsimTestCase {
+public class ReRoutingIT {
 
-	/*package*/ static final Logger log = Logger.getLogger(ReRoutingIT.class);
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	
 	private Scenario loadScenario() {
-		Config config = loadConfig(getClassInputDirectory() + "config.xml");
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.testClassInputResourcePath(), "config.xml"));
 		config.qsim().setTimeStepSize(10.0);
         config.qsim().setStuckTime(100.0);
         config.qsim().setRemoveStuckVehicles(true);
@@ -58,7 +61,8 @@ public class ReRoutingIT extends MatsimTestCase {
 		PopulationUtils.sortPersons(scenario.getPopulation());
 		return scenario;
 	}
-	
+
+	@Test
 	public void testReRoutingDijkstra() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
@@ -69,6 +73,7 @@ public class ReRoutingIT extends MatsimTestCase {
 		this.evaluate();
 	}
 
+	@Test
 	public void testReRoutingFastDijkstra() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
@@ -82,6 +87,7 @@ public class ReRoutingIT extends MatsimTestCase {
 	/**
 	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
 	 */
+	@Test
 	public void testReRoutingAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
@@ -92,6 +98,7 @@ public class ReRoutingIT extends MatsimTestCase {
 		this.evaluate();
 	}
 
+	@Test
 	public void testReRoutingFastAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
@@ -103,21 +110,19 @@ public class ReRoutingIT extends MatsimTestCase {
 	}
 	
 	private void evaluate() {
-		Config config = loadConfig(getClassInputDirectory() + "config.xml");
-		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
-		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
-		
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.testClassInputResourcePath(), "config.xml"));
+
 		Scenario referenceScenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
-		new PopulationReader(referenceScenario).readFile(originalFileName);
+		new MatsimNetworkReader(referenceScenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
+		new PopulationReader(referenceScenario).parse(IOUtils.newUrl(utils.testInputResourcePath(), "1.plans.xml.gz"));
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new PopulationReader(scenario).readFile(revisedFileName);
+		new PopulationReader(scenario).readFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").getAbsolutePath());
 
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {
-			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write( getOutputDirectory() + "/reference_population.xml.gz");
-			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write( getOutputDirectory() + "/output_population.xml.gz");
+			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/reference_population.xml.gz");
+			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
 		Assert.assertTrue("different plans files.", isEqual);
 	}

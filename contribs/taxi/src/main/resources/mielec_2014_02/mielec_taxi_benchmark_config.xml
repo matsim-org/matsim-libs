@@ -25,14 +25,14 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="src/main/resources/mielec_2014_02/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
 		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
 	</module>
 
 	<module name="plans">
-		<!-- param name="inputPlansFile" value="src/main/resources/mielec_2014_02/plans_only_taxi_1.0.xml.gz" / -->
-		<param name="inputPlansFile" value="src/main/resources/mielec_2014_02/plans_only_taxi_4.0.xml.gz" />
+		<!-- param name="inputPlansFile" value="plans_only_taxi_1.0.xml.gz" / -->
+		<param name="inputPlansFile" value="plans_only_taxi_4.0.xml.gz" />
 	</module>
 
 	<module name="qsim">

@@ -21,6 +21,7 @@
 
 package playground.boescpa.ivtBaseline;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -60,7 +61,7 @@ public class TestRunBaseline {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Test @Ignore
 	public void testScenario() {
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";

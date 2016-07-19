@@ -37,6 +37,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Inject;
@@ -61,12 +62,12 @@ public class RunCarsharingTest {
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
 
-		config.network().setInputFile( utils.getClassInputDirectory()+"/network.xml" );
+		config.network().setInputFile("network.xml" );
 
-		config.plans().setInputFile( utils.getClassInputDirectory()+"/10persons.xml");
-		config.plans().setInputPersonAttributeFile( utils.getClassInputDirectory()+"/1000desiresAttributes.xml");
+		config.plans().setInputFile("10persons.xml");
+		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
 
-		config.facilities().setInputFile( utils.getClassInputDirectory()+"/facilities.xml" );
+		config.facilities().setInputFile("facilities.xml" );
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
 

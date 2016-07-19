@@ -165,15 +165,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="network" >
-		<param name="inputChangeEventsFile" value="test\output\org\matsim\contrib\evacuation\scenariogenerator\ScenarioGeneratorTest\testScenarioGenerator/networkChangeEvents.xml" />
-		<param name="inputNetworkFile" value="./test/output/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator//network.xml.gz" />
-		<param name="laneDefinitionsFile" value="null" />
-		<param name="timeVariantNetwork" value="true" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="otfvis" >
 		<param name="agentSize" value="120.0" />
 		<param name="coloringScheme" value="standard" />
@@ -324,22 +315,6 @@
 
 		<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
 		<param name="constant_other" value="0.0" />
-	</module>
-
-<!-- ====================================================================== -->
-
-	<module name="plans" >
-
-		<!-- Path to a file containing person attributes (required file format: ObjectAttributes). -->
-		<param name="inputPersonAttributesFile" value="null" />
-
-		<param name="inputPlansFile" value="./test/output/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator//population.xml.gz" />
-
-		<!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
-		<param name="networkRouteType" value="LinkNetworkRoute" />
-
-		<!-- Name of the (Object)Attribute defining the subpopulation to which pertains a Person (as freight, through traffic, etc.). The attribute must be of String type. -->
-		<param name="subpopulationAttributeName" value="subpopulation" />
 	</module>
 
 <!-- ====================================================================== -->

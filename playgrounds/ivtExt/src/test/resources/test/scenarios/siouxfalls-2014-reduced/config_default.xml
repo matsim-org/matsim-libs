@@ -4,15 +4,15 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/siouxfalls-2014-reduced/Siouxfalls_network_PT.xml" />
+		<param name="inputNetworkFile" value="Siouxfalls_network_PT.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/siouxfalls-2014-reduced/Siouxfalls_population.xml" />
+		<param name="inputPlansFile" value="Siouxfalls_population.xml" />
 	</module>
 	
 	<module name="facilities" >
-		<param name="inputFacilitiesFile" value="test/scenarios/siouxfalls-2014-reduced/Siouxfalls_facilities.xml" />
+		<param name="inputFacilitiesFile" value="Siouxfalls_facilities.xml" />
 	</module>
 	
 	<module name="controler">
@@ -178,8 +178,8 @@
    
   	<module name="transit">
 	  	<param name="useTransit" value="true" />
-  		<param name="transitScheduleFile" value="test/scenarios/siouxfalls-2014-reduced/Siouxfalls_transitSchedule.xml" />
- 		<param name="vehiclesFile" value="test/scenarios/siouxfalls-2014-reduced/Siouxfalls_vehicles.xml" />
+  		<param name="transitScheduleFile" value="Siouxfalls_transitSchedule.xml" />
+ 		<param name="vehiclesFile" value="Siouxfalls_vehicles.xml" />
   	 	<param name="transitModes" value="pt,bus" />
   	</module>
 	

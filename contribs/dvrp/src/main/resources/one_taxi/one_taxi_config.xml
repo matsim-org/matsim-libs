@@ -6,11 +6,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="src/main/resources/grid_network.xml" />
+		<param name="inputNetworkFile" value="../grid_network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="src/main/resources/one_taxi/one_taxi_population.xml" />
+		<param name="inputPlansFile" value="one_taxi_population.xml" />
 	</module>
 
 	<module name="qsim">

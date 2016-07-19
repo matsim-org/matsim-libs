@@ -16,41 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.usecases.readFromURL;
+package org.matsim.core.network;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
  * @author nagel
+ * @author michaz
  *
  */
-public class ReadFromURL {
+public class ReadFromURLIT {
 
-	/**
-	 * @param args
-	 * @throws MalformedURLException 
-	 */
-	public static void main(String[] args) throws MalformedURLException {
-
+	@Test
+	public void testReadingFromURLWorks() throws MalformedURLException {
 		Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ;
 		MatsimNetworkReader reader = new MatsimNetworkReader(network) ;
-
-//		URL abc = new URL("http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/be/brussels/network/belgium_incl_borderArea_clean_simple_epsg31300projection.xml.gz") ;
-//		URL abc = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/matsim/examples/equil/network.xml") ;
-		URL abc = new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/countries/za/capetown/2015-10-15_network.xml") ;
-		
-//		String abc = "../../matsim/examples/equil/network.xml" ;
-
-		reader.parse(abc);
-		
-		System.out.println("done");
-		
+		reader.parse(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/countries/za/capetown/2015-10-15_network.xml"));
+		assertThat(network.getLinks().size(), equalTo(188065));
 	}
 
 }

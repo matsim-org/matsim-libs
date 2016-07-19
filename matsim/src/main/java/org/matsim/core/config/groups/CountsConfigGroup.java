@@ -20,6 +20,8 @@
 
 package org.matsim.core.config.groups;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 
@@ -72,7 +74,8 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	private String analyzedModes = TransportMode.car;
 	private boolean filterModes = false;
 	private String inputCRS = null;
-	
+	private URL countsFileURL;
+
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -154,6 +157,14 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 		this.countsFileName = countsFileName;
 	}
 
+	public URL getCountsFileURL(URL context) {
+		try {
+			return new URL(context, getCountsFileName());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@StringGetter( COUNTSSCALEFACTOR )
 	public double getCountsScaleFactor() {
 		return this.countsScaleFactor;
@@ -213,4 +224,5 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
 	}
+
 }

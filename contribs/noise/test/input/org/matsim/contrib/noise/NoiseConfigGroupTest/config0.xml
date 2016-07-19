@@ -16,11 +16,11 @@
 	</module>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/org/matsim/contrib/noise/NoiseConfigGroupTest/network1.xml" />
+		<param name="inputNetworkFile" value="network1.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/org/matsim/contrib/noise/NoiseConfigGroupTest/population1.xml" />
+		 <param name="inputPlansFile" value="population1.xml" />
 	</module>
 	
 	<module name="controler">

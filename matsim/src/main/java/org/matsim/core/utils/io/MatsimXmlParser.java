@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
+import java.util.zip.GZIPInputStream;
 
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
@@ -46,8 +47,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 
 	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
-	private final Stack<StringBuffer> buffers = new Stack<StringBuffer>();
-	private final Stack<String> context = new Stack<String>();
+	private final Stack<StringBuffer> buffers = new Stack<>();
+	private final Stack<String> context = new Stack<>();
 
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
@@ -150,7 +151,15 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	public void parse(final URL url) throws UncheckedIOException {
 		this.source = url.toString();
 		log.info("starting to parse xml from url " + this.source + " ...");
-		parse(new InputSource(url.toExternalForm()));
+		if (url.getFile().endsWith(".gz")) {
+			try {
+				parse(new InputSource(new GZIPInputStream(url.openStream())));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			parse(new InputSource(url.toExternalForm()));
+		}
 	}
 
 	public void parse(final InputStream stream) throws UncheckedIOException {
@@ -176,11 +185,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 				SAXParser parser = factory.newSAXParser();
 				parser.parse(input, this);
 			}
-		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
-		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
-		} catch (IOException e) {
+		} catch (SAXException | ParserConfigurationException | IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}

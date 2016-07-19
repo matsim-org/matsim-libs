@@ -66,7 +66,7 @@ public class SignalSystemsIT {
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
 		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
+		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFileURL(config.getContext()).getFile());
 
 		config.network().setLaneDefinitionsFile(lanes20);
 		config.controler().setWriteEventsInterval(10);
@@ -113,7 +113,7 @@ public class SignalSystemsIT {
 			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFileURL(c.getConfig().getContext()).getFile());
 			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -135,7 +135,7 @@ public class SignalSystemsIT {
 
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
 			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
 			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -167,7 +167,7 @@ public class SignalSystemsIT {
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
 		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
+		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFileURL(config.getContext()).getFile());
 
 		config.network().setLaneDefinitionsFile(lanes20);
 
@@ -196,7 +196,7 @@ public class SignalSystemsIT {
 					0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
 			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
@@ -214,7 +214,7 @@ public class SignalSystemsIT {
 
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
 			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");

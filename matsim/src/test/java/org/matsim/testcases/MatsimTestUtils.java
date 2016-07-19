@@ -21,6 +21,8 @@ package org.matsim.testcases;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Permission;
 
 import org.junit.Assert;
@@ -71,6 +73,48 @@ public class MatsimTestUtils extends TestWatchman {
 		MatsimRandom.reset();
 	}
 
+	public Config createConfigWithTestInputResourcePathAsContext() {
+		Config config = ConfigUtils.createConfig();
+		config.setContext(testInputResourcePath());
+		this.outputDirectory = getOutputDirectory();
+		config.controler().setOutputDirectory(this.outputDirectory);
+		return config;
+	}
+
+	public URL testInputResourcePath() {
+		return this.testClass.getResource("/" + getClassInputDirectory() + getMethodName() + "/.");
+	}
+
+	public URL testClassInputResourcePath() {
+		return this.testClass.getResource("/" + getClassInputDirectory() + "/.");
+	}
+
+
+	public Config createConfigWithTestInputFilePathAsContext() {
+		try {
+			Config config = ConfigUtils.createConfig();
+			config.setContext(new File(this.getInputDirectory()).toURI().toURL());
+			this.outputDirectory = getOutputDirectory();
+			config.controler().setOutputDirectory(this.outputDirectory);
+			return config;
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public Config createConfig(URL context) {
+		Config config = ConfigUtils.createConfig();
+		config.setContext(context);
+		this.outputDirectory = getOutputDirectory();
+		config.controler().setOutputDirectory(this.outputDirectory);
+		return config;
+	}
+
+	public URL getScenario(String name) {
+		return this.testClass.getResource("/test/scenarios/"+ name +"/");
+	}
+
+
 	/**
 	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).
 	 *
@@ -84,6 +128,25 @@ public class MatsimTestUtils extends TestWatchman {
 		} else {
 			config = ConfigUtils.createConfig( customGroups );
 		}
+		this.outputDirectory = getOutputDirectory();
+		config.controler().setOutputDirectory(this.outputDirectory);
+		return config;
+	}
+
+	public Config loadConfig(final URL configfile, final ConfigGroup... customGroups) {
+		Config config;
+		if (configfile != null) {
+			config = ConfigUtils.loadConfig(configfile, customGroups);
+		} else {
+			config = ConfigUtils.createConfig( customGroups );
+		}
+		this.outputDirectory = getOutputDirectory();
+		config.controler().setOutputDirectory(this.outputDirectory);
+		return config;
+	}
+
+	public Config createConfig(final ConfigGroup... customGroups) {
+		Config config = ConfigUtils.createConfig( customGroups );
 		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
@@ -185,7 +248,6 @@ public class MatsimTestUtils extends TestWatchman {
 		this.testClass = null;
 		this.testMethodName = null;
 	}
-
 
 	public static class ExitTrappedException extends SecurityException {
 		private static final long serialVersionUID = 1L;

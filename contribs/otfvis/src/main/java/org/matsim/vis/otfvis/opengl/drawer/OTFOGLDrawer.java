@@ -394,19 +394,23 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	public static Component createGLCanvas(OTFVisConfigGroup otfVisConfig) {
 		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
-		if (otfVisConfig.isMapOverlayMode()) {
-            // A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
-            // The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
-            // We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
-            GLJPanel glJPanel = new GLJPanel(caps);
-            if (otfVisConfig.isMapOverlayMode()) {
-                glJPanel.setOpaque(false); // So that the map shines through
-            }
-			return glJPanel;
-		} else {
+//		if (otfVisConfig.isMapOverlayMode()) {
+//            // A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
+//            // The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
+//            // We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
+//            GLJPanel glJPanel = new GLJPanel(caps);
+//            if (otfVisConfig.isMapOverlayMode()) {
+//                glJPanel.setOpaque(false); // So that the map shines through
+//            }
+//			caps.setBackgroundOpaque(false);
+//
+//			return glJPanel;
+//		} else {
 			// This is the default JOGL component. JOGL doc recommends using it if you do not need a GLJPanel.
-			return new GLCanvas(caps);
-		}
+		GLCanvas glCanvas = new GLCanvas(caps);
+//		glCanvas.set
+		return glCanvas;
+//		}
 	}
 
 	@Override
