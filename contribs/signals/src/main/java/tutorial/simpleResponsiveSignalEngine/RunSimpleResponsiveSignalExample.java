@@ -71,11 +71,17 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  */
 public class RunSimpleResponsiveSignalExample {
+	
+	private final Controler controler;
 
 	public static void main(String[] args) {
+		new RunSimpleResponsiveSignalExample().run();
+	}
+
+	public RunSimpleResponsiveSignalExample() {
 		final Config config = defineConfig();
 		final Scenario scenario = defineScenario(config);
-		final Controler controler = new Controler(scenario);
+		controler = new Controler(scenario);
 
 		// add the general signals module
 		controler.addOverridingModule(new SignalsModule());
@@ -88,8 +94,14 @@ public class RunSimpleResponsiveSignalExample {
 				addControlerListenerBinding().to(SimpleResponsiveSignal.class);
 			}
 		});
-		
+	}
+	
+	public void run(){
 		controler.run();
+	}
+
+	public Controler getControler() {
+		return controler;
 	}
 
 	private static Scenario defineScenario(Config config) {
@@ -245,8 +257,9 @@ public class RunSimpleResponsiveSignalExample {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("output/simpleResponsiveSignalEngineExample/");
 
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(40);
 		config.travelTimeCalculator().setMaxTime(3600 * 5);
+		config.qsim().setStartTime(0);
 		config.qsim().setEndTime(3600 * 5);
 		
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
