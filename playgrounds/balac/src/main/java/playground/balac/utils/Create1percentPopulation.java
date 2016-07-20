@@ -20,8 +20,8 @@ public class Create1percentPopulation {
 	public void run(String plansFilePath, String networkFilePath) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader populationReader = new PopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
-		networkReader.readFile(networkFilePath);
+		//MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
+		//networkReader.readFile(networkFilePath);
 	//	new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		populationReader.readFile(plansFilePath);
 				
@@ -34,15 +34,15 @@ public class Create1percentPopulation {
 				scenario.getPopulation().getPersons().remove(((Person)arr[i]).getId());
 				
 			}	
-			else {
+			//else {
 				
-				Person person = (Person)arr[i];
-				Plan plan = person.getSelectedPlan();
-				((Activity)plan.getPlanElements().get(0)).setStartTime(Time.UNDEFINED_TIME);
-			}
+			//	Person person = (Person)arr[i];
+			//	Plan plan = person.getSelectedPlan();
+			//	((Activity)plan.getPlanElements().get(0)).setStartTime(Time.UNDEFINED_TIME);
+			//}
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/InducedDemand/plans_1perc.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("C:/Users/balacm/Documents/MATSim/WorkspaceShaghai/MATSimTest/examples/siouxfalls-2014/plans_10perc.xml.gz");		
 		
 	}
 	
