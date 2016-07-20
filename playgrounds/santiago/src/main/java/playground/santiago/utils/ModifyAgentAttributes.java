@@ -24,15 +24,17 @@ public class ModifyAgentAttributes {
 
 	final static String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
 	final static String agentsWithCar  = svnWorkingDir + "inputForMATSim/plans/agentsWithCar.txt";
-	final static String sampledPlans = svnWorkingDir + "inputForMATSim/plans/randomized_sampled_plans.xml.gz";
-	final static String sampledAgentAttributes = svnWorkingDir + "inputForMATSim/plans/sampledAgentAttributes.xml";
+	final static String plansFile = svnWorkingDir + "inputForMATSim/plans/randomized_sampled_plans.xml.gz";
+//	final static String plansFile = svnWorkingDir + "inputForMATSim/plans/randomized_expanded_plans.xml.gz";
+	final static String agentAttributesFile = svnWorkingDir + "inputForMATSim/plans/sampledAgentAttributes.xml";
+//	final static String agentAttributesFile = svnWorkingDir + "inputForMATSim/plans/expandedAgentAttributes.xml";
 	
 	private final static Logger log = Logger.getLogger(ModifyAgentAttributes.class);
 	
 	public static void main(final String[] args) {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).readFile(sampledPlans);
+		new PopulationReader(scenario).readFile(plansFile);
 		Population population = scenario.getPopulation();
 		LinkedList<Person> persons = new LinkedList<>(population.getPersons().values());
 		
@@ -66,6 +68,9 @@ public class ModifyAgentAttributes {
 		log.error(new Exception(e));		
 		}
 		
+		//not necessary
+		Collections.sort(carUsers);
+		
 		ObjectAttributes oa = new ObjectAttributes();
 		
 		for(String id : carUsers){
@@ -82,7 +87,7 @@ public class ModifyAgentAttributes {
 			}
 		
 		
-		new ObjectAttributesXmlWriter(oa).writeFile(sampledAgentAttributes);
+		new ObjectAttributesXmlWriter(oa).writeFile(agentAttributesFile);
 		
 		
 		
