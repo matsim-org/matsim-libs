@@ -22,8 +22,10 @@
  */
 package playground.ikaddoura.decongestion;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -60,54 +62,36 @@ public class DecongestionPricingTest {
 	@Test
 	public final void test1() {
 		
-		final String configFile = testUtils.getPackageInputDirectory() + "bottleneck/configVTTS.xml";
+		System.out.println(testUtils.getPackageInputDirectory());
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "/config.xml";
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
-		String outputDirectory = outputBaseDirectory +
-				"total" + config.controler().getLastIteration() + "it" + 
-				"_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() +
-				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() +
-				"_timeMutation" + config.timeAllocationMutator().getMutationRange() +
-				"_" + decongestionSettings.getTOLLING_APPROACH();
-		
-		if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.NoPricing.toString())) {
-			// no relevant parameters
-		
-		} else {
-			
-			outputDirectory = outputDirectory
-					+ "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() + "_it"
-					+ "_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
-					+ "_start" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT()
-					+ "_end" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT();
-			
-			if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.BangBang.toString())) {			
-				outputDirectory = outputDirectory + 
-						"_init" + decongestionSettings.getINITIAL_TOLL() +
-						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
-			
-			} else if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.PID.toString())) {
-				outputDirectory = outputDirectory +
-						"_Kp" + decongestionSettings.getKp() +
-						"_Ki" + decongestionSettings.getKi() +
-						"_Kd" + decongestionSettings.getKd();
-			}
-		}
-			
-		log.info("Output directory: " + outputDirectory);
-		
-		config.controler().setOutputDirectory(outputDirectory + "/");
+		String outputDirectory = testUtils.getOutputDirectory() + "/";
+		config.controler().setOutputDirectory(outputDirectory);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 		final Decongestion decongestion = new Decongestion(info);
 		
 		final Controler controler = decongestion.getControler();
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         controler.run();   
 		
+        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 35 * 60 + 5., null, null);
+        double tt3 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 35 * 60 + 10., null, null);
+
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 2652.732890, tt1, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 3847.328125, tt2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 3847.328125, tt3, MatsimTestUtils.EPSILON);
 	}
 	
 }
