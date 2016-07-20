@@ -38,9 +38,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 	private final static Logger log = Logger.getLogger(NetworkFactory.class);
 
 	private LinkFactory linkFactory = null;
-	
-
-	private NetworkChangeEventFactory networkChangeEventFactory = new NetworkChangeEventFactoryImpl();
 
 	private final Network network;
 
@@ -61,23 +58,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 		return this.linkFactory.createLink(id, fromNode, toNode, 
 				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
 	}
-
-	/**
-	 * @param time the time when the NetworkChangeEvent occurs
-	 * @return a new NetworkChangeEvent
-	 *
-	 * @see #setNetworkChangeEventFactory(NetworkChangeEventFactory)
-	 */
-	@Override
-	public NetworkChangeEvent createNetworkChangeEvent(double time) {
-		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
-	}
 	@Override
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
-	}
-	@Override
-	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
-		this.networkChangeEventFactory = networkChangeEventFactory;
 	}
 }

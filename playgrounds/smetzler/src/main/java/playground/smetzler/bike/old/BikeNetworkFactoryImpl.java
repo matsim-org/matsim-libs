@@ -8,9 +8,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 
 public class BikeNetworkFactoryImpl implements NetworkFactory {
@@ -19,9 +16,6 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 
 	private LinkFactory linkFactory = null;
 	
-
-	private NetworkChangeEventFactory networkChangeEventFactory = new NetworkChangeEventFactoryImpl();
-
 	final Network network;
 
 	public BikeNetworkFactoryImpl(final Network network) {
@@ -50,44 +44,10 @@ public class BikeNetworkFactoryImpl implements NetworkFactory {
 			final double lanes) {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
-
-
-//	/**
-//	 * @param time the time when the NetworkChangeEvent occurs
-//	 * @return a new NetworkChangeEvent
-//	 *
-//	 * @see #setNetworkChangeEventFactory(NetworkChangeEventFactory)
-//	 */
-//	public NetworkChangeEvent createNetworkChangeEvent(double time) {
-//		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
-//	}
 	
 	@Override
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
 	}
-
-
-	@Override
-	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-
-	@Override
-	public NetworkChangeEvent createNetworkChangeEvent(double time) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-//	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
-//		this.networkChangeEventFactory = networkChangeEventFactory;
-//	}
-	
-//	public boolean isTimeVariant() {
-//		return (this.linkFactory instanceof TimeVariantLinkFactory);
-//	}
-
 
 }

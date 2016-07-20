@@ -51,8 +51,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
@@ -192,9 +190,8 @@ public class KNAccidentScenario {
 
 	private static void scheduleAccident(final Scenario scenario) {
 		List<NetworkChangeEvent> events = new ArrayList<>() ;
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(8*3600.) ;
+			NetworkChangeEvent event = new NetworkChangeEvent(8*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) ) ;
 			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 0.1 ) ;
 			event.setFlowCapacityChange(change);
@@ -203,7 +200,7 @@ public class KNAccidentScenario {
 			events.add(event) ;
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(9*3600.) ;
+			NetworkChangeEvent event = new NetworkChangeEvent(9*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) );
 			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 10. ) ;
 			event.setFlowCapacityChange(change);
