@@ -115,7 +115,7 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.INTERVALBASED;
 	public enum PricingType{
 		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
@@ -126,7 +126,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/pricingNewBraessCap/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/ICP/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -142,7 +142,7 @@ public final class RunBraessSimulation {
 		}
 		if (PRICING_TYPE.equals(PricingType.INTERVALBASED)) {
 			try {
-				MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), 1, "tolls");
+				MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), 1, "toll_perLinkAndTimeBin");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -172,7 +172,7 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize(300);
+		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
 
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -463,11 +463,11 @@ public final class RunBraessSimulation {
 		if (SIMULATION_PERIOD != 1){
 			runName += "_" + SIMULATION_PERIOD + "h";
 		}
-		runName += "_start" + (int)SIMULATION_START_TIME; 
+//		runName += "_start" + (int)SIMULATION_START_TIME; 
 		
 		switch(INIT_ROUTES_TYPE){
 		case ALL:
-			runName += "_ALL-sel1+3";
+			runName += "_ALL"; //"_ALL-sel1+3";
 			break;
 		case ONLY_OUTER:
 			runName += "_OUTER";
@@ -584,7 +584,11 @@ public final class RunBraessSimulation {
 		}
 		
 		if (!PRICING_TYPE.equals(PricingType.NONE)){
-			runName += "_" + PRICING_TYPE.toString();
+			if (PRICING_TYPE.equals(PricingType.INTERVALBASED)){
+				runName += "_INTERVAL_tbs" + config.travelTimeCalculator().getTraveltimeBinSize();
+			} else {
+				runName += "_" + PRICING_TYPE.toString();
+			}
 		}
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)

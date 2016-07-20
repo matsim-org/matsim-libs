@@ -31,18 +31,19 @@ public class DecongestionConfigGroup {
 //	private TollingApproach TOLLING_APPROACH = TollingApproach.NoPricing;
 
 	// BangBang approach
-	private TollingApproach TOLLING_APPROACH = TollingApproach.BangBang;
+//	private TollingApproach TOLLING_APPROACH = TollingApproach.BangBang;
 	private double INITIAL_TOLL = 10.0;
-	private double TOLL_ADJUSTMENT = 0.1; // default: 0.1
+	private double TOLL_ADJUSTMENT = 1.0; // default: 0.1
 
 	// PID approach
-//	private TollingApproach TOLLING_APPROACH = TollingApproach.PID;
+	private TollingApproach TOLLING_APPROACH = TollingApproach.PID;
 	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
-	private double Kp = 0.0;
+	private double Kp = 1.0;
 	private double Ki = 1.0;
 	private double Kd = 1.0;
 	
 	// General parameters
+	private boolean RUN_FINAL_ANALYSIS = true;
 	private int UPDATE_PRICE_INTERVAL = 1; // default: 1
 	private int WRITE_OUTPUT_ITERATION = 1; // default: 1
 	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // default: 1.0
@@ -161,6 +162,14 @@ public class DecongestionConfigGroup {
 				+ TOLERATED_AVERAGE_DELAY_SEC + ", FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT="
 				+ FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT + ", FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT="
 				+ FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT + "]";
+	}
+
+	public boolean isRUN_FINAL_ANALYSIS() {
+		return RUN_FINAL_ANALYSIS;
+	}
+
+	public void setRUN_FINAL_ANALYSIS(boolean rUN_FINAL_ANALYSIS) {
+		RUN_FINAL_ANALYSIS = rUN_FINAL_ANALYSIS;
 	}
 			
 }

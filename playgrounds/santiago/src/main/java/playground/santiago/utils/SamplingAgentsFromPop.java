@@ -93,6 +93,7 @@ public class SamplingAgentsFromPop {
 		PlansConfigGroup plans = config.plans();
 		plans.setInputPersonAttributeFile(runsSampledDir + "input/agentAttributes.xml" );
 		plans.setInputFile( runsSampledDir + "input/randomized_sampled_plans.xml.gz" );
+		plans.setInputPersonAttributeFile( runsSampledDir + "input/sampledAgentAttributes.xml");
 		
 		TransitConfigGroup transit = config.transit();
 		transit.setTransitScheduleFile(runsSampledDir + "input/transitschedule_simplified.xml" );

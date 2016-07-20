@@ -22,7 +22,7 @@ public class RunPrismicTripChoiceSetConversionTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Test @Ignore( "see MATSIM-558" )
 	public void runTest() {
 		final PrismicConversionConfigGroup group = new PrismicConversionConfigGroup();
 		final Config config =
