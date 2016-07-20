@@ -16,35 +16,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings.run;
+package playground.polettif.crossings.lib;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
-/**
- * Runs a small scenario with a given config
- */
-public class RunSmallScenario {
-
-	public static void main(String[] args) {
-		String base = "";
-		String scenarioName = "small";
-
-		String inputBase = base + "input/" + scenarioName + "/";
-
-		// run 1 iteration of scenario
-		Config config = ConfigUtils.loadConfig(inputBase+"config.xml");
-		config.controler().setOutputDirectory(base+"output/"+scenarioName+"/");
-		config.network().setInputFile(inputBase+"network.xml");
-		config.plans().setInputFile(inputBase+"population.xml");
-		config.network().setChangeEventsInputFile(inputBase + "networkChangeEvents.xml");
-//		config.network().setTimeVariantNetwork(true);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		controler.run();
+public class LinkChangeEventImpl implements LinkChangeEvent {
+	
+	private Id<Link> linkId;
+	private String starttime;
+	private String stoptime;
+	private String capacity;
+     
+	public LinkChangeEventImpl(Id<Link> linkId, String starttime, String stoptime, String capacity) {
+		this.linkId = linkId;
+		this.starttime = starttime;
+		this.stoptime = stoptime;
+		this.capacity = capacity;
+	}
+	
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+	
+	public String getStarttime() {
+		return starttime;
+	}
+	
+	public String getStoptime() {
+		return stoptime;
+	}
+	
+	public String getCapacity() {
+		return capacity;
 	}
 }

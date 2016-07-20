@@ -16,35 +16,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings.run;
+package playground.polettif.crossings.lib;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
- * Runs a small scenario with a given config
+ * A change event for a link, is used to create network
+ * change events.
+ *
+ * @author polettif
  */
-public class RunSmallScenario {
+public interface LinkChangeEvent {
 
-	public static void main(String[] args) {
-		String base = "";
-		String scenarioName = "small";
+	Id<Link> getLinkId();
 
-		String inputBase = base + "input/" + scenarioName + "/";
+	String getStarttime();
 
-		// run 1 iteration of scenario
-		Config config = ConfigUtils.loadConfig(inputBase+"config.xml");
-		config.controler().setOutputDirectory(base+"output/"+scenarioName+"/");
-		config.network().setInputFile(inputBase+"network.xml");
-		config.plans().setInputFile(inputBase+"population.xml");
-		config.network().setChangeEventsInputFile(inputBase + "networkChangeEvents.xml");
-//		config.network().setTimeVariantNetwork(true);
+	String getStoptime();
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		controler.run();
-	}
+	String getCapacity();
 }

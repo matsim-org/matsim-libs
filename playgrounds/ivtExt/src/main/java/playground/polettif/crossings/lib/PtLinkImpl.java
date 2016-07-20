@@ -16,38 +16,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings;
+package playground.polettif.crossings.lib;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class LinkChangeEvent {
-	
-	private Id<Link> linkId;
-	private String starttime;
-	private String stoptime;
-	private String capacity;
-     
-	public LinkChangeEvent(Id<Link> linkId, String starttime, String stoptime, String capacity) {
-		this.linkId = linkId;
-		this.starttime = starttime;
-		this.stoptime = stoptime;
-		this.capacity = capacity;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Public transport link with referenced Crossings on it
+ *
+ * @author polettif
+ */
+public class PtLinkImpl implements PtLink {
+
+	private Id<Link> ptId;
+	private Set<Crossing> crossings = new HashSet<>();
+
+	public PtLinkImpl(String ptId) {
+		this.ptId = Id.createLinkId(ptId);
 	}
-	
+
+	public void addCrossing(Crossing crossing) {
+		this.crossings.add(crossing);
+	}
+
 	public Id<Link> getLinkId() {
-		return linkId;
+		return ptId;
 	}
-	
-	public String getStarttime() {
-		return starttime;
+
+	public Set<Crossing> getCrossings() {
+		return crossings;
 	}
-	
-	public String getStoptime() {
-		return stoptime;
-	}
-	
-	public String getCapacity() {
-		return capacity;
-	}
+
 }

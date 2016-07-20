@@ -16,25 +16,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings.parser;
+package playground.polettif.crossings.lib;
 
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class Crossing {
+/**
+ * A crossing is referenced to a road link and has
+ * a coordinate.
+ *
+ * @author polettif
+ */
+public class CrossingImpl implements Crossing {
 
 	private Id<Link> refLinkId = null;
 	private Coord coord = null;
 
-	public Crossing(Id<Link> refLinkId) {
+	public CrossingImpl(Id<Link> refLinkId) {
 		this.refLinkId = refLinkId;
 	}
-	public Crossing(Coord coord) {
+
+	public CrossingImpl(Coord coord) {
 		this.coord = coord;
 	}
-	public Crossing(double x, double y) {
+
+	public CrossingImpl(double x, double y) {
 		this.coord = new Coord(x, y);
 	}
 

@@ -16,35 +16,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings.run;
+package playground.polettif.crossings.lib;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import playground.polettif.crossings.lib.Crossing;
+
+import java.util.Set;
 
 /**
- * Runs a small scenario with a given config
+ * Public transport link with referenced Crossings on it
+ *
+ * @author polettif
  */
-public class RunSmallScenario {
+public interface PtLink {
 
-	public static void main(String[] args) {
-		String base = "";
-		String scenarioName = "small";
+	void addCrossing(Crossing crossing);
 
-		String inputBase = base + "input/" + scenarioName + "/";
+	Id<Link> getLinkId();
 
-		// run 1 iteration of scenario
-		Config config = ConfigUtils.loadConfig(inputBase+"config.xml");
-		config.controler().setOutputDirectory(base+"output/"+scenarioName+"/");
-		config.network().setInputFile(inputBase+"network.xml");
-		config.plans().setInputFile(inputBase+"population.xml");
-		config.network().setChangeEventsInputFile(inputBase + "networkChangeEvents.xml");
-//		config.network().setTimeVariantNetwork(true);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		controler.run();
-	}
+	Set<Crossing> getCrossings();
 }

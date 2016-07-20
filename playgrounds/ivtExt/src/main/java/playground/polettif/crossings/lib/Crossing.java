@@ -16,36 +16,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings.parser;
+package playground.polettif.crossings.lib;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Public transport link with referenced Crossings on it
+ * A crossing is referenced to a road link and has
+ * a coordinate.
+ *
+ * @author polettif
  */
-public class RailLink {
+public interface Crossing {
 
-	private Id<Link> ptId;
-	private Set<Crossing> crossings = new HashSet<>();
+	void setRefLinkId(Id<Link> refLinkId);
 
-	public RailLink(String ptId) {
-		this.ptId = Id.createLinkId(ptId);
-	}
+	Id<Link> getRefLinkId();
 
-	public void addCrossing(Crossing crossing) {
-		this.crossings.add(crossing);
-	}
-
-	public Id<Link> getId() {
-		return ptId;
-	}
-
-	public Set<Crossing> getCrossings() {
-		return crossings;
-	}
-
+	Coord getCoord();
 }

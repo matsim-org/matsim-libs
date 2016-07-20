@@ -28,13 +28,12 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.misc.Time;
-import playground.polettif.crossings.parser.Crossing;
-import playground.polettif.crossings.parser.CrossingsParser;
-import playground.polettif.crossings.parser.RailLink;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.crossings.lib.Crossing;
+import playground.polettif.crossings.lib.LinkChangeEvent;
+import playground.polettif.crossings.lib.LinkChangeEventImpl;
+import playground.polettif.crossings.lib.PtLink;
 
 import java.util.*;
-
 
 /**
  * Handles when a train enters a rail link and stores the
@@ -42,9 +41,9 @@ import java.util.*;
  *
  * @author polettif
  */
-public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+public class CrossingEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
-	private static final Logger log = Logger.getLogger(CrossingsParser.class);
+	private static final Logger log = Logger.getLogger(CrossingsFileParser.class);
 	
 	private double preBuffer = 80;
 	private double postBuffer = 40;
@@ -53,22 +52,21 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	private Network network;
 
 	private Map<List<Object>, Double> enterEvents = new HashMap<>();
-	private Map<Id<Link>, RailLink> RailLinks;
+	private Map<Id<Link>, PtLink> ptLinks;
 
 	public void reset(int iteration) {
 		System.out.println("reset...");
 	}
 
 	public void loadCrossings(String filename) {
-		// from ScenarioLoaderImpl
-		CrossingsParser parser = new CrossingsParser();
+		CrossingsFileParser parser = new CrossingsFileParser();
 		parser.parse(filename);
-		this.RailLinks = parser.getRailLinks();
+		this.ptLinks = parser.getPtLinks();
 		}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {	
-		if(RailLinks.keySet().contains(event.getLinkId())) {
+		if(ptLinks.keySet().contains(event.getLinkId())) {
 			List<Object> key = new ArrayList<>();
 			key.add(event.getVehicleId());
 			key.add(event.getLinkId());
@@ -80,7 +78,7 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(RailLinks.containsKey(event.getLinkId())) {
+		if(ptLinks.containsKey(event.getLinkId())) {
 			
 			// get corresponding enterEvent
 			List<Object> key = new ArrayList<>();
@@ -95,25 +93,23 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 			// todo combine change events with the same time
 			Id<Link> railId = event.getLinkId();
 			
-			RailLink RailLink = RailLinks.get(railId);
+			PtLink railLink = ptLinks.get(railId);
 
 			int id=0;
-			for(Crossing crossing : RailLink.getCrossings()) {
+			for(Crossing crossing : railLink.getCrossings()) {
 				Id<Link> crossId = crossing.getRefLinkId();
 
 				// calculate time(coordinates of crossing, coordinates of fromNode, train speed, linkEnterTime)
 				// -> time(distance, train speed, linkEnterTime
 				double timeOfCrossing = enterTime+getTimeToCrossing(railId, crossId, linkTravelTime);
-				
 
 				String starttime = Time.writeTime(timeOfCrossing-preBuffer, "HH:mm:ss");
 				String stoptime = Time.writeTime(timeOfCrossing+postBuffer, "HH:mm:ss");
 				String capacity = Double.toString( network.getLinks().get(crossId).getCapacity() );
 				
-				LinkChangeEvent tmpChangeEvent = new LinkChangeEvent(crossId, starttime, stoptime, capacity);
+				LinkChangeEvent tmpChangeEvent = new LinkChangeEventImpl(crossId, starttime, stoptime, capacity);
 								
 				linkChangeEvents.add(tmpChangeEvent);
-
 				}
 			}
 	}

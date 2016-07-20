@@ -29,7 +29,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RunLinkTravelTimeAnalysis {
+/**
+ * Analyses link travel times and volumes.
+ *
+ * @author polettif
+ */
+public class RunLinkAnalysis {
 	
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 

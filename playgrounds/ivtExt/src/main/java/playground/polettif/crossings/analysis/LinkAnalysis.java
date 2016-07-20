@@ -38,7 +38,11 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
-
+/**
+ * Analyses enter and leave events on links
+ *
+ * @author polettif
+ */
 public class LinkAnalysis {
 	
 	private static final Logger log = Logger.getLogger(LinkAnalysis.class);
@@ -188,7 +192,7 @@ public class LinkAnalysis {
 			csvLines.put(entry.getKey(), line);
 		}
 
-		return new LinkedList<String>(csvLines.values());
+		return new LinkedList<>(csvLines.values());
 	}
 
 }

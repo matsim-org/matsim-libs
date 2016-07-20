@@ -19,24 +19,38 @@
 package playground.polettif.crossings;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
-import playground.polettif.crossings.parser.CrossingsParser;
+import playground.polettif.crossings.lib.LinkChangeEvent;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Creates a timetable (network change events file) with a given
+ * network, crossings and events file.
+ *
+ * @author polettif
+ */
 public class CreateCrossingsTimetable {
 
-	private static final Logger log = Logger.getLogger(CrossingsParser.class);
+	private static final Logger log = Logger.getLogger(CrossingsFileParser.class);
 
+	/**
+	 * Creates a timetable (network change events file)
+	 * @param args [0] inputNetworkFile<br/>
+	 *             [1] inputCrossingsFile<br/>
+	 *             [2] inputEventsFile<br/>
+	 *             [3] outputNetworkChangeEventsFile<br/>
+	 *             [4] preBuffer<br/>
+	 *             [5] postBuffer<br/>
+	 */
 	public static void main(String[] args) {
 		double preBuffer = Double.parseDouble(args[4]);
 		double postBuffer = Double.parseDouble(args[5]);
@@ -48,18 +62,15 @@ public class CreateCrossingsTimetable {
 			String inputEventsFile, String outputNetworkChangeEventsFile, double preBuffer, double postBuffer) {
 		
 		// generate basic Config
-		Config config = ConfigUtils.createConfig();
-		config.setParam("network", "inputNetworkFile", inputNetworkFile);
-		
-		// load scenario
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile(inputNetworkFile);
 
 		//create an event object
 		EventsManager eventsManager = EventsUtils.createEventsManager();
         			
 		//create the handler and add it
-		CrossingsHandler handler = new CrossingsHandler();
-		handler.setNetwork(scenario.getNetwork());
+		CrossingEventHandler handler = new CrossingEventHandler();
+		handler.setNetwork(network);
 		handler.setBuffer(preBuffer, postBuffer);
 		handler.loadCrossings(inputCrossingsFile);
 		eventsManager.addHandler(handler);
@@ -67,14 +78,15 @@ public class CreateCrossingsTimetable {
 		//create the reader and read the file
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 		reader.readFile(inputEventsFile);
-		
 		List<LinkChangeEvent> linkChangeEvents = handler.getLinkChangeEvents();
-		
-		
+
 		// write networkChangeEvents file
 		WriteNetworkChangeEvents(linkChangeEvents, outputNetworkChangeEventsFile);
 	}
 
+	/**
+	 * Writes the network change events file with a given list of link change events
+	 */
 	private static void WriteNetworkChangeEvents(List<LinkChangeEvent> linkChangeEvents, String filepath) {
 			
 		final BufferedWriter out = IOUtils.getBufferedWriter(filepath);

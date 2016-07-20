@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings.parser;
+package playground.polettif.crossings;
 
 import java.net.URL;
 import java.util.*;
@@ -27,23 +27,30 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
+import playground.polettif.crossings.lib.CrossingImpl;
+import playground.polettif.crossings.lib.PtLink;
+import playground.polettif.crossings.lib.PtLinkImpl;
 
-
-public class CrossingsParser extends MatsimXmlParser {
+/**
+ * Used to parse a crossings file.
+ */
+public class CrossingsFileParser extends MatsimXmlParser {
 	
 	// ========================================================================
 	// static fields
 	// ========================================================================
 	
-	private static final Logger log = Logger.getLogger(CrossingsParser.class);
+	private static final Logger log = Logger.getLogger(CrossingsFileParser.class);
 	
 	static final String CROSSINGS_TAG = "crossings";
 	
-	static final String PTLINK_TAG = "railwayLink";
+	static final String PTLINK_TAG = "ptLink";
 	static final String PTLINK_KEY_ID = "id";
 	
 	static final String CROSSING_TAG = "crossing";
 	static final String CROSSING_KEY_REFID = "refId";
+
+	// todo coordinates are currently not used
 	static final String CROSSING_KEY_X = "x";
 	static final String CROSSING_KEY_Y = "y";
 
@@ -52,15 +59,15 @@ public class CrossingsParser extends MatsimXmlParser {
 	// private members
 	// ========================================================================
 
-	private RailLink currentRailLink;
+	private PtLink currentRailLink;
 	
-	private Map<Id<Link>, RailLink> railwayLinks;
+	private Map<Id<Link>, PtLink> railwayLinks;
 
 	// ========================================================================
 	// constructor
 	// ========================================================================
 
-	public CrossingsParser() {
+	public CrossingsFileParser() {
 	
 	}
 	
@@ -70,12 +77,12 @@ public class CrossingsParser extends MatsimXmlParser {
 	
 	/**
 	 * Parses a file with crossings and returns a list with
-	 * instances of {@link RailLink}.
+	 * instances of {@link PtLink}.
 	 *
 	 * @param file
 	 *            a xml file containing network change events.
 	 */
-	public Map<Id<Link>, RailLink> parseCrossings(String file) {
+	public Map<Id<Link>, PtLink> parseCrossings(String file) {
 		railwayLinks = new HashMap<>();
 		super.parse(file);
 		return railwayLinks;
@@ -110,7 +117,7 @@ public class CrossingsParser extends MatsimXmlParser {
 	 *         {@link #parse(String)}, {@link #parse(String)} nor
 	 *         {@link #parse(URL)} has been called before.
 	 */
-	public Map<Id<Link>, RailLink> getRailLinks() {
+	public Map<Id<Link>, PtLink> getPtLinks() {
 		return railwayLinks;
 	}
 	
@@ -121,7 +128,7 @@ public class CrossingsParser extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equalsIgnoreCase(PTLINK_TAG)) {
-			railwayLinks.put(currentRailLink.getId(), currentRailLink);
+			railwayLinks.put(currentRailLink.getLinkId(), currentRailLink);
 			currentRailLink = null;
 		}
 	}
@@ -133,7 +140,7 @@ public class CrossingsParser extends MatsimXmlParser {
 		 */
 		if(name.equalsIgnoreCase(PTLINK_TAG)) {
 			String value = atts.getValue(PTLINK_KEY_ID);
-			currentRailLink = new RailLink(value);
+			currentRailLink = new PtLinkImpl(value);
 		/*
 		 * crossingLinks
 		 */
@@ -142,10 +149,10 @@ public class CrossingsParser extends MatsimXmlParser {
 			String x = atts.getValue(CROSSING_KEY_X);
 			String y = atts.getValue(CROSSING_KEY_Y);
 			if(refId != null) {
-				currentRailLink.addCrossing(new Crossing(Id.createLinkId(refId)));
+				currentRailLink.addCrossing(new CrossingImpl(Id.createLinkId(refId)));
 				}
 			if(x != null && y != null) {
-				currentRailLink.addCrossing(new Crossing(Double.parseDouble(x), Double.parseDouble(y)));
+				currentRailLink.addCrossing(new CrossingImpl(Double.parseDouble(x), Double.parseDouble(y)));
 			}
 		}
 		
