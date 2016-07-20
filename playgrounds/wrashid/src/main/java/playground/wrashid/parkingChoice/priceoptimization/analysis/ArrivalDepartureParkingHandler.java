@@ -20,7 +20,8 @@ public class ArrivalDepartureParkingHandler implements ParkingArrivalEventHandle
 	private Map<Id<PC2Parking>, Double> departuresTimeMap = new HashMap<Id<PC2Parking>, Double>();
 	private Map<Id<PC2Parking>, Integer> departuresCountMap = new HashMap<Id<PC2Parking>, Integer>();
 	private HashMap<Id<PC2Parking>, Double> rentableDur = new HashMap<Id<PC2Parking>, Double>();
-	
+	private HashMap<Id<PC2Parking>, double[]> rentableDurPerHour = new HashMap<Id<PC2Parking>, double[]>();
+
 	private Map<Id<PC2Parking>, Integer> arrDepBeforePeakCountMap = new HashMap<Id<PC2Parking>, Integer>();
 	private Map<Id<PC2Parking>, Double> arrivalsPeakTimeMap = new HashMap<Id<PC2Parking>, Double>();
 	private Map<Id<PC2Parking>, Double> departuresPeakTimeMap = new HashMap<Id<PC2Parking>, Double>();
@@ -48,6 +49,21 @@ public class ArrivalDepartureParkingHandler implements ParkingArrivalEventHandle
 		if (event.getTime() < 24 * 60 * 60) {
 
 			Id<PC2Parking> parkingId = event.getParkingId(event.getAttributes());
+			
+			int startIndex = (int)(event.getTime() / 3600.0);
+			
+			double[] durations = this.rentableDurPerHour.get(parkingId);
+			
+			durations[startIndex] -= ((startIndex + 1) * 3600 - event.getTime());
+			
+			for (int i = startIndex + 1; i < 24; i++) {
+				
+				durations[i] -= 3600.0;
+			}
+			this.rentableDurPerHour.put(parkingId, durations);
+			
+			
+			
 			if (event.getTime() < this.startMorning) {
 				this.arrDepBeforePeakCountMap.put(parkingId, this.arrDepBeforePeakCountMap.get(parkingId) - 1);
 				ids.add(parkingId);
@@ -84,6 +100,39 @@ public class ArrivalDepartureParkingHandler implements ParkingArrivalEventHandle
 	public void handleEvent(ParkingArrivalEvent event) {
 		if (event.getTime() < 24 * 60 * 60) {
 			Id<PC2Parking> parkingId = event.getParkingId(event.getAttributes());
+			
+			if (this.rentableDurPerHour.containsKey(parkingId)) {
+				
+				int startIndex = (int)(event.getTime() / 3600.0);
+				
+				double[] durations = this.rentableDurPerHour.get(parkingId);
+				
+				durations[startIndex] += (startIndex + 1) * 3600 - event.getTime();
+				
+				for (int i = startIndex + 1; i < 24; i++) {
+					
+					durations[i] += 3600.0;
+				}
+				this.rentableDurPerHour.put(parkingId, durations);
+			}
+			else {
+				int startIndex = (int)(event.getTime() / 3600.0);
+
+				double[] durations = new double[24];
+				
+				durations[startIndex] += (startIndex + 1) * 3600 - event.getTime();
+				
+				for (int i = startIndex + 1; i < 24; i++) {
+					
+					durations[i] += 3600.0;
+				}
+				this.rentableDurPerHour.put(parkingId, durations);
+
+			}
+			
+			
+			
+			
 			if (this.arrDepBeforePeakCountMap.containsKey(parkingId)
 					&& event.getTime() < this.startMorning) {
 				
@@ -157,5 +206,9 @@ public class ArrivalDepartureParkingHandler implements ParkingArrivalEventHandle
 		return rentableDur;
 	}
 	
+	public HashMap<Id<PC2Parking>, double[]> getRentableDurPerHour() {
+		
+		return this.rentableDurPerHour;
+	}
 
 }
