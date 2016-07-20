@@ -56,49 +56,52 @@ import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 import playground.santiago.SantiagoScenarioConstants;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-/**
- * @author benjamin
- *
- */
-public class SantiagoScenarioRunnerFirstBest {
-	private static String inputPath = "../../../runs-svn/santiago/cluster_2/input/";
-//	private static String inputPath = "net/ils4/lcamus/runs-svn/santiago/cluster_2/input/";
-	private static boolean doModeChoice = true;
-//	private static boolean mapActs2Links = true;
-	private static boolean mapActs2Links = false;	
-	
-//	private static boolean pricing = true; 
-		
+
+public class SantiagoScenarioRunnerTry {
+
+	private static boolean doModeChoice = true;	
+	private static boolean mapActs2Links = false;
+	private static boolean pricingFirstBest = false;
+	private static boolean pricingCordon = false;	
+	//TODO: ADD HERE OTHER POLICIES SO TO RUN ALL THE CASES WITH THE SAME RUNNER.
+//	private static boolean someOtherPolicy = false;
+
+	private static String caseName = "01FIRSTBEST";
+	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/input/";
 	private static String configFile;
+	
+	private static double sigma = 3.0;
 	
 	public static void main(String args[]){
 
+
+
 		if(args.length==0){
-			configFile = inputPath + "new-input/randomized_config_final.xml";
-//			configFile = inputPath + "config_triangleCordon.xml";
-		} else {
+			
+			configFile = inputPath + "randomized_sampled_config.xml";
+
+		} else { /*FOR CLUSTER*/
+			
 			configFile = args[0];
-			mapActs2Links = Boolean.parseBoolean(args[1]);
+			doModeChoice = Boolean.parseBoolean(args[1]);
+			mapActs2Links = Boolean.parseBoolean(args[2]);
+			pricingFirstBest = Boolean.parseBoolean(args[3]);
+			pricingCordon = Boolean.parseBoolean(args[4]);
+			
 
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile);
-//		config.controler().setOutputDirectory(outputDirectory);
-//		config.qsim().setNumberOfThreads(1);
-//		config.parallelEventHandling().setNumberOfThreads(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		Controler controler = new Controler(scenario);
 		
-		// adding other network modes than car requires some router; here, the same values as for car are used
 		setNetworkModeRouting(controler);
 		
 		// adding pt fare
@@ -114,24 +117,29 @@ public class SantiagoScenarioRunnerFirstBest {
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
 	
-
-        TollHandler tollHandler = new TollHandler(scenario);
-
-        EventHandler congestionHandler = new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario());
-
-        controler.addControlerListener(
-                new MarginalCongestionPricingContolerListener(controler.getScenario(),
-                        tollHandler, congestionHandler));
-		
-		
-		
+		if (pricingFirstBest){
+			
+			TollHandler tollHandler = new TollHandler(scenario);
+			EventHandler congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario());
+			controler.addControlerListener(
+					new MarginalCongestionPricingContolerListener(controler.getScenario(),
+							tollHandler, congestionHandler));
 		
 
+		}
 		
+		if (pricingCordon){
+			
+			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+			rpcg.setTollLinksFile(inputPath + "outerCordon.xml");
+			config.plansCalcRoute().setRoutingRandomness(sigma); 
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 
 
+		}
 		
-		controler.run();
+		controler.run();		
+		
 	}
 
 	private static void mapActivities2properLinks(Scenario scenario) {
