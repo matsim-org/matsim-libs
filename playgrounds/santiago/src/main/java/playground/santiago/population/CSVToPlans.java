@@ -20,7 +20,9 @@
 package playground.santiago.population;
 
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -67,7 +69,7 @@ public class CSVToPlans {
 
 	private Scenario scenario;
 	private ObjectAttributes agentAttributes;
-	
+	private LinkedList<String> agentsWithCar;
 	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
 	
 	private Map<String,Persona> personas = new HashMap<>();
@@ -315,10 +317,13 @@ public class CSVToPlans {
 		Population population = this.scenario.getPopulation();
 		PopulationFactory popFactory = (PopulationFactory) population.getFactory();
 		this.agentAttributes = new ObjectAttributes();
-		
+		this.agentsWithCar = new LinkedList<>(); 
+
 		for(Persona persona : this.personas.values()){
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
 			if(persona.hasCar() && persona.hasDrivingLicence()){
+				String id = persona.getId();
+				agentsWithCar.add(id);
 				agentAttributes.putAttribute(person.getId().toString(), carUsers, carAvail);
 				carAvailCounter++;
 			}
@@ -499,6 +504,21 @@ public class CSVToPlans {
 //		createDir(new File(this.outputDirectory));
 		new ObjectAttributesXmlWriter(agentAttributes).writeFile(this.outputDirectory + "agentAttributes.xml");
 		new PopulationWriter(this.scenario.getPopulation()).write(this.outputDirectory + "plans_eod.xml.gz");
+		
+		
+		try {
+			
+			PrintWriter pw = new PrintWriter (new FileWriter ( this.outputDirectory + "agentsWithCar.txt" ));
+			for (String agent : agentsWithCar) {
+				pw.println(agent);
+
+			}
+			
+			pw.close();
+		} catch (IOException e) {
+			log.error(new Exception(e));
+		}
+		
 	}
 	
 	private String getActType(int index){
