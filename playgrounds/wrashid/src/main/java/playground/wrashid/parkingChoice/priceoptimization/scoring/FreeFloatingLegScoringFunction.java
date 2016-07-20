@@ -6,29 +6,25 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
-	private PlanImpl plan;
+	private Plan plan;
 	
 	private Config config;
 	private ArrayList<Stats> freefloatingRentals = new ArrayList<Stats>();
 
-	public FreeFloatingLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
+	public FreeFloatingLegScoringFunction(Plan plan, CharyparNagelScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
 		this.plan = plan;		
 		this.config = config;
 	}
-	@Override
-	public void reset() {
-		super.reset();
-		
-	}
+	
 	
 	@Override
 	public void finish() {		

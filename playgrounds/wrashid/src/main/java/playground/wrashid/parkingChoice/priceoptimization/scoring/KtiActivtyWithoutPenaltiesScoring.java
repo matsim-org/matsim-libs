@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -47,7 +46,7 @@ import java.util.*;
  * There's lots of quick copy-paste here!
  * @author thibautd
  */
-public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, ScoringFunctionAccumulator.ActivityScoring {
+public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring {
 	private static final Logger logger = Logger.getLogger(KtiActivtyWithoutPenaltiesScoring.class);
 
 	// lock at reset or getScore, to avoid strange hard-to detect bugs
@@ -106,7 +105,6 @@ public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, Scori
 	}
 
 	private Activity activityWithoutStart = null;
-	@Override
 	public void endActivity(double time, Activity act) {
 		lock.checkLock();
 		assert time == act.getEndTime();
@@ -124,7 +122,6 @@ public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, Scori
 		}
 	}
 
-	@Override
 	public void startActivity(double time, Activity act) {
 		lock.checkLock();
 
@@ -401,10 +398,7 @@ public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, Scori
 		return score;
 	}
 
-	@Override
-	public void reset() {
-		lock.lock();
-	}
+	
 }
 
 class Lock {
