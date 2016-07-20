@@ -19,7 +19,9 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -48,12 +50,11 @@ public class ASCFromModalSplitCalibrator implements StartupListener, IterationSt
 
 	private static final Logger LOG = Logger.getLogger(ASCFromModalSplitCalibrator.class);
 	
-	private SortedMap<String, Double> initialMode2share ; // if empty, take from it.0
+	private final SortedMap<String, Double> initialMode2share = new TreeMap<>(); // if empty, take from it.0
 	private SortedMap<String, Double> previousASC ; // all zeros
 	
-	// following is scenario specific (using for Patna)
-	private final List<String> externalModes = Arrays.asList("car_ext","bike_ext","motorbike_ext","truck_ext");
-
+	private final List<String> availableModes = new ArrayList<>(); //AA_TODO : if multiple mode choice modules are used, this will only work with default. 
+	
 	@Inject ModalShareEventHandler modalShareEventHandler;
 	@Inject Scenario scenario;
 
@@ -61,69 +62,89 @@ public class ASCFromModalSplitCalibrator implements StartupListener, IterationSt
 	private int innovationStop ;
 
 	public ASCFromModalSplitCalibrator(final SortedMap<String, Double> mode2share, final int updateASCIterations){
-		this.initialMode2share = mode2share;
+		this.initialMode2share.clear(); 
+		this.initialMode2share.putAll( mode2share );
 		this.updateASCAfterIts = updateASCIterations;
+		this.availableModes.clear();
+		this.availableModes.addAll(this.initialMode2share.keySet());
 		initializeInitialASC();
 	}
 
 	public ASCFromModalSplitCalibrator(final int updateASCIterations){
-		this.initialMode2share = new TreeMap<>();
-		this.updateASCAfterIts = updateASCIterations;
+		this(new TreeMap<>(),updateASCIterations);
 	}
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Config config =event.getServices().getScenario().getConfig();
 		this.innovationStop = (int) ( ( config.controler().getLastIteration() - config.controler().getFirstIteration() ) 
-				/ config.strategy().getFractionOfIterationsToDisableInnovation() ); 
+				* config.strategy().getFractionOfIterationsToDisableInnovation() );
+		
+		if(this.availableModes.isEmpty()){ // dont override the modes from input share.
+			this.availableModes.addAll( Arrays.asList(config.changeMode().getModes()) );	
+		}
 	}
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int itr = event.getIteration();
 		
-		if( this.initialMode2share.isEmpty() && itr==0 ) { // store initial modal split if not provided
-			
-			SortedMap<String, Integer> mode2legs = modalShareEventHandler.getMode2numberOflegs();
-			
-			// following is Patna specific only, I dont want to get share for external modes.
-			mode2legs.keySet().removeAll(externalModes);
-			this.initialMode2share = MapUtils.getIntPercentShare(mode2legs);
-			
-			initializeInitialASC();
-			
-			event.getServices().getEvents().removeHandler(modalShareEventHandler);
-			
-		} else if( itr%updateASCAfterIts==0 && itr <= innovationStop ) { //AA_TODO: not sure if update it during innovation stop 
-			
-			SortedMap<String, Integer> mode2legs = modalShareEventHandler.getMode2numberOflegs();
-			mode2legs.keySet().removeAll(externalModes);
-			SortedMap<String, Double> mode2shre = MapUtils.getIntPercentShare(mode2legs);
-
-			// update ascs
-			updateASC(mode2shre);
-			
-			// update in scenario
-			for (String mode : this.previousASC.keySet()) {
-				event.getServices().getScenario().getConfig().planCalcScore().getOrCreateModeParams(mode).setConstant(this.previousASC.get(mode));
+		if(itr==0){
+			if(this.initialMode2share.isEmpty()){
+				SortedMap<String, Integer> mode2legs = modalShareEventHandler.getMode2numberOflegs();
+				updateModes(mode2legs);// this is required if, at least one sub-population exists without mode choice and different modes
+				this.initialMode2share.clear();
+				this.initialMode2share.putAll(MapUtils.getIntPercentShare(mode2legs));
+				
+				initializeInitialASC();
+				
+				event.getServices().getEvents().removeHandler(modalShareEventHandler);
 			}
-			
-			event.getServices().getEvents().removeHandler(modalShareEventHandler);
+		} else {
+			if( itr%updateASCAfterIts==0 && itr <= innovationStop ) { //AA_TODO: not sure if update it during innovation stop 
+				
+				SortedMap<String, Integer> mode2legs = modalShareEventHandler.getMode2numberOflegs();
+				updateModes(mode2legs); // this is required if, at least one sub-population exists without mode choice and different modes
+				
+				SortedMap<String, Double> mode2shre = MapUtils.getIntPercentShare(mode2legs);
+
+				// update ascs
+				updateASC(mode2shre);
+				
+				// update in scenario
+				for (String mode : this.previousASC.keySet()) {
+					event.getServices().getScenario().getConfig().planCalcScore().getOrCreateModeParams(mode).setConstant(this.previousASC.get(mode));
+				}
+				event.getServices().getEvents().removeHandler(modalShareEventHandler);
+			}
 		}
-		event.getServices().getEvents().removeHandler(modalShareEventHandler);
 	}
 
+	// asc update is required only for modes which are available for mode choice
+	private void updateModes( SortedMap<String,Integer> mode2legs){
+		Iterator<Entry<String,Integer>> it = mode2legs.entrySet().iterator();
+		while(it.hasNext()){
+			Entry<String,Integer> e = it.next();
+			if (! this.availableModes.contains(e.getKey()) ) it.remove(); 
+		}
+	}
+	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int itr = event.getIteration();
-		if( this.initialMode2share.isEmpty() && itr==0 ) { // store initial modal split it not provided
-			event.getServices().getEvents().addHandler(modalShareEventHandler);
-		} else if(itr%updateASCAfterIts==0 && itr <= innovationStop ) {
-			event.getServices().getEvents().addHandler(modalShareEventHandler);
+		if(itr==0){
+			if(this.initialMode2share.isEmpty()) {// store initial modal split it not provided
+				event.getServices().getEvents().addHandler(modalShareEventHandler);	
+			}
+		} else {
+			if(itr%updateASCAfterIts==0 && itr <= innovationStop ) {
+				event.getServices().getEvents().addHandler(modalShareEventHandler);
+			}
 		}
 	}
 	
 	private void initializeInitialASC (){
+		this.previousASC = new TreeMap<>();
 		for (String mode : this.initialMode2share.keySet()){
 			this.previousASC.put(mode, 0.0);
 		}
@@ -143,8 +164,8 @@ public class ASCFromModalSplitCalibrator implements StartupListener, IterationSt
 		// number of non-zero ascs can not be greater than number of modes-1
 		for(String mode :ascs.keySet()){
 			double asc = ascs.get(mode) - lowestASC;
-			this.previousASC.put(mode, asc);
 			LOG.warn("The previous ASC for "+ mode +" was "+ this.previousASC.get(mode) +". It is changed to "+ asc);
+			this.previousASC.put(mode, asc);
 		}
 	}
 }

@@ -73,7 +73,10 @@ public class JointCalibrationControler {
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
 	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
-	private static boolean updatingASC = true;
+	
+	private static boolean updatingASC = false;
+	private static int updateASCAfterIt = 10;
+	
 	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/c000/";
 
 	public static void main(String[] args) {
@@ -84,6 +87,7 @@ public class JointCalibrationControler {
 			ConfigUtils.loadConfig(config, args[0]);
 			OUTPUT_DIR = args [1];
 			updatingASC = Boolean.valueOf( args[2] );
+			if(args.length>3) updateASCAfterIt = Integer.valueOf(args[3]);
 			config.controler().setOutputDirectory( OUTPUT_DIR );
 		} else {
 			config = pjc.createBasicConfigSettings();
@@ -162,7 +166,7 @@ public class JointCalibrationControler {
 			initialModalShare.put("bike", 33.0);
 			initialModalShare.put("pt", 22.0);
 			initialModalShare.put("walk", 29.0);
-			ASCFromModalSplitCalibrator msc = new ASCFromModalSplitCalibrator(initialModalShare ,10);
+			ASCFromModalSplitCalibrator msc = new ASCFromModalSplitCalibrator(initialModalShare , updateASCAfterIt);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -365,7 +369,7 @@ public class JointCalibrationControler {
 			case "bike_ext" :
 				modeParam.setMarginalUtilityOfTraveling(-0.0);
 				modeParam.setMonetaryDistanceRate(0.0); 
-				//				modeParam.setMarginalUtilityOfDistance(0.0002); 
+				modeParam.setMarginalUtilityOfDistance(-0.0002); 
 				break;
 			default :
 				modeParam.setMarginalUtilityOfTraveling(0.0);
