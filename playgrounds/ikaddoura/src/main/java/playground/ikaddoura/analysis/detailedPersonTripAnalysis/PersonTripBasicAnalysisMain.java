@@ -101,9 +101,9 @@ public class PersonTripBasicAnalysisMain {
 
 	public void run() {
 					
-		String networkFile = runDirectory + "output_network.xml.gz";
+		String networkFile = "output_network.xml.gz";
 		String configFile = runDirectory + "output_config.xml.gz";
-		String populationFile = runDirectory + "output_plans.xml.gz";
+		String populationFile = "output_plans.xml.gz";
 
 		Config config = ConfigUtils.loadConfig(configFile);	
 		config.plans().setInputFile(populationFile);
