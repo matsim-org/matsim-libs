@@ -98,7 +98,7 @@ public class StockholmP0Handler implements BasicEventHandler{
 			}
 			this.iteration=iteration;
 			if(iteration==0){
-				 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000+Math.random()/100000+Math.random()/1000000);//Assuming the simulations start at 06:00
+				 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000+Math.random()/100000+Math.random()/1000000);//Assuming the simulations start at 06:00
 				 change.addLink(link);
 				 // The statement 1/inLinks.size() to give equal percentage initially to all links
 				 change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 1.0/inLinks.size()*link.getCapacity()/3600));
@@ -226,7 +226,7 @@ public class StockholmP0Handler implements BasicEventHandler{
 //				double newcapacity = lastcapacitieslink.get(time)+greendeltas.get(link.getId())*satCapacities.get(link.getId());
 				if(newcapacity>50 && newcapacity<satCapacities.get(link.getId())){
 					this.capacitiesLinks.put(link.getId(),newcapacity);
-					NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000+Math.random()/100000+Math.random()/1000000);//To ensure the change takes effect at the start of the time bin
+					NetworkChangeEvent change = new NetworkChangeEvent(time+Math.random()/10000+Math.random()/100000+Math.random()/1000000);//To ensure the change takes effect at the start of the time bin
 					change.addLink(link);
 					change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacitiesLinks.get(link.getId())/3600));
 					events.add(change);

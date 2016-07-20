@@ -72,9 +72,9 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 		initer = this.inLinks.iterator();
 		while(initer.hasNext()){
 			Link link = initer.next();
-			NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+			NetworkChangeEvent change = new NetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 			while(changeeventtimes.contains(change.getStartTime())){
-				change = network.getFactory().createNetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+				change = new NetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 			}
 			changeeventtimes.add(change.getStartTime());
 			change.addLink(link);
@@ -155,9 +155,9 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 			Iterator<Double> biniter = capsatbins.keySet().iterator();
 			while(biniter.hasNext()){
 				Double bin = biniter.next();
-				NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+				NetworkChangeEvent change = new NetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 				while(changeeventtimes.contains(change.getStartTime())){
-					 change = network.getFactory().createNetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+					 change = new NetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 				}
 				changeeventtimes.add(change.getStartTime());
 				change.addLink(link);

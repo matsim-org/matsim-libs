@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventFactory;
 
 public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
@@ -102,18 +101,6 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 
 	@Override
 	public void setLinkFactory(LinkFactory factory) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
-	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-	@Override
-	public NetworkChangeEvent createNetworkChangeEvent(double time) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

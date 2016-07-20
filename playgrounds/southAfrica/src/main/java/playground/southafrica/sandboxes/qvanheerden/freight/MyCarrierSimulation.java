@@ -43,8 +43,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -141,8 +139,6 @@ public class MyCarrierSimulation {
 	public static void getNetworkChangeEvents(Scenario scenario, double amStart, double amEnd, double pmStart, double pmEnd) {
 		Collection<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>();
 
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl();
-
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 //			double speed = 0 ;
@@ -150,7 +146,7 @@ public class MyCarrierSimulation {
 			final double threshold = kmph/3.6; //convert to m/s
 			if ( speed > threshold ) {
 				{//morning peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(amStart*3600.) ;
 					event.addLink(link);
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 					final NetworkChangeEvent event1 = event;
@@ -159,7 +155,7 @@ public class MyCarrierSimulation {
 //					events.add(event);
 				}
 				{//morning peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(amEnd*3600.) ;
 					event.addLink(link);
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 //					ni.addNetworkChangeEvent(event);
@@ -167,7 +163,7 @@ public class MyCarrierSimulation {
 //					events.add(event);
 				}
 				{//afternoon peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(pmStart*3600.) ;
 					event.addLink(link);
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 //					ni.addNetworkChangeEvent(event);
@@ -175,7 +171,7 @@ public class MyCarrierSimulation {
 //					events.add(event);
 				}
 				{//afternoon peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(pmEnd*3600.) ;
 					event.addLink(link);
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 					final NetworkChangeEvent event1 = event;

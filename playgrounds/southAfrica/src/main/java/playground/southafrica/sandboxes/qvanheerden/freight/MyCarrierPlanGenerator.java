@@ -1,5 +1,40 @@
 package playground.southafrica.sandboxes.qvanheerden.freight;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierImpl;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
@@ -10,35 +45,9 @@ import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.filesampler.MyFileFilter;
 import playground.southafrica.utilities.filesampler.MyFileSampler;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
@@ -176,7 +185,6 @@ public class MyCarrierPlanGenerator {
 		Polygon poly = gf.createPolygon(coordArray);
 		
 		//now apply congestion
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl();
 
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			boolean contains = false;
@@ -197,7 +205,7 @@ public class MyCarrierPlanGenerator {
 				final double threshold = speedKmph/3.6; //convert to m/s
 				if ( speed > threshold ) {
 					{//morning peak starts
-						NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
+						NetworkChangeEvent event = new NetworkChangeEvent(amStart*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
@@ -206,7 +214,7 @@ public class MyCarrierPlanGenerator {
 						//					events.add(event);
 					}
 					{//morning peak ends
-						NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
+						NetworkChangeEvent event = new NetworkChangeEvent(amEnd*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
@@ -215,7 +223,7 @@ public class MyCarrierPlanGenerator {
 						//					events.add(event);
 					}
 					{//afternoon peak starts
-						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
+						NetworkChangeEvent event = new NetworkChangeEvent(pmStart*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
@@ -224,7 +232,7 @@ public class MyCarrierPlanGenerator {
 						//					events.add(event);
 					}
 					{//afternoon peak ends
-						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
+						NetworkChangeEvent event = new NetworkChangeEvent(pmEnd*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
 						final NetworkChangeEvent event1 = event;
