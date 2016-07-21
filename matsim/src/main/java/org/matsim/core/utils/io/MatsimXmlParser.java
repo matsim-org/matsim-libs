@@ -30,7 +30,6 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
@@ -49,7 +48,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
 	private final Stack<StringBuffer> buffers = new Stack<>();
-	private final Stack<String> theContext = new Stack<>();
+	private final Stack<String> context = new Stack<>();
 
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
@@ -66,7 +65,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * As the mechanism implemented in InputSource is not really working for error handling
 	 * the source to be parsed is stored here for error handling.
 	 */
-	private String theSource;
+	private String source;
 
 	/**
 	 * Creates a validating XML-parser.
@@ -145,13 +144,13 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 */
 	public final void parse(final String filename) throws UncheckedIOException {
 		log.info("starting to parse xml from file " + filename + " ...");
-		this.theSource = filename;
+		this.source = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
 	public void parse(final URL url) throws UncheckedIOException {
-		this.theSource = url.toString();
-		log.info("starting to parse xml from url " + this.theSource + " ...");
+		this.source = url.toString();
+		log.info("starting to parse xml from url " + this.source + " ...");
 		if (url.getFile().endsWith(".gz")) {
 			try {
 				parse(new InputSource(new GZIPInputStream(url.openStream())));
@@ -164,7 +163,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	}
 
 	public void parse(final InputStream stream) throws UncheckedIOException {
-		this.theSource = "stream";
+		this.source = "stream";
 		parse(new InputSource(stream));
 	}
 
@@ -255,24 +254,16 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		return source;
     }
 
-	private static InputSource findDtdInRemoteLocation(final String fullSystemId) {
+	private InputSource findDtdInRemoteLocation(final String fullSystemId) {
 		log.info("Trying to load " + fullSystemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
-		URL url;
-		URLConnection urlConn = null ;
 		try {
-			url = new URL(fullSystemId);
-			urlConn = url.openConnection();
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		urlConn.setConnectTimeout(5000);
-		urlConn.setReadTimeout(5000);
-		urlConn.setAllowUserInteraction(false);         
-		try (InputStream is = urlConn.getInputStream() ) {
+			URL url = new URL(fullSystemId);
+			URLConnection urlConn = url.openConnection();
+			urlConn.setConnectTimeout(5000);
+			urlConn.setReadTimeout(5000);
+			urlConn.setAllowUserInteraction(false);         
+			
+			InputStream is = urlConn.getInputStream();
 			/* If there was no exception until here, than the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
 			 * would have to fetch the same file again, requiring two accesses to the webserver */
@@ -299,18 +290,15 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	
 	private InputSource findDtdInClasspath(final String shortSystemId) {
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
-		try ( InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId) ) {
+		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {
 			log.info("Using local DTD from classpath: /dtd/" + shortSystemId);
 			return new InputSource(stream);
 		}
 		return null;
-		} catch (Exception ee ) {
-			throw new RuntimeException("something went wrong:" + ee) ;
-		}
 	}
 	
-	private static InputSource findDtdInDefaultLocation(final String shortSystemId) {
+	private InputSource findDtdInDefaultLocation(final String shortSystemId) {
 		log.info("Trying to access local dtd folder at standard location ./dtd...");
 		File dtdFile = new File("./dtd/" + shortSystemId);
 		if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
@@ -334,23 +322,23 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) throws SAXException {
 		String tag = (uri.length() == 0) ? qName : localName;
 		this.buffers.push(new StringBuffer());
-		this.startTag(tag, atts, this.theContext);
-		this.theContext.push(tag);
+		this.startTag(tag, atts, this.context);
+		this.context.push(tag);
 	}
 
 	@Override
 	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		String tag = (uri.length() == 0) ? qName : localName;
-		this.theContext.pop();
+		this.context.pop();
 		StringBuffer buffer = this.buffers.pop();
-		this.endTag(tag, buffer.toString(), this.theContext);
+		this.endTag(tag, buffer.toString(), this.context);
 	}
 
 	/* implement ErrorHandler */
 
 	@Override
 	public void error(final SAXParseException ex) throws SAXException {
-		if (this.theContext.isEmpty()) {
+		if (this.context.isEmpty()) {
 			System.err.println("Missing DOCTYPE.");
 		}
 		System.err.println("XML-ERROR: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
@@ -384,7 +372,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return ex.getPublicId();
 		}
 		//try to use the locally stored inputSource
-		return this.theSource;
+		return this.source;
 	}
 
 }
