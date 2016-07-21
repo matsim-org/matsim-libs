@@ -20,8 +20,10 @@ import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
 import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -60,6 +62,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final boolean IntelligentRouters;
     private final Logger slaveLogger;
     private final PlanCatcher plancatcher;
+    private static double slaveMutationRate;
     private boolean initialRouting;
     private int numberOfIterations = -1;
     private int executedPlanCount;
@@ -177,6 +180,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
 
         numberOfPSimIterationsPerCycle = reader.readInt();
+        slaveMutationRate = reader.readDouble();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
         config.controler().setLastIteration(reader.readInt());
         initialRouting = reader.readBoolean();
@@ -201,8 +205,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         config.controler().setWriteEventsInterval(0);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
+//        Important, otherwise Psim breaks
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         config.parallelEventHandling().setNumberOfThreads(1);
+        setReplanningWeights(config,slaveMutationRate);
 
         scenario = ScenarioUtils.loadScenario(config);
 
@@ -252,7 +258,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                     transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(matsimControler.getScenario(),
                             waitTimes,
                             stopStopTimes);
                     bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
@@ -593,5 +599,39 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
         }
     }
+
+    private void setReplanningWeights(Config config, double mutationRate) {
+        if (mutationRate > 1)
+            mutationRate = 0.9999;
+        List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+        strategySettings.addAll(config.strategy().getStrategySettings());
+        Map<Integer, Double> selectors = new HashMap<>();
+        Map<Integer, Double> mutators = new HashMap<>();
+        for (int i = 0; i < strategySettings.size(); i++) {
+            StrategyConfigGroup.StrategySettings setting = strategySettings.get(i);
+            if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
+                selectors.put(i, setting.getWeight());
+            else {
+                mutators.put(i, setting.getWeight());
+            }
+        }
+
+        double mutatorSum = CollectionUtils.sumElements(mutators.values());
+        double selectorSum = CollectionUtils.sumElements(selectors.values());
+        // set to new weight
+        for (Map.Entry<Integer, Double> entry : selectors.entrySet()) {
+            strategySettings.get(entry.getKey()).setWeight((1 - mutationRate ) * entry.getValue() / selectorSum);
+        }
+        for (Map.Entry<Integer, Double> entry : mutators.entrySet()) {
+            strategySettings.get(entry.getKey()).setWeight(mutationRate * entry.getValue() / mutatorSum);
+        }
+        //put it back in the config
+        config.strategy().clearStrategySettings();
+        for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+            config.strategy().addStrategySettings(strategySetting);
+        }
+    }
+
+
 }
 

@@ -182,4 +182,13 @@ public class CollectionUtils {
         out2 = split(testArraySplit,2);
 
     }
+
+    public static double sumElements(Collection<Double> values) {
+        double sum = 0;
+        for (Double value : values) {
+           sum += value ;
+        }
+
+        return sum;
+    }
 }

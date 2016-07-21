@@ -38,9 +38,11 @@ import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestat
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.SlaveScoreWriter;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
+import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -64,8 +66,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private static Options options;
     private static StringBuilder masterInitialLogString;
     private static String appendString;
+    private static double MasterMutationRate = -1;
+    private static double SlaveMutationRate = -1;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final Hydra hydra;
+    private int numSlaves = 1;
+    private static double MasterBorrowingRate = 0.5;
+    private int innovationEndsAtIter = -1;
 
     public static boolean isTrackGenome() {
         return TrackGenome;
@@ -117,7 +124,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         formatter.printHelp("MasterControler", header, options, footer, true);
     }
 
-    private static void parseCommandLineOptions(String[] args) {
+    private void parseCommandLineOptions(String[] args) {
         System.setProperty("matsim.preferLocalDtds", "true");
         options = new Options();
         options.addOption(OptionBuilder.withLongOpt("config")
@@ -136,6 +143,24 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 .hasArg(true)
                 .withArgName("iters")
                 .create("i"));
+        options.addOption(OptionBuilder.withLongOpt("masterMutationRate")
+                .withDescription("The proportion of mutation allocated in replanning on master. " +
+                        "Defaults to whatever is specified in the config.")
+                .hasArg(true)
+                .withArgName("0 ≤ x ≤ 1")
+                .create("mr"));
+        options.addOption(OptionBuilder.withLongOpt("masterBorrowingRate")
+                .withDescription("The proportion of plans borrowed from slaves. " +
+                        "Defaults to half.")
+                .hasArg(true)
+                .withArgName("0 ≤ x ≤ 1")
+                .create("mb"));
+        options.addOption(OptionBuilder.withLongOpt("slaveMutationRate")
+                .withDescription("The proportion of mutation allocated in replanning on slaves. " +
+                        "Defaults to whatever is specified in the config.")
+                .hasArg(true)
+                .withArgName("0 ≤ x ≤ 1")
+                .create("sr"));
         options.addOption(OptionBuilder.withLongOpt("numberOfSlaves")
                 .withDescription("Number of slaves to distribute to.")
                 .hasArg(true)
@@ -178,6 +203,23 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         appendString = (commandLine.hasOption("appendString") || commandLine.hasOption("a")) ? commandLine.getOptionValue("a") : "";
 
         masterInitialLogString = new StringBuilder();
+
+        if (commandLine.hasOption("c")) {
+            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
+        } else {
+            masterLogger.error("Config file not specified");
+            printHelp();
+            System.exit(1);
+        }
+
+
+        if (commandLine.hasOption("n"))
+            numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
+        else {
+            masterInitialLogString.append("Unspecified number of slaves. Will start with the default of a single slave.\n");
+        }
+
+
         if (commandLine.hasOption("f") || commandLine.hasOption("fullTransit")) {
             FullTransitPerformanceTransmission = true;
             masterInitialLogString.append("Transmitting full transit performance to slaves.\n");
@@ -206,6 +248,21 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         } else {
             QuickReplanning = false;
             masterInitialLogString.append("NORMAL Replanning: each replanning strategy operates at the rate specified in the config for each PSim iteration\n");
+        }
+
+        if (commandLine.hasOption("mr")) {
+            MasterMutationRate = Double.parseDouble(commandLine.getOptionValue("mr"));
+            masterInitialLogString.append("MASTER mutation rate set to" + MasterMutationRate + " \n");
+        }
+
+        if (commandLine.hasOption("mb")) {
+            MasterBorrowingRate = Double.parseDouble(commandLine.getOptionValue("mr"));
+            masterInitialLogString.append("MASTER borrowing rate set to" + MasterBorrowingRate + " \n");
+        }
+
+        if (commandLine.hasOption("sr")) {
+            SlaveMutationRate = Double.parseDouble(commandLine.getOptionValue("sr"));
+            masterInitialLogString.append("SLAVE mutation rate set to" + SlaveMutationRate + " \n");
         }
 
         if (commandLine.hasOption("g")) {
@@ -254,27 +311,17 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     public MasterControler(String[] args) throws NumberFormatException, IOException, InterruptedException {
-
-        if (commandLine.hasOption("c")) {
-            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
-        } else {
-            masterLogger.error("Config file not specified");
-            printHelp();
-            System.exit(1);
-        }
-
-        int numSlaves = 1;
-        if (commandLine.hasOption("n"))
-            numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
-        else {
-            masterInitialLogString.append("Unspecified number of slaves. Will start with the default of a single slave.\n");
-        }
-
+        parseCommandLineOptions(args);
 
         slaveHandlerTreeMap = new TreeMap<>();
         slaveScoreStats = new SlaveScoreStats(config);
 
-//        register initial number of slaveHandlerTreeMap
+        if (MasterMutationRate > 0 && MasterMutationRate <= 1) {
+            setReplanningWeights(config, MasterMutationRate, MasterBorrowingRate);
+
+        }
+
+//        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
@@ -291,6 +338,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         Thread hydraThread = new Thread(hydra);
         hydraThread.setName("HYDRA");
         hydraThread.start();
+
 
         scenario = ScenarioUtils.loadScenario(config);
 //        determine the memory use of the population for some initial load balancing
@@ -358,6 +406,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         masterLogger.warn(masterInitialLogString);
         String outputDirectory = config.controler().getOutputDirectory();
         outputDirectory += "_P" + numberOfPSimIterations +
+                String.format("_mr%.3f_mb%.3f_sr%.3f", MasterMutationRate, MasterBorrowingRate, SlaveMutationRate) +
                 (SelectedSimulationMode.equals(SimulationMode.SERIAL) ? "_m" : "") +
                 (FullTransitPerformanceTransmission ? "_f" : "") +
                 (TrackGenome ? "_g" : "") +
@@ -374,6 +423,56 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));
         }
 
+    }
+
+    /**
+     * Experimental or parameter optimization. Probably won't work with subpopulations
+     *  @param config
+     * @param masterMutationRate
+     * @param borrowingRate
+     */
+    private void setReplanningWeights(Config config, double masterMutationRate, double borrowingRate) {
+        int disableAfterIteration = config.controler().getLastIteration();
+        int maximumIterationForMutationDisabling = -1;
+        if(borrowingRate + masterMutationRate >= 1){
+            borrowingRate = 0.9999 * borrowingRate / (masterMutationRate + borrowingRate);
+            masterMutationRate = 0.9999 * masterMutationRate / (masterMutationRate + borrowingRate);
+        }
+        List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+        strategySettings.addAll(config.strategy().getStrategySettings());
+        Map<Integer, Double> selectors = new HashMap<>();
+        Map<Integer, Double> mutators = new HashMap<>();
+        for (int i = 0; i < strategySettings.size(); i++) {
+            StrategyConfigGroup.StrategySettings setting = strategySettings.get(i);
+            if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
+                selectors.put(i, setting.getWeight());
+            else {
+                mutators.put(i, setting.getWeight());
+                maximumIterationForMutationDisabling = Math.max(setting.getDisableAfter(), maximumIterationForMutationDisabling);
+            }
+        }
+
+        double mutatorSum = CollectionUtils.sumElements(mutators.values());
+        double selectorSum = CollectionUtils.sumElements(selectors.values());
+        // set to new weight
+        for (Entry<Integer, Double> entry : selectors.entrySet()) {
+            strategySettings.get(entry.getKey()).setWeight((1 - masterMutationRate - borrowingRate) * entry.getValue() / selectorSum);
+        }
+        for (Entry<Integer, Double> entry : mutators.entrySet()) {
+            strategySettings.get(entry.getKey()).setWeight(masterMutationRate * entry.getValue() / mutatorSum);
+        }
+        //put it back in the config
+        config.strategy().clearStrategySettings();
+        for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+            config.strategy().addStrategySettings(strategySetting);
+        }
+        // add the borrowing rate entry
+        StrategyConfigGroup.StrategySettings borrowingSetting = new StrategyConfigGroup.StrategySettings();
+        borrowingSetting.setWeight(borrowingRate);
+        borrowingSetting.setStrategyName("ReplacePlanFromSlave");
+        borrowingSetting.setDisableAfter(maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling: disableAfterIteration);
+        config.strategy().addStrategySettings(borrowingSetting);
+        this.innovationEndsAtIter = maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling: disableAfterIteration;
     }
 
 
@@ -395,7 +494,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     public static void main(String[] args) throws InterruptedException {
         MasterControler master = null;
-        parseCommandLineOptions(args);
+
         try {
             master = new MasterControler(args);
         } catch (IOException e) {
@@ -468,6 +567,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
         this.currentIteration = event.getIteration();
+        if(event.getIteration()>innovationEndsAtIter)
+            return;
         //wait for previous transmissions to complete, if necessary
         waitForSlaveThreads();
         //start receiving plans from slaveHandlerTreeMap as the QSim runs
@@ -480,6 +581,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
+        if(event.getIteration()>innovationEndsAtIter)
+            return;
+        if(event.getIteration() == innovationEndsAtIter){
+            startSlaveHandlersInMode(CommunicationsMode.DIE);
+            return;
+        }
+
         if (SelectedSimulationMode.equals(SimulationMode.PARALLEL)) {
             waitForSlaveThreads();
             mergePlansFromSlaves();
@@ -971,6 +1079,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             writer.flush();
         }
 
+        public void sendDouble(double i) throws IOException {
+            writer.writeDouble(i);
+            writer.flush();
+        }
+
 
         public Collection<? extends PersonSerializable> getPersons() {
             return slavePersonPool;
@@ -1050,6 +1163,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private void initializeSlave(SlaveHandler slaveHandler, int i, boolean initialRoutingOnSlaves) throws IOException {
         slaveHandler.sendNumber(i);
         slaveHandler.sendNumber(numberOfPSimIterations);
+        slaveHandler.sendDouble(SlaveMutationRate);
         slaveHandler.sendNumber(config.controler().getLastIteration() * numberOfPSimIterations);
         slaveHandler.sendBoolean(initialRoutingOnSlaves);
         slaveHandler.sendBoolean(QuickReplanning);

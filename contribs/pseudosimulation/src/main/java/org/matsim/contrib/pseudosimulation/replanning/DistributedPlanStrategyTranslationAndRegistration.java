@@ -49,6 +49,10 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     private DistributedPlanStrategyTranslationAndRegistration() {
     }
 
+    static {
+        initMaps();
+    }
+
     static void initMaps() {
         SupportedSelectors.put("KeepLastSelected", KeepLastSelected.class);
         SupportedSelectors.put("BestScore", SelectBest.class);
