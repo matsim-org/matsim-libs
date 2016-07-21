@@ -59,7 +59,7 @@ public class CongestionInfoWriter {
 			bw.write("Link Id");
 			for (int i = 0; i < totalNumberOfTimeBins; i++) {
 				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
-				bw.write(";Average delay " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+				bw.write(";" + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			}
 			bw.newLine();
 			
