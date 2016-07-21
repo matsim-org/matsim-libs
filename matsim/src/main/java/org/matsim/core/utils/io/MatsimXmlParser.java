@@ -149,7 +149,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
-	public void parse(final URL url) throws UncheckedIOException {
+	public final void parse(final URL url) throws UncheckedIOException {
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
 		if (url.getFile().endsWith(".gz")) {
@@ -163,7 +163,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		}
 	}
 
-	public void parse(final InputStream stream) throws UncheckedIOException {
+	public final void parse(final InputStream stream) throws UncheckedIOException {
 		this.theSource = "stream";
 		parse(new InputSource(stream));
 	}
