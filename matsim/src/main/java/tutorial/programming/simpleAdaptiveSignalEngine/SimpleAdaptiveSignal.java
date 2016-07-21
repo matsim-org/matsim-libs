@@ -31,12 +31,15 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -50,9 +53,9 @@ import org.matsim.core.utils.io.IOUtils;
  * @author nagel
  *
  */
-class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitializedListener, LinkEnterEventHandler, LinkLeaveEventHandler {
+class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitializedListener, BasicEventHandler {
 
-	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<Double>() ;
+	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<>() ;
 	private long cnt4 = 0 ;
 	private long cnt5 = 0 ;
 	private OutputDirectoryHierarchy controlerIO;
@@ -67,7 +70,7 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitial
 		double shareDown ;
 	} ;
 	
-	private List<Result> results = new ArrayList<Result>() ;
+	private List<Result> results = new ArrayList<>() ;
 	
 	@Inject
 	public SimpleAdaptiveSignal(OutputDirectoryHierarchy controlerIO) {
@@ -103,22 +106,22 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitial
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if ( event.getLinkId().equals(Id.create("5", Link.class)) ) {
-			this.vehicleExitTimesOnLink5.add( event.getTime() + 100. ) ;
-			// yy replace "100" by freeSpeedTravelTime
-			// jedes Fahrzeug, welches die Kante betritt, erhöht den Zähler um 1:
-			cnt5++ ;
-		} 
-		if ( event.getLinkId().equals(Id.create("4", Link.class)) ) {
-			cnt4++ ;
-		}
-	}
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		if ( event.getLinkId().equals(Id.create("5", Link.class)) ) {
-			// jedes Fahrzeug, welches die Kante verlässg, erniedrigt den Zähler um 1:
-			this.vehicleExitTimesOnLink5.remove() ;
+	public void handleEvent(Event event) {
+		if ( event instanceof LinkEnterEvent || event instanceof VehicleEntersTrafficEvent ) {
+			if ( ((HasLinkId) event).getLinkId().equals(Id.create("5", Link.class)) ) {
+				this.vehicleExitTimesOnLink5.add( event.getTime() + 100. ) ;
+				// yy replace "100" by freeSpeedTravelTime
+				
+				// every vehicle that enters the link increases the counter:
+				cnt5++ ;
+			} 
+			if ( ((HasLinkId) event).getLinkId().equals(Id.create("4", Link.class)) ) {
+				cnt4++ ;
+			}
+		} else if ( event instanceof LinkLeaveEvent || event instanceof VehicleLeavesTrafficEvent ) {
+			if ( ((HasLinkId) event).getLinkId().equals(Id.create("5", Link.class)) ) {
+				this.vehicleExitTimesOnLink5.remove() ;
+			}
 		}
 	}
 

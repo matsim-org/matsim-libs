@@ -55,7 +55,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 		 satcapacity5 = link5.getCapacity();
 		 events = new ArrayList<NetworkChangeEvent>() ;
 		 
-		 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+		 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 		 change.addLink(link2);
 		 change.setFlowCapacityChange((new ChangeValue(ChangeType.ABSOLUTE, 500.0/3600.0)));
 		 addNetworkChangeEvent(change);
@@ -116,7 +116,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 if(capacity4 == satcapacity4){
 					 capacity4=satcapacity4*satcapacity5/combinedsatcapacity;
 				 }
-				 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+				 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 				 change.addLink(link2);
 				 //change.setFlowCapacityChange((new ChangeValue(ChangeType.FACTOR, capacity2/satcapacity5)));
 				 change.setFlowCapacityChange((new ChangeValue(ChangeType.FACTOR, capacity2/satcapacity5)));
@@ -124,7 +124,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 //network.addNetworkChangeEvent(change);
 				 //addNetworkChangeEvent(change);
 				 str = "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
-				 NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);
+				 NetworkChangeEvent change1 = new NetworkChangeEvent(21600 + Math.random()/10000);
 				 change1.addLink(link4);
 				 change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacity4/satcapacity5));//Allowing due share
 				 //addNetworkChangeEvent(change1);
@@ -231,7 +231,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	   //-100 for starting from start of time bin,  (iter+1)/1000 + Math.random()/10000 for ordering the events based on iteration number as well as limiting it from exceptions due to two events on same time
 	   if (p2>p4 && factor2<0.8 && ctevents<iter){
 		   		ctevents++;
-			   	NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time);//To ensure the change takes effect at the start of the time bin
+			   	NetworkChangeEvent change = new NetworkChangeEvent(time);//To ensure the change takes effect at the start of the time bin
 				change.addLink(link2);
 				change.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1+factor/capacity2));
 				 //addNetworkChangeEvent(change);
@@ -240,7 +240,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 str += "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
 				 factor2=factor2*(1+factor/capacity2);
 				
-				NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(time);
+				NetworkChangeEvent change1 = new NetworkChangeEvent(time);
 				change1.addLink(link4);
 				change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1-factor/capacity4));
 				//addNetworkChangeEvent(change1);
@@ -251,7 +251,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	   }
 	   else if (p4>p2 && factor4<0.8 && ctevents<iter){
 		   		ctevents++;
-			   	NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time);
+			   	NetworkChangeEvent change = new NetworkChangeEvent(time);
 				change.addLink(link2);
 				change.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(ChangeType.FACTOR, 1-factor/capacity2));
 				//network.addNetworkChangeEvent(change);
@@ -260,7 +260,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 str += "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
 				 factor2=factor2*(1-factor/capacity2);
 				
-				NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(time);
+				NetworkChangeEvent change1 = new NetworkChangeEvent(time);
 				change1.addLink(link4);
 				change1.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(ChangeType.FACTOR, 1+factor/capacity4));
 				//network.addNetworkChangeEvent(change1);

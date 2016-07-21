@@ -85,16 +85,15 @@ public class RandomizedTransitRouterIT {
 	@Test
 //	@Ignore
 	public final void test() {
-		String scenarioDir = utils.getPackageInputDirectory() ;
 		String outputDir = utils.getOutputDirectory() ;
 
-		Config config = ConfigUtils.createConfig();
+		Config config = utils.createConfigWithPackageInputResourcePathAsContext();
 		
-		config.network().setInputFile(scenarioDir + "/network.xml");
-		config.plans().setInputFile(scenarioDir + "/population.xml");
+		config.network().setInputFile("network.xml");
+		config.plans().setInputFile("population.xml");
 
-		config.transit().setTransitScheduleFile(scenarioDir + "/transitschedule.xml");
-		config.transit().setVehiclesFile( scenarioDir + "/transitVehicles.xml" );
+		config.transit().setTransitScheduleFile("transitschedule.xml");
+		config.transit().setVehiclesFile("transitVehicles.xml");
 		config.transit().setUseTransit(true);
 		
 		config.controler().setOutputDirectory( outputDir );

@@ -115,7 +115,7 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.INTERVALBASED;
 	public enum PricingType{
 		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
@@ -142,7 +142,7 @@ public final class RunBraessSimulation {
 		}
 		if (PRICING_TYPE.equals(PricingType.INTERVALBASED)) {
 			try {
-				MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), 1, "tolls");
+				MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), 1, "toll_perLinkAndTimeBin");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -172,7 +172,7 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize(300);
+		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
 
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -463,11 +463,11 @@ public final class RunBraessSimulation {
 		if (SIMULATION_PERIOD != 1){
 			runName += "_" + SIMULATION_PERIOD + "h";
 		}
-		runName += "_start" + (int)SIMULATION_START_TIME; 
+//		runName += "_start" + (int)SIMULATION_START_TIME; 
 		
 		switch(INIT_ROUTES_TYPE){
 		case ALL:
-			runName += "_ALL-sel1+3";
+			runName += "_ALL"; //"_ALL-sel1+3";
 			break;
 		case ONLY_OUTER:
 			runName += "_OUTER";
@@ -483,7 +483,7 @@ public final class RunBraessSimulation {
 
 		runName += "_" + config.controler().getLastIteration() + "it";
 
-		// create info about the different possible travel times
+		// create info about the different possible travel times, capacities and link length
 		Link middleLink = scenario.getNetwork().getLinks()
 				.get(Id.createLinkId("3_4"));
 		Link slowLink = scenario.getNetwork().getLinks()
@@ -495,20 +495,18 @@ public final class RunBraessSimulation {
 		if (middleLink == null){
 			runName += "_woZ";
 		} else {
-			int fastTT = (int)Math.ceil(middleLink.getLength()
+			int middleTT = (int)Math.ceil(middleLink.getLength()
 					/ middleLink.getFreespeed());
+			int fastTT = (int)Math.ceil(fastLink.getLength()
+					/ fastLink.getFreespeed());
 			int slowTT = (int)Math.ceil(slowLink.getLength()
 					/ slowLink.getFreespeed());
 			int capZ = (int)middleLink.getCapacity();
-			runName += "_" + fastTT + "-vs-" + slowTT + "_capZ" + capZ;
-		}
-		
-		// create info about capacity and link length
-		runName += "_cap" + (int)slowLink.getCapacity();
-		if (slowLink.getLength() != 200)
-			runName += "_l" + (int)slowLink.getLength() + "m";
-		if (slowLink.getLength() != fastLink.getLength()){
-			runName += "_l" + (int)fastLink.getLength() + "m";
+			int capFast = (int)fastLink.getCapacity();
+			int capSlow = (int)slowLink.getCapacity();
+			runName += "_tt-" + fastTT + "-" + middleTT + "-" + slowTT;
+			runName += "_cap-" + capFast + "-" + capZ + "-" + capSlow;
+			runName += "_l-" + (int)fastLink.getLength() + "-" + (int)middleLink.getLength() + "-" + (int)slowLink.getLength();
 		}
 		
 		if (scenario.getNetwork().getNodes().containsKey(Id.createNodeId(23))){
@@ -586,7 +584,11 @@ public final class RunBraessSimulation {
 		}
 		
 		if (!PRICING_TYPE.equals(PricingType.NONE)){
-			runName += "_" + PRICING_TYPE.toString();
+			if (PRICING_TYPE.equals(PricingType.INTERVALBASED)){
+				runName += "_INTERVAL_tbs" + config.travelTimeCalculator().getTraveltimeBinSize();
+			} else {
+				runName += "_" + PRICING_TYPE.toString();
+			}
 		}
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)

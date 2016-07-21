@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.cadyts.general;
 
 import org.apache.log4j.Logger;
@@ -31,36 +28,35 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
 /**
  * @author nagel
- *
  */
 public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CadytsScoring.class);
 
-	private double score = 0. ;
-	private PlansTranslator<T> ptPlanToPlanStep;
+	private double score = 0.;
+	private PlansTranslator<T> plansTranslator;
 	private AnalyticalCalibrator<T> matsimCalibrator;
 	private Plan plan;
-	private final double beta ;
-	private double weightOfCadytsCorrection = 1. ;
+	private final double beta;
+	private double weightOfCadytsCorrection = 1.;
 
-	public CadytsScoring(final Plan plan, Config config, final CadytsContextI<T> context ) {
-		this.ptPlanToPlanStep = context.getPlansTranslator() ;
-		this.matsimCalibrator = context.getCalibrator() ;
-		this.plan = plan ;
-		this.beta = config.planCalcScore().getBrainExpBeta() ;
+	public CadytsScoring(final Plan plan, Config config, final CadytsContextI<T> context) {
+		this.plansTranslator = context.getPlansTranslator();
+		this.matsimCalibrator = context.getCalibrator();
+		this.plan = plan;
+		this.beta = config.planCalcScore().getBrainExpBeta();
 	}
-	
+
 	@Override
 	public void finish() {
-		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getCadytsPlan(plan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.plansTranslator.getCadytsPlan(plan);
 		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
-		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection ;
+		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection;
 	}
 
 	@Override
 	public double getScore() {
-		return score ;
+		return score;
 	}
 
 	public void setWeightOfCadytsCorrection(double weightOfCadytsCorrection) {

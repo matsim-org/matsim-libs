@@ -56,13 +56,10 @@ public class Fixture {
 		try {
 			Method m = this.getClass().getMethod("createAndLoadTestScenario", Boolean.class);
 			testUtils.initWithoutJUnitForFixture(this.getClass(), m);
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
+		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
-		Config conf = ConfigUtils.createConfig();
+		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		conf.controler().setMobsim("qsim");
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
@@ -72,12 +69,12 @@ public class Fixture {
 		settings.setStrategyName("ChangeExpBeta");
 		settings.setWeight(1.0);
 		conf.strategy().addStrategySettings(settings);
-		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
+		conf.network().setInputFile("network.xml.gz");
 		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
+		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFileURL(conf.getContext()).getFile());
 		conf.network().setLaneDefinitionsFile(lanes20);
-		conf.plans().setInputFile(plansFile);
+		conf.plans().setInputFile("plans1Agent.xml");
 		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		//as signals are configured below we don't need signals on

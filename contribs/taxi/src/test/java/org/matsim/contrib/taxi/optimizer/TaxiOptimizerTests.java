@@ -113,7 +113,7 @@ public class TaxiOptimizerTests
             config = ConfigUtils.loadConfig(configFile, taxiCfg);
 
             config.plans().setInputFile(
-                    dir + "plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
+                    "plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
             taxiCfg.setTaxisFile(dir + "taxis_mini_benchmark-" + taxisSuffix + ".xml");
 
             miniBenchmark = RunTaxiMiniBenchmark.createMiniBenchmark(config);

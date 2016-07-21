@@ -76,7 +76,7 @@ public class PopulationWriterHandlerImplV5Test {
 	}
 
 	private NetworkRoute doTestWriteNetworkRoute(final String startLinkId, final String linkIds, final String endLinkId, final String expectedRouteSerialization) {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig(null));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig((String) null));
 		Id<Link> idFrom = Id.create(startLinkId, Link.class);
 		Id<Link> idTo = Id.create(endLinkId, Link.class);
 
@@ -120,7 +120,7 @@ public class PopulationWriterHandlerImplV5Test {
 	
 	@Test
 	public void testWriteGenericRouteRoute() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig(null));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig((String) null));
 		String startLinkId = "1";
 		String endLinkId = "4";
 		Id<Link> idFrom = Id.create(startLinkId, Link.class);

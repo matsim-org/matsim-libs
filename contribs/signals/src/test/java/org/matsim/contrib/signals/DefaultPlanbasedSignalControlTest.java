@@ -52,7 +52,7 @@ public class DefaultPlanbasedSignalControlTest {
 	 */
 	@Test
 	public final void planSwitchingTest() {
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(utils.classInputResourcePath());
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -61,17 +61,16 @@ public class DefaultPlanbasedSignalControlTest {
 		qsimConfig.setEndTime(400.0);
 		qsimConfig.setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 	
-		String inputDir = utils.getClassInputDirectory();
 		//scenario
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
-		String networkInputFile = inputDir + "network.xml";
+		String networkInputFile = "network.xml";
 		config.network().setInputFile(networkInputFile);
 		//signals
-		String signalsFile = inputDir + "signal_systems.xml";
+		String signalsFile = "signal_systems.xml";
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsFile);
-		String signalGroupsFile = inputDir + "signal_groups.xml";
+		String signalGroupsFile = "signal_groups.xml";
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
-		String signalControlFile = inputDir + "signal_control.xml";
+		String signalControlFile = "signal_control.xml";
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
 	
 		Controler controler = new Controler(config);

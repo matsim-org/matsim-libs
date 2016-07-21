@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.router.util.TravelTime;
@@ -69,7 +68,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// add a freespeed change to 20 at 8am.
-    		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
+    		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
     		change.addLink(link2);
     		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
 		final NetworkChangeEvent event = change;
@@ -113,7 +112,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// add a freespeed change to 20 at 8am.
-    		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
+    		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
     		change.addLink(link2);
     		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
 		final NetworkChangeEvent event = change;

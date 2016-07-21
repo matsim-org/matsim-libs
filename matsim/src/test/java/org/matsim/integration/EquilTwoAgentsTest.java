@@ -82,9 +82,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	public void testSingleIterationPlansV4() {
 		final Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
-		String netFileName = "test/scenarios/equil/network.xml";
-		config.network().setInputFile(netFileName);
-		config.plans().setInputFile(this.getClassInputDirectory() + "plans2.xml");
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
 		ActivityParams params = new ActivityParams("h") ;

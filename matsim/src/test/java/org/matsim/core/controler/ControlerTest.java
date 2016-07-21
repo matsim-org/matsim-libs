@@ -146,7 +146,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testTravelTimeCalculation() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
@@ -246,7 +246,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetScoringFunctionFactory() {
-		final Config config = this.utils.loadConfig(null);
+		final Config config = this.utils.loadConfig((String) null);
 		config.controler().setLastIteration(0);
 
 		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
@@ -294,7 +294,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingRoutes() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -383,7 +383,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingActLinks() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */

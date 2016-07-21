@@ -123,7 +123,7 @@ public class TollTravelCostCalculatorTest {
 
 	@Test
 	public void testDistanceTollRouter() {
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
@@ -208,7 +208,7 @@ public class TollTravelCostCalculatorTest {
 
 	@Test
 	public void testLinkTollRouter() {
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
@@ -303,7 +303,7 @@ public class TollTravelCostCalculatorTest {
 	
 	@Test
 	public void testCordonTollRouter() {
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();

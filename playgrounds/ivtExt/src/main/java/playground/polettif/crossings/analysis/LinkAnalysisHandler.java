@@ -13,6 +13,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import java.util.*;
 
 
+/**
+ * Handler to handle link enter and leave events. Calculates travel
+ * times and link volumes.
+ *
+ * @author polettif
+ */
 public class LinkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private static final Logger log = Logger.getLogger(LinkAnalysisHandler.class);

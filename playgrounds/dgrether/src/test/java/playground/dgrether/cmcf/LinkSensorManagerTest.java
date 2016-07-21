@@ -23,6 +23,7 @@ package playground.dgrether.cmcf;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -44,7 +45,8 @@ public class LinkSensorManagerTest extends MatsimTestCase implements IterationSt
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.config = loadConfig(getInputDirectory() + "config.xml");
+		this.config = loadConfig("test/scenarios/equil/config.xml");
+		ConfigUtils.loadConfig(getInputDirectory() + "config.xml");
 	}
 
 	@Override

@@ -25,7 +25,7 @@ package playground.mzilske.teach;
 
 import java.io.IOException;
 
-import tutorial.trafficsignals.VisSimpleTrafficSignalScenario;
+import tutorial.fixedTimeSignals.VisSimpleTrafficSignalScenario;
 
 public class RunSomething {
 

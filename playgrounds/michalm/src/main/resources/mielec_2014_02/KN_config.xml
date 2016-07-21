@@ -22,14 +22,14 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/network.xml" />
+		<param name="inputNetworkFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/network.xml" />
 		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
 		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
 	</module>
 
 	<module name="plans">
 		<!-- param name="inputPlansFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/plans_taxi_1.0.xml.gz" / -->
-		<param name="inputPlansFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/plans_taxi_4.0.xml.gz" />
+		<param name="inputPlansFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/plans_taxi_4.0.xml.gz" />
 	</module>
 
 	<module name="qsim">

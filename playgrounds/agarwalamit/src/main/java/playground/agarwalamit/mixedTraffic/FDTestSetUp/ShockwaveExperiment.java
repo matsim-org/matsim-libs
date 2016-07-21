@@ -29,8 +29,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -75,16 +73,15 @@ public class ShockwaveExperiment {
 
 
 		double flowCapBefore = desiredLink.getCapacity();
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.) ;
+			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0)); 
 			event.addLink(desiredLink);
 			final NetworkChangeEvent event1 = event;
 			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.+60*5) ;
+			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.+60*5) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(desiredLink);
 			final NetworkChangeEvent event1 = event;

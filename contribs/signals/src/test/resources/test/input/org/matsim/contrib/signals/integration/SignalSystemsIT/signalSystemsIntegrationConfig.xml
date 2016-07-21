@@ -13,12 +13,12 @@
   </module>
   
     <module name="network">
-    <param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
+    <param name="inputNetworkFile" value="network.xml.gz" />
     <param name="laneDefinitionsFile" value="./test/output/org/matsim/contrib/signals/integration/SignalSystemsIT/testSignalSystems/testLaneDefinitions_v2.0.xml" />
   </module>
 
   <module name="plans">
-    <param name="inputPlansFile" value="&INPUTBASE;/plans.xml.gz" />
+    <param name="inputPlansFile" value="plans.xml.gz" />
   </module>
 
   <module name="signalsystems">

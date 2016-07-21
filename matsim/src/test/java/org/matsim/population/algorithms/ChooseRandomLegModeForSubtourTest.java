@@ -134,10 +134,10 @@ public class ChooseRandomLegModeForSubtourTest {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		this.testSubTourMutationToCar((Network) network);
-		this.testSubTourMutationToPt((Network) network);
-		this.testUnknownModeDoesntMutate((Network) network);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
+		this.testSubTourMutationToCar(network);
+		this.testSubTourMutationToPt(network);
+		this.testUnknownModeDoesntMutate(network);
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		Config config = utils.loadConfig(CONFIGFILE);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFileURL(config.getContext()));
 		this.testSubTourMutationToCar(facilities);
 		this.testSubTourMutationToPt(facilities);
 		this.testUnknownModeDoesntMutate(facilities);
@@ -156,9 +156,9 @@ public class ChooseRandomLegModeForSubtourTest {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
-		testCarDoesntTeleport((Network) network, TransportMode.car, TransportMode.pt);
-		testCarDoesntTeleport((Network) network, TransportMode.pt, TransportMode.car);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
+		testCarDoesntTeleport(network, TransportMode.car, TransportMode.pt);
+		testCarDoesntTeleport(network, TransportMode.pt, TransportMode.car);
 	}
 
 	@Test

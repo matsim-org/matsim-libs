@@ -99,7 +99,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
     public final void testInVehicleDelay01() {
    	 	
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -203,7 +203,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testInVehicleDelay02(){
 	
-	Config config = utils.loadConfig(null);
+	Config config = utils.createConfig();
 	
 	config.controler().setOutputDirectory(utils.getOutputDirectory());
 	config.controler().setLastIteration(0);
@@ -323,7 +323,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testInVehicleDelay03(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -482,7 +482,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay01(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -581,7 +581,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay02(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -682,7 +682,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay03(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -789,7 +789,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay03b(){
 			
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 			
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -797,8 +797,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 			
 		config.transit().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-			
+
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(hParams);
@@ -891,7 +890,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay04(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1012,7 +1011,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay05(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1133,7 +1132,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay06(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1252,7 +1251,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay01(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1323,7 +1322,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay02(){
 	
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1391,7 +1390,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay03(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1471,7 +1470,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay04(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1548,7 +1547,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay05(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);

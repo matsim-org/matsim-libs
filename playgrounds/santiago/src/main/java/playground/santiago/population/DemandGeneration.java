@@ -3,9 +3,6 @@ package playground.santiago.population;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -13,7 +10,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,8 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
 
 
 
@@ -53,48 +48,39 @@ public class DemandGeneration {
 	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
 	final String originalConfig = svnWorkingDir + "inputForMATSim/config_final.xml";	
 	final String originalPlans = svnWorkingDir + "inputForMATSim/plans/plans_final.xml.gz";
-	final String expandedAgentAttributes = svnWorkingDir + "inputForMATSim/plans/expandedAgentAttributes.xml";
+
 
 	
 	final String databaseFilesDir = svnWorkingDir + "inputFromElsewhere/exportedFilesFromDatabase/";
 	final String Normal = databaseFilesDir + "Normal/";
 	final String personasFile =  Normal + "Persona.csv";
-	final String hogaresFile =  Normal + "Hogar.csv";
-		
-
 
 	
 	final double percentage = 0.1;
 	
 	private ActivityClassifier activityClassifier;
 	private Population originalPopulation;
+	private Map<String,Double> idsFactorsSantiago;
+	private Map<String,Double> idsFactorsMatsim;
+	private int totalPopulation;
+	private double proportionalFactor;
 	
-	private Map<String,Persona> personas = new HashMap<>();
-	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
-	private Map<String, Coord> hogarId2Coord = new HashMap<>();
-	private ObjectAttributes agentAttributes;
-	private LinkedList <String> clonedAgentIds ;
-	private LinkedList<String> originalAgentIds ;
-	private String clonedPlans;
-	private final String carUsers = "carUsers";
-	private final String carAvail = "carAvail";	
-	
-	
-	private Map<String,Double> getIdsAndFactorsSantiago(String personasFile){
 
-		Map<String, Double> IdFactors = new TreeMap<String,Double>();
+	private void getIdsAndFactorsSantiago(){
+
+		this.idsFactorsSantiago = new TreeMap<String,Double>();
 
 			try {
 					
-				BufferedReader bufferedReaderTwo = IOUtils.getBufferedReader(personasFile);				
-				String currentLineTwo = bufferedReaderTwo.readLine();				
-					while ((currentLineTwo = bufferedReaderTwo.readLine()) != null) {
-						String[] entries = currentLineTwo.split(",");
-						IdFactors.put(entries[1], Double.parseDouble(entries[33]));
+				BufferedReader bufferedReader = IOUtils.getBufferedReader(personasFile);				
+				String currentLine = bufferedReader.readLine();				
+					while ((currentLine = bufferedReader.readLine()) != null) {
+						String[] entries = currentLine.split(",");
+						idsFactorsSantiago.put(entries[1], Double.parseDouble(entries[33]));
 							
 					}
 
-				bufferedReaderTwo.close();
+				bufferedReader.close();
 					
 				} catch (IOException e) {
 					
@@ -102,61 +88,60 @@ public class DemandGeneration {
 				
 				}
 
-			return IdFactors;
+
 	}
 	
-	private int getTotalPopulationSantiago(String personasFile){
+	private void getTotalPopulationSantiago(){
 
 		double population=0;
-		Map <String, Double> IdFactors=getIdsAndFactorsSantiago(personasFile);
-		for (Map.Entry<String, Double> entry : IdFactors.entrySet()){
+
+		for (Map.Entry<String, Double> entry : idsFactorsSantiago.entrySet()){
 			population += entry.getValue();
 		}
 
-		int totalPopulation = (int)Math.round(population);
+		this.totalPopulation = (int)Math.round(population);
 		System.out.println("The total number of persons in Santiago is " + totalPopulation + ". Obs: this number differs from the total population stored in SantiagoScenarioConstants.java by 35 persons... ");
-		return totalPopulation;
+
 	}
 	
-	private Map<String,Double> getIdsAndFactorsMatsimPop(String originalPlans, String personasFile){
-		
-
-		
+	private void getIdsAndFactorsMatsimPop(){
+	
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());		
 		PopulationReader pr = new PopulationReader(scenario);
 		pr.readFile(originalPlans);
 		this.originalPopulation = scenario.getPopulation();
 		
-		List<Person> persons = new ArrayList<>(originalPopulation.getPersons().values());	
-		Map<String, Double> IdsFactorsSantiago = getIdsAndFactorsSantiago(personasFile);
-		Map<String, Double> IdsFactorsMatsim = new LinkedHashMap <String,Double>();
+		List<Person> persons = new ArrayList<>(originalPopulation.getPersons().values());		
+
 		List<String> IdsMatsim = new ArrayList<>();
 		
+
 		for (Person p : persons){			
 			IdsMatsim.add(p.getId().toString());	
 		}
 		
+		this.idsFactorsMatsim = new TreeMap <String,Double>();
+		
 		for(String Ids : IdsMatsim ) {
-			IdsFactorsMatsim.put(Ids, IdsFactorsSantiago.get(Ids));		
+			idsFactorsMatsim.put(Ids, idsFactorsSantiago.get(Ids));		
 		}
 
-		return IdsFactorsMatsim;
+
 
 	
 	}
 
-	private double getProportionalFactor(double percentage, String personasFile){
+	private void getProportionalFactor(){
 		
-		int totalPopulation = getTotalPopulationSantiago(personasFile);
-		Map<String,Double> infoFromMatsim = getIdsAndFactorsMatsimPop (originalPlans , personasFile);
+
 		double sumFactors = 0;
 		
-		for (Map.Entry<String,Double> entry : infoFromMatsim.entrySet()){		
+		for (Map.Entry<String,Double> entry : idsFactorsMatsim.entrySet()){		
 			sumFactors += entry.getValue();
 		}
 
-		double pF = (percentage*totalPopulation)/sumFactors;
-		return pF;
+		this.proportionalFactor = (percentage*totalPopulation)/sumFactors;
+
 		}
 
 	private double createRandomEndTime(Random random){
@@ -229,19 +214,14 @@ public class DemandGeneration {
 		log.info("...Done.");
 	}
 	
-	private void clonePersons(double percentage, String originalConfig, String personasFile){
+	private void clonePersons(){
 		
 
-		Map<String,Double> IdsAndFactorsFromMatsimPop = getIdsAndFactorsMatsimPop(originalPlans, personasFile);
-		double pF = getProportionalFactor(percentage, personasFile);
-
 		List<Person> persons = new ArrayList<>(originalPopulation.getPersons().values());
-
-
 	
 		for (Person p : persons) {
 			String keyId = p.getId().toString();
-			int clonateFactor = (int)Math.round(pF*IdsAndFactorsFromMatsimPop.get(keyId));
+			int clonateFactor = (int)Math.round(proportionalFactor*idsFactorsMatsim.get(keyId));
 			
 			for(int cf = 1; cf < clonateFactor ; cf++) {
 				Id<Person> pOutId = Id.createPersonId( p.getId().toString().concat("_").concat(String.valueOf(cf)) );
@@ -283,7 +263,7 @@ public class DemandGeneration {
 		this.activityClassifier = new ActivityClassifier(scenarioTmp);
 		activityClassifier.run();
 		new PopulationWriter(activityClassifier.getOutPop()).write(svnWorkingDir + "inputForMATSim/plans/expanded_plans.xml.gz");
-		this.clonedPlans = svnWorkingDir + "inputForMATSim/plans/expanded_plans.xml.gz";
+
 		log.info("expanded_plans has the entire population w/ randomized activity end times "
 				+ "INCLUDING the classification of the activities");
 		///////////////////////////////////////////////////////////////////////////////////////////
@@ -292,103 +272,8 @@ public class DemandGeneration {
 				
 		
 	}
-	
-	private void readHogares(String hogaresFile){
 		
-
-		final int idxHogarId = 0;
-		final int idxNVeh = 11;
-		
-		BufferedReader reader = IOUtils.getBufferedReader(hogaresFile);
-
-		
-		try {
-			String line = reader.readLine();
-			while( (line = reader.readLine()) != null ){
-				String[] splittedLine = line.split(",");
-				String id = splittedLine[idxHogarId];
-				int nVehicles = Integer.parseInt(splittedLine[idxNVeh]);
-				this.hogarId2NVehicles.put(id, nVehicles);
-
-			}
-			reader.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}	
-	
-	private void readPersonas(String personasFile){
-		
-		final int idxHogarId = 0;
-		final int idxPersonId = 1;
-		final int idxAge = 2;
-		final int idxSex = 3;
-		final int idxNViajes = 5;
-		final int idxLicence = 6;
-		final int idxCoordX = 16;
-		final int idxCoordY = 17;
-		
-		
-		BufferedReader reader = IOUtils.getBufferedReader(personasFile);
-		
-		try {
-			
-			String line = reader.readLine();
-			while( (line = reader.readLine()) != null ){
-				String[] splittedLine = line.split(",");
-				String hogarId = splittedLine[idxHogarId];
-				String id = splittedLine[idxPersonId];
-				int age = 2012 - Integer.valueOf(splittedLine[idxAge]);
-				String sex = splittedLine[idxSex];
-				String drivingLicence = splittedLine[idxLicence];
-				int nCars = this.hogarId2NVehicles.get(hogarId);
-				String nViajes = splittedLine[idxNViajes];
-				
-				Persona persona = new Persona(id, age, sex, drivingLicence, nCars, nViajes);
-				persona.setHomeCoord(this.hogarId2Coord.get(hogarId));
-				
-				String x = splittedLine[idxCoordX];
-				String y = splittedLine[idxCoordY];
-				if(!x.equals("") && !y.equals("") && !x.equals("0") && !y.equals("0")){
-					persona.setWorkCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
-				}
-				
-				this.personas.put(id,persona);
-
-			}
-			
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-	
-	private void readPlans(String clonedPlans) {
-		
-		this.clonedAgentIds = new LinkedList<>();
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).readFile(clonedPlans);
-		Population population = scenario.getPopulation();
-		List<Person> persons = new ArrayList<>(population.getPersons().values());
-		for (Person p : persons) {
-			String keyId = p.getId().toString();
-			clonedAgentIds.add(keyId);
-			
-		}
-		
-		this.originalAgentIds = new LinkedList<>();
-		
-		for (String agents : clonedAgentIds) {
-			String[]completeIds=agents.split("_");
-			originalAgentIds.add(completeIds[0]);
-		}
-
-	}
-	
-	private void writeNewConfigFile (String originalConfig, double percentage, String runsWorkingDir){
+	private void writeNewConfigFile (){
 		
 		Config oldConfig = ConfigUtils.loadConfig(originalConfig);
 		
@@ -425,8 +310,7 @@ public class DemandGeneration {
 		////////////////////////////////////////////////////////////////////////
 		
 	}
-		
-	
+			
 	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
 		for(String act :acts.keySet()){
 			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
@@ -449,36 +333,12 @@ public class DemandGeneration {
 	
 	private void run (){
 
-		clonePersons(percentage, originalConfig, personasFile);
-
-		
-		readHogares(hogaresFile);
-		readPersonas(personasFile);
-		readPlans(clonedPlans);
-		
-
-		
-		this.agentAttributes = new ObjectAttributes();
-		
-		for(Persona persona : this.personas.values()){
-			
-			if(persona.hasCar() && persona.hasDrivingLicence()){
-				String id = persona.getId();
-				int start = originalAgentIds.indexOf(id);
-				int end = originalAgentIds.lastIndexOf(id);
-				/*Avoid the case in which, because of the sampling, the ID doesn't exist in the synthetic population*/
-				if (start!=-1){
-					for (int i = start; i<=end; i++){					
-					agentAttributes.putAttribute(clonedAgentIds.get(i), carUsers, carAvail);					
-					}
-				}
-
-			}		
-		}
-		
-		new ObjectAttributesXmlWriter(agentAttributes).writeFile(expandedAgentAttributes);
-		
-		writeNewConfigFile (originalConfig, percentage, runsWorkingDir);
+		getIdsAndFactorsSantiago();
+		getTotalPopulationSantiago();
+		getIdsAndFactorsMatsimPop();
+		getProportionalFactor();
+		clonePersons();
+		writeNewConfigFile();
 		
 	}
 	

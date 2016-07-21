@@ -326,25 +326,27 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		
-		log.info("Simulation is shut down. Running final analysis...");
-		
-		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(event.getServices().getConfig().controler().getOutputDirectory());
-		analysis.run();
-		
-		try {
-			MATSimVideoUtils.createLegHistogramVideo(event.getServices().getConfig().controler().getOutputDirectory());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		try {
-			MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (this.congestionInfo.getDecongestionConfigGroup().isRUN_FINAL_ANALYSIS()) {
+			log.info("Simulation is shut down. Running final analysis...");
+			
+			PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(event.getServices().getConfig().controler().getOutputDirectory());
+			analysis.run();
+			
+			try {
+				MATSimVideoUtils.createLegHistogramVideo(event.getServices().getConfig().controler().getOutputDirectory());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			try {
+				MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

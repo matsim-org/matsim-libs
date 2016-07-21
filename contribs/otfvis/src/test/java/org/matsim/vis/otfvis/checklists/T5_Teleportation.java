@@ -36,7 +36,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class T5_Teleportation {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml");
+		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config-qsim.xml");
 		List<String> emptyList = Collections.emptyList();
 		config.qsim().setMainModes(emptyList);
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);

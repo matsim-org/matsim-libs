@@ -43,10 +43,9 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -184,7 +183,6 @@ public class PopulationGenerator {
 
 	private static void createNetworkChangeEvents(Scenario sc) {
 		Collection<NetworkChangeEvent> events = new LinkedList<NetworkChangeEvent>();
-		NetworkChangeEventFactoryImpl fac = new NetworkChangeEventFactoryImpl();
 
 
 		double time = 0;
@@ -192,7 +190,7 @@ public class PopulationGenerator {
 
 			int ii = 0;
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
+				NetworkChangeEvent e = new NetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -233,7 +231,7 @@ public class PopulationGenerator {
 			}
 			int jj = 0;
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time+ 2*60+30);
+				NetworkChangeEvent e = new NetworkChangeEvent(time+ 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -262,7 +260,7 @@ public class PopulationGenerator {
 //				continue;
 //			}
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
+				NetworkChangeEvent e = new NetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -289,7 +287,7 @@ public class PopulationGenerator {
 				events.add(e);
 			}
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time + 2*60+30);
+				NetworkChangeEvent e = new NetworkChangeEvent(time + 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
