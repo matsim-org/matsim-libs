@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.incidents;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -56,11 +57,11 @@ public class IncidentControlerListener implements IterationStartsListener {
 
 		log.info("Setting network change events for the next iteration: " + nce);
 						
-		List<NetworkChangeEvent> networkChangeEvents = new NetworkChangeEventsParser(controler.getScenario().getNetwork()).parseEvents(nce);;
+		List<NetworkChangeEvent> events = new ArrayList<>() ;
+		new NetworkChangeEventsParser(controler.getScenario().getNetwork(), events).parse(nce);;
 				
-		Network network = (Network) controler.getScenario().getNetwork();
+		Network network = controler.getScenario().getNetwork();
 		NetworkUtils.getNetworkChangeEvents(network).clear();
-		final List<NetworkChangeEvent> events = networkChangeEvents;
 		NetworkUtils.setNetworkChangeEvents(network,events);
 		event.getServices().getConfig().network().setChangeEventsInputFile(nce);
 	}

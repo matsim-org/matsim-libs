@@ -20,14 +20,17 @@
 package org.matsim.core.scenario;
 
 import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -46,7 +49,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
 import com.google.inject.Inject;
-import java.net.URL;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -138,10 +140,11 @@ class ScenarioLoaderImpl {
 
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
-	            Network network = (Network) this.scenario.getNetwork();
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
+				Network network = this.scenario.getNetwork();
+				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
 				parser.parse(this.config.network().getChangeEventsInputFile());
-				NetworkUtils.setNetworkChangeEvents(network,parser.getEvents());
+				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
 		}
 	}

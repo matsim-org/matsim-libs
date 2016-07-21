@@ -142,7 +142,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final String filename) throws UncheckedIOException {
+	public final void parse(final String filename) throws UncheckedIOException {
 		log.info("starting to parse xml from file " + filename + " ...");
 		this.source = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));

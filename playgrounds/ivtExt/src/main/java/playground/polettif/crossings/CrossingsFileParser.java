@@ -61,65 +61,64 @@ public class CrossingsFileParser extends MatsimXmlParser {
 
 	private PtLink currentRailLink;
 	
-	private Map<Id<Link>, PtLink> railwayLinks;
+	private final Map<Id<Link>, PtLink> railwayLinks;
 
 	// ========================================================================
 	// constructor
 	// ========================================================================
 
-	public CrossingsFileParser() {
-	
+	public CrossingsFileParser(Map<Id<Link>,PtLink> railwayLinks ) {
+		this.railwayLinks = railwayLinks ;
 	}
 	
 	// ========================================================================
 	// parsing
 	// ========================================================================
 	
-	/**
-	 * Parses a file with crossings and returns a list with
-	 * instances of {@link PtLink}.
-	 *
-	 * @param file
-	 *            a xml file containing network change events.
-	 */
-	public Map<Id<Link>, PtLink> parseCrossings(String file) {
-		railwayLinks = new HashMap<>();
-		super.parse(file);
-		return railwayLinks;
-	}
-	
-
-	@Override
-	public void parse(String filename) throws UncheckedIOException {
-		railwayLinks = new HashMap<>();
-		super.parse(filename);
-
-		log.info("Crossings file read.");
-
-	}
-
-	@Override
-	public void parse(URL url) throws UncheckedIOException {
-		railwayLinks = new HashMap<>();
-		super.parse(url);
-	}
+//	/**
+//	 * Parses a file with crossings and returns a list with
+//	 * instances of {@link PtLink}.
+//	 *
+//	 * @param file
+//	 *            a xml file containing network change events.
+//	 */
+//	public Map<Id<Link>, PtLink> parseCrossings(String file) {
+//		super.parse(file);
+//		return railwayLinks;
+//	}
+//	
+//
+//	@Override
+//	public void parse(String filename) throws UncheckedIOException {
+//		railwayLinks = new HashMap<>();
+//		super.parse(filename);
+//
+//		log.info("Crossings file read.");
+//
+//	}
+//
+//	@Override
+//	public void parse(URL url) throws UncheckedIOException {
+//		railwayLinks = new HashMap<>();
+//		super.parse(url);
+//	}
 	
 	// ========================================================================
 	// accessor
 	// ========================================================================
-
-	/**
-	 * Returns the list with public transport links with crossings on them. Be sure to call
-	 * {@link #parse(String)}, {@link #parse(String)} or
-	 * {@link #parse(URL)} before.
-	 * 
-	 * @return a list of public transport links, or <tt>null</tt> if
-	 *         {@link #parse(String)}, {@link #parse(String)} nor
-	 *         {@link #parse(URL)} has been called before.
-	 */
-	public Map<Id<Link>, PtLink> getPtLinks() {
-		return railwayLinks;
-	}
+//
+//	/**
+//	 * Returns the list with public transport links with crossings on them. Be sure to call
+//	 * {@link #parse(String)}, {@link #parse(String)} or
+//	 * {@link #parse(URL)} before.
+//	 * 
+//	 * @return a list of public transport links, or <tt>null</tt> if
+//	 *         {@link #parse(String)}, {@link #parse(String)} nor
+//	 *         {@link #parse(URL)} has been called before.
+//	 */
+//	public Map<Id<Link>, PtLink> getPtLinks() {
+//		return railwayLinks;
+//	}
 	
 	// ========================================================================
 	// parsing methods

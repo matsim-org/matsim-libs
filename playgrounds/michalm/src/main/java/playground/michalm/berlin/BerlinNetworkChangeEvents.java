@@ -45,8 +45,9 @@ public class BerlinNetworkChangeEvents
         Scenario onlyBerlinScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
 
-        List<NetworkChangeEvent> berlinBrbEvents = new NetworkChangeEventsParser(
-                berlinBrbScenario.getNetwork()).parseEvents(DIR + allChangeEventsFile);
+        List<NetworkChangeEvent> berlinBrbEvents = new ArrayList<>() ;
+        new NetworkChangeEventsParser(
+                berlinBrbScenario.getNetwork(), berlinBrbEvents).parse(DIR + allChangeEventsFile);
 
         List<NetworkChangeEvent> onlyBerlinEvents = new ArrayList<>();
         Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();
