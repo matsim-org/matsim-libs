@@ -59,13 +59,13 @@ public class TestRunIVTBaselineCalibration {
 		final String pathToStreetLinksHourlyToMonitor = utils.getClassInputDirectory() + "streetLinksHourlyToMonitor.txt";
 
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
-		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
-		final String pathToInitialPopulation = utils.getClassInputDirectory() + "population.xml";
+		final String pathToNetwork = "multimodalnetwork.xml";
+		final String pathToInitialPopulation = "population2.xml";
 		final String pathToPopulation = utils.getOutputDirectory() + "population.xml";
 		final String pathToPrefs = utils.getOutputDirectory() + "prefs.xml";
-		final String pathToFacilities = utils.getOutputDirectory() + "facilities.xml";
+		final String pathToFacilities = "facilities.xml";
 		final String pathToF2L = utils.getOutputDirectory() + "f2l.f2l";
-		final String pathToConfig = utils.getOutputDirectory() + "config.xml";
+		final String pathToConfig = utils.getClassInputDirectory() + "config.xml";
 		final String pathToSchedule = utils.getClassInputDirectory() + "transitschedule.xml";
 		final String pathToVehicles = "test/scenarios/pt-tutorial/transitVehicles.xml";
 
