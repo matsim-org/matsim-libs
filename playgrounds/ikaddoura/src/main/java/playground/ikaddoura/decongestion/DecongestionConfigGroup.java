@@ -44,12 +44,12 @@ public class DecongestionConfigGroup {
 	
 	// General parameters
 	private boolean RUN_FINAL_ANALYSIS = true;
-	private int UPDATE_PRICE_INTERVAL = 1; // default: 1
-	private int WRITE_OUTPUT_ITERATION = 1; // default: 1
+	private int UPDATE_PRICE_INTERVAL = 1;
+	private int WRITE_OUTPUT_ITERATION = 1;
 	private boolean WRITE_LINK_INFO_CHARTS = true; // set to false for big networks
-	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // default: 1.0
-	private double FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = 0.1; // default: 0.1
-	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // default: 1.0
+	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // set to 1.0 to account for rounding errors
+	private double FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = 0.1; // set above 0.0 to disable pricing in the previous iterations
+	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // set below 1.0 to disable price adjustment for final iterations
 	
 	public enum TollingApproach {
         NoPricing, V8, BangBang, PID
