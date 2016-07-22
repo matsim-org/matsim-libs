@@ -81,7 +81,7 @@ public class ClusterSantiagoRunner {
 		
 			caseName = args[0];
 			inputPath = "/net/ils4/lcamus/runs-svn/santiago/"+caseName+"/";
-			configFile = inputPath + "randomized_expanded_config.xml";
+			configFile = inputPath + "cluster_randomized_expanded_config.xml";
 			
 			policy = args[1]; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
 			
