@@ -8,7 +8,7 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../../../../../../../../../matsim/test/input/scenarios/berlin/network.xml.gz" />
+		<param name="inputNetworkFile" value="../../../../../scenarios/berlin/network.xml.gz" />
 	</module>
 
 	<module name="facilities">
