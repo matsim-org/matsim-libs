@@ -102,7 +102,7 @@ public final class RunBraessSimulation {
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
@@ -126,7 +126,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/ICP/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/pricingBraess1800/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -161,7 +161,7 @@ public final class RunBraessSimulation {
 		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalControlType.NONE) ? false : true);
 
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta(20);
+		config.planCalcScore().setBrainExpBeta(2);
 
 		// choose between link to link and node to node routing
 		// (only has effect if lanes are used)
@@ -183,7 +183,7 @@ public final class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			strat.setWeight(0.0);
+			strat.setWeight(0.1);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
@@ -372,6 +372,7 @@ public final class RunBraessSimulation {
 			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
 			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 			decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+			decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
 			controler = decongestion.getControler();
