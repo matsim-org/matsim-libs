@@ -32,18 +32,29 @@ public class PopulationComparison {
 		int count1 = 0;
 		int count2 = 0;
 		int count3 = 0;
+		double score1 = 0.0;
+		double score2 = 0.0;
+		double score3 = 0.0;
 		int count = 0;
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			
 			Plan plan = person.getSelectedPlan();
 			Plan plan2 = scenario2.getPopulation().getPersons().get(person.getId()).getSelectedPlan();
-			if (plan.getPlanElements().size() > plan2.getPlanElements().size())
+			if (plan.getPlanElements().size() > plan2.getPlanElements().size()) {
 				count1++;
-			else if (plan.getPlanElements().size() < plan2.getPlanElements().size())
+				score1 += plan.getScore() - plan2.getScore();
+			}
+			else if (plan.getPlanElements().size() < plan2.getPlanElements().size()) {
 				count2++;
-			else 
+				score2 += plan.getScore() - plan2.getScore();
+
+			}
+			else { 
 				count3++;
+				score3 += plan.getScore() - plan2.getScore();
+
+			}
 			
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan, null);
 			
@@ -68,6 +79,8 @@ public class PopulationComparison {
 
 		
 		System.out.println(count1 + " " + count2 + " " + count3);
+		System.out.println(score1 / count1 + " " + score2 / count2 + " " + score3 / count3);
+
 		
 	}
 
