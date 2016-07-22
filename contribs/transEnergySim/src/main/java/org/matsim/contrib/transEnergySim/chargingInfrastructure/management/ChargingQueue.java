@@ -1,5 +1,6 @@
 package org.matsim.contrib.transEnergySim.chargingInfrastructure.management;
 
+import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
@@ -14,11 +15,15 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 public interface ChargingQueue {
 	
 	// Returns true if vehicle successfully added to queue and false if queue is full
-	boolean addVehicle(ChargingPlugType plugType, Vehicle vehicle);
-	boolean isQueueFull();
-	Vehicle dequeueVehicle(ChargingPlugType plugType);
-	Vehicle peek(ChargingPlugType chargingPlugType);
-	int size();
-	boolean removeVehicle(Vehicle vehicle);
+	boolean isPhysicalSiteFull();
+	VehicleAgent dequeueVehicleFromChargingQueue(ChargingPlugType plugType);
+	VehicleAgent peekAtChargingQueue(ChargingPlugType chargingPlugType);
+	int getNumAtPhysicalSite();
+	int maxSizeOfPhysicalSite();
+	boolean removeVehicleFromChargingQueue(VehicleAgent vehicle);
+	void removeVehicleFromPhysicalSite(VehicleAgent vehicle);
+	boolean addVehicleToPhysicalSite();
+	boolean addVehicleToChargingQueue(ChargingPlugType plugType, VehicleAgent vehicle);
+	int getNumInChargingQueue(ChargingPlugType chargingPlugType);
 
 }

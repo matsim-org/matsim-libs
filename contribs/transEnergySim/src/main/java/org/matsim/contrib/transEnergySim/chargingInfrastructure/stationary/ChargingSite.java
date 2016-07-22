@@ -8,6 +8,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.management.ChargingNetworkOperator;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.management.ChargingSitePolicy;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 
 public interface ChargingSite extends Identifiable<ChargingSite> {
 
@@ -54,4 +56,12 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract void handleBeginChargingSession(ChargingPlug plug,VehicleAgent agent);
 
 	abstract void handleEndChargingSession(ChargingPlug plug, VehicleAgent agent);
+
+	abstract void removeVehicleFromQueue(ChargingPlug plug, VehicleAgent vehicle);
+
+	void registerPlugAvailable(ChargingPlug plug);
+
+	void registerPlugUnavailable(ChargingPlug plug);
+
+	abstract void registerVehicleDeparture(VehicleAgent agent);
 }
