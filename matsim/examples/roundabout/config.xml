@@ -4,22 +4,20 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="examples/roundabout/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="examples/roundabout/plans.xml" />
+		<param name="inputPlansFile" value="plans.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
-		<param name="mobsim" value="queueSimulation" />
 		<param name = "snapshotFormat"	value = "otfvis,transims"/>
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="flowCapacityFactor" value="0.5" />
 		<param name="storageCapacityFactor" value="0.5" />
 

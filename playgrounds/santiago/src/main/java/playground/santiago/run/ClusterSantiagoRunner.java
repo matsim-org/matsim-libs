@@ -63,40 +63,39 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 
-public class SantiagoScenarioRunnerTry {
+public class ClusterSantiagoRunner {
 
-	private static boolean doModeChoice = true;	
-	private static boolean mapActs2Links = false;
-	private static boolean pricingFirstBest = false;
-	private static boolean pricingCordon = false;	
-	//TODO: ADD HERE OTHER POLICIES SO TO RUN ALL THE CASES WITH THE SAME RUNNER.
-//	private static boolean someOtherPolicy = false;
-
-	private static String caseName = "01FIRSTBEST";
-	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/input/";
+	private static boolean doModeChoice;	
+	private static boolean mapActs2Links;	
+	private static String policy;
+	private static String caseName;
+	private static String inputPath;  	
 	private static String configFile;
-	
-	private static double sigma = 3.0;
+	private static int sigma;
+	private static String cordonFile;
+
 	
 	public static void main(String args[]){
 
-
-
-		if(args.length==0){
-			
-			configFile = inputPath + "randomized_sampled_config.xml";
-
-		} else { /*FOR CLUSTER*/
-			
-			configFile = args[0];
-			doModeChoice = Boolean.parseBoolean(args[1]);
-			mapActs2Links = Boolean.parseBoolean(args[2]);
-			pricingFirstBest = Boolean.parseBoolean(args[3]);
-			pricingCordon = Boolean.parseBoolean(args[4]);
-			
-
-		}
 		
+		
+			caseName = args[0];
+			inputPath = "/net/ils4/lcamus/runs-svn/santiago/"+caseName+"/";
+			configFile = inputPath + "randomized_expanded_config.xml";
+			
+			policy = args[1]; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
+			
+			doModeChoice = Boolean.parseBoolean(args[2]);
+			mapActs2Links = Boolean.parseBoolean(args[3]);
+
+			//ONLY NECESSARY FOR SIMULATE THE SCENARIO WITH A CORDON TOLL.
+			if (policy.equals("2")){ 
+			sigma = Integer.parseInt(args[4]);
+			cordonFile = inputPath +"input/"+ args[5];
+			}
+
+			
+
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
@@ -116,28 +115,39 @@ public class SantiagoScenarioRunnerTry {
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
-	
-		if (pricingFirstBest){
+		
+		switch (policy){
+		
+		case "0":
+			
+			//NOTHING-TO-DO, GO TO controler.run()
+			
+			break;
+		
+		case "1": //FIRST-BEST
 			
 			TollHandler tollHandler = new TollHandler(scenario);
 			EventHandler congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario());
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(),
 							tollHandler, congestionHandler));
-		
-
-		}
-		
-		if (pricingCordon){
+			break;
+			
+		case "2": //CORDON-TOLL
 			
 			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-			rpcg.setTollLinksFile(inputPath + "outerCordon.xml");
+			rpcg.setTollLinksFile(cordonFile);
 			config.plansCalcRoute().setRoutingRandomness(sigma); 
 			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-
-
+			
+			break;
+//			
+//		case "3": //SOME-OTHER-POLICY
+//			
+//			break;
 		}
-		
+	
+
 		controler.run();		
 		
 	}

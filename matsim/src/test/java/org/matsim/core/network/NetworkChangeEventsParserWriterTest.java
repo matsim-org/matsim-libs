@@ -20,6 +20,7 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -50,9 +51,9 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		final Node toNode1 = node3;
 		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1500, 1.667, (double) 3600, (double) 1 );
 
-		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
+		List<NetworkChangeEvent> events = new ArrayList<>() ;
+		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, events );
 		parser.parse(input);
-		List<NetworkChangeEvent> events  = parser.getEvents();
 		new NetworkChangeEventsWriter().write(output, events);
 
 		long checksum_ref = CRCChecksum.getCRCFromFile(input);

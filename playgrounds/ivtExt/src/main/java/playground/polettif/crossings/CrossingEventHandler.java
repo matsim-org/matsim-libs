@@ -52,16 +52,16 @@ public class CrossingEventHandler implements LinkEnterEventHandler, LinkLeaveEve
 	private Network network;
 
 	private Map<List<Object>, Double> enterEvents = new HashMap<>();
-	private Map<Id<Link>, PtLink> ptLinks;
+	private Map<Id<Link>, PtLink> ptLinks = new HashMap<>() ;
 
 	public void reset(int iteration) {
 		System.out.println("reset...");
 	}
 
 	public void loadCrossings(String filename) {
-		CrossingsFileParser parser = new CrossingsFileParser();
+		CrossingsFileParser parser = new CrossingsFileParser( this.ptLinks );
 		parser.parse(filename);
-		this.ptLinks = parser.getPtLinks();
+//		this.ptLinks = parser.getPtLinks();
 		}
 	
 	@Override

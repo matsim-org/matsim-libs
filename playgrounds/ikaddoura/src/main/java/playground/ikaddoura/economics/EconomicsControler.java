@@ -66,11 +66,11 @@ import java.util.Random;
 public class EconomicsControler {
 	
 	private static final Logger log = Logger.getLogger(EconomicsControler.class);
-	private static final String path = "/Users/ihab/Documents/workspace/runs-svn/economics/";
+	private static final String path = "../../../runs-svn/economics/";
 	
-	private final int minDemand = 100;
-	private final int maxDemand = 7200;
-	private final int incrementDemand = 100;
+	private final int minDemand = 1;
+	private final int maxDemand = 100;
+	private final int incrementDemand = 1;
 	private final double timeBin = 3600;
 	
 	private final double minCost = 1000.;
@@ -278,7 +278,8 @@ public class EconomicsControler {
 			config.controler().setOutputDirectory(path + "output_CostAsFunctionOfDemand_" + demand + "/");
 			
 			Population population = PopulationUtils.createPopulation(config);
-			population = generatePopulation(population, demand);
+//			population = generatePopulation(population, demand);
+			population = generatePopulationSameTime(population, demand);
 			
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
@@ -375,6 +376,35 @@ public class EconomicsControler {
 			population.addPerson(person);
 			
 			linkEnterTimeThisAgent += linkEnterGap;
+		}
+		
+		return population;
+	}
+	
+	private Population generatePopulationSameTime(Population population, int demand) {
+				
+		final double linkEnterTimeThisAgent = 0.;
+		
+		for (int personNr = 0; personNr < demand; personNr++) {
+			
+			Coord homeLocation = getHomeCoord();
+			Coord workLocation = new Coord(15000., 0.);		
+			
+			Person person = population.getFactory().createPerson(Id.create("person_" + personNr, Person.class));
+			Plan plan = population.getFactory().createPlan();
+
+			Activity activity0 = population.getFactory().createActivityFromCoord("h", homeLocation);
+			
+			activity0.setEndTime(linkEnterTimeThisAgent);
+			plan.addActivity(activity0);
+						
+			plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+			
+			Activity activity1 = population.getFactory().createActivityFromCoord("w", workLocation);
+			plan.addActivity(activity1);
+			
+			person.addPlan(plan);
+			population.addPerson(person);			
 		}
 		
 		return population;

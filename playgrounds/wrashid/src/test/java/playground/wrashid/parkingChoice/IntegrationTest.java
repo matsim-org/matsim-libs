@@ -24,7 +24,7 @@ public class IntegrationTest  extends TestCase {
 		
 	public void testModeChange(){
 		ParkingChoiceLib.isTestCaseRun=true;
-		Controler controler=new Controler("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
+		Controler controler=new Controler("test/input/scenarios/chessConfig5.xml");
 		
 		controler.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// too many things don't work with access/egress walk true. kai, jun'16
