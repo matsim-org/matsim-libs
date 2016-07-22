@@ -39,7 +39,7 @@ public class ParkingIntegrationTestSmall {
 	// just to test, that the system runs without errors.
 	@Test
 	public void testScenario(){
-		Config config = ConfigUtils.loadConfig( "test/input/scenarios/chessConfig2.xml", new ParkingConfigModule()) ;
+		Config config = ConfigUtils.loadConfig( utils.getPackageInputDirectory() + "chessConfig2.xml", new ParkingConfigModule()) ;
 		
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);

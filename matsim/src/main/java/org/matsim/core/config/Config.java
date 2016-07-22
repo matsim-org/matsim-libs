@@ -109,6 +109,7 @@ public class Config implements MatsimExtensionPoint {
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
+		log.info( "context=[" + context + "]" ) ;
 	}
 
 	/**
