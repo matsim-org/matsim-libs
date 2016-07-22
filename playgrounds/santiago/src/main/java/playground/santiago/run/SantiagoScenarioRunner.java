@@ -53,6 +53,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+
 import playground.santiago.SantiagoScenarioConstants;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -68,8 +69,8 @@ import javax.inject.Provider;
 public class SantiagoScenarioRunner {
 	
 	
-	private static String caseName = "BASE1/";
-	private static String inputPath = "../../../runs-svn/santiago/"+caseName;
+	private static String caseName = "BASE1";
+	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
 	private static boolean doModeChoice = true;
 	private static boolean mapActs2Links = false;
 	
@@ -148,6 +149,8 @@ public class SantiagoScenarioRunner {
 		controler.run();
 	}
 
+
+	
 	private static void mapActivities2properLinks(Scenario scenario) {
 		Network subNetwork = getNetworkWithProperLinksOnly(scenario.getNetwork());
 		for(Person person : scenario.getPopulation().getPersons().values()){
