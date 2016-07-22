@@ -49,7 +49,7 @@ public class DecongestionConfigGroup {
 	private boolean WRITE_LINK_INFO_CHARTS = true; // set to false for big networks
 	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // default: 1.0
 	private double FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = 0.1; // default: 0.1
-	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 0.9; // default: 0.9
+	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // default: 1.0
 	
 	public enum TollingApproach {
         NoPricing, V8, BangBang, PID
