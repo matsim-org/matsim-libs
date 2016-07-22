@@ -18,48 +18,26 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.junit.Test;
 
 /**
  * @author nagel
  *
  */
-public class RunConfigurableQNetworkFactoryExample {
-
+public class RunConfigurableQNetworkFactoryExampleTest {
 
 	/**
-	 * @param args
+	 * Test method for {@link org.matsim.core.mobsim.qsim.qnetsimengine.RunConfigurableQNetworkFactoryExample#main(java.lang.String[])}.
 	 */
-	public static void main(String[] args) {
-
-		Config config = ConfigUtils.createConfig() ;
+	@SuppressWarnings("static-method")
+	@Test
+	public final void testMain() {
+		try {
+			RunConfigurableQNetworkFactoryExample.main(null);
+		} catch ( Exception ee ) {
+			throw new RuntimeException("something went wrong") ;
+		}
 		
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
-		
-		final Scenario scenario = ScenarioUtils.createScenario( config ) ;
-		
-		Controler controler = new Controler( scenario ) ;
-		
-		final EventsManager events = controler.getEvents() ;
-		
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install() {
-				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
-				factory.setLinkSpeedCalculator(null); // fill with something reasonable
-				bind( QNetworkFactory.class ).toInstance( factory ) ;
-				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring 
-				// it in every iteration via the initializeFactory(...) method. kai, mar'16 
-			}
-		});
-		
-		controler.run();
 		
 	}
 
