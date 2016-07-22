@@ -37,7 +37,7 @@ public class PathTest {
 		}
 
 		config.network().setInputFile(urlString);
-		config.plans().setInputFile("./../matsim/../matsim/examples/equil/plans2.xml");
+		config.plans().setInputFile("../../../matsim/matsim/matsim/matsim/examples/equil/plans2.xml");
 
 //		config.network().setInputFile("file:C:\\Users/GabrielT/Vsp/matsim/matsim/matsim/matsim/examples/equil/network.xml");
 //		config.plans().setInputFile("file:C:\\Users/GabrielT/Vsp/matsim/matsim/matsim/matsim/examples/equil/plans2.xml");
