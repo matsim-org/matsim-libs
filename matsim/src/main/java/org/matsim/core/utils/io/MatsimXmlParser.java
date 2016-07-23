@@ -167,7 +167,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		parse(new InputSource(stream));
 	}
 
-	protected void parse(final InputSource input) throws UncheckedIOException {
+	public final void parse(final InputSource input) throws UncheckedIOException {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setValidating(this.isValidating);

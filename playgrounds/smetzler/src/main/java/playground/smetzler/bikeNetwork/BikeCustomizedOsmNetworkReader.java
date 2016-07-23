@@ -1131,14 +1131,6 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 
 
-		// this method needs to be here if the network reader is not in the same package as the MatsimXmlParser
-		// as it wont be found otherwise
-		// cf. CustomizedOsmNetworkReader
-		@Override
-		protected void parse(InputSource input) throws UncheckedIOException {
-			super.parse(input);
-		}
-
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 
