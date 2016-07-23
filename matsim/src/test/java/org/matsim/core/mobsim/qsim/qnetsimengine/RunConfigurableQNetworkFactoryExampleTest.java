@@ -19,6 +19,9 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.junit.Test;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
  * @author nagel
@@ -33,7 +36,10 @@ public class RunConfigurableQNetworkFactoryExampleTest {
 	@Test
 	public final void testMain() {
 		try {
-			RunConfigurableQNetworkFactoryExample.main(null);
+			Config config = ConfigUtils.createConfig() ;
+			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controler().setLastIteration(5);
+			RunConfigurableQNetworkFactoryExample.run(config);
 		} catch ( Exception ee ) {
 			throw new RuntimeException("something went wrong") ;
 		}

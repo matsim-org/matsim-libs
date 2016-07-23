@@ -39,10 +39,13 @@ public class RunConfigurableQNetworkFactoryExample {
 	 */
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.createConfig() ;
+		Config config = ConfigUtils.createConfig(args[0]) ;
 		
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
+		run(config);
 		
+	}
+
+	static void run(Config config) {
 		final Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		
 		Controler controler = new Controler( scenario ) ;
@@ -60,7 +63,6 @@ public class RunConfigurableQNetworkFactoryExample {
 		});
 		
 		controler.run();
-		
 	}
 
 }
