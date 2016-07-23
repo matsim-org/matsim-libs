@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.utils;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -57,7 +59,25 @@ public final class LoadMyScenarios {
 		String configFile = outputDir+"/output_config.xml";
 		String plansFile = outputDir+"/output_plans.xml.gz";
 		String networkFile = outputDir+"/output_network.xml.gz";
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile, configFile);
+		
+		Config config = new Config();
+		config.addCoreModules();
+		ConfigReader configReader = new ConfigReader(config);
+		configReader.readFile(configFile);
+		config.plans().setInputFile(plansFile);
+		config.network().setInputFile(networkFile);
+		
+		String personAttributeFile = outputDir+"output_personAttributes.xml.gz";
+		if ( new File(personAttributeFile).exists() )  {
+			config.plans().setInputPersonAttributeFile(personAttributeFile);
+		}
+		
+		String vehicleFile = outputDir+"output_vehicles.xml.gz";
+		if(new File(vehicleFile).exists()) {
+			config.vehicles().setVehiclesFile(vehicleFile);
+		}
+		
+		Scenario sc = ScenarioUtils.loadScenario(config);
 		sc.getConfig().controler().setOutputDirectory(outputDir);
 		return sc;
 	}
