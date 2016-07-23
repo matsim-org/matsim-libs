@@ -128,7 +128,7 @@
 <!-- ====================================================================== -->
 
 	<module name="f2l" >
-		<param name="inputF2LFile" value="test/output/playground/boescpa/ivtBaseline/TestRunIVTBaselineCalibration/testScenario/f2l.f2l" />
+		<param name="inputF2LFile" value="test/input/playground/boescpa/ivtBaseline/TestRunIVTBaselineCalibration/f2l.f2l" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -519,9 +519,9 @@
 		<param name="inputCRS" value="null" />
 
 		<!-- Path to a file containing person attributes (required file format: ObjectAttributes). -->
-		<param name="inputPersonAttributesFile" value="test/output/playground/boescpa/ivtBaseline/TestRunIVTBaselineCalibration/testScenario/prefs.xml" />
+		<param name="inputPersonAttributesFile" value="prefs.xml" />
 
-		<param name="inputPlansFile" value="test/output/playground/boescpa/ivtBaseline/TestRunIVTBaselineCalibration/testScenario/population.xml" />
+		<param name="inputPlansFile" value="population.xml" />
 
 		<!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
 		<param name="networkRouteType" value="LinkNetworkRoute" />
@@ -944,7 +944,7 @@
 		<param name="transitModes" value="pt" />
 
 		<!-- Input file containing the transit schedule to be simulated. -->
-		<param name="transitScheduleFile" value="test/input/playground/boescpa/ivtBaseline/TestRunIVTBaselineCalibration/transitschedule.xml" />
+		<param name="transitScheduleFile" value="transitschedule.xml" />
 
 		<!-- Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes. -->
 		<param name="transitStopsAttributesFile" value="null" />
@@ -953,7 +953,7 @@
 		<param name="useTransit" value="true" />
 
 		<!-- Input file containing the vehicles used by the departures in the transit schedule. -->
-		<param name="vehiclesFile" value="test/scenarios/pt-tutorial/transitVehicles.xml" />
+		<param name="vehiclesFile" value="transitVehicles.xml" />
 	</module>
 
 <!-- ====================================================================== -->
