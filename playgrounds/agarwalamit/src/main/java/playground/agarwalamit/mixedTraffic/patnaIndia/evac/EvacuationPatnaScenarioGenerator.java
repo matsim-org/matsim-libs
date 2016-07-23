@@ -19,7 +19,9 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -178,6 +180,12 @@ public class EvacuationPatnaScenarioGenerator {
 		// will create a network connecting with safe node.
 		EvacuationNetworkGenerator net = new EvacuationNetworkGenerator(sc, evavcuationArea, safeLinkId);
 		net.run();
+		
+		//since the original network is multi-mode, the new links should also allow all modes
+		for (Link l : sc.getNetwork().getLinks().values()){
+			Set<String> allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
+			l.setAllowedModes(allowedModes);
+		}
 
 		new NetworkWriter(sc.getNetwork()).write(dir+"/input/"+outNetworkFile);
 		return sc;
