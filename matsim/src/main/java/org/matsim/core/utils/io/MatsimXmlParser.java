@@ -211,7 +211,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	/* implement EntityResolver */
 
 	@Override
-	public final InputSource resolveEntity(final String publicId, final String systemId) {
+	public InputSource resolveEntity(final String publicId, final String systemId) {
 		// yyyyyy ConfigReader* overrides this.  Not sure if it does that for good reaons.  kai, jul'16
 		
 		// extract the last part of the systemId
