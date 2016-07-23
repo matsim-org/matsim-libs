@@ -32,7 +32,7 @@ public class ConfigToCluster {
 		net.setInputFile(pathForCluster + "input/network_merged_cl.xml.gz" );
 		
 		PlansConfigGroup plans = config.plans();
-		plans.setInputPersonAttributeFile(pathForCluster + "input/agentAttributes.xml" );
+		plans.setInputPersonAttributeFile(pathForCluster + "input/expandedAgentAttributes.xml" );
 		plans.setInputFile(pathForCluster + "input/randomized_expanded_plans.xml.gz" );
 		
 		TransitConfigGroup transit = config.transit();

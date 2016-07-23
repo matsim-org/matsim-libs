@@ -48,6 +48,8 @@ public class CongestionInfoWriter {
 		File dir = new File(outputPathCongestionInfo);
 		dir.mkdirs();
 		
+		log.info("Writing csv file...");
+		
 		String fileName = outputPathCongestionInfo + "delays_perLinkAndTimeBin.csv";
 		File file = new File(fileName);
 		
@@ -86,30 +88,36 @@ public class CongestionInfoWriter {
 			e.printStackTrace();
 		}
 		
-		XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Average delay [seconds]");
 		
-		int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-						
-		double[] timeBins = new double[totalNumberOfTimeBins];
-		for (int i = 0; i < totalNumberOfTimeBins; i++) {
-			double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
-			timeBins[i] = timeInterval / 3600.;
-		}
-		
-		for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+		if (congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) {
+			log.info("Writing png file...");
+
+			XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Average delay [seconds]");
 			
-			double[] values = new double[totalNumberOfTimeBins];	
-			boolean isEmpty = true;
-			
-			for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
-				values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(i);
-				if (values[i] > 0.) {
-					isEmpty = false;
-				}
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+							
+			double[] timeBins = new double[totalNumberOfTimeBins];
+			for (int i = 0; i < totalNumberOfTimeBins; i++) {
+				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+				timeBins[i] = timeInterval / 3600.;
 			}
-			if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
+			
+			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+				
+				double[] values = new double[totalNumberOfTimeBins];	
+				boolean isEmpty = true;
+				
+				for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
+					values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(i);
+					if (values[i] > 0.) {
+						isEmpty = false;
+					}
+				}
+				if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
+			}
+			chart.saveAsPng(outputPathCongestionInfo + "delays_perLinkAndTimeBin.png", 800, 600);
 		}
-		chart.saveAsPng(outputPathCongestionInfo + "delays_perLinkAndTimeBin.png", 800, 600);
+		
 	}
 	
 	public static void writeTolls(DecongestionInfo congestionInfo, int iteration, String outputPath) {
@@ -117,6 +125,8 @@ public class CongestionInfoWriter {
 		String outputPathCongestionInfo = outputPath;
 		File dir = new File(outputPathCongestionInfo);
 		dir.mkdirs();
+		
+		log.info("Writing csv file...");
 		
 		String fileName2 = outputPathCongestionInfo + "toll_perLinkAndTimeBin.csv";
 		File file2 = new File(fileName2);
@@ -156,30 +166,34 @@ public class CongestionInfoWriter {
 			e.printStackTrace();
 		}
 		
-		XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Toll [monetary units]");
-		
-		int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-						
-		double[] timeBins = new double[totalNumberOfTimeBins];
-		for (int i = 0; i < totalNumberOfTimeBins; i++) {
-			double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
-			timeBins[i] = timeInterval / 3600.;
-		}
-		
-		for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+		if (congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) {
+			log.info("Writing png file...");
 			
-			double[] values = new double[totalNumberOfTimeBins];	
-			boolean isEmpty = true;
+			XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Toll [monetary units]");
 			
-			for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2toll().keySet()) {
-				values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i);
-				if (values[i] > 0.) {
-					isEmpty = false;
-				}
+			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+							
+			double[] timeBins = new double[totalNumberOfTimeBins];
+			for (int i = 0; i < totalNumberOfTimeBins; i++) {
+				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+				timeBins[i] = timeInterval / 3600.;
 			}
-			if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
+			
+			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
+				
+				double[] values = new double[totalNumberOfTimeBins];	
+				boolean isEmpty = true;
+				
+				for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2toll().keySet()) {
+					values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(i);
+					if (values[i] > 0.) {
+						isEmpty = false;
+					}
+				}
+				if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
+			}
+			chart.saveAsPng(outputPathCongestionInfo + "toll_perLinkAndTimeBin.png", 800, 600);
 		}
-		chart.saveAsPng(outputPathCongestionInfo + "toll_perLinkAndTimeBin.png", 800, 600);
 	}
 	
 	public static void writeIterationStats(
@@ -216,75 +230,5 @@ public class CongestionInfoWriter {
 			e.printStackTrace();
 		}
 	}
-
-	public static void writeWeights(DecongestionInfo congestionInfo, int iteration, String outputPath) {
-		String outputPathCongestionInfo = outputPath;
-		File dir = new File(outputPathCongestionInfo);
-		dir.mkdirs();
-		
-		String fileName = outputPathCongestionInfo + "weight_perLinkAndTimeBin.csv";
-		File file2 = new File(fileName);
-		
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			
-			int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-			
-			bw.write("Link Id");
-			for (int i = 0; i < totalNumberOfTimeBins; i++) {
-				double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
-				bw.write(";" + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			}
-			bw.newLine();
-			
-			for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
-				
-				if (!congestionInfo.getlinkInfos().get(linkId).getTime2value().isEmpty()) {
-					bw.write(linkId.toString());
-					
-					for (int i = 0; i < totalNumberOfTimeBins; i++) {
-											
-						double weight = 0.;
-						if (congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(i)) {
-							weight = congestionInfo.getlinkInfos().get(linkId).getTime2value().get(i);
-						}
-						
-						bw.write(";" + weight);
-					}
-					bw.newLine();
-				}
-			}
-			
-			bw.close();
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		XYLineChart chart = new XYLineChart("Iteration " + iteration, "Time of day [hours]", "Weight");
-		
-		int totalNumberOfTimeBins = (int) (congestionInfo.getScenario().getConfig().travelTimeCalculator().getMaxTime() / congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-						
-		double[] timeBins = new double[totalNumberOfTimeBins];
-		for (int i = 0; i < totalNumberOfTimeBins; i++) {
-			double timeInterval = (i + 1) * congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
-			timeBins[i] = timeInterval / 3600.;
-		}
-		
-		for (Id<Link> linkId : congestionInfo.getlinkInfos().keySet()) {
-			
-			double[] values = new double[totalNumberOfTimeBins];	
-			boolean isEmpty = true;
-			
-			for (Integer i : congestionInfo.getlinkInfos().get(linkId).getTime2value().keySet()) {
-				values[i] = congestionInfo.getlinkInfos().get(linkId).getTime2value().get(i);
-				if (values[i] > 0.) {
-					isEmpty = false;
-				}
-			}
-			if (!isEmpty) chart.addSeries("Link " + linkId, timeBins, values);
-		}
-		chart.saveAsPng(outputPathCongestionInfo + "weight_perLinkAndTimeBin.png", 800, 600);
-	}
+	
 }

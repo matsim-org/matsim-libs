@@ -8,21 +8,21 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/chessboard/network.xml" />
+		<param name="inputNetworkFile" value="chessboard/network.xml" />
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/scenarios/chessboard/facilities.xml" />
+		<param name="inputFacilitiesFile" value="chessboard/facilities.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/wrashid/parkingChoice/utils/chessPlans4.xml" />
+		<param name="inputPlansFile" value="chessPlans5.xml" />
 	</module>
 
 	<module name="controler">
 		<param name="outputDirectory" value="output/Test1" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="1" />
 	</module>
 
 	<module name="planCalcScore">
@@ -73,17 +73,15 @@
 		<param name="activityMinimalDuration_4" value="08:00:00" />
 	</module>
 	
+	<module name="changeMode" >
+		<param name="modes" value="car,pt,bike,walk" />
+	</module>
+	
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
-		<param name="ModuleProbability_1" value="0.8" />
-		<param name="Module_1" value="BestScore" />
-
-		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="ReRoute" />
-	
-		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="TimeAllocationMutator" />
+		<param name="ModuleProbability_1" value="1" />
+		<param name="Module_1" value="ChangeTripMode" />
 	</module>
 	
 	<module name="parkingChoice">
@@ -92,6 +90,9 @@
 		<!-- used for calibration: how important is parking compared to the other score parts -->
 		<param name="parkingPriceScoreScalingFactor" value="1.0" />
 		<param name="parkingActivityDurationPenaltyScalingFactor" value="1.0" />
+		
+		<param name="parkingSelectionManager" value="shortestWalkingDistance" />
+
 	</module>
 	
 	<module name="parallelEventHandling">

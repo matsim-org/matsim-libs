@@ -225,6 +225,9 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.NoPricing);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
@@ -235,6 +238,8 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.BangBang);
 			decongestionSettings.setINITIAL_TOLL(10.0);
 			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
@@ -248,6 +253,8 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.BangBang);
 			decongestionSettings.setINITIAL_TOLL(10.0);
 			decongestionSettings.setTOLL_ADJUSTMENT(10.0);
@@ -261,6 +268,8 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 			decongestionSettings.setKp(1.0);
 			decongestionSettings.setKi(0.0);
@@ -275,6 +284,8 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 			decongestionSettings.setKp(0.0);
 			decongestionSettings.setKi(1.0);
@@ -289,6 +300,8 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 			decongestionSettings.setKp(0.0);
 			decongestionSettings.setKi(0.0);
@@ -303,6 +316,8 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 			decongestionSettings.setKp(1.0);
 			decongestionSettings.setKi(1.0);

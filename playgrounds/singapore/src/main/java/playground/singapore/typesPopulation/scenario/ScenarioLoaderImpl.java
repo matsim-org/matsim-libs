@@ -20,6 +20,7 @@
 package playground.singapore.typesPopulation.scenario;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -179,9 +180,10 @@ public class ScenarioLoaderImpl {
 			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
+				List<NetworkChangeEvent> events = new ArrayList<>() ;
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, events );
 				parser.parse(config.network().getChangeEventsInputFile());
-				NetworkUtils.setNetworkChangeEvents(network,(List<NetworkChangeEvent>) parser.getEvents());
+				NetworkUtils.setNetworkChangeEvents(network,events );
 			}
 		}
 	}

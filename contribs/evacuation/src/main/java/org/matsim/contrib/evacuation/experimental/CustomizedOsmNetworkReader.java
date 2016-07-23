@@ -707,11 +707,6 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 
 		@Override
-		protected void parse(InputSource input) throws UncheckedIOException {
-			super.parse(input);
-		}
-		
-		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 			if ("node".equals(name)) {
 				if (this.loadNodes) {

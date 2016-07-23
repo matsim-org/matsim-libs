@@ -49,7 +49,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new DbInspireNetworkParser(scenario, "EPSG:32632").parse(
+		new DbInspireNetworkParser(scenario, "EPSG:32632").parseAndConvert(
 				"/home/dhosse/Dokumente/10_data/data.db/DB-Netz_INSPIRE_20131128.gml");
 		
 		new NetworkWriter(scenario.getNetwork()).write("/home/dhosse/inspire-railNetwork.xml");
@@ -154,8 +154,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		
 	}
 	
-	@Override
-	public void parse(String filename){
+	public void parseAndConvert(String filename){
 		
 		super.parse(filename);
 		log.info("Converting...");

@@ -38,17 +38,17 @@ public class UpdateInitialTravelTimes {
 							((Activity)plan.getPlanElements().get(index + 1)).getCoord());
 					
 					if (mode.equals("walk")) {
-						((Leg) pe).setTravelTime(distance / 1.05 );
+						((Leg) pe).setTravelTime(distance / 1.05);
 						((Leg) pe).getRoute().setTravelTime(distance / 1.05);
 					}
 					else if (mode.equals("pt")) {
-						((Leg) pe).setTravelTime(distance / 2.18 );
-						((Leg) pe).getRoute().setTravelTime(distance / 2.18);
+						((Leg) pe).setTravelTime(distance / 2.18 * 4);
+						((Leg) pe).getRoute().setTravelTime(distance / 2.18 * 4);
 
 					}
 					else if (mode.equals("bike")) {
-						((Leg) pe).setTravelTime(distance / 1.9 );
-						((Leg) pe).getRoute().setTravelTime(distance / 1.9);
+						((Leg) pe).setTravelTime(distance / 1.9 * 4);
+						((Leg) pe).getRoute().setTravelTime(distance / 1.9 * 4);
 
 					}
 				}
@@ -57,7 +57,7 @@ public class UpdateInitialTravelTimes {
 		}
 		
 		new PopulationWriter(scenario.getPopulation(),
-				scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/InducedDemand/plans_0.1perc_fixedtt_50perc.xml.gz");		
+				scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/InducedDemand/plans_0.1perc_fixedtt_50perc_inc.xml.gz");		
 
 		
 	}

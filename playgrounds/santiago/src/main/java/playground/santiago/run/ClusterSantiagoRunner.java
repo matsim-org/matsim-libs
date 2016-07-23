@@ -71,8 +71,8 @@ public class ClusterSantiagoRunner {
 	private static String caseName;
 	private static String inputPath;  	
 	private static String configFile;
-	private static int sigma;
-	private static String cordonFile;
+//	private static int sigma;
+//	private static String cordonFile;
 
 	
 	public static void main(String args[]){
@@ -81,7 +81,7 @@ public class ClusterSantiagoRunner {
 		
 			caseName = args[0];
 			inputPath = "/net/ils4/lcamus/runs-svn/santiago/"+caseName+"/";
-			configFile = inputPath + "randomized_expanded_config.xml";
+			configFile = inputPath + "cluster_randomized_expanded_config.xml";
 			
 			policy = args[1]; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
 			
@@ -89,10 +89,10 @@ public class ClusterSantiagoRunner {
 			mapActs2Links = Boolean.parseBoolean(args[3]);
 
 			//ONLY NECESSARY FOR SIMULATE THE SCENARIO WITH A CORDON TOLL.
-			if (policy.equals("2")){ 
-			sigma = Integer.parseInt(args[4]);
-			cordonFile = inputPath +"input/"+ args[5];
-			}
+//			if (policy.equals("2")){ 
+//			sigma = Integer.parseInt(args[4]);
+//			cordonFile = inputPath +"input/"+ args[5];
+//			}
 
 			
 
@@ -133,14 +133,14 @@ public class ClusterSantiagoRunner {
 							tollHandler, congestionHandler));
 			break;
 			
-		case "2": //CORDON-TOLL
-			
-			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-			rpcg.setTollLinksFile(cordonFile);
-			config.plansCalcRoute().setRoutingRandomness(sigma); 
-			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-			
-			break;
+//		case "2": //CORDON-TOLL
+//			
+//			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+//			rpcg.setTollLinksFile(cordonFile);
+//			config.plansCalcRoute().setRoutingRandomness(sigma); 
+//			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+//			
+//			break;
 //			
 //		case "3": //SOME-OTHER-POLICY
 //			
