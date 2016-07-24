@@ -37,13 +37,18 @@ public class DemandGeneratorOnePersonV2 {
 		
 		
 		// input and output files
-		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
-		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
+//		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
+		String commuterFileIn = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
+//		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
+		String commuterFileOut = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 		
-		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
-		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
+//		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
+		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
+//		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
+		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/";
+//		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/";
+		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/21neu1/";
 		
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
