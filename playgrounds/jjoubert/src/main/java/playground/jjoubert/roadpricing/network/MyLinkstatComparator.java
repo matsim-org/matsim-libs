@@ -89,7 +89,7 @@ public class MyLinkstatComparator {
 			
 			// Read the network file if the number of lanes are specified.
 			NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-			nr.parse(args[6]);
+			nr.read(args[6]);
 		}
 		
 		mlc.compare(sc.getNetwork(), minimumLanes, threshold);

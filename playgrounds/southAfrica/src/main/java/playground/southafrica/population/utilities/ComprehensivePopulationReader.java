@@ -59,25 +59,25 @@ public class ComprehensivePopulationReader {
 		/* Read population. */
 		LOG.info("Reading population...");
 		PopulationReader pr = new PopulationReader(this.sc);
-		pr.parse(inputfolder + "population.xml.gz");
+		pr.read(inputfolder + "population.xml.gz");
 		
 		/* Read population attributes. */
 		LOG.info("Reading person attributes...");
 		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(this.sc.getPopulation().getPersonAttributes());
 		oar1.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
-		oar1.parse(inputfolder + "populationAttributes.xml.gz");
+		oar1.read(inputfolder + "populationAttributes.xml.gz");
 		
 		/* Read households */
 		LOG.info("Reading households...");
 		HouseholdsReaderV10 hhr = new HouseholdsReaderV10(this.sc.getHouseholds());
-		hhr.parse(inputfolder + "households.xml.gz");
+		hhr.read(inputfolder + "households.xml.gz");
 		
 		/* Read household attributes. */ 
 		LOG.info("Reading household attributes...");
 		ObjectAttributesXmlReader oar2 = new ObjectAttributesXmlReader(this.sc.getHouseholds().getHouseholdAttributes());
 		oar2.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
 		oar2.putAttributeConverter(Coord.class, new CoordConverter());
-		oar2.parse(inputfolder + "householdAttributes.xml.gz");
+		oar2.read(inputfolder + "householdAttributes.xml.gz");
 
 		LOG.info("================================================================");
 		LOG.info("Population size: " + sc.getPopulation().getPersons().size());

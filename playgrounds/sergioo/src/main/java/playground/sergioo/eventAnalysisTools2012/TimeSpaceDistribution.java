@@ -66,11 +66,11 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException, ParseException {
 		TimeSpaceDistribution.TIME_INTERVAL = 60*Double.parseDouble(args[3]);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(args[0]);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).read(args[0]);
 		EventsManager events = EventsUtils.createEventsManager();
 		TimeSpaceDistribution tSD = new TimeSpaceDistribution(scenario.getNetwork());
 		events.addHandler(tSD);
-		new EventsReaderXMLv1(events).parse(args[1]);
+		new EventsReaderXMLv1(events).read(args[1]);
 		tSD.printCSVFiles(args[2]);
 		//tSD.printTXTFiles(args[2]);
 		if(args.length>4) {

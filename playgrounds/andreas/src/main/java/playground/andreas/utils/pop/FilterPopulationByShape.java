@@ -104,7 +104,7 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		eventsManager.addHandler(this);
-		reader.parse(eventsFile);
+		reader.read(eventsFile);
 		log.info("Found " + this.agentsToKeep.size() + " agent ids to keep.");
 		Gbl.printMemoryUsage();
 		Gbl.printElapsedTime();

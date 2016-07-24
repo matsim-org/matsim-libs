@@ -147,13 +147,13 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Mat
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}.
+	 * Parses the specified plans file. This method calls {@link #read(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
+		read(filename);
 	}
 
 	private void startPopulation(final Attributes atts) {

@@ -64,7 +64,7 @@ public class PlanCorrectorDeprecated {
 	}
 	
 	private void addCarAvailability(Population population, String populationAttributesFile) {
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(populationAttributesFile);
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).read(populationAttributesFile);
 		
 		int hasCar = 0;
 		int hasLicense = 0;

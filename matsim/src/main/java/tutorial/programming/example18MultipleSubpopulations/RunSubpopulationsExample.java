@@ -83,7 +83,7 @@ public class RunSubpopulationsExample {
 
 			/* Set up network and plans. */
 			MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-			mnr.parse(EQUIL_NETWORK);
+			mnr.read(EQUIL_NETWORK);
 			createPopulation(sc, SUBPOP1_NAME, 100);
 			createPopulation(sc, SUBPOP2_NAME, 100);
 			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);

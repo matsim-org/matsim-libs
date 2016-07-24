@@ -56,7 +56,7 @@ public class ZeroLengthReporter {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String networkFile = args[0];
 		String outputFile = args[1];
-		new MatsimNetworkReader(sc.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).read(networkFile);
 		
 		reportZeroLengthLinks(sc.getNetwork(), outputFile);
 		

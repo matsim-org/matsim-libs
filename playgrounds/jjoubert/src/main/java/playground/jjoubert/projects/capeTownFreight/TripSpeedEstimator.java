@@ -75,7 +75,7 @@ public class TripSpeedEstimator{
 		String output = args[1];
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(plans);
+		new PopulationReader(sc).read(plans);
 
 		LOG.info("Processing plans to extract trip times as a function of distance...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);
@@ -135,7 +135,7 @@ public class TripSpeedEstimator{
 			
 			for(File file : files){
 				DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-				dvr.parse(file.getAbsolutePath());
+				dvr.read(file.getAbsolutePath());
 				DigicoreVehicle dv = dvr.getVehicle();
 				
 				int legId = 0;

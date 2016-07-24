@@ -104,7 +104,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	}
 
 	public void readFile(final String fileName) throws UncheckedIOException {
-		this.parse(fileName);
+		this.read(fileName);
 	}
 
 	@Override

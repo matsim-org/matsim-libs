@@ -110,7 +110,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 	//Main
 	public static void main(String[] args) {
 		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
-		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
+		new SocialNetworkReader(scenario).read(args.length>1 ? args[1] : null);
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
 		controler.getConfig().controler().setOverwriteFileSetting(

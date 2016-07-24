@@ -329,7 +329,7 @@ public class WelfareAnalysisMain {
 			events.addHandler(noiseHandler);
 			
 			NoiseEventsReader noiseEventReader = new NoiseEventsReader(events);		
-			noiseEventReader.parse(eventsFile);
+			noiseEventReader.read(eventsFile);
 			
 			log.info("Reading events file... Done.");
 

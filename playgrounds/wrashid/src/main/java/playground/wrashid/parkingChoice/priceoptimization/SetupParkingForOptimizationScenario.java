@@ -255,7 +255,7 @@ public class SetupParkingForOptimizationScenario {
 		Map<Id<Link>, Double> linkSlopes=new HashMap<>();
 		String linkSlopeAttributeFile = controler.getConfig().getParam("parkingChoice.ZH", "networkLinkSlopes");
 		ObjectAttributes lp = new ObjectAttributes();
-		new ObjectAttributesXmlReader(lp).parse(linkSlopeAttributeFile);
+		new ObjectAttributesXmlReader(lp).read(linkSlopeAttributeFile);
 
         for (Id<Link> linkId : controler.getScenario().getNetwork().getLinks().keySet()) {
 			linkSlopes.put(linkId, (Double) lp.getAttribute(linkId.toString(), "slope"));

@@ -60,7 +60,7 @@ public class JointPlanIOTest {
 
 		final Scenario rereadScenario = ScenarioUtils.createScenario( scenario.getConfig() );
 		((MutableScenario) rereadScenario).setPopulation( scenario.getPopulation() );
-		new JointPlansXmlReader( rereadScenario ).parse( file );
+		new JointPlansXmlReader( rereadScenario ).read( file );
 		final JointPlans reReadJointPlans = (JointPlans)
 				rereadScenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 
@@ -102,7 +102,7 @@ public class JointPlanIOTest {
 		new PopulationWriter( scenario.getPopulation() , scenario.getNetwork() ).write( file );
 
 		final Scenario scenarioReRead = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new PopulationReader( scenarioReRead ).parse( file );
+		new PopulationReader( scenarioReRead ).read( file );
 
 		final Iterator<? extends Person> dumpedPersons = scenario.getPopulation().getPersons().values().iterator();
 		final Iterator<? extends Person> readPersons = scenarioReRead.getPopulation().getPersons().values().iterator();

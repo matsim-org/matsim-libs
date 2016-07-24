@@ -50,8 +50,8 @@ public class UsedFacilitiesExtraction {
 		// Load scenario:
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
-		new FacilitiesReaderMatsimV1(scenario).parse(scenario.getConfig().facilities().getInputFile());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(scenario.getConfig().network().getInputFile());
+		new FacilitiesReaderMatsimV1(scenario).read(scenario.getConfig().facilities().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).read(scenario.getConfig().network().getInputFile());
 
 		// Used facilities:
 		ActivityFacilities usedActivityFacilities = getUsedFacilities(scenario.getPopulation(), scenario.getActivityFacilities());

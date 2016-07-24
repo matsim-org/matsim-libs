@@ -23,7 +23,7 @@ public class TravelTimeRealPT {
 		double centerY = 247300.0;	
 ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(attributes);	
+		new ObjectAttributesXmlReader(bla).read(attributes);	
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 			MatsimPopulationReader populationReader = new PopulationReader(scenario);

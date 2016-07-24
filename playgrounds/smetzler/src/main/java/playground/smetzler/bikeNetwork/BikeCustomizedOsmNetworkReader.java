@@ -246,14 +246,14 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.read(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.read(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
@@ -261,7 +261,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.read(osmFilename);
 			}
 		}
 		convert();

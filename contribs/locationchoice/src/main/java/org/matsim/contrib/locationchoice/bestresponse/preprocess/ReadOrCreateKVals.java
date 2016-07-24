@@ -65,8 +65,8 @@ public class ReadOrCreateKVals {
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
 			try {
-				persKValuesReader.parse(pkValuesFileName);
-				facKValuesReader.parse(fkValuesFileName);
+				persKValuesReader.read(pkValuesFileName);
+				facKValuesReader.read(fkValuesFileName);
 				log.info("reading kvals from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName);
 				return 0;
 			} catch  (UncheckedIOException e) {

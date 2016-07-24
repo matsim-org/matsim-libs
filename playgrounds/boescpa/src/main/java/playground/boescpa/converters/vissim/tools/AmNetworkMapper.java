@@ -61,7 +61,7 @@ public class AmNetworkMapper extends AbstractNetworkMapper {
 				network.addNode(networkFactory.createNode(anmNode.id, anmNode.coord));
 			}
 		});
-		xmlParser.parse(path2VissimNetworkAnm);
+		xmlParser.read(path2VissimNetworkAnm);
 
 		// create links:
 		int countErrLinks = 0;

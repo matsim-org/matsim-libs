@@ -116,7 +116,7 @@ public class BootstrapPopulationGenerator {
 		Counter counter = new Counter("  vehicle # ");
 		for(File f : vehicles){
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.parse(f.getAbsolutePath());
+			dvr.read(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Check each activity chain. */
@@ -209,7 +209,7 @@ public class BootstrapPopulationGenerator {
 		Counter counter = new Counter("  vehicle # ");
 		for(File f : vehicles){
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.parse(f.getAbsolutePath());
+			dvr.read(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Check each activity chain. */

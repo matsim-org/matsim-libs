@@ -50,7 +50,7 @@ public class RunTaxiScenario
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).read(taxiCfg.getTaxisFile());
         return createControler(scenario, taxiData, otfvis);
     }
 

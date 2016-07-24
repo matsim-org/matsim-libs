@@ -59,7 +59,7 @@ public class RunTaxiBenchmark
 
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).read(taxiCfg.getTaxisFile());
         return createControler(scenario, taxiData, runs);
     }
 

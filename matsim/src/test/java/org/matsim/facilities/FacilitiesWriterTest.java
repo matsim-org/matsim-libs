@@ -41,7 +41,7 @@ public class FacilitiesWriterTest {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		facilities = scenario.getActivityFacilities();
 		MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
-		reader.parse(filename);
+		reader.read(filename);
 		
 		Assert.assertEquals(3, facilities.getFacilities().size());
 		

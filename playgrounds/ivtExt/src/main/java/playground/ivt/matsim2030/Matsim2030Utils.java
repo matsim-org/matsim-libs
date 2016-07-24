@@ -416,7 +416,7 @@ public class Matsim2030Utils {
 			final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
 			new TransitRouterNetworkReader(
 					scenario.getTransitSchedule(),
-					transitRouterNetwork ).parse(
+					transitRouterNetwork ).read(
 						matsim2030conf.getThinnedTransitRouterNetworkFile() );
 	
 			final TransitRouterWithThinnedNetworkFactory transitRouterFactory =

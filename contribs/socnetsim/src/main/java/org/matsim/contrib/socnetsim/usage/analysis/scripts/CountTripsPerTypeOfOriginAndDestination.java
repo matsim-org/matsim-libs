@@ -114,7 +114,7 @@ public class CountTripsPerTypeOfOriginAndDestination {
 
 	private static Population readPopulation(final String inPlansFile) {
 		final Scenario s = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new PopulationReader( s ).parse( inPlansFile );
+		new PopulationReader( s ).read( inPlansFile );
 		return s.getPopulation();
 	}
 

@@ -122,7 +122,7 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalysisModule{
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
 		
-		emissionReader.parse(this.emissionEventsFile);
+		emissionReader.read(this.emissionEventsFile);
 	}
 
 	@Override

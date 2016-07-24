@@ -114,7 +114,7 @@ public class NetworkCutter {
 		if (pathToOutputNetwork != null) {
 			new NetworkWriter(filteredNetwork).write(pathToOutputNetwork);
 			// test network
-			new NetworkReaderMatsimV1(ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork()).parse(pathToOutputNetwork);
+			new NetworkReaderMatsimV1(ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork()).read(pathToOutputNetwork);
 		}
 		log.info(" Filter network... done.");
 		log.info(" Filtered " + filteredNetwork.getNodes().size() + " nodes of originally " + network.getNodes().size() + " nodes");

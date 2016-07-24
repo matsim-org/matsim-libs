@@ -531,7 +531,7 @@ public class KTFreight_v3 {
 		try {
 			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 			rpConfig.setTollLinksFile(TOLLFILE);
-			rpReader.parse(rpConfig.getTollLinksFile());
+			rpReader.read(rpConfig.getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

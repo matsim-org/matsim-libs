@@ -90,7 +90,7 @@ public class OsmStats {
 	}
 
 	private void getStats(final String osmFilePath, final String outputFilePath) {
-		parser.parse(osmFilePath);
+		parser.read(osmFilePath);
 		if (this.cutter == null) {
 			writeStats(outputFilePath, this.histLengthsOut);
 		} else {

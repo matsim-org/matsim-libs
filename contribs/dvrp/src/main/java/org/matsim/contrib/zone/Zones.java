@@ -39,7 +39,7 @@ public class Zones
     public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile)
     {
         ZoneXmlReader xmlReader = new ZoneXmlReader();
-        xmlReader.parse(zonesXmlFile);
+        xmlReader.read(zonesXmlFile);
         Map<Id<Zone>, Zone> zones = xmlReader.getZones();
 
         ZoneShpReader shpReader = new ZoneShpReader(zones);

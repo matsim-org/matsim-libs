@@ -376,7 +376,7 @@ public class Controller {
 		try {
 			this.evacuationConfigModule = new EvacuationConfigModule("evacuation");//, selectedFile.getAbsolutePath());
 			EvacuationConfigReader parser = new EvacuationConfigReader(this.evacuationConfigModule);
-			parser.parse(selectedFile.getAbsolutePath());
+			parser.read(selectedFile.getAbsolutePath());
 
 			this.scenarioPath = selectedFile.getParent();
 			this.evacuationFile = selectedFile.getAbsolutePath();

@@ -184,7 +184,7 @@ public class LocatedTripsWriter {
 		StreamingUtils.setIsStreaming(reader, true);
 		reader.addAlgorithm(new InfoFiller( filter , infos ));
 
-		new PopulationReader( scenario ).parse( inPopFile );
+		new PopulationReader( scenario ).read( inPopFile );
 		return infos;
 	}
 

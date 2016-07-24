@@ -129,12 +129,12 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	/**
-	 * Parses the specified facilities file. This method calls {@link #parse(String)}.
+	 * Parses the specified facilities file. This method calls {@link #read(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
+		read(filename);
 	}
 
 }

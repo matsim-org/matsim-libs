@@ -142,7 +142,7 @@ public class CadytsDistanceBasedExample {
 		new PopulationReader(scenario).readFile(inputPlansFile);
 
 		final Counts<Link> counts = new Counts<>();
-		new CountsReaderMatsimV1(counts).parse(countsFileName);
+		new CountsReaderMatsimV1(counts).read(countsFileName);
 		scenario.addScenarioElement("calibrationCounts", counts);
 
 		Controler controler = new Controler(scenario);

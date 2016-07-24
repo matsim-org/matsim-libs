@@ -63,7 +63,7 @@ public class CrossingEventHandler implements LinkEnterEventHandler, LinkLeaveEve
 
 	public void loadCrossings(String filename) {
 		CrossingsFileParser parser = new CrossingsFileParser( this.ptLinks );
-		parser.parse(filename);
+		parser.read(filename);
 //		this.ptLinks = parser.getPtLinks();
 		}
 	

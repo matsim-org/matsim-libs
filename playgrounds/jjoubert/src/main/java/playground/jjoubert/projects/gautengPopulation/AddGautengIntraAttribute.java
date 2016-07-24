@@ -60,8 +60,8 @@ public class AddGautengIntraAttribute {
 	public static void run(String populationFile, String inputPopulationAtrributeFile,
 			String shapefile, String outputPopulationAttributeFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(populationFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputPopulationAtrributeFile);
+		new PopulationReader(sc).read(populationFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(inputPopulationAtrributeFile);
 		
 		Scenario adaptedScenario = IntraAreaIdentifier.run(sc, shapefile, false, "intraGauteng");
 		

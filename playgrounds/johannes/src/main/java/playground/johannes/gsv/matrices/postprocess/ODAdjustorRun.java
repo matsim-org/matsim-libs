@@ -91,7 +91,7 @@ public class ODAdjustorRun {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 //		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
-		reader.parse(args[3]);
+		reader.read(args[3]);
 		NumericMatrix refMatrix = reader.getMatrix();
 //		MatrixOperations.multiply(refMatrix, 1 / 16.0);
 //		MatrixOperations.multiply(refMatrix, 1 / (4 * 11.8));

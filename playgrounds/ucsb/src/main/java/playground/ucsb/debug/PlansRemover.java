@@ -71,7 +71,7 @@ public class PlansRemover {
 		Set<Id<Person>> pids = UCSBUtils.parseObjectIds(inputPidFile, Person.class);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(inputNetworkfile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).read(inputNetworkfile);
 
 		Population pop = (Population)scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);

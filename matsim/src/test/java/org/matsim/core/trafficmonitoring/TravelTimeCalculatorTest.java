@@ -308,7 +308,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).read(networkFile);
 
 		EventsManager events = EventsUtils.createEventsManager(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 

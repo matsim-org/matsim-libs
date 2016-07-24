@@ -33,7 +33,7 @@ public class CarTravelTimesAnalysis {
 		Purpose purpose = new Purpose(scenario);
     	
     	events.addHandler(purpose);
-    	reader.parse(s);
+    	reader.read(s);
     	System.out.println(purpose.averageSpeed());
     }
     

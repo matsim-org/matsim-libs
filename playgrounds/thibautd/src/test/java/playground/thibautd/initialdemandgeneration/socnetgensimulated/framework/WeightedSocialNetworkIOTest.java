@@ -49,7 +49,7 @@ public class WeightedSocialNetworkIOTest {
 
 		new WeightedSocialNetworkWriter().write( testNetwork, filePath );
 
-		final WeightedSocialNetwork readNetwork = new WeightedSocialNetworkReader().read( filePath );
+		final WeightedSocialNetwork readNetwork = new WeightedSocialNetworkReader().createAndReadSocialNetwork( filePath );
 
 		Assert.assertEquals(
 				"unexpected size",

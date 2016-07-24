@@ -64,7 +64,7 @@ public class SetupFreight {
 		config.controler().setLastIteration(10);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).parse(NETFILENAME);
+		new MatsimNetworkReader(scenario.getNetwork()).read(NETFILENAME);
 
 		/* Set up freight specific stuff. */
 		Carriers carriers = new Carriers();

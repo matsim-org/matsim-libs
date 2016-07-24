@@ -65,7 +65,7 @@ public class DiluteSocialNetworkedPopulation {
 			final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 			new PopulationReader( scenario ).readFile( inpopfile );
-			new SocialNetworkReader( scenario ).parse( insocnet );
+			new SocialNetworkReader( scenario ).read( insocnet );
 
 			switch ( dilutionType ) {
 				case area_all_alters:

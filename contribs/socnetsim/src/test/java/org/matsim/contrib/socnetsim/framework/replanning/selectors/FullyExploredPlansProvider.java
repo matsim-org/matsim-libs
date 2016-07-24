@@ -98,7 +98,7 @@ public class FullyExploredPlansProvider {
 			new PopulationReader( scenario ).readFile( paths.plansFilePath );
 
 			log.info( "read joint plans from "+paths.jointPlansFilePath );
-			new JointPlansXmlReader( scenario ).parse( paths.jointPlansFilePath );
+			new JointPlansXmlReader( scenario ).read( paths.jointPlansFilePath );
 			final JointPlans jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 
 			final SelectedInformation information = new SelectedInformation( jointPlans );

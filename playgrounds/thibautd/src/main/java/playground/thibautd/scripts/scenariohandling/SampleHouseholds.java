@@ -55,8 +55,8 @@ public class SampleHouseholds {
 		final Config config = ConfigUtils.createConfig();
 		config.scenario().setUseHouseholds( true );
 		final Scenario sc = ScenarioUtils.createScenario( config );
-		new HouseholdsReaderV10( ((MutableScenario) sc).getHouseholds() ).parse( inHouseholdFile );
-		new PopulationReader( sc ).parse( inPopFile );
+		new HouseholdsReaderV10( ((MutableScenario) sc).getHouseholds() ).read( inHouseholdFile );
+		new PopulationReader( sc ).read( inPopFile );
 
 		final HouseholdsImpl newHouseholds = new HouseholdsImpl();
         MutableScenario sc1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

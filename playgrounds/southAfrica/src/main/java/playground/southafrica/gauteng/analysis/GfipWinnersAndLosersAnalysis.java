@@ -61,11 +61,11 @@ public class GfipWinnersAndLosersAnalysis {
 		
 		/* Read the first (base) plan. */
 		Scenario sc1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc1).parse(file1);
+		new PopulationReader(sc1).read(file1);
 
 		/* Read the second plan. */
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc2).parse(file2);
+		new PopulationReader(sc2).read(file2);
 		
 		/* Calculate the gains/losses for each person. */
 //		Map<Id, Double> map = new TreeMap<Id, Double>();

@@ -63,7 +63,7 @@ public class EstimateVktFromPopulation {
 		
 		/* Parse population */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(population);
+		new PopulationReader(sc).read(population);
 		
 		/* Parse shapefile */
 		ShapeFileReader sfr = new ShapeFileReader();

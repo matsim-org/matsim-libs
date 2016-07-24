@@ -45,10 +45,10 @@ public class FilterCliquesBasedOnPopulation {
 		final String outCliques = args[2];
 
 		PlansParser plansParser = new PlansParser();
-		plansParser.parse( plansFile );
+		plansParser.read( plansFile );
 
 		CliquesParser cliquesParser = new CliquesParser( plansParser );
-		cliquesParser.parse( cliquesFile );
+		cliquesParser.read( cliquesFile );
 
 		(new CliquesWriter( cliquesParser.cliques )).writeFile( outCliques );
 	}

@@ -102,7 +102,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 	public static void main(String[] args) {
 		Scenario scenario = new ScenarioSocialNetwork(ConfigUtils.loadConfig(args.length>0 ? args[0] : null));
 		ScenarioUtils.loadScenario(scenario);
-		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
+		new SocialNetworkReader(scenario).read(args.length>1 ? args[1] : null);
 		org.matsim.core.controler.Controler controler = new org.matsim.core.controler.Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
 		controler.getConfig().controler().setOverwriteFileSetting(

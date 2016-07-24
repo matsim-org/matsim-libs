@@ -65,12 +65,12 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 	}
 
 	/**
-	 * Parses the specified matrices file. This method is the same as {@link #parse(String)}.
+	 * Parses the specified matrices file. This method is the same as {@link #read(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
-		parse(filename);
+		read(filename);
 	}
 
 	@Override

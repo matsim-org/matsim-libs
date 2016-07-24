@@ -77,7 +77,7 @@ public class ClusteredChainGeneratorTest{
 		/* Check facilities. */
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.parse(utils.getOutputDirectory() + "facilities.xml");
+		fr.read(utils.getOutputDirectory() + "facilities.xml");
 		ActivityFacilities afs = sc.getActivityFacilities();
 		Assert.assertTrue("Facility 1 not in map.", afs.getFacilities().containsKey(Id.create("f1", Facility.class)));
 		Assert.assertTrue("Facility 2 not in map.", afs.getFacilities().containsKey(Id.create("f2", Facility.class)));
@@ -149,7 +149,7 @@ public class ClusteredChainGeneratorTest{
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
 		oar.putAttributeConverter(Point.class, new HullConverter());
 		oar.putAttributeConverter(Polygon.class, new HullConverter());
-		oar.parse(facilityAttributes);
+		oar.read(facilityAttributes);
 		
 		String inputFolder = utils.getOutputDirectory() + "xml/";
 		String outputFolder = utils.getOutputDirectory() + "xml2/";
@@ -169,7 +169,7 @@ public class ClusteredChainGeneratorTest{
 		
 		/* Check that the correct three activities do have facility Ids. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(utils.getOutputDirectory() + "xml2/v1.xml.gz");
+		dvr.read(utils.getOutputDirectory() + "xml2/v1.xml.gz");
 		DigicoreChain chain = dvr.getVehicle().getChains().get(0);
 		Assert.assertNotNull("First activity must have an id.", chain.getAllActivities().get(0).getFacilityId());
 		Assert.assertEquals("First activity has wrong id.", Id.create("f1", Facility.class), chain.getAllActivities().get(0).getFacilityId());

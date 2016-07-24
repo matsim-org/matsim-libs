@@ -137,7 +137,7 @@ class OptimizeRoadpricing {
 						RoadPricingConfigGroup.class);
 		final RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl();
 		new RoadPricingReaderXMLv1(roadPricingScheme)
-				.parse(roadPricingConfigGroup.getTollLinksFile());
+				.read(roadPricingConfigGroup.getTollLinksFile());
 		final AbstractModule roadpricingModule = new ControlerDefaultsWithRoadPricingModule(
 				roadPricingScheme);
 

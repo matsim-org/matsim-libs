@@ -110,8 +110,8 @@ public class MyPlanMerger {
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader mpr = new PopulationReader(sc);
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		mpr.parse(baseFile);
-		nr.parse(networkFile);
+		mpr.read(baseFile);
+		nr.read(networkFile);
 		log.info("Successfully created the base scenario with plans and network.");
 		this.xy2Links = new XY2Links(sc);
 		for(Person p : sc.getPopulation().getPersons().values()){
@@ -134,7 +134,7 @@ public class MyPlanMerger {
 
 		PopulationReader mprAdd = new PopulationReader(scAdd);
 		
-		mprAdd.parse(addFile);
+		mprAdd.read(addFile);
 		Map<Id<Person>, ? extends Person> peopleToAdd = scAdd.getPopulation().getPersons();
 		for (Id<Person> idToAdd : peopleToAdd.keySet()) {
 			Person p = pf.createPerson(Id.create(nextId, Person.class));

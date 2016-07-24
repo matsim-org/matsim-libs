@@ -154,7 +154,7 @@ public class RunUtils {
 	public static Config loadConfig(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
 		addConfigGroups( config );
-		new ConfigReader( config ).parse( configFile );
+		new ConfigReader( config ).read( configFile );
 		return config;
 	}
 

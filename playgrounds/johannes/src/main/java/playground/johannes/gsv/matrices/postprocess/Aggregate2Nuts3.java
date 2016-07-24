@@ -58,7 +58,7 @@ public class Aggregate2Nuts3 {
 
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(matrixFile);
+		reader.read(matrixFile);
 		NumericMatrix m = reader.getMatrix();
 
 		ZoneCollection modenaZones = new ZoneCollection(null);

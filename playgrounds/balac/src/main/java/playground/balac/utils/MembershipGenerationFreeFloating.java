@@ -36,7 +36,7 @@ public class MembershipGenerationFreeFloating {
 		populationReader.readFile(args[1]);
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[2]);
+		new ObjectAttributesXmlReader(bla).read(args[2]);
 		int h = 0;
 		for(Person p : scenario.getPopulation().getPersons().values()) {
 			if (withinBorders(p))

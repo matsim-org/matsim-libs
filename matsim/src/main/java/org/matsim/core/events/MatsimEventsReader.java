@@ -100,14 +100,14 @@ public class MatsimEventsReader implements MatsimSomeReader {
 		}
 
 		/**
-		 * Parses the specified events file. This method calls {@link #parse(String)}, but handles all
+		 * Parses the specified events file. This method calls {@link #read(String)}, but handles all
 		 * possible exceptions on its own.
 		 *
 		 * @param filename The name of the file to parse.
 		 * @throws UncheckedIOException
 		 */
 		public void readFile(final String filename) throws UncheckedIOException {
-			parse(filename);
+			read(filename);
 		}
 
 		@Override

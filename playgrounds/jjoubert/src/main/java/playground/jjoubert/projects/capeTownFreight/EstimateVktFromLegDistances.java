@@ -71,7 +71,7 @@ public class EstimateVktFromLegDistances {
 		
 		/* Parse population */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(population);
+		new PopulationReader(sc).read(population);
 		
 		/* Parse shapefile */
 		ShapeFileReader sfr = new ShapeFileReader();
@@ -88,7 +88,7 @@ public class EstimateVktFromLegDistances {
 		}
 		
 		/* Parse the network */
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).read(network);
 		
 		/* Set up the multithreaded infrastructure. */
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);

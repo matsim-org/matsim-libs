@@ -79,7 +79,7 @@ public class Fcd {
 	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork, double minDistanceBetweenTwoActs){
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc.getNetwork());
-		reader.parse(matsimNetwork);
+		reader.read(matsimNetwork);
 		
 		Fcd fcd = new Fcd(fcdNetInFile, fcdEventsInFile, minDistanceBetweenTwoActs);
 		fcd.writeNetworkFromEvents(outDir + "fcd_netFromEvents.xml.gz");
@@ -102,7 +102,7 @@ public class Fcd {
 		
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc.getNetwork());
-		reader.parse(matsimNetwork);
+		reader.read(matsimNetwork);
 		
 		Fcd fcd = new Fcd(netInFile, fcdEventsInFile, 0.0);
 		fcd.writeNetworkFromEvents(netOutFile);

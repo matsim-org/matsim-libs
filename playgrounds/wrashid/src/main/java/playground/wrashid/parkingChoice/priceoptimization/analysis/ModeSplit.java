@@ -45,7 +45,7 @@ public class ModeSplit implements BasicEventHandler {
 		events.addHandler(occ); 
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(args[0]);
+		reader.read(args[0]);
 		System.out.println(occ.count);
 		
 	}

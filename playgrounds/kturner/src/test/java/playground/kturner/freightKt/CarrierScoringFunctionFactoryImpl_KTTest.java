@@ -288,7 +288,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		try {
 			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 			rpConfig.setTollLinksFile(TOLL_FILE);
-			rpReader.parse(rpConfig.getTollLinksFile());
+			rpReader.read(rpConfig.getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -365,7 +365,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 				try {
 					RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 					rpConfig.setTollLinksFile(TOLL_FILE);
-					rpReader.parse(rpConfig.getTollLinksFile());
+					rpReader.read(rpConfig.getTollLinksFile());
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}

@@ -50,7 +50,7 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 	}
 
 	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
+		read(filename);
 	}
 
 	@Override

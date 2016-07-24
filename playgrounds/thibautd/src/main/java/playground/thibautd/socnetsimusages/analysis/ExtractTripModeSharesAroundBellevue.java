@@ -147,13 +147,13 @@ public class ExtractTripModeSharesAroundBellevue {
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
-		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).parse( networkFile );
+		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).read( facilitiesFile );
+		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).read( networkFile );
 
 		final Population pop = (Population) scenario.getPopulation();
 
 		if ( attributesFile != null ) {
-			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).parse( attributesFile );
+			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).read( attributesFile );
 		}
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
@@ -184,7 +184,7 @@ public class ExtractTripModeSharesAroundBellevue {
 				}			
 			}
 		});
-		new PopulationReader( scenario ).parse( plansFile );
+		new PopulationReader( scenario ).read( plansFile );
 
 		writer.close();
 	}

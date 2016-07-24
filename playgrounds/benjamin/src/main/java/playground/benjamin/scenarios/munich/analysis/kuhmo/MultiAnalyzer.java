@@ -189,7 +189,7 @@ public class MultiAnalyzer {
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		MoneyEventHandler moneyEventHandler = new MoneyEventHandler();
 		eventsManager.addHandler(moneyEventHandler);
-		eventsReader.parse(eventsFile);
+		eventsReader.read(eventsFile);
 
 		Map<Id<Person>, Double> personId2Toll = moneyEventHandler.getPersonId2TollMap();
 		
@@ -228,7 +228,7 @@ public class MultiAnalyzer {
 
 		eventsManager.addHandler(carDistanceEventHandler);
 		eventsManager.addHandler(ttHandler);
-		eventsReader.parse(eventsFile);
+		eventsReader.read(eventsFile);
 		
 		Map<Id, Double> personId2carDistance = carDistanceEventHandler.getPersonId2CarDistance();
 		Map<UserGroup, Double> userGroup2carTrips = carDistanceEventHandler.getUserGroup2carTrips();

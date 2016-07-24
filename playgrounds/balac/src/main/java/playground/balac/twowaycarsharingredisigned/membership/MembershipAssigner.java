@@ -245,7 +245,7 @@ public class MembershipAssigner {
 		
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[4]);
+		new ObjectAttributesXmlReader(bla).read(args[4]);
 		
 		TwoWayCSVehicleLocation stations = new TwoWayCSVehicleLocation(args[0], scenario);
 		

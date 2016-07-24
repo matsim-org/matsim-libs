@@ -242,7 +242,7 @@ public class PersonAnalysis {
 		new PopulationReader(scenario).readFile(plansFile);
 		
 		ObjectAttributes subpopAtts = new ObjectAttributes();
-		new ObjectAttributesXmlReader(subpopAtts).parse(personAttributesFile);
+		new ObjectAttributesXmlReader(subpopAtts).read(personAttributesFile);
 		
 		int nNonCarUsersUsingCar = 0;
 		

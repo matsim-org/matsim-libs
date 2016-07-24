@@ -54,10 +54,10 @@ public class CreateJointTripDataSetForClique {
 		final String outputFile = args[ 3 ];
 
 		CliqueParser clique = new CliqueParser( cliqueId );
-		clique.parse( cliquesFile );
+		clique.read( cliquesFile );
 
 		JointPlanParser jointPlans = new JointPlanParser( clique.membersIds );
-		jointPlans.parse( jointPlansFile );
+		jointPlans.read( jointPlansFile );
 
 		write( jointPlans , outputFile );
 	}

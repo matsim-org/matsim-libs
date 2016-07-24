@@ -42,7 +42,7 @@ public class BikeTravelDisutility implements TravelDisutility {
 	BikeTravelDisutility(BikeConfigGroup bikeConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
 		//get infos from ObjectAttributes
 		bikeAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(bikeAttributes).parse(bikeConfigGroup.getNetworkAttFile());
+		new ObjectAttributesXmlReader(bikeAttributes).read(bikeConfigGroup.getNetworkAttFile());
 		
 		marginalUtilityOfDistance = Double.valueOf(cnScoringGroup.getModes().get("bike").getMarginalUtilityOfDistance());
 		marginalUtilityOfTime = 	Double.valueOf(cnScoringGroup.getModes().get("bike").getMarginalUtilityOfTraveling());

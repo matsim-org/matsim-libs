@@ -47,7 +47,7 @@ public class BerlinNetworkChangeEvents
 
         List<NetworkChangeEvent> berlinBrbEvents = new ArrayList<>() ;
         new NetworkChangeEventsParser(
-                berlinBrbScenario.getNetwork(), berlinBrbEvents).parse(DIR + allChangeEventsFile);
+                berlinBrbScenario.getNetwork(), berlinBrbEvents).read(DIR + allChangeEventsFile);
 
         List<NetworkChangeEvent> onlyBerlinEvents = new ArrayList<>();
         Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();

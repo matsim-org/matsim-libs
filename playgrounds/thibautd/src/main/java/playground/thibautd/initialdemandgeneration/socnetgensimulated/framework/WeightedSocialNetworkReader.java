@@ -38,8 +38,12 @@ public class WeightedSocialNetworkReader extends MatsimXmlParser {
 		super( false );
 	}
 
-	public WeightedSocialNetwork read( final String file ) {
-		parse( file );
+	public WeightedSocialNetwork createAndReadSocialNetwork( final String file ) {
+		// Obviously, the inherited parse method (whatever it will be called in the end) will now not work any more ... it will read the file,
+		// but the user will not be able to get the "network" object.  If this is to be avoided, my intuition would be to use MatsimXmlParser
+		// as delegate, not as superclass.  kai, jul'16
+		
+		read( file );
 		return network;
 	}
 

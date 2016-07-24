@@ -142,7 +142,7 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 			writer.write("# scenarioId\tnumberOfTripsPt\tnumberOfMinibusesWithAtLeastOneTrip\tkmTravelledByAllMinibuses\tpassengerKmMinibus\tnumberOfPassengersUsingPtAndMinibus\tboardingInServiceAreaP\talightingInServiceAreaP\tboardingInServiceAreaPt\talightingInServiceAreaPt"); writer.newLine();
 			
 				ana.reset(0);
-				reader.parse(eventsFile);
+				reader.read(eventsFile);
 				ana.writeToFile(writer, scenarioId);			
 		
 			writer.close();	

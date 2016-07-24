@@ -329,7 +329,7 @@ public class StopStopCalculator extends Thread{
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(waitTimeCalculator);
 		eventsManager.addHandler(travelTimeCalculator);
-		(new EventsReaderXMLv1(eventsManager)).parse(args[4]);
+		(new EventsReaderXMLv1(eventsManager)).read(args[4]);
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
 		TransitRouterNetworkWW network = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), transitRouterConfig.getBeelineWalkConnectionDistance());

@@ -163,7 +163,7 @@ public class SpatialGrid<T> {
 		GridXMLParser<V> parser = new GridXMLParser<V>(serializer);
 		parser.setValidating(false);
 		try {
-			parser.parse(filename);
+			parser.read(filename);
 			return parser.grid;
 		} catch (Exception e) {
 			logger.fatal("Exception during parsing occured!", e);

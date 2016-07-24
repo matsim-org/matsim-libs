@@ -41,7 +41,7 @@ public class SocialNetworkAsMatsimNetworkUtils {
 	public static Network parseSocialNetworkAsMatsimNetwork(
 			final String file) {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( file );
+		new SocialNetworkReader( sc ).read( file );
 	
 		final SocialNetwork sn = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		return convertToNetwork( sn );

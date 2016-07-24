@@ -170,7 +170,7 @@ public class PopulationWriterHandlerImplV5Test {
 
 		@Override
 		public void readFile(String filename) {
-			this.parse(filename);
+			this.read(filename);
 		}
 
 		@Override

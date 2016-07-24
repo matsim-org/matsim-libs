@@ -77,12 +77,12 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	}
 
 	/**
-	 * Parses the specified counts file. This method is the same as {@link #parse(String)}.
+	 * Parses the specified counts file. This method is the same as {@link #read(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
-		parse(filename);
+		read(filename);
 	}
 
 	@Override

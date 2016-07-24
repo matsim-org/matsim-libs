@@ -49,12 +49,12 @@ public class OSM2MatsimCounts {
 
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse(osmCountsFile);
+		cReader.read(osmCountsFile);
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		nReader.parse(networkFile);
+		nReader.read(networkFile);
 
 		Network network = scenario.getNetwork();
 

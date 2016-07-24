@@ -62,8 +62,8 @@ public class FreightPopulationSampler {
 		String outputAttributes = args[5];
 		
 		Scenario inSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(inSc).parse(inputPopulation);
-		new ObjectAttributesXmlReader(inSc.getPopulation().getPersonAttributes()).parse(inputAttributes);
+		new PopulationReader(inSc).read(inputPopulation);
+		new ObjectAttributesXmlReader(inSc.getPopulation().getPersonAttributes()).read(inputAttributes);
 		
 		Scenario outSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimRandom.reset(seed);

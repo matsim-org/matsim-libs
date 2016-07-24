@@ -58,7 +58,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
-		nr.parse(getOutputDirectory() + "network.xml.gz");
+		nr.read(getOutputDirectory() + "network.xml.gz");
 
 		assertEquals("Network must have 8 links.", 8, sc.getNetwork().getLinks().size());
 
@@ -93,7 +93,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
-		nr.parse(getOutputDirectory() + "network.xml.gz");
+		nr.read(getOutputDirectory() + "network.xml.gz");
 
 		monc.cleanNetwork(sc.getNetwork(), mp);
 		assertNotNull("Cleaned network should exists.", monc.getNewNetwork());

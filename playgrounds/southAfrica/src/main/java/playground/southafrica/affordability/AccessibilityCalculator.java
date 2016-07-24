@@ -135,7 +135,7 @@ public class AccessibilityCalculator {
 		String personAttributesFile = args[2];
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
-		oar.parse(personAttributesFile);
+		oar.read(personAttributesFile);
 		/* Add attributes to population. */
 		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
 			String hhId = (String) oa.getAttribute(id.toString(), "householdId");

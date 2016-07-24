@@ -155,10 +155,10 @@ public class WagonToDemandConverterMain {
 
 		Config config = Utils.getDefaultWagonSimConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(scheduleNetworkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).read(scheduleNetworkFile);
 		new TransitScheduleReader(scenario).readFile(scheduleFile);
 		ObjectAttributes transitVehicleAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(transitVehicleAttributes).parse(transitVehicleAttributesFile);
+		new ObjectAttributesXmlReader(transitVehicleAttributes).read(transitVehicleAttributesFile);
 		
 		Date demandDateTime = WagonSimConstants.DATE_FORMAT_YYYYMMDDHHMMSS.parse(date+"-"+time);
 		WagonToDemandConverterMain converter = new WagonToDemandConverterMain(demandDateTime);

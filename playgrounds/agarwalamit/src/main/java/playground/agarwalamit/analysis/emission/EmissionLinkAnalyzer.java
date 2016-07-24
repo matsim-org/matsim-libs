@@ -157,7 +157,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
-		emissionReader.parse(this.emissionEventsFile);
+		emissionReader.read(this.emissionEventsFile);
 	}
 
 	@Override

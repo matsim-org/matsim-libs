@@ -115,7 +115,7 @@ public class createDemandFromSaturnMatrix {
 		Scenario sc = mdm.generateDemand(list, new Random(5463), populationFraction, "car");
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.parse(networkFilename);
+		nr.read(networkFilename);
 		
 		XY2Links xy = new XY2Links(sc.getNetwork(), null);
 		xy.run(sc.getPopulation());

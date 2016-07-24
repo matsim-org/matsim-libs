@@ -62,7 +62,7 @@ public class EventHandling {
 	EventsManager manager = EventsUtils.createEventsManager();
 	manager.addHandler(calculator);
 	manager.addHandler(volumes);
-	new EventsReaderXMLv1(manager).parse(eventsfile);
+	new EventsReaderXMLv1(manager).read(eventsfile);
 	
 	TravelTime tt = calculator.getLinkTravelTimes();
 	System.out.println("TT");

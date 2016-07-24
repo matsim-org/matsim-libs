@@ -85,7 +85,7 @@ public class ExtCostEventHandlerTest {
 		reader.readFile(eventsFile);
 		
 		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
+		congestionEventsReader.read(eventsFile);
 	
 		Map<Double, Double> tripDepTime2avgAmount = handler.getAvgAmountPerTripDepartureTime(TransportMode.car);
 		Map<Double, Double> tripDistance2avgAmount = handler.getAvgAmountPerTripDistance(TransportMode.car);
@@ -135,7 +135,7 @@ public class ExtCostEventHandlerTest {
 		reader.readFile(eventsFile);
 		
 		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
+		congestionEventsReader.read(eventsFile);
 	
 		Map<Double, Double> tripDepTime2avgAmountCar = handler.getAvgAmountPerTripDepartureTime(TransportMode.car);
 		Map<Double, Double> tripDistance2avgAmountCar = handler.getAvgAmountPerTripDistance(TransportMode.car);

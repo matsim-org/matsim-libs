@@ -183,7 +183,7 @@ public class RunZurichBikeSharingSimulation {
 		final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
 		new TransitRouterNetworkReader(
 				sc.getTransitSchedule(),
-				transitRouterNetwork ).parse(
+				transitRouterNetwork ).read(
 					group.getThinnedTransitRouterNetworkFile() );
 
 		return new RoutingData( sc ,  transitRouterNetwork );

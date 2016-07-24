@@ -21,7 +21,7 @@ public class FreeFloatingMembership {
 
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[0]);
+		new ObjectAttributesXmlReader(bla).read(args[0]);
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader populationReader = new PopulationReader(scenario);

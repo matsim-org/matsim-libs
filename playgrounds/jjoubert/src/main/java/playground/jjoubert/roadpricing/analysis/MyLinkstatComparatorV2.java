@@ -110,7 +110,7 @@ public class MyLinkstatComparatorV2 {
 		// Read the network file if the number of lanes are specified.
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.parse(networkFile);
+		nr.read(networkFile);
 		
 		mlc.network = sc.getNetwork();
 		mlc.compare(minimumLanes, threshold);

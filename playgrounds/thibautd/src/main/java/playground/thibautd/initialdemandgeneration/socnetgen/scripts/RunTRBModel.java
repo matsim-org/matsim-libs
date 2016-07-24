@@ -192,7 +192,7 @@ public class RunTRBModel {
 			@Override
 			public void endTag(String name, String content,
 					Stack<String> context) {}
-		}.parse( populationFile );
+		}.read( populationFile );
 
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );

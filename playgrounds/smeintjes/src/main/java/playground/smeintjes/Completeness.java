@@ -139,7 +139,7 @@ public class Completeness {
 
 				for (File file : listOfFiles) {
 					String vehicle = file.toString();
-					dvr.parse(vehicle);
+					dvr.read(vehicle);
 					DigicoreVehicle dv = dvr.getVehicle();
 					List<DigicoreChain> digicoreChains = dv.getChains();
 					for (DigicoreChain digicoreChain : digicoreChains) {

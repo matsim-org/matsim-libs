@@ -60,9 +60,9 @@ public class ExtractCapeTownVehiclesFromPopulation {
 		
 		/* Read in the population file. */
 		Scenario scInput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scInput).parse(inputPopulationFile);
+		new PopulationReader(scInput).read(inputPopulationFile);
 		/* Read in the population attributes. */
-		new ObjectAttributesXmlReader(scInput.getPopulation().getPersonAttributes()).parse(inputAttributeFile);
+		new ObjectAttributesXmlReader(scInput.getPopulation().getPersonAttributes()).read(inputAttributeFile);
 		LOG.info("Total number in population before extraction: " + scInput.getPopulation().getPersons().size());
 		
 		

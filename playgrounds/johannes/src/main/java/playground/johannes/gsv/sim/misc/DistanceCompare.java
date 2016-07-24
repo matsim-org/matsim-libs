@@ -58,7 +58,7 @@ public class DistanceCompare {
 		ObjectAttributes oAttrs = scenario.getPopulation().getPersonAttributes();
 		ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(oAttrs);
 		oaReader.putAttributeConverter(ArrayList.class, new Proxy2Matsim.Converter());
-		oaReader.parse(args[1]);
+		oaReader.read(args[1]);
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[2]));
 		writer.write("mid\tsim");

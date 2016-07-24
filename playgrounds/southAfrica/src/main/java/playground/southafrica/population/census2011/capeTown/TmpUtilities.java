@@ -67,7 +67,7 @@ public class TmpUtilities {
 	
 	public static void checkWalkLegs(){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse("/Users/jwjoubert/Documents/Projects/CapeTownMultimodal/001pct/population.xml.gz");
+		new PopulationReader(sc).read("/Users/jwjoubert/Documents/Projects/CapeTownMultimodal/001pct/population.xml.gz");
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter("/Users/jwjoubert/Downloads/walkLegs.csv");
 		try{

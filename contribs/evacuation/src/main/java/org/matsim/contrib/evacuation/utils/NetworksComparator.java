@@ -48,12 +48,12 @@ public class NetworksComparator {
 
 		Config c0 = ConfigUtils.createConfig();
 		Scenario sc0 = ScenarioUtils.createScenario(c0);
-		new MatsimNetworkReader(sc0.getNetwork()).parse(net0);
+		new MatsimNetworkReader(sc0.getNetwork()).read(net0);
 		Network n0 = sc0.getNetwork();
 
 		Config c1 = ConfigUtils.createConfig();
 		Scenario sc1 = ScenarioUtils.createScenario(c1);
-		new MatsimNetworkReader(sc1.getNetwork()).parse(net1);
+		new MatsimNetworkReader(sc1.getNetwork()).read(net1);
 		Network n1 = sc1.getNetwork();
 
 		if (n0.getCapacityPeriod() != n1.getCapacityPeriod()) {

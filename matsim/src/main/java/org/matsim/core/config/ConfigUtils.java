@@ -94,7 +94,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		if (config.global() == null) {
 			config.addCoreModules();
 		}
-		new ConfigReader(config).parse(filename);
+		new ConfigReader(config).read(filename);
 	}
 
 	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {

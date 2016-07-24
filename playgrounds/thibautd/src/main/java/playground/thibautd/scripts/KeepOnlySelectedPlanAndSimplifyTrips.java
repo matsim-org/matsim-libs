@@ -52,7 +52,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 
 		final ObjectAttributes atts = new ObjectAttributes();
 		if ( inputAttributes != null ) {
-			new ObjectAttributesXmlReader( atts ).parse( inputAttributes );
+			new ObjectAttributesXmlReader( atts ).read( inputAttributes );
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
@@ -90,7 +90,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 			}
 		});
 
-		new PopulationReader( scenario ).parse( inPopulation );
+		new PopulationReader( scenario ).read( inPopulation );
 		writer.writeEndPlans();
 	}
 }

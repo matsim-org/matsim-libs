@@ -107,7 +107,7 @@ public class PtScenarioAdaption {
 		scenario.getConfig().transit().setUseTransit(true);
 		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		new MatsimNetworkReader(scenario.getNetwork()).parse(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).read(networkfilePath);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		this.transitFactory = schedule.getFactory();

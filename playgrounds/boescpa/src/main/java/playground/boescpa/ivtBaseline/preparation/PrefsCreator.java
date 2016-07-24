@@ -356,7 +356,7 @@ public class PrefsCreator {
     private static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
         ObjectAttributes prefs = new ObjectAttributes();
         ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(prefs);
-        reader.parse(pathToInputPrefs);
+        reader.read(pathToInputPrefs);
         return prefs;
     }
 

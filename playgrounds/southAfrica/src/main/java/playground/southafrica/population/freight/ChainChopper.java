@@ -72,7 +72,7 @@ public class ChainChopper {
 		
 		Scenario scInput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scOutput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scInput).parse(inputPopulation);;
+		new PopulationReader(scInput).read(inputPopulation);;
 		for(Person person : scInput.getPopulation().getPersons().values()){
 			Plan plan = person.getSelectedPlan();
 			List<Plan> list = ChainChopper.chop(plan); 

@@ -54,7 +54,7 @@ public class KS2015RouteXMLParser extends MatsimXmlParser{
 	
 	public void readFile(final String filename) {
 		this.setValidating(false);
-		parse(filename);
+		read(filename);
 		log.info("Read " + this.comsWithRoutes.getNumberOfCommodites() + " routes");
 	}
 	

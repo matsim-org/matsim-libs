@@ -232,7 +232,7 @@ public class TTMatrixGenerator {
 		
 		logger.info("Loading network...");
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
-		reader.parse(netFile);
+		reader.read(netFile);
 		
 		logger.info("Loading zones...");
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey, null);

@@ -48,7 +48,7 @@ public class EventsToTrips {
 		networkReader.readFile(networkFile);
 
     	events.addHandler(eventsToTripsHandler);
-    	reader.parse(s);
+    	reader.read(s);
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(outputFile);
 
     	HashMap<Id<Vehicle>, ArrayList<RouteInfo>> routes = eventsToTripsHandler.getRoutes();

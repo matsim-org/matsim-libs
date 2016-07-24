@@ -126,7 +126,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
                             + "construct a zero toll file and insert that. ") ;
                 }
                 RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-                new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
+                new RoadPricingReaderXMLv1(rpsImpl).read(tollLinksFile);
                 return rpsImpl;
             }
         }

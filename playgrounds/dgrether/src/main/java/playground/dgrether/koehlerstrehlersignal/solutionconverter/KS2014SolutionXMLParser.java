@@ -40,7 +40,7 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 	
 	public void readFile(final String filename) {
 		this.setValidating(false);
-		parse(filename);
+		read(filename);
 		log.info("Read " + crossingSolutions.size() + " solutions");
 	}
 	

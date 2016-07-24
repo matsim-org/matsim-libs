@@ -48,7 +48,7 @@ public class DigicoreVehicleReader extends MatsimXmlParser {
 	 */
 	@Deprecated
 	public DigicoreVehicle parseDigicoreVehicle(String filename){
-		delegate.parse(filename);
+		delegate.read(filename);
 		return this.vehicle;
 	}
 	

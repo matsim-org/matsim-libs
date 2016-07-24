@@ -42,7 +42,7 @@ public class Converter {
 		
 		/* Read the network. */
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(input);
+		new MatsimNetworkReader(scenario.getNetwork()).read(input);
 		
 		/* Transform each node. */
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:25833");

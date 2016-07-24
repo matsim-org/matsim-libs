@@ -105,7 +105,7 @@ public class IKNetworkPopulationWriter {
 	private void exportNetwork2Shp1(){
 		
 		if (this.scenario.getNetwork().getLinks().size() == 0) {
-			new NetworkReaderMatsimV1(scenario.getNetwork()).parse(this.networkFile);
+			new NetworkReaderMatsimV1(scenario.getNetwork()).read(this.networkFile);
 		}
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
@@ -144,7 +144,7 @@ public class IKNetworkPopulationWriter {
 	private void exportNetwork2Shp2() {
 		
 		if (this.scenario.getNetwork().getLinks().size() == 0) {
-			new NetworkReaderMatsimV1(scenario.getNetwork()).parse(this.networkFile);
+			new NetworkReaderMatsimV1(scenario.getNetwork()).read(this.networkFile);
 		}
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(scenario.getNetwork(), crs);

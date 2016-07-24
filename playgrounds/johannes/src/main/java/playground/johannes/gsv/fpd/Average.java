@@ -46,7 +46,7 @@ public class Average {
         NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
         reader.setValidating(false);
         for(String file : files) {
-            reader.parse(file);
+            reader.read(file);
             matrices.add(reader.getMatrix());
         }
 

@@ -73,13 +73,13 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #parse(String)}.
+	 * Parses the specified config file. This method calls {@link #read(String)}.
 	 *
 	 * @param filename The name of the file to parse.
 	 * @throws UncheckedIOException e.g. if the file cannot be found
 	 */
 	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
+		read(filename);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 	public void readFile(final String filename, final String dtdFilename) throws UncheckedIOException {
 		log.info("trying to read config from " + filename);
 	  this.localDtd = dtdFilename;
-		parse(filename);
+		read(filename);
 		this.localDtd = null;
 	}
 

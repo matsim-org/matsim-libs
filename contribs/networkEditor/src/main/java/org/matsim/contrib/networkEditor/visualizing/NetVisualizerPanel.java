@@ -187,7 +187,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		board.clearCounts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(board.counts);
 		try {
-			countsReader.parse(path);            
+			countsReader.read(path);            
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

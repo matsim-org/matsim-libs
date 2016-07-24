@@ -189,7 +189,7 @@ public class MyPatronComparator {
 		List<Id<Link>> list = new ArrayList<>();
 		RoadPricingSchemeImpl rps = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(rps);
-		rpr.parse(linksFile);
+		rpr.read(linksFile);
 		for(Id<Link> i : rps.getTolledLinkIds()){
 			list.add(i);
 		}

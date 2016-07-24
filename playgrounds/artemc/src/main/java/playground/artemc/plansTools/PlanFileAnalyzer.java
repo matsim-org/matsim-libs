@@ -24,7 +24,7 @@ public class PlanFileAnalyzer {
 	String activity="";
 	String prevActivity="";
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario).parse("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
+	new PopulationReader(scenario).read("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
 	Population population = scenario.getPopulation();
 
 	for(Person agent:population.getPersons().values()){

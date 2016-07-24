@@ -55,7 +55,7 @@ public class Facilities2Links {
 		
 		logger.info("Loading network...");
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		netReader.parse(args[1]);
+		netReader.read(args[1]);
 		Network network = (Network) scenario.getNetwork();
 		
 		logger.info("Conneting facilities...");

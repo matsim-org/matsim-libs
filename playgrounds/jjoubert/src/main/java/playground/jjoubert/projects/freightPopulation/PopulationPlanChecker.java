@@ -83,7 +83,7 @@ public class PopulationPlanChecker {
 		}
 		
 		Scenario sc= ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(population);
+		new PopulationReader(sc).read(population);
 		
 		setUpAreaGeometries(shapefileFolder);
 		

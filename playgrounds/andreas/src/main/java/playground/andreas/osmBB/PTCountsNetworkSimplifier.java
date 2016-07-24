@@ -105,7 +105,7 @@ public class PTCountsNetworkSimplifier {
 		} else {
 			this.inCounts = new Counts();
 			CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(this.inCounts);
-			countsReader.parse(inCounts);
+			countsReader.read(inCounts);
 		}
 		
 		this.countsOutFile = countsOutFile;

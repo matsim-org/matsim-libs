@@ -45,7 +45,7 @@ public class FlattenCliqueComposition {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		Parser parser = new Parser( writer );
-		parser.parse( inFile );
+		parser.read( inFile );
 		try {
 			writer.close();
 		} catch (IOException e) {

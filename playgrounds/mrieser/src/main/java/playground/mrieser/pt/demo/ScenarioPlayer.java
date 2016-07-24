@@ -72,7 +72,7 @@ public class ScenarioPlayer {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/pt-tutorial/multimodalnetwork.xml");
 
 		TransitSchedule schedule = ((MutableScenario) scenario).getTransitSchedule();
-		new TransitScheduleReaderV1(scenario).parse("test/scenarios/pt-tutorial/transitschedule.xml");
+		new TransitScheduleReaderV1(scenario).read("test/scenarios/pt-tutorial/transitschedule.xml");
 		new CreateVehiclesForSchedule(schedule, ((MutableScenario) scenario).getTransitVehicles()).run();
 
 		final EventsManager events = EventsUtils.createEventsManager();

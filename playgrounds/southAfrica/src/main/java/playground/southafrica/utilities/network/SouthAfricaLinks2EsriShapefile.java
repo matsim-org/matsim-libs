@@ -50,7 +50,7 @@ public class SouthAfricaLinks2EsriShapefile {
 		/* Read the network. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-		mnr.parse(input);
+		mnr.read(input);
 		
 		/* Set up the ESRI conversion. */
 		CoordinateReferenceSystem crs = MGC.getCRS("WGS84_SA_Albers");

@@ -56,10 +56,10 @@ public class KNLinksCompare {
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		ObjectAttributes net1Attribs = new ObjectAttributes() ;
-		new ObjectAttributesXmlReader( net1Attribs ).parse( args[1] );
+		new ObjectAttributesXmlReader( net1Attribs ).read( args[1] );
 
 		ObjectAttributes net2Attribs = new ObjectAttributes() ;
-		new ObjectAttributesXmlReader( net2Attribs ).parse( args[2] );
+		new ObjectAttributesXmlReader( net2Attribs ).read( args[2] );
 
 		BufferedWriter writerLo = IOUtils.getBufferedWriter( "linksLo.txt" ) ;
 		BufferedWriter writerHi = IOUtils.getBufferedWriter( "linksHi.txt" ) ;

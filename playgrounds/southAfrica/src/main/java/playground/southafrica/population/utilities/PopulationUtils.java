@@ -64,7 +64,7 @@ public class PopulationUtils {
 	 */
 	public static void extractActivityDurations(String populationFile, String outputFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).read(populationFile);
 		
 		/*TODO Remove after debugging. */
 		double maxS = Double.NEGATIVE_INFINITY;
@@ -171,7 +171,7 @@ public class PopulationUtils {
 	public static void printHouseholdStatistics(String householdsFilename){
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 hr = new HouseholdsReaderV10(households);
-		hr.parse(householdsFilename);
+		hr.read(householdsFilename);
 		
 		/* Get the number of members. */
 		int members = 0;

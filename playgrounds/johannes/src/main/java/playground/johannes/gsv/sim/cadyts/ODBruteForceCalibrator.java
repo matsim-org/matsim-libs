@@ -451,7 +451,7 @@ public class ODBruteForceCalibrator {
 
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
+		reader.read("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
 		NumericMatrix refMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(refMatrix, 1 / 16.0);
 		MatrixOperations.applyFactor(refMatrix, 1 / (4 * 11.8));

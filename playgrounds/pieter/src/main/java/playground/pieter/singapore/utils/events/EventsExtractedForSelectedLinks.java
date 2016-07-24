@@ -54,7 +54,7 @@ public class EventsExtractedForSelectedLinks {
 				linkIds);
 		events.addHandler(idFinder);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(inFileName);
+		reader.read(inFileName);
 		ArrayList<String> personIds = new ArrayList<>();
 		personIds.addAll(idFinder.getPersonIds());
 		int N = personIds.size();
@@ -70,7 +70,7 @@ public class EventsExtractedForSelectedLinks {
 				outfileName, sampledIds,false);
 		events.addHandler(trimmer);
 		reader = new EventsReaderXMLv1(events);
-		reader.parse(inFileName);
+		reader.read(inFileName);
 		trimmer.closeFile();
 	}
 

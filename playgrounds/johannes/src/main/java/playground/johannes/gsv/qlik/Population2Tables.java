@@ -48,7 +48,7 @@ public class Population2Tables {
 
         XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
-        reader.parse(inPop);
+        reader.read(inPop);
 
         Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
 

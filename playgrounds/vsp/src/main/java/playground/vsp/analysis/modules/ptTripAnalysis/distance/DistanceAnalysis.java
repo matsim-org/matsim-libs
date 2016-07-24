@@ -87,7 +87,7 @@ public class DistanceAnalysis {
 	@SuppressWarnings("unchecked")
 	private void readPlansAndNetwork(String plans, String network) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(sc.getNetwork()).parse(network);
+		new NetworkReaderMatsimV1(sc.getNetwork()).read(network);
 		this.eventsHandler.addLinks((Map<Id<Link>, Link>) sc.getNetwork().getLinks());
 		
 //		final Population reader = (Population) sc.getPopulation();

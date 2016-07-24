@@ -28,7 +28,7 @@ public class PopulationParameterEditor {
 		Population population = (Population) scenario.getPopulation();
 
 		new PopulationReader(scenario).readFile(populationPath);
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(personAttributePath);
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).read(personAttributePath);
 
 //		//Random generator = new Random(10830239345L);
 //		Random generator = new Random(4600062981430244332L);

@@ -174,7 +174,7 @@ public class GAPScenarioRunner {
 		XY2Links xy2links = new XY2Links(scenario2);
 
 		ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader(atts).parse(Global.runInputDir
+		new ObjectAttributesXmlReader(atts).read(Global.runInputDir
 				+ "demographicAtts.xml");
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {

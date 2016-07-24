@@ -70,13 +70,13 @@ public class RelationsDiffPlot {
 		 */
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(itpFile);
+		reader.read(itpFile);
 		NumericMatrix itp = reader.getMatrix();
 
-		reader.parse(tomtomFile);
+		reader.read(tomtomFile);
 		NumericMatrix tomtom = reader.getMatrix();
 
-		reader.parse(simFile);
+		reader.read(simFile);
 		NumericMatrix simulation = reader.getMatrix();
 //		MatrixOperations.symmetrize(simulation);
 //		MatrixOperations.multiply(simulation, 11.8);

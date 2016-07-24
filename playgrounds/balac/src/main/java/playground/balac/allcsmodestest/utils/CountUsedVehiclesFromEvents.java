@@ -20,7 +20,7 @@ public class CountUsedVehiclesFromEvents {
 		Purpose purpose = new Purpose();
     	
     	events.addHandler(purpose);
-    	reader.parse(s);
+    	reader.read(s);
     	System.out.println(purpose.IDS().size());
     }
     

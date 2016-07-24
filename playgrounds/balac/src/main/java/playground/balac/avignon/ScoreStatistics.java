@@ -24,7 +24,7 @@ public class ScoreStatistics {
 		double centerY = 247300.0;
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(attributes);	
+		new ObjectAttributesXmlReader(bla).read(attributes);	
 	//	for (String plansFilePath : input) {
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 

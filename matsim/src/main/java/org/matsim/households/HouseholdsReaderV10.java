@@ -31,7 +31,7 @@ public class HouseholdsReaderV10 extends AbstractHouseholdsReaderV10 {
 	}
 	
 	public void readFile(String filename) throws UncheckedIOException {
-		parse(filename);
+		read(filename);
 	}
 	
 }

@@ -25,7 +25,7 @@ public class NetworkCapacityMultiplier {
 				"../roadpricingSingapore/scenarios/siouxFalls/networkCapacityChanges.csv"));
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).read(networkPath);
 		Network network = (Network) scenario.getNetwork();
 
 		network.setCapacityPeriod(3600.0);

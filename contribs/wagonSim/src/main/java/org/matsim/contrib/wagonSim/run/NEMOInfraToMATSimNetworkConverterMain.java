@@ -63,7 +63,7 @@ public class NEMOInfraToMATSimNetworkConverterMain {
 	
 	public final void convertFromFile(String nemoInfraXmlFile) {
 		NEMOInfraDataContainer dataContainer = new NEMOInfraDataContainer();
-		new NEMOInfraParser(dataContainer).parse(nemoInfraXmlFile);
+		new NEMOInfraParser(dataContainer).read(nemoInfraXmlFile);
 		NEMOInfraToMATSimNetworkConverter converter = new NEMOInfraToMATSimNetworkConverter(scenario.getNetwork(),nodeAttributes,linkAttributes);
 		converter.convert(dataContainer);
 		converter.makeNetworkBiDirectional();

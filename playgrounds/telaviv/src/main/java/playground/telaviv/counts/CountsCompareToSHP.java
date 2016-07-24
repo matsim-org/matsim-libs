@@ -70,7 +70,7 @@ public class CountsCompareToSHP {
 	}
 	
 	private void readNetwork() throws Exception {
-		new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).read(networkFile);
 	}
 	
 	private void readCounts() throws Exception {

@@ -74,15 +74,15 @@ public class WalkDistanceEstimator {
 		
 		/* Parse the entire population. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new HouseholdsReaderV10(sc.getHouseholds()).parse(householdFile);
-		new PopulationReader(sc).parse(populationFile);
+		new HouseholdsReaderV10(sc.getHouseholds()).read(householdFile);
+		new PopulationReader(sc).read(populationFile);
 		
 		/* Parse the attributes. */
 		ObjectAttributesXmlReader hhaReader = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
 		hhaReader.putAttributeConverter(Coord.class, new CoordConverter());
-		hhaReader.parse(householdAttributesFile);
+		hhaReader.read(householdAttributesFile);
 		
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(populationAttributesFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(populationAttributesFile);
 		
 		WalkDistanceEstimator.extractWalkDistances(sc, output);
 		

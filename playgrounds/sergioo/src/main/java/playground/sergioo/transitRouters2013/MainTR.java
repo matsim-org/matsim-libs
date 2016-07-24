@@ -55,7 +55,7 @@ public class MainTR {
 		eventsManager.addHandler(stopStopTimeCalculatorTuple);
 		eventsManager.addHandler(travelTimeCalculator);
 		eventsManager.addHandler(vehicleOccupancyCalculator);
-		(new EventsReaderXMLv1(eventsManager)).parse(args[4]);
+		(new EventsReaderXMLv1(eventsManager)).read(args[4]);
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());

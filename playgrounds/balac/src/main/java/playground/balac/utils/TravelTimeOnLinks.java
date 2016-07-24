@@ -30,7 +30,7 @@ public class TravelTimeOnLinks {
         
         events.addHandler(eventHandler);
         EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-        reader.parse(eventsFile);
+        reader.read(eventsFile);
 		
         
        System.out.println(eventHandler.getTravelTime1() + " " + eventHandler.getTravelTime2() + " " +eventHandler.getTravelTime3());

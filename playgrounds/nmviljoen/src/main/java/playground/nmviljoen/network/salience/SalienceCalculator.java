@@ -200,7 +200,7 @@ public class SalienceCalculator {
 						f.getAbsolutePath().lastIndexOf("/")+1, 
 						f.getAbsolutePath().length()-7);
 				Matrices m = new Matrices();
-				new MatsimMatricesReader(m, sc).parse(f.getAbsolutePath());
+				new MatsimMatricesReader(m, sc).read(f.getAbsolutePath());
 				Matrix matrix = m.getMatrix(matrixName);
 				Entry entry = matrix.getEntry(o, d);
 				if(entry != null){

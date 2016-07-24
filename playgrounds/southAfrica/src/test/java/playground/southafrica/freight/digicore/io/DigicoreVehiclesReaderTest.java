@@ -61,7 +61,7 @@ public class DigicoreVehiclesReaderTest {
 		new DigicoreVehiclesWriter(dvsOut).write(utils.getOutputDirectory() + "vehicles.xml");
 		
 		DigicoreVehicles dvsIn = createVehicles();
-		new DigicoreVehiclesReader(dvsIn).parse(utils.getOutputDirectory() + "vehicles.xml");
+		new DigicoreVehiclesReader(dvsIn).read(utils.getOutputDirectory() + "vehicles.xml");
 		/* Check container. */
 		assertTrue("Wrong CRS.", dvsIn.getCoordinateReferenceSystem().equalsIgnoreCase(dvsOut.getCoordinateReferenceSystem()));
 		assertTrue("Wrong description.", dvsIn.getDescription().equalsIgnoreCase(dvsOut.getDescription()));

@@ -87,7 +87,7 @@ public class FreightChainGenerator {
 		
 		/* Read the path-dependent complex network. */
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
-		nr.parse(complexNetworkFile);
+		nr.read(complexNetworkFile);
 		PathDependentNetwork pathDependentNetwork = nr.getPathDependentNetwork();
 		pathDependentNetwork.writeNetworkStatisticsToConsole();
 		

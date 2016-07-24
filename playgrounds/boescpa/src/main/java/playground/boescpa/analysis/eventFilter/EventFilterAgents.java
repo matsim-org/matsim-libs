@@ -79,7 +79,7 @@ public class EventFilterAgents {
 		log.info("Reading events file...");
 		if (eventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.parse(eventsFile);
+			reader.read(eventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

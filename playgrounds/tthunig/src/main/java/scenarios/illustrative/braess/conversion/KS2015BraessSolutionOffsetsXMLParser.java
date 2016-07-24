@@ -54,7 +54,7 @@ public class KS2015BraessSolutionOffsetsXMLParser extends MatsimXmlParser{
 	
 	public void readFile(final String filename) {
 		this.setValidating(false);
-		parse(filename);
+		read(filename);
 	}
 	
 	

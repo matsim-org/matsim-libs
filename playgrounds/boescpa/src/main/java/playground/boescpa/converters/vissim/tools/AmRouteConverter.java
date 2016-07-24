@@ -64,7 +64,7 @@ public class AmRouteConverter extends AbstractRouteConverter {
 				routes.add(anmRoute);
 			}
 		});
-		xmlParser.parse(path2AnmroutesFile);
+		xmlParser.read(path2AnmroutesFile);
 
 		// create trips:
 		for (SimpleAnmroutesParser.AnmRoute anmRoute : routes) {

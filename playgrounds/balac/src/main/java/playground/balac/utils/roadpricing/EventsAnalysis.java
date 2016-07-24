@@ -35,7 +35,7 @@ public class EventsAnalysis {
 		eventsManager.addHandler(linkEnterHandler);
 		
 		EventsReaderXMLv1 readerEvents = new EventsReaderXMLv1(eventsManager);
-		readerEvents.parse("C:/Users/balacm/Downloads/TRB/events_notoll.xml.gz");
+		readerEvents.read("C:/Users/balacm/Downloads/TRB/events_notoll.xml.gz");
 		
 		Map<String, int[]> map = linkEnterHandler.getMapa();
 		

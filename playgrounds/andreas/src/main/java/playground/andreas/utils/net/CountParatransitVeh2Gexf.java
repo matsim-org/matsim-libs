@@ -100,7 +100,7 @@ public class CountParatransitVeh2Gexf extends MatsimJaxbXmlWriter {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			eventsManager.addHandler(handler);
 			EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-			eventsReader.parse(path + runName + "/ITERS/it." + iteration + "/" + runName +"." + iteration + ".events.xml.gz");
+			eventsReader.read(path + runName + "/ITERS/it." + iteration + "/" + runName +"." + iteration + ".events.xml.gz");
 			
 			addValuesToGexf(iteration, handler);
 			

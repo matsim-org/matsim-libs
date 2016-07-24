@@ -95,7 +95,7 @@ public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
 		//afterwards it can be read by the jaxb parser
 		else{
 			log.info("Validating file against schema locally provided in dtd folder");
-			this.parse(filename);
+			this.read(filename);
 			log.info("File valid...");
 		}
 	}

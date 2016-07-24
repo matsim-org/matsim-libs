@@ -156,7 +156,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	
 	public void parseAndConvert(String filename){
 		
-		super.parse(filename);
+		super.read(filename);
 		log.info("Converting...");
 		convert();
 		logConversionInfo();

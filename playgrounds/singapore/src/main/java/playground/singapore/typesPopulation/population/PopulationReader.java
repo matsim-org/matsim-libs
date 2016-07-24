@@ -60,7 +60,7 @@ public class PopulationReader extends MatsimXmlParser implements MatsimPopulatio
 	}
 
 	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
+	 * Parses the specified plans file. This method calls {@link #read(String)}, but handles all
 	 * possible exceptions on its own.
 	 *
 	 * @param filename The name of the file to parse.
@@ -68,7 +68,7 @@ public class PopulationReader extends MatsimXmlParser implements MatsimPopulatio
 	 */
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
+		read(filename);
 	}
 
 	@Override

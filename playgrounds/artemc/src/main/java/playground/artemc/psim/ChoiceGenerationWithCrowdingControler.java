@@ -229,7 +229,7 @@ public class ChoiceGenerationWithCrowdingControler implements BeforeMobsimListen
 		eventsManager.addHandler(crowdingEventsHandler);
 		eventsManager.addHandler(transferDelayInVehicleEventHandler);
 		eventsManager.addHandler(capacityDelayEventHandler);
-		reader.parse(eventsFile);
+		reader.read(eventsFile);
 
 		HashMap<Integer, Double> avgCrowdingDisutility = new HashMap<Integer, Double>();
 		HashMap<Integer, Double> avgCrowdingExternality = new HashMap<Integer, Double>();

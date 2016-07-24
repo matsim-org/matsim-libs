@@ -165,7 +165,7 @@ class CreateUCCCarriers {
 		try {
 //			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 //			rpConfig.setTollLinksFile("F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/toll_distance_test_kt.xml");
-			rpReader.parse(TOLLFILE);
+			rpReader.read(TOLLFILE);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

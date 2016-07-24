@@ -44,7 +44,7 @@ public class MatsimIo {
 
 	public static Config loadConfig(final Config conf, final String filename) {
 		ConfigReader reader = new ConfigReader(conf);
-		reader.parse(filename);
+		reader.read(filename);
 		return conf;
 	}
 

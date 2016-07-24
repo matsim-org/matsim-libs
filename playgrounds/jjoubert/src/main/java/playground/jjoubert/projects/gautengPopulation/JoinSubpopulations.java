@@ -87,20 +87,20 @@ public class JoinSubpopulations {
 	public static void Run(String first, String firstAttribute, String second, String secondAttribute, String output, String outputAttribute){
 		/* Read the first subpopulation. */
 		Scenario sc1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc1).parse(first);
+		new PopulationReader(sc1).read(first);
 		/* Read the (optional) attributes of the first subpopulation. */
 		File f1 = new File(firstAttribute);
 		if(f1.exists() && f1.canRead()){
-			new ObjectAttributesXmlReader(sc1.getPopulation().getPersonAttributes()).parse(firstAttribute);
+			new ObjectAttributesXmlReader(sc1.getPopulation().getPersonAttributes()).read(firstAttribute);
 		}
 		
 		/* Read the second subpopulation. */
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc2).parse(second);
+		new PopulationReader(sc2).read(second);
 		/* Read the (optional) attributes of the first subpopulation. */
 		File f2 = new File(secondAttribute);
 		if(f2.exists() && f2.canRead()){
-			new ObjectAttributesXmlReader(sc2.getPopulation().getPersonAttributes()).parse(secondAttribute);
+			new ObjectAttributesXmlReader(sc2.getPopulation().getPersonAttributes()).read(secondAttribute);
 		}
 		
 		/* Add all the persons from the second to the first subpopulation. */

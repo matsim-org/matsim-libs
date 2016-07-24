@@ -85,7 +85,7 @@ public class TravelTimes implements PersonDepartureEventHandler, PersonArrivalEv
 		em.addHandler(tt);
 
 		EventsReaderXMLv1 r = new EventsReaderXMLv1(em);
-		r.parse(scDir + "it." + it + "/" + it + ".events.xml.gz");
+		r.read(scDir + "it." + it + "/" + it + ".events.xml.gz");
 
 		tt.done();
 	}

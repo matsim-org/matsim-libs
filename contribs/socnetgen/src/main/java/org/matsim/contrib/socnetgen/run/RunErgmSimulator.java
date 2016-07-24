@@ -79,7 +79,7 @@ public class RunErgmSimulator {
 		 */
 		Config config = new Config();
 		ConfigReader creader = new ConfigReader(config);
-		creader.parse(args[0]);
+		creader.read(args[0]);
 		/*
 		 * load population
 		 */

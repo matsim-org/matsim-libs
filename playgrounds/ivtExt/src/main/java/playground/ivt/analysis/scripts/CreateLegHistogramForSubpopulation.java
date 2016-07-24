@@ -85,7 +85,7 @@ public class CreateLegHistogramForSubpopulation {
 		final double radius = 1000 * args.getDoubleValue( "-r" );
 
 		final ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader( atts ).parse( personAttributesFile );
+		new ObjectAttributesXmlReader( atts ).read( personAttributesFile );
 
 		final LegHistogram histogram = new LegHistogram( 300 );
 		final SubpopulationFilteringEventsManager events =
@@ -97,7 +97,7 @@ public class CreateLegHistogramForSubpopulation {
 					network,
 					histogram ) );
 
-		new EventsReaderXMLv1( events ).parse( inputEventsFile );
+		new EventsReaderXMLv1( events ).read( inputEventsFile );
 
 		if ( outputDataFile != null ) histogram.write( outputDataFile );
 		if ( outputFigure != null ) LegHistogramChart.writeGraphic(histogram, outputFigure);

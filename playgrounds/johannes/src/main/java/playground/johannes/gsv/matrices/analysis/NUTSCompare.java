@@ -67,7 +67,7 @@ public class NUTSCompare {
 		 */
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(itpFile);
+		reader.read(itpFile);
 		NumericMatrix itpNuts3 = reader.getMatrix();
 		
 		MatrixOperations.applyFactor(itpNuts3, 1/365.0);
@@ -75,13 +75,13 @@ public class NUTSCompare {
 		/*
 		 * tomtom
 		 */
-		reader.parse(tomtomFile);
+		reader.read(tomtomFile);
 		NumericMatrix tomtomNuts3 = reader.getMatrix();
 		removeEntries(tomtomNuts3, zones, distThreshold);
 		/*
 		 * sim
 		 */
-		reader.parse(simFile);
+		reader.read(simFile);
 		NumericMatrix simNuts3 = reader.getMatrix();
 		
 		MatrixOperations.applyFactor(simNuts3, 11);

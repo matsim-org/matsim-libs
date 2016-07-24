@@ -45,7 +45,7 @@ public class AnalyzeIVTBaselineDemand {
         final String pathToEventsFile = args[0];
         final Network network = NetworkUtils.readNetwork(args[1]);
         final Population population = PopulationUtils.readPopulation(args[2]);
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(args[3]);
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).read(args[3]);
         final int scaleFactor = Integer.parseInt(args[4]);
         final String pathToOutputFolder = args.length > 5 ? args[5] : "";
 

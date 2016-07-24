@@ -62,7 +62,7 @@ public class AnalyseNmbmSamplePopulation {
 		/* Read in the population. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader pr = new PopulationReader(sc);
-		pr.parse(args[1]);
+		pr.read(args[1]);
 		
 		/* Determine statistics for activity types. */
 		extractActivityCoordinates(outputFolder, sc);

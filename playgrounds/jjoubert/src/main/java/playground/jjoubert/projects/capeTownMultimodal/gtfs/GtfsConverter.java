@@ -67,7 +67,7 @@ public class GtfsConverter {
 		String[] serviceIds = {"daily"};
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).read(network);
 		LOG.info("Total number of links in (original) network: " + sc.getNetwork().getLinks().size());
 		
 		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(folders, modes, sc.getNetwork(), serviceIds, "WGS84_SA_Albers");

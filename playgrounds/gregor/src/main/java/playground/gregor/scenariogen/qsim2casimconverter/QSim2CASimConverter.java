@@ -54,7 +54,7 @@ public class QSim2CASimConverter {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.parse(inputDir + "/output_network.xml.gz");
+		nr.read(inputDir + "/output_network.xml.gz");
 		convertNet(sc.getNetwork());
 		NetworkWriter nw = new NetworkWriter(sc.getNetwork());
 		nw.write(outputDir + "/network.xml.gz");

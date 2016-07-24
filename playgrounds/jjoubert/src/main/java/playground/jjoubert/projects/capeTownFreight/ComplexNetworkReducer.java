@@ -54,7 +54,7 @@ public class ComplexNetworkReducer {
 		
 		/* Read complex network. */
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
-		nr.parse(networkFile);
+		nr.read(networkFile);
 		PathDependentNetwork network = nr.getPathDependentNetwork();
 		network.writeNetworkStatisticsToConsole();
 		
