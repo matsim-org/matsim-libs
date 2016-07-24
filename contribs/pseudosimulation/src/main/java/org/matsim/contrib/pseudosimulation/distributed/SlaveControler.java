@@ -301,16 +301,16 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         SlaveControler slave = new SlaveControler(args);
         new Thread(slave).start();
-        System.out.printf("Enter KILL to kill the slave: ");
-        Scanner in = new Scanner(System.in);
-        String s;
-        boolean running = true;
-        do {
-            s = in.nextLine();
-            if (s.equals("KILL"))
-                running = false;
-        } while (running);
-        slave.requestShutDown();
+//        System.out.printf("Enter KILL to kill the slave: ");
+//        Scanner in = new Scanner(System.in);
+//        String s;
+//        boolean running = true;
+//        do {
+//            s = in.nextLine();
+//            if (s.equals("KILL"))
+//                running = false;
+//        } while (running);
+//        slave.requestShutDown();
     }
 
     public Config getConfig() {

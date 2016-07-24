@@ -256,7 +256,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         if (commandLine.hasOption("mb")) {
-            MasterBorrowingRate = Double.parseDouble(commandLine.getOptionValue("mr"));
+            MasterBorrowingRate = Double.parseDouble(commandLine.getOptionValue("mb"));
             masterInitialLogString.append("MASTER borrowing rate set to" + MasterBorrowingRate + " \n");
         }
 
@@ -403,7 +403,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         });
         matsimControler.addControlerListener(this);
 
-        masterLogger.warn(masterInitialLogString);
+
         String outputDirectory = config.controler().getOutputDirectory();
         outputDirectory += "_P" + numberOfPSimIterations +
                 String.format("_mr%.3f_mb%.3f_sr%.3f", MasterMutationRate, MasterBorrowingRate, SlaveMutationRate) +
@@ -541,6 +541,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyStartup(StartupEvent event) {
+        masterLogger.warn(masterInitialLogString);
         startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_SCENARIO);
         if (initialRoutingOnSlaves) {
             waitForSlaveThreads();
