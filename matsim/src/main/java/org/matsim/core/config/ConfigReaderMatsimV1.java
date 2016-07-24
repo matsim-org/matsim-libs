@@ -118,19 +118,20 @@ import org.xml.sax.InputSource;
 		this.localDtd = null;
 	}
 
-	@Override
-	public InputSource resolveEntity(final String publicId, final String systemId) {
-
-		InputSource is = super.resolveEntity(publicId, systemId);
-		if (is == null && this.localDtd != null) {
-			File dtdFile = new File(this.localDtd);
-			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + this.localDtd);
-				return new InputSource(this.localDtd);
-			}
-			return null;
-		}
-		return is;
-	}
+	// The following did override the inherited resolveEntity method.  But I have no idea why that may have made sense.  kai, jul'16
+//	@Override
+//	public InputSource resolveEntity(final String publicId, final String systemId) {
+//
+//		InputSource is = super.resolveEntity(publicId, systemId);
+//		if (is == null && this.localDtd != null) {
+//			File dtdFile = new File(this.localDtd);
+//			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+//				log.info("Using the local DTD " + this.localDtd);
+//				return new InputSource(this.localDtd);
+//			}
+//			return null;
+//		}
+//		return is;
+//	}
 
 }

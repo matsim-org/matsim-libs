@@ -114,31 +114,32 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 		}
 	}
 
-	@Override
-	public InputSource resolveEntity(final String publicId, final String systemId) {
-		InputSource is = super.resolveEntity(publicId, systemId);
-		if (is != null) {
-			// everything is fine, we can access the dtd
-			return is;
-		}
-		// okay, standard procedure failed... let's see if we have it locally
-		if (this.localDtd != null) {
-			File dtdFile = new File(this.localDtd);
-			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + this.localDtd);
-				return new InputSource(this.localDtd);
-			}
-		}
-		// hmm, didn't find the local one either... maybe inside a jar somewhere?
-		int index = systemId.replace('\\', '/').lastIndexOf('/');
-		String shortSystemId = systemId.substring(index + 1);
-		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
-		if (stream != null) {
-			log.info("Using local DTD from jar-file " + shortSystemId);
-			return new InputSource(stream);
-		}
-		// we fail...
-		return null;
-	}
+	// The following did override the inherited resolveEntity method.  But I have no idea why that may have made sense.  kai, jul'16
+//	@Override
+//	public InputSource resolveEntity(final String publicId, final String systemId) {
+//		InputSource is = super.resolveEntity(publicId, systemId);
+//		if (is != null) {
+//			// everything is fine, we can access the dtd
+//			return is;
+//		}
+//		// okay, standard procedure failed... let's see if we have it locally
+//		if (this.localDtd != null) {
+//			File dtdFile = new File(this.localDtd);
+//			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+//				log.info("Using the local DTD " + this.localDtd);
+//				return new InputSource(this.localDtd);
+//			}
+//		}
+//		// hmm, didn't find the local one either... maybe inside a jar somewhere?
+//		int index = systemId.replace('\\', '/').lastIndexOf('/');
+//		String shortSystemId = systemId.substring(index + 1);
+//		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
+//		if (stream != null) {
+//			log.info("Using local DTD from jar-file " + shortSystemId);
+//			return new InputSource(stream);
+//		}
+//		// we fail...
+//		return null;
+//	}
 
 }
