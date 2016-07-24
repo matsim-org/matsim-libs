@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.cemdapMatsimCadyts.moyo;
+package playground.dziemke.cemdapMatsimCadyts.pt;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

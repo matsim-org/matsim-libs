@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.cemdapMatsimCadyts.controller;
+package playground.dziemke.cemdapMatsimCadyts.pt;
 
 import javax.inject.Inject;
 
