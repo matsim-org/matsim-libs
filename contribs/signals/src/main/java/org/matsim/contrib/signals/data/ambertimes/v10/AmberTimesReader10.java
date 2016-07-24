@@ -59,7 +59,7 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 	
 	
 	@Override
-	public void readJaxbFile(final String filename) {
+	public void readFile(final String filename) {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLAmberTimes xmlatdefs = null;

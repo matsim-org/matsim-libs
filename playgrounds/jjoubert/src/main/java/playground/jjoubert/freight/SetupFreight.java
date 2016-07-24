@@ -68,7 +68,7 @@ public class SetupFreight {
 
 		/* Set up freight specific stuff. */
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS);
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS);
 		
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES);

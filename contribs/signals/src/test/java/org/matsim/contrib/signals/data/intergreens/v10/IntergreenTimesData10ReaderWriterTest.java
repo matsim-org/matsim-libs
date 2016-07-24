@@ -61,7 +61,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 			ParserConfigurationException {
 		IntergreenTimesData atd = new IntergreenTimesDataImpl();
 		IntergreenTimesReader10 reader = new IntergreenTimesReader10(atd);
-		reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(atd);
 
 	}
@@ -74,7 +74,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 		// read the test file
 		IntergreenTimesData atd = new IntergreenTimesDataImpl();
 		IntergreenTimesReader10 reader = new IntergreenTimesReader10(atd);
-		reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 
 		// write the test file
 		log.debug("write the test file...");
@@ -84,7 +84,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 		log.debug("and read it again");
 		atd = new IntergreenTimesDataImpl();
 		reader = new IntergreenTimesReader10(atd);
-		reader.readJaxbFile(testoutput);
+		reader.readFile(testoutput);
 		checkContent(atd);
 	}
 

@@ -23,7 +23,7 @@ public class VisualizeCarrierPlans {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap15.xml");
 		
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read("output/0.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");
+		new CarrierPlanXmlReaderV2(carriers).readFile("output/0.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");
 //        new CarrierPlanXmlReaderV2(carriers).read("scenarios/single_cordon/2.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");
 //        new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/scenarios/multipleCarriers_withoutTW_withDepots_withPlan.xml");
 		

@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
-import org.apache.log4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Stack;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
@@ -29,9 +29,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Stack;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimSomeReader;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -54,9 +56,21 @@ import java.util.Stack;
  * @author dgrether
  *
  */
-public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
+public abstract class MatsimJaxbXmlParser implements MatsimSomeReader {
+
+	private final class ParserDelegate extends MatsimXmlParser {
+		@Override public void startTag(String name, Attributes atts, Stack<String> context) {
+			// not used
+		}
+		@Override public void endTag(String name, String content, Stack<String> context) {
+			// not used
+		}
+	}
+
 
 	private static final Logger log = Logger.getLogger(MatsimJaxbXmlParser.class);
+	
+	private final MatsimXmlParser delegate ;
 	
 	private String schemaLocation;
 
@@ -65,14 +79,19 @@ public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
 	 * @param schemaLocation the url where the schema is located (also called systemId)
 	 */
 	public MatsimJaxbXmlParser(String schemaLocation){
+		this.delegate = new ParserDelegate() ;
 		this.schemaLocation = schemaLocation;
 	}
 
-	public abstract void readJaxbFile(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException;
+	public abstract void readFile(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException;
 	// yyyyyy this is not so great, for Jaxb files still having the "standard" and the special method side by side.  But I first need to figure out
 	// what is going on with these exceptions. kai, jul'16
 	
-	protected void validateFile(String filename, Unmarshaller u) throws SAXException, ParserConfigurationException, IOException{
+	/**
+	 * @throws ParserConfigurationException  
+	 * @throws IOException 
+	 */
+	protected final void validateFile(String filename, Unmarshaller u) throws SAXException, ParserConfigurationException, IOException{
 		URL schemaUrl = null;
 		SchemaFactory schemaFac = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;
@@ -97,21 +116,9 @@ public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
 		//afterwards it can be read by the jaxb parser
 		else{
 			log.info("Validating file against schema locally provided in dtd folder");
-			this.readFile(filename);
+			delegate.readFile(filename);
 			log.info("File valid...");
 		}
 	}
 
-
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-	}
-
-
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-	}
-	
-	
-		
 }

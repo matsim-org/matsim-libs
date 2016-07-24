@@ -62,7 +62,7 @@ public class RunChessboard {
             Controler controler = new Controler(config);
 
             final Carriers carriers = new Carriers();
-            new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlans.xml");
+            new CarrierPlanXmlReaderV2(carriers).readFile("input/usecases/chessboard/freight/carrierPlans.xml");
 
             final CarrierVehicleTypes types = new CarrierVehicleTypes();
             new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");

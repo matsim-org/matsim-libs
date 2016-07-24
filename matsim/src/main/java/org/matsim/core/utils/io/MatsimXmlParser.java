@@ -21,6 +21,7 @@
 package org.matsim.core.utils.io;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimReader;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -47,7 +48,7 @@ import java.util.zip.GZIPInputStream;
  *
  * @author mrieser
  */
-public abstract class MatsimXmlParser extends DefaultHandler {
+public abstract class MatsimXmlParser extends DefaultHandler implements MatsimReader {
 
 	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
@@ -146,6 +147,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
 	 * @throws UncheckedIOException
 	 */
+	@Override
 	public final void readFile(final String filename) throws UncheckedIOException {
 		log.info("starting to parse xml from file " + filename + " ...");
 		this.theSource = filename;

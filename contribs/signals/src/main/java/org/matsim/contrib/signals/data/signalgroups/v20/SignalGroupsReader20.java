@@ -64,7 +64,7 @@ public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
 	}
 
 	@Override
-	public void readJaxbFile(String filename) {
+	public void readFile(String filename) {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLSignalGroups xmlsgdefs = null;

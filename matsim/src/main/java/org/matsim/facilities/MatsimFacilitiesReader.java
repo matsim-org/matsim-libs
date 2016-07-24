@@ -37,7 +37,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class MatsimFacilitiesReader extends MatsimXmlParser implements MatsimSomeReader {
+public class MatsimFacilitiesReader extends MatsimXmlParser {
 	/* Why is this suddenly a "Matsim"FacilitiesReader and not just a Facilities reader to be consistent with all other 
 	 * naming conventions?  kai, jan09
 	 * because all other readers in Matsim are also called Matsim*Reader,

@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements MatsimSomeReader {
+public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader11.class);
@@ -75,10 +75,10 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 	
 
 	/**
-	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readJaxbFile(java.lang.String)
+	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
 	 */
 	@Override
-	public void readJaxbFile(String filename) throws RuntimeException {
+	public void readFile(String filename) throws RuntimeException {
 		//create jaxb infrastructure
 		JAXBContext jc;
 		XMLLaneDefinitions xmlLaneDefinitions;

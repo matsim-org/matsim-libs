@@ -62,7 +62,7 @@ public class MyCarrierPlanInterpreter {
 		for(File file : listOfPlans){
 			Carriers carriers = new Carriers();
 			carriers.getCarriers().clear();
-			new CarrierPlanXmlReaderV2(carriers).read(file.getAbsolutePath());
+			new CarrierPlanXmlReaderV2(carriers).readFile(file.getAbsolutePath());
 			Carrier carrier = carriers.getCarriers().get(Id.create("MyCarrier", Carrier.class));
 			CarrierPlan plan = carrier.getSelectedPlan();
 

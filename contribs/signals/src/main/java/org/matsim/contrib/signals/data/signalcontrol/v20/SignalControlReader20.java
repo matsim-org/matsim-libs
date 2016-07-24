@@ -108,7 +108,7 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 
 
 	@Override
-	public void readJaxbFile(String filename) {
+	public void readFile(String filename) {
 		SignalControlDataFactory factory = this.signalControlData.getFactory();
 
 		XMLSignalControl xmlSignalControl = this.readSignalControl20File(filename);

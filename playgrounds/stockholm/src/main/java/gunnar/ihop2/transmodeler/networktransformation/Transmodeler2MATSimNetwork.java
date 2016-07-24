@@ -428,7 +428,7 @@ public class Transmodeler2MATSimNetwork {
 			final LaneDefinitions11 lanedefs11 = new LaneDefinitions11Impl();
 			final LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(
 					lanedefs11);
-			reader11.readJaxbFile(this.matsimLanesFile11);
+			reader11.readFile(this.matsimLanesFile11);
 			final Lanes lanedefs20 = LaneDefinitionsV11ToV20Conversion
 					.convertTo20(lanedefs11, net, UTurnCreation.OFF);
 			final LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(

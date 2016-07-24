@@ -36,7 +36,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public final class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeReader {
+public final class MatsimNetworkReader extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(MatsimNetworkReader.class);
 	private final static String NETWORK_V1 = "network_v1.dtd";

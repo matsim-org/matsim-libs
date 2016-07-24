@@ -64,7 +64,7 @@ public class SignalsScenarioLoader {
 	private void loadIntergreenTimes(SignalsData data){
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
 			IntergreenTimesReader10 reader = new IntergreenTimesReader10(data.getIntergreenTimesData());
-			reader.readJaxbFile(this.signalConfig.getIntergreenTimesFile());
+			reader.readFile(this.signalConfig.getIntergreenTimesFile());
 		}
 	}
 
@@ -72,7 +72,7 @@ public class SignalsScenarioLoader {
 	private void loadAmberTimes(SignalsData data) {
 		if (this.signalConfig.getAmberTimesFile() != null){
 			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData(), AmberTimesWriter10.AMBERTIMES10);
-			reader.readJaxbFile(this.signalConfig.getAmberTimesFile());
+			reader.readFile(this.signalConfig.getAmberTimesFile());
 		}
 		else {
 			log.info("Signals: No amber times file set, can't load amber times!");
@@ -82,7 +82,7 @@ public class SignalsScenarioLoader {
 	private void loadControl(SignalsData data){
 		if (this.signalConfig.getSignalControlFile() != null){
 			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
-			controlReader.readJaxbFile(this.signalConfig.getSignalControlFile());
+			controlReader.readFile(this.signalConfig.getSignalControlFile());
 		}
 		else {
 			log.info("Signals: No signal control file set, can't load signal control data!");
@@ -92,7 +92,7 @@ public class SignalsScenarioLoader {
 	private void loadGroups(SignalsData data) {
 		if (this.signalConfig.getSignalGroupsFile() != null){
 			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData(), MatsimSignalSystemsReader.SIGNALGROUPS20);
-			groupsReader.readJaxbFile(this.signalConfig.getSignalGroupsFile());
+			groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
 		}
 		else {
 			log.info("Signals: No signal groups file set, can't load signal groups!");
@@ -102,7 +102,7 @@ public class SignalsScenarioLoader {
 	private void loadSystems(SignalsData data){
 		if (this.signalConfig.getSignalSystemFile() != null){
 			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData(), MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-			systemsReader.readJaxbFile(this.signalConfig.getSignalSystemFile());
+			systemsReader.readFile(this.signalConfig.getSignalSystemFile());
 		}
 		else {
 			log.info("Signals: No signal systems file set, can't load signal systems information!");

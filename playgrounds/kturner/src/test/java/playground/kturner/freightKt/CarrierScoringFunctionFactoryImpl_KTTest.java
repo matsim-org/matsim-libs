@@ -51,7 +51,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
     	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
     	
@@ -102,7 +102,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
     	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
     	
@@ -154,7 +154,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
     	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
     	
@@ -210,7 +210,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
     	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
     	
@@ -263,7 +263,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
     	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
     	
@@ -342,7 +342,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
     	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
     	

@@ -102,7 +102,7 @@ public class MyCarrierSimulation {
 
 		//read carriers and their capabilities
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(carrierPlanFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(carrierPlanFile);
 
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(vehicleTypes).readFile(vehicleTypesFile);

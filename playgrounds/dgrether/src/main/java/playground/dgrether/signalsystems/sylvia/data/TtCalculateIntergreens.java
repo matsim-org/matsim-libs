@@ -68,7 +68,7 @@ public class TtCalculateIntergreens {
 		// read fixed time control
 		SignalControlData signalControl = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(signalControl);
-		reader.readJaxbFile(signalControlInputFile);
+		reader.readFile(signalControlInputFile);
 
 		// create a container for the intergreens of all signal systems
 		IntergreenTimesData intergreens = new IntergreenTimesDataImpl();

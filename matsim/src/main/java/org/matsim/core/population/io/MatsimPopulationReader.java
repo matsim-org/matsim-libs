@@ -20,16 +20,18 @@
 
 package org.matsim.core.population.io;
 
-import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.api.internal.MatsimReader;
 
 
-public interface MatsimPopulationReader extends MatsimSomeReader {
+public interface MatsimPopulationReader extends MatsimReader {
+	// yyyyyy I think that this interface can go.  kai, jul'16
 	
 	/**
 	 * read plans from the specified file.
 	 * 
 	 * @param filename name of the file to read plans from.
 	 */
+	@Override
 	void readFile(String filename);
 
 }

@@ -54,7 +54,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
+public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private final TransitSchedule schedule;
 	private final RouteFactories routeFactory;

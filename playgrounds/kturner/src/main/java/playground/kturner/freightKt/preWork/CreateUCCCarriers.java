@@ -80,7 +80,7 @@ class CreateUCCCarriers {
 
 		//Carrier-Stuff
 //		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERFILE) ;
 //		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPEFILE) ;
 

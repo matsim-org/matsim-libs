@@ -20,15 +20,15 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-
-import java.net.URL;
 
 /**
  * Reads {@link TransitSchedule}s from file as long as the files are in one of the
@@ -36,7 +36,7 @@ import java.net.URL;
  *
  * @author mrieser
  */
-public class TransitScheduleReader implements MatsimSomeReader {
+public class TransitScheduleReader implements MatsimReader {
 
 	private final Scenario scenario;
 	private final CoordinateTransformation transformation;
@@ -52,6 +52,7 @@ public class TransitScheduleReader implements MatsimSomeReader {
 		this( new IdentityTransformation() , scenario );
 	}
 
+	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
 		String systemId = guesser.getSystemId();

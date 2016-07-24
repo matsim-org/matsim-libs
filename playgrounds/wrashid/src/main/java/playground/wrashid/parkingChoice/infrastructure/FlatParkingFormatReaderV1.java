@@ -13,7 +13,7 @@ import org.xml.sax.Attributes;
 
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
-public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
+public class FlatParkingFormatReaderV1 extends MatsimXmlParser {
 
 	LinkedList<PParking> parkings=new LinkedList<PParking>();
 	

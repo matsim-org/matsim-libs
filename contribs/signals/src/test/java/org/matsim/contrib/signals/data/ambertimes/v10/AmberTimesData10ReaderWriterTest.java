@@ -54,7 +54,7 @@ public class AmberTimesData10ReaderWriterTest {
 			ParserConfigurationException {
 		AmberTimesData atd = new AmberTimesDataImpl();
 		AmberTimesReader10 reader = new AmberTimesReader10(atd);
-		reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(atd);
 
 	}
@@ -67,7 +67,7 @@ public class AmberTimesData10ReaderWriterTest {
 		// read the test file
 		AmberTimesData atd = new AmberTimesDataImpl();
 		AmberTimesReader10 reader = new AmberTimesReader10(atd);
-		reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 
 		// write the test file
 		log.debug("write the test file...");
@@ -77,7 +77,7 @@ public class AmberTimesData10ReaderWriterTest {
 		log.debug("and read it again");
 		atd = new AmberTimesDataImpl();
 		reader = new AmberTimesReader10(atd);
-		reader.readJaxbFile(testoutput);
+		reader.readFile(testoutput);
 		checkContent(atd);
 	}
 

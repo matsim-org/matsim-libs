@@ -49,7 +49,7 @@ public class OffsetRandomizer {
 
 		SignalControlData data = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(data);
-		reader.readJaxbFile(SIGNAL_CONTROL_FILENAME);
+		reader.readFile(SIGNAL_CONTROL_FILENAME);
 		Random random = MatsimRandom.getLocalInstance();
 		
 		for (SignalSystemControllerData controlerData : data.getSignalSystemControllerDataBySystemId().values()) {

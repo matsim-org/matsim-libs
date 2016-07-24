@@ -62,7 +62,7 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 	
 	
 	@Override
-	public void readJaxbFile(final String filename) throws UncheckedIOException {
+	public void readFile(final String filename) throws UncheckedIOException {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLIntergreenTimes xmlIntergreenTimes = null;

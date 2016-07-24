@@ -222,7 +222,7 @@ public class KNFreight4 {
 
 	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS) ;
 
 		// assign vehicle types to the carriers (who already have their vehicles (??)):
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;

@@ -317,7 +317,7 @@ public class KTFreight_v3 {
 
 	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERFILE) ;
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;

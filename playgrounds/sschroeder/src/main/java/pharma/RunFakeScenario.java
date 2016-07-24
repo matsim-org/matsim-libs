@@ -37,7 +37,7 @@ public class RunFakeScenario {
         Controler controler = new Controler(config);
 
         final Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).read("in/carriers.xml");
+        new CarrierPlanXmlReaderV2(carriers).readFile("in/carriers.xml");
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readFile("in/vehicleTypes.xml");

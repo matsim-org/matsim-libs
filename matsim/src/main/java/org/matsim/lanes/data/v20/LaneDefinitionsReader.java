@@ -19,21 +19,22 @@
  * *********************************************************************** */
 package org.matsim.lanes.data.v20;
 
+import java.io.IOException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-
 /**
  * @author dgrether
  */
-public class LaneDefinitionsReader implements MatsimSomeReader {
+public class LaneDefinitionsReader implements MatsimReader {
 	
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader.class);
@@ -52,6 +53,7 @@ public class LaneDefinitionsReader implements MatsimSomeReader {
 	/**
 	 * Reads both file formats, 1.1 and 2.0.
 	 */
+	@Override
 	public void readFile(final String filename) {
 		try {
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
@@ -79,7 +81,7 @@ public class LaneDefinitionsReader implements MatsimSomeReader {
 				throw new IllegalArgumentException(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
 			}
 			log.info("reading file " + filename);
-			reader.readJaxbFile(filename);
+			reader.readFile(filename);
 		} catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
 			throw new RuntimeException(e);
 		}

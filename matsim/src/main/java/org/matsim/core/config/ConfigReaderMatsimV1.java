@@ -37,7 +37,7 @@ import org.xml.sax.InputSource;
  *
  * @author mrieser
  */
- class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeReader {
+ class ConfigReaderMatsimV1 extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(ConfigReaderMatsimV1.class);
 //	private final static String CONFIG = "config";

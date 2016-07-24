@@ -77,7 +77,7 @@ public class EquilWithCarrierWithoutPassTest {
 	@Test
 	public void testMobsimWithCarrierRunsWithoutException() {
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
 		controler.addOverridingModule(new CarrierModule(carriers));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -93,7 +93,7 @@ public class EquilWithCarrierWithoutPassTest {
 	@Test
 	public void testScoringInMeters(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
 		controler.addOverridingModule(new CarrierModule(carriers));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -115,7 +115,7 @@ public class EquilWithCarrierWithoutPassTest {
 	@Test
 	public void testScoringInSeconds(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
 		controler.addOverridingModule(new CarrierModule(carriers));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -138,7 +138,7 @@ public class EquilWithCarrierWithoutPassTest {
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
 		CarrierModule carrierControler = new CarrierModule(carriers);
 		carrierControler.setPhysicallyEnforceTimeWindowBeginnings(true);
 		controler.addOverridingModule(carrierControler);
