@@ -26,11 +26,13 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 
 /**
@@ -39,7 +41,11 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class IncomeDistributionGenerator {
 
-	private final String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
+	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
+//	private final String plansFile = dir+"/output_plans.xml.gz";
+	private final String plansFile = dir+"/ITERS/it.0/0.plans.xml.gz";
+	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
+	
 	private final SortedMap<Double, SortedMap<String, Integer>> avgInc2mode2Count = new TreeMap<>();
 	private final double USD2INRRate = 66.6; // 08 June 2016 
 
@@ -50,7 +56,7 @@ public class IncomeDistributionGenerator {
 	}
 
 	private void writeData(){
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/avgIncToCount.txt")) {
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it.0.txt")) {
 			writer.write("avgIncomUSD\tmode\tcount\n");
 
 			for (Double d : this.avgInc2mode2Count.keySet()){
@@ -64,11 +70,16 @@ public class IncomeDistributionGenerator {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason :"+e);
 		}
-
 	}
 
 	private void parseFile(){
-		Scenario sc = LoadMyScenarios.loadScenarioFromOutputDir(outputDir);
+		Config config = ConfigUtils.createConfig();
+		config.addCoreModules();
+		config.plans().setInputFile(plansFile);
+		config.plans().setInputPersonAttributeFile(personAttributeFile);
+		
+		Scenario sc = ScenarioUtils.loadScenario(config);
+		
 		for (Person p: sc.getPopulation().getPersons().values()) {
 
 			if(! PatnaPersonFilter.isPersonBelongsToUrban(p.getId())) continue;
