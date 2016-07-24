@@ -75,10 +75,10 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 	
 
 	/**
-	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
+	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readJaxbFile(java.lang.String)
 	 */
 	@Override
-	public void readFile(String filename) throws RuntimeException {
+	public void readJaxbFile(String filename) throws RuntimeException {
 		//create jaxb infrastructure
 		JAXBContext jc;
 		XMLLaneDefinitions xmlLaneDefinitions;

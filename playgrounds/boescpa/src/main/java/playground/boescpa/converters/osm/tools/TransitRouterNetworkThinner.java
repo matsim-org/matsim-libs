@@ -73,7 +73,7 @@ public class TransitRouterNetworkThinner {
 		log.info("Reading transit router network from file...");
 		Gbl.startMeasurement();
 		TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
-		new TransitRouterNetworkReaderMatsimV1(scenario, transitRouterNetwork).read(args[1]);
+		new TransitRouterNetworkReaderMatsimV1(scenario, transitRouterNetwork).readFile(args[1]);
 		Gbl.printElapsedTime();
 		Gbl.printMemoryUsage();
 		System.gc();

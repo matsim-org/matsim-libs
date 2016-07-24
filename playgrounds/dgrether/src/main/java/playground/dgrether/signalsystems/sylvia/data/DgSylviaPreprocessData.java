@@ -77,11 +77,11 @@ public class DgSylviaPreprocessData {
 			throws JAXBException, SAXException, ParserConfigurationException, IOException {
 		SignalControlData signalControl = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(signalControl);
-		reader.readFile(signalControlInputFile);
+		reader.readJaxbFile(signalControlInputFile);
 
 		SignalGroupsData signalGroupsData = new SignalGroupsDataImpl();
 		SignalGroupsReader20 groupsReader = new SignalGroupsReader20(signalGroupsData);
-		groupsReader.readFile(signalGroupsFile);
+		groupsReader.readJaxbFile(signalGroupsFile);
 
 		convertSignalGroupsData(signalGroupsData, signalControl);
 
@@ -122,7 +122,7 @@ public class DgSylviaPreprocessData {
 			throws JAXBException, SAXException, ParserConfigurationException, IOException{
 		SignalControlData signalControl = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(signalControl);
-		reader.readFile(signalControlInputFile);
+		reader.readJaxbFile(signalControlInputFile);
 
 		SignalControlDataImpl sylviaSignalControl = new SignalControlDataImpl();
 		convertSignalControlData(signalControl, sylviaSignalControl);

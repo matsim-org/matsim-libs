@@ -125,7 +125,7 @@ public class RailCounts {
 		RailCounts counts = new RailCounts(attribs);
 		RailCountsXMLParser parser = new RailCountsXMLParser(counts, network, schedule);
 		parser.setValidating(false);
-		parser.read(file);
+		parser.readFile(file);
 		
 		return counts;
 	}

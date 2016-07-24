@@ -65,7 +65,7 @@ public class TrackMatchingXmlReader extends MatsimXmlParser {
 		
 		TrackMatchingXmlReader tmx = new TrackMatchingXmlReader();
 		tmx.setValidating(false);
-		tmx.read(filename);
+		tmx.readFile(filename);
 		tmx.getLargestRoute();
 		
 		Header.printFooter();

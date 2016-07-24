@@ -113,7 +113,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
-				rpReader.read( otherTollLinkFile  );
+				rpReader.readFile( otherTollLinkFile  );
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -130,7 +130,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
-				rpReader.read( tollLinksFileName  );
+				rpReader.readFile( tollLinksFileName  );
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

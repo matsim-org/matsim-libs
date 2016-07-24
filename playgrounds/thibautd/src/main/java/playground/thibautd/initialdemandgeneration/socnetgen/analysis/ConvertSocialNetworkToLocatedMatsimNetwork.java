@@ -49,7 +49,7 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Map<Id<Person>, Coord> coords = parsePopulation( popFile );
-		new SocialNetworkReader( sc ).read( socNetFile );
+		new SocialNetworkReader( sc ).readFile( socNetFile );
 
 		final Network network =
 			SocialNetworkAsMatsimNetworkUtils.convertToNetwork(
@@ -101,7 +101,7 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 			@Override
 			public void endTag(String name, String content,
 					Stack<String> context) {}
-		}.read( populationFile );
+		}.readFile( populationFile );
 
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );

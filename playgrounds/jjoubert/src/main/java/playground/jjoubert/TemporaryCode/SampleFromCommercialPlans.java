@@ -85,7 +85,7 @@ public class SampleFromCommercialPlans {
 		PopulationFactory pf = sNew.getPopulation().getFactory();
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew.getNetwork());
-		nr.read(networkFile);
+		nr.readFile(networkFile);
 		XY2Links xy = new XY2Links(sNew.getNetwork(), null);
 
 		int id = Integer.parseInt(firstId);
@@ -96,7 +96,7 @@ public class SampleFromCommercialPlans {
 			String filename = root + "plansGauteng5000_Sample" + i + ".xml";
 			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			PopulationReader pr = new PopulationReader(s);
-			pr.read(filename);
+			pr.readFile(filename);
 			listSc.add(s);
 		}
 		
@@ -145,7 +145,7 @@ public class SampleFromCommercialPlans {
 			log.info("Combining car and commercial vehicles.");
 			Scenario car = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			PopulationReader pr = new PopulationReader(car);
-			pr.read(carFile);
+			pr.readFile(carFile);
 			
 			for(Id idCar : car.getPopulation().getPersons().keySet()){
 				Person carPerson = car.getPopulation().getPersons().get(idCar);

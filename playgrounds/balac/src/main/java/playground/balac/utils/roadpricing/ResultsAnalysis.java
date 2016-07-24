@@ -83,7 +83,7 @@ public static void main(String[] args) throws IOException {
 	
 	ObjectAttributes bla = new ObjectAttributes();
 	
-	new ObjectAttributesXmlReader(bla).read(args[3]);
+	new ObjectAttributesXmlReader(bla).readFile(args[3]);
 	// args[3] is the VOT attributes file, where we want to add the deltascore	
 	
 	//Iterate through households and get person id's and income

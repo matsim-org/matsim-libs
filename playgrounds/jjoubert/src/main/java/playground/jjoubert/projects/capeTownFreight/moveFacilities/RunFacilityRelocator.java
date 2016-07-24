@@ -63,11 +63,11 @@ public class RunFacilityRelocator {
 		String network = args[3];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).read(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		
 		FacilityRelocator fr = new FacilityRelocator(sc.getNetwork(), relocation);
 		
-		new PopulationReader(sc).read(populationToRelocate);
+		new PopulationReader(sc).readFile(populationToRelocate);
 		
 		Scenario newSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = newSc.getPopulation().getFactory();

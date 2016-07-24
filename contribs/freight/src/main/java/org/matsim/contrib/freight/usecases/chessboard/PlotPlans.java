@@ -31,7 +31,7 @@ public class PlotPlans {
         new CarrierPlanXmlReaderV2(carriers).read("output/ITERS/it.140/140.carrierPlans.xml");
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
+        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1",Carrier.class));

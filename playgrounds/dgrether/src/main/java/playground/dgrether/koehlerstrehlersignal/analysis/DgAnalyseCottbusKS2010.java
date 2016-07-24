@@ -486,7 +486,7 @@ public class DgAnalyseCottbusKS2010 {
 		String signalSystemsFile = DgPaths.REPOS + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalSystems);
-		signalsReader.readFile(signalSystemsFile);
+		signalsReader.readJaxbFile(signalSystemsFile);
 //		signalSystems.getSignalSystemData().remove(new IdImpl("13")); //just to make sure we have consistent data
 		
 		e = new Extent();

@@ -63,8 +63,8 @@ public class ReportPopulationStatistics {
 	public static void Run(String population, String populationAttributes){
 		/* Read the population and population attributes. */
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(population);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(populationAttributes);
+		new PopulationReader(sc).readFile(population);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(populationAttributes);
 		
 		/* Parse and report some numbers. */
 		parseAttribute("subpopulation");

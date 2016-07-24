@@ -55,7 +55,7 @@ public class FlattenSelectedPlansStats {
 		String inFile = args[ 0 ];
 		String outFile = args[ 1 ];
 
-		(new Parser( outFile )).read( inFile );
+		(new Parser( outFile )).readFile( inFile );
 	}
 
 	private static class Parser extends MatsimXmlParser {

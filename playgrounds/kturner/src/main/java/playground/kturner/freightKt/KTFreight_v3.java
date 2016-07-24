@@ -326,7 +326,7 @@ public class KTFreight_v3 {
 
 	private static CarrierVehicleTypes createVehicleTypes() {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPEFILE) ;
 		return vehicleTypes;
 	}
 
@@ -531,7 +531,7 @@ public class KTFreight_v3 {
 		try {
 			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 			rpConfig.setTollLinksFile(TOLLFILE);
-			rpReader.read(rpConfig.getTollLinksFile());
+			rpReader.readFile(rpConfig.getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

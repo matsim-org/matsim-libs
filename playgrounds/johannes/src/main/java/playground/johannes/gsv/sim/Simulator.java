@@ -166,7 +166,7 @@ public class Simulator {
         logger.info("Loading person attributes...");
         ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes());
         oaReader.putAttributeConverter(ArrayList.class, new Proxy2Matsim.Converter());
-        oaReader.read(gsvConfigGroup.getAttributesFile());
+        oaReader.readFile(gsvConfigGroup.getAttributesFile());
 
         controler.run();
 

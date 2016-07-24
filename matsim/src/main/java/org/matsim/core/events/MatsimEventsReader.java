@@ -99,17 +99,6 @@ public class MatsimEventsReader implements MatsimSomeReader {
 			this.delegate.endTag(name, content, context);
 		}
 
-		/**
-		 * Parses the specified events file. This method calls {@link #read(String)}, but handles all
-		 * possible exceptions on its own.
-		 *
-		 * @param filename The name of the file to parse.
-		 * @throws UncheckedIOException
-		 */
-		public void readFile(final String filename) throws UncheckedIOException {
-			read(filename);
-		}
-
 		@Override
 		protected void setDoctype(final String doctype) {
 			super.setDoctype(doctype);

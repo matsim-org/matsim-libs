@@ -62,9 +62,9 @@ public class RunETaxiBenchmark
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
-        new EvrpVehicleReader(scenario.getNetwork(), taxiData).read(taxiCfg.getTaxisFile());
+        new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario, evData).read(evCfg.getChargerFile());
+        new ChargerReader(scenario, evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);
 
         Controler controler = RunTaxiBenchmark.createControler(scenario, taxiData, runs);

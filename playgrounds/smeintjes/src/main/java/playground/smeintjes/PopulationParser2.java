@@ -394,7 +394,7 @@ public class PopulationParser2 {
 
 //		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(this.scenario);
-		this.reader.read(populationFile);
+		this.reader.readFile(populationFile);
 //		popReader.parse(populationFile);
 		Collection<? extends Person> personCollection = this.scenario.getPopulation().getPersons().values();
 //		Collection<? extends Person> personCollection = sc.getPopulation().getPersons().values();

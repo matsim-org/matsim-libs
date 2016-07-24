@@ -44,7 +44,7 @@ public class ExtractHitchHikingDistancesFromEvents {
 					outfile);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler( handler );
-		new EventsReaderXMLv1( events ).read( eventsFile );
+		new EventsReaderXMLv1( events ).readFile( eventsFile );
 		handler.close();
 	}
 }

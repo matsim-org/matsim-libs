@@ -98,7 +98,7 @@ public class DigicoreVehicleCollator {
 		List<File> files = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
 		for(File file : files){
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.read(file.getAbsolutePath());
+			dvr.readFile(file.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			vehicles.addDigicoreVehicle(dv);
 		}

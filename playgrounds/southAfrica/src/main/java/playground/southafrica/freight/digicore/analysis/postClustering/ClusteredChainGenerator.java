@@ -110,7 +110,7 @@ public class ClusteredChainGenerator {
 				oar.putAttributeConverter(Point.class, new HullConverter());
 				oar.putAttributeConverter(LineString.class, new HullConverter());
 				oar.putAttributeConverter(Polygon.class, new HullConverter());
-				oar.read(facilityAttributeFile);
+				oar.readFile(facilityAttributeFile);
 				
 				/* Build facility QuadTree. */
 				QuadTree<DigicoreFacility> facilityTree = ccg.buildFacilityQuadTree(facilityFile, facilityAttributeFile);
@@ -196,7 +196,7 @@ public class ClusteredChainGenerator {
 		/* Read facilities. */
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.read(facilityFile);
+		fr.readFile(facilityFile);
 		
 		/* Convert each MATSim facility to a specific DigicoreFacility. */
 		List<DigicoreFacility> facilityList = new ArrayList<DigicoreFacility>();

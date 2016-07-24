@@ -53,7 +53,7 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 
 		List<NetworkChangeEvent> events = new ArrayList<>() ;
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, events );
-		parser.read(input);
+		parser.readFile(input);
 		new NetworkChangeEventsWriter().write(output, events);
 
 		long checksum_ref = CRCChecksum.getCRCFromFile(input);

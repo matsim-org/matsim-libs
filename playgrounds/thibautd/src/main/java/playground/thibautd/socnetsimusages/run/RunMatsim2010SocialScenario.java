@@ -115,7 +115,7 @@ public class RunMatsim2010SocialScenario {
 		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
 				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
 
-		new SocialNetworkReader( scenario ).read( snConf.getInputFile() );
+		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
 
 		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
@@ -149,7 +149,7 @@ public class RunMatsim2010SocialScenario {
 		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new SocialDilutionConfigGroup() );
 		config.addModule( new EquityConfigGroup() );
-		new ConfigReader( config ).read( configFile );
+		new ConfigReader( config ).readFile( configFile );
 		return config;
 	}
 

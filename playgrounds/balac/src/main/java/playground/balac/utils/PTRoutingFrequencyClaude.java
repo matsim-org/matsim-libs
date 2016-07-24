@@ -196,7 +196,7 @@ public class PTRoutingFrequencyClaude {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
-	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).read("./transitRouterNetwork_thinned.xml.gz");
+	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).readFile("./transitRouterNetwork_thinned.xml.gz");
 
 	//	new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitRouterNetwork_thinned.xml.gz");
 		//config.planCalcScore().setUtilityOfLineSwitch(0.0);

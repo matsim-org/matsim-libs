@@ -142,7 +142,7 @@ public class DemandFromEmissionEvents {
 
 		EmissionsPerLinkWarmEventHandler warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, this.noOfTimeBins);
 		eventsManager.addHandler(warmHandler);
-		emissionReader.read(emissionFileBAU);
+		emissionReader.readFile(emissionFileBAU);
 		return warmHandler.getTime2linkIdLeaveCount();
 	}
 

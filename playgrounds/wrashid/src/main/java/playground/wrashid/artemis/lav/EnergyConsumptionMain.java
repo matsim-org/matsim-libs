@@ -68,7 +68,7 @@ public class EnergyConsumptionMain {
 
 		events.addHandler(parkingTimesPlugin);
 
-		reader.read(eventsFileName);
+		reader.readFile(eventsFileName);
 		// reader.readFile(eventsFile);
 
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();

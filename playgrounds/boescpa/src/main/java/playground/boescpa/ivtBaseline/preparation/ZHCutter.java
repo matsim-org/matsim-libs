@@ -123,11 +123,11 @@ public class ZHCutter {
 		final String pathToInputScenarioFolder = cutterConfig.getPathToInputScenarioFolder() + File.separator;
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(pathToInputScenarioFolder + PreparationScript.CONFIG));
 		new PopulationReader(scenario).readFile(pathToInputScenarioFolder + POPULATION);
-		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).read(pathToInputScenarioFolder + POPULATION_ATTRIBUTES);
+		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(pathToInputScenarioFolder + POPULATION_ATTRIBUTES);
 		new HouseholdsReaderV10(scenario.getHouseholds()).readFile(pathToInputScenarioFolder + HOUSEHOLDS);
-		new ObjectAttributesXmlReader(scenario.getHouseholds().getHouseholdAttributes()).read(pathToInputScenarioFolder + HOUSEHOLD_ATTRIBUTES);
+		new ObjectAttributesXmlReader(scenario.getHouseholds().getHouseholdAttributes()).readFile(pathToInputScenarioFolder + HOUSEHOLD_ATTRIBUTES);
 		new FacilitiesReaderMatsimV1(scenario).readFile(pathToInputScenarioFolder + FACILITIES);
-		new NetworkReaderMatsimV1(scenario.getNetwork()).read(pathToInputScenarioFolder + NETWORK);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(pathToInputScenarioFolder + NETWORK);
 		new TransitScheduleReader(scenario).readFile(pathToInputScenarioFolder + SCHEDULE);
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(pathToInputScenarioFolder + VEHICLES);
 		this.commuterTag = cutterConfig.getCommuterTag();

@@ -135,7 +135,7 @@ public class LinkSHPWriter {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		reader.read("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
+		reader.readFile("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
 		
 		Network network = scenario.getNetwork();
 		LinkOccupancyCalculator calc = new LinkOccupancyCalculator(null);

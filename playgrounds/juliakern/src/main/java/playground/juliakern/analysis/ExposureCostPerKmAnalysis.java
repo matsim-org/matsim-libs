@@ -194,7 +194,7 @@ public class ExposureCostPerKmAnalysis {
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		TollPerKmHandler tollperKmHandler = new TollPerKmHandler(scenario.getNetwork(), munichShapeFile);
 		eventsManager.addHandler(tollperKmHandler);
-		eventsReader.read(eventsFile);
+		eventsReader.readFile(eventsFile);
 		
 		// combine link leave events with money events to paid toll per km 
 		System.out.println("----- get person id 2 list ");

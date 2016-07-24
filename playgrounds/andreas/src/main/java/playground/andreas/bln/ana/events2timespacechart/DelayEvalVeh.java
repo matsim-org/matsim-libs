@@ -75,7 +75,7 @@ public class DelayEvalVeh {
 		}		
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.read(filename);
+		reader.readFile(filename);
 		
 		for (DelayHandler delayHandler : this.handler) {
 			delayHandler.writeGnuPlot(this.stopIDNameMap);

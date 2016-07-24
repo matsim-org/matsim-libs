@@ -299,8 +299,8 @@ public class TransitScheduleAnalyserToCSVandTEX {
 	public static void main(String[] args) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
-		(new NetworkReaderMatsimV1(sc.getNetwork())).read("F:/temp/network.final.xml.gz");
-		(new TransitScheduleReaderV1(sc)).read("F:/temp/transitSchedule_basecase.xml.gz");
+		(new NetworkReaderMatsimV1(sc.getNetwork())).readFile("F:/temp/network.final.xml.gz");
+		(new TransitScheduleReaderV1(sc)).readFile("F:/temp/transitSchedule_basecase.xml.gz");
 		
 		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(sc.getTransitSchedule(), sc.getNetwork(), "F:/temp");
 	}

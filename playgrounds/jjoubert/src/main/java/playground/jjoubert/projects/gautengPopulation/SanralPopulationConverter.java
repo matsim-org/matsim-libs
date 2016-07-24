@@ -98,7 +98,7 @@ public class SanralPopulationConverter {
 		PopulationFactory pf = scNew.getPopulation().getFactory();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(inputFile);
+		new PopulationReader(sc).readFile(inputFile);
 		int id = 0;
 		
 		for(Person person : sc.getPopulation().getPersons().values()){

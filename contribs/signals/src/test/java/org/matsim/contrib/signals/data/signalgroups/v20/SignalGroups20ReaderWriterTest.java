@@ -72,7 +72,7 @@ public class SignalGroups20ReaderWriterTest {
 			ParserConfigurationException {
 		SignalGroupsData sgd = new SignalGroupsDataImpl();
 		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd,MatsimSignalSystemsReader.SIGNALGROUPS20);
-		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+		reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(sgd);
 
 	}
@@ -85,7 +85,7 @@ public class SignalGroups20ReaderWriterTest {
 		// read the test file
 		SignalGroupsData sgd = new SignalGroupsDataImpl();
 		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd, MatsimSignalSystemsReader.SIGNALGROUPS20);
-		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+		reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 
 		// write the test file
 		log.debug("write the test file...");
@@ -95,7 +95,7 @@ public class SignalGroups20ReaderWriterTest {
 		log.debug("and read it again");
 		sgd = new SignalGroupsDataImpl();
 		reader = new SignalGroupsReader20(sgd, MatsimSignalSystemsReader.SIGNALGROUPS20);
-		reader.readFile(testoutput);
+		reader.readJaxbFile(testoutput);
 		checkContent(sgd);
 	}
 	

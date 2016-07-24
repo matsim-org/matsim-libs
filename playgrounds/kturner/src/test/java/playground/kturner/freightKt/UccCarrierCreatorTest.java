@@ -82,7 +82,7 @@ public class UccCarrierCreatorTest {
     	final String VEHTYPES_FILE = utils.getClassInputDirectory() + "vehTypes.xml";
     	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -156,7 +156,7 @@ public class UccCarrierCreatorTest {
     	}
 
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;

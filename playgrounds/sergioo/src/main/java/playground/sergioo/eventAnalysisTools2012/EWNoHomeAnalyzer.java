@@ -87,7 +87,7 @@ public class EWNoHomeAnalyzer implements PersonDepartureEventHandler, PersonArri
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).read("./data/MATSim-Sin-2.0/input/network/singapore6.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./data/MATSim-Sin-2.0/input/network/singapore6.xml");
 		EWNoHomeAnalyzer publicTranportTeleportAnalizer = new EWNoHomeAnalyzer();
 		EventsManager events = (EventsManager)EventsUtils.createEventsManager();
 		events.addHandler(publicTranportTeleportAnalizer);

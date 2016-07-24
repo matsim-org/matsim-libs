@@ -28,7 +28,7 @@ public class VisualizeCarrierPlans {
 //        new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/scenarios/multipleCarriers_withoutTW_withDepots_withPlan.xml");
 		
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes_v2.xml");
+		new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes_v2.xml");
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		
 		new Visualiser(config, scenario).visualizeLive(carriers);

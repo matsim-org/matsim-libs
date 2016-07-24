@@ -97,15 +97,6 @@ import org.xml.sax.InputSource;
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #read(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) throws UncheckedIOException {
-		read(filename);
-	}
-
-	/**
 	 * Parses the specified config file, and uses the given dtd file as a local copy to use as dtd
 	 * if the one specified in the config file cannot be found.
 	 *

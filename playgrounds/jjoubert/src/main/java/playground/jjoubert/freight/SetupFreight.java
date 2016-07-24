@@ -64,14 +64,14 @@ public class SetupFreight {
 		config.controler().setLastIteration(10);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).read(NETFILENAME);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETFILENAME);
 
 		/* Set up freight specific stuff. */
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS);
 		
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES);
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES);
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 		
 		/* Create a plan for each carrier. The plan is the result of a VRP instance solved. */

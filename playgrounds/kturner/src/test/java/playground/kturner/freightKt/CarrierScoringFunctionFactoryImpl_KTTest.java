@@ -48,7 +48,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		final String NETWORK_FILE = utils.getClassInputDirectory() + "network.xml";
 	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -99,7 +99,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		final String NETWORK_FILE = utils.getClassInputDirectory() + "network.xml";
 	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -151,7 +151,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		final String NETWORK_FILE = utils.getClassInputDirectory() + "network.xml";
 	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -207,7 +207,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		final String NETWORK_FILE = utils.getClassInputDirectory() + "network.xml";
 	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -260,7 +260,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		final String TOLL_FILE = utils.getClassInputDirectory() + "grid-tollCordon.xml";
 	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -288,7 +288,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		try {
 			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 			rpConfig.setTollLinksFile(TOLL_FILE);
-			rpReader.read(rpConfig.getTollLinksFile());
+			rpReader.readFile(rpConfig.getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -339,7 +339,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 		final String TOLL_FILE = utils.getClassInputDirectory() + "grid-tollCordon.xml";
 	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
     	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
@@ -365,7 +365,7 @@ public class CarrierScoringFunctionFactoryImpl_KTTest {
 				try {
 					RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 					rpConfig.setTollLinksFile(TOLL_FILE);
-					rpReader.read(rpConfig.getTollLinksFile());
+					rpReader.readFile(rpConfig.getTollLinksFile());
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}

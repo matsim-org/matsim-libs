@@ -28,8 +28,8 @@ public class PlanFileCompare {
 	String prevActivity="";
 	Scenario scenario1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario1).read("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
-	new PopulationReader(scenario2).read("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
+	new PopulationReader(scenario1).readFile("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
+	new PopulationReader(scenario2).readFile("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
 	Population population1 = scenario1.getPopulation();
 	Population population2 = scenario1.getPopulation();
 

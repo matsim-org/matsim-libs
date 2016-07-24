@@ -55,17 +55,17 @@ public class Compare {
 		String suffix = "v2";
 		double threshold = 0;
 
-		reader.read(String.format("/home/johannes/gsv/fpd/telefonica/matrix%s/avr.xml", suffix));
+		reader.readFile(String.format("/home/johannes/gsv/fpd/telefonica/matrix%s/avr.xml", suffix));
 		NumericMatrix iais = reader.getMatrix();
 		MatrixOperations.applyFactor(iais, 2.0);
 
-		reader.read("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.xml");
+		reader.readFile("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.xml");
 		NumericMatrix tomtom = reader.getMatrix();
 
-		reader.read("/home/johannes/sge/prj/synpop/run/902/output/nuts3/modena.miv.xml");
+		reader.readFile("/home/johannes/sge/prj/synpop/run/902/output/nuts3/modena.miv.xml");
 		NumericMatrix model = reader.getMatrix();
 
-		reader.read("/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.xml");
+		reader.readFile("/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.xml");
 		NumericMatrix sim = reader.getMatrix();
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter

@@ -43,7 +43,7 @@ public class KeyMatrix2Visum {
 
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.read(in);
+		reader.readFile(in);
 
 		NumericMatrix inMatrix = reader.getMatrix();
 

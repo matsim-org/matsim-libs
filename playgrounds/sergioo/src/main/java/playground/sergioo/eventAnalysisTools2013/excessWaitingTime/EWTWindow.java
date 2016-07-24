@@ -70,7 +70,7 @@ public class EWTWindow extends LayersWindow {
 		//ObjectInputStream ois = new ObjectInputStream(new FileInputStream(args[5]));
 		final ExcessWaitingTimeCalculator eWTCalculator = /*(ExcessWaitingTimeCalculator) ois.readObject();*/new ExcessWaitingTimeCalculator();
 		events.addHandler(eWTCalculator);
-		new EventsReaderXMLv1(events).read(args[2]);
+		new EventsReaderXMLv1(events).readFile(args[2]);
 		/*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(args[5]));
 		oos.writeObject(eWTCalculator);
 		oos.close();

@@ -71,7 +71,7 @@ public class EventsToTrips {
 		log.info("Reading events file...");
 		if (pathToEventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.read(pathToEventsFile);
+			reader.readFile(pathToEventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

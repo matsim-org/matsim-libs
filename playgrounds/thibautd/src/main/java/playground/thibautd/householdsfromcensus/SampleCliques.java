@@ -52,7 +52,7 @@ public class SampleCliques {
 		final String outFile = args[ 2 ];
 
 		Parser parser = new Parser();
-		parser.read( inFile );
+		parser.readFile( inFile );
 		
 		int popSize = 0;
 		for (Record r : parser.getRecords()) {

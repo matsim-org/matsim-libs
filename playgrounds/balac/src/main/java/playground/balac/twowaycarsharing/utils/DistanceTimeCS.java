@@ -37,7 +37,7 @@ public class DistanceTimeCS {
 		
 		RentalTimes rentalTimes = new RentalTimes(scenario, outLink);		
 		events.addHandler(rentalTimes);
-    	reader.read(args[1]);
+    	reader.readFile(args[1]);
 		
     	
 		

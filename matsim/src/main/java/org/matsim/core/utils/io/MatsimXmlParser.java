@@ -39,7 +39,11 @@ import java.util.zip.GZIPInputStream;
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
  * functionality required to parse xml-files. Extending classes have only to implement {@link #startTag} and {@link #endTag}
  * to implement a custom parser.<br/>
- * The parser implements a custom <code>EntityResolver</code> to look
+ * The parser implements a custom <code>EntityResolver</code> to look for DTDs in the MATSim world.
+ * <p/>
+ * Notes:<ul>
+ * <li> If implementing classes want to override the final methods, the will have to resort to delegation.   
+ * </ul>
  *
  * @author mrieser
  */
@@ -142,7 +146,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
 	 * @throws UncheckedIOException
 	 */
-	public final void read(final String filename) throws UncheckedIOException {
+	public final void readFile(final String filename) throws UncheckedIOException {
 		log.info("starting to parse xml from file " + filename + " ...");
 		this.theSource = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));

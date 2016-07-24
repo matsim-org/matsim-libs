@@ -74,8 +74,8 @@ public class InAreaPlanKeeper {
 		String outputPlansFile = args[3];
 		String outputAttributesFile = args[4];
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(inputPlansFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(inputAttributesFile);
+		new PopulationReader(sc).readFile(inputPlansFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(inputAttributesFile);
 
 		/* Checking inside envelope is good enough, setting 'strictlyInside to false */
 		Scenario cleanScenario = InAreaPlanKeeper.run(sc, shapefile, false);

@@ -63,7 +63,7 @@ public class AdjustFacilitiesFromMatrix {
 		logger.info("Loading matrix...");
 		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
-		mReader.read(matrixFile);
+		mReader.readFile(matrixFile);
 		NumericMatrix m = mReader.getMatrix();
 		/*
 		 * load zones

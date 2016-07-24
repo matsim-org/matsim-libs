@@ -68,13 +68,13 @@ public class EstimateCarOwnership {
 		
 		/* Parse the population and its attributes. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(args[0]);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(args[1]);
-		new HouseholdsReaderV10(sc.getHouseholds()).read(args[2]);
+		new PopulationReader(sc).readFile(args[0]);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(args[1]);
+		new HouseholdsReaderV10(sc.getHouseholds()).readFile(args[2]);
 		
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
 		oar.putAttributeConverter(Coord.class, new CoordConverter());
-		oar.read(args[3]);
+		oar.readFile(args[3]);
 		
 		estimateAccessibilityCriteria(sc);
 		

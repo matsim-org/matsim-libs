@@ -90,7 +90,7 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 
 		/* Parse the population. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(populationFile);
+		new PopulationReader(sc).readFile(populationFile);
 
 		/* Parse the shapefile. */
 		ShapeFileReader sfr = new ShapeFileReader();

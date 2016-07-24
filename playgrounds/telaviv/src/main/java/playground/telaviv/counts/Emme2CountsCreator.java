@@ -147,7 +147,7 @@ public class Emme2CountsCreator {
 
 		// count data based on real world data
 		Counts countsReference = new Counts();
-		new CountsReaderMatsimV1(countsReference).read(basePath + realWorldCountsFile);
+		new CountsReaderMatsimV1(countsReference).readFile(basePath + realWorldCountsFile);
 		
 		Counts countsCounted = new Counts();
 		countsCounted.setName("Tel Aviv Model");

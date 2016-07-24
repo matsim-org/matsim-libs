@@ -154,8 +154,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
 			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);
 			try {
-				personsBetasReader.read(pBetasFileName);
-				facilitiesAttributesReader.read(fAttributesFileName);
+				personsBetasReader.readFile(pBetasFileName);
+				facilitiesAttributesReader.readFile(fAttributesFileName);
 				log.info("reading betas and facilities attributes from: \n"+ pBetasFileName + "\n" + fAttributesFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
@@ -169,7 +169,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		if (prefsFileName != null) {			
 			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
 			try {
-				prefsReader.read(prefsFileName);
+				prefsReader.readFile(prefsFileName);
 				log.info("reading prefs attributes from: \n"+ prefsFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful

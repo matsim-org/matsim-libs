@@ -232,7 +232,7 @@ public class KNFreight4 {
 
 	private static CarrierVehicleTypes createVehicleTypes() {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES) ;
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES) ;
 		return vehicleTypes;
 	}
 

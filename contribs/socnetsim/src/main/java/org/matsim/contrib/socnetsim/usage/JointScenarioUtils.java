@@ -88,7 +88,7 @@ public class JointScenarioUtils {
 		final JointPlansConfigGroup jpConfig = (JointPlansConfigGroup)
 			config.getModule( JointPlansConfigGroup.GROUP_NAME );
 		if ( jpConfig.getFileName() != null) {
-			new JointPlansXmlReader( scenario ).read( jpConfig.getFileName() );
+			new JointPlansXmlReader( scenario ).readFile( jpConfig.getFileName() );
 		}
 		else {
 			scenario.addScenarioElement(JointPlans.ELEMENT_NAME, new JointPlans());
@@ -119,7 +119,7 @@ public class JointScenarioUtils {
 
 	public static Config loadConfig(final String configFile) {
 		final Config config = createConfig();
-		new ConfigReader( config ).read( configFile );
+		new ConfigReader( config ).readFile( configFile );
 		return config;
 	}
 }

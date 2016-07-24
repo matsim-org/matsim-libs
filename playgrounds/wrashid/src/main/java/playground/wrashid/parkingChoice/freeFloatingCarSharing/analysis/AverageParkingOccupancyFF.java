@@ -91,7 +91,7 @@ public class AverageParkingOccupancyFF implements BasicEventHandler {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		occ.readRentals();
 
-		reader.read(args[0]);
+		reader.readFile(args[0]);
 		
 		
         CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781");    // EPSG Code for Swiss CH1903_LV03 coordinate system

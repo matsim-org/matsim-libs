@@ -53,7 +53,7 @@ public class IndividualSelectedBenefitsSQLWriter {
 				new PopulationReader(scenario).readFile(populationFile);
 				System.out.println("   Population size: " + scenario.getPopulation().getPersons().size());
 
-				new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).read(populationAttributesFile);
+				new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(populationAttributesFile);
 
 				//Read selected plan score
 				System.out.println("   Reading population from: " + populationFile);

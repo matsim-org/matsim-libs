@@ -125,9 +125,10 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		this.wgs84ToRBS = coordTransformation;
 	}
 
-	public void readFile(final String filename) throws SAXException, ParserConfigurationException, IOException {
-		this.parse(new InputSource(new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"))));
-	}
+//	public void readFile(final String filename) throws SAXException, ParserConfigurationException, IOException {
+//		this.parse(new InputSource(new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"))));
+//	}
+	// yyyyyy hm, not sure if I can delete this, or if this changes functionality.  kai, jul'16 
 
 	public void readFile(final File file) throws SAXException, ParserConfigurationException, IOException {
 		this.parse(new InputSource(new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1"))));

@@ -24,7 +24,7 @@ public class CopyMembershipFromRT {
 		populationReader.readFile(args[2]);
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).read(args[0]);
+		new ObjectAttributesXmlReader(bla).readFile(args[0]);
 		
 		for(Person p : scenario.getPopulation().getPersons().values()) {
 			

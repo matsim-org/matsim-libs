@@ -68,7 +68,7 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 	}
 
 	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
+	public void readJaxbFile(final String filename) throws UncheckedIOException {
 		// create jaxb infrastructure
 		JAXBContext jc;
 		XMLSignalSystems xmlssdefs = null;

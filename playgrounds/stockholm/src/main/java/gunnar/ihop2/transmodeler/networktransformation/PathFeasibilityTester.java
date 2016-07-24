@@ -51,7 +51,7 @@ public class PathFeasibilityTester {
 		this.linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				linkAttributes);
-		reader.read(linkAttributesFileName);
+		reader.readFile(linkAttributesFileName);
 	}
 
 	private List<Id<Link>> extractLinks(final Leg leg) {

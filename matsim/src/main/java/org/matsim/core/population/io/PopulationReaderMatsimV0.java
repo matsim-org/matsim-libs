@@ -128,17 +128,6 @@ import org.xml.sax.Attributes;
 		}
 	}
 
-	/**
-	 * Parses the specified plans file. This method calls {@link #read(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		read(filename);
-	}
-
 	private void startPerson(final Attributes atts) {
 		this.currperson = this.plans.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
 	}

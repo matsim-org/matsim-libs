@@ -168,17 +168,17 @@ public class PreparationScript {
 		plansReader.readFile(pathPopulation);
 		Population scenarioPopulation = scenario.getPopulation();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
-		attributesReader.read(pathPopulationAttributes);
+		attributesReader.readFile(pathPopulationAttributes);
 		// add tag for main population
 		/*for (Person p : scenarioPopulation.getPersons().values()) {
 			scenarioPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "main_pop");
 		}*/
 		// add the freight population to the scenario population
 		plansReader.readFile(pathFreightPopulation);
-		attributesReader.read(pathFreightPopulationAttributes);
+		attributesReader.readFile(pathFreightPopulationAttributes);
 		// add the cb population to the scenario population
 		plansReader.readFile(pathCBPopulation);
-		attributesReader.read(pathCBPopulationAttributes);
+		attributesReader.readFile(pathCBPopulationAttributes);
 		// write the new, merged population and its attributes:
 		PopulationWriter writer = new PopulationWriter(scenarioPopulation);
 		writer.write(pathPopulation);

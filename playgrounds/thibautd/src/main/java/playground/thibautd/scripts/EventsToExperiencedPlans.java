@@ -64,7 +64,7 @@ public class EventsToExperiencedPlans {
 		final String inPopFile = args[ 1 ];
 		final String outputPlansFile = args[ 2 ];
 
-		new PopulationReader( inputSc ).read( inPopFile );
+		new PopulationReader( inputSc ).readFile( inPopFile );
 
 		final EventsToPlans eventsToPlans =
 			new EventsToPlans(

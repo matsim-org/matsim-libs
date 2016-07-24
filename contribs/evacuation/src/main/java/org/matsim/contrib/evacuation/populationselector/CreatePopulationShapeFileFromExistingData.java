@@ -55,7 +55,7 @@ public class CreatePopulationShapeFileFromExistingData {
 		r1.readFileAndInitialize(existingDataFile);
 		EvacuationConfigModule gcm = new EvacuationConfigModule("evacuation");
 		EvacuationConfigReader gcd = new EvacuationConfigReader(gcm);//,false);
-		gcd.read(evacuationConfig);
+		gcd.readFile(evacuationConfig);
 		
 		ShapeFileReader r2 = new ShapeFileReader();
 		r2.readFileAndInitialize(gcm.getEvacuationAreaFileName());

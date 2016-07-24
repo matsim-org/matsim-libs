@@ -83,18 +83,6 @@ public class PopulationReader extends MatsimXmlParser implements MatsimPopulatio
 		this.delegate.endTag(name, content, context);
 	}
 
-	/**
-	 * Parses the specified plans file. This method calls {@link #read(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 * @throws UncheckedIOException
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		super.read(filename);
-	}
-
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);

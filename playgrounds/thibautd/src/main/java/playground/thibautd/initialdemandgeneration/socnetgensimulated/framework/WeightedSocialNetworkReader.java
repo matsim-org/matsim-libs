@@ -43,7 +43,7 @@ public class WeightedSocialNetworkReader extends MatsimXmlParser {
 		// but the user will not be able to get the "network" object.  If this is to be avoided, my intuition would be to use MatsimXmlParser
 		// as delegate, not as superclass.  kai, jul'16
 		
-		read( file );
+		readFile( file );
 		return network;
 	}
 

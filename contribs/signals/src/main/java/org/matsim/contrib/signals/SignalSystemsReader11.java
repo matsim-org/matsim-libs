@@ -74,7 +74,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 	
 
 	@Override
-	public void readFile(final String filename) throws JAXBException,
+	public void readJaxbFile(final String filename) throws JAXBException,
 			SAXException, ParserConfigurationException, IOException {
 		throw new UnsupportedOperationException("Use readSignalSystems11File() method");
 	}

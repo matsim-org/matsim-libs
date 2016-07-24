@@ -53,8 +53,8 @@ public class F2LCreator {
 
 		// Load scenario:
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		new FacilitiesReaderMatsimV1(scenario).read(scenario.getConfig().facilities().getInputFile());
-		new MatsimNetworkReader(scenario.getNetwork()).read(scenario.getConfig().network().getInputFile());
+		new FacilitiesReaderMatsimV1(scenario).readFile(scenario.getConfig().facilities().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 
 		// Link facilities to network:
 		createF2L(scenario, args[1]);

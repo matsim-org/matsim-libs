@@ -140,7 +140,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
                             + "construct a zero toll file and insert that. ") ;
                 }
                 RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-                new RoadPricingReaderXMLv1(rpsImpl).read(tollLinksFile);
+                new RoadPricingReaderXMLv1(rpsImpl).readFile(tollLinksFile);
                 return rpsImpl;
             }
         }

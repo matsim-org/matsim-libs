@@ -47,7 +47,7 @@ public class ObjectAttributesToSQLWriter {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new PopulationReader(scenario).readFile(populationPath);
-		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).read(personAttributePath);
+		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(personAttributePath);
 	}
 
 	public void writeToDatabase(String connectionPropertiesFile, String schema, String tableName) {

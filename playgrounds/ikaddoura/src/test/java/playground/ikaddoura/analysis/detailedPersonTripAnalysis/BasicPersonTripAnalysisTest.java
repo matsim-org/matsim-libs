@@ -186,7 +186,7 @@ public class BasicPersonTripAnalysisTest {
 //		reader.readFile(eventsFile);
 		
 		CNEventsReader cnReader = new CNEventsReader(events);
-		cnReader.read(eventsFile);
+		cnReader.readFile(eventsFile);
 		
 		log.info("Reading the events file... Done.");
 		

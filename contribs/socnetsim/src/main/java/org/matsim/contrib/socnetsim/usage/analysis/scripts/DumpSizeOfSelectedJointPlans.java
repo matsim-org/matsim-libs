@@ -103,7 +103,7 @@ public class DumpSizeOfSelectedJointPlans {
 					}
 				}
 			}
-		}.read( jointPlansFile );
+		}.readFile( jointPlansFile );
 
 		for ( Id p : agentWithNoJointPlan ) {
 			writer.newLine();
@@ -148,7 +148,7 @@ public class DumpSizeOfSelectedJointPlans {
 					final String content,
 					final Stack<String> context) {
 			}
-		}.read( plansFile );
+		}.readFile( plansFile );
 
 		counter.printCounter();
 

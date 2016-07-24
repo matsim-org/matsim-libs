@@ -110,7 +110,7 @@ public class MyCarrierPlanGenerator {
 //			new CarrierPlanXmlReaderV2(carriers).read(carrierInput);
 
 			CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-			new CarrierVehicleTypeReader(carrierVehicleTypes).read(vehicleTypesFile);
+			new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(vehicleTypesFile);
 
 			new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(carrierVehicleTypes);
 

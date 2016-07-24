@@ -69,7 +69,7 @@ public class FilterDefaultSubpopulation {
 			}
 		});
 
-		new ObjectAttributesXmlReader( sc.getPopulation().getPersonAttributes() ).read( inAttributes );
+		new ObjectAttributesXmlReader( sc.getPopulation().getPersonAttributes() ).readFile( inAttributes );
 
 		writer.startStreaming( outPlansFile );
 		new PopulationReader( sc ).readFile( inPlansFile );

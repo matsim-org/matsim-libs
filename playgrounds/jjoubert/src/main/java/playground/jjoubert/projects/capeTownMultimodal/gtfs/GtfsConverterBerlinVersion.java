@@ -79,10 +79,10 @@ public class GtfsConverterBerlinVersion {
 		LOG.trace("    base: " + inputNetwork);
 		LOG.trace("  myCiTi: " + transitFolder + "transitNetwork.xml.gz");
 		Network baseNetwork = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(baseNetwork ).read(inputNetwork);
+		new MatsimNetworkReader(baseNetwork ).readFile(inputNetwork);
 		String prefix = "";
 		Network myCiTiNetwork = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(myCiTiNetwork).read(transitFolder + "transitNetwork.xml.gz");
+		new MatsimNetworkReader(myCiTiNetwork).readFile(transitFolder + "transitNetwork.xml.gz");
 		
 		MergeNetworks.merge(baseNetwork, prefix, myCiTiNetwork);
 		new NetworkWriter(baseNetwork).write(outputNetwork);

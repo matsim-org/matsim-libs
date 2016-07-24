@@ -61,7 +61,7 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 
 		counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.read(countsFile);
+		reader.readFile(countsFile);
 	}
 
 	@Override

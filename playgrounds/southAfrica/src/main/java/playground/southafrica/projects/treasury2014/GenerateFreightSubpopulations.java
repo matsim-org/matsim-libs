@@ -53,8 +53,8 @@ public class GenerateFreightSubpopulations {
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			String inputFreightFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "com_010per_30_15.xml.gz";;
 			String inputFreightAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "comAttr_010per_30_15.xml.gz";;
-			new PopulationReader(sc).read(inputFreightFile);
-			new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(inputFreightAttributeFile);;
+			new PopulationReader(sc).readFile(inputFreightFile);
+			new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(inputFreightAttributeFile);;
 			
 			sc = InAreaPlanKeeper.run(sc, areaShapefile, false);
 			

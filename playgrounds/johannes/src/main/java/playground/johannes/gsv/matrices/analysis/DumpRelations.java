@@ -65,18 +65,18 @@ public class DumpRelations {
 		 */
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.read(refFile1);
+		reader.readFile(refFile1);
 		NumericMatrix itp = reader.getMatrix();
 
 		MatrixOperations.applyFactor(itp, 1 / 365.0);
 
-		reader.read(refFile2);
+		reader.readFile(refFile2);
 		NumericMatrix tomtom = reader.getMatrix();
 
 		/*
 		 * load simulated matrix
 		 */
-		reader.read(simFile);
+		reader.readFile(simFile);
 		NumericMatrix simulation = reader.getMatrix();
 		removeUnknownZones(simulation);
 		// MatrixOperations.symmetrize(simulation);

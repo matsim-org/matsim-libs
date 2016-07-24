@@ -78,7 +78,7 @@ public class SignalSystems11To20Converter {
 	private LaneDefinitions11 readLaneDefinitions11(String laneDefinitions11) {
 		LaneDefinitions11 laneDefs = new LaneDefinitions11Impl();
 		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefs, LaneDefinitionsReader.SCHEMALOCATIONV11);
-		reader.readFile(laneDefinitions11);
+		reader.readJaxbFile(laneDefinitions11);
 		return laneDefs;
 	}
 

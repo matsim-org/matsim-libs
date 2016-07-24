@@ -53,11 +53,11 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 	public ChainsAnalyzer(String networkFile, String plansFile, String eventsFile, String noHomeFileLocation) throws FileNotFoundException {
 		activityChains = new HashMap<Id<Person>, List<String>>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario.getNetwork()).read(networkFile);
-		new PopulationReader(scenario).read(plansFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(this);
-		new EventsReaderXMLv1(eventsManager).read(eventsFile);
+		new EventsReaderXMLv1(eventsManager).readFile(eventsFile);
 		reviewActivities(noHomeFileLocation, scenario.getPopulation());
 	}
 	

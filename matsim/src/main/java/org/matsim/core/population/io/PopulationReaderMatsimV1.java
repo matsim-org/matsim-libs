@@ -140,17 +140,6 @@ import org.xml.sax.Attributes;
 		}
 	}
 
-	/**
-	 * Parses the specified plans file. This method calls {@link #read(String)}.
-	 *
-	 * @param filename
-	 *          The name of the file to parse.
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		read(filename);
-	}
-
 	private void startPlans(final Attributes atts) {
 		this.plans.setName(atts.getValue("name"));
 	}

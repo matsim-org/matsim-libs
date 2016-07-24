@@ -140,7 +140,7 @@ public class RidershipTracking implements Runnable {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler(handler);
         EventsReaderXMLv1 eventReader = new EventsReaderXMLv1(eventsManager);
-        eventReader.read(eventsFile);
+        eventReader.readFile(eventsFile);
 
     }
 

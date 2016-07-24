@@ -34,7 +34,7 @@ public class PTTravelTimesFromEvents {
 		Purpose purpose = new Purpose();
     	
     	events.addHandler(purpose);
-    	reader.read(s);
+    	reader.readFile(s);
     	
     	
     	HashMap<Id, ArrayList<playground.balac.utils.PTTravelTimesFromEvents.Purpose.TripInfo>> results = purpose.results();

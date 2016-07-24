@@ -39,7 +39,7 @@ public class CalculateCarsharingTripDistance {
 			Purpose purpose = new Purpose(scenario.getNetwork());
 	    	
 	    	events.addHandler(purpose);
-	    	reader.read(s);
+	    	reader.readFile(s);
 	    	for (int i = 0; i < purpose.distanceTraveled.length; i++) 
 				System.out.println((double)purpose.distanceTraveled[i]/(double)purpose.count * 100.0);
 	    }

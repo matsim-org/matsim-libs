@@ -55,7 +55,7 @@ public class WriteLegCoordinatePairs {
 		String outputFile = args[1];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(populationFile);
+		new PopulationReader(sc).readFile(populationFile);
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{

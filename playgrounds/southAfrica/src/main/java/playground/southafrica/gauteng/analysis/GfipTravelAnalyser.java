@@ -80,10 +80,10 @@ public class GfipTravelAnalyser {
 		
 		/* Read all the scenario elements. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(populationFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(populationAttributesFile);
-		new MatsimNetworkReader(sc.getNetwork()).read(networkFile);
-		new VehicleReaderV1(sc.getVehicles()).read(vehiclesFile);
+		new PopulationReader(sc).readFile(populationFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(populationAttributesFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+		new VehicleReaderV1(sc.getVehicles()).readFile(vehiclesFile);
 		
 		calculateGfipTravel(sc, eventsFile);
 		writeGfipTravelToFile(outputFile);

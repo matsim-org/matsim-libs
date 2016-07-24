@@ -56,7 +56,7 @@ public class NetworkConverter {
 		String outputCRS = args[3];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).read(inputNetwork);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(inputNetwork);
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 		Counter counter = new Counter("  node # ");

@@ -74,7 +74,7 @@ public final class StreamingPopulationReader implements MatsimPopulationReader {
 //		}
 	}
 	public void parse(String filename) {
-		reader.read(filename);
+		reader.readFile(filename);
 	}
 	public void parse(InputStream is) {
 		reader.parse(is);

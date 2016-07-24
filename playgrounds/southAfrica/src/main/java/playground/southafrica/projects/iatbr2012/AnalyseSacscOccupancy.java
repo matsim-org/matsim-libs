@@ -59,7 +59,7 @@ public class AnalyseSacscOccupancy {
 		/* Read the GLA facility attributes. */
 		MutableScenario general = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(general);
-		fr.read(args[0]);
+		fr.readFile(args[0]);
 		for(Id id : general.getActivityFacilities().getFacilities().keySet()){
 			if(id.toString().startsWith("sacsc") || id.toString().startsWith("osm")){
 				shopMapBase.put(id, 0);
@@ -70,16 +70,16 @@ public class AnalyseSacscOccupancy {
 		}
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(attributes);
-		oar.read(args[1]); 
+		oar.readFile(args[1]); 
 		
 		/* BASE CASE */
 		Scenario base = ScenarioUtils.createScenario(ConfigUtils.createConfig());		
 		/* Read the network. */
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(base.getNetwork());
-		nr.read(args[2]);
+		nr.readFile(args[2]);
 		/* Read in the plans file of the base case. */
 		PopulationReader pr = new PopulationReader(base);
-		pr.read(args[3]);
+		pr.readFile(args[3]);
 		for(Id id : base.getPopulation().getPersons().keySet()){
 			Plan plan = base.getPopulation().getPersons().get(id).getSelectedPlan();
 			for(PlanElement pe : plan.getPlanElements()){
@@ -100,10 +100,10 @@ public class AnalyseSacscOccupancy {
 		Scenario compare = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		/* Read the network. */
 		nr = new NetworkReaderMatsimV1(compare.getNetwork());
-		nr.read(args[2]);
+		nr.readFile(args[2]);
 		/* Read in the plans file of the comparative case. */
 		pr = new PopulationReader(compare);
-		pr.read(args[4]);
+		pr.readFile(args[4]);
 		for(Id id : compare.getPopulation().getPersons().keySet()){
 			Plan plan = compare.getPopulation().getPersons().get(id).getSelectedPlan();
 			for(PlanElement pe : plan.getPlanElements()){

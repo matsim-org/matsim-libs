@@ -46,8 +46,8 @@ public class PlanToShapefile {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
 		PopulationReader pr = new PopulationReader(s);
-		nr.read(networkFilename);
-		pr.read(plansFilename);
+		nr.readFile(networkFilename);
+		pr.readFile(plansFilename);
 		
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(
 				s.getPopulation(), 

@@ -90,7 +90,7 @@ public class SamplePersons {
 			}
 		});
 
-		new PopulationReader( scenario ).read( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 
 		if ( inAttributes != null ) filterAttributes( kept, inAttributes, outAttributes );

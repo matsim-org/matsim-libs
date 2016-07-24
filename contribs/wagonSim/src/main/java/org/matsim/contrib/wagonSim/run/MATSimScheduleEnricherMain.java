@@ -68,11 +68,11 @@ public class MATSimScheduleEnricherMain {
 	public MATSimScheduleEnricherMain(String networkFile, String transitScheduleFile, String transitVehiclesFile, String transitVehicleAttributesFile) {
 		Config config = Utils.getDefaultWagonSimConfig();
 		scenario = ScenarioUtils.createScenario(config);
-		new NetworkReaderMatsimV1(scenario.getNetwork()).read(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
 		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 		new VehicleReaderV1(((MutableScenario)scenario).getTransitVehicles()).readFile(transitVehiclesFile);
 		vehicleAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(vehicleAttributes).read(transitVehicleAttributesFile);
+		new ObjectAttributesXmlReader(vehicleAttributes).readFile(transitVehicleAttributesFile);
 	}
 
 	//////////////////////////////////////////////////////////////////////

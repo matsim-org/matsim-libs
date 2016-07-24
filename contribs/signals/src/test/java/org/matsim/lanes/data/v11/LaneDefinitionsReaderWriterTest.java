@@ -71,7 +71,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		LaneDefinitions11Impl lanedefs11 = new LaneDefinitions11Impl();
 		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(lanedefs11);
-		reader.readFile(this.getClassInputDirectory() + TESTXMLV11);
+		reader.readJaxbFile(this.getClassInputDirectory() + TESTXMLV11);
 		checkContentV11(lanedefs11);
 	}
 
@@ -81,7 +81,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		// read the test file
 		LaneDefinitions11Impl lanedefs11 = new LaneDefinitions11Impl();
 		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(lanedefs11);
-		reader.readFile(this.getClassInputDirectory() + TESTXMLV11);
+		reader.readJaxbFile(this.getClassInputDirectory() + TESTXMLV11);
 
 		// write the test file
 		log.debug("write the test file...");
@@ -91,7 +91,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		log.debug("and read it again");
 		lanedefs11 = new LaneDefinitions11Impl();
 		reader = new LaneDefinitionsReader11(lanedefs11);
-		reader.readFile(testoutput);
+		reader.readJaxbFile(testoutput);
 		checkContentV11(lanedefs11);
 	}
 

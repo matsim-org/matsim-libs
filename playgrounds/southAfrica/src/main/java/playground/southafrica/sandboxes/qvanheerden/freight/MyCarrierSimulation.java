@@ -105,7 +105,7 @@ public class MyCarrierSimulation {
 		new CarrierPlanXmlReaderV2(carriers).read(carrierPlanFile);
 
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(vehicleTypes).read(vehicleTypesFile);
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(vehicleTypesFile);
 
 		//assign them to their corresponding vehicles - carriers already have vehicles in the carrier plan file
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);

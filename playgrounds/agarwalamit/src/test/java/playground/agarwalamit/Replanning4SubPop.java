@@ -55,7 +55,7 @@ public class Replanning4SubPop {
 		{
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-			mnr.read(EQUIL_NETWORK);
+			mnr.readFile(EQUIL_NETWORK);
 		}
 		
 		// building and running the simulation based on the example scenario:

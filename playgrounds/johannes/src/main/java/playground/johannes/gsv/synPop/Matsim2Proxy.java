@@ -63,7 +63,7 @@ public class Matsim2Proxy {
 		logger.info("Loading proxy persons...");
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.read(args[1]);
+		parser.readFile(args[1]);
 		logger.info(String.format("Loaded %s proxy persons.", parser.getPersons().size()));
 		
 		Map<Id<Person>, ? extends Person> matsimPersons = scenario.getPopulation().getPersons();

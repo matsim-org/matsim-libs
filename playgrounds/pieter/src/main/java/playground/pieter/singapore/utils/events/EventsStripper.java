@@ -109,7 +109,7 @@ public class EventsStripper {
 				outfileName, sampledIds, listenForTransitDrivers);
 		events.addHandler(filteredWriter);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.read(inFileName);
+		reader.readFile(inFileName);
 		filteredWriter.closeFile();
 		if (listenForTransitDrivers
 				&& filteredWriter.getTransitVehicleIds() != null) {
@@ -118,7 +118,7 @@ public class EventsStripper {
 			events = EventsUtils.createEventsManager();
 			events.addHandler(transitDriverFinder);
 			reader = new EventsReaderXMLv1(events);
-			reader.read(inFileName);
+			reader.readFile(inFileName);
 			sampledIds.addAll(transitDriverFinder.transitDriverIds);
 			sampledIds.addAll(filteredWriter.getTransitVehicleIds());
 			events = EventsUtils.createEventsManager();
@@ -126,7 +126,7 @@ public class EventsStripper {
 					sampledIds, false);
 			events.addHandler(filteredWriter);
 			reader = new EventsReaderXMLv1(events);
-			reader.read(inFileName);
+			reader.readFile(inFileName);
 			filteredWriter.closeFile();
 		}
 	}

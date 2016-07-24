@@ -92,29 +92,29 @@ public class IatbrPlanBuilder {
 		/* READ THE VARIOUS INPUT FILES */	
 		/* Read SACSC shopping facilities */
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.read(sacscFile);
+		fr.readFile(sacscFile);
 		processSacscQT(sc);
 		
 		/* Read SACSC shopping facility attributes */
 		sacscAttributes = new ObjectAttributes();
 		ObjectAttributesXmlReader or = new ObjectAttributesXmlReader(sacscAttributes);
-		or.read(sacscAttributeFile);
+		or.readFile(sacscAttributeFile);
 		
 		/* Read the general amenities file. */
 		MutableScenario scAmenities = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader mfr = new MatsimFacilitiesReader(scAmenities);
-		mfr.read(amenityFile);
+		mfr.readFile(amenityFile);
 		processAmenities(scAmenities);
 		
 		/* Read network */
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.read(sc.getConfig().network().getInputFile());
+		nr.readFile(sc.getConfig().network().getInputFile());
 		LOG.info("Number of links: " + sc.getNetwork().getLinks().size());
 		LOG.info("Number of nodes: " + sc.getNetwork().getNodes().size());
 
 		/* Read plans */
 		PopulationReader pr = new PopulationReader(sc);
-		pr.read(plansFile);
+		pr.readFile(plansFile);
 		createPrimaryActivityFacilities(sc.getPopulation());
 		
 		

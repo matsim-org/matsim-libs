@@ -354,9 +354,9 @@ public class MainEventAnalyzer {
 	public static void main(String[] args) throws IOException {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).read("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		scenario.getConfig().transit().setUseTransit(true);
-		new TransitScheduleReaderV1(scenario).read("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
+		new TransitScheduleReaderV1(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(), 15*60, 30*3600, scenario.getConfig().travelTimeCalculator());
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(ttc);

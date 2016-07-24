@@ -82,7 +82,7 @@ public class MyCountingStationCleaner {
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.read(networkFilename);
+		nr.readFile(networkFilename);
 		
 		ccs.readLinkIds(linkFilename);
 		ccs.cleanCounts(root, sc.getNetwork());
@@ -145,7 +145,7 @@ public class MyCountingStationCleaner {
 			// Create a duplicate counting station.
 			Counts csNew = new Counts();
 			
-			cr.read(file.getAbsolutePath());
+			cr.readFile(file.getAbsolutePath());
 			csNew.setName(cs.getName());
 			csNew.setYear(cs.getYear());
 			Set<Id<Link>> all = cs.getCounts().keySet();

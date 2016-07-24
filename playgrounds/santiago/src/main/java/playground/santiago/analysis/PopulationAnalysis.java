@@ -78,7 +78,7 @@ public class PopulationAnalysis {
 		String plansFile = runPath + "output/output_plans.xml.gz";
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).read(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		
 		Set<Person> plansWithNegativeScores = new HashSet<Person>();
 		
@@ -121,7 +121,7 @@ public class PopulationAnalysis {
 		Map<Id<Person>, Person> carUsersWoCarAvailable = new TreeMap<Id<Person>, Person>();
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).read(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 	
 		//collect agents using car on their tour
 		for(Person person : scenario.getPopulation().getPersons().values()){
@@ -140,7 +140,7 @@ public class PopulationAnalysis {
 		//read attributes -- carAvail?
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader attrReader = new ObjectAttributesXmlReader(attributes);
-		attrReader.read(attributesFile);
+		attrReader.readFile(attributesFile);
 		
 		//write car availability to car users.
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {

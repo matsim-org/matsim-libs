@@ -143,7 +143,7 @@ class ScenarioLoaderImpl {
 				Network network = this.scenario.getNetwork();
 				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
-				parser.read(this.config.network().getChangeEventsInputFile());
+				parser.readFile(this.config.network().getChangeEventsInputFile());
 				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
 		}
@@ -180,7 +180,7 @@ class ScenarioLoaderImpl {
 			log.info("loading facility attributes from " + facilitiesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.read(facilitiesAttributesFileName);
+			reader.readFile(facilitiesAttributesFileName);
 		}
 		else {
 			log.info("no facility-attributes file set in config, not loading any facility attributes");
@@ -230,7 +230,7 @@ class ScenarioLoaderImpl {
 		final String householdsFile = this.config.households().getInputFile();
 		if ( (this.config.households() != null) && (householdsFile != null) ) {
 			log.info("loading households from " + householdsFile);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).read(householdsFile);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).readFile(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
@@ -241,7 +241,7 @@ class ScenarioLoaderImpl {
 			log.info("loading household attributes from " + householdAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.read(householdAttributesFileName);
+			reader.readFile(householdAttributesFileName);
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -278,7 +278,7 @@ class ScenarioLoaderImpl {
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.read(transitLinesAttributesFileName);
+			reader.readFile(transitLinesAttributesFileName);
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
@@ -286,7 +286,7 @@ class ScenarioLoaderImpl {
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.read(transitStopsAttributesFileName);
+			reader.readFile(transitStopsAttributesFileName);
 		}
 	}
 

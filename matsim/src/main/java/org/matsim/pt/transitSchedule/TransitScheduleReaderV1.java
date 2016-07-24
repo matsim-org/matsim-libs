@@ -34,12 +34,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -101,10 +100,6 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		this.coordinateTransformation = coordinateTransformation;
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;
-	}
-
-	public void readFile(final String fileName) throws UncheckedIOException {
-		this.read(fileName);
 	}
 
 	@Override

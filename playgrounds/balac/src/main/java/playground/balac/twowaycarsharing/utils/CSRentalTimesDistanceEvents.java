@@ -25,7 +25,7 @@ public class CSRentalTimesDistanceEvents {
 		
 		RentalTimes rentalTimes = new RentalTimes(scenario);		
 		events.addHandler(rentalTimes);
-    	reader.read(args[1]);
+    	reader.readFile(args[1]);
 		
     	System.out.println(rentalTimes.number() * 0.00029 + " ff");
 		

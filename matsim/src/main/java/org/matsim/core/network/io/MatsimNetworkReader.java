@@ -76,18 +76,18 @@ public final class MatsimNetworkReader extends MatsimXmlParser implements Matsim
 		this.delegate.endTag(name, content, context);
 	}
 
-	/**
-	 * Parses the specified network file. This method calls {@link #read(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		read(filename);
-//		if (this.network instanceof NetworkImpl) {
-//			((NetworkImpl) network).connect();
-//		}
-	}
+//	/**
+//	 * Parses the specified network file. This method calls {@link #readFile(String)}, but handles all
+//	 * possible exceptions on its own.
+//	 *
+//	 * @param filename The name of the file to parse.
+//	 */
+//	public void readFile(final String filename) {
+//		readFile(filename);
+////		if (this.network instanceof NetworkImpl) {
+////			((NetworkImpl) network).connect();
+////		}
+//	}
 
 	@Override
 	protected void setDoctype(final String doctype) {

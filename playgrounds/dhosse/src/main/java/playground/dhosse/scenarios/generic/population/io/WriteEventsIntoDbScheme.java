@@ -85,7 +85,7 @@ public class WriteEventsIntoDbScheme implements PersonDepartureEventHandler, Per
 		events.addHandler(new WriteEventsIntoDbScheme());
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.read(args[3]);
+		reader.readFile(args[3]);
 		
 		writeOutput(args);
 		

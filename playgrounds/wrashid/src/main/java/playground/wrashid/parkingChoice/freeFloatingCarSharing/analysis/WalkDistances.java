@@ -297,7 +297,7 @@ public class WalkDistances implements BasicEventHandler {
 		events.addHandler(occ); 
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.read(args[0]);	
+		reader.readFile(args[0]);	
 		occ.outp();
 		System.out.println();
 		occ.outcs();

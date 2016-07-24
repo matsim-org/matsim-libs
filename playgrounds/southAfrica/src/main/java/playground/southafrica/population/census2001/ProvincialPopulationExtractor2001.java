@@ -53,7 +53,7 @@ public class ProvincialPopulationExtractor2001 {
 		
 		/* Read the network */
 		MatsimNetworkReader nr = new MatsimNetworkReader(cr.getScenario().getNetwork());
-		nr.read(network);
+		nr.readFile(network);
 		
 		/* Households */
 		LOG.info("Evaluating households in province code(s)...");

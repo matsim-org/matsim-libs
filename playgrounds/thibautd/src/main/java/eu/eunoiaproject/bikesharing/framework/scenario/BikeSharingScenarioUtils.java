@@ -98,12 +98,12 @@ public class BikeSharingScenarioUtils {
 		final Config config = sc.getConfig();
 		final BikeSharingConfigGroup confGroup = (BikeSharingConfigGroup)
 			config.getModule( BikeSharingConfigGroup.GROUP_NAME );
-		new BikeSharingFacilitiesReader( sc ).read( confGroup.getFacilitiesFile() );
+		new BikeSharingFacilitiesReader( sc ).readFile( confGroup.getFacilitiesFile() );
 
 		final BikeSharingFacilities bsFacilities = (BikeSharingFacilities)
 			sc.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
 		if ( confGroup.getFacilitiesAttributesFile() != null ) {
-			new ObjectAttributesXmlReader( bsFacilities.getFacilitiesAttributes() ).read(
+			new ObjectAttributesXmlReader( bsFacilities.getFacilitiesAttributes() ).readFile(
 					confGroup.getFacilitiesAttributesFile() );
 		}
 

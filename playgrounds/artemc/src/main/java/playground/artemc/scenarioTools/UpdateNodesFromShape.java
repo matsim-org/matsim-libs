@@ -39,7 +39,7 @@ public class UpdateNodesFromShape {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new NetworkReaderMatsimV1(scenario.getNetwork()).read(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkPath);
 		Network network = scenario.getNetwork();
 		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
 		

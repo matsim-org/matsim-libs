@@ -75,8 +75,8 @@ public class AssignTollAttributes {
 	public static void Run(String population, String inputAttributes, String outputAttributes){
 		/* Read population and population attributes. */
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(population);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(inputAttributes);
+		new PopulationReader(sc).readFile(population);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(inputAttributes);
 		
 		for(Person p : sc.getPopulation().getPersons().values()){
 			addTagPenetration(p);

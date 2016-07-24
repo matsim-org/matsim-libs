@@ -73,16 +73,6 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #read(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 * @throws UncheckedIOException e.g. if the file cannot be found
-	 */
-	public void readFile(final String filename) throws UncheckedIOException {
-		read(filename);
-	}
-
-	/**
 	 * Parses the specified config file, and uses the given dtd file as a local copy to use as dtd
 	 * if the one specified in the config file cannot be found.
 	 *
@@ -91,9 +81,11 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 	 * @throws UncheckedIOException e.g. if the file cannot be found
 	 */
 	public void readFile(final String filename, final String dtdFilename) throws UncheckedIOException {
+		// yyyyyy if this is a necessary/useful method, I would prefer it in the superclass.  kai, jul'16
+		
 		log.info("trying to read config from " + filename);
 	  this.localDtd = dtdFilename;
-		read(filename);
+		readFile(filename);
 		this.localDtd = null;
 	}
 

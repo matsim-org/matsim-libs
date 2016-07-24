@@ -228,7 +228,7 @@ public class PopulationParser {
 	
 	public Collection<? extends Person> readPopulation(String populationFile) {
 		PopulationReader popReader = new PopulationReader(this.scenario);
-		popReader.read(populationFile);
+		popReader.readFile(populationFile);
 		Collection<? extends Person> personCollection = this.scenario.getPopulation().getPersons().values();
 		
 		return personCollection;

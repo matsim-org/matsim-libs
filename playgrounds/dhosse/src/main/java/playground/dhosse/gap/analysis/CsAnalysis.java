@@ -52,7 +52,7 @@ public class CsAnalysis {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "networkMultimodal.xml");
 		ObjectAttributes attributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(attributes).read(Global.runInputDir + "subpopulationAtts.xml");
+		new ObjectAttributesXmlReader(attributes).readFile(Global.runInputDir + "subpopulationAtts.xml");
 		
 		BufferedReader reader = IOUtils.getBufferedReader("/home/dhosse/cs_stations/" + sc + "/" + it + ".OW_CS");
 		Set<String> userIds = new HashSet<>();

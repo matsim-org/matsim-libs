@@ -43,7 +43,7 @@ public class PrtAnalyzer {
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		VrpData data = new VrpDataImpl();
 		VehicleReader vehReader = new VehicleReader(scenario.getNetwork(), data);
-		vehReader.read("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
+		vehReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		PrtEventsHandler handler = new PrtEventsHandler(scenario);

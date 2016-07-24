@@ -74,8 +74,8 @@ public class IntraAreaIdentifier {
 		String attributeName = args[3];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).read(populationFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).read(attributesFile);
+		new PopulationReader(sc).readFile(populationFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(attributesFile);
 		
 		IntraAreaIdentifier.run(sc, shapefile, false, attributeName);
 		

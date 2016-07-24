@@ -301,7 +301,7 @@ public class TransmodelerTripWriter {
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				linkAttributes);
-		reader.read(linkAttributesFileName);
+		reader.readFile(linkAttributesFileName);
 
 		final TransmodelerTripWriter tripWriter = new TransmodelerTripWriter(
 				scenario.getPopulation(), linkAttributes);

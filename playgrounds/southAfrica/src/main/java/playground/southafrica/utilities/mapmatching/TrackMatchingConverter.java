@@ -60,7 +60,7 @@ public class TrackMatchingConverter {
 			TrackMatchingXmlReader tmx = new TrackMatchingXmlReader();
 			tmx.setValidating(false);
 			try{
-				tmx.read(tmFile);
+				tmx.readFile(tmFile);
 
 				/* Get the route from the TrackMatching file. */
 				List<Route> route = tmc.mapRoutesToNetwork(tmx.getAllRoutes());

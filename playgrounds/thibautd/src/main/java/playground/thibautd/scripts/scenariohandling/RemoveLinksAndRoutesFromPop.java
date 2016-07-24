@@ -37,7 +37,7 @@ public class RemoveLinksAndRoutesFromPop {
 		final String outPop = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new PopulationReader( sc ).read( inPop );
+		new PopulationReader( sc ).readFile( inPop );
 
 		final PersonAlgorithm algo = new PersonRemoveLinkAndRoute();
 		for ( Person p : sc.getPopulation().getPersons().values() ) {

@@ -151,6 +151,6 @@ public class TemplateNetworkConverter {
 	 */
 	private static void testNetwork(String pathToOutputFile) {
 		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(NetworkUtils.createNetwork());
-		networkReader.read(pathToOutputFile);
+		networkReader.readFile(pathToOutputFile);
 	}
 }

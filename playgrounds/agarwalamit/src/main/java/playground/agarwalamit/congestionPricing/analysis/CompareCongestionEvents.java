@@ -66,7 +66,7 @@ public class CompareCongestionEvents  {
 				congestionevents.add(event);
 			}
 		});
-		reader.read(eventsFile);
+		reader.readFile(eventsFile);
 
 		return congestionevents;
 	}

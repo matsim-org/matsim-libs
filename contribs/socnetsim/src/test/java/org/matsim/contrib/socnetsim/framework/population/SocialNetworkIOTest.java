@@ -59,7 +59,7 @@ public class SocialNetworkIOTest {
 		new SocialNetworkWriter( output ).write( path );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).read( path );
+		new SocialNetworkReader( sc ).readFile( path );
 
 		final SocialNetwork input = (SocialNetwork)
 			sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );

@@ -150,15 +150,15 @@ public class DataPrepare {
 		Network transitNetwork = transitScenario.getNetwork();
 		MutableScenario streetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
-		new MatsimNetworkReader(transitScenario.getNetwork()).read(IntermediateTransitNetworkFile);
-		new MatsimNetworkReader(streetScenario.getNetwork()).read(InNetworkFile);
+		new MatsimNetworkReader(transitScenario.getNetwork()).readFile(IntermediateTransitNetworkFile);
+		new MatsimNetworkReader(streetScenario.getNetwork()).readFile(InNetworkFile);
 		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (Network) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(OutMultimodalNetworkFile);
 	}
 
 	protected void routePopulation() {
 		Population pop = this.scenario.getPopulation();
-		new PopulationReader(this.scenario).read(InInputPlansFileWithXY2Links);
+		new PopulationReader(this.scenario).readFile(InInputPlansFileWithXY2Links);
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());

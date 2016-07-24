@@ -57,7 +57,7 @@ public class CausedDelayAnalyzer {
 		CongestionEventsReader reader = new CongestionEventsReader(eventsManager);
 
 		eventsManager.addHandler(handler);
-		reader.read(this.eventsFile);
+		reader.readFile(this.eventsFile);
 	}
 
 	public SortedMap<Double, Map<Id<Person>, Double>> getTimeBin2CausingPersonId2Delay() {

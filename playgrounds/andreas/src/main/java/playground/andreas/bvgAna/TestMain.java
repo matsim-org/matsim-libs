@@ -152,7 +152,7 @@ public class TestMain {
 		VehDelayAtStopHistogram dH = new VehDelayAtStopHistogram(24 * 60);
 //		eventsManager.addHandler(dH);
 
-		reader.read(eventsFile);
+		reader.readFile(eventsFile);
 
 //		Map<Id, List<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
 //

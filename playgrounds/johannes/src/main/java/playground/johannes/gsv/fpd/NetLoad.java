@@ -88,7 +88,7 @@ public class NetLoad {
 		 */
 		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
-		mReader.read(matrixFile);
+		mReader.readFile(matrixFile);
 		NumericMatrix m = mReader.getMatrix();
 
 		MatrixOperations.applyFactor(m, 1.952898582487276);
@@ -108,7 +108,7 @@ public class NetLoad {
 		 */
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.read(countsFile);
+		cReader.readFile(countsFile);
 		/*
 		 * load zones
 		 */

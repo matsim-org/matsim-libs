@@ -107,7 +107,7 @@ public class ScenarioGenerator {
 			gcm = new EvacuationConfigModule("evacuation");//, this.configFile);
 			this.matsimConfig.addModule(gcm);
 			EvacuationConfigReader parser = new EvacuationConfigReader(gcm);
-			parser.read(this.configFile);
+			parser.readFile(this.configFile);
 //			gcm.setFileNamesAbsolute();
 			String crs = getCRSFromEvacArea(gcm.getEvacuationAreaFileName());
 			this.matsimConfig.global().setCoordinateSystem(crs);

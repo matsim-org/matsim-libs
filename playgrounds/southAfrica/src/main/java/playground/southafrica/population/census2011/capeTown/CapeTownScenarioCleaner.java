@@ -158,10 +158,10 @@ public class CapeTownScenarioCleaner {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(personCRS, wantedCRS);
 		
-		new HouseholdsReaderV10(sc.getHouseholds()).read(folder + "wip/households.xml.gz");
+		new HouseholdsReaderV10(sc.getHouseholds()).readFile(folder + "wip/households.xml.gz");
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
 		oar.putAttributeConverter(Coord.class, new CoordConverter());
-		oar.read(folder + "wip/householdAttributes.xml.gz");
+		oar.readFile(folder + "wip/householdAttributes.xml.gz");
 		
 		for(Household hh : sc.getHouseholds().getHouseholds().values()){
 			int householdSize = hh.getMemberIds().size();
@@ -183,7 +183,7 @@ public class CapeTownScenarioCleaner {
 	
 	private static void updateNetworkModes(Scenario sc, String folder, String network){
 		LOG.info("Ensuring network and config has all routed modes.");
-		new MatsimNetworkReader(sc.getNetwork()).read(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		
 		/* Update the network modes. */
 		String[] networkModes = {"car", "commercial"};
@@ -243,8 +243,8 @@ public class CapeTownScenarioCleaner {
 		
 		/* Parse the persons. */
 		Scenario scPersons = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scPersons).read(folder + "persons.xml.gz");
-		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).read(folder + "personAttributes.xml.gz");
+		new PopulationReader(scPersons).readFile(folder + "persons.xml.gz");
+		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).readFile(folder + "personAttributes.xml.gz");
 		for(Id<Person> id : scPersons.getPopulation().getPersons().keySet()){
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
 			Plan plan = PopulationUtils.createPlan();
@@ -279,8 +279,8 @@ public class CapeTownScenarioCleaner {
 		
 		/* Parse the commercial vehicles. */
 		Scenario scCom = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scCom).read(folder + "commercial.xml.gz");
-		new ObjectAttributesXmlReader(scCom.getPopulation().getPersonAttributes()).read(folder + "commercialAttributes.xml.gz");
+		new PopulationReader(scCom).readFile(folder + "commercial.xml.gz");
+		new ObjectAttributesXmlReader(scCom.getPopulation().getPersonAttributes()).readFile(folder + "commercialAttributes.xml.gz");
 		for(Id<Person> id : scCom.getPopulation().getPersons().keySet()){
 			String[] sa = id.toString().split("_");
 			Person person = pf.createPerson(Id.createPersonId("coct_c_" + sa[1]));

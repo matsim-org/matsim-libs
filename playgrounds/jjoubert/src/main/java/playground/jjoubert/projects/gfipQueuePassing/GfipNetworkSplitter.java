@@ -60,7 +60,7 @@ public class GfipNetworkSplitter {
 		String inputNetwork = args[1];
 		String outputNetworkPrefix = args[2];
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).read(networkFolder + inputNetwork);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFolder + inputNetwork);
 		
 		List<Double> thresholds = new ArrayList<>();
 		for(int i = 3; i < args.length; i++){

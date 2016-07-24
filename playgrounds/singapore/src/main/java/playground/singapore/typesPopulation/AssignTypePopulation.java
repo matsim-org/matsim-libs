@@ -44,7 +44,7 @@ public class AssignTypePopulation {
 	}
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		(new PopulationReader(scenario)).read(args[0]);
+		(new PopulationReader(scenario)).readFile(args[0]);
 		Population population = null;
 		switch(Type.getType(args[1])) {
 		case ID:

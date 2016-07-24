@@ -40,8 +40,8 @@ public class JointCountsGenerator {
 
 		Counts<Link> counts = new Counts<>();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.read(urbanCountFile);
-		reader.read(externalCountFile);
+		reader.readFile(urbanCountFile);
+		reader.readFile(externalCountFile);
 		
 		new CountsWriter(counts).write(jointCountFile);
 	}

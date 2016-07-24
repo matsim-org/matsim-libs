@@ -53,18 +53,18 @@ public class TTRatio {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 
-		reader.read(carVolFile);
+		reader.readFile(carVolFile);
 		NumericMatrix carVol = reader.getMatrix();
 
-		reader.read(railVolFile);
+		reader.readFile(railVolFile);
 		NumericMatrix railVol = reader.getMatrix();
 		MatrixOperations.applyFactor(railVol, 1/365.0);
 
-		reader.read(carTTFile);
+		reader.readFile(carTTFile);
 		NumericMatrix carTT = reader.getMatrix();
 		MatrixOperations.applyFactor(carTT, 2);
 		
-		reader.read(railTTFile);
+		reader.readFile(railTTFile);
 		NumericMatrix railTT = reader.getMatrix();
 
 		List<Tuple<String, String>> relations = getRelations(railVol, 100000);

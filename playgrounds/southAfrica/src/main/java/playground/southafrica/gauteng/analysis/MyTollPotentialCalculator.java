@@ -110,12 +110,12 @@ public class MyTollPotentialCalculator {
 	
 	private void readNetwork(String filename){
 		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-		mnr.read(filename);
+		mnr.readFile(filename);
 	}
 	
 	private void readPopulation(String filename){
 		PopulationReader mpr = new PopulationReader(sc);
-		mpr.read(filename);
+		mpr.readFile(filename);
 	}
 	
 	public Scenario getScenario(){
@@ -183,7 +183,7 @@ public class MyTollPotentialCalculator {
 	private List<Id<Link>> readLinkIdsFromRoadPricingScheme(String roadpricingFilename){
 		log.info("Reading tolled links from " + roadpricingFilename);		
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
-		rpr.read(roadpricingFilename);		
+		rpr.readFile(roadpricingFilename);		
 		List<Id<Link>> list = new ArrayList<>();
 		for(Id<Link> i : this.scheme.getTolledLinkIds()){
 			list.add(i);

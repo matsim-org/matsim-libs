@@ -221,7 +221,7 @@ public class XferEventsFromLoResToHiResNetwork{
 		eventsManager.addHandler(new VehicleLinkEventLoader());
 		
 		EventsReaderXMLv1 eventReader = new EventsReaderXMLv1(eventsManager);
-		eventReader.read(outpath.getPath()+"/linktemp/link_events.xml");
+		eventReader.readFile(outpath.getPath()+"/linktemp/link_events.xml");
 		
 	}
 
@@ -232,7 +232,7 @@ public class XferEventsFromLoResToHiResNetwork{
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(eventSplitter);
 		EventsReaderXMLv1 eventReader = new EventsReaderXMLv1(eventsManager);
-		eventReader.read(loResEvents);
+		eventReader.readFile(loResEvents);
 		eventSplitter.close();	
 
 	}

@@ -61,7 +61,7 @@ public class SetHomeLocations {
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
-		parser.read(config.findParam(MODULE_NAME, "popInputFile"));
+		parser.readFile(config.findParam(MODULE_NAME, "popInputFile"));
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		

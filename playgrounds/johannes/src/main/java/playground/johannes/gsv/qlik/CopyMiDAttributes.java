@@ -49,11 +49,11 @@ public class CopyMiDAttributes {
         reader.setValidating(false);
 
         logger.info("Loading sim persons...");
-        reader.read(simIn);
+        reader.readFile(simIn);
         Collection<PlainPerson> simPersons = (Set<PlainPerson>)reader.getPersons();
 
         logger.info("Loading mid persons...");
-        reader.read(midIn);
+        reader.readFile(midIn);
         Collection<PlainPerson> tmpPerson = (Set<PlainPerson>)reader.getPersons();
 
         Map<String, Person> midPersons = new HashMap<>();

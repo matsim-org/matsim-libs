@@ -108,7 +108,7 @@ public class DuplicatePersons {
 			}
 		});
 
-		new PopulationReader( scenario ).read( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 
 		if ( inAttributes != null ) filterAttributes( clones , inAttributes , outAttributes );

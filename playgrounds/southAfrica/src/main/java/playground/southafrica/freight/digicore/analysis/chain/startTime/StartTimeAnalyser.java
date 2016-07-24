@@ -67,7 +67,7 @@ public class StartTimeAnalyser {
 
 			for(File f : vehicleFiles){
 				DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-				dvr.read(f.getAbsolutePath());
+				dvr.readFile(f.getAbsolutePath());
 				DigicoreVehicle v = dvr.getVehicle();
 				
 				for(DigicoreChain chain : v.getChains()){

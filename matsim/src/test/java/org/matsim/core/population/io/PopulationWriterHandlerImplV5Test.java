@@ -169,11 +169,6 @@ public class PopulationWriterHandlerImplV5Test {
 		}
 
 		@Override
-		public void readFile(String filename) {
-			this.read(filename);
-		}
-
-		@Override
 		public void startTag(String name, Attributes atts, Stack<String> context) {
 			this.delegate.startTag(name, atts, context);
 		}

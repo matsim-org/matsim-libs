@@ -96,7 +96,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 						final String name,
 						final String content,
 						final Stack<String> context) {}
-			}.read( inhh );
+			}.readFile( inhh );
 		}
 		else {
 			log.info( "read households using households reader" );

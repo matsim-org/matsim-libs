@@ -68,7 +68,9 @@ public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
 		this.schemaLocation = schemaLocation;
 	}
 
-	public abstract void readFile(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException;
+	public abstract void readJaxbFile(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException;
+	// yyyyyy this is not so great, for Jaxb files still having the "standard" and the special method side by side.  But I first need to figure out
+	// what is going on with these exceptions. kai, jul'16
 	
 	protected void validateFile(String filename, Unmarshaller u) throws SAXException, ParserConfigurationException, IOException{
 		URL schemaUrl = null;
@@ -95,7 +97,7 @@ public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
 		//afterwards it can be read by the jaxb parser
 		else{
 			log.info("Validating file against schema locally provided in dtd folder");
-			this.read(filename);
+			this.readFile(filename);
 			log.info("File valid...");
 		}
 	}

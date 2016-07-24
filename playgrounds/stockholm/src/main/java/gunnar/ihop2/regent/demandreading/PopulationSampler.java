@@ -24,7 +24,7 @@ public class PopulationSampler {
 		final ObjectAttributes all = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				all);
-		reader.read(fromFile);
+		reader.readFile(fromFile);
 
 		final ObjectAttributes subset = ObjectAttributeUtils2
 				.newFractionalSubset(all, fraction);

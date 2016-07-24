@@ -36,7 +36,7 @@ public class TrackMatchingConverterTest {
 		setup();
 		TrackMatchingXmlReader tmx = new TrackMatchingXmlReader();
 		tmx.setValidating(false);
-		tmx.read(utils.getClassInputDirectory() + "test.xml");
+		tmx.readFile(utils.getClassInputDirectory() + "test.xml");
 		List<Tuple<Id<Node>, Id<Node>>> nodes = tmx.getLargestRoute();
 		
 		TrackMatchingConverter tmc = new TrackMatchingConverter(utils.getOutputDirectory() + "network.xml");

@@ -44,7 +44,7 @@ public class PrintEventsOfSingleAgent {
 		//reader.readFile(eventsFile);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.read(eventsFile);
+		reader.readFile(eventsFile);
 		
 	}
 	

@@ -108,7 +108,7 @@ public class SviReplanningMain {
 //		pop.addAlgorithm(replanner);
 //		pop.addAlgorithm(ods);
 
-		new PopulationReader(scenario).read(inputPopulationFilename);
+		new PopulationReader(scenario).readFile(inputPopulationFilename);
 
 		// write new demand matrices
 		// TODO [MR] need description of format

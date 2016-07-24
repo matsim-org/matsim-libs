@@ -30,7 +30,7 @@ public class CSRentalTimesFromEvents {
     	CSEventsHandler rentalTimes = new CSEventsHandler(sc.getNetwork());
     	
     	events.addHandler(rentalTimes);
-    	reader.read(s);
+    	reader.readFile(s);
     	/*int[] rentalTime = rentalTimes.rentalTimes;
     	System.out.println(rentalTimes.number1());
     	System.out.println(rentalTimes.number());

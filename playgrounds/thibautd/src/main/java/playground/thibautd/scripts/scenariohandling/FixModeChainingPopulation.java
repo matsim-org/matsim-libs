@@ -59,7 +59,7 @@ public class FixModeChainingPopulation {
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).read( facilitiesFile );
+		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).readFile( facilitiesFile );
 		final Population pop = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
 
@@ -79,7 +79,7 @@ public class FixModeChainingPopulation {
 			}
 		});
 
-		new PopulationReader( scenario ).read( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 		correctionCounter.printCounter();
 	}

@@ -115,7 +115,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		});
 		if (path2EventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.read(path2EventsFile);
+			reader.readFile(path2EventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

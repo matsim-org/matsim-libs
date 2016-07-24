@@ -122,13 +122,13 @@ public class OsmNetworkReader {
 		if (this.slowButLowMemory) {
 			log.info("parsing osm file first time: identifying nodes used by ways");
 			parser.enableOptimization(1);
-			parser.read(osmFilename);
+			parser.readFile(osmFilename);
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
-			parser.read(osmFilename);
+			parser.readFile(osmFilename);
 			log.info("done loading data");
 		} else {
-			parser.read(osmFilename);
+			parser.readFile(osmFilename);
 		}
 		convert();
 		log.info("= conversion statistics: ==========================");

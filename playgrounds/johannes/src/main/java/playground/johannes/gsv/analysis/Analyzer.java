@@ -35,7 +35,7 @@ public class Analyzer {
 
 	public static void main(String[] args) throws IOException {
 		Config config = ConfigUtils.createConfig();
-		new ConfigReader(config).read(args[0]);
+		new ConfigReader(config).readFile(args[0]);
 		
 		String eventsFile = args[1];
 		String outputDir = args[2];

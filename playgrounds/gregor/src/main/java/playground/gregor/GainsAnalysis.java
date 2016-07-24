@@ -44,11 +44,11 @@ public class GainsAnalysis implements LinkLeaveEventHandler{
 		EventsManagerImpl e = new EventsManagerImpl();
 		e.addHandler(gains);
 		gains.setStrategy(Strategy.sp);
-		new EventsReaderXMLv1(e).read(sp);
+		new EventsReaderXMLv1(e).readFile(sp);
 		gains.setStrategy(Strategy.ne);
-		new EventsReaderXMLv1(e).read(ne);
+		new EventsReaderXMLv1(e).readFile(ne);
 		gains.setStrategy(Strategy.so);
-		new EventsReaderXMLv1(e).read(so);
+		new EventsReaderXMLv1(e).readFile(so);
 
 		AgentInfo ai = gains.getMax();
 		System.out.println(ai);

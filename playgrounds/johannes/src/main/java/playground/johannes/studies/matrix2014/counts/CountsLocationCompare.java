@@ -50,7 +50,7 @@ public class CountsLocationCompare {
 
         Counts<Link> refCounts = new Counts<>();
         MatsimCountsReader countsReader = new MatsimCountsReader(refCounts);
-        countsReader.read(refFile);
+        countsReader.readFile(refFile);
 
         Map<String, Coord> refCoords = new HashMap<>();
         for(Count<Link> count : refCounts.getCounts().values()) {
@@ -60,7 +60,7 @@ public class CountsLocationCompare {
         Counts<Link> targetCounts = new Counts<>();
         countsReader = new MatsimCountsReader(targetCounts);
 //        countsReader.setValidating(false);
-        countsReader.read(targetFile);
+        countsReader.readFile(targetFile);
 
         Map<String, Coord> targetCoords = new HashMap<>();
         for(Count<Link> count : targetCounts.getCounts().values()) {

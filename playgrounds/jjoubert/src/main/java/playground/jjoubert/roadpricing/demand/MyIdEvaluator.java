@@ -35,7 +35,7 @@ public class MyIdEvaluator {
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader pr = new PopulationReader(sc);
-		pr.read(args[0]);
+		pr.readFile(args[0]);
 		
 		Integer minId = Integer.MAX_VALUE;
 		Integer maxId = Integer.MIN_VALUE;

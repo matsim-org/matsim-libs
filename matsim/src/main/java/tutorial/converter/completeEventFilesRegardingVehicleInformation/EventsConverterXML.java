@@ -70,16 +70,6 @@ public class EventsConverterXML extends MatsimXmlParser{
 		this.basicEventsReader = new EventsReaderXMLv1(events);
 	}
 
-	/**
-	 * Parses the specified events file. This method calls {@link #read(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 * @throws UncheckedIOException
-	 */
-	public void readFile(final String filename) throws UncheckedIOException {
-		read(filename);
-	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {

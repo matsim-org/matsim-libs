@@ -72,7 +72,7 @@ public class SignalSystemsData20ReaderWriterTest {
   public void testParser() throws IOException, JAXBException, SAXException, ParserConfigurationException {
   	SignalSystemsData lss = new SignalSystemsDataImpl();
   	SignalSystemsReader20 reader = new SignalSystemsReader20(lss, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-  	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+  	reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
   	
   	checkContent(lss);
   }
@@ -84,7 +84,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	//read the test file
   	SignalSystemsData lss = new SignalSystemsDataImpl();
   	SignalSystemsReader20 reader = new SignalSystemsReader20(lss, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-  	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+  	reader.readJaxbFile(this.testUtils.getPackageInputDirectory() + TESTXML);
   	
   	//write the test file
   	log.debug("write the test file...");
@@ -94,7 +94,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	log.debug("and read it again");
   	lss = new SignalSystemsDataImpl();
   	reader = new SignalSystemsReader20(lss, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
-  	reader.readFile(testoutput);
+  	reader.readJaxbFile(testoutput);
   	checkContent(lss);
   }
 

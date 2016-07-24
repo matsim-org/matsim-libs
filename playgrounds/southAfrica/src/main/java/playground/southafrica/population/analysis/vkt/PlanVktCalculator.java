@@ -82,7 +82,7 @@ public class PlanVktCalculator {
 		/* Read and update the network. */
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario.getNetwork());
-		mnr.read(networkFile);		
+		mnr.readFile(networkFile);		
 		LOG.info("Updating road types... (" + scenario.getNetwork().getLinks().size() + " links)");
 		Counter linkCounter = new Counter("  links # ");
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()){
@@ -97,7 +97,7 @@ public class PlanVktCalculator {
 		
 		/* Read the population file. */
 		PopulationReader mpr = new PopulationReader(scenario);
-		mpr.read(plansfile);
+		mpr.readFile(plansfile);
 
 		/* The actual stuff to run the Vkt analysis. */
 		DigicoreNetworkRouterFactory factory = new DigicoreNetworkRouterFactory(scenario);

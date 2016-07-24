@@ -82,7 +82,7 @@ public class PopulationReset {
 		// Filter person attributes
 		if (pathToInputPopulationAttributes != null) {
 			final ObjectAttributes personAttributes = new ObjectAttributes();
-			new ObjectAttributesXmlReader(personAttributes).read(pathToInputPopulationAttributes);
+			new ObjectAttributesXmlReader(personAttributes).readFile(pathToInputPopulationAttributes);
 			final ObjectAttributes filteredPersonAttributes = filterPersonAttributes(personAttributes, newPopulation);
 			new ObjectAttributesXmlWriter(filteredPersonAttributes).writeFile(pathToOutputPopulationAttributes);
 		} else {

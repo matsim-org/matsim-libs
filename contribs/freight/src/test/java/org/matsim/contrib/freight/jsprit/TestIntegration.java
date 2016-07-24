@@ -89,7 +89,7 @@ public class TestIntegration {
 
 	private static CarrierVehicleTypes createVehicleTypes(String vehicleTypeFilename ) {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).read(vehicleTypeFilename) ;
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(vehicleTypeFilename) ;
 		return vehicleTypes;
 	}
 

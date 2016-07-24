@@ -141,16 +141,6 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements MatsimP
 		}
 	}
 
-	/**
-	 * Parses the specified plans file. This method calls {@link #read(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		read(filename);
-	}
-
 	private void startPopulation(final Attributes atts) {
 		this.plans.setName(atts.getValue(ATTR_POPULATION_DESC));
 	}

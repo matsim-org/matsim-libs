@@ -45,7 +45,7 @@ class TryOutEventsReading implements EventHandler {
 		System.out.println("reading network");
 		final NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(
 				scenario.getNetwork());
-		networkReader.read(matsimNetworkFile);
+		networkReader.readFile(matsimNetworkFile);
 
 		// defining links of interest and checking if they are there
 		final List<Id<Link>> observedLinks = new ArrayList<Id<Link>>();

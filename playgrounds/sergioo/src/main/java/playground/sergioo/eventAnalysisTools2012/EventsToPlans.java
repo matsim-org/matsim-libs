@@ -77,7 +77,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 		eventsToLegs.addLegHandler(eventsToPlans);
 		eventsManager.addHandler(eventsToActivities);
 		eventsManager.addHandler(eventsToLegs);
-		new EventsReaderXMLv1(eventsManager).read(args[2]);
+		new EventsReaderXMLv1(eventsManager).readFile(args[2]);
 		eventsToPlans.writeExperiencedPlans(args[3]);
 	}
 

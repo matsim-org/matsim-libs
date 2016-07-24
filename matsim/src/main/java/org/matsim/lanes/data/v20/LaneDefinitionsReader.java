@@ -79,7 +79,7 @@ public class LaneDefinitionsReader implements MatsimSomeReader {
 				throw new IllegalArgumentException(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
 			}
 			log.info("reading file " + filename);
-			reader.readFile(filename);
+			reader.readJaxbFile(filename);
 		} catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
 			throw new RuntimeException(e);
 		}

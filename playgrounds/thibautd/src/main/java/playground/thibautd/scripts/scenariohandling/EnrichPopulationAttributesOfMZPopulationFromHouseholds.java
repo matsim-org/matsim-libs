@@ -47,7 +47,7 @@ public class EnrichPopulationAttributesOfMZPopulationFromHouseholds {
 		final String outputPopulationAttributes = args[ 3 ];
 
 		final ObjectAttributes attributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader( attributes ).read( inputPopulationAttributes );
+		new ObjectAttributesXmlReader( attributes ).readFile( inputPopulationAttributes );
 
 		final Map<String, Collection<Id<Person>>> personsInHousehold = new HashMap<>();
 		for ( Person p : readPopulation( inputPopulationFile ) ) {
