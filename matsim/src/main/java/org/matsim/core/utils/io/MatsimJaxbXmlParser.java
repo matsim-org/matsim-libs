@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.Stack;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
@@ -57,6 +56,9 @@ import org.xml.sax.SAXException;
  *
  */
 public abstract class MatsimJaxbXmlParser implements MatsimSomeReader {
+	// I have changed this class from inheritance of MatsimXmlParser to delegation.  In consequence, it exposes considerably fewer methods.
+	// Maybe some of these non-exposed methods are necessary at some point, at which point they could presumably be exposed 
+	// by delegating them. kai, jul'16
 
 	private final class ParserDelegate extends MatsimXmlParser {
 		@Override public void startTag(String name, Attributes atts, Stack<String> context) {
@@ -83,10 +85,6 @@ public abstract class MatsimJaxbXmlParser implements MatsimSomeReader {
 		this.schemaLocation = schemaLocation;
 	}
 
-	public abstract void readFile(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException;
-	// yyyyyy this is not so great, for Jaxb files still having the "standard" and the special method side by side.  But I first need to figure out
-	// what is going on with these exceptions. kai, jul'16
-	
 	/**
 	 * @throws ParserConfigurationException  
 	 * @throws IOException 

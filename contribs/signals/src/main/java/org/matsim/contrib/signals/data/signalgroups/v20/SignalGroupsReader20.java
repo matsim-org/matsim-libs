@@ -29,6 +29,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.MatsimSignalSystemsReader;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -36,17 +41,13 @@ import org.matsim.jaxb.signalgroups20.XMLIdRefType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  * @author jbischoff
  */
-public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
+public class SignalGroupsReader20 extends MatsimJaxbXmlParser implements MatsimReader {
 
 	private SignalGroupsData signalGroupsData;
 	private SignalGroupsDataFactory factory;

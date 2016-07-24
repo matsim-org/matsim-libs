@@ -115,12 +115,5 @@ public class JAXBUnmarschalV2 extends MatsimJaxbXmlParser{
 			System.exit(-1);
 		}
 	}
-	
-	@Override
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
-		throw new UnsupportedOperationException("Use unmaschalMATSimConfig()");
-	}
-
 }
 

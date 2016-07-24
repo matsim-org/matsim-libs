@@ -67,7 +67,6 @@ class LaneDefinitionsReader20 extends MatsimJaxbXmlParser {
 	/**
 	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
 	 */
-	@Override
 	public void readFile(String filename) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
 		//create jaxb infrastructure

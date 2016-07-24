@@ -58,7 +58,7 @@ public class LaneDefinitionsReader implements MatsimReader {
 		try {
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
 			String sid = fileTypeGuesser.getSystemId();
-			MatsimJaxbXmlParser reader;
+			LaneDefinitionsReader20 delegate;
 			if (sid != null) {
 				log.debug("creating parser for system id: " + sid);
 				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
@@ -69,7 +69,7 @@ public class LaneDefinitionsReader implements MatsimReader {
 							"is given as input. Please convert manually.");
 				}
 				else if (sid.compareTo(SCHEMALOCATIONV20) == 0){
-					reader = new LaneDefinitionsReader20(this.laneDefinitions, sid);
+					delegate = new LaneDefinitionsReader20(this.laneDefinitions, sid);
 					log.info("Using LaneDefinitionReader20...");
 				}
 				else {
@@ -81,7 +81,7 @@ public class LaneDefinitionsReader implements MatsimReader {
 				throw new IllegalArgumentException(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
 			}
 			log.info("reading file " + filename);
-			reader.readFile(filename);
+			delegate.readFile(filename);
 		} catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
 			throw new RuntimeException(e);
 		}
