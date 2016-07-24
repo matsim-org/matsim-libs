@@ -138,7 +138,7 @@ public class NEMOInfraParser extends MatsimXmlParser {
 	//////////////////////////////////////////////////////////////////////
 
 	public NEMOInfraParser(NEMOInfraDataContainer dataContainer) {
-		super(false);
+		setValidating(false);
 		this.dataContainer = dataContainer;
 	}
 
@@ -148,7 +148,7 @@ public class NEMOInfraParser extends MatsimXmlParser {
 	 * @param validateXml
 	 */
 	public NEMOInfraParser(NEMOInfraDataContainer dataContainer, boolean validateXml) {
-		super(validateXml);
+		setValidating(validateXml);
 		this.dataContainer = dataContainer;
 	}
 

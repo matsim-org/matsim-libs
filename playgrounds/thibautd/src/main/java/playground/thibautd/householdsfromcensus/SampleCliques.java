@@ -116,7 +116,7 @@ public class SampleCliques {
 		private final Counter counter = new Counter( "importing clique info # " );
 
 		public Parser() {
-			super( false );
+			setValidating( false );
 		}
 
 		@Override

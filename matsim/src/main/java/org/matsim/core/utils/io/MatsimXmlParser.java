@@ -76,11 +76,6 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	 * Creates a validating XML-parser.
 	 */
 	public MatsimXmlParser() {
-		this(true);
-	}
-
-	public MatsimXmlParser(final boolean validateXml) {
-		this.isValidating = validateXml;
 		String localDtd = System.getProperty("matsim.preferLocalDtds");
 		if (localDtd != null) {
 			this.preferLocalDtds = Boolean.parseBoolean(localDtd);

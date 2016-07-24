@@ -92,7 +92,7 @@ public class CreateJointTripDataSetForClique {
 		private boolean inClique = false;
 		
 		public CliqueParser(final String cliqueId) {
-			super( false );
+			setValidating( false );
 			this.cliqueId = cliqueId;
 		}
 
@@ -131,7 +131,7 @@ public class CreateJointTripDataSetForClique {
 		private final Counter count = new Counter( "store plan # " );
 
 		public JointPlanParser(final List<String> members) {
-			super( false );
+			setValidating( false );
 			this.members = members;
 		}
 

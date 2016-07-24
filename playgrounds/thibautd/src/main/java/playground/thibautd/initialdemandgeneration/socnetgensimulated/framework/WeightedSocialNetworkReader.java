@@ -35,7 +35,7 @@ public class WeightedSocialNetworkReader extends MatsimXmlParser {
 
 	public WeightedSocialNetworkReader() {
 		// do not validate, as not yet a dtd
-		super( false );
+		setValidating( false );
 	}
 
 	public WeightedSocialNetwork createAndReadSocialNetwork( final String file ) {

@@ -40,7 +40,7 @@ public class ConvertToCsv extends MatsimXmlParser implements MatsimSomeReader {
 	private String separater;
 
 	public ConvertToCsv() {
-		super(false);
+		setValidating(false);
 		System.out.println("name" + separater + "lat" + separater + "lng" + separater + "num" + separater + "price");
 	}
 

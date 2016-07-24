@@ -82,7 +82,7 @@ public class FilterCliquesBasedOnPopulation {
 		private boolean isToKeep = false;
 
 		public CliquesParser(final PlansParser plans) {
-			super( false );
+			setValidating( false );
 			agentsToKeep = new TreeSet<>(plans.ids);
 		}
 

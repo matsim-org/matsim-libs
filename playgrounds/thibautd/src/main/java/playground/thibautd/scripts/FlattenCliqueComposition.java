@@ -60,7 +60,7 @@ public class FlattenCliqueComposition {
 		private final Counter counter = new Counter( "writing line # " );
 
 		public Parser(final BufferedWriter writer) {
-			super( false );
+			setValidating( false );
 			this.writer = writer;
 			try {
 				this.writer.write( CLIQUE + SEP + PERSON );

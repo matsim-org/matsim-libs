@@ -72,7 +72,7 @@ public class ConvertCliquesToHouseholds {
 		private List<Id<Person>> currentMembers = null;
 
 		public ConvertingParser() {
-			super( false );
+			setValidating( false );
 		}
 
 		@Override

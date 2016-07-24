@@ -74,8 +74,11 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		if ( args.isSwitched( "--cliques" ) ) {
 			log.info( "read households using cliques reader" );
 
-			new MatsimXmlParser( false ) {
+			new MatsimXmlParser(  ) {
 				HouseholdImpl currentHousehold = null;
+				{
+					this.setValidating(false);
+				}
 				@Override
 				public void startTag(
 						final String name,

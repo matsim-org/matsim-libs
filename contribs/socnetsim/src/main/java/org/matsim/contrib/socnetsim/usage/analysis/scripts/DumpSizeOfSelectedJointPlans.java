@@ -53,7 +53,10 @@ public class DumpSizeOfSelectedJointPlans {
 		writer.write( "personId\tsize" );
 
 		final Counter counter = new Counter( "parse joint plan # " );
-		new MatsimXmlParser( false ) {
+		new MatsimXmlParser( ) {
+			{
+				setValidating(false) ;
+			}
 			int size = -1;
 			boolean isSelected = false;
 			final List<Id> persons = new ArrayList<Id>();
