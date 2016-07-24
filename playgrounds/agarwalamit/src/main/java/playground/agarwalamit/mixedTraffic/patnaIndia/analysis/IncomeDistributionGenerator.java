@@ -33,7 +33,6 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
-import playground.agarwalamit.utils.MapUtils;
 
 /**
  * @author amit
@@ -42,8 +41,8 @@ import playground.agarwalamit.utils.MapUtils;
 public class IncomeDistributionGenerator {
 
 	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
-//	private final String plansFile = dir+"/output_plans.xml.gz";
-	private final String plansFile = dir+"/ITERS/it.0/0.plans.xml.gz";
+	private final int iterationNumber = 100;
+	private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
 	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
 	
 	private final SortedMap<Double, SortedMap<String, Integer>> avgInc2mode2Count = new TreeMap<>();
@@ -56,14 +55,14 @@ public class IncomeDistributionGenerator {
 	}
 
 	private void writeData(){
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it.0.txt")) {
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it."+iterationNumber+".txt")) {
 			writer.write("avgIncomUSD\tmode\tcount\n");
 
 			for (Double d : this.avgInc2mode2Count.keySet()){
 				for(String str : this.avgInc2mode2Count.get(d).keySet()){
 					writer.write(Math.round(d/USD2INRRate)+"\t"+str+"\t"+this.avgInc2mode2Count.get(d).get(str)+"\n");
 				}
-				writer.write(Math.round(d/USD2INRRate)+"\t"+"total\t"+MapUtils.intValueSum(this.avgInc2mode2Count.get(d))+"\n");
+//				writer.write(Math.round(d/USD2INRRate)+"\t"+"total\t"+MapUtils.intValueSum(this.avgInc2mode2Count.get(d))+"\n");
 			}
 			writer.close();
 
