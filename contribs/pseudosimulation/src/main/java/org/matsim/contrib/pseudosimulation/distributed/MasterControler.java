@@ -71,7 +71,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final Hydra hydra;
     private int numSlaves = 1;
-    private static double MasterBorrowingRate = 0.5;
+    private static double MasterBorrowingRate = 0.6667;
     private int innovationEndsAtIter = -1;
 
     public static boolean isTrackGenome() {
@@ -316,10 +316,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         slaveHandlerTreeMap = new TreeMap<>();
         slaveScoreStats = new SlaveScoreStats(config);
 
-        if (MasterMutationRate > 0 && MasterMutationRate <= 1) {
-            setReplanningWeights(config, MasterMutationRate, MasterBorrowingRate);
-
+        if (MasterMutationRate <= 0 ) {
+            masterInitialLogString.append("No or bad (>1) master mutation rate specified. Assuming the default of nearly zero, " +
+                    "and 2/3 of plans in a qsim coming from slaves, unless borrowing rate has been set already.");
+            MasterMutationRate = 0.0001;
         }
+        setReplanningWeights(config, MasterMutationRate, MasterBorrowingRate);
 
 //        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(socketNumber);
@@ -427,14 +429,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     /**
      * Experimental or parameter optimization. Probably won't work with subpopulations
-     *  @param config
+     *
+     * @param config
      * @param masterMutationRate
      * @param borrowingRate
      */
     private void setReplanningWeights(Config config, double masterMutationRate, double borrowingRate) {
         int disableAfterIteration = config.controler().getLastIteration();
         int maximumIterationForMutationDisabling = -1;
-        if(borrowingRate + masterMutationRate >= 1){
+        if (borrowingRate + masterMutationRate >= 1) {
             borrowingRate = 0.9999 * borrowingRate / (masterMutationRate + borrowingRate);
             masterMutationRate = 0.9999 * masterMutationRate / (masterMutationRate + borrowingRate);
         }
@@ -470,9 +473,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         StrategyConfigGroup.StrategySettings borrowingSetting = new StrategyConfigGroup.StrategySettings();
         borrowingSetting.setWeight(borrowingRate);
         borrowingSetting.setStrategyName("ReplacePlanFromSlave");
-        borrowingSetting.setDisableAfter(maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling: disableAfterIteration);
+        borrowingSetting.setDisableAfter(maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration);
         config.strategy().addStrategySettings(borrowingSetting);
-        this.innovationEndsAtIter = maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling: disableAfterIteration;
+        this.innovationEndsAtIter = maximumIterationForMutationDisabling > 0 ? maximumIterationForMutationDisabling : disableAfterIteration;
     }
 
 
@@ -501,7 +504,16 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             e.printStackTrace();
             Runtime.getRuntime().halt(0);
         }
-        master.run();
+        try {
+
+            master.run();
+        } catch (
+                RuntimeException re
+                ) {
+            masterLogger.error(re.getStackTrace());
+            master.hydra.killHydra();
+            Runtime.getRuntime().halt(-1);
+        }
         Runtime.getRuntime().halt(0);
     }
 
@@ -550,7 +562,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             mergePlansFromSlaves();
             //this code is a copy of the replanning strategy
             for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
-                person.removePlan(person.getSelectedPlan());
+//                person.removePlan(person.getSelectedPlan());
                 Plan plan = newPlans.get(person.getId().toString());
                 person.addPlan(plan);
                 person.setSelectedPlan(plan);
@@ -568,7 +580,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
         this.currentIteration = event.getIteration();
-        if(event.getIteration()>innovationEndsAtIter)
+        if (innovationEndsAtIter > 0 && event.getIteration() > innovationEndsAtIter)
             return;
         //wait for previous transmissions to complete, if necessary
         waitForSlaveThreads();
@@ -582,9 +594,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        if(event.getIteration()>innovationEndsAtIter)
+        if (innovationEndsAtIter > 0 && event.getIteration() > innovationEndsAtIter)
             return;
-        if(event.getIteration() == innovationEndsAtIter){
+        if (event.getIteration() == innovationEndsAtIter) {
             startSlaveHandlersInMode(CommunicationsMode.DIE);
             return;
         }
@@ -632,6 +644,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     @Override
     public void notifyShutdown(ShutdownEvent event) {
         //start receiving plans from slaveHandlerTreeMap as the QSim runs
+        hydra.killHydra();
         startSlaveHandlersInMode(CommunicationsMode.DIE);
     }
 
@@ -1110,11 +1123,17 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         TreeMap<Integer, SlaveHandler> hydraSlaves = new TreeMap<>();
         AtomicBoolean accessingMap = new AtomicBoolean(false);
 
+        public void killHydra() {
+            this.acceptSlaves = false;
+        }
+
+        boolean acceptSlaves = true;
+
         public void run() {
             ServerSocket writeServer = null;
             try {
                 writeServer = new ServerSocket(socketNumber);
-                while (true) {
+                while (acceptSlaves) {
                     Socket socket = writeServer.accept();
                     int i = slaveUniqueNumber++;
                     masterLogger.warn("Slave accepted.");

@@ -28,14 +28,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,7 +47,7 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener, Runnable {
+public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener, ShutdownListener, Runnable {
     public static int numberOfPSimIterationsPerCycle;
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
@@ -208,7 +202,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 //        Important, otherwise Psim breaks
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         config.parallelEventHandling().setNumberOfThreads(1);
-        setReplanningWeights(config,slaveMutationRate);
+        if (slaveMutationRate > 0)
+            setReplanningWeights(config, slaveMutationRate);
 
         scenario = ScenarioUtils.loadScenario(config);
 
@@ -347,7 +342,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     public void notifyIterationStarts(IterationStartsEvent event) {
         if (numberOfIterations >= 0 || initialRouting)
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
-
+// send plans only after the previous iteration has completed
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterationsPerCycle == 0)) {
             this.totalIterationTime = getTotalIterationTime();
             communications();
@@ -620,7 +615,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         double selectorSum = CollectionUtils.sumElements(selectors.values());
         // set to new weight
         for (Map.Entry<Integer, Double> entry : selectors.entrySet()) {
-            strategySettings.get(entry.getKey()).setWeight((1 - mutationRate ) * entry.getValue() / selectorSum);
+            strategySettings.get(entry.getKey()).setWeight((1 - mutationRate) * entry.getValue() / selectorSum);
         }
         for (Map.Entry<Integer, Double> entry : mutators.entrySet()) {
             strategySettings.get(entry.getKey()).setWeight(mutationRate * entry.getValue() / mutatorSum);
@@ -633,5 +628,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
 
+    @Override
+    public void notifyShutdown(ShutdownEvent event) {
+        //send the last iteratin's plans
+        this.totalIterationTime = getTotalIterationTime();
+        communications();
+        //wait for the kill signal from master
+        communications();
+    }
 }
 
