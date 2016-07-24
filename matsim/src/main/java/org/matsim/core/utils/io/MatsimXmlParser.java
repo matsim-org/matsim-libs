@@ -58,7 +58,6 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 
-//	private String localDtdBase = "dtd";
 	private String localDtdBase = null;
 	// yy this is NOT working for me with "dtd", but it IS working with null. 
 	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
@@ -289,9 +288,9 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		if (this.localDtdBase != null) {
 			String localFileName = this.localDtdBase + "/" + shortSystemId;
 			File dtdFile = new File(localFileName);
-			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
+//			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + localFileName);
+				log.info("Using the local DTD " + localFileName + " with absolute path " + dtdFile.getAbsolutePath() );
 				return new InputSource(dtdFile.getAbsolutePath());
 			}
 		}
@@ -302,7 +301,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {
-			log.info("Using local DTD from classpath: /dtd/" + shortSystemId);
+			log.info("Using local DTD from classpath:dtd/" + shortSystemId);
 			return new InputSource(stream);
 		}
 		return null;
