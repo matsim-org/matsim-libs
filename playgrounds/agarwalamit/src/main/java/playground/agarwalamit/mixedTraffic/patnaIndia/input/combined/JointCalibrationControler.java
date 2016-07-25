@@ -66,7 +66,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 public class JointCalibrationControler {
 
 	private final static double SAMPLE_SIZE = 0.10;
-	private final static String subPopAttributeName = "userGroup";
 
 	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz"; //
 	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
@@ -158,22 +157,23 @@ public class JointCalibrationControler {
 		// add income dependent scoring function factory
 		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
 		
-		// add asc updator
-		if(updatingASC){
-			SortedMap<String, Double> initialModalShare = new TreeMap<>();
-			initialModalShare.put("car", 2.0);
-			initialModalShare.put("motorbike", 14.0);
-			initialModalShare.put("bike", 33.0);
-			initialModalShare.put("pt", 22.0);
-			initialModalShare.put("walk", 29.0);
-			ASCFromModalSplitCalibrator msc = new ASCFromModalSplitCalibrator(initialModalShare , updateASCAfterIt);
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					this.addControlerListenerBinding().toInstance(msc);
-				}
-			});
-		}
+		// dont use asc updator amit july 25, 2016
+//		// add asc updator
+//		if(updatingASC){
+//			SortedMap<String, Double> initialModalShare = new TreeMap<>();
+//			initialModalShare.put("car", 2.0);
+//			initialModalShare.put("motorbike", 14.0);
+//			initialModalShare.put("bike", 33.0);
+//			initialModalShare.put("pt", 22.0);
+//			initialModalShare.put("walk", 29.0);
+//			ASCFromModalSplitCalibrator msc = new ASCFromModalSplitCalibrator(initialModalShare , updateASCAfterIt);
+//			controler.addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					this.addControlerListenerBinding().toInstance(msc);
+//				}
+//			});
+//		}
 		controler.run();
 
 		// delete unnecessary iterations folder here.
@@ -209,7 +209,7 @@ public class JointCalibrationControler {
 		config.network().setInputFile(NET_FILE);
 
 		config.plans().setInputFile(JOINT_PLANS_10PCT);
-		config.plans().setSubpopulationAttributeName(subPopAttributeName);
+		config.plans().setSubpopulationAttributeName(PatnaUtils.SUBPOP_ATTRIBUTE);
 		config.plans().setInputPersonAttributeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
 
 		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
