@@ -57,10 +57,12 @@ public class PatnaBikeTrackGenerator {
 	private Map<Coord, String> coordId = new HashMap<Coord, String>();
 	private final CoordinateTransformation ct= PatnaUtils.COORDINATE_TRANSFORMATION;
 	
-	private final String outNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
-
 	public static void main(String[] args) {
-		new PatnaBikeTrackGenerator().process();
+		String outNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
+		
+		PatnaBikeTrackGenerator track = new PatnaBikeTrackGenerator();
+		track.process();
+		new NetworkWriter(track.getNetwork()).write(outNetworkFile);
 	}
 
 	public void process(){
@@ -108,7 +110,10 @@ public class PatnaBikeTrackGenerator {
 			createAndAddLink(new Node [] {n1,  n2}, "manuallyAdded");
 			createAndAddLink(new Node [] {n2,  n1}, "manuallyAdded");
 		}
-		new NetworkWriter(this.network).write(outNetworkFile);
+	}
+	
+	public Network getNetwork(){
+		return this.network;
 	}
 
 	private void addBiDirectionLinks(Coordinate[] coords, String osmId) {
@@ -120,7 +125,7 @@ public class PatnaBikeTrackGenerator {
 	}
 	
 	private void createAndAddLink(Node [] nodes, String osmId) {
-		int noOfLinks = network.getLinks().size();
+		int noOfLinks = this.network.getLinks().size();
 		String id = osmId+"_link"+noOfLinks;
 		double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
 		Set<String> modes = new HashSet<>();

@@ -30,20 +30,16 @@ import org.matsim.api.core.v01.network.Network;
 
 public final class PatnaTrafficRestrainer {
 	
-	public PatnaTrafficRestrainer(Network network) {
-		this.network = network;
-	}
-
-	private final Network network;
+	public PatnaTrafficRestrainer() { }
 	
-	public void run(){
+	public static void run(Network network){
 		
 		{ 
 			// major problem with the follwoing links
 			Id<Link> linkId = Id.createLinkId("1538010000");
 			Id<Link> reverseLinkId = Id.createLinkId("15380");
-			this.network.removeLink(linkId);
-			this.network.removeLink(reverseLinkId);
+			network.removeLink(linkId);
+			network.removeLink(reverseLinkId);
 		}
 		
 		{ 
@@ -51,12 +47,8 @@ public final class PatnaTrafficRestrainer {
 			//"connect Gandhi Setu with the major arterial and no where in between."
 			Id<Link> linkId = Id.createLinkId("1572810000-1573110000-1573810000-15737-1572510000-1574810000-1574310000");
 			Id<Link> reverseLinkId = Id.createLinkId("15743-15748-15725-1573710000-15738-15731-15728");
-			this.network.removeLink(linkId);
-			this.network.removeLink(reverseLinkId);
+			network.removeLink(linkId);
+			network.removeLink(reverseLinkId);
 		}
-	}
-	
-	public Network getNetwork(){
-		return this.network;
 	}
 }
