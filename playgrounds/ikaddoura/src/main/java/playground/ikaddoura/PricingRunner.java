@@ -121,6 +121,8 @@ public class PricingRunner {
 				pricingApproach = PricingApproach.DecongestionD;
 			} else if (pricingApproachString.equals(PricingApproach.DecongestionPID.toString())) {
 				pricingApproach = PricingApproach.DecongestionPID;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionPIDwithParameters.toString())) {
+				pricingApproach = PricingApproach.DecongestionPIDwithParameters;
 			
 			// unknown pricing approach
 			} else {
