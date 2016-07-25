@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -284,7 +284,7 @@ public class CreatePlansFromTrips {
 	}
 		
 	private void writePlans(String filename){
-		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.writeStartPlans(filename);
 		writer.writePersons();
 		writer.writeEndPlans();

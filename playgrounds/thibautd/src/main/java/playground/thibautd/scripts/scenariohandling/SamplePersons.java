@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -73,8 +73,8 @@ public class SamplePersons {
 		final Population pop = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
 
-		final PopulationWriter writer =
-			new PopulationWriter(
+		final StreamingPopulationWriter writer =
+			new StreamingPopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
 		writer.writeStartPlans( outPopulation );

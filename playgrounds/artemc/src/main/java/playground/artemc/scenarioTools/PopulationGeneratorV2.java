@@ -57,7 +57,7 @@ public class PopulationGeneratorV2 {
 		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		StreamingUtils.setIsStreaming(population, true);
-		PopulatioStreamingPopulationWriternWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(populationPath);
 		
 		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkPath);

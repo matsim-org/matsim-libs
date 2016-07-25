@@ -51,7 +51,7 @@ public class PlanGenerator {
 		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		StreamingUtils.setIsStreaming(population, true);
-		PopulaStreamingPopulationWritertionWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(populationPath);
 		
 		/*Get Population*/

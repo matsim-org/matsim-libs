@@ -75,6 +75,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -719,7 +720,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network) {
-		PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(((MutableScenario) null).getConfig(), ((MutableScenario) null).getNetwork()), network);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(PopulationUtils.createPopulation(((MutableScenario) null).getConfig(), ((MutableScenario) null).getNetwork()), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -738,7 +739,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network, MutableScenario scenario) {
-		PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()), network);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {

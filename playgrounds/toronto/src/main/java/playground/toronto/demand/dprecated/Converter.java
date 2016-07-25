@@ -19,7 +19,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -253,7 +253,7 @@ public class Converter {
 		c.setPop(((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			PopulationWriter writer = new PopulationWriter(c.pop, null);
+			StreamingPopulationWriter writer = new StreamingPopulationWriter(c.pop, null);
 			writer.writeStartPlans(newPlansFilename);
 			String line = reader.readLine();
 			do {
