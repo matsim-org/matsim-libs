@@ -67,14 +67,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * Set the pretty print flag of the XMLWriter, see comment of flag.
 	 * @param doPrettyPrint
 	 */
-	public void setPrettyPrint(boolean doPrettyPrint){
+	public final void setPrettyPrint(boolean doPrettyPrint){
 		this.doPrettyPrint = doPrettyPrint;
 	}
 	/**
 	 * Set the String used for indentation in the pretty print xml mode.
 	 * @param indentationString
 	 */
-	public void setIndentationString(String indentationString) {
+	public final void setIndentationString(String indentationString) {
 		this.indentationString = indentationString;
 	}
 
@@ -83,20 +83,20 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * pretty print option
 	 * @param level
 	 */
-	protected void setIndentationLevel(int level){
+	protected final void setIndentationLevel(int level){
 		this.indentationLevel = level;
 	}
 
-	protected int getIndentationLevel(){
-		return this.indentationLevel;
-	}
+//	protected int getIndentationLevel(){
+//		return this.indentationLevel;
+//	}
 
 	/**
 	 * Writes the standard xml 1.0 header to the output.
 	 *
 	 * @throws UncheckedIOException
 	 */
-	protected void writeXmlHead() throws UncheckedIOException {
+	protected final void writeXmlHead() throws UncheckedIOException {
 		try {
 			this.writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			if (doPrettyPrint) {
@@ -114,7 +114,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @param dtdUrl The location of the document type definition of this XML document.
 	 * @throws UncheckedIOException
 	 */
-	protected void writeDoctype(String rootTag, String dtdUrl) throws UncheckedIOException {
+	protected final void writeDoctype(String rootTag, String dtdUrl) throws UncheckedIOException {
 		try {
 			this.writer.write("<!DOCTYPE " + rootTag + " SYSTEM \"" + dtdUrl + "\">\n");
 		} catch (IOException e) {
@@ -125,35 +125,35 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
-	protected Tuple<String, String> createTuple(String one, String two){
-		return new Tuple<String, String>(one, two);
+	protected static Tuple<String, String> createTuple(String one, String two){
+		return new Tuple<>(one, two);
 	}
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
-	protected Tuple<String, String> createTuple(String one, int two) {
-		return this.createTuple(one, Integer.toString(two));
-	}
-
-	/**
-	 * Convenience method to create XML Attributes written by startTag()
-	 */
-	protected Tuple<String, String> createTuple(String one, double two) {
-		return this.createTuple(one, Double.toString(two));
+	protected static Tuple<String, String> createTuple(String one, int two) {
+		return MatsimXmlWriter.createTuple(one, Integer.toString(two));
 	}
 
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
-	protected Tuple<String, String> createTuple(String one, boolean two) {
-		return this.createTuple(one, Boolean.toString(two));
+	protected static Tuple<String, String> createTuple(String one, double two) {
+		return MatsimXmlWriter.createTuple(one, Double.toString(two));
 	}
 
 	/**
 	 * Convenience method to create XML Attributes written by startTag()
 	 */
-	protected Tuple<String, String> createTimeTuple(String one, double sec) {
-		return this.createTuple(one, Time.writeTime(sec));
+	protected static Tuple<String, String> createTuple(String one, boolean two) {
+		return MatsimXmlWriter.createTuple(one, Boolean.toString(two));
+	}
+
+	/**
+	 * Convenience method to create XML Attributes written by startTag()
+	 */
+	protected static Tuple<String, String> createTimeTuple(String one, double sec) {
+		return MatsimXmlWriter.createTuple(one, Time.writeTime(sec));
 	}
 
 
@@ -168,11 +168,11 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @param attributes
 	 * @throws UncheckedIOException
 	 */
-	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws UncheckedIOException{
+	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes) throws UncheckedIOException{
 		this.writeStartTag(tagname, attributes, false);
 	}
 
-	protected void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException {
+	protected final void writeStartTag(String tagname, List<Tuple<String, String>> attributes, boolean closeElement) throws UncheckedIOException {
 		try {
 		if (doPrettyPrint) {
 			this.writer.write(NL);
@@ -200,7 +200,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	}
 
 
-	protected void writeContent(String content, boolean allowWhitespaces) throws UncheckedIOException{
+	protected final void writeContent(String content, boolean allowWhitespaces) throws UncheckedIOException{
 		try {
 			if (doPrettyPrint) {
 				this.noWhitespaces = !allowWhitespaces;
@@ -224,7 +224,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @param tagname
 	 * @throws UncheckedIOException
 	 */
-	protected void writeEndTag(String tagname) throws UncheckedIOException {
+	protected final void writeEndTag(String tagname) throws UncheckedIOException {
 		try {
 			if (doPrettyPrint) {
 				this.indentationLevel--;
@@ -250,14 +250,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @param attributeValue
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
-	protected String encodeAttributeValue(final String attributeValue) {
+	protected static String encodeAttributeValue(final String attributeValue) {
 		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
 			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 		}
 		return attributeValue;
 	}
 
-	protected String encodeContent(final String content) {
+	protected static String encodeContent(final String content) {
 		if (content.contains("&") || content.contains("<") || content.contains(">")) {
 			return content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 		}
