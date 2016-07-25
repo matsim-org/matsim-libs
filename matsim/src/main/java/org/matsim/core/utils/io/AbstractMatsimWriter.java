@@ -51,10 +51,10 @@ public abstract class AbstractMatsimWriter {
 	 * the file is opened for writing. If not set explicitly, the usage of
 	 * compression is defined by the ending of the filename.
 	 *
-	 * @param useCompression
+	 * @param useCompression1
 	 */
-	public void useCompression(final boolean useCompression) {
-		this.useCompression = Boolean.valueOf(useCompression);
+	public final void useCompression(final boolean useCompression1) {
+		this.useCompression = Boolean.valueOf(useCompression1);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public abstract class AbstractMatsimWriter {
 	 * @param filename
 	 * @throws UncheckedIOException
 	 */
-	protected void openFile(final String filename) throws UncheckedIOException {
+	protected final void openFile(final String filename) throws UncheckedIOException {
 		assertNotAlreadyOpen();
 		if (this.useCompression == null) {
 			this.writer = IOUtils.getBufferedWriter(filename);
@@ -76,7 +76,7 @@ public abstract class AbstractMatsimWriter {
 	 * Uses the specified OutputStream for writing.
 	 * 
 	 */
-	protected void openOutputStream(OutputStream outputStream) {
+	protected final void openOutputStream(OutputStream outputStream) {
 		assertNotAlreadyOpen();
 		try {
 			if (this.useCompression == null || this.useCompression.booleanValue()) {
@@ -100,7 +100,7 @@ public abstract class AbstractMatsimWriter {
 	 *
 	 * @throws UncheckedIOException
 	 */
-	protected void close() throws UncheckedIOException {
+	protected final void close() throws UncheckedIOException {
 		if (this.writer != null) {
 			try {
 				this.writer.flush();
