@@ -5,11 +5,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,7 +55,7 @@ public class DistributeEndTime extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		MatsimPopulationReader popReader = new PopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		DistributeEndTime dp = new DistributeEndTime(net, inPop, outPlansFile, startTime, endTime);

@@ -23,12 +23,12 @@ package org.matsim.run;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;

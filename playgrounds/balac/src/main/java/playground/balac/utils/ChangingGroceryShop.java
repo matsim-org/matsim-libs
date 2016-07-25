@@ -4,9 +4,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -15,13 +15,13 @@ public class ChangingGroceryShop {
 
 	public static void main(String[] args) {
 		MutableScenario scenario1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader populationReader1 = new PopulationReader(scenario1);
+		MatsimReader populationReader1 = new PopulationReader(scenario1);
 		MatsimNetworkReader networkReader1 = new MatsimNetworkReader(scenario1.getNetwork());
 		networkReader1.readFile(args[2]);
 		populationReader1.readFile(args[0]);
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader populationReader2 = new PopulationReader(scenario2);
+		MatsimReader populationReader2 = new PopulationReader(scenario2);
 		MatsimNetworkReader networkReader2 = new MatsimNetworkReader(scenario2.getNetwork());
 		networkReader2.readFile(args[3]);
 		populationReader2.readFile(args[1]);

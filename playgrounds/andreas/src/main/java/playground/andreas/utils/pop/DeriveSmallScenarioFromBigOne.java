@@ -6,13 +6,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
@@ -70,12 +70,12 @@ public class DeriveSmallScenarioFromBigOne {
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
 		Population wholeRoutedPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		MatsimPopulationReader popReader = new PopulationReader(new SharedNetScenario(bigNetScenario, wholeRoutedPop));
+		MatsimReader popReader = new PopulationReader(new SharedNetScenario(bigNetScenario, wholeRoutedPop));
 		popReader.readFile(wholeRoutedPlansFile);
 
 		log.info("Reading unrouted population: " + unroutedWholePlansFile);
 		Population unroutedWholePop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		MatsimPopulationReader origPopReader = new PopulationReader(new SharedNetScenario(bigNetScenario, unroutedWholePop));
+		MatsimReader origPopReader = new PopulationReader(new SharedNetScenario(bigNetScenario, unroutedWholePop));
 		origPopReader.readFile(unroutedWholePlansFile);
 
 		PopGeoFilter popGeoFilter = new PopGeoFilter(wholeRoutedPop, popGeoFilterOut, unroutedWholePop, bigNetScenario.getNetwork(), minXY, maxXY);
@@ -115,7 +115,7 @@ public class DeriveSmallScenarioFromBigOne {
 
 		final Population plans = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
-		final MatsimPopulationReader plansReader = new PopulationReader(scenario);
+		final MatsimReader plansReader = new PopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
 		StreamingUtils.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));

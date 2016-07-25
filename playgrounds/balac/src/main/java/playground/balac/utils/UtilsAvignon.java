@@ -4,9 +4,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -18,7 +18,7 @@ public class UtilsAvignon {
 	 * @param args
 	 */
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	MatsimPopulationReader populationReader = new PopulationReader(scenario);
+	MatsimReader populationReader = new PopulationReader(scenario);
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	double centerX = 683217.0;  //Belvue coordinates
 	double centerY = 247300.0;

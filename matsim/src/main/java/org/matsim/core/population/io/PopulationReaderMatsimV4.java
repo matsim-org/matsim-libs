@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -59,7 +60,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-/* package */class PopulationReaderMatsimV4 extends MatsimXmlParser implements MatsimPopulationReader {
+/* package */class PopulationReaderMatsimV4 extends MatsimXmlParser implements MatsimReader {
 
 	/* package */final static String PLANS = "plans";
 	/* package */final static String PERSON = "person";

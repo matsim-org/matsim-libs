@@ -21,11 +21,11 @@
 package playground.balmermi.datapuls;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -64,7 +64,7 @@ public class CBPopulationPreparation {
 //		final Population population = (Population) scenario.getPopulation();
 		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
 		StreamingUtils.setIsStreaming(population, true);
-		MatsimPopulationReader plansReader = new PopulationReader(scenario);
+		MatsimReader plansReader = new PopulationReader(scenario);
 		PopulationWriter plansWriter = new PopulationWriter(null, scenario.getNetwork());
 		plansWriter.startStreaming(args[1].trim());
 

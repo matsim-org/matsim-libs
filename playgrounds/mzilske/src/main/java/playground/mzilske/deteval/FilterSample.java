@@ -10,11 +10,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -55,7 +55,7 @@ public class FilterSample {
 		Population filterpop = (Population) filtersc.getPopulation();
 		StreamingUtils.setIsStreaming(filterpop, true);
 		
-		final MatsimPopulationReader plansReader = new PopulationReader(filtersc);
+		final MatsimReader plansReader = new PopulationReader(filtersc);
 		
 		StreamingUtils.addAlgorithm(filterpop, new PersonAlgorithm() {
 		

@@ -22,11 +22,11 @@ package playground.wrashid.parkingSearch.planLevel.initDemand;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,7 +57,7 @@ public class PlanGeneratorWithParkingActivities {
 
 		this.closestParkingMatrix = new ClosestParkingMatrix(scenario.getActivityFacilities(), network);
 
-		MatsimPopulationReader popReader = new PopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(inputPlansFilePath);
 	}
 

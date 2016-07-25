@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -70,7 +70,7 @@ public class MembershipMain
     new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 
     log.info("  reading file " + this.plansfilePath);
-    MatsimPopulationReader plansReader = new PopulationReader(this.scenario);
+    MatsimReader plansReader = new PopulationReader(this.scenario);
     plansReader.readFile(this.plansfilePath);
   }
 

@@ -122,9 +122,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "	<param name=\"BrainExpBeta\" value=\"1.0\" />");
 			log.log( lvl, "</module>");
 		}
-		
-		// === planCalcScore:
-		
+				
 		// added apr'15:
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 			if ( PtConstants.TRANSIT_ACTIVITY_TYPE.equals( params.getActivityType() ) ) {
@@ -209,7 +207,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
 		}
 		
-		// qsim:
+		// === qsim:
 		
 		// added jun'16
 		if ( config.qsim().getUsePersonIdForMissingVehicleId() ) {
@@ -228,6 +226,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		switch( config.qsim().getTrafficDynamics() ) {
 		case withHoles:
 			break;
+		case queue:
 		default:
 			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
 					+ TrafficDynamics.withHoles + "'." ) ;

@@ -6,9 +6,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -21,7 +21,7 @@ public class AnalyseShoppingBehaviour {
 
 	public void run(String plansFilePath, String networkFilePath, String facilitiesfilePath, String  facilitiesfilePath1) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader populationReader = new PopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);

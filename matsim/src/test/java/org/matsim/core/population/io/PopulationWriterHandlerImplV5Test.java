@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReaderMatsimV5;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -160,7 +160,7 @@ public class PopulationWriterHandlerImplV5Test {
 		Assert.assertEquals("wrong distance", dist, route2.getDistance(), 1e-9);
 	}
 
-	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements MatsimPopulationReader {
+	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements MatsimReader {
 		private final MatsimXmlParser delegate;
 		/*package*/ String interceptedRouteContent = null;
 

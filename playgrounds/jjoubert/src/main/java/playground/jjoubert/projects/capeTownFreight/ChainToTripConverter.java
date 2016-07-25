@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -82,7 +82,7 @@ public class ChainToTripConverter {
 		LOG.info("Reading the population whose selected plans will be converted to trips...");
 		/* Read the population. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new PopulationReader(sc);
+		MatsimReader pr = new PopulationReader(sc);
 		pr.readFile(input);
 		LOG.info("Done reading the population.");
 		Counter counter = new Counter("  person # ");

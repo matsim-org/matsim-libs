@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -40,7 +41,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -59,7 +59,7 @@ public class QSim2CASimConverter {
 		NetworkWriter nw = new NetworkWriter(sc.getNetwork());
 		nw.write(outputDir + "/network.xml.gz");
 
-		MatsimPopulationReader pr = new PopulationReader(sc);
+		MatsimReader pr = new PopulationReader(sc);
 		pr.readFile(inputDir + "/ITERS/it.0/0.plans.xml.gz");
 		convertPlans(sc.getPopulation());
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation(),

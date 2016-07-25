@@ -8,13 +8,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
@@ -50,7 +50,7 @@ public class Analyzer {
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);
 		schedReader.readFile(config.getParam("transit", "transitScheduleFile"));
 		
-		MatsimPopulationReader popReader = new PopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(config.getParam("plans", "inputPlansFile"));
 		
 		EventsManager events = new EventsManagerImpl();

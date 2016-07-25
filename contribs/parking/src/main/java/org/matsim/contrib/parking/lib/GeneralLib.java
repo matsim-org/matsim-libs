@@ -64,6 +64,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -72,7 +73,6 @@ import org.matsim.core.network.io.KmlNetworkWriter;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
@@ -113,7 +113,7 @@ public class GeneralLib {
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		MatsimPopulationReader popReader = new PopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(plansFile);
 
 		return scenario;

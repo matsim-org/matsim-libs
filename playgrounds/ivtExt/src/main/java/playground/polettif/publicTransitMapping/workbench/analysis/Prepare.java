@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -32,7 +33,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.*;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -170,7 +170,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader reader = new PopulationReader(sc);
+		MatsimReader reader = new PopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}
@@ -183,7 +183,7 @@ public class Prepare {
 		this.vehicles = ScheduleTools.readVehicles(inputVehicles);
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader reader = new PopulationReader(sc);
+		MatsimReader reader = new PopulationReader(sc);
 		reader.readFile(inputPopulation);
 		this.population = sc.getPopulation();
 	}

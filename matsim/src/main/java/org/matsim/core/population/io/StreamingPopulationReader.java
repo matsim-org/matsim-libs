@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -38,7 +39,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public final class StreamingPopulationReader implements MatsimPopulationReader {
+public final class StreamingPopulationReader implements MatsimReader {
 	private static final Logger log = Logger.getLogger(StreamingPopulationReader.class);
 	
 	private PopulationReader reader ;

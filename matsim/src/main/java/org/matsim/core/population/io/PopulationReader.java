@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.population.io.StreamingPopulationReader.StreamingPopulation;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -37,7 +38,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class PopulationReader extends MatsimXmlParser implements MatsimPopulationReader {
+public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 
 	private final static String PLANS    = "plans.dtd"; // a special, inofficial case, handle it like plans_v0
 	private final static String PLANS_V0 = "plans_v0.dtd";

@@ -7,9 +7,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -20,7 +20,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class TravelDistanceGrocery {
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	MatsimPopulationReader populationReader = new PopulationReader(scenario);
+	MatsimReader populationReader = new PopulationReader(scenario);
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	public void run(String plansFilePath, String networkFilePath) throws IOException {
 		populationReader.readFile(plansFilePath);

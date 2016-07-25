@@ -13,10 +13,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -54,7 +54,7 @@ public class ScenarioCut {
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);
 		schedReader.readFile(schedFile);
 		
-		MatsimPopulationReader popReader = new PopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(popFile);
 		
 		logger.info("Loading geometry...");

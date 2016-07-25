@@ -3,9 +3,9 @@ package playground.balac.utils;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -24,7 +24,7 @@ public class FreeFloatingMembership {
 		new ObjectAttributesXmlReader(bla).readFile(args[0]);
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader populationReader = new PopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		populationReader.readFile(args[1]);
 		int goal = 6250;
 		int number = 0;

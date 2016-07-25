@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.MatsimPopulationReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
@@ -61,7 +61,7 @@ public class MatsimIo {
 		Scenario scenario = new ScenarioBuilder( ConfigUtils.createConfig() ).setNetwork(network).build() ;
 		Population plans = scenario.getPopulation();
 		log.info("  reading plans xml file... ");
-		MatsimPopulationReader plansReader = new PopulationReader(scenario);
+		MatsimReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(filename);
 		log.info("  done");
 		return plans;
