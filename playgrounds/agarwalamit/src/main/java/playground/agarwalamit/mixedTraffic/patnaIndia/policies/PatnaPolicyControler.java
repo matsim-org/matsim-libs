@@ -55,8 +55,8 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 
 public class PatnaPolicyControler {
 	
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/bau/";
-	private static String configFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/input/config.xml.gz";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/baseCaseCtd/";
+	private static String configFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/input/configBaseCaseCtd.xml";
 	private static boolean applyTrafficRestrain = false;
 	private static boolean addBikeTrack = false;
 	
@@ -75,7 +75,7 @@ public class PatnaPolicyControler {
 		config.controler().setOutputDirectory(outputDir);
 				
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		// policies if any
 		if (applyTrafficRestrain ) {
