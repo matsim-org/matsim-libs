@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
-import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
@@ -41,6 +40,7 @@ import org.matsim.core.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -99,7 +99,7 @@ public class PlansPrepare {
 		StreamingPopulationReader reader = new StreamingPopulationReader( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ) ;
 		StreamingUtils.setIsStreaming(reader, true);
 
-		PopulationWriter writer = new PopulationWriter(null, this.scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(null, this.scenario.getNetwork());
 		writer.startStreaming(toFile);
 
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInterest, network);
@@ -123,7 +123,7 @@ public class PlansPrepare {
 //		Population reader = (Population) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		StreamingUtils.setIsStreaming(reader, true);
-		final PopulationWriter plansWriter = new PopulationWriter(null, this.scenario.getNetwork(), percentage);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, this.scenario.getNetwork(), percentage);
 		plansWriter.startStreaming(toFile);
 		reader.addAlgorithm(plansWriter);
 		

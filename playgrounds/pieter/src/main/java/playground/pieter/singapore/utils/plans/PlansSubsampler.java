@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 
 class PlansSubsampler {
@@ -14,7 +14,7 @@ class PlansSubsampler {
 	public void run(Scenario s, String fileName, double samplingProbability) {
 		Population plans = (Population) s.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
-		PopulationWriter pw = new PopulationWriter(
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(
 				plans, s.getNetwork());
 		pw.startStreaming(fileName);
 		System.out.println("    running " + this.getClass().getName()

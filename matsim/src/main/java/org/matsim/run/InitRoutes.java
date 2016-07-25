@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -34,10 +32,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
@@ -140,7 +136,7 @@ public class InitRoutes {
 
 //		StreamingUtils.setIsStreaming(reader, true);
 //		final PopulationReader plansReader = new StreamingPopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(null, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, network);
 		Gbl.assertNotNull(this.plansfile);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());

@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,7 +46,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -154,7 +153,7 @@ public class MATSimUtils {
 		StreamingUtils.setIsStreaming(plans, true);
 		
 		final MatsimReader plansReader = new PopulationReader(this.scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
 		
 
 		StreamingUtils.addAlgorithm(plans, plansWriter);

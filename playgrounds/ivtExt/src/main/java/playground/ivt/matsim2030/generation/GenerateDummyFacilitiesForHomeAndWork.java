@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -68,7 +68,7 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 		StreamingUtils.setIsStreaming(population, true);
 		final ActivityFacilities facilities = scenario.getActivityFacilities();
 
-		final PopulationWriter writer = new PopulationWriter( null );
+		final StreamingPopulationWriter writer = new StreamingPopulationWriter( null );
 		writer.startStreaming( outputPopFile );
 
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );

@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -18,7 +18,7 @@ public class PopulationWriterTask implements PersonSink {
 
     private Population reader;
 
-	private PopulationWriter populationWriter;
+	private StreamingPopulationWriter populationWriter;
 
 	private final Network network;
 	
@@ -34,7 +34,7 @@ public class PopulationWriterTask implements PersonSink {
 //		reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 		StreamingUtils.setIsStreaming(reader, true);
-		populationWriter = new PopulationWriter(null, network);
+		populationWriter = new StreamingPopulationWriter(null, network);
 		final PersonAlgorithm algo = populationWriter;
 		reader.addAlgorithm(algo);
 		populationWriter.startStreaming(filename);

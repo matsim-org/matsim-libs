@@ -23,16 +23,14 @@ package playground.balmermi.census2000v2;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -93,7 +91,7 @@ public class PopulationSample {
 //		Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 		StreamingUtils.setIsStreaming(reader, true);
-		PopulationWriter pop_writer = new PopulationWriter(null, scenario.getNetwork());
+		StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(null, scenario.getNetwork());
 		pop_writer.startStreaming(null);
 		final PersonAlgorithm algo = pop_writer;//config.plans().getOutputFile());
 		reader.addAlgorithm(algo);

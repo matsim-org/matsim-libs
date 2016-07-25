@@ -30,8 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -68,7 +68,7 @@ public class PopulationMerger {
 	private String outputFileName = "mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 //	private String outputFileName = "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 
-	private PopulationWriter populationWriter;
+	private StreamingPopulationWriter populationWriter;
 	
 	protected static CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
 
@@ -85,7 +85,7 @@ public class PopulationMerger {
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
 		StreamingUtils.setIsStreaming(reader, true);
-		populationWriter = new PopulationWriter(null, scenario.getNetwork());
+		populationWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
 		final PersonAlgorithm algo = populationWriter;
 		reader.addAlgorithm(algo);
 		populationWriter.startStreaming(outputPath + outputFileName);

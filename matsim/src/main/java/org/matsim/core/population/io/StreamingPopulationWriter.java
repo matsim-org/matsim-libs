@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public final class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter {
+public final class StreamingPopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 
 	private final double write_person_fraction;
 
@@ -52,16 +52,16 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
-	private final static Logger log = Logger.getLogger(PopulationWriter.class);
+	private final static Logger log = Logger.getLogger(StreamingPopulationWriter.class);
 	
 	
-	public PopulationWriter(final Population population) {
+	public StreamingPopulationWriter(final Population population) {
 		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
 		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this(population, null, 1.0);
 	}
 
-	public PopulationWriter(
+	public StreamingPopulationWriter(
 			final CoordinateTransformation coordinateTransformation,
 			final Population population) {
 		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
@@ -77,13 +77,13 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 *
 	 * @param population the population to write to file
 	 */
-	public PopulationWriter(final Population population, final Network network) {
+	public StreamingPopulationWriter(final Population population, final Network network) {
 		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
 		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
 		this(population, network, 1.0);
 	}
 
-	public PopulationWriter(
+	public StreamingPopulationWriter(
 			final CoordinateTransformation coordinateTransformation,
 			final Population population,
 			final Network network) {
@@ -102,7 +102,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(
+	public StreamingPopulationWriter(
 			final CoordinateTransformation coordinateTransformation,
 			final Population population,
 			final Network network,
@@ -125,7 +125,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(
+	public StreamingPopulationWriter(
 			final Population population,
 			final Network network,
 			final double fraction) {
@@ -178,13 +178,77 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	}
 
 
-	private  final void writePersons() {
+	// implementation of PersonAlgorithm
+	// this is primarily to use the PlansWriter with filters and other algorithms.
+	public final void startStreaming(final String filename) {
+//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+//		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+	// write the file head if it is used with streaming.
+			writeStartPlans(filename);
+//		} else {
+//			log.error("Cannot start streaming. Streaming must be activated in the Population.");
+//		}
+	}
+
+	@Override
+	public final void run(final Person person) {
+		writePerson(person);
+	}
+
+	public final void closeStreaming() {
+//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
+//		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+			if (this.writer != null) {
+				writeEndPlans();
+			} else {
+				log.error("Cannot close streaming. File is not open.");
+			}
+//		} else {
+//			log.error("Cannot close streaming. Streaming must be activated in the Population.");
+//		}
+	}
+
+	public final void writeStartPlans(final String filename) {
+		Population fakepop = new Population(){
+			@Override public PopulationFactory getFactory() {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public String getName() {
+				return "population written from streaming" ;
+			}
+			@Override public void setName(String name) {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public Map<Id<Person>, ? extends Person> getPersons() {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public void addPerson(Person p) {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public Person removePerson(Id<Person> personId) {
+				throw new RuntimeException("not implemented") ;
+			}
+			@Override public ObjectAttributes getPersonAttributes() {
+				throw new RuntimeException("not implemented") ;
+			}
+		} ;
+		try {
+			this.openFile(filename);
+			this.handler.writeHeaderAndStartElement(this.writer);
+			this.handler.startPlans(fakepop, this.writer);
+			this.handler.writeSeparator(this.writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public final void writePersons() {
 		for (Person p : PopulationUtils.getSortedPersons(this.population).values()) {
 			writePerson(p);
 		}
 	}
 
-	private final void writePerson(final Person person) {
+	public final void writePerson(final Person person) {
 		try {
 			if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
 				return;
@@ -194,6 +258,15 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public final void writeEndPlans() {
+		try {
+			this.handler.endPlans(this.writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		this.close();
 	}
 
 	public final void writeV0(final String filename) {
@@ -212,7 +285,6 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	}
 
 	public final BufferedWriter getWriter() {
-		// yyyyyy public?  why?  kai, jul'16
 		return this.writer;
 	}
 

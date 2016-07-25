@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -56,7 +55,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -105,7 +104,7 @@ public class RunAnalyses {
 		Population pop = (Population) s.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
 
-		PopulationWriter writer = new PopulationWriter(pop, s.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(pop, s.getNetwork());
 		writer.startStreaming("selectedPlansOnly.xml.gz");
 		StreamingUtils.addAlgorithm(pop, new PersonFilterSelectedPlan());
 		final PersonAlgorithm algo = writer;

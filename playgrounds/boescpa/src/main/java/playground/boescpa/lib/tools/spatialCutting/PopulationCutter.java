@@ -40,7 +40,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -102,7 +102,7 @@ public class PopulationCutter {
 
         log.info(" Setting up population objects...");
         StreamingUtils.setIsStreaming(population, true);
-        PopulationWriter pop_writer = new PopulationWriter(population, scenario.getNetwork());
+        StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(population, scenario.getNetwork());
         pop_writer.startStreaming(populationOutputFile);
         MatsimReader pop_reader = new PopulationReader(scenario);
 

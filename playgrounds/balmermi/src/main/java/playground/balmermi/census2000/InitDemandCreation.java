@@ -22,16 +22,15 @@ package playground.balmermi.census2000;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -116,7 +115,7 @@ public class InitDemandCreation {
 //		Population sReader = (Population) scenario.getPopulation();
 		StreamingPopulationReader sReader = new StreamingPopulationReader( scenario ) ;
 		StreamingUtils.setIsStreaming(sReader, true);
-		PopulationWriter plansWriter = new PopulationWriter(null, scenario.getNetwork());
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 //		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

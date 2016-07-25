@@ -36,6 +36,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -76,7 +77,7 @@ public class PlansRemover {
 		Population pop = (Population)scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
 		StreamingUtils.addAlgorithm(pop, new PersonRemovePlans(pids));
-		PopulationWriter writer = new PopulationWriter(pop,scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(pop,scenario.getNetwork());
 		writer.startStreaming(outputBase+"/plans.tmp.xml.gz");
 		final PersonAlgorithm algo = writer;
 		StreamingUtils.addAlgorithm(pop, algo);

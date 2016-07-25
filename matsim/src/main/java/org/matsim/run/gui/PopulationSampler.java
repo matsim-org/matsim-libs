@@ -24,9 +24,8 @@ import javax.swing.SpinnerNumberModel;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -202,10 +201,10 @@ public final class PopulationSampler extends JFrame {
 		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
 		StreamingUtils.setIsStreaming(reader, true);
 		
-		PopulationWriter writer = null;
+		StreamingPopulationWriter writer = null;
 		try {
 		
-			writer = new PopulationWriter(null, null, samplesize);
+			writer = new StreamingPopulationWriter(null, null, samplesize);
 			writer.startStreaming(outputPopulationFile.getAbsolutePath());
 			final PersonAlgorithm algo = writer;
 			

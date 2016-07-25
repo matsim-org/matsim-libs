@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -70,7 +70,7 @@ final class RunPopulationStreamingExample {
 		reader.addAlgorithm( new RemoveUnselectedPlans() ) ;
 
 		// --- add writing the population needs to be explicitly added!:
-		final PopulationWriter writer = new PopulationWriter( null );
+		final StreamingPopulationWriter writer = new StreamingPopulationWriter( null );
 		// with current design, PopulationWriter(...) minimally demands a population.  Which can, however, be null when used for streaming.
 		
 		writer.startStreaming(outputPopFile);
