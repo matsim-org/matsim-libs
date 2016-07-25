@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.network.PatnaBikeTrackGenerator;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -38,9 +38,13 @@ public final class PatnaBikeTrackCreator {
 
 	public static void run(Network network){
 
-		PatnaBikeTrackGenerator bikeTrack = new PatnaBikeTrackGenerator();
-		bikeTrack.process();
-		Network bikeNetwork = bikeTrack.getNetwork();
+//		PatnaBikeTrackGenerator bikeTrack = new PatnaBikeTrackGenerator();
+//		bikeTrack.process();
+		
+		// is using with cluster, provide bike track network.
+//		String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
+		String bikeTrack = "/net/ils4/agarwal/patnaIndia/run108/input/bikeTrack.xml.gz";
+		Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(bikeTrack).getNetwork();
 
 		// put everything to the original network
 		for (Node n : bikeNetwork.getNodes().values()){
