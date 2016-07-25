@@ -488,7 +488,7 @@ public class KTFreight_v3 {
 				}
 				{
 					NetworkChangeEvent event = new NetworkChangeEvent(10*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
 					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
@@ -502,7 +502,7 @@ public class KTFreight_v3 {
 				}
 				{
 					NetworkChangeEvent event = new NetworkChangeEvent(19*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
 					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);

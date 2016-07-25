@@ -210,8 +210,9 @@ public final class LinkActivityCalculationFromEventsMain {
 				}
 			}
 		});
-		new PopulationReader(sc).readFile(plansFile);
-		reader.runAlgorithms();
+//		new PopulationReader(sc).readFile(plansFile);
+//		reader.runAlgorithms();
+		reader.readFile(plansFile);
 		log.info("finished (load scenario-data).");
 		return sc;
 	}

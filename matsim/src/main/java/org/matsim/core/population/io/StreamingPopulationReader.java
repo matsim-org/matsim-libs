@@ -63,41 +63,11 @@ public final class StreamingPopulationReader implements MatsimPopulationReader {
 	Population getStreamingPopulation() {
 		return pop ;
 	}
-	@Override
-	public void readFile(String filename) {
-//		for ( PersonAlgorithm algo : personAlgos ) {
-//			algo.initialize() ;
-//		}
-		reader.readFile(filename);
-//		for ( PersonAlgorithm algo : personAlgos ) {
-//			algo.finalize() ;
-//		}
-	}
-	public void parse(String filename) {
+	@Override public void readFile(String filename) {
 		reader.readFile(filename);
 	}
 	public void parse(InputStream is) {
 		reader.parse(is);
-	}
-
-
-	@SuppressWarnings("static-method")
-	public void runAlgorithms() {
-		throw new RuntimeException("need to call the readFile method.  need the output filename for that") ;
-//		if (!this.isStreaming) {
-//			for (PersonAlgorithm algo : this.personAlgos) {
-//				log.info("running algorithm " + algo.getClass().getName());
-//				Counter cntr = new Counter(" person # ");
-//				for (Person person : this.getPersons().values()) {
-//					cntr.incCounter();
-//					algo.run(person);
-//				}
-//				cntr.incCounter();
-//				log.info("done running algorithm.");
-//			}
-//		} else {
-//			log.info("Plans-Streaming is on. Algos were run during parsing");
-//		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -132,10 +102,8 @@ public final class StreamingPopulationReader implements MatsimPopulationReader {
 			throw new RuntimeException("streaming == false currently not supported with this approach; see log statements" ) ;
 		}
 	}
-	@Override
-	public final String toString() {
-		return 
-				"[nof_plansalgos=" + this.personAlgos.size() + "]";
+	@Override public final String toString() {
+		return "[nof_plansalgos=" + this.personAlgos.size() + "]";
 	}
 
 	final class StreamingPopulation implements Population {
@@ -147,9 +115,6 @@ public final class StreamingPopulationReader implements MatsimPopulationReader {
 		
 		@Override
 		public final void addPerson(final Person p) {
-			// yyyyyy do we really need this?  It makes replacing the population impossible.  Also, does it make a lot of sense?
-			// pop.getPerson( current ) will then work, but pop.getPerson( other ) will not work.  Might be better to just get rid of this
-			// completely, no?  kai, jul'16
 			
 			
 			cnt++ ;
@@ -164,6 +129,9 @@ public final class StreamingPopulationReader implements MatsimPopulationReader {
 				 * with "agent = population.getPersons().get(personId);"
 				 * remove it after running the algorithms! */
 				delegate.addPerson(p);
+				// (yyyyyy do we really need this?  Also, does it make a lot of sense?
+				// pop.getPerson( current ) will then work, but pop.getPerson( other ) will not work.  Might be better to just get rid of this
+				// completely, no?  kai, jul'16)
 
 				// run algos
 				for (PersonAlgorithm algo : personAlgos) {

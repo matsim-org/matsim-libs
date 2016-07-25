@@ -57,7 +57,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 		 
 		 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 		 change.addLink(link2);
-		 change.setFlowCapacityChange((new ChangeValue(ChangeType.ABSOLUTE, 500.0/3600.0)));
+		 change.setFlowCapacityChange((new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 500.0/3600.0)));
 		 addNetworkChangeEvent(change);
 	}
 	public void printDelayStats(){

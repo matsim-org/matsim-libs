@@ -101,7 +101,7 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 		StreamingUtils.setIsStreaming(reader, true);
 		reader.addAlgorithm(new TransportModeAnalysis(infoFile));
 //		new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
-		reader.parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
+		reader.readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
 		PopulationUtils.printPlansCount(reader) ;
 		infoFile.close();
 		log.info("done");

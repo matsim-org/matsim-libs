@@ -36,7 +36,7 @@ import java.util.*;
 public final class NetworkChangeEvent {
 
 	public static enum ChangeType {
-		ABSOLUTE, FACTOR
+		ABSOLUTE_IN_SI_UNITS, FACTOR
 	}
 
 	public static class ChangeValue {

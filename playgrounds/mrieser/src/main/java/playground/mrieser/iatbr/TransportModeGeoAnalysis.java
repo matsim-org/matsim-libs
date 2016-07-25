@@ -151,7 +151,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			final PersonAlgorithm algo = analysis;
 			reader.addAlgorithm(algo);
 			new PopulationReader(scenario).readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
-			reader.parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
+			reader.readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
 			PopulationUtils.printPlansCount(reader) ;
 			infoFile.close();
 			log.info("done");

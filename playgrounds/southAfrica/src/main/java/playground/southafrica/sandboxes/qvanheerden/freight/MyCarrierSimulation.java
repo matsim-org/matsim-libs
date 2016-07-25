@@ -148,7 +148,7 @@ public class MyCarrierSimulation {
 				{//morning peak starts
 					NetworkChangeEvent event = new NetworkChangeEvent(amStart*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
 					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
@@ -157,7 +157,7 @@ public class MyCarrierSimulation {
 				{//morning peak ends
 					NetworkChangeEvent event = new NetworkChangeEvent(amEnd*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 //					ni.addNetworkChangeEvent(event);
 //					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 //					events.add(event);
@@ -165,7 +165,7 @@ public class MyCarrierSimulation {
 				{//afternoon peak starts
 					NetworkChangeEvent event = new NetworkChangeEvent(pmStart*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 //					ni.addNetworkChangeEvent(event);
 //					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 //					events.add(event);
@@ -173,7 +173,7 @@ public class MyCarrierSimulation {
 				{//afternoon peak ends
 					NetworkChangeEvent event = new NetworkChangeEvent(pmEnd*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
 					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);

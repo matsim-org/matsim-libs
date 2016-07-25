@@ -51,28 +51,28 @@ public class MyTimeDependentNetworkGenerator {
 			if ( speed > threshold ) {
 				{//morning peak starts
 					NetworkChangeEvent event = new NetworkChangeEvent(amStart*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);
 				}
 				{//morning peak ends
 					NetworkChangeEvent event = new NetworkChangeEvent(amEnd*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);
 				}
 				{//afternoon peak starts
 					NetworkChangeEvent event = new NetworkChangeEvent(pmStart*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);
 				}
 				{//afternoon peak ends
 					NetworkChangeEvent event = new NetworkChangeEvent(pmEnd*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);

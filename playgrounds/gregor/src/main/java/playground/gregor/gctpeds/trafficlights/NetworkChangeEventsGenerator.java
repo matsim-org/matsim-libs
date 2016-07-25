@@ -54,7 +54,7 @@ public class NetworkChangeEventsGenerator {
 		for (double time = 6*3600; time < 20*3600; time += green) {
 			{
 				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, 0.01);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.01);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(0)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(2)));
@@ -63,7 +63,7 @@ public class NetworkChangeEventsGenerator {
 			time += red;
 			{
 				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, AbstractCANetwork.V_HAT);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, AbstractCANetwork.V_HAT);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(0)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(2)));
@@ -74,7 +74,7 @@ public class NetworkChangeEventsGenerator {
 		for (double time = 6*3600; time < 20*3600; time += red) {
 			{
 				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE,  AbstractCANetwork.V_HAT);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS,  AbstractCANetwork.V_HAT);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(494)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(470)));
@@ -83,7 +83,7 @@ public class NetworkChangeEventsGenerator {
 			time += green;
 			{
 				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE,0.01);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS,0.01);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(494)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(470)));

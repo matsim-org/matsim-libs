@@ -77,7 +77,7 @@ public class ExclusiveChangeableNetworkCreator {
 					nce.addLink(l);
 					double newFreespeed = length / newTravelTime;
 					if (newFreespeed < MINIMUMFREESPEED) newFreespeed = MINIMUMFREESPEED;
-					ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, newFreespeed);
+					ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, newFreespeed);
 					nce.setFreespeedChange(freespeedChange);
 					
 					

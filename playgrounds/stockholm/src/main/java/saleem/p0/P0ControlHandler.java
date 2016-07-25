@@ -80,12 +80,12 @@ public class P0ControlHandler implements BasicEventHandler{
 		 if(iter==0){
 			 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 			 change.addLink(link2);
-			 change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
+			 change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity2/3600));
 			 events.add(change);
 			 
 			 NetworkChangeEvent change1 = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 			 change1.addLink(link4);
-			 change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
+			 change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity4/3600));
 			 events.add(change1);
 			 
 			}
@@ -227,12 +227,12 @@ public class P0ControlHandler implements BasicEventHandler{
 				   		capacity4=capacity4-factor4;
 			   			NetworkChangeEvent change = new NetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
 						change.addLink(link2);
-						change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
+						change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity2/3600));
 						events.add(change);
 						
 						NetworkChangeEvent change1 = new NetworkChangeEvent(time+Math.random()/10000);
 						change1.addLink(link4);
-						change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
+						change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity4/3600));
 						events.add(change1);
 			   		}
 		   }
@@ -242,12 +242,12 @@ public class P0ControlHandler implements BasicEventHandler{
 		   	   		capacity4=capacity4+factor4;
 		   			NetworkChangeEvent change = new NetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
 					change.addLink(link2);
-					change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
+					change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity2/3600));
 					events.add(change);
 					
 					NetworkChangeEvent change1 = new NetworkChangeEvent(time+Math.random()/10000);
 					change1.addLink(link4);
-					change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
+					change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity4/3600));
 					events.add(change1);
 		   		}
 		   }

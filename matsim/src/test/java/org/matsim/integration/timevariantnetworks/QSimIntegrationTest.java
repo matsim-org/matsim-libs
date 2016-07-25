@@ -87,7 +87,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
 		change.addLink(link2);
-		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
+		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
 		final NetworkChangeEvent event = change;
 		NetworkUtils.addNetworkChangeEvent(((Network)network),event);
 

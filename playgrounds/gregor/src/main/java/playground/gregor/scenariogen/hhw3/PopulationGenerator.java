@@ -206,7 +206,7 @@ public class PopulationGenerator {
 							l.setLength(.26);
 							l.setFreespeed(0.5);
 							e.addLink(l);
-							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0);
+							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0);
 							e.setFlowCapacityChange(cv);
 //							ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.01);
 //							e.setFreespeedChange(cxv);
@@ -245,7 +245,7 @@ public class PopulationGenerator {
 						l.setLength(.26);
 						l.setFreespeed(0.5);
 						e.addLink(l);
-						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0);
+						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0);
 						e.setFlowCapacityChange(cv);
 //						ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.01);
 //						e.setFreespeedChange(cxv);
@@ -269,7 +269,7 @@ public class PopulationGenerator {
 					}
 					for (Link ll : l.getToNode().getOutLinks().values()){
 						if (CoordUtils.calcEuclideanDistance(to1, ll.getToNode().getCoord()) < 0.1){
-							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.5);
+							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.5);
 							e.setFlowCapacityChange(cv);
 //							ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 1.34);
 //							e.setFreespeedChange(cxv);
@@ -297,7 +297,7 @@ public class PopulationGenerator {
 					}
 					if (t2.contains(MGC.coord2Point(l.getToNode().getCoord()))) {
 						e.addLink(l);
-						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.5);
+						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.5);
 						e.setFlowCapacityChange(cv);
 //						ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 1.34);
 //						e.setFreespeedChange(cxv);

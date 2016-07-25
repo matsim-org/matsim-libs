@@ -75,14 +75,14 @@ public class ShockwaveExperiment {
 		double flowCapBefore = desiredLink.getCapacity();
 		{
 			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.) ;
-			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0)); 
+			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.0)); 
 			event.addLink(desiredLink);
 			final NetworkChangeEvent event1 = event;
 			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);
 		}
 		{
 			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.+60*5) ;
-			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
+			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(desiredLink);
 			final NetworkChangeEvent event1 = event;
 			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);

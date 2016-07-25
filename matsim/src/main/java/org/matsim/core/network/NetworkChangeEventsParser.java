@@ -207,7 +207,7 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 		if(typeStr != null && valueStr != null) {
 			double value = Double.parseDouble(valueStr);
 			if(typeStr.equalsIgnoreCase(ABSOLUTE_VALUE))
-				return new ChangeValue(ChangeType.ABSOLUTE, value);
+				return new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, value);
 			else if(typeStr.equalsIgnoreCase(FACTOR_VALUE))
 				return new ChangeValue(ChangeType.FACTOR, value);
 			else {

@@ -61,7 +61,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		final double [] responsesLink1 = {1.667, 1.667, 10., 10., 10., 10.};
     		NetworkChangeEvent event = new NetworkChangeEvent(1);
     		event.addLink(link1);
-    		event.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,10.));
+    		event.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,10.));
     		((TimeVariantLinkImpl)link1).applyEvent(event);
     
     		// link3 change event factor, undef. endtime
@@ -101,7 +101,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
+    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
     		link.applyEvent(change);
     
     		// do the tests
@@ -192,7 +192,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// - first a change event starting at 7am
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
+    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
     		link.applyEvent(change);
     		// - second, a change event starting at from 8am
     		NetworkChangeEvent change2 = new NetworkChangeEvent(8*3600.0);
@@ -202,7 +202,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// - third a change event starting at 10am
     		NetworkChangeEvent change3 = new NetworkChangeEvent(10*3600.0);
     		change3.addLink(link);
-    		change3.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 30));
+    		change3.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 30));
     		link.applyEvent(change3);
     
     		/* I would now expect the following speeds:
@@ -227,7 +227,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// - a change event starting 12am
     		NetworkChangeEvent change4 = new NetworkChangeEvent(12*3600.0);
     		change4.addLink(link);
-    		change4.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 40));
+    		change4.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 40));
     		link.applyEvent(change4);
     		// - a change event starting 11am
     		NetworkChangeEvent change5 = new NetworkChangeEvent(11*3600.0);
@@ -291,7 +291,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
+    		change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 2));
     		link.applyEvent(change);
     
     		// do the tests
@@ -329,7 +329,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, 2.0));
+    		change.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 2.0));
     		link.applyEvent(change);
     
     		// do the tests

@@ -76,7 +76,7 @@ public class ConfigIO
 					double time = Time.parseTime(timeString);
 					NetworkChangeEvent ev = new NetworkChangeEvent(time);
 					 ev.setFreespeedChange(new
-					 ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+					 ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0));
 //					ev.setFlowCapacityChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
 
 					ev.addLink(scenario.getNetwork().getLinks().get(currentId));
