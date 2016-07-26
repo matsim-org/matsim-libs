@@ -131,7 +131,7 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac: parkingFacilitiesAtLink){
 			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
-			if (this.occupation.get(fac).doubleValue()<=cap) {
+			if (this.occupation.get(fac).doubleValue()<cap) {
 //				Logger.getLogger(getClass()).info("occ: "+this.occupation.get(fac).toString()+" cap: "+cap);
 				this.occupation.get(fac).increment();
 				this.parkingReservation.put(vid, fac);
