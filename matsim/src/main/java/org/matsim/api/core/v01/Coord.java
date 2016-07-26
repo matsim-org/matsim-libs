@@ -60,16 +60,16 @@ public final class Coord implements Serializable, Lockable {
 //		this.x = x;
 //	}
 
-	public void setY(final double y) {
-		testForLocked() ;
-		this.y = y;
-	}
+//	public void setY(final double y) {
+//		testForLocked() ;
+//		this.y = y;
+//	}
 
-	public void setXY(final double x, final double y) {
-		testForLocked() ;
-		this.x = x;
-		this.y = y;
-	}
+//	public void setXY(final double x, final double y) {
+//		testForLocked() ;
+//		this.x = x;
+//		this.y = y;
+//	}
 
 	@Override
 	public boolean equals(final Object other) {

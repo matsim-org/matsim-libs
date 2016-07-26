@@ -877,7 +877,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public /*final*/ Coord coord;
 		public final Map<String, String> tags = new HashMap<String, String>(4);
 
 		public OsmNode(final long id, final Coord coord) {
@@ -993,7 +993,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord = c ;
 						this.nodeCounter.incCounter();
 						this.currentNode = node;
 					}

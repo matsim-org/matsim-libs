@@ -55,7 +55,8 @@ public class DgPrognose2025Network2WGS84Converter {
 		Coord c = null;
 		for (Node n : sc.getNetwork().getNodes().values()){
 			c = transform.getTransformed(n.getCoord());
-			n.getCoord().setXY(c.getX(), c.getY());
+//			n.getCoord().setXY(c.getX(), c.getY());
+			n.setCoord(c);
 		}
 
 		NetworkWriter netWriter = new NetworkWriter(sc.getNetwork());

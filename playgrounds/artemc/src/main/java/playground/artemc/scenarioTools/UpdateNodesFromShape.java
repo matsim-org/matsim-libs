@@ -1,8 +1,10 @@
 package playground.artemc.scenarioTools;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -15,8 +17,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.util.Collection;
-import java.util.Map;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 
@@ -68,7 +70,8 @@ public class UpdateNodesFromShape {
 		    for (Property p :properties) {
 		    	System.out.println("Value: "+p.getValue().toString());
 		    	Node node = nodes.get(Id.create(p.getValue().toString(), Node.class));
-		    	node.getCoord().setXY(x, y);
+//		    	node.getCoord().setXY(x, y);
+		    	node.setCoord( new Coord( x,y ) );
 		    	System.out.println("Name: "+p.getName().toString());
 		    	System.out.println("Descriptor: "+p.getDescriptor().toString());
 		    	

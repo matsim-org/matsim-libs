@@ -103,7 +103,8 @@ public class TinyScenarioPreparator {
 				}
 					else if (pe instanceof Activity){
 						Coord c = dest.transform(((Activity) pe).getCoord());
-						((Activity) pe).getCoord().setXY(c.getX(), c.getY());
+//						((Activity) pe).getCoord().setXY(c.getX(), c.getY());
+						((Activity) pe).setCoord( c );
 					}
 				}
 			if	(clone){

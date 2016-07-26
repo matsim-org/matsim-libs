@@ -1054,7 +1054,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public /*final*/ Coord coord;
 		//		public final Map<String, String> Nodetags = new HashMap<String, String>(4);
 
 		//public final Map<String, String> NodeTags = new HashMap<String, String>(4);
@@ -1150,7 +1150,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 						double lon = Double.parseDouble(atts.getValue("lon"));
 
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord = c ;
 						this.nodeCounter.incCounter();
 					}
 				}

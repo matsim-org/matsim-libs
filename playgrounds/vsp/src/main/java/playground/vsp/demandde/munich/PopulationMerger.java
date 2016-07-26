@@ -164,7 +164,7 @@ public class PopulationMerger {
 				Activity act = (Activity) pe;
 				Coord wgs84Coord = act.getCoord();
 				Coord gk4Coord = wgs84ToDhdnGk4.transform(wgs84Coord);
-				act.getCoord().setXY(gk4Coord.getX(), gk4Coord.getY());
+				act.setCoord(gk4Coord ) ;
 			}
 		}
 	}

@@ -83,7 +83,8 @@ public class FilterPersonActs extends NewPopulation {
 					if(this.kmlOutputEnabled){
 						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
-					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+//					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+					act.setCoord( new Coord(this.coordBBI.getX(), this.coordBBI.getY()));
 					PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_SXF-BBI", Person.class) ) ;
 				}
 
@@ -96,7 +97,8 @@ public class FilterPersonActs extends NewPopulation {
 					if(this.kmlOutputEnabled){
 						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
-					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+//					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+					act.setCoord(new Coord(this.coordBBI.getX(), this.coordBBI.getY()));
 					PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_TXL-BBI", Person.class) ) ;
 				}
 			}

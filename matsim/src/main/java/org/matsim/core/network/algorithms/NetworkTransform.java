@@ -40,7 +40,8 @@ public class NetworkTransform implements NetworkRunnable {
 		for (Node n : network.getNodes().values()) {
 			Coord coord = n.getCoord();
 			Coord new_coord = transformer.transform(coord);
-			coord.setXY(new_coord.getX(), new_coord.getY());
+//			coord.setXY(new_coord.getX(), new_coord.getY());
+			n.setCoord(new_coord);
 		}
 	}
 }

@@ -243,7 +243,8 @@ public class ShapeConverterPopRandom {
 		Double firstx = firstAct.getCoord().getX();
 		Double firsty = firstAct.getCoord().getY();
 		Activity lastAct = (Activity) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
-		lastAct.getCoord().setXY(firstx, firsty);
+//		lastAct.getCoord().setXY(firstx, firsty);
+		lastAct.setCoord( new Coord( firstx, firsty ) );
 		
 		newPerson.addPlan(newPlan);
 		newPersons.add(newPerson);

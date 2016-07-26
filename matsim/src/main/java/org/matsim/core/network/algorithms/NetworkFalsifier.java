@@ -48,8 +48,8 @@ public class NetworkFalsifier implements NetworkRunnable {
 		double maxDistance = this.distance * 2.0;
 		for (Node node : network.getNodes().values()) {
 			Coord coord = node.getCoord();
-			coord.setXY(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  maxDistance,
-					coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance);
+			node.setCoord( new Coord(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  maxDistance,
+					coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance) ) ;
 		}
 
 		for (Link link : network.getLinks().values()) {

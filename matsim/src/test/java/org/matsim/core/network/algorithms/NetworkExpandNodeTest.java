@@ -157,7 +157,8 @@ public class NetworkExpandNodeTest {
 		Fixture f = new Fixture();
 		f.createNetwork_ThreeWayIntersection();
 		Coord c = f.scenario.getNetwork().getNodes().get(Id.create("3", Node.class)).getCoord();
-		f.scenario.getNetwork().getNodes().get(Id.create("1", Node.class)).getCoord().setXY(c.getX(), c.getY()); // move it on top of node 3
+//		f.scenario.getNetwork().getNodes().get(Id.create("1", Node.class)).getCoord().setXY(c.getX(), c.getY()); // move it on top of node 3
+		f.scenario.getNetwork().getNodes().get(Id.create("1", Node.class)).setCoord(c); // move it on top of node 3
 		
 		
 		NetworkExpandNode exp = new NetworkExpandNode(f.scenario.getNetwork(), 25, 5);

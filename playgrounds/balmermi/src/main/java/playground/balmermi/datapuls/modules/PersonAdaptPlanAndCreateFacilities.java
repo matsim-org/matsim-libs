@@ -115,7 +115,8 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 				if ( true ) throw new RuntimeException( "desires are gone and the behavior here can be reproduced with the classic config PlanCalcScore" );
 				
 				// reset coordinates
-				a.getCoord().setXY((int)a.getCoord().getX(),(int)a.getCoord().getY());
+//				a.getCoord().setXY((int)a.getCoord().getX(),(int)a.getCoord().getY());
+				a.setCoord( new Coord((int)a.getCoord().getX(),(int)a.getCoord().getY()));
 				
 				// create CB facilities (located outside of Switzerland)
 				if (a.getType().equals("tta") || a.getType().equals("home")) {
