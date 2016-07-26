@@ -69,9 +69,9 @@ public static void main(String[] args) throws IOException {
 	MatsimNetworkReader networkReaderToll = new MatsimNetworkReader(scenarioToll.getNetwork());
 	PopulationReader populationReaderToll = new PopulationReader(scenarioToll);
 
-	final BufferedWriter agentattributes = IOUtils.getBufferedWriter("C:\\Users\\balacm\\Downloads\\TRB/Analysis120716.txt");
+	final BufferedWriter agentattributes = IOUtils.getBufferedWriter("C:\\Users\\balacm\\Downloads\\TRB/Analysis250716.txt");
 	
-	agentattributes.write("personID Income VOT ScoreZero ScoreToll Deltascore Crossed UsedCar Inside Crossedafter UsedCarafter Insideafter HomeX Homey Sex Age WorkX WorkY CarUser CarUserafter Caravail TravelTime TravelTimeToll");
+	agentattributes.write("personID Income VOT ScoreZero ScoreToll Deltascore Crossed UsedCar Inside Crossedafter UsedCarafter Insideafter HomeX Homey Sex Age WorkX WorkY CarUser CarUserafter Caravail TravelTimeCar TravelTimeCarToll NumberCarTripsNoToll NumberCarTripsToll TotalTravelTime TotalTravelTimeToll");
 	agentattributes.newLine();
 	
 	networkReaderZero.readFile(args[2]);
@@ -88,88 +88,87 @@ public static void main(String[] args) throws IOException {
 	
 	//Iterate through households and get person id's and income
 	for(Person p : scenarioZero.getPopulation().getPersons().values()) {
-	mid = p.getId();
-	
-	int age = PersonUtils.getAge(p);
-	String sex = PersonUtils.getSex(p);
-	caravail = PersonUtils.getCarAvail(p);
-	boolean employed = PersonUtils.isEmployed(p);
-	Plan plan = p.getSelectedPlan();
-	scorezero = plan.getScore();
-	
+		mid = p.getId();
+		
+		int age = PersonUtils.getAge(p);
+		String sex = PersonUtils.getSex(p);
+		caravail = PersonUtils.getCarAvail(p);
+		boolean employed = PersonUtils.isEmployed(p);
+		Plan plan = p.getSelectedPlan();
+		scorezero = plan.getScore();
+		double totaltraveltimenotoll = 0.0;
+		double totaltraveltimetoll = 0.0;
+
 	
 	// go through the instances of the selected plan to check if the cordon was cross
 	// and if so with which mode
-	List<Activity> activities = TripStructureUtils.getActivities(plan, null);
-	             boolean previousInside = false;
-	             boolean first = true;
-	            
-	
-	             traveltime = 0;
-	             for (Activity a : activities) {
-	            	 String type= a.getType();
-	            	 
-	            int index = plan.getPlanElements().indexOf(a);
-	            if (plan.getPlanElements().size() > index + 1) {
-		            Leg leg = (Leg) plan.getPlanElements().get(index + 1);	 
-		            String modetime = leg.getMode();
-	            	if (modetime.equals("car")) {
-	            		traveltime = traveltime + leg.getTravelTime();
-	            	}
-	            }	 
-	            // get work location
-	            if (type.contains("work")){
-		            workx = a.getCoord().getX();
-		            worky = a.getCoord().getY();
-	             }
-	             // get home location
-	             
-	             if (type.equals("home")){
-		             homex = a.getCoord().getX();
-		             homey = a.getCoord().getY();
-	             }
-	                   
-	                    if (first) {
-	                          
-	                           previousInside = getPosition(a);
-	                           first = false;
-	                           if(previousInside){
-	                           inside = true;
-	                           }
-	                    }
-	                    else {
-	                          
-	                           boolean currentInside = getPosition(a);
-	                           //int index = plan.getPlanElements().indexOf(a);
-	                           
-	                           Leg previousLeg = (Leg) plan.getPlanElements().get(index - 1);
-	                           String mode = previousLeg.getMode();
-	                           if (mode.equals("car")) {
-	                               CarUser = true;
-	                          }
-	                          
-	                           if (previousInside != currentInside) {
-	                                inside = false; 
-	                                crossed = true;
-	                                  
-	                                  if (mode.equals("car")) {
-	                                       usedCar = true;
-	                                  }
-	                                       
-	                           }
-	                          
-	                    }
-	                    
-	                 //   if(first=false){
-	                 //   int index = plan.getPlanElements().indexOf(a);
-	                 //   Leg leg = (Leg) plan.getPlanElements().get(index - 1);
-	                 //   String mode = leg.getMode();
-	                    
-	                 //   if (mode.equals("car")) {
-	                 //       CarUser = true;
-	                 //  } 
-	                 // }
-	             }
+		List<Activity> activities = TripStructureUtils.getActivities(plan, null);
+         boolean previousInside = false;
+         boolean first = true;
+        
+
+         traveltime = 0;
+         
+         int countcarnotoll = 0;
+
+         for (Activity a : activities) {
+        	 String type= a.getType();
+        	 
+        int index = plan.getPlanElements().indexOf(a);
+        if (plan.getPlanElements().size() > index + 1) {
+            Leg leg = (Leg) plan.getPlanElements().get(index + 1);	 
+            
+            totaltraveltimenotoll += leg.getTravelTime();
+            String modetime = leg.getMode();
+        	if (modetime.equals("car")) {
+        		traveltime = traveltime + leg.getTravelTime();
+        		countcarnotoll++;
+        	}
+        }	 
+        // get work location
+        if (type.contains("work")){
+            workx = a.getCoord().getX();
+            worky = a.getCoord().getY();
+         }
+         // get home location
+         
+         if (type.equals("home")){
+             homex = a.getCoord().getX();
+             homey = a.getCoord().getY();
+         }
+               
+        if (first) {
+              
+               previousInside = getPosition(a);
+               first = false;
+               if(previousInside){
+               inside = true;
+               }
+        }
+        else {
+              
+               boolean currentInside = getPosition(a);
+               //int index = plan.getPlanElements().indexOf(a);
+               
+               Leg previousLeg = (Leg) plan.getPlanElements().get(index - 1);
+               String mode = previousLeg.getMode();
+               if (mode.equals("car")) {
+                   CarUser = true;
+              }
+              
+               if (previousInside != currentInside) {
+                    inside = false; 
+                    crossed = true;
+                      
+                      if (mode.equals("car")) {
+                           usedCar = true;
+                      }
+                           
+               }
+              
+        }                   
+               
+    }
 	            
 	            
 	            Person ptoll = scenarioToll.getPopulation().getPersons().get(mid);
@@ -181,14 +180,19 @@ public static void main(String[] args) throws IOException {
 	             first = true;
 	            
 	             traveltimetoll = 0;
+	             totaltraveltimetoll = 0.0;
+	             int countcartoll = 0;
 	             for (Activity atoll : activitiestoll) {
 	             
 	            	 int index = plantoll.getPlanElements().indexOf(atoll);
 	            	 if (plantoll.getPlanElements().size() > index + 1) {
 		                 Leg legtime = (Leg) plantoll.getPlanElements().get(index + 1);	 
+		                 totaltraveltimetoll += legtime.getTravelTime();
+
 		                 String modetime = legtime.getMode();
 		                 if (modetime.equals("car")) {
 		                     traveltimetoll = traveltimetoll + legtime.getTravelTime();
+		                     countcartoll++;
 		                 }
 	            	 }
 	                    if (first) {
@@ -231,7 +235,8 @@ public static void main(String[] args) throws IOException {
 	double deltascore = scoretoll - scorezero;
 	
 	
-	agentattributes.write(mid + " " + income + " " + vot + " " + scorezero + " " + scoretoll + " " + deltascore + " " + crossed + " " + usedCar + " " + inside + " " + crossedafter + " " + usedCarafter + " " + insideafter + " " + homex + " " + homey + " " + sex+ " " + age+ " " + workx+ " " + worky+ " " + CarUser+ " " + CarUserafter  + " " + employed  + " " + caravail  + " " + traveltime  + " " +  traveltimetoll );
+	agentattributes.write(mid + " " + income + " " + vot + " " + scorezero + " " + scoretoll + " " + deltascore + " " + crossed + " " + usedCar + " " + inside + " " + crossedafter + " " + usedCarafter + " " + insideafter + " " + homex + " " + homey + " " + sex+ " " + age+ " " + workx+ " " + worky+ " " + CarUser+ " " + CarUserafter
+			+ " " + employed  + " " + caravail  + " " + traveltime + " " + countcarnotoll  + " " +  traveltimetoll + " " + countcartoll + " " + totaltraveltimenotoll + " " + totaltraveltimetoll );
 	agentattributes.newLine();
 	crossed = false;
 	usedCar = false;
