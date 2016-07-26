@@ -23,7 +23,8 @@ public static void main(String[] args) {
 //       System.out.println("STARTED ...");
 	
 //	String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
-	String path = "/home/saleem/input/config.xml";
+//	String path = "/home/saleem/input/config.xml";
+	String path = "./ihop2/matsim-input/config - Opt.xml";
     Config config = ConfigUtils.loadConfig(path);
     final Scenario scenario = ScenarioUtils.loadScenario(config);
 	Controler controler = new Controler(scenario);
@@ -33,9 +34,9 @@ public static void main(String[] args) {
 	PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 	capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 	
-	Network network = scenario.getNetwork();
-	TransitSchedule schedule = scenario.getTransitSchedule();
-	new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
+//	Network network = scenario.getNetwork();
+//	TransitSchedule schedule = scenario.getTransitSchedule();
+//	new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 //	NetworkWriter networkWriter =  new NetworkWriter(network);
 //	networkWriter.write("/home/saleem/input/PseudoNetwork.xml");
 //	networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
