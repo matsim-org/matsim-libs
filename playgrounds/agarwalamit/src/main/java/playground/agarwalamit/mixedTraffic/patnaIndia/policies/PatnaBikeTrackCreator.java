@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -42,15 +44,20 @@ public final class PatnaBikeTrackCreator {
 //		bikeTrack.process();
 		
 		// is using with cluster, provide bike track network.
-//		String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
-		String bikeTrack = "/net/ils4/agarwal/patnaIndia/run108/input/bikeTrack.xml.gz";
+		String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
+		if ( ! new File(bikeTrack).exists()) bikeTrack = "/net/ils4/agarwal/patnaIndia/run108/input/bikeTrack.xml.gz"; 
+		
 		Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(bikeTrack).getNetwork();
 
 		// put everything to the original network
+		
 		for (Node n : bikeNetwork.getNodes().values()){
-			network.addNode(n);
+			// cant simply add the network because it also has information about in-/out- links from the node
+			// adding the same in- out- link will throw exception (while adding a link, in-/out-links are added to to-/from-nodes.)
+			Node nNew = network.getFactory().createNode(n.getId(), n.getCoord());
+			network.addNode(nNew);
 		}
-
+		
 		for (Link l: bikeNetwork.getLinks().values() ) {
 			network.addLink(l);
 		}
