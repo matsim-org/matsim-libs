@@ -8,16 +8,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-public class StopCoord extends Coord implements Clusterable {
+public class StopCoord implements Clusterable {
 
 	private static final long serialVersionUID = 1L;
 
 	//Attributes
 	private Id<TransitStopFacility> id;
+	private Coord coord ;
 
 	//Constructors
 	public StopCoord(double x, double y, Id<TransitStopFacility> id) {
-		super(x, y);
+		coord = new Coord(x,y) ;
 		this.id = id;
 	}
 
@@ -26,20 +27,24 @@ public class StopCoord extends Coord implements Clusterable {
 		return id;
 	}
 	public double distanceFrom(StopCoord p) {
-		return CoordUtils.calcEuclideanDistance(this, p);
+		return CoordUtils.calcEuclideanDistance(this.getCoord(), p.getCoord());
 	}
-	public StopCoord centroidOf(Collection<StopCoord> ps) {
+	public static StopCoord centroidOf(Collection<StopCoord> ps) {
 		double x=0, y=0;
 		for(StopCoord p:ps) {
-			x+=p.getX();
-			y+=p.getY();
+			x+=p.getCoord().getX();
+			y+=p.getCoord().getY();
 		}
 		return new StopCoord(x/ps.size(), y/ps.size(), null);
 	}
 
 	@Override
 	public double[] getPoint() {
-		return new double[] {getX(), getY()};
+		return new double[] {coord.getX(), coord.getY()};
+	}
+
+	final Coord getCoord() {
+		return this.coord;
 	}
 
 }

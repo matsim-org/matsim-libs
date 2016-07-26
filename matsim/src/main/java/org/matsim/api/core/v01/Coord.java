@@ -34,7 +34,7 @@ import org.matsim.core.scenario.Lockable;
  *   (0/0) ---->
  * </pre>
  */
-public class Coord implements Serializable, Lockable {
+public final class Coord implements Serializable, Lockable {
 
 	private static final long serialVersionUID = 1L;
 
