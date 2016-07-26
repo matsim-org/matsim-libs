@@ -29,12 +29,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimDataClassImplMarkerInterface;
 import org.matsim.core.scenario.CustomizableUtils;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * maintainer: mrieser / Senozon AG
  */
-public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassImplMarkerInterface {
+public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassImplMarkerInterface, Lockable {
 	// After some thinking, we think that this design is ok:
 	// * all methods are final (reduce maintenance for upstream maintainers)
 	// * the class itself is not final
@@ -53,6 +54,8 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	private Id<ActivityFacility> id;
 
 	private Id<Link> linkId;
+
+	private boolean locked = false ;
 
 	/**
 	 * Deliberately protected, see {@link MatsimDataClassImplMarkerInterface}
@@ -85,8 +88,9 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 		}
 		this.activities.put(type, option);
 	}
-	
+	@Override
 	public final void setCoord(Coord newCoord) {
+		testForLocked() ;
 		this.coord = newCoord;
 	}
 
@@ -136,6 +140,17 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
+	}
+
+	@Override
+	public void setLocked() {
+		this.locked = true ;
+	}
+	
+	private void testForLocked() {
+		if ( this.locked ) {
+			throw new RuntimeException("too late to do this") ;
+		}
 	}
 
 }

@@ -18,6 +18,7 @@
 package org.matsim.contrib.networkEditor.utils;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.networkEditor.visualizing.MutableCoord;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
@@ -99,6 +100,9 @@ public class GeometryTools {
 	}
 
 	static public Coordinate MATSimCoordToCoordinate(Coord c) {
+		return new Coordinate(c.getX(), c.getY());
+	}
+	static public Coordinate MATSimCoordToCoordinate(MutableCoord c) {
 		return new Coordinate(c.getX(), c.getY());
 	}
 
