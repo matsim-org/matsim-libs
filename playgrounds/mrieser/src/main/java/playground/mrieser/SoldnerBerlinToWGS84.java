@@ -102,7 +102,7 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	  }
 
 	  public Coord bl2rh(final double b, final double l){
-		  Coord p = new Coord((double) 0, (double) 0);
+		  Coord p = null ;
 	    if (!this.ell.isSoldner()) {
 	      int kz = (int)((l+(this.ell.getDEG()==3?0.5:1)*this.ell.getDEG())/this.ell.getDEG());
 	      //int kz = (int)((P.getLongitude()+0.5*this.Ell.getDEG())/this.Ell.getDEG());
@@ -123,8 +123,8 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      y[2] = 1.0/( 120.0*Math.pow(rho,5)) * N * Math.pow(Math.cos(l/rho),5) * (5.0-18.0  *Math.pow(t,2) + Math.pow(t,4));
 	      y[3] = 1.0/(5040.0*Math.pow(rho,7)) * N * Math.pow(Math.cos(l/rho),7) * (61.0-479.0*Math.pow(t,2) + 179.0*Math.pow(t,4) - Math.pow(t,6));
 
-	      p.setY(this.ell.getScale()*(x[0]    + x[1]*Math.pow(dL,2) + x[2]*Math.pow(dL,4) + x[3]*Math.pow(dL,6)));
-	      p.setX( this.ell.getScale()*(y[0]*dL + y[1]*Math.pow(dL,3) + y[2]*Math.pow(dL,5) + y[3]*Math.pow(dL,7)) + 500000.0 + kz*1000000.0);
+	      p = new Coord(this.ell.getScale()*(x[0]    + x[1]*Math.pow(dL,2) + x[2]*Math.pow(dL,4) + x[3]*Math.pow(dL,6)), 
+	      		this.ell.getScale()*(y[0]*dL + y[1]*Math.pow(dL,3) + y[2]*Math.pow(dL,5) + y[3]*Math.pow(dL,7)) + 500000.0 + kz*1000000.0);
 	    }
 
 	    else {
@@ -145,8 +145,8 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      y  = N*cosB*dl/rho;
 	      y -= N*Math.pow(cosB,3)*Math.pow(t,2)*Math.pow(dl,3)/(6.0*Math.pow(rho,3));
 
-	      p.setY( x ); // jep, that's correct, y := x
-	      p.setX( y );
+	      p = new Coord( y, x ) ;
+	      // jep, that's correct, y := x
 	    }
 	    return p;
 	  }
@@ -177,8 +177,8 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      L[2] = -rho/(  6*Math.pow(N,3)*Math.cos(B[0]/rho)) * (1+ 2*Math.pow(Math.tan(B[0]/rho),2)+eta2);
 	      L[3] =  rho/(120*Math.pow(N,5)*Math.cos(B[0]/rho)) * (5+28*Math.pow(Math.tan(B[0]/rho),2)+24*Math.pow(Math.tan(B[0]/rho),4));
 
-	      p.setY( B[0] + B[1]*Math.pow(y0,2) + B[2]*Math.pow(y0,4) + B[3]*Math.pow(y0,6));
-	      p.setX(L[0] + L[1]*         y0    + L[2]*Math.pow(y0,3) + L[3]*Math.pow(y0,5));
+	      p = new Coord( B[0] + B[1]*Math.pow(y0,2) + B[2]*Math.pow(y0,4) + B[3]*Math.pow(y0,6), 
+	      		L[0] + L[1]*         y0    + L[2]*Math.pow(y0,3) + L[3]*Math.pow(y0,5));
 	    }
 
 	    else {
@@ -203,8 +203,9 @@ public class SoldnerBerlinToWGS84 implements CoordinateTransformation {
 	      l += Math.pow(tF,2)*rho*(1.0 + 3.0*Math.pow(tF,2))/(15.0*Math.pow(NF,5)*Math.cos(BF/rho)) * Math.pow(y,5);
 	      L = L0 + l;
 
-	      p.setY( B );
-	      p.setX( L );
+//	      p.setY( B );
+//	      p.setX( L );
+	      p = new Coord( L, B ) ;
 	    }
 
 	    return p;

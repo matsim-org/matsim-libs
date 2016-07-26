@@ -43,8 +43,7 @@ public class TransformNetworkCoordinates {
 		for (Node node : network.getNodes().values()) {						
 			Coord coord = node.getCoord();				
 			Coord helperCoord = ct.transform(coord);
-			node.getCoord().setX(helperCoord.getX() + shiftX);
-			node.getCoord().setY(helperCoord.getY() + shiftY);
+			node.setCoord( new Coord( helperCoord.getX() + shiftX, helperCoord.getY() + shiftY ) ) ;
 		}
 		
 		new NetworkWriter(scenario.getNetwork()).write(targetFile);

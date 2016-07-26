@@ -152,9 +152,8 @@ public class NetworkExtender {
 		network.addNode(centroidNode);
 
 		nodeId = Id.createNodeId(String.format("%s.n%s", id, 1));
-		Coord c = MatsimCoordUtils.pointToCoord(centroid);
-		c.setX(c.getX() + 1);
-		c.setY(c.getY() + 1);
+		Coord c1 = MatsimCoordUtils.pointToCoord(centroid);
+		Coord c = new Coord(c1.getX() + 1, c1.getY()+1 ) ;
 
 		Node neighbourNode = network.getFactory().createNode(nodeId, c);
 		network.addNode(neighbourNode);
