@@ -21,9 +21,17 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -79,7 +87,29 @@ public class PatnaPolicyControler {
 		
 		// policies if any
 		if (applyTrafficRestrain ) {
+			// if appying this, remove all routes from the plan.
 			PatnaTrafficRestrainer.run(scenario.getNetwork());
+			//since some links are now removed, route in the plans will throw exception, remove them.
+			for (Person p : scenario.getPopulation().getPersons().values()){
+				List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
+				for (PlanElement pe :pes ){
+					if (pe instanceof Activity) { 
+						Activity act = ((Activity)pe);
+						Id<Link> linkId = act.getLinkId();
+						if(! scenario.getNetwork().getLinks().containsKey(linkId) ){
+							// if activities are on such links, remove links 
+							act.setLinkId(null);
+							Coord cord = act.getCoord();
+							if (cord == null ) { // and if cord is not assigned to acitivity, assign it. 
+								act.setCoord( scenario.getNetwork().getLinks().get(linkId).getCoord());
+							}
+						} 
+					} else if ( pe instanceof Leg){
+						Leg leg = (Leg) pe;
+						leg.setRoute(null);
+					}
+				}
+			}
 		} 
 		
 		if(addBikeTrack) {
