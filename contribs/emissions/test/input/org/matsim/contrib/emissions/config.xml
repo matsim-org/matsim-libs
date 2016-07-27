@@ -432,9 +432,6 @@
 		<!-- `queue' for the standard queue model, `withHoles' (experimental!!) for the queue model with holes -->
 		<param name="trafficDynamics" value="queue" />
 
-		<!-- If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties. -->
-		<param name="useDefaultVehicles" value="true" />
-
 		<!-- If a route does not reference a vehicle, agents will use the vehicle with the same id as their own. -->
 		<param name="usePersonIdForMissingVehicleId" value="true" />
 
