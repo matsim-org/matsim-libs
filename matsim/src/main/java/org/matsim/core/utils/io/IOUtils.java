@@ -631,7 +631,11 @@ public class IOUtils {
 		try {
 			return new URL(context, spec);
 		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			try {
+				return new File(spec).toURI().toURL();
+			} catch (MalformedURLException e1) {
+				throw new RuntimeException(e1);
+			}
 		}
 	}
 }
