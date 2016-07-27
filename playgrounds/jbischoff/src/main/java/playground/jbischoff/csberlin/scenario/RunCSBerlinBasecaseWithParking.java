@@ -39,7 +39,7 @@ import playground.jbischoff.parking.sim.SetupParking;
 public class RunCSBerlinBasecaseWithParking {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking.xml");
-		String runId = "bc08_park2";
+		String runId = "bc09_park";
 		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
 		config.controler().setRunId(runId);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
