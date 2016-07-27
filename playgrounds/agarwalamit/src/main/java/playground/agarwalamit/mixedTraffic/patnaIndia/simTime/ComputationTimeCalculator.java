@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.simTime;
+package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.simTime;
+package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
 
 import java.io.PrintStream;
 
