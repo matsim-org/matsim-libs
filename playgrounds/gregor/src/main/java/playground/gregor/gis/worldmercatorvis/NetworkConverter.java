@@ -47,7 +47,8 @@ public class NetworkConverter {
 			} catch (TransformException e) {
 				e.printStackTrace();
 			}
-			c.setXY(cc.x, cc.y);
+//			c.setXY(cc.x, cc.y);
+			n.setCoord( new Coord( cc.x, cc.y ) );
 		}
 	}
 

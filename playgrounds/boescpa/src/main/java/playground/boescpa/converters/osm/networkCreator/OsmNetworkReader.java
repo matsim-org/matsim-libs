@@ -488,7 +488,7 @@ public class OsmNetworkReader {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public Coord coord;
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
@@ -575,7 +575,8 @@ public class OsmNetworkReader {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord=c ;
 						this.nodeCounter.incCounter();
 					}
 				}

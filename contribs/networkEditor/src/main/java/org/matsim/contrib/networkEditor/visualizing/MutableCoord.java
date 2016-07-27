@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * CoordI.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,66 +16,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.api.core.v01;
-
-import java.io.Serializable;
-
-import org.matsim.core.scenario.Lockable;
+package org.matsim.contrib.networkEditor.visualizing;
 
 /**
- * In MATSim, generally Cartesian Coordinates are used, with x increasing
- * to the right, and y increasing to the top:
- * <pre>
- *     ^
- *   y |
- *     |     x
- *   (0/0) ---->
- * </pre>
+ * This is a re-implementation of {@link Coord}, but with setters.  It can be used for certain computations.  It is deliberately not related
+ * to {@link Coord}, i.e. not under the same interface and not inherited, because we want to make sure that if we get a Coord in the
+ * core classes, it is immutable.  And not some mutable object behind a seemingly immutable interface.  kai, jul'16
+ * 
+ * @author nagel
+ *
  */
-public final class Coord implements Serializable, Lockable {
-
-	private static final long serialVersionUID = 1L;
+public class MutableCoord {
 
 	private double x;
 	private double y;
 
-	private boolean locked = false ;
-
-	public Coord(final double x, final double y) {
+	public MutableCoord(final double x, final double y) {
 		this.x = x;
 		this.y = y;
 	}
+	public MutableCoord( org.matsim.api.core.v01.Coord coord ) {
+		this.x = coord.getX() ;
+		this.y = coord.getY() ;
+	}
+
 
 	public double getX() {
 		return this.x;
 	}
+
 	public double getY() {
 		return this.y;
 	}
 
-//	public void setX(final double x) {
-//		testForLocked() ;
-//		this.x = x;
-//	}
+	public void setX(final double x) {
+		this.x = x;
+	}
 
-//	public void setY(final double y) {
-//		testForLocked() ;
-//		this.y = y;
-//	}
+	public void setY(final double y) {
+		this.y = y;
+	}
 
-//	public void setXY(final double x, final double y) {
-//		testForLocked() ;
-//		this.x = x;
-//		this.y = y;
-//	}
+	public void setXY(final double x, final double y) {
+		this.x = x;
+		this.y = y;
+	}
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof Coord)) {
+		if (!(other instanceof MutableCoord)) {
 			return false;
 		}
-		Coord o = (Coord)other;
+		MutableCoord o = (MutableCoord)other;
 		return ((this.x == o.getX()) && (this.y == o.getY()));
 	}
 
@@ -94,18 +85,5 @@ public final class Coord implements Serializable, Lockable {
 	public final String toString() {
 		return "[x=" + this.x + "][y=" + this.y + "]";
 	}
-
-
-	@Override
-	public void setLocked() {
-		this.locked = true ;
-	}
-	private void testForLocked() {
-		if ( locked ) {
-			throw new RuntimeException( "Coord is locked; too late to do this.  See comments in code.") ;
-		}
-	}
-
-
 
 }

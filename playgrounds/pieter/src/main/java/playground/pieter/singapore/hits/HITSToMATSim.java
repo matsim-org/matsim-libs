@@ -701,11 +701,10 @@ public class HITSToMATSim {
 		}
 	}
 
-	private Coord shoot(Coord coord) {
+	private static Coord shoot(Coord coord) {
 		// scatters coords within a 200x200m2 square
 		int squareSize = 200;
-		coord.setX(coord.getX() + squareSize * Math.random() - squareSize / 2);
-		coord.setY(coord.getY() + squareSize * Math.random() - squareSize / 2);
+		new Coord( coord.getX() + squareSize * Math.random() - squareSize / 2, coord.getY() + squareSize * Math.random() - squareSize / 2 ) ;
 		return coord;
 	}
 

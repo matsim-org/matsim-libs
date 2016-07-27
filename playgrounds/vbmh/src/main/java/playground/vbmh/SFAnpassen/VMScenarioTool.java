@@ -228,7 +228,8 @@ public class VMScenarioTool {
 					System.out.println("Activity gefunden");
 					Activity activity = (Activity) planElement;
 					if (activity.getType().equals("home")){
-						activity.getCoord().setXY(xCoord, yCoord);
+//						activity.getCoord().setXY(xCoord, yCoord);
+						activity.setCoord( new Coord( xCoord, yCoord ) ) ;
 						activity.setEndTime(activity.getEndTime()-2400); //!! 40 minuten frueher wegfahren - gute idee??
 						activity.setFacilityId(newFacId);
 						System.out.println("moved agent");

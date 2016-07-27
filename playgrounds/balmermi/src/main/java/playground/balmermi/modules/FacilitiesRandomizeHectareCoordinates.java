@@ -42,9 +42,9 @@ public class FacilitiesRandomizeHectareCoordinates {
 			int x = (int)coord.getX();
 			int y = (int)coord.getY();
 			if ((x % 100 == 0) && (y % 100 == 0)) {
-				coord.setX(x+MatsimRandom.getRandom().nextInt(100));
-				coord.setY(y+MatsimRandom.getRandom().nextInt(100));
+				Coord c2 = new Coord( x+MatsimRandom.getRandom().nextInt(100), y+MatsimRandom.getRandom().nextInt(100));
 				cnt++;
+				f.setCoord(c2);
 			}
 		}
 		System.out.println("=> # facilities:            "+facilities.getFacilities().size());

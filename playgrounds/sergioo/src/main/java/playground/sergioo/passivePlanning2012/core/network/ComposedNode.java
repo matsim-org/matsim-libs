@@ -108,10 +108,16 @@ public class ComposedNode implements Node {
 			idText+=node.getId()+SEPARATOR;
 		idText=idText.substring(0, idText.length()-1);
 		id = Id.create(idText, Node.class);
-		coord = new Coord((double) 0, (double) 0);
-		for(Node node:nodes)
-			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
-		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
+//		coord = new Coord((double) 0, (double) 0);
+		double xx = 0. ;
+		double yy = 0. ;
+		for(Node node:nodes) {
+//			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
+			xx += node.getCoord().getX();
+			yy += node.getCoord().getY();
+		}
+//		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
+		this.coord = new Coord(xx/nodes.size(), yy/nodes.size());
 		inLinks = new HashMap<Id<Link>, Link>();
 		outLinks = new HashMap<Id<Link>, Link>();
 		this.nodes = nodes;

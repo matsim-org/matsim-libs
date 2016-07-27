@@ -32,6 +32,7 @@ import org.matsim.core.network.LinkFactory;
 public interface NetworkFactory extends MatsimFactory {
 
 	public Node createNode(final Id<Node> id, final Coord coord);
+	// this is NOT CoordI, since it wants to rely on the fact that coord is immutable! kai, jul'16
 
 	/**
 	 * Creates a link with the given id leading from one node to another.

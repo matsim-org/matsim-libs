@@ -49,9 +49,9 @@ public class PlansConverter {
 					if (pe instanceof Activity){
 						Coord coord =((Activity) pe).getCoord();
 						Coord newCoord = ct.transform(coord);
-						coord.setX(newCoord.getX());
-						coord.setY(newCoord.getY());
-						
+//						coord.setX(newCoord.getX());
+//						coord.setY(newCoord.getY());
+						((Activity) pe).setCoord(newCoord);
 					}
 				}
 			}

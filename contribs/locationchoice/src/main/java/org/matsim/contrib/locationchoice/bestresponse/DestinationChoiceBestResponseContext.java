@@ -365,5 +365,11 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		public void addActivityOption(ActivityOption option) {
 			this.activityFacility.addActivityOption(option);
 		}
+
+		@Override
+		public void setCoord(Coord coord) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 }

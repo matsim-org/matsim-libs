@@ -264,7 +264,8 @@ public class RandomizeCoordinates {
 		for(ActivityFacility facility : setToSearch){	
 
 			if (i == item){			
-				coord.setXY(facility.getCoord().getX(), facility.getCoord().getY());					    
+//				coord.setXY(facility.getCoord().getX(), facility.getCoord().getY());
+				coord = facility.getCoord();
 
 
 			}

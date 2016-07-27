@@ -94,18 +94,19 @@ public class PseudoGravityModel {
 	}
 
 	void checkMax( Coord coord ) {
-		double xx = coord.getX();
-		if ( xx < minCoord.getX() ) {
-			minCoord.setX(xx) ;
-		} else if ( xx > maxCoord.getX() ) {
-			maxCoord.setX(xx) ;
-		}
-		double yy = coord.getY() ;
-		if ( yy < minCoord.getY() ) {
-			minCoord.setY(yy) ;
-		} else if ( yy > maxCoord.getY() ) {
-			maxCoord.setY(yy) ;
-		}
+		throw new RuntimeException("not implemented") ;
+//		double xx = coord.getX();
+//		if ( xx < minCoord.getX() ) {
+//			minCoord.setX(xx) ;
+//		} else if ( xx > maxCoord.getX() ) {
+//			maxCoord.setX(xx) ;
+//		}
+//		double yy = coord.getY() ;
+//		if ( yy < minCoord.getY() ) {
+//			minCoord.setY(yy) ;
+//		} else if ( yy > maxCoord.getY() ) {
+//			maxCoord.setY(yy) ;
+//		}
 	}
 
 	// TODO: there should actually a ctor that constructs this w/o coords (i.e. computes them internally)
