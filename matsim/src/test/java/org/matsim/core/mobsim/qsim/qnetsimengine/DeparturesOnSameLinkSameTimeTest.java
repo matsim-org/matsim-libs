@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -198,7 +199,8 @@ public class DeparturesOnSameLinkSameTimeTest {
 		private void createPopulation(){
 
 			// Vehicles info			
-			scenario.getConfig().qsim().setUseDefaultVehicles(false);
+//			scenario.getConfig().qsim().setUseDefaultVehicles(false);
+			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.fromVehiclesData ) ;
 			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));

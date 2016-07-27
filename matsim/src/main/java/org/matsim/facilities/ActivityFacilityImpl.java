@@ -40,11 +40,14 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	// * the class itself is not final
 	// * the constructor is protected
 	// * derived classes can thus extend to the attributes
-	// 
+
+	// yyyyyy I have to say that I am at this point not so happy.  Better make it final, make it package-protected, make 
+	// all functionality accessible by interface or from static methods, and then let external users use delegation.  
+	// People need to get un-used to casting things into the impl to get hold of "special" functionality. kai, jul'16
 	
 	private Customizable customizableDelegate;
 
-	private final Map<String, ActivityOption> activities = new TreeMap<String, ActivityOption>();
+	private final Map<String, ActivityOption> activities = new TreeMap<>();
 
 	private String desc = null;
 

@@ -38,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -199,7 +200,8 @@ public class ComputationTimeCalculator {
 
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setMainModes(Arrays.asList("car","bike"));
-		config.qsim().setUseDefaultVehicles(false);
+//		config.qsim().setUseDefaultVehicles(false);
+		config.qsim().setVehiclesSource( VehiclesSource.fromVehiclesData ) ;
 		config.qsim().setFlowCapFactor(0.01);
 		config.qsim().setStorageCapFactor(0.01);
 
