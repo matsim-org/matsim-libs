@@ -51,18 +51,17 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	ParkingManager manager;
 	
 	ParkingChoiceLogic parkingLogic;  
-
-	@Inject
 	Network network;
 	
 	@Inject
 	/**
 	 * 
 	 */
-	public VehicleTeleportationToNearbyParking(Config config) {
+	public VehicleTeleportationToNearbyParking(Config config, Network network) {
 		// TODO Auto-generated constructor stub
 		this.beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
 		this.parkingLogic = new RandomParkingChoiceLogic(network);
+		this.network = network;
 	}
 
 	/* (non-Javadoc)
