@@ -20,6 +20,8 @@
 package tutorial.fixedTimeSignals;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -51,7 +53,10 @@ public class RunSignalSystemsExample {
 	 * @param args is ignored
 	 */
 	public static void main(String[] args) {
-		
+		run(true);
+	}
+
+	static void run(boolean usingOTFVis) {
 		String inputDir = "./../../matsim/examples/equil-extended/";
 		
 		File f = new File("t");
@@ -98,7 +103,9 @@ public class RunSignalSystemsExample {
 		Controler c = new Controler( scenario );
 
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule( new OTFVisWithSignalsLiveModule() );
+		if ( usingOTFVis ) {
+			c.addOverridingModule( new OTFVisWithSignalsLiveModule() );
+		}
 		
 		//do it, do it, do it, now
 		c.run();
