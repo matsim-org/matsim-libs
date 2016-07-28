@@ -73,6 +73,8 @@ public class RunSignalSystemsExample {
 		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		
+		config.qsim().setNodeOffset(5.);
+		
 		SignalSystemsConfigGroup signalConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
 		
 		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
@@ -89,7 +91,7 @@ public class RunSignalSystemsExample {
 		
 		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 		otfvisConfig.setScaleQuadTreeRect(true); // make links visible beyond screen edge
-//		otfvisConfig.setColoringScheme(ColoringScheme.byId);
+		otfvisConfig.setColoringScheme(ColoringScheme.byId);
 		otfvisConfig.setAgentSize(240);
 		
 		// ---
