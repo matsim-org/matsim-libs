@@ -10,13 +10,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 
 public class CarsharingAgentFactory implements AgentFactory{
 	private final Netsim simulation;
-	private CarSharingVehicles carSharingVehicles;
+	private CarSharingVehiclesNew carSharingVehicles;
 
 	private LeastCostPathCalculator pathCalculator;
 	
 	
 	public CarsharingAgentFactory(final Netsim simulation, final Scenario scenario, 
-			CarSharingVehicles carSharingVehicles, LeastCostPathCalculator pathCalculator) {
+			CarSharingVehiclesNew carSharingVehicles, LeastCostPathCalculator pathCalculator) {
 		this.simulation = simulation;
 		this.carSharingVehicles = carSharingVehicles;
 		this.pathCalculator = pathCalculator;

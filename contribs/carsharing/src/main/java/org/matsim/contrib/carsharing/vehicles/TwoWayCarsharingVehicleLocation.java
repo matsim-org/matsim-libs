@@ -1,6 +1,8 @@
 package org.matsim.contrib.carsharing.vehicles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -10,7 +12,7 @@ import org.matsim.core.utils.collections.QuadTree;
 public class TwoWayCarsharingVehicleLocation {
 	
 	private QuadTree<TwoWayCarsharingStation> vehicleLocationQuadTree;	
-	//private static final Logger log = Logger.getLogger(TwoWayCarsharingVehicleLocation.class);
+	private Map<String, TwoWayCarsharingStation> twowaycarsharingstationsMap;
 
 	public TwoWayCarsharingVehicleLocation(Scenario scenario, ArrayList<TwoWayCarsharingStation> stations) {
 	    double minx = (1.0D / 0.0D);
@@ -27,11 +29,12 @@ public class TwoWayCarsharingVehicleLocation {
 	    minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
 
 	    vehicleLocationQuadTree = new QuadTree<TwoWayCarsharingStation>(minx, miny, maxx, maxy);
-	    
+	    twowaycarsharingstationsMap = new HashMap<String, TwoWayCarsharingStation>();
 	    
 	    for(TwoWayCarsharingStation f: stations) {  
 	    	
 	    	vehicleLocationQuadTree.put(f.getCoord().getX(), f.getCoord().getY(), f);
+	    	twowaycarsharingstationsMap.put(f.getStationId(), f);
 	    }
 	   
 	  }
@@ -40,18 +43,24 @@ public class TwoWayCarsharingVehicleLocation {
 		return vehicleLocationQuadTree;
 	}
 		
-	public void addVehicle(TwoWayCarsharingStation station, String id) {
+	public void addVehicle( String type, StationBasedVehicle vehicle) {
 		
-		station.getIDs().add(id);
-		station.addCar();
+		TwoWayCarsharingStation station = this.twowaycarsharingstationsMap.get(vehicle.getStationId());
+		
+		station.addCar(type, vehicle);
 	}
 	
-	public void removeVehicle(TwoWayCarsharingStation station, String id) {
+	public void removeVehicle( String type, StationBasedVehicle vehicle) {
 		
-		if (!station.getIDs().remove(id)) 
-			throw new NullPointerException("Removing the vehicle did not work!");
-		station.removeCar();
+		TwoWayCarsharingStation station = this.twowaycarsharingstationsMap.get(vehicle.getStationId());
+
+		station.removeCar(type, vehicle);
 		
-	}	
+	}		
+	
+	public TwoWayCarsharingStation getStationWIthId(String stationId) {
+		
+		return twowaycarsharingstationsMap.get(stationId);
+	}
 	
 }

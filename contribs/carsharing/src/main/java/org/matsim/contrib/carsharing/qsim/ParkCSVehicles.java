@@ -3,15 +3,19 @@ package org.matsim.contrib.carsharing.qsim;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.carsharing.stations.FreeFloatingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
+import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
 import org.matsim.contrib.carsharing.vehicles.FreeFloatingVehiclesLocation;
 import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
+import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -58,35 +62,45 @@ public class ParkCSVehicles implements AgentSource {
 		int counterFF = 0;
 
 		if (ffvehiclesLocationqt != null)
-		for (FreeFloatingStation ffstation: ffvehiclesLocationqt.getQuadTree().values()) {
+		for (FFCSVehicle ffvehicle: ffvehiclesLocationqt.getQuadTree().values()) {
 			
-			for (String id:ffstation.getIDs()) {
-				//log.info("Parked freefloating car with id: " + id);
 
-				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("FF_"+(id), Vehicle.class), modeVehicleTypes.get("freefloating")), ffstation.getLinkId() ) ;
+				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(ffvehicle.getVehicleId(), Vehicle.class),
+						modeVehicleTypes.get("freefloating")), ffvehicle.getLink().getId() ) ;
 				counterFF++;
 			}
 			
-		}
+		
 		if (owvehiclesLocationqt != null)
 			for (OneWayCarsharingStation owstation: owvehiclesLocationqt.getQuadTree().values()) {
-				
-				for (String id:owstation.getIDs()) {
-					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("OW_"+(id), Vehicle.class), modeVehicleTypes.get("onewaycarsharing")), owstation.getLinkId());
-					counterOW++;
-				}
-				
-			}
-		
+				Set<String> vehicleTypesAtStation = owstation.getVehicleIDsPerType().keySet();
+
+				for (String type : vehicleTypesAtStation) {
+					
+					for (StationBasedVehicle vehicle : owstation.getVehicles(type)) {
+						
+						qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(vehicle.getVehicleId(), Vehicle.class),
+								modeVehicleTypes.get("onewaycarsharing")), owstation.getLinkId());
+						counterTW++;
+						
+					}					
+				}				
+			}		
 		if (twvehiclesLocationqt != null) {
 			for (TwoWayCarsharingStation twstation: twvehiclesLocationqt.getQuadTree().values()) {
 				
-				for (String id : twstation.getIDs()) {
-					
-					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("TW_"+id, Vehicle.class), modeVehicleTypes.get("twowaycarsharing")), twstation.getLinkId());
-					counterTW++;
-				}
+				Set<String> vehicleTypesAtStation = twstation.getVehicleIDsPerType().keySet();
 				
+				for (String type : vehicleTypesAtStation) {
+					
+					for (StationBasedVehicle vehicle : twstation.getVehicles(type)) {
+						
+						qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(vehicle.getVehicleId(), Vehicle.class),
+								modeVehicleTypes.get("twowaycarsharing")), twstation.getLinkId());
+						counterTW++;
+						
+					}					
+				}				
 			}
 			log.info("Parked " + counterTW + " twowaycarsharing vehicles.");
 			log.info("Parked " + counterOW + " onewaycarsharing vehicles.");

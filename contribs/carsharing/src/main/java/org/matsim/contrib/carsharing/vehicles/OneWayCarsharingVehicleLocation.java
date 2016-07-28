@@ -1,10 +1,13 @@
 package org.matsim.contrib.carsharing.vehicles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
+import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.core.utils.collections.QuadTree;
 
 
@@ -12,7 +15,8 @@ public class OneWayCarsharingVehicleLocation {
 
 
 	private QuadTree<OneWayCarsharingStation> vehicleLocationQuadTree;	
-	
+	private Map<String, OneWayCarsharingStation> onewaycarsharingstationsMap;
+
 	
 	public OneWayCarsharingVehicleLocation(Scenario sc, ArrayList<OneWayCarsharingStation> stations)  {
 	    double minx = (1.0D / 0.0D);
@@ -28,44 +32,39 @@ public class OneWayCarsharingVehicleLocation {
 	    }
 	    minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
 
-	    vehicleLocationQuadTree = new QuadTree<OneWayCarsharingStation>(minx, miny, maxx, maxy);
 	    
+	    vehicleLocationQuadTree = new QuadTree<OneWayCarsharingStation>(minx, miny, maxx, maxy);
+	    onewaycarsharingstationsMap = new HashMap<String, OneWayCarsharingStation>();
 	    
 	    for(OneWayCarsharingStation f: stations) {  
 	    	
-	    	ArrayList<String> vehIDs = f.getIDs();
-			ArrayList<String> newvehIDs = new ArrayList<String>();
-			for (String s : vehIDs) {
-				newvehIDs.add(s);
-			}
-			Link link = sc.getNetwork().getLinks().get( f.getLinkId() ) ;
-	    	
-			OneWayCarsharingStation fNew = new OneWayCarsharingStation(link, f.getNumberOfVehicles(), newvehIDs,  f.getNumberOfAvailableParkingSpaces());		
-
-	    	vehicleLocationQuadTree.put(fNew.getCoord().getX(), fNew.getCoord().getY(), fNew);
-	    }
-	    
-	  
-	    
-	   
-	  }
+	    	vehicleLocationQuadTree.put(f.getCoord().getX(), f.getCoord().getY(), f);
+	    	onewaycarsharingstationsMap.put(f.getStationId(), f);
+	    }	   	    	   
+    }
 	public QuadTree<OneWayCarsharingStation> getQuadTree() {
 		
 		return vehicleLocationQuadTree;
 	}
 	
-	public void addVehicle(OneWayCarsharingStation station, String id) {
+	public void addVehicle( String type, StationBasedVehicle vehicle) {
 		
-			station.getIDs().add(id);
-			station.addCar();
+		OneWayCarsharingStation station = this.onewaycarsharingstationsMap.get(vehicle.getStationId());
 		
+		station.addCar(type, vehicle);
 	}
 	
-	public void removeVehicle(OneWayCarsharingStation station, String id) {
+	public void removeVehicle( String type, StationBasedVehicle vehicle) {
 		
-		station.getIDs().remove(id);
-		station.removeCar();
-				
+		OneWayCarsharingStation station = this.onewaycarsharingstationsMap.get(vehicle.getStationId());
+
+		station.removeCar(type, vehicle);
+		
+	}		
+	
+	public OneWayCarsharingStation getStationWIthId(String stationId) {
+		
+		return onewaycarsharingstationsMap.get(stationId);
 	}
 	
 	public void reserveParkingSpot(OneWayCarsharingStation station) {
