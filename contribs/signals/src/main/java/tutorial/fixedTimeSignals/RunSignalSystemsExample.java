@@ -61,9 +61,9 @@ public class RunSignalSystemsExample {
 		config.controler().setLastIteration(0); // use higher values if you want to iterate
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		config.network().setInputFile(inputDir + "network.xml");
+		config.network().setInputFile("network.xml");
 		
-		config.plans().setInputFile(inputDir + "plans2000.xml.gz");
+		config.plans().setInputFile("plans2000.xml.gz");
 		
 		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
@@ -84,8 +84,8 @@ public class RunSignalSystemsExample {
 		
 		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 		otfvisConfig.setScaleQuadTreeRect(true); // make links visible beyond screen edge
-		otfvisConfig.setColoringScheme(ColoringScheme.byId);
-		otfvisConfig.setAgentSize(120);
+//		otfvisConfig.setColoringScheme(ColoringScheme.byId);
+		otfvisConfig.setAgentSize(240);
 		
 		// ---
 
