@@ -24,7 +24,10 @@
 package playground.jjoubert.coord3D;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +45,8 @@ public class ElevationScoringFunction implements ScoringFunction {
 	private double score;
 	private Network network;
 	private String vehicleType;
+	
+	private Map<Id<Link>, Map<String, Double>> experienceMap = new TreeMap<Id<Link>, Map<String,Double>>();
 	
 	public ElevationScoringFunction(Network network, String vehicleType) {
 		this.network = network;
@@ -104,7 +109,9 @@ public class ElevationScoringFunction implements ScoringFunction {
 			throw new RuntimeException("Don't know how to interpret the elevation factor for mode type '" + this.vehicleType + "'");
 		}
 		
-		return factor*link.getLength();
+		double experiencedDistance = factor*link.getLength();
+		
+		return experiencedDistance;
 	}
 
 
