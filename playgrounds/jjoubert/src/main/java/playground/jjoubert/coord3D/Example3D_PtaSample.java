@@ -85,7 +85,7 @@ public class Example3D_PtaSample {
 		/* Set up SRTM tile. */
 		Coord blc = Utils3D.getBottomLeftCoordinate(sc.getNetwork());
 		LOG.info("Bottom-left corner: " + blc.toString());
-		String tileName = getSrtmTile(blc);
+		String tileName = Utils3D.getSrtmTile(blc);
 		File srtmFile = new File(path + "data/tiles/" + tileName + ".hgt");
 		if(!srtmFile.exists() || !srtmFile.canRead()){
 			LOG.error("Cannot read SRTM tile from " + srtmFile.getAbsolutePath());
@@ -184,21 +184,7 @@ public class Example3D_PtaSample {
 		LOG.info("Done with Pretoria sample.");
 	}
 	
-	
-	
-	/**
-	 * 
-	 * @param c a coordinate assumed to be in WGS84 decimal degrees format.
-	 * @return
-	 */
-	private static String getSrtmTile(Coord c){
-		int lon = (int)Math.floor(c.getX());
-		int lat = (int)Math.floor(c.getY());
-		String lonPrefix = lon < 0 ? "W" : "E";
-		String latPrefix = lat < 0 ? "S" : "N";
-		return String.format("%s%02d%s%03d", latPrefix, Math.abs(lat), lonPrefix, Math.abs(lon));
-	}
-	
+		
 	/**
 	 * Build a regular grid of elevation points 
 	 * @param network the given network (using a projected coordinate reference system);
@@ -226,7 +212,7 @@ public class Example3D_PtaSample {
 		/* Set up SRTM tile. */
 		Coord blc = Utils3D.getBottomLeftCoordinate(network);
 		LOG.info("Bottom-left corner: " + blc.toString());
-		String tileName = getSrtmTile(blc);
+		String tileName = Utils3D.getSrtmTile(blc);
 		File srtmFile = new File(path + "data/tiles/" + tileName + ".hgt");
 		if(!srtmFile.exists() || !srtmFile.canRead()){
 			LOG.error("Cannot read SRTM tile from " + srtmFile.getAbsolutePath());
