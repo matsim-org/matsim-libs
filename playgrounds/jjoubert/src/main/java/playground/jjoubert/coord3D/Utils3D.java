@@ -21,6 +21,13 @@
  */
 package playground.jjoubert.coord3D;
 
+<<<<<<< b37765579b9a51583883e9aa918ee56e3f93f050
+=======
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+
+>>>>>>> Added classes/methods to automatically detect and download SRTM tiles
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +41,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+<<<<<<< b37765579b9a51583883e9aa918ee56e3f93f050
+=======
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.osmtools.srtm.SrtmTile;
+
+import playground.southafrica.utilities.Header;
+>>>>>>> Added classes/methods to automatically detect and download SRTM tiles
 
 /**
  * A number of utilities to deal with 3D networks.
@@ -42,12 +57,85 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  */
 public class Utils3D {
 	private final static Logger LOG = Logger.getLogger(Utils3D.class);
+	private final static String SRTM_URL_AFRICA = "https://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Africa/";
+	
+	public static void main(String[] args){
+		Header.printHeader(Utils3D.class.toString(), args);
+		
+		int option = Integer.parseInt(args[0]);
+		String network = args[1];
+		String tilePath = args[2];
+		String crs = args[3];
+		String output = args[4];
+		switch (option) {
+		case 1: /* Calculate and write the grade for each link in a MATSim network. */
+			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(crs, "WGS84");
+			writeNetworkGrades(network, tilePath, ct, output);
+			break;
+		default:
+			throw new RuntimeException("Don't know what to execute for option '" + option + "'.");
+		}
+		
+		Header.printFooter();
+	}
+	
+	
+	
+	private static void writeNetworkGrades(String network, String tilePath, CoordinateTransformation ct, String output){
+		LOG.info("Calculating the grade for each link in a network and writing it to file...");
+		
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		
+		/* Provide elevation to each node in the network. */
+		LOG.info("Estimating elevation for each network node...");
+		Counter nodeCounter = new Counter("  node # ");
+		for(Node node : sc.getNetwork().getNodes().values()){
+			Coord cWgs = ct.transform(node.getCoord());
+			double elev = estimateSrtmElevation(tilePath, cWgs);
+			node.getCoord().setZ(elev);
+			nodeCounter.incCounter();
+		}
+		nodeCounter.printCounter();
+		
+		LOG.info("Calculating grade for each link...");
+		BufferedWriter bw = IOUtils.getBufferedWriter(output);
+		Counter linkCounter = new Counter("  link # ");
+		try{
+			/* Write header. */
+			bw.write("id,length,grade");
+			bw.newLine();
+			
+			/* Calculate the grade of each link. */
+			for(Link link : sc.getNetwork().getLinks().values()){
+				double grade = calculateGrade(link);
+				bw.write(String.format("%s,%.1f,%.8f\n", link.getId().toString(), link.getLength(), grade));
+				linkCounter.incCounter();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + output);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + output);
+			}
+		}
+		linkCounter.printCounter();
+		LOG.info("Done calculating the grades for network links.");
+	}
+	
+	
+	
+	
 	
 	public static double calculateAngle(Link link){
 		if(!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()){
 			LOG.error("From node: " + link.getFromNode().getCoord().toString());
 			LOG.error("To node: " + link.getToNode().getCoord().toString());
-			throw new IllegalArgumentException("Cannot calculate grade if both nodes on the link do not have elevation (z) set.");
+			throw new IllegalArgumentException("Cannot calculate angle if both nodes on the link do not have elevation (z) set.");
 		}
 		
 		Coord c1 = link.getFromNode().getCoord();
@@ -106,6 +194,7 @@ public class Utils3D {
 		/* Adjust all links to have 2 lanes. */
 		for(Link link : sc.getNetwork().getLinks().values()){
 			link.setNumberOfLanes(2.0);
+			link.setCapacity(10000);
 
 			/* Fix link 6's length to be the same as all the others. */
 			if(link.getId().equals(Id.createLinkId("6"))){
@@ -128,6 +217,54 @@ public class Utils3D {
 		}
 		return CoordUtils.createCoord(minX, minY);
 	}
+ 	
+ 
+	/**
+	 * 
+	 * @param c a coordinate assumed to be in WGS84 decimal degrees format.
+	 * @return
+	 */
+ 	public static String getSrtmTile(Coord c){
+		int lon = (int)Math.floor(c.getX());
+		int lat = (int)Math.floor(c.getY());
+		String lonPrefix = lon < 0 ? "W" : "E";
+		String latPrefix = lat < 0 ? "S" : "N";
+		return String.format("%s%02d%s%03d", latPrefix, Math.abs(lat), lonPrefix, Math.abs(lon));
+ 	}
+ 	
+ 	public static double estimateSrtmElevation(String pathToTiles, Coord c){
+ 		pathToTiles += pathToTiles.endsWith("/") ? "" : "/";
+ 		String tileName = getSrtmTile(c);
+ 		String tileFileName = pathToTiles + tileName + ".hgt";
+ 		File tileFile = new File(tileFileName);
+ 		
+ 		/* Download the tile file if it does not exist. */
+ 		if(!tileFile.exists()){
+ 			LOG.warn("Tile " + tileFileName + " is not available locally. Downloading...");
+ 			Runtime rt = Runtime.getRuntime();
+ 			String url = SRTM_URL_AFRICA + tileName + ".hgt.zip";
+ 			try {
+				Process p1 = rt.exec("curl -o " + tileFileName + ".zip " + url);
+				while(p1.isAlive()){ /* Wait */ }
+				Process p2 = rt.exec("unzip " + tileFileName + ".zip -d " + pathToTiles);
+				while(p2.isAlive()){ /* Wait */ }
+				Process p3 = rt.exec("rm " + tileFileName + ".zip");
+				while(p3.isAlive()){ /* Wait */ }
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not download SRTM tile file.");
+			}
+ 		}
+ 		
+ 		/* Estimate the elevation. */
+		SrtmTile srtmTile = new SrtmTile(tileFile);
+ 		return srtmTile.getElevation(c.getX(), c.getY());
+ 	}
+ 	
+ 	
+ 	
+ 	
+ 	
 	
 
 }
