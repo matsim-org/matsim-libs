@@ -97,7 +97,7 @@ public class ScenarioBuilder3D {
 	 * @return
 	 */
 	private static Scenario buildScenario(String folder, int numberOfPersons, int run){
-		MatsimRandom.reset(SEED + run);
+		MatsimRandom.reset(SEED*run);
 		Scenario sc = Utils3D.elevateEquilNetwork();
 		sc = buildPersonsWithPlans(sc, numberOfPersons);
 		sc = buildVehicles(sc);
