@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Utils3D.java                                                                        *
+ * Utils3D.java                                                            *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2016 by the members listed in the COPYING,        *
@@ -21,13 +21,10 @@
  */
 package playground.jjoubert.coord3D;
 
-<<<<<<< b37765579b9a51583883e9aa918ee56e3f93f050
-=======
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 
->>>>>>> Added classes/methods to automatically detect and download SRTM tiles
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -41,14 +38,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-<<<<<<< b37765579b9a51583883e9aa918ee56e3f93f050
-=======
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.osmtools.srtm.SrtmTile;
 
 import playground.southafrica.utilities.Header;
->>>>>>> Added classes/methods to automatically detect and download SRTM tiles
 
 /**
  * A number of utilities to deal with 3D networks.
