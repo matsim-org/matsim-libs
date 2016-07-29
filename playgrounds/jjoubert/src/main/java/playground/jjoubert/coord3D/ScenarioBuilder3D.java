@@ -66,7 +66,6 @@ import playground.southafrica.utilities.Header;
  */
 public class ScenarioBuilder3D {
 	final private static Logger LOG = Logger.getLogger(ScenarioBuilder3D.class);
-	final private static long SEED = 20160716;
 	
 	public static void main(String[] args){
 		Header.printHeader(ScenarioBuilder3D.class.toString(), args);
@@ -76,8 +75,8 @@ public class ScenarioBuilder3D {
 		
 		int numberOfPersons = Integer.parseInt(args[1]);
 		
-		MatsimRandom.reset(SEED);
-		buildScenario(path, numberOfPersons, MatsimRandom.getRandom().nextInt());
+		MatsimRandom.reset(20160728001l);
+		buildScenario(path, numberOfPersons, MatsimRandom.getLocalInstance().nextLong(), MatsimRandom.getLocalInstance().nextInt());
 		
 		Header.printFooter();
 	}
@@ -96,8 +95,8 @@ public class ScenarioBuilder3D {
 	 * @param folder
 	 * @return
 	 */
-	private static Scenario buildScenario(String folder, int numberOfPersons, int run){
-		MatsimRandom.reset(SEED*run);
+	private static Scenario buildScenario(String folder, int numberOfPersons, long seed, int run){
+		MatsimRandom.reset(seed*run);
 		Scenario sc = Utils3D.elevateEquilNetwork();
 		sc = buildPersonsWithPlans(sc, numberOfPersons);
 		sc = buildVehicles(sc);
@@ -117,13 +116,13 @@ public class ScenarioBuilder3D {
 	}
 	
 	
-	public static Scenario buildScenario(int numberOfPersons, int run){
-		return buildScenario(null, numberOfPersons, run);
+	public static Scenario buildScenario(int numberOfPersons, long seed, int run){
+		return buildScenario(null, numberOfPersons, seed, run);
 	}
 	
 	
 	public static Scenario buildScenario(int numberOfPersons){
-		return buildScenario(null, numberOfPersons, MatsimRandom.getRandom().nextInt());
+		return buildScenario(null, numberOfPersons, MatsimRandom.getLocalInstance().nextLong(), MatsimRandom.getLocalInstance().nextInt());
 	}
 	
 	
@@ -177,7 +176,7 @@ public class ScenarioBuilder3D {
 		linkIds.add(Id.createLinkId("1"));
 		
 		/* Add the next two links based on some random sample. */
-		int routeChoice = MatsimRandom.getRandom().nextInt(9);
+		int routeChoice = MatsimRandom.getLocalInstance().nextInt(9);
 		switch (routeChoice) {
 		case 0:
 			linkIds.add(Id.createLinkId("2"));
@@ -248,7 +247,7 @@ public class ScenarioBuilder3D {
 			
 			/* Sample random vehicle type */
 			VehicleType vehicleType = null;
-			double r = MatsimRandom.getRandom().nextDouble();
+			double r = MatsimRandom.getLocalInstance().nextDouble();
 			if(r <= 0.5){
 				vehicleType = VehicleType3D.A.getVehicleType();
 			} else{

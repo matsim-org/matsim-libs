@@ -66,7 +66,7 @@ public class EquilRandomRouterModule implements PlanStrategyModule {
 		linkIds.add(Id.createLinkId("1"));
 		
 		/* Add the next two links based on some random sample. */
-		int routeChoice = MatsimRandom.getRandom().nextInt(9);
+		int routeChoice = MatsimRandom.getLocalInstance().nextInt(9);
 		switch (routeChoice) {
 		case 0:
 			linkIds.add(Id.createLinkId("2"));
