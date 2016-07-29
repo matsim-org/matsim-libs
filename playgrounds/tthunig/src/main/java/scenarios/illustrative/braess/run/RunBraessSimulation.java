@@ -83,6 +83,7 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
+import scenarios.illustrative.braess.signals.ResponsiveLocalDelayMinimizingSignal;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
@@ -107,15 +108,15 @@ public final class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = null;
 
 	// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
-	// if SignalControlType SIGNAL4_X_Seconds_Z is used, SECONDS_Z_GREEN gives the green time for Z
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_X_SECOND_Z;
+	// if SignalControlType SIGNAL4_X_Seconds_Z or SIGNAL4_RESPONSIVE is used, SECONDS_Z_GREEN gives the green time for Z
 	private static final int SECONDS_Z_GREEN = 1;
 	
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.INTERVALBASED;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
@@ -126,7 +127,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/pricingBraess1800/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/badBelzig2016/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -161,7 +162,7 @@ public final class RunBraessSimulation {
 		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalControlType.NONE) ? false : true);
 
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta(2);
+		config.planCalcScore().setBrainExpBeta(20);
 
 		// choose between link to link and node to node routing
 		// (only has effect if lanes are used)
@@ -172,8 +173,9 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize(900);
-		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
+		config.travelTimeCalculator().setTraveltimeBinSize(10);
+//		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
+		config.travelTimeCalculator().setMaxTime(3600 * 24);
 
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
@@ -222,8 +224,9 @@ public final class RunBraessSimulation {
 
 		config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 		// set end time to shorten simulation run time: 2 hours after the last agent departs
-		config.qsim().setEndTime(3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2));
-
+//		config.qsim().setEndTime(3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2));
+		config.qsim().setEndTime(3600 * 24);
+		
 		// adapt monetary distance cost rate (should be negative)
 		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0);
 
@@ -278,6 +281,17 @@ public final class RunBraessSimulation {
 		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
 		sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
 		controler.addOverridingModule(sylviaSignalsModule);
+		
+		// add responsive signal controler if enabled
+		if (SIGNAL_TYPE.equals(SignalControlType.SIGNAL4_RESPONSIVE)){
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
+					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
+				}
+			});
+		}
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
@@ -572,6 +586,9 @@ public final class RunBraessSimulation {
 			case SIGNAL4_X_SECOND_Z:
 				runName += "_S4_" + SECONDS_Z_GREEN + "sZ";
 				break;
+			case SIGNAL4_RESPONSIVE:
+				runName += "_S4resp_init" + SECONDS_Z_GREEN + "sZ";
+				break;
 			case SIGNAL4_SYLVIA_V2Z:
 				runName += "_S4_Sylvia_V2Z";
 				break;
@@ -594,6 +611,9 @@ public final class RunBraessSimulation {
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)
 			runName += "_max" + config.strategy().getMaxAgentPlanMemorySize() + "plans";
+		
+		runName += "_stuckT" + (int)config.qsim().getStuckTime();
+		runName += "_simEndT" + (int)(config.qsim().getEndTime()/24) + "h";
 
 		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
 		// create directory

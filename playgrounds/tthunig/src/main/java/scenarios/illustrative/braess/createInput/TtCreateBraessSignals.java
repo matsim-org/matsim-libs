@@ -68,7 +68,7 @@ public final class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_X_SECOND_Z, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V
+		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_X_SECOND_Z, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V, SIGNAL4_RESPONSIVE
 	}
 	
 	private static final int CYCLE_TIME = 60;
@@ -146,12 +146,15 @@ public final class TtCreateBraessSignals {
 	 */
 	private void createSignalSystems() {
 
-		if (signalType.equals(SignalControlType.SIGNAL4_X_SECOND_Z) || 
-				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_V2Z) ||
-				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_Z2V)) {
+		switch (signalType){
+		case SIGNAL4_X_SECOND_Z:
+		case SIGNAL4_SYLVIA_V2Z:
+		case SIGNAL4_SYLVIA_Z2V:
+		case SIGNAL4_RESPONSIVE:
 			// create only one signal system at node 4
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
-		} else {
+			break;
+		default:
 			// create signal systems at nodes 2, 3, 4 and 5
 			for (Node node : this.scenario.getNetwork().getNodes().values()) {
 				switch (node.getId().toString()) {
@@ -230,7 +233,7 @@ public final class TtCreateBraessSignals {
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
-		SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
+		SignalControlDataFactory fac = signalControl.getFactory();
 		
 		// create a temporary, empty signal control object needed in case sylvia is used
 		SignalControlData tmpSignalControl = new SignalControlDataImpl();		
@@ -273,6 +276,7 @@ public final class TtCreateBraessSignals {
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
 				case SIGNAL4_X_SECOND_Z:
+				case SIGNAL4_RESPONSIVE:
 					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), secondsZGreen);
 					break;
 				case SIGNAL4_SYLVIA_V2Z:
