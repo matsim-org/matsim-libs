@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -50,6 +51,7 @@ public class RunCoord3D {
 	final private static int NUMBER_OF_PERSONS = 900;
 	final private static int ITERS = 100;
 	final private static int RUNS = 100;
+	final private static long SEED = 20160728l;
 
 	/**
 	 * @param args
@@ -62,8 +64,10 @@ public class RunCoord3D {
 		
 		for(int run = 1; run <= RUNS; run++){
 			LOG.info("==================== RUN " + run + " ====================");
-			Scenario sc = ScenarioBuilder3D.buildScenario(NUMBER_OF_PERSONS, run);
+			Scenario sc = ScenarioBuilder3D.buildScenario(NUMBER_OF_PERSONS, SEED, run);
 			sc = setupConfig(sc, path, run);
+			new ConfigWriter(sc.getConfig()).write(path + "config.xml");
+			
 			Controler controler = setupControler(sc);
 			
 			controler.run();
@@ -89,7 +93,7 @@ public class RunCoord3D {
 		Config config = sc.getConfig();
 		
 		/* Fix the seed and threads. */
-		config.global().setRandomSeed(20160716l * run);
+		config.global().setRandomSeed(SEED * run);
 		config.global().setNumberOfThreads(1);
 		config.qsim().setNumberOfThreads(1);
 		

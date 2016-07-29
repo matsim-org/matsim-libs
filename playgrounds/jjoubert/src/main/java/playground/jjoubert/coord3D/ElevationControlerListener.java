@@ -25,10 +25,13 @@ package playground.jjoubert.coord3D;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -65,12 +68,14 @@ public class ElevationControlerListener implements StartupListener, IterationEnd
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		List<Id<Link>> linkList = getLinkList();
 		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(event.getServices().getControlerIO().getOutputPath() + "/routeChoice.csv");
 		try{
 			bw.write(String.valueOf(event.getIteration()));
-			Iterator<Integer[]> iterator = eventhandler.linkMap.values().iterator();
+			Iterator<Id<Link>> iterator = linkList.iterator();
 			while(iterator.hasNext()){
-				Integer[] ia = iterator.next();
+				Id<Link> lid = iterator.next();
+				Integer[] ia = eventhandler.linkMap.get(lid);
 				bw.write(String.format(",%d,%d", ia[0], ia[1]));
 			}
 			bw.newLine();
@@ -106,6 +111,20 @@ public class ElevationControlerListener implements StartupListener, IterationEnd
 		}
 		
 		this.events.addHandler(this.eventhandler);
+	}
+	
+	private List<Id<Link>> getLinkList(){
+		List<Id<Link>> linkList = new ArrayList<>();
+		linkList.add(Id.createLinkId("2"));
+		linkList.add(Id.createLinkId("3"));
+		linkList.add(Id.createLinkId("4"));
+		linkList.add(Id.createLinkId("5"));
+		linkList.add(Id.createLinkId("6"));
+		linkList.add(Id.createLinkId("7"));
+		linkList.add(Id.createLinkId("8"));
+		linkList.add(Id.createLinkId("9"));
+		linkList.add(Id.createLinkId("10"));
+		return linkList;
 	}
 
 }
