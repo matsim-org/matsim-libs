@@ -132,12 +132,23 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500);
 			this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
 			this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
-			this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600);
+			
+//			this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
+//			this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
+
+			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections. 
+			// If someone does a systematic study, please report.  kai, jul'16
+			this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
+			this.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(6, "minor",         1,  20.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(6, "residential",   1,  15.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(6, "living_street", 1,  10.0/3.6, 1.0,  300);
+
 			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 		}
 	}
 
