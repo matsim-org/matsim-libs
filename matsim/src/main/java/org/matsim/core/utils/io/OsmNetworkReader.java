@@ -147,6 +147,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(6, "minor",         1,  20.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(6, "residential",   1,  15.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(6, "living_street", 1,  10.0/3.6, 1.0,  300);
+			// changing the speed values failed the evacuation ScenarioGenerator test because of a different network -- DESPITE
+			// the fact that all the speed values are reset to some other value there.  No idea what happens there. kai, jul'16
 
 			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
 		}
