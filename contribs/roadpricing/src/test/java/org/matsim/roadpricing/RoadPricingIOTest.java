@@ -57,7 +57,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		// first, read the scheme from file
 		RoadPricingSchemeImpl scheme1 = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
-		reader1.parse(origFile);
+		reader1.readFile(origFile);
 
 		// compare it with what's expected
 		assertEquals("distance-toll-1", scheme1.getName());
@@ -100,7 +100,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 */
 		RoadPricingSchemeImpl scheme2 = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
-		reader2.parse(tmpFile1);
+		reader2.readFile(tmpFile1);
 
 		// write the scheme to a file
 		RoadPricingWriterXMLv1 writer2 = new RoadPricingWriterXMLv1(scheme2);

@@ -1,8 +1,8 @@
 package playground.balac.retailers.preprocess;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.balac.retailers.utils.ActivityDifferentiatorBalac;
 
@@ -10,10 +10,10 @@ import playground.balac.retailers.utils.ActivityDifferentiatorBalac;
 public class ModifyDesires {
 	
 	private final static Logger log = Logger.getLogger(ActivityDifferentiatorBalac.class);
-	private ActivityImpl act;
-	private PersonImpl person;
+	private Activity act;
+	private Person person;
 
-	public ModifyDesires(final ActivityImpl act,PersonImpl person) {
+	public ModifyDesires(final Activity act,Person person) {
 		this.act = act;
 		this.person = person;
 	}

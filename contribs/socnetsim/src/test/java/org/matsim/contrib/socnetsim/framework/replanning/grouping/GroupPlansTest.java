@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -56,7 +55,7 @@ public class GroupPlansTest {
 		final List<Plan> plans = new ArrayList<Plan>();
 
 		for (int i=0; i < 5; i++) {
-			plans.add( new PlanImpl(PopulationUtils.createPerson(Id.create(i, Person.class))) );
+			plans.add( PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class))) );
 		}
 
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
@@ -70,11 +69,10 @@ public class GroupPlansTest {
 			final Map<Id<Person>, Plan> planMap = new HashMap< >();
 			for (int j=0; j < 5; j++) {
 				Id id = Id.createPersonId( i + (1000 * j) );
+				final Id<Person> id1 = id;
 				planMap.put(
 						id,
-						new PlanImpl(
-								PopulationUtils.createPerson(
-										id)) );
+						PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(id1)) );
 			}
 			plans.add( factory.createJointPlan( planMap ) );
 		}

@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 
 public class NetworkDoubleLinks {
 
@@ -54,14 +54,20 @@ public class NetworkDoubleLinks {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void handleDoubleLink(LinkImpl l, NetworkImpl network) {
+	private final void handleDoubleLink(Link l, Network network) {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
 		Coord nc = new Coord(0.5 * (fn.getCoord().getX() + tn.getCoord().getX()), 0.5 * (fn.getCoord().getY() + tn.getCoord().getY()));
-		Node n = network.createAndAddNode(Id.create(l.getId()+this.suffix, Node.class),nc,((NodeImpl) fn).getType());
+		Node r = ((Node) fn);
+		final Coord coord = nc;
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(l.getId()+this.suffix, Node.class), coord);
+		NetworkUtils.setType(n1,(String) NetworkUtils.getType( r ));
+		Node n = n1;
 		network.removeLink(l.getId());
-		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
-		LinkImpl l2new = network.createAndAddLink(Id.create(l.getId()+this.suffix, Link.class),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
+		final Node toNode = n;
+		Link l1new = NetworkUtils.createAndAddLink(network,l.getId(), l.getFromNode(), toNode, 0.5*l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes(), (String) NetworkUtils.getOrigId( l ), (String) NetworkUtils.getType(l));
+		final Node fromNode = n;
+		Link l2new = NetworkUtils.createAndAddLink(network,Id.create(l.getId()+this.suffix, Link.class), fromNode, l.getToNode(), 0.5*l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes(), (String) NetworkUtils.getOrigId( l ), (String) NetworkUtils.getType(l));
 		log.info("    lid="+l.getId()+" split into lids="+l1new.getId()+","+l2new.getId()+" with additional nid="+n.getId());
 	}
 
@@ -69,7 +75,7 @@ public class NetworkDoubleLinks {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
+	public void run(Network network) {
 		log.info("running "+this.getClass().getName()+" module...");
 		log.info("  init number of links: "+network.getLinks().size());
 		log.info("  init number of nodes: "+network.getNodes().size());
@@ -77,9 +83,9 @@ public class NetworkDoubleLinks {
 		for (Node n : network.getNodes().values()) {
 			Object [] outLinks = n.getOutLinks().values().toArray();
 			for (int i=0; i<outLinks.length; i++) {
-				LinkImpl refLink = (LinkImpl)outLinks[i];
+				Link refLink = (Link)outLinks[i];
 				for (int j=i+1; j<outLinks.length; j++) {
-					LinkImpl candidateLink = (LinkImpl)outLinks[j];
+					Link candidateLink = (Link)outLinks[j];
 					if (refLink.getToNode().equals(candidateLink.getToNode())) {
 						linkIds.add(candidateLink.getId());
 					}
@@ -88,7 +94,7 @@ public class NetworkDoubleLinks {
 		}
 		log.info("  number of links to handle: "+linkIds.size());
 
-		for (Id id : linkIds) { handleDoubleLink((LinkImpl) network.getLinks().get(id),network); }
+		for (Id id : linkIds) { handleDoubleLink((Link) network.getLinks().get(id),network); }
 
 		log.info("  final number of links: "+network.getLinks().size());
 		log.info("  final number of nodes: "+network.getNodes().size());

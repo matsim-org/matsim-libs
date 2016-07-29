@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.gui;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
@@ -33,6 +34,7 @@ import java.util.Vector;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -68,7 +70,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private IdResolver agentIdResolver = new MyIdResolver();;
 
-	private final OTFHostControlBar hostControlBar;
+	private final OTFControlBar hostControlBar;
 
 	private final OTFServer server;
 
@@ -90,7 +92,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private final OTFVisConfigGroup config;
 
-	public OTFQueryControl(OTFServer server, OTFHostControlBar handler, final OTFVisConfigGroup config) {
+	public OTFQueryControl(OTFServer server, OTFControlBar handler, final OTFVisConfigGroup config) {
 		this.config = config;
 		this.hostControlBar = handler;
 		this.server = server;
@@ -122,7 +124,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 		}
 		this.queryEntries.clear();
 		textField.setText("");
-		hostControlBar.redrawDrawers();
+		((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 	}
 
 	@Override
@@ -136,7 +138,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 	public void handleClick(Rectangle2D.Double origRect, int mouseButton) {
 		if (mouseButton == 3) {
 			removeQueries();
-			hostControlBar.redrawDrawers();
+			((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 		} else {
 			String queryName = this.config.getQueryType();
 			Type typeOfQuery = getTypeOfQuery(queryName);
@@ -199,7 +201,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 			handleIdQuery(id, queryName);
 		}
 		textField.setText(infoText.toString());
-		hostControlBar.redrawDrawers();
+		((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 	}
 
 	@SuppressWarnings("unchecked")

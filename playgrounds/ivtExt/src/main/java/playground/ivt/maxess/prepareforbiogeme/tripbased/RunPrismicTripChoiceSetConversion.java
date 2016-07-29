@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
@@ -34,10 +34,8 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
@@ -63,7 +61,7 @@ public class RunPrismicTripChoiceSetConversion {
 		final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(sc.getNetwork());
 		final Network carNetwork = NetworkUtils.createNetwork();
 		filter.filter(carNetwork, Collections.singleton("car"));
-		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (NetworkImpl) carNetwork);
+		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (Network) carNetwork);
 
 		new XY2Links( sc ).run(sc.getPopulation());
 
@@ -104,17 +102,13 @@ public class RunPrismicTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new MainModeIdentifierImpl() );
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new MainModeIdentifierImpl(),
+									group.getModes() ) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()

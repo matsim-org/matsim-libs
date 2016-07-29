@@ -7,10 +7,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -39,10 +39,10 @@ public class ModalSplitGrocery {
 		double centerY = 247300.0;
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(attributes);	
+		new ObjectAttributesXmlReader(bla).readFile(attributes);	
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-			PopulationReader populationReader = new MatsimPopulationReader(scenario);
+			MatsimReader populationReader = new PopulationReader(scenario);
 			populationReader.readFile(input);
 	
 			int count = 0;

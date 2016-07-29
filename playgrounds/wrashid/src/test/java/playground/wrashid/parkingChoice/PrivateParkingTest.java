@@ -83,6 +83,10 @@ public class PrivateParkingTest extends MatsimTestCase {
 	
 	public void testChagingTheActTypeOfPrivateParkingShouldLeadToLongerWalkingDistances(){
 		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure

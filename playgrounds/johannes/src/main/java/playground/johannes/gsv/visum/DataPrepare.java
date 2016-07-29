@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -188,7 +188,7 @@ X;Dritte GV;OV;1.000
 	}
 
 	protected void createNetworkFromSchedule() {
-		NetworkImpl network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
 		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
 		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
@@ -199,15 +199,15 @@ X;Dritte GV;OV;1.000
 		Network transitNetwork = transitScenario.getNetwork();
 		MutableScenario streetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
-		new MatsimNetworkReader(transitScenario.getNetwork()).parse("/home/johannes/gsv/matsim/studies/netz2030/data/network.rail.wgs84.xml");
-		new MatsimNetworkReader(streetScenario.getNetwork()).parse("/home/johannes/gsv/matsim/studies/netz2030/data/network.road.wgs84.xml");
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
+		new MatsimNetworkReader(transitScenario.getNetwork()).readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.rail.wgs84.xml");
+		new MatsimNetworkReader(streetScenario.getNetwork()).readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.road.wgs84.xml");
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (Network) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write("/home/johannes/gsv/matsim/studies/netz2030/data/network.wgs84.xml");
 	}
 
 	protected void routePopulation() {
 		Population pop = this.scenario.getPopulation();
-		new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
+		new PopulationReader(this.scenario).readFile(INPUT_PLANS_FILE);
 
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());
 //		if ( scenario.getConfig().transit().isUseTransit() ) {

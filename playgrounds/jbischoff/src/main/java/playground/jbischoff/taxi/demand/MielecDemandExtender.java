@@ -26,8 +26,8 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
@@ -146,7 +146,7 @@ public class MielecDemandExtender
     {
         Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(sc.getNetwork()).readFile(inputNetFile);
-        new MatsimPopulationReader(sc).readFile(inputPlansFile);
+        new PopulationReader(sc).readFile(inputPlansFile);
         agentIds = new HashSet<>();
         for (Entry<Id<Person>, ? extends Person> e : sc.getPopulation().getPersons().entrySet()) {
             if (e.getKey().equals(Id.create("1398", Person.class)))

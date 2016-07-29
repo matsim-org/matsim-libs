@@ -44,7 +44,7 @@ public class KeepMidTrips {
 	public static void main(String[] args) {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		

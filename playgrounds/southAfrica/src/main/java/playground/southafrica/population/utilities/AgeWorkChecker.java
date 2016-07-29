@@ -22,13 +22,17 @@ package playground.southafrica.population.utilities;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class AgeWorkChecker {
 	private PersonAlgorithm algorithm;
@@ -61,8 +65,8 @@ public class AgeWorkChecker {
 			private boolean hasWork(Person person){
 				if(person.getPlans().size() > 0){
 					for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-						if(pe instanceof ActivityImpl){
-							ActivityImpl activity = (ActivityImpl) pe;
+						if(pe instanceof Activity){
+							Activity activity = (Activity) pe;
 							if(activity.getType().contains("w")){
 								return true;
 							}
@@ -81,11 +85,14 @@ public class AgeWorkChecker {
 	
 	public void checkForWorkingKids(String population){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(this.algorithm);
-		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
+		final PersonAlgorithm algo = this.algorithm;
+//		final Population population2 = (Population)scenario.getPopulation();
+		StreamingPopulationReader population2 = new StreamingPopulationReader( scenario ) ;
+		population2.addAlgorithm(algo);
+		StreamingUtils.setIsStreaming(population2, true);
 		
-		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
-		pr.readFile(population);
+//		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
+		population2.readFile(population);
 	}
 
 }

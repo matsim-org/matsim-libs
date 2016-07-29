@@ -21,8 +21,8 @@ package playground.wrashid.parkingSearch.ca.matlabInfra;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
@@ -33,7 +33,7 @@ public class Config {
 	public static String baseFolder = "C:/l/studies/LaHowara_Parking/input/zurichCity/matsim_scenario/teleatlas/";
 	private static String outputFolder = baseFolder + "/created/";
 	
-	private static NetworkImpl network=null;
+	private static Network network=null;
 	
 	public static String getNetworkFile() {
 		return baseFolder + "network.xml.gz";
@@ -60,9 +60,9 @@ public class Config {
 		return isInsideStudyArea(coord);
 	}
 	
-	public static NetworkImpl getNetwork(){
+	public static Network getNetwork(){
 		if (network==null){
-			network=(NetworkImpl) GeneralLib.readNetwork(getNetworkFile());
+			network=(Network) GeneralLib.readNetwork(getNetworkFile());
 		}
 		return network;
 	}

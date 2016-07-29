@@ -75,7 +75,7 @@ public class RunTestRoad {
 			config.controler().setLastIteration(0);
 			config.network().setInputFile(inputPath + "network.xml");
 			config.network().setTimeVariantNetwork(true);
-			config.network().setChangeEventInputFile(inputPath + "capacityChanges.xml");
+			config.network().setChangeEventsInputFile(inputPath + "capacityChanges.xml");
 			config.plans().setInputFile(inputPath + day + "_plans.xml.gz");
 
 			Scenario scenario = controler.getScenario();

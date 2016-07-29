@@ -36,7 +36,7 @@ public class PopulationIO {
     public static <P extends Person> Set<P> loadFromXML(String file, Factory factory) {
         XMLHandler parser = new XMLHandler(factory);
         parser.setValidating(false);
-        parser.parse(file);
+        parser.readFile(file);
 
         Set<P> persons = (Set<P>) parser.getPersons();
         logger.info(String.format("Loaded %s persons.", persons.size()));

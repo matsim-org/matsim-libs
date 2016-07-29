@@ -32,23 +32,24 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.OTFClientFile;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFEvent2MVI;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.*;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
@@ -90,15 +91,14 @@ public class OTFVis {
 	}
 
 	public static void main(final String[] args) {
-		String [] args2 = args;
-		if (args2.length == 0) {
+		if (args.length == 0) {
 			OTFVisGUI.runDialog();
-		} else if ( args2[0].equalsIgnoreCase("-convert") || args2[0].equalsIgnoreCase("--convert") ) {
-			convert(args2);
-		} else if (args2[0].equalsIgnoreCase("-help") || args2[0].equalsIgnoreCase("--help") || args2[0].equalsIgnoreCase("-?") ) {
-			convert(args2);
-		} else if (args2.length == 1) {
-			String filename = args2[0];
+		} else if ( args[0].equalsIgnoreCase("-convert") || args[0].equalsIgnoreCase("--convert") ) {
+			convert(args);
+		} else if (args[0].equalsIgnoreCase("-help") || args[0].equalsIgnoreCase("--help") || args[0].equalsIgnoreCase("-?") ) {
+			convert(args);
+		} else if (args.length == 1) {
+			String filename = args[0];
 			play(filename);
 		} else {
 			printUsage();
@@ -123,30 +123,30 @@ public class OTFVis {
 		}
 	}
 
-	private static String chooseFile() {
-		JFileChooser fc = new JFileChooser();
-		fc.setFileFilter( new FileFilter() {
-			@Override public boolean accept( File f ) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
-			}
-			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
-		} );
-
-		fc.setFileFilter( new FileFilter() {
-			@Override public boolean accept( File f ) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
-			}
-			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
-		} );
-
-		int state = fc.showOpenDialog( null );
-		if ( state == JFileChooser.APPROVE_OPTION ) {
-			String filename = fc.getSelectedFile().getAbsolutePath();
-			return filename;
-		}
-		System.out.println( "No file selected." );
-		return null;
-	}
+//	private static String chooseFile() {
+//		JFileChooser fc = new JFileChooser();
+//		fc.setFileFilter( new FileFilter() {
+//			@Override public boolean accept( File f ) {
+//				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
+//			}
+//			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
+//		} );
+//
+//		fc.setFileFilter( new FileFilter() {
+//			@Override public boolean accept( File f ) {
+//				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
+//			}
+//			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
+//		} );
+//
+//		int state = fc.showOpenDialog( null );
+//		if ( state == JFileChooser.APPROVE_OPTION ) {
+//			String filename = fc.getSelectedFile().getAbsolutePath();
+//			return filename;
+//		}
+//		System.out.println( "No file selected." );
+//		return null;
+//	}
 
 	public static void playMVI(final String[] args) {
 		playMVI(args[0]);
@@ -183,14 +183,7 @@ public class OTFVis {
 	}
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-
-		// this is the start/stop facility, which may be used outside of otfvis:
-		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
-		server.setNotificationListener( playPauseMobsimListener ) ;
-		qSim.addQueueSimulationListeners(playPauseMobsimListener);
-		
-		server.setSimulation(qSim);
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
 
 		if (config.transit().isUseTransit()) {
 
@@ -198,7 +191,15 @@ public class OTFVis {
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
 			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
-			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
+			
+//			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getagentsnapshotinfofactory();
+			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+			linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
+			if (! Double.isNaN(network.getEffectiveLaneWidth())){
+				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+			}
+			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+			
 			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
 			server.addAdditionalElement(facilityWriter);
 		}
@@ -212,7 +213,6 @@ public class OTFVis {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 		final Map<Id<Link>, VisLink> visLinks = new HashMap<>();
 		for (final Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 			visLinks.put(linkId, new VisLink() {
@@ -237,7 +237,17 @@ public class OTFVis {
 				}
 			});
 		}
-		server.setSimulation(new VisMobsim() {
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, new VisMobsim() {
+			@Override
+			public void run() {
+
+			}
+
+			@Override
+			public void addQueueSimulationListeners(MobsimListener listener) {
+
+			}
+
 			@Override
 			public VisNetwork getVisNetwork() {
 				return new VisNetwork() {
@@ -249,11 +259,6 @@ public class OTFVis {
 					@Override
 					public Network getNetwork() {
 						return scenario.getNetwork();
-					}
-
-					@Override
-					public AgentSnapshotInfoFactory getAgentSnapshotInfoFactory() {
-						return null;
 					}
 				};
 			}

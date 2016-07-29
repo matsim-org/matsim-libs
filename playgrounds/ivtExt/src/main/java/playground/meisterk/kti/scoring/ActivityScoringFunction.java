@@ -52,7 +52,7 @@ import java.util.*;
  *
  */
 public class ActivityScoringFunction extends
-org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
+org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	// TODO should be in person.desires
 	public static final int DEFAULT_PRIORITY = 1;

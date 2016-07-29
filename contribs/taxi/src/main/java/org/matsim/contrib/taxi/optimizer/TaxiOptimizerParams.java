@@ -20,6 +20,4 @@
 package org.matsim.contrib.taxi.optimizer;
 
 public interface TaxiOptimizerParams
-{
-    TaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext);
-}
+{}

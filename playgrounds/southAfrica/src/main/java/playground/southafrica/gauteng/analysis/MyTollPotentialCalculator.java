@@ -38,8 +38,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -110,12 +110,12 @@ public class MyTollPotentialCalculator {
 	
 	private void readNetwork(String filename){
 		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-		mnr.parse(filename);
+		mnr.readFile(filename);
 	}
 	
 	private void readPopulation(String filename){
-		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
-		mpr.parse(filename);
+		PopulationReader mpr = new PopulationReader(sc);
+		mpr.readFile(filename);
 	}
 	
 	public Scenario getScenario(){
@@ -183,7 +183,7 @@ public class MyTollPotentialCalculator {
 	private List<Id<Link>> readLinkIdsFromRoadPricingScheme(String roadpricingFilename){
 		log.info("Reading tolled links from " + roadpricingFilename);		
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
-		rpr.parse(roadpricingFilename);		
+		rpr.readFile(roadpricingFilename);		
 		List<Id<Link>> list = new ArrayList<>();
 		for(Id<Link> i : this.scheme.getTolledLinkIds()){
 			list.add(i);

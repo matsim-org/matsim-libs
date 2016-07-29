@@ -18,15 +18,17 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.TripRouterModule;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -63,14 +65,24 @@ public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>
 	@Override
 	public final void install() {
 		// bind scenario elements
-		bind( Scenario.class ).toInstance( scenario );
-		bind( ActivityFacilities.class ).toInstance( scenario.getActivityFacilities() );
-		bind( Population.class ).toInstance( scenario.getPopulation() );
-		//bind( Config.class ).toInstance( scenario.getConfig() );
-		bind( Network.class ).toInstance( scenario.getNetwork() );
-		bind( TransitSchedule.class ).toInstance( scenario.getTransitSchedule() );
+		//bind( Scenario.class ).toInstance( scenario );
+		//bind( ActivityFacilities.class ).toInstance( scenario.getActivityFacilities() );
+		//bind( Population.class ).toInstance( scenario.getPopulation() );
+		////bind( Config.class ).toInstance( scenario.getConfig() );
+		//bind( Network.class ).toInstance( scenario.getNetwork() );
+		//bind( TransitSchedule.class ).toInstance( scenario.getTransitSchedule() );
 
+		install( new ScenarioByInstanceModule( scenario ) );
 		install( new TripRouterModule() );
+
+		install( new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding( "car" ).to( FreespeedTravelTimeAndDisutility.class );
+				addTravelDisutilityFactoryBinding( "car" ).toInstance(
+						tt -> (TravelDisutility) tt);
+			}
+		} );
 
 		// Do not really understand how this can possibly work, but this allows to bind generic types
 		// with specific type parameters.
@@ -79,6 +91,11 @@ public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>
 		// http://gafter.blogspot.ch/2006/12/type-literals.html
 		bind( newGenericType( NestedLogitAccessibilityCalculator.class ) );
 		bind( newGenericType( NestedLogitModel.class ) );
+	}
+
+	@Provides @Singleton
+	public FreespeedTravelTimeAndDisutility createTravelTime( final PlanCalcScoreConfigGroup config ) {
+		return new FreespeedTravelTimeAndDisutility( config );
 	}
 
 	/**

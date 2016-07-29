@@ -53,7 +53,6 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
@@ -421,7 +420,7 @@ public class DgFigure9ScenarioGenerator {
 		if (net.getCapacityPeriod() != 3600.0){
 			throw new IllegalStateException();
 		}
-		((NetworkImpl)net).setEffectiveLaneWidth(1.0);
+		((Network)net).setEffectiveLaneWidth(1.0);
 		NetworkFactory fac = net.getFactory();
 		double scale = 300.0;
 		Node n1, n2, n3, n4, n5, n6, n7, n8;

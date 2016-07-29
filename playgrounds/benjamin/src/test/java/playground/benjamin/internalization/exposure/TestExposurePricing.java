@@ -111,6 +111,8 @@ public class TestExposurePricing {
 		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 		Scenario sc = minimalControlerSetting();
+		
+		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true); 
 
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs" : "notConsiderCO2Costs") + "_"+this.noOfTimeBins+"_timeBins/";
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
@@ -128,7 +130,7 @@ public class TestExposurePricing {
 		Plan selectedPlan = activeAgent.getSelectedPlan();
 
 		// check with the first leg
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(3) ).getRoute() ;
 		// Agent should take longer route to avoid exposure toll
 		Assert.assertTrue("Wrong route is selected. Agent should have used route with shorter link (i.e. 39) instead.", route.getLinkIds().contains(Id.create("39", Link.class)));
 	}
@@ -139,6 +141,8 @@ public class TestExposurePricing {
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
 		Scenario sc = minimalControlerSetting();
+
+		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true); 
 
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs" : "notConsiderCO2Costs") + "_"+this.noOfTimeBins+"_timeBins/";
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
@@ -187,7 +191,7 @@ public class TestExposurePricing {
 		Plan selectedPlan = activeAgent.getSelectedPlan();
 
 		// check with the first leg
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(3) ).getRoute() ;
 		// Agent should take longer route to avoid exposure toll
 		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
 	}
@@ -198,6 +202,9 @@ public class TestExposurePricing {
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
 		Scenario sc = minimalControlerSetting();
+		
+		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// yy otherwise, the scenario consumes walk time from activity to link, somewhat modifying the results. kai, jun'16
 
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs" : "notConsiderCO2Costs") + "_"+this.noOfTimeBins+"_timeBins/";
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
@@ -287,7 +294,7 @@ public class TestExposurePricing {
 
 				for (PersonMoneyEvent e : personMoneyEventHandler.events){
 					if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
-						Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.193609 ), df.format( e.getAmount() ) );
+						Assert.assertEquals( "Exposure toll on link 39 from manual calculation does not match from money event.", df.format( -0.193609 ), df.format( e.getAmount() ) );
 					}
 				}
 			} else {

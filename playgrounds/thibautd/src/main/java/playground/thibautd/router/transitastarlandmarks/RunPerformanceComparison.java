@@ -29,6 +29,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -80,7 +81,7 @@ public class RunPerformanceComparison {
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
 		final TransitRouterAStar testee = new TransitRouterAStar( config , sc.getTransitSchedule() );
-		final TransitRouter reference = new TransitRouterImpl( new TransitRouterConfig( config ) , sc.getTransitSchedule() );
+		final TransitRouterImpl reference = new TransitRouterImpl( new TransitRouterConfig( config ) , sc.getTransitSchedule() );
 
 		final ConcurrentStopWatch<Algo> stopWatch = new ConcurrentStopWatch<>( Algo.class );
 
@@ -98,7 +99,7 @@ public class RunPerformanceComparison {
 	private static void measureForPopulation(
 			final Scenario sc,
 			final TransitRouterAStar testee,
-			final TransitRouter reference,
+			final TransitRouterImpl reference,
 			final ConcurrentStopWatch<Algo> stopWatch ) {
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 		final List<TripStructureUtils.Trip> trips = new ArrayList<>();
@@ -123,19 +124,11 @@ public class RunPerformanceComparison {
 			counter.incCounter();
 
 			stopWatch.startMeasurement( Algo.AStar );
-			testee.calcRoute(
-					trip.getOriginActivity().getCoord(),
-					trip.getDestinationActivity().getCoord(),
-					trip.getOriginActivity().getEndTime(),
-					null );
+			testee.calcRoute( new FakeFacility(trip.getOriginActivity().getCoord()), new FakeFacility(trip.getDestinationActivity().getCoord()), trip.getOriginActivity().getEndTime(), null );
 			stopWatch.endMeasurement( Algo.AStar );
 
 			stopWatch.startMeasurement( Algo.classic );
-			reference.calcRoute(
-					trip.getOriginActivity().getCoord(),
-					trip.getDestinationActivity().getCoord(),
-					trip.getOriginActivity().getEndTime(),
-					null );
+			reference.calcRoute( new FakeFacility(trip.getOriginActivity().getCoord()), new FakeFacility(trip.getDestinationActivity().getCoord()), trip.getOriginActivity().getEndTime(), null );
 			stopWatch.endMeasurement( Algo.classic );
 		}
 		counter.printCounter();
@@ -143,7 +136,7 @@ public class RunPerformanceComparison {
 
 	private static void measureForRandomODs( Scenario sc,
 			TransitRouterAStar testee,
-			TransitRouter reference,
+			TransitRouterImpl reference,
 			ConcurrentStopWatch<Algo> stopWatch ) {
 		final List<Id<TransitStopFacility>> facilityIds = new ArrayList<>( sc.getTransitSchedule().getFacilities().keySet() );
 		Collections.sort( facilityIds );
@@ -166,11 +159,11 @@ public class RunPerformanceComparison {
 			counter.incCounter();
 
 			stopWatch.startMeasurement( Algo.AStar );
-			testee.calcRoute( orign.getCoord(), destination.getCoord(), time, null );
+			testee.calcRoute( new FakeFacility(orign.getCoord()), new FakeFacility(destination.getCoord()), time, null );
 			stopWatch.endMeasurement( Algo.AStar );
 
 			stopWatch.startMeasurement( Algo.classic );
-			reference.calcRoute( orign.getCoord(), destination.getCoord(), time, null );
+			reference.calcRoute( new FakeFacility(orign.getCoord()), new FakeFacility(destination.getCoord()), time, null );
 			stopWatch.endMeasurement( Algo.classic );
 		}
 		counter.printCounter();

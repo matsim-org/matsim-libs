@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -52,7 +51,7 @@ public class InpNetworkMapper extends AbstractNetworkMapper {
 	@Override
 	protected Network providePreparedNetwork(String path2VissimNetworkInp, String notUsed) {
 		final Network network = NetworkUtils.createNetwork();
-		final NetworkFactory networkFactory = new NetworkFactoryImpl(network);
+		final NetworkFactory networkFactory = network.getFactory();
 
 		// parse inp-file:
 		try {

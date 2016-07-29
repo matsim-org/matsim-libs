@@ -24,15 +24,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
@@ -40,7 +41,7 @@ public class NetworkThinner {
 
 	private static final Logger log = Logger.getLogger(NetworkThinner.class);
 
-	private final void merge(List<Link> list, NetworkImpl network, Counts counts) {
+	private final void merge(List<Link> list, Network network, Counts counts) {
 		Link first = list.get(0);
 		Node fromNode = first.getFromNode();
 		Node toNode = list.get(list.size()-1).getToNode();
@@ -48,10 +49,13 @@ public class NetworkThinner {
 		for (Link l : list) { network.removeLink(l.getId()); }
 		// add a new link
 		double length = 0.0; for (Link l : list) { length += l.getLength(); }
-		Link newLink = network.createAndAddLink(first.getId(),fromNode,toNode,length,first.getFreespeed(),first.getCapacity(),first.getNumberOfLanes());
-		((LinkImpl) newLink).setType(((LinkImpl) first).getType());
+		final Node fromNode1 = fromNode;
+		final Node toNode1 = toNode;
+		final double length1 = length;
+		Link newLink = NetworkUtils.createAndAddLink(network,first.getId(), fromNode1, toNode1, length1, first.getFreespeed(), first.getCapacity(), first.getNumberOfLanes() );
+		NetworkUtils.setType( ((Link) newLink), (String) NetworkUtils.getType(((Link) first)));
 		// always assign the origId of the first link (for convenience)
-		((LinkImpl) newLink).setOrigId(((LinkImpl) first).getOrigId());
+		NetworkUtils.setOrigId( ((Link) newLink), (String) NetworkUtils.getOrigId( ((Link) first) ) ) ;
 
 		// mapping info
 		for (Link l : list) { log.info("    mapping: "+l.getId()+" => "+newLink.getId()); }
@@ -75,7 +79,7 @@ public class NetworkThinner {
 		}
 	}
 
-	public void run(final NetworkImpl network, Counts counts) {
+	public void run(final Network network, Counts counts) {
 		log.info("running "+this.getClass().getName()+" module...");
 		log.info("  init number of links: "+network.getLinks().size());
 		log.info("  init number of nodes: "+network.getNodes().size());
@@ -84,7 +88,8 @@ public class NetworkThinner {
 		for (Link l : network.getLinks().values()) {
 			Link currLink = l;
 			Node fromNode = currLink.getFromNode();
-			while ((((NodeImpl) fromNode).getIncidentNodes().size() == 2) &&
+			Node r = ((Node) fromNode);
+			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r)).size() == 2) &&
 					(((fromNode.getOutLinks().size() == 1) && (fromNode.getInLinks().size() == 1)) ||
 					((fromNode.getOutLinks().size() == 2) && (fromNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = fromNode.getInLinks().values().iterator();
@@ -104,7 +109,8 @@ public class NetworkThinner {
 			Link currLink = network.getLinks().get(lid);
 			linksToMerge.add(currLink);
 			Node toNode = currLink.getToNode();
-			while ((((NodeImpl) toNode).getIncidentNodes().size() == 2) &&
+			Node r = ((Node) toNode);
+			while ((((Map<Id<Node>, ? extends Node>) NetworkUtils.getIncidentNodes(r)).size() == 2) &&
 					(((toNode.getOutLinks().size() == 1) && (toNode.getInLinks().size() == 1)) ||
 					((toNode.getOutLinks().size() == 2) && (toNode.getInLinks().size() == 2)))) {
 				Iterator<? extends Link> linkIt = toNode.getOutLinks().values().iterator();
@@ -115,7 +121,7 @@ public class NetworkThinner {
 						(currLink.getCapacity() != nextLink.getCapacity()) ||
 						(currLink.getFreespeed() != nextLink.getFreespeed()) ||
 						(currLink.getNumberOfLanes() != nextLink.getNumberOfLanes()) ||
-						!((LinkImpl) currLink).getType().equals(((LinkImpl) nextLink).getType()) ||
+						!NetworkUtils.getType(((Link) currLink)).equals(NetworkUtils.getType(((Link) nextLink))) ||
 						!currLink.getAllowedModes().equals(nextLink.getAllowedModes())) {
 					mergeGroups.add(linksToMerge);
 					linksToMerge = new ArrayList<Link>();

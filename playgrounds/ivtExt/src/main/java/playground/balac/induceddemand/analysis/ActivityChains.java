@@ -2,10 +2,10 @@ package playground.balac.induceddemand.analysis;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
@@ -19,7 +19,7 @@ public class ActivityChains {
 	public static void main(String[] args) {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
@@ -29,7 +29,7 @@ public class ActivityChains {
 		Set<String> activityChains = new HashSet<String>();
 		Map<String, Integer> actPerType = new HashMap<String, Integer>();
 		
-		int[] sizeChain = new int[20];
+		int[] sizeChain = new int[30];
 		
 		stageTypes.addActivityTypes( new StageActivityTypesImpl( "pt interaction" ) );
 

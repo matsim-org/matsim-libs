@@ -9,7 +9,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import playground.mzilske.cdr.BerlinRunUncongested3;
 import roadclassification.RunRoadClassification;
 
 /**
@@ -23,7 +22,7 @@ public class MZRoadClassificationMain {
     public static void main(String[] args) {
         Config config = new Config();
         config.addCoreModules();
-        new ConfigReader(config).parse(BerlinRunUncongested3.class.getResourceAsStream("2kW.15.xml"));
+//        new ConfigReader(config).parse(BerlinRunUncongested3.class.getResourceAsStream("2kW.15.xml"));
         config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");
         config.controler().setWritePlansInterval(0);
         config.controler().setDumpDataAtEnd(false);
@@ -36,12 +35,12 @@ public class MZRoadClassificationMain {
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         final Counts allCounts = new Counts();
-        new CountsReaderMatsimV1(allCounts).parse(sightingsDir + "/all_counts.xml.gz");
+        new CountsReaderMatsimV1(allCounts).readFile(sightingsDir + "/all_counts.xml.gz");
 
         scenario.addScenarioElement(Counts.ELEMENT_NAME, allCounts);
 
         final ObjectAttributes linkAttributes = new ObjectAttributes();
-        new ObjectAttributesXmlReader(linkAttributes).parse("/Users/michaelzilske/git/java8-matsim-playground/output/berlin/road-categories/road-categories.xml");
+        new ObjectAttributesXmlReader(linkAttributes).readFile("/Users/michaelzilske/git/java8-matsim-playground/output/berlin/road-categories/road-categories.xml");
         scenario.addScenarioElement("linkAttributes", linkAttributes);
         RunRoadClassification.optimize(scenario);
         System.out.println("Done.");

@@ -26,7 +26,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -37,7 +37,7 @@ import org.xml.sax.InputSource;
  *
  * @author mrieser
  */
- class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeReader {
+ class ConfigReaderMatsimV1 extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(ConfigReaderMatsimV1.class);
 //	private final static String CONFIG = "config";
@@ -80,8 +80,8 @@ import org.xml.sax.InputSource;
 		  //if there are type safe optional modules they have to be added here
 		  if (name.equals(QSimConfigGroup.GROUP_NAME)){
 		    this.currmodule = this.config.qsim();
-		  } else if ( name.equals(SimulationConfigGroup.GROUP_NAME) ) {
-			  this.currmodule = new SimulationConfigGroup() ;
+		  } else if ( name.equals(ExternalMobimConfigGroup.GROUP_NAME) ) {
+			  this.currmodule = new ExternalMobimConfigGroup() ;
 			  this.config.addModule(this.currmodule);
 		  }
 		  //it must be a not type safe generic module
@@ -97,15 +97,6 @@ import org.xml.sax.InputSource;
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
-	}
-
-	/**
 	 * Parses the specified config file, and uses the given dtd file as a local copy to use as dtd
 	 * if the one specified in the config file cannot be found.
 	 *
@@ -118,19 +109,20 @@ import org.xml.sax.InputSource;
 		this.localDtd = null;
 	}
 
-	@Override
-	public InputSource resolveEntity(final String publicId, final String systemId) {
-
-		InputSource is = super.resolveEntity(publicId, systemId);
-		if (is == null && this.localDtd != null) {
-			File dtdFile = new File(this.localDtd);
-			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + this.localDtd);
-				return new InputSource(this.localDtd);
-			}
-			return null;
-		}
-		return is;
-	}
+	// The following did override the inherited resolveEntity method.  But I have no idea why that may have made sense.  kai, jul'16
+//	@Override
+//	public InputSource resolveEntity(final String publicId, final String systemId) {
+//
+//		InputSource is = super.resolveEntity(publicId, systemId);
+//		if (is == null && this.localDtd != null) {
+//			File dtdFile = new File(this.localDtd);
+//			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+//				log.info("Using the local DTD " + this.localDtd);
+//				return new InputSource(this.localDtd);
+//			}
+//			return null;
+//		}
+//		return is;
+//	}
 
 }

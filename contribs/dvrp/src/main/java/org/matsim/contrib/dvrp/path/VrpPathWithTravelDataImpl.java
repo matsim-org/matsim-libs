@@ -106,6 +106,13 @@ public class VrpPathWithTravelDataImpl
 
 
     @Override
+    public void setLinkTravelTime(int idx, double linkTT)
+    {
+        linkTTs[idx] = linkTT;
+    }
+
+
+    @Override
     public Iterator<Link> iterator()
     {
         return Iterators.forArray(links);

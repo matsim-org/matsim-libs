@@ -21,14 +21,13 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
@@ -142,10 +141,13 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
-		if ((act.getLinkId() == null || act.getCoord() == null)
+		if (  (act.getLinkId() == null && act.getCoord() == null)  // yyyy this used to be || instead of && --???  kai, jun'16
 				&& facilities != null
 				&& !facilities.getFacilities().isEmpty()) {
-			// use facilities only if the activity does not provides the required fields.
+			// use facilities only if the activity does not provide the required fields.
+			// yyyyyy Seems to me that the Access/EgressRoutingModule only needs either link or coord to start from.  So we only go
+			// to facilities if neither is provided.  --  This may, however, be at odds of how it is done in the AERoutingModule, so we 
+			// need to conceptually sort this out!!  kai, jun'16
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
 		return new ActivityWrapperFacility( act );
@@ -178,7 +180,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
+			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				return endTime;

@@ -21,8 +21,8 @@
 package playground.sergioo.singapore2012.transitLocationChoice;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class TransitActsRemoverStrategy extends AbstractMultithreadedModule {
 

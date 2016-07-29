@@ -33,8 +33,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -65,21 +65,21 @@ public class RandomSelectorsTest {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
 
-		Person person = PopulationUtils.createPerson(Id.create("tintin", Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("tintin", Person.class));
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 5d );
 
-		person = PopulationUtils.createPerson(Id.create("milou", Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create("milou", Person.class));
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 5000d );
 
-		person = PopulationUtils.createPerson(Id.create("tim", Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create("tim", Person.class));
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
@@ -88,7 +88,7 @@ public class RandomSelectorsTest {
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( -5000d );
 
-		person = PopulationUtils.createPerson(Id.create("struppy", Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create("struppy", Person.class));
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( -10d );
@@ -108,9 +108,10 @@ public class RandomSelectorsTest {
 		Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
 		Id<Person> id = Id.createPersonId( "tintin" );
-		Person person = PopulationUtils.createPerson(id);
+		final Id<Person> id1 = id;
+		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 1d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -121,7 +122,8 @@ public class RandomSelectorsTest {
 		jp3.put( id , plan );
 
 		id = Id.createPersonId( "milou" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id2 = id;
+		person = PopulationUtils.getFactory().createPerson(id2);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
@@ -134,7 +136,8 @@ public class RandomSelectorsTest {
 		jp3.put( id , plan );
 
 		id = Id.createPersonId( "tim" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id3 = id;
+		person = PopulationUtils.getFactory().createPerson(id3);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
@@ -147,7 +150,8 @@ public class RandomSelectorsTest {
 		jp3.put( id , plan );
 
 		id = Id.createPersonId( "struppy" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id4 = id;
+		person = PopulationUtils.getFactory().createPerson(id4);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( -10d );
@@ -182,9 +186,10 @@ public class RandomSelectorsTest {
 		Map<Id<Person>, Plan> jp8 = new HashMap< >();
 
 		Id<Person> id = Id.createPersonId( "tintin" );
-		Person person = PopulationUtils.createPerson(id);
+		final Id<Person> id1 = id;
+		Person person = PopulationUtils.getFactory().createPerson(id1);
 		group.addPerson( person );
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
 		jp1.put( id , plan );
 		plan = PersonUtils.createAndAddPlan(person, false);
@@ -198,7 +203,8 @@ public class RandomSelectorsTest {
 		jp7.put( id , plan );
 
 		id = Id.createPersonId( "milou" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id2 = id;
+		person = PopulationUtils.getFactory().createPerson(id2);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( -200d );
@@ -214,7 +220,8 @@ public class RandomSelectorsTest {
 		jp8.put( id , plan );
 
 		id = Id.createPersonId( "tim" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id3 = id;
+		person = PopulationUtils.getFactory().createPerson(id3);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 10d );
@@ -229,7 +236,8 @@ public class RandomSelectorsTest {
 		jp7.put( id , plan );
 
 		id = Id.createPersonId( "struppy" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id4 = id;
+		person = PopulationUtils.getFactory().createPerson(id4);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 333d );
@@ -243,7 +251,8 @@ public class RandomSelectorsTest {
 		jp8.put( id , plan );
 
 		id = Id.createPersonId( "haddock" );
-		person = PopulationUtils.createPerson(id);
+		final Id<Person> id5 = id;
+		person = PopulationUtils.getFactory().createPerson(id5);
 		group.addPerson( person );
 		plan = PersonUtils.createAndAddPlan(person, false);
 		plan.setScore( 500d );

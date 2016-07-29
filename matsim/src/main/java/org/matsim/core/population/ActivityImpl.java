@@ -35,7 +35,7 @@ import org.matsim.facilities.ActivityFacility;
  * </ul>
  *
  */
-public final class ActivityImpl implements Activity {
+/* package */ final class ActivityImpl implements Activity {
 	// Assume this as input to iterations.  Cases:
 	// Case (0): comes with coord and linkId.  No problem.
 	// Case (1): comes with linkId but w/o coord.  Coord is (presumably) set in prepareForIterations.
@@ -60,33 +60,6 @@ public final class ActivityImpl implements Activity {
 	
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
-	}
-
-	public ActivityImpl(final String type, final Id<Link> linkId) {
-		this(type);
-		this.linkId = linkId ;
-	}
-
-	public ActivityImpl(final String type, final Coord coord) {
-		this(type);
-		this.coord = coord ;
-	}
-
-	public ActivityImpl(final String type, final Coord coord, final Id<Link> linkId) {
-		this(type, linkId);
-		this.coord = coord ;
-	}
-
-	public ActivityImpl(final Activity act) {
-		this(act.getType());
-		// Act coord could be null according to first c'tor!
-		Coord c = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
-		this.coord = c ;
-		this.linkId = act.getLinkId();
-		this.setStartTime(act.getStartTime());
-		this.setEndTime(act.getEndTime());
-		this.setMaximumDuration(act.getMaximumDuration());
-		this.setFacilityId(act.getFacilityId());
 	}
 
 	@Override
@@ -129,7 +102,7 @@ public final class ActivityImpl implements Activity {
 	public final Coord getCoord() {
 		return this.coord;
 	}
-
+	@Override
 	public void setCoord(final Coord coord) {
 //		testForLocked();
 		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15
@@ -145,11 +118,13 @@ public final class ActivityImpl implements Activity {
 		return this.facilityId;
 	}
 
+	@Override
 	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
 //		testForLocked();
 		this.facilityId = facilityId;
 	}
 
+	@Override
 	public final void setLinkId(final Id<Link> linkId) {
 //		testForLocked();
 		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15
@@ -163,6 +138,7 @@ public final class ActivityImpl implements Activity {
 				"[linkId=" + this.linkId + "]" +
 				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
 				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
+				"[duration=" + Time.writeTime(this.getMaximumDuration()) + "]" +
 				"[facilityId=" + this.facilityId + "]" ;
 	}
 

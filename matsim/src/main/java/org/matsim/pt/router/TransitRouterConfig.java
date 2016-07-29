@@ -85,9 +85,13 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double marginalUtilityOfWaitingPt_utl_s;
 
+	private double marginalUtilityOfTravelDistanceWalk_utl_m;
+	
 	private double marginalUtilityOfTravelDistanceTransit_utl_m;
 
 	private double utilityOfLineSwitch_utl;
+
+	private Double beelineDistanceFactor;
 
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
@@ -99,10 +103,14 @@ public class TransitRouterConfig implements MatsimParameters {
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
 		
 		// walk:
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
-				/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
+		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
 
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
+				/ beelineDistanceFactor ;
+		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
+		
+		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getModes().get(TransportMode.walk).getMonetaryDistanceRate();
 		
 		// pt:
 		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
@@ -144,7 +152,11 @@ public class TransitRouterConfig implements MatsimParameters {
 	public void setMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_s) {
 		this.marginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_s;
 	}
-
+	
+	public void setMarginalUtilityOfTravelDistanceWalk_utl_m(final double marginalUtilityOfTravelDistanceWalk_utl_m) {
+		this.marginalUtilityOfTravelDistanceWalk_utl_m = marginalUtilityOfTravelDistanceWalk_utl_m;
+	}
+	
 	/**
 	 * @return the marginal utility of travel time by public transit.
 	 */
@@ -172,6 +184,10 @@ public class TransitRouterConfig implements MatsimParameters {
 		return this.marginalUtilityOfTravelDistanceTransit_utl_m;
 	}
 
+	public double getMarginalUtilityOfTravelDistanceWalk_utl_m() {
+		return this.marginalUtilityOfTravelDistanceWalk_utl_m;
+	}
+	
 	public void setBeelineWalkSpeed(final double beelineWalkSpeed) {
 		this.beelineWalkSpeed = beelineWalkSpeed;
 	}
@@ -213,6 +229,10 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	public void setAdditionalTransferTime(double additionalTransferTime) {
 		this.additionalTransferTime = additionalTransferTime;
+	}
+
+	final Double getBeelineDistanceFactor() {
+		return this.beelineDistanceFactor;
 	}
 
 }

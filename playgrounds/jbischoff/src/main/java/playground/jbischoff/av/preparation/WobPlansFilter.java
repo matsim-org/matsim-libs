@@ -19,18 +19,21 @@
 
 package playground.jbischoff.av.preparation;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -41,14 +44,14 @@ public class WobPlansFilter {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.taxiplans_alltrips.xml.gz");
+		new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.taxiplans_alltrips.xml.gz");
 		Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			boolean copyPerson = false;
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
-					if (((Leg) pe).getMode().equals(TaxiUtils.TAXI_MODE)){
+					if (((Leg) pe).getMode().equals(TaxiModule.TAXI_MODE)){
 						copyPerson = true;
 					}
 				}
@@ -71,8 +74,10 @@ public class WobPlansFilter {
 				if (pe instanceof Leg){
 					if (((Leg) pe).getMode().equals(TransportMode.car))
 							{
+						Id<Link> start = ((Leg) pe).getRoute().getStartLinkId();
+						Id<Link> end = ((Leg) pe).getRoute().getStartLinkId();
 						((Leg) pe).setMode(TransportMode.ride);
-						((Leg) pe).setRoute(null);
+						((Leg) pe).setRoute(new GenericRouteImpl(start, end));
 					}
 				}
 			}

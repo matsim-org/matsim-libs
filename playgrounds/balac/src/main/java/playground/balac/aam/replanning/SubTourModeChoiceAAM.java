@@ -5,12 +5,12 @@ package playground.balac.aam.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
-import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import javax.inject.Provider;
 

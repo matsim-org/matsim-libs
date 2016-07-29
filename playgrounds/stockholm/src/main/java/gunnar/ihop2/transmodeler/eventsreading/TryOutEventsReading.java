@@ -13,7 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.utilities.Time;
@@ -45,7 +45,7 @@ class TryOutEventsReading implements EventHandler {
 		System.out.println("reading network");
 		final NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(
 				scenario.getNetwork());
-		networkReader.parse(matsimNetworkFile);
+		networkReader.readFile(matsimNetworkFile);
 
 		// defining links of interest and checking if they are there
 		final List<Id<Link>> observedLinks = new ArrayList<Id<Link>>();

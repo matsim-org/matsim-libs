@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -165,7 +165,7 @@ public class PopulationUtilsTest {
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		new MatsimNetworkReader(s1.getNetwork()).readFile(netFileName);
-		new MatsimPopulationReader(s1).readFile(popFileName);
+		new PopulationReader(s1).readFile(popFileName);
 		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s1.getPopulation()));
 	}
 

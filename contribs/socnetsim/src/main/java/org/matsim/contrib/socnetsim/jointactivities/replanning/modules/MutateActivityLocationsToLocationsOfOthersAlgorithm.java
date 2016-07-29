@@ -32,10 +32,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.Facility;
@@ -67,9 +67,9 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 			for ( Activity act : TripStructureUtils.getActivities( plan , choiceSet.filter ) ) {
 				assert act.getType().equals( choiceSet.type );
 				final Facility choice = groupChoiceSet.get( random.nextInt( groupChoiceSet.size() ) );
-				((ActivityImpl) act).setCoord( choice.getCoord() );
-				((ActivityImpl) act).setLinkId( choice.getLinkId() );
-				((ActivityImpl) act).setFacilityId( choice.getId() );
+				((Activity) act).setCoord( choice.getCoord() );
+				((Activity) act).setLinkId( choice.getLinkId() );
+				((Activity) act).setFacilityId( choice.getId() );
 			}
 		}
 	}

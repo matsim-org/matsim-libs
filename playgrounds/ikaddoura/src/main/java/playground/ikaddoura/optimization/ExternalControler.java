@@ -35,8 +35,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -261,7 +261,7 @@ class ExternalControler {
 			}
 		}
 		
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		demand = scenario.getPopulation().getPersons().size();
 		
 		scenario.getConfig().transit().setTransitScheduleFile(scheduleFile);

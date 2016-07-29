@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
@@ -99,11 +99,11 @@ public class PlanScoreAnalysis {
 
 		Scenario scenario1 = new ScenarioBuilder( ConfigUtils.createConfig() ).setNetwork(net).build() ;
 		Population plans = scenario1.getPopulation();
-		new MatsimPopulationReader(scenario1).readFile(PLANS);
+		new PopulationReader(scenario1).readFile(PLANS);
 
 		Scenario scenario2 = new ScenarioBuilder( ConfigUtils.createConfig() ).setNetwork(net).build() ;
 		Population plans2 = scenario2.getPopulation();
-		new MatsimPopulationReader(scenario2).readFile(PLANS2);
+		new PopulationReader(scenario2).readFile(PLANS2);
 
 
 		Logger.getLogger(PlanScoreAnalysis.class).info("plans read");
@@ -125,7 +125,7 @@ public class PlanScoreAnalysis {
 				id = person.getId();
 				score1 = plan.getScore().doubleValue();
 				score2 = plans2.getPersons().get(id).getSelectedPlan().getScore().doubleValue();
-				loc = ((ActivityImpl) plan.getPlanElements().get(0)).getCoord();
+				loc = ((Activity) plan.getPlanElements().get(0)).getCoord();
 				writer.addLine(id.toString(), Double.toString(loc.getX()), Double
 						.toString(loc.getY()), Double.toString(score1), Double
 						.toString(score2));

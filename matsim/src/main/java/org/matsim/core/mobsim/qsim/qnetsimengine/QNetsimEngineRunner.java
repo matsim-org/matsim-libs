@@ -34,7 +34,7 @@ import java.util.concurrent.Phaser;
  * @author (of this documentation) nagel
  *
  */
-class QNetsimEngineRunner extends NetElementActivator implements Runnable, Callable<Boolean> {
+class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnable, Callable<Boolean> {
 
 	private double time = 0.0;
 
@@ -184,7 +184,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 
-			remainsActive = link.doSimStep(time);
+			remainsActive = link.doSimStep();
 
 			if (!remainsActive) simLinks.remove();
 		}
@@ -197,7 +197,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void activateLink(QLinkI link) {
+	protected void registerLinkAsActive(QLinkI link) {
 		if (!lockLinks) linksList.add(link);
 		else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
 	}
@@ -213,7 +213,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void activateNode(QNode node) {
+	protected void registerNodeAsActive(QNode node) {
 		if (!this.lockNodes) this.nodesQueue.add(node);
 		else throw new RuntimeException("Tried to activate a QNode at a time where this was not allowed. Aborting!");
 	}

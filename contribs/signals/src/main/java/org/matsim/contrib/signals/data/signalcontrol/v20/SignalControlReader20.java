@@ -30,14 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
-import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
+import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -46,7 +39,15 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
+import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
+import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
+import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
+import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.xml.sax.SAXException;
 
 
@@ -54,7 +55,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalControlReader20 extends MatsimJaxbXmlParser {
+public class SignalControlReader20 extends MatsimJaxbXmlParser implements MatsimReader {
 
 
 	private static final Logger log = Logger.getLogger(SignalControlReader20.class);

@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -59,7 +59,7 @@ public class AnalyseSacscOccupancy {
 		/* Read the GLA facility attributes. */
 		MutableScenario general = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(general);
-		fr.parse(args[0]);
+		fr.readFile(args[0]);
 		for(Id id : general.getActivityFacilities().getFacilities().keySet()){
 			if(id.toString().startsWith("sacsc") || id.toString().startsWith("osm")){
 				shopMapBase.put(id, 0);
@@ -70,16 +70,16 @@ public class AnalyseSacscOccupancy {
 		}
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(attributes);
-		oar.parse(args[1]); 
+		oar.readFile(args[1]); 
 		
 		/* BASE CASE */
 		Scenario base = ScenarioUtils.createScenario(ConfigUtils.createConfig());		
 		/* Read the network. */
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(base.getNetwork());
-		nr.parse(args[2]);
+		nr.readFile(args[2]);
 		/* Read in the plans file of the base case. */
-		MatsimPopulationReader pr = new MatsimPopulationReader(base);
-		pr.parse(args[3]);
+		PopulationReader pr = new PopulationReader(base);
+		pr.readFile(args[3]);
 		for(Id id : base.getPopulation().getPersons().keySet()){
 			Plan plan = base.getPopulation().getPersons().get(id).getSelectedPlan();
 			for(PlanElement pe : plan.getPlanElements()){
@@ -100,10 +100,10 @@ public class AnalyseSacscOccupancy {
 		Scenario compare = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		/* Read the network. */
 		nr = new NetworkReaderMatsimV1(compare.getNetwork());
-		nr.parse(args[2]);
+		nr.readFile(args[2]);
 		/* Read in the plans file of the comparative case. */
-		pr = new MatsimPopulationReader(compare);
-		pr.parse(args[4]);
+		pr = new PopulationReader(compare);
+		pr.readFile(args[4]);
 		for(Id id : compare.getPopulation().getPersons().keySet()){
 			Plan plan = compare.getPopulation().getPersons().get(id).getSelectedPlan();
 			for(PlanElement pe : plan.getPlanElements()){

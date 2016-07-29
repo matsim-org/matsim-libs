@@ -25,16 +25,21 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateSingleTripPopulation;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateSingleTripPopulationConfigGroup;
+import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates an ivt config with location choice.
  *
  * @author boescpa
  */
+@Deprecated
 public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 
 	public static void main(String[] args) {
@@ -60,10 +65,21 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 	}
 
 	@Override
-	protected Map<String, Double> getStrategyDescr() {
-		Map<String, Double> strategyDescr = new HashMap<>();
-		strategyDescr.put("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 1.0);
-		return strategyDescr;
+	protected List<StrategyConfigGroup.StrategySettings> getStrategyDescr() {
+		List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+		// main pop
+		strategySettings.add(getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 1.0));
+		// cb pop
+		StrategyConfigGroup.StrategySettings strategySetting =
+				getStrategySetting("ChangeExpBeta", 1.0);
+		strategySetting.setSubpopulation(CreateCBPop.CB_TAG);
+		strategySettings.add(strategySetting);
+		// freight pop
+		strategySetting =
+				getStrategySetting("ChangeExpBeta", 1.0);
+		strategySetting.setSubpopulation(CreateFreightTraffic.FREIGHT_TAG);
+		strategySettings.add(strategySetting);
+		return strategySettings;
 	}
 
 }

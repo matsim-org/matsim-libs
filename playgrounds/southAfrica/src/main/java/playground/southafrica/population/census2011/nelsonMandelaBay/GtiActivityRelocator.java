@@ -10,11 +10,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -451,7 +451,7 @@ public class GtiActivityRelocator {
 					for(Plan plan : p.getPlans()){
 						for(PlanElement pe : plan.getPlanElements()){
 							if(pe instanceof Activity){
-								ActivityImpl activity = (ActivityImpl)pe;
+								Activity activity = (Activity)pe;
 								SurveyActivities activityType = SurveyActivities.valueOf(activity.getType());
 								ActivityFacility facility = null;
 								switch (activityType) {

@@ -29,9 +29,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -120,19 +119,19 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan1(){
-		PlanImpl plan = new PlanImpl();
-		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
+		Plan plan = PopulationUtils.createPlan();
+		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		/* Create the point far enough away that it will only reach it by 
 		 * 08:00 the next morning. */
 		double travelTime = Time.parseTime("16:00:00");
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
-		Activity b = new ActivityImpl("b", CoordUtils.createCoord(distance, 2.0));
+		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 2.0));
 		plan.addActivity(b);
 		return plan;
 	}
@@ -149,25 +148,25 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan2(){
-		PlanImpl plan = new PlanImpl();
-		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
+		Plan plan = PopulationUtils.createPlan();
+		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		/* Create the point far enough away that it will reach it by 23:00:00 
 		 * the evening. */
 		double travelTime = Time.parseTime("07:00:00");
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
-		Activity b = new ActivityImpl("b", CoordUtils.createCoord(distance, 1.0));
+		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 1.0));
 		b.setMaximumDuration(Time.parseTime("02:00:00"));
 		plan.addActivity(b);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
-		Activity c = new ActivityImpl("c", CoordUtils.createCoord(2*distance, 2.0));
+		Activity c = PopulationUtils.createActivityFromCoord("c", CoordUtils.createCoord(2*distance, 2.0));
 		plan.addActivity(c);
 		return plan;
 	}
@@ -183,19 +182,19 @@ public class ChainChopperTest {
 	 * @return
 	 */
 	private Plan buildPlan3(){
-		PlanImpl plan = new PlanImpl();
-		Activity a = new ActivityImpl("a", CoordUtils.createCoord(0.0, 0.0));
+		Plan plan = PopulationUtils.createPlan();
+		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
 		plan.addActivity(a);
 		
-		plan.addLeg(new LegImpl("truck"));
+		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		/* Create the point far enough away that it will reach it by 20:00 the 
 		 * same day. */
 		double travelTime = Time.parseTime("06:00:00");
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
-		Activity b = new ActivityImpl("b", CoordUtils.createCoord(distance, 2.0));
+		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 2.0));
 		plan.addActivity(b);
 		return plan;
 	}

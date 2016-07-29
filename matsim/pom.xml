@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>matsim.org</url>
 	<inceptionYear>2005</inceptionYear>
@@ -113,6 +113,18 @@
                         <configuration>
                             <skip>${skipTestJar}</skip>
                         </configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
@@ -306,7 +318,26 @@
 		<profile>
 			<id>release</id>
 			<build>
-				<defaultGoal>assembly:assembly</defaultGoal>
+				<defaultGoal>package</defaultGoal>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-release.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id> <!-- this is used for inheritance merges -->
+								<phase>package</phase> <!-- bind to the packaging phase -->
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
 				<pluginManagement>
 					<plugins>
 						<plugin>
@@ -319,14 +350,6 @@
 										<mainClass>org.matsim.run.gui.Gui</mainClass>
 									</manifest>
 								</archive>
-							</configuration>
-						</plugin>
-						<plugin>
-							<artifactId>maven-assembly-plugin</artifactId>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
-								</descriptors>
 							</configuration>
 						</plugin>
 					</plugins>

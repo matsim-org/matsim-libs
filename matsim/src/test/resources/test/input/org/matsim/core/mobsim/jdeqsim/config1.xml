@@ -8,15 +8,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
+		<param name="inputNetworkFile" value="../../../../../../scenarios/equil/network.xml" />
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+		<param name="inputFacilitiesFile" value="../../../../../../scenarios/equil/facilities.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/org/matsim/core/mobsim/jdeqsim/plans1.xml" />
+		<param name="inputPlansFile" value="plans1.xml" />
 	</module>
 
 	<module name="controler">

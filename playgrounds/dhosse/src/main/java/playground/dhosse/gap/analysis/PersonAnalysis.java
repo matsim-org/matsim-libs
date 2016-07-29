@@ -9,10 +9,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -38,7 +38,7 @@ public class PersonAnalysis {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new MatsimPopulationReader(scenario).readFile(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		
 		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
@@ -134,7 +134,7 @@ public class PersonAnalysis {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new MatsimPopulationReader(scenario).readFile(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		
 		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
@@ -167,7 +167,7 @@ public class PersonAnalysis {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new MatsimPopulationReader(scenario).readFile(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 
 		Population filtered = filterPopulation(scenario.getPopulation());
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -201,7 +201,7 @@ public class PersonAnalysis {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new MatsimPopulationReader(scenario).readFile(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		int cnt = 0;
 		
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -239,10 +239,10 @@ public class PersonAnalysis {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new MatsimPopulationReader(scenario).readFile(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		
 		ObjectAttributes subpopAtts = new ObjectAttributes();
-		new ObjectAttributesXmlReader(subpopAtts).parse(personAttributesFile);
+		new ObjectAttributesXmlReader(subpopAtts).readFile(personAttributesFile);
 		
 		int nNonCarUsersUsingCar = 0;
 		

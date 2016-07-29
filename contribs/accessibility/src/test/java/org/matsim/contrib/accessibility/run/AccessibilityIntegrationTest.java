@@ -32,10 +32,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -457,12 +459,15 @@ public class AccessibilityIntegrationTest {
 
 				@Override
 				public ControlerListener get() {
-					GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, scenario.getConfig(), scenario, travelTimes, travelDisutilityFactories);
+					BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
+					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+					accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize));
+					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario.getConfig(), scenario, travelTimes, travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 					// activating transport modes of interest
 					for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-						gacl.setComputingAccessibilityForMode(mode, true);
+						accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
 					}
-//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+					//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 					// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 
 					// this will be called by the accessibility listener after the accessibility calculations are finished
@@ -470,8 +475,6 @@ public class AccessibilityIntegrationTest {
 					EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
 					gacl.addSpatialGridDataExchangeListener(etr);
 
-					// generating measuring points and SpatialGrids by using the bounding box
-					gacl.generateGridsAndMeasuringPointsByNetwork(cellSize);
 					return gacl;
 				}
 			});

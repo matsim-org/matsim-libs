@@ -1,11 +1,11 @@
 package playground.balac.allcsmodestest.utils;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -18,10 +18,10 @@ public class SubpopulationMembers {
 		
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[0]);		
+		new ObjectAttributesXmlReader(bla).readFile(args[0]);		
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[1]);
 		populationReader.readFile(args[2]);
@@ -39,7 +39,7 @@ public class SubpopulationMembers {
 			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_only_rt_members_" + args[3] + ".xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4("./plans_only_rt_members_" + args[3] + ".xml.gz");		
 		
 	//	ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
 	//	betaWriter.writeFile("./personAttrSubpop.xml.gz");

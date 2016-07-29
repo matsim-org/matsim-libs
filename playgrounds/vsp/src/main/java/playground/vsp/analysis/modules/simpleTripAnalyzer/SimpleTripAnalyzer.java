@@ -49,9 +49,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * A simple analysis-class for a very basic MATSim-Scenario, i.e it should be used 

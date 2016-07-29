@@ -21,7 +21,8 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
@@ -35,14 +36,19 @@ public class TripPrebookingManager
     {
         private final double submissionTime;
         private final MobsimPassengerAgent passenger;
-        private final Leg leg;
+        private final Id<Link> fromLinkId;
+        private final Id<Link> toLinkId;
+        private final double departureTime;
 
 
-        private PrebookingEntry(double submissionTime, MobsimPassengerAgent passenger, Leg leg)
+        private PrebookingEntry(double submissionTime, MobsimPassengerAgent passenger,
+                Id<Link> fromLinkId, Id<Link> toLinkId, double departureTime)
         {
             this.submissionTime = submissionTime;
             this.passenger = passenger;
-            this.leg = leg;
+            this.fromLinkId = fromLinkId;
+            this.toLinkId = toLinkId;
+            this.departureTime = departureTime;
         }
     }
 
@@ -66,12 +72,13 @@ public class TripPrebookingManager
 
 
     public void scheduleTripPrebooking(double submissionTime, MobsimPassengerAgent passenger,
-            Leg leg)
+            Id<Link> fromLinkId, Id<Link> toLinkId, double departureTime)
     // yy I don't think that this is called from anywhere right now.  This is consistent with the statement that
     // call-head is currently not investigated; the only thing that is investigated is call-before-day-starts
     // (as benchmark).  kai, jul'14
     {
-        PrebookingEntry prebooking = new PrebookingEntry(submissionTime, passenger, leg);
+        PrebookingEntry prebooking = new PrebookingEntry(submissionTime, passenger, fromLinkId,
+                toLinkId, departureTime);
         prebookingQueue.add(prebooking);
     }
 
@@ -100,7 +107,8 @@ public class TripPrebookingManager
     {
         while (prebookingQueue.peek().submissionTime <= now) {
             PrebookingEntry pe = prebookingQueue.poll();
-            passengerEngine.prebookTrip(now, pe.passenger, pe.leg);
+            passengerEngine.prebookTrip(now, pe.passenger, pe.fromLinkId, pe.toLinkId,
+                    pe.departureTime);
         }
     }
 }

@@ -28,7 +28,7 @@ public class FlexTransPersonImpl implements Person
 
   public FlexTransPersonImpl(Person p)
   {
-    delegate = PopulationUtils.createPerson(p.getId());
+    delegate = PopulationUtils.getFactory().createPerson(p.getId());
     PersonUtils.setAge(this, PersonUtils.getAge(p));
     PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(p));
     PersonUtils.setLicence(this, PersonUtils.getLicense(p));

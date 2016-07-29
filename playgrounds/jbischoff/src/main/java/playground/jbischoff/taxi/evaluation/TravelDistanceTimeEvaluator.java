@@ -138,17 +138,17 @@ public class TravelDistanceTimeEvaluator
     }
 
 
-    public String writeTravelDistanceStatsToFiles(String distanceFile)
+    public String writeTravelDistanceStatsToFiles(String outputFolder)
     {
 
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(distanceFile)));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputFolder+"/taxiDistanceStats.txt")));
             double tkm = 0.;
             double tpkm = 0.;
             double s = 0.;
             double ps = 0.;
             double onlineTimes = 0.;
-            bw.write("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
+            bw.write("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance");
             for (Entry<Id, Double> e : this.taxiTravelDistance.entrySet()) {
                 tpkm += tryToGetOrReturnZero(taxiTravelDistancesWithPassenger, e.getKey());
                 tkm += e.getValue();
@@ -158,9 +158,9 @@ public class TravelDistanceTimeEvaluator
                 bw.newLine();
                 double relativeOccupanceDist = tryToGetOrReturnZero(
                         taxiTravelDistancesWithPassenger, e.getKey()) / e.getValue();
-                double relativeOccpanceTime = tryToGetOrReturnZero(
-                        this.taxiTravelDurationwithPassenger, e.getKey())
-                        / tryToGetOrReturnZero(this.taxiTravelDuration, e.getKey());
+//                double relativeOccpanceTime = tryToGetOrReturnZero(
+//                        this.taxiTravelDurationwithPassenger, e.getKey())
+//                        / tryToGetOrReturnZero(this.taxiTravelDuration, e.getKey());
                 double startTime = 0.;
                 double endTime = 0.;
 
@@ -175,11 +175,12 @@ public class TravelDistanceTimeEvaluator
                         + (e.getValue() / 1000)
                         + "\t"
                         + (tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger, e.getKey()) / 1000)
-                        + "\t" + relativeOccupanceDist + "\t"
-                        + tryToGetOrReturnZero(this.taxiTravelDuration, e.getKey()) + "\t"
-                        + tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())
-                        + "\t" + relativeOccpanceTime + "\t" + startTime + "\t" + endTime + "\t"
-                        + onlineTime);
+                        + "\t" + relativeOccupanceDist);
+//                		+ "\t"
+//                        + tryToGetOrReturnZero(this.taxiTravelDuration, e.getKey()) + "\t"
+//                        + tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())
+//                        + "\t" + relativeOccpanceTime + "\t" + startTime + "\t" + endTime + "\t"
+//                        + onlineTime);
 
             }
             tkm = tkm / 1000;
@@ -200,7 +201,7 @@ public class TravelDistanceTimeEvaluator
             return avs;
         }
         catch (IOException e) {
-            System.err.println("Could not create File" + distanceFile);
+            System.err.println("Could not create File in " + outputFolder);
             e.printStackTrace();
         }
         return null;

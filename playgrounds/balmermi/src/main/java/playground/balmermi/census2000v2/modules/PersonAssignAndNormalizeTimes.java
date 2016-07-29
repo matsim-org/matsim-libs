@@ -24,17 +24,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -94,8 +94,10 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				prev_ttime = l.getTravelTime();
 				l.setDepartureTime(tod);
 				l.setTravelTime(0.0);
-				if (l instanceof LegImpl) {
-					((LegImpl) l).setArrivalTime(tod);
+				if (l instanceof Leg) {
+					final double arrTime = tod;
+					Leg r = ((Leg) l);
+					r.setTravelTime( arrTime - r.getDepartureTime() );
 				}
 			}
 		}
@@ -105,13 +107,13 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 	private final void normalizeTimes(final Plan p) {
 		if (p.getPlanElements().size() == 1) {
-			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(0);
+			Activity a = (Activity)p.getPlanElements().get(0);
 			a.setStartTime(0.0);
 			a.setMaximumDuration(Time.MIDNIGHT);
 			a.setEndTime(Time.MIDNIGHT);
 			return;
 		}
-		double home_dur = ((ActivityImpl)p.getPlanElements().get(0)).getEndTime();
+		double home_dur = ((Activity)p.getPlanElements().get(0)).getEndTime();
 		double othr_dur = 0.0;
 		for (int i=1; i<p.getPlanElements().size()-1; i=i++) {
 			PlanElement pe = p.getPlanElements().get(i);
@@ -120,7 +122,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 			}
 		}
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
-			ActivityImpl a = (ActivityImpl)p.getPlanElements().get(p.getPlanElements().size()-1);
+			Activity a = (Activity)p.getPlanElements().get(p.getPlanElements().size()-1);
 			a.setMaximumDuration(Time.UNDEFINED_TIME);
 			a.setEndTime(Time.UNDEFINED_TIME);
 			return;
@@ -148,8 +150,10 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				Leg l = (Leg)p.getPlanElements().get(i);
 				l.setDepartureTime(tod);
 				l.setTravelTime(0.0);
-				if (l instanceof LegImpl) {
-					((LegImpl) l).setArrivalTime(tod);
+				if (l instanceof Leg) {
+					final double arrTime = tod;
+					Leg r = ((Leg) l);
+					r.setTravelTime( arrTime - r.getDepartureTime() );
 				}
 			}
 		}
@@ -191,7 +195,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 		// draw a new random number until the new end time >= 0.0
 		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
-		double first_end_time = ((ActivityImpl)acts_legs.get(0)).getEndTime();
+		double first_end_time = ((Activity)acts_legs.get(0)).getEndTime();
 		while (first_end_time+bias < 0.0) { bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; }
 
 		for (int i=0; i<acts_legs.size(); i++) {
@@ -216,7 +220,9 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
 				leg.setDepartureTime(leg.getDepartureTime()+bias);
-				((LegImpl) leg).setArrivalTime(((LegImpl) leg).getArrivalTime()+bias);
+				Leg r = ((Leg) leg);
+				Leg r1 = ((Leg) leg);
+				r1.setTravelTime( r.getDepartureTime() + r.getTravelTime()+bias - r1.getDepartureTime() );
 			}
 		}
 	}

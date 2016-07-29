@@ -54,10 +54,10 @@ public class CreateJointTripDataSetForClique {
 		final String outputFile = args[ 3 ];
 
 		CliqueParser clique = new CliqueParser( cliqueId );
-		clique.parse( cliquesFile );
+		clique.readFile( cliquesFile );
 
 		JointPlanParser jointPlans = new JointPlanParser( clique.membersIds );
-		jointPlans.parse( jointPlansFile );
+		jointPlans.readFile( jointPlansFile );
 
 		write( jointPlans , outputFile );
 	}
@@ -92,7 +92,7 @@ public class CreateJointTripDataSetForClique {
 		private boolean inClique = false;
 		
 		public CliqueParser(final String cliqueId) {
-			super( false );
+			setValidating( false );
 			this.cliqueId = cliqueId;
 		}
 
@@ -131,7 +131,7 @@ public class CreateJointTripDataSetForClique {
 		private final Counter count = new Counter( "store plan # " );
 
 		public JointPlanParser(final List<String> members) {
-			super( false );
+			setValidating( false );
 			this.members = members;
 		}
 

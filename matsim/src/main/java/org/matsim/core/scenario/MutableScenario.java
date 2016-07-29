@@ -27,8 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.*;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -46,7 +45,8 @@ import org.matsim.vehicles.Vehicles;
  * @author dgrether
  * @author mrieser
  */
-public final class MutableScenario implements Scenario {
+public final class MutableScenario implements Scenario, Lockable {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(MutableScenario.class);
 
 	private boolean locked = false ;
@@ -69,7 +69,7 @@ public final class MutableScenario implements Scenario {
 
 	MutableScenario(Config config) {
 		this.config = config;
-		this.network = NetworkImpl.createNetwork();
+		this.network = NetworkUtils.createNetwork(this.config);
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
 		this.facilities = new ActivityFacilitiesImpl();
 		this.households = new HouseholdsImpl();
@@ -169,6 +169,7 @@ public final class MutableScenario implements Scenario {
 		return elements.get( name );
 	}
 
+	@Override
 	public final void setLocked() {
 		this.locked = true ;
 	}

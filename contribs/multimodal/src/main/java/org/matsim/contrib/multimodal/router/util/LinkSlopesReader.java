@@ -71,7 +71,7 @@ public class LinkSlopesReader {
 		if (slopeInformationFile != null) {
 			ObjectAttributes objectAttributes = new ObjectAttributes();
 			log.info("Loading slope information from " + slopeInformationFile);
-			new ObjectAttributesXmlReader(objectAttributes).parse(slopeInformationFile);
+			new ObjectAttributesXmlReader(objectAttributes).readFile(slopeInformationFile);
 			return objectAttributes;
 		} else {
 			log.warn("No slope information file specified in the multi modal config group!");

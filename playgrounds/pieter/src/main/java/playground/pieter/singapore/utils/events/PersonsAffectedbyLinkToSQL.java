@@ -66,7 +66,7 @@ public class PersonsAffectedbyLinkToSQL {
 				linkIds);
 		events.addHandler(idFinder);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse("F:\\data\\sing2.2\\40.events.xml.gz");
+		reader.readFile("F:\\data\\sing2.2\\40.events.xml.gz");
 		String actTableName = "u_fouriep.idsforlinkanalysis";
 		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("person_id",

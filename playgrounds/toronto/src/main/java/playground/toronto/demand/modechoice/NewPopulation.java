@@ -23,20 +23,20 @@ package playground.toronto.demand.modechoice;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 
 /**
  * @author yu
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
-	protected PopulationWriter pw;
+	protected StreamingPopulationWriter pw;
 	protected Network network;
 
 	public NewPopulation(final Network network, final Population population,
 			final String outputPopulationFilename) {
 		this.network = network;
-		pw = new PopulationWriter(population, network);
+		pw = new StreamingPopulationWriter(population, network);
 		pw.writeStartPlans(outputPopulationFilename);
 	}
 

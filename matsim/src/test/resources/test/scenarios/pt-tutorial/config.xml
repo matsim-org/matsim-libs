@@ -8,11 +8,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/pt-tutorial/multimodalnetwork.xml" />
+		<param name="inputNetworkFile" value="multimodalnetwork.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/pt-tutorial/population.xml" />
+		<param name="inputPlansFile" value="population.xml" />
 	</module>
 
 	<module name="controler">
@@ -84,12 +84,12 @@
 
 	<module name="transit">
 		<param name="useTransit" value="true" />
-		<param name="transitScheduleFile" value="test/scenarios/pt-tutorial/transitschedule.xml" />
-		<param name="vehiclesFile" value="test/scenarios/pt-tutorial/transitVehicles.xml" />
+		<param name="transitScheduleFile" value="transitschedule.xml" />
+		<param name="vehiclesFile" value="transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
 	
-	<module name="changeLegMode">
+	<module name="changeMode">
 		<param name="modes" value="car,pt" />
 	</module>
 

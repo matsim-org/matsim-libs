@@ -29,8 +29,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -88,7 +88,7 @@ public class TestMain {
 
 		new MatsimNetworkReader(sc.getNetwork()).readFile(netFile);
 		final Population plans = sc.getPopulation();
-		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
+		PopulationReader popReader = new PopulationReader(sc);
 		popReader.readFile(plansFile);
 
 		new TransitScheduleReader(sc).readFile(transitScheduleFile);
@@ -152,7 +152,7 @@ public class TestMain {
 		VehDelayAtStopHistogram dH = new VehDelayAtStopHistogram(24 * 60);
 //		eventsManager.addHandler(dH);
 
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 
 //		Map<Id, List<Tuple<Id, Double>>> testMap = comp.getAgentId2StopDifferenceMap();
 //

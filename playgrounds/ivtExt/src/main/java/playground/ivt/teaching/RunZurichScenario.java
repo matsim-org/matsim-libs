@@ -22,6 +22,7 @@ package playground.ivt.teaching;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
@@ -31,12 +32,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.ivt.lib.tools.fileCreation.F2LConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
 
 import java.io.File;
@@ -62,7 +63,8 @@ public class RunZurichScenario {
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
-				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup() );
+				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup(),
+				new F2LConfigGroup());
 		
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
@@ -92,7 +94,7 @@ public class RunZurichScenario {
 	private static void connectFacilitiesWithNetwork(MatsimServices controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+        Network network = (Network) controler.getScenario().getNetwork();
 		//log.warn("number of links: " +network.getLinks().size());
 
 		WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());

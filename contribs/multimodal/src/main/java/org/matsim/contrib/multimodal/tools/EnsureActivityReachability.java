@@ -26,13 +26,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.Facility;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,7 +110,7 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 						Facility facility = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId());
 						if (facility != null) {
 							if (facility.getLinkId() != null) {
-								((ActivityImpl)activity).setLinkId(facility.getLinkId());
+								((Activity)activity).setLinkId(facility.getLinkId());
 							}
 							else continue;
 						}
@@ -182,9 +181,9 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 						}
 							
 						if (newFacility != null) {
-							((ActivityImpl) activity).setFacilityId(newFacility.getId());
-							((ActivityImpl) activity).setLinkId(newFacility.getLinkId());
-							((ActivityImpl) activity).setCoord(newFacility.getCoord());
+							((Activity) activity).setFacilityId(newFacility.getId());
+							((Activity) activity).setLinkId(newFacility.getLinkId());
+							((Activity) activity).setCoord(newFacility.getCoord());
 							relocateCounter.incCounter();
 						}
 						else {
@@ -201,8 +200,8 @@ class EnsureActivityReachability extends AbstractPersonAlgorithm implements Plan
 						}
 						
 						if (newLink != null) {
-							((ActivityImpl) activity).setLinkId(newLink.getId());
-							((ActivityImpl) activity).setCoord(newLink.getCoord());
+							((Activity) activity).setLinkId(newLink.getId());
+							((Activity) activity).setCoord(newLink.getCoord());
 							relocateCounter.incCounter();
 						}
 						else {

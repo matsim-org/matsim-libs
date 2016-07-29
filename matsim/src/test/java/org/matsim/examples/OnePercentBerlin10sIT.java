@@ -35,8 +35,8 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
@@ -68,7 +68,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
-		new MatsimPopulationReader(scenario).readFile(popFileName);
+		new PopulationReader(scenario).readFile(popFileName);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
@@ -121,7 +121,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
-		new MatsimPopulationReader(scenario).readFile(popFileName);
+		new PopulationReader(scenario).readFile(popFileName);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML(eventsFileName);

@@ -24,7 +24,9 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -115,7 +117,11 @@ public class CsvUtils {
 		private final TObjectIntMap<String> map = new TObjectIntHashMap<>();
 		private final String[] names;
 
-		public TitleLine( final String[] names ) {
+		public TitleLine( final Collection<String> names ) {
+			this( names.toArray( new String[ names.size() ] ) );
+		}
+
+		public TitleLine( final String... names ) {
 			for ( int i = 0; i < names.length; i++ ) {
 				map.put( names[ i ] , i );
 			}

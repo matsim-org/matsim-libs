@@ -20,12 +20,15 @@
 
 package playground.jjoubert.CommercialDemandGeneration;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.jjoubert.CommercialDemandGenerator.MyCommercialDemandGenerator01;
 
-public class MyCommercialDemandGenerator01Test extends MatsimTestCase{
+public class MyCommercialDemandGenerator01Test{
 	
+	@Test
 	public void testMyCommercialDemandGeneratorConstructor(){
 		
 		String root = "ABC";
@@ -33,9 +36,9 @@ public class MyCommercialDemandGenerator01Test extends MatsimTestCase{
 		Integer numberOfPlans = Integer.valueOf(2);
 		Double threshold = 0.9;
 		MyCommercialDemandGenerator01 mcdg = new MyCommercialDemandGenerator01(root, area, threshold);
-		assertEquals("Root name not correct.", root, mcdg.getRoot());
-		assertEquals("Study area name not correct.", area, mcdg.getStudyArea());
-		assertEquals("Threshold not correct.", threshold, mcdg.getActivityThreshold());
+		Assert.assertEquals("Root name not correct.", root, mcdg.getRoot());
+		Assert.assertEquals("Study area name not correct.", area, mcdg.getStudyArea());
+		Assert.assertEquals("Threshold not correct.", threshold, mcdg.getActivityThreshold(), MatsimTestUtils.EPSILON);
 				
 		/*
 		 * I don't have to test whether the right 'within' and 'through' vehicles are

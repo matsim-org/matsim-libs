@@ -8,11 +8,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/berlin/network.xml.gz" />
+		<param name="inputNetworkFile" value="network.xml.gz" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/berlin/plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
+		<param name="inputPlansFile" value="plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
 	</module>
 
 	<module name="controler">
@@ -23,17 +23,6 @@
 
 	<module name="controler">
 		<param name= "routingAlgorithmType" value="AStarLandmarks" />
-	</module>
-
-	<module name="simulation">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
-	
-		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		
-		<param name = "flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
-		<param name = "storageCapacityFactor" value="0.05" />
 	</module>
 
 	<module name="planCalcScore">

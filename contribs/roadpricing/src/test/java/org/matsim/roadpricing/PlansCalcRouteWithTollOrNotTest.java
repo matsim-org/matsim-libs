@@ -39,6 +39,7 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -46,7 +47,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -67,7 +67,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	 */
 	@Test
 	public void testBestAlternatives() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
@@ -156,7 +156,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	 */
 	@Test
 	public void testTolledActLink() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
@@ -182,7 +182,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	 */
 	@Test
 	public void testAllAlternativesTolled() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
@@ -230,7 +230,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	@Test
 	public void testOutsideTollTime() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 

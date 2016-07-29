@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
@@ -77,7 +77,7 @@ public class SpatialAveragingTollPayments {
 	private SpatialGrid runCase(String plansFile) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
+		PopulationReader mpr = new PopulationReader(scenario);
 		mpr.readFile(plansFile);
 		Population pop = scenario.getPopulation();
 		

@@ -32,11 +32,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -87,13 +88,13 @@ public class RunM2U {
 		 * Calculate, for each zone, the distance to the closest transit node.
 		 */
 		log.info("Calculating the distance to the closest transit node.");
-		NetworkImpl nPt = (NetworkImpl) sPt.getNetwork();
+		Network nPt = (Network) sPt.getNetwork();
 		Map<Id,Double> distanceToPt = new TreeMap<Id, Double>();
 		GeometryFactory gf = new GeometryFactory();
 		for(MyZone z : zones){
-			NodeImpl c = new NodeImpl(Id.create("dummy", Node.class));
+			Node c = NetworkUtils.createNode(Id.create("dummy", Node.class));
 			c.setCoord(new Coord(z.getCentroid().getX(), z.getCentroid().getY()));
-			Node n = nPt.getNearestNode(c.getCoord());
+			Node n = NetworkUtils.getNearestNode(nPt,c.getCoord());
 			if(n != null){
 				Point p1 = gf.createPoint(new Coordinate(c.getCoord().getX(), c.getCoord().getY()));
 				Point p2 = gf.createPoint(new Coordinate(n.getCoord().getX(), n.getCoord().getY()));

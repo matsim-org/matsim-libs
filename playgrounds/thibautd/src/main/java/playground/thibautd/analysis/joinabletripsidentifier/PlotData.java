@@ -102,7 +102,7 @@ public class PlotData {
 
 		// run ploting function and export
 		JoinableTripsXmlReader reader = new JoinableTripsXmlReader();
-		reader.parse(xmlFile);
+		reader.readFile(xmlFile);
 		DataPloter ploter = new DataPloter(reader.getJoinableTrips());
 		CommutersFilter filter = new CommutersFilter(network, -1, -1);
 		CommutersFilter shortFilter = new CommutersFilter(network, -1, LONGER_DIST);

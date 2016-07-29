@@ -20,30 +20,36 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Class to generate a synthetic population of agents from data extracted from UrbanSim.
@@ -103,8 +109,8 @@ public class MyDemandGenerator {
 		Population p = scenario.getPopulation();
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario.getNetwork());
-		nr.parse(networkFile.getAbsolutePath());
-		NetworkImpl ni = (NetworkImpl) scenario.getNetwork(); 
+		nr.readFile(networkFile.getAbsolutePath());
+		Network ni = (Network) scenario.getNetwork(); 
 		
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(inputFile.getAbsolutePath());
@@ -115,10 +121,10 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					Person agent = PopulationUtils.createPerson(Id.create(agentId, Person.class));
+					Person agent = PopulationUtils.getFactory().createPerson(Id.create(agentId, Person.class));
 					PersonUtils.setEmployed(agent, true);
 
-					Plan plan = new PlanImpl(agent);
+					Plan plan = PopulationUtils.createPlan(agent);
 					
 					/*
 					 * Generate the start-of-day home activity. Some criteria:
@@ -133,7 +139,7 @@ public class MyDemandGenerator {
 					Point pHome = homeZone.getInteriorPoint();
 					Coord cHome = new Coord(pHome.getX(), pHome.getY());
 					Link lHome = NetworkUtils.getNearestRightEntryLink(ni, cHome);
-					Activity homeStart = new ActivityImpl("home", cHome, lHome.getId());
+					Activity homeStart = PopulationUtils.createActivityFromCoordAndLinkId("home", cHome, lHome.getId());
 					homeStart.setStartTime(0);
 					homeStart.setEndTime(21595 + Math.random()*10.0);
 					
@@ -150,11 +156,11 @@ public class MyDemandGenerator {
 					Leg toHome = null;
 					int carOwner = Integer.parseInt(entry[3]);
 					if(carOwner == 1){
-						fromHome = new LegImpl(TransportMode.car);
-						toHome = new LegImpl(TransportMode.car);
+						fromHome = PopulationUtils.createLeg(TransportMode.car);
+						toHome = PopulationUtils.createLeg(TransportMode.car);
 					} else{
-						fromHome = new LegImpl(TransportMode.pt);
-						toHome = new LegImpl(TransportMode.pt);
+						fromHome = PopulationUtils.createLeg(TransportMode.pt);
+						toHome = PopulationUtils.createLeg(TransportMode.pt);
 					}
 					
 					
@@ -168,7 +174,7 @@ public class MyDemandGenerator {
 					Point pWork = workZone.getInteriorPoint();
 					Coord cWork = new Coord(pWork.getX(), pWork.getY());
 					Link lWork = NetworkUtils.getNearestRightEntryLink(ni, cWork);
-					Activity work = new ActivityImpl("work", cWork, lWork.getId());
+					Activity work = PopulationUtils.createActivityFromCoordAndLinkId("work", cWork, lWork.getId());
 					work.setStartTime(25200);
 					work.setEndTime(work.getStartTime() + 32400);
 					
@@ -176,7 +182,7 @@ public class MyDemandGenerator {
 					/*
 					 * Generate the end-of-day home activity.
 					 */
-					Activity homeEnd = new ActivityImpl("home", cHome, lHome.getId());
+					Activity homeEnd = PopulationUtils.createActivityFromCoordAndLinkId("home", cHome, lHome.getId());
 					homeEnd.setStartTime(work.getEndTime()+1800);
 					homeEnd.setEndTime(86399);
 					
@@ -199,7 +205,7 @@ public class MyDemandGenerator {
 		log.info("Total number of agents created: " + p.getPersons().size());
 				
 		PopulationWriter pw = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		pw.writeFileV4(outputFile.getAbsolutePath());
+		pw.writeV4(outputFile.getAbsolutePath());
 		
 		SelectedPlans2ESRIShape sh = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), MGC.getCRS("WGS84_SA_Albers"), outputFile.getParent());
 		String outputFolder = outputFile.getParentFile().getAbsolutePath();

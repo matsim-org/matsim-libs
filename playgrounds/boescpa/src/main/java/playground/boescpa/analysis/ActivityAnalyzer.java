@@ -1,10 +1,10 @@
 package playground.boescpa.analysis;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -45,8 +45,8 @@ public class ActivityAnalyzer {
             if (p.getSelectedPlan() != null) {
                 actChain = "";
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-                    if (pe instanceof ActivityImpl) {
-                        ActivityImpl act = (ActivityImpl) pe;
+                    if (pe instanceof Activity) {
+                        Activity act = (Activity) pe;
                         if (!actToIgnore.contains(act.getType())) {
                             actChain = actChain.concat(act.getType().substring(0,2) + "-");
                         }

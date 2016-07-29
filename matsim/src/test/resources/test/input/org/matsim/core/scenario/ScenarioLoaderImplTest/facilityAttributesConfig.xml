@@ -8,7 +8,7 @@
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+		<param name="inputFacilitiesFile" value="../../../../../../../scenarios/equil/facilities.xml" />
 	</module>
 
 	<!-- module name="network">
@@ -23,14 +23,6 @@
 		<param name="outputDirectory" value="./output/equil" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
-	</module>
-
-	<module name="simulation">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
-	
-		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 	</module>
 
 	<module name="planCalcScore">

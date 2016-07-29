@@ -43,7 +43,7 @@ public class ScorePlans {
 		ScorePlansHandler scorePlansHandler = new ScorePlansHandler(net);
 		eventsManager.addHandler(scorePlansHandler);
 		
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 		TreeMap<Id, Double> scores = new TreeMap<Id, Double>();
 		TreeMap<Id, ScoreContainer> personId2ScoreMap = scorePlansHandler.getPersonId2ScoreMap();

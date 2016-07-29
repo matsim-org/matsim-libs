@@ -60,7 +60,7 @@ public class ComputeSocialDistanceBetweenRandomIndividuals {
 		final String outputDataFile = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( inputSocialNetwork );
+		new SocialNetworkReader( sc ).readFile( inputSocialNetwork );
 	
 		final SocialNetwork socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		writeRandomDistances( outputDataFile, socialNetwork, 10000 );

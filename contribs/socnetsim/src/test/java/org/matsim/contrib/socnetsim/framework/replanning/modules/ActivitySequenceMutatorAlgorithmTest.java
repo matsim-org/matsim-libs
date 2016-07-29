@@ -26,13 +26,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.Random;
 
@@ -42,15 +39,15 @@ import java.util.Random;
 public class ActivitySequenceMutatorAlgorithmTest {
 	@Test
 	public void testTwoActivities() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "w" , Id.create( "w" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "l" , Id.create( "l" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("l", Id.create( "l" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
@@ -74,13 +71,13 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testOneActivities() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "w" , Id.create( "w" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
@@ -100,11 +97,11 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testZeroActivities() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
@@ -120,17 +117,17 @@ public class ActivitySequenceMutatorAlgorithmTest {
 
 	@Test
 	public void testStage() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("somebody", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 		
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "stage" , Id.create( "s" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "w" , Id.create( "w" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "l" , Id.create( "l" , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode" ) );
-		plan.addActivity( new ActivityImpl( "h" , Id.create( "h" , Link.class ) ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("stage", Id.create( "s" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("l", Id.create( "l" , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode") );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
 
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(

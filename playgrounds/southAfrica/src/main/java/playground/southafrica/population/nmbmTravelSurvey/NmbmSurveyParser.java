@@ -33,11 +33,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -182,7 +183,7 @@ public class NmbmSurveyParser {
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		Person person = null;
-		PlanImpl plan = null;
+		Plan plan = null;
 		try{
 			String line = br.readLine(); /* Header */
 			while((line = br.readLine()) != null){
@@ -262,7 +263,7 @@ public class NmbmSurveyParser {
 						}
 						PersonUtils.setEmployed(person, isEmployed);
 						PersonUtils.setCarAvail(person, hasCar);
-						plan = (PlanImpl) population.getFactory().createPlan();
+						plan = (Plan) population.getFactory().createPlan();
 						
 						/* Add the first activity. */
 						if(coordFrom == null){
@@ -295,7 +296,7 @@ public class NmbmSurveyParser {
 							LOG.error("Person Ids are not the same: should be " + person.getId().toString() + " but was " + personId.toString());
 						}
 						/* Update the previous activity's duration. */
-						Activity a = plan.getLastActivity();
+						Activity a = PopulationUtils.getLastActivity(plan);
 						a.setEndTime(startTime);
 
 						/*TODO Remove validation after debugging. */

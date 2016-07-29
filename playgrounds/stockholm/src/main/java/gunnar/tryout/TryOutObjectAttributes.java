@@ -30,7 +30,7 @@ public class TryOutObjectAttributes {
 	static void test2() {
 		final ObjectAttributes attrs = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attrs);
-		reader.parse("./150410_worktrips_small.xml");
+		reader.readFile("./150410_worktrips_small.xml");
 		System.out.println(attrs);
 		
 	}

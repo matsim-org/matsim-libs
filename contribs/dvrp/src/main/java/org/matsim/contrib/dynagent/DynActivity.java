@@ -22,6 +22,10 @@ package org.matsim.contrib.dynagent;
 public interface DynActivity
     extends DynAction
 {
+    //Double.POSITIVE_INFINITY == stop simulating the agent (permanent sleep)
+    public static final double END_ACTIVITY_LATER = Double.MAX_VALUE;
+
+
     String getActivityType();
 
 

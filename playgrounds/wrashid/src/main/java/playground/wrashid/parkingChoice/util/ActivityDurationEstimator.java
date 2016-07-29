@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -18,7 +19,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
-import org.matsim.core.population.ActivityImpl;
 
 
 public class ActivityDurationEstimator implements ActivityStartEventHandler, PersonDepartureEventHandler {
@@ -79,8 +79,8 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 		double estimatedActduration = 0;
 
 		for (int i = indexOfActivity; i < indexOfFirstCarLegAfterCurrentAct; i++) {
-			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
+			if (plan.getPlanElements().get(i) instanceof Activity) {
+				Activity act = (Activity) plan.getPlanElements().get(i);
 				// this is hard-coded "tryEndtimeThenDuration":
 				if (act.getEndTime() != Double.NEGATIVE_INFINITY) {
 					estimatedActduration += GeneralLib.getIntervalDuration(event.getTime(), act.getEndTime());
@@ -90,8 +90,8 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 			} else {
 				// TODO: estimate travel time according to mode of travel...
 				Leg leg = (Leg) plan.getPlanElements().get(i);
-				ActivityImpl prevAct = (ActivityImpl) plan.getPlanElements().get(i - 1);
-				ActivityImpl nextAct = (ActivityImpl) plan.getPlanElements().get(i + 1);
+				Activity prevAct = (Activity) plan.getPlanElements().get(i - 1);
+				Activity nextAct = (Activity) plan.getPlanElements().get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
 				if (leg.getMode().equalsIgnoreCase("walk") || leg.getMode().equalsIgnoreCase("transit_walk")) {
 					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance, pcrConfig );

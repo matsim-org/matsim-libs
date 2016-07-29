@@ -55,7 +55,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -114,7 +114,7 @@ public class LinkCounterByHour implements LinkEnterEventHandler, VehicleEntersTr
 	public SimpleFeatureCollection createFeatureCollection(String network){
 		LOG.info("Parsing network from " + network);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(network);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		GeometryFactory gf = new GeometryFactory();
 
@@ -234,7 +234,7 @@ public class LinkCounterByHour implements LinkEnterEventHandler, VehicleEntersTr
 	public void writeHourlyLinkCounts(String network, String output){
 		LOG.info("Parsing network from " + network);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(network);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		LOG.info("Writing link counts to " + output);
 		

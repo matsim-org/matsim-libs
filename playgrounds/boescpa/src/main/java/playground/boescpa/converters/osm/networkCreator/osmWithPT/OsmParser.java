@@ -45,7 +45,7 @@ public class OsmParser {
 		if (filename.toLowerCase(Locale.ROOT).endsWith(".osm.pbf")) {
 //			new OsmPbfParser(distributor).parse(filename);
 		} else {
-			new OsmXmlParser(distributor).parse(filename);
+			new OsmXmlParser(distributor).readFile(filename);
 		}
 	}
 

@@ -37,8 +37,12 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -57,11 +61,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -141,7 +140,7 @@ public class CarPassingBusTest {
 
 	private void createNetwork() {
 		Network network = this.scenario.getNetwork();
-		((NetworkImpl) network).setCapacityPeriod(3600.0);
+		((Network) network).setCapacityPeriod(3600.0);
 
 		Node n01, n10, n11, n12, n13, n14;
 		double x1 = -500;
@@ -179,7 +178,7 @@ public class CarPassingBusTest {
 		// transit line A		
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
-		NetworkRoute networkRouteA = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 
 		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
 		linkListA.add(Id.create("1011", Link.class)); 
@@ -228,16 +227,16 @@ public class CarPassingBusTest {
 		PopulationFactory pb = population.getFactory();
 
 		Person person = pb.createPerson(Id.create("carUser", Person.class));
-		PlanImpl plan = (PlanImpl) pb.createPlan();
+		Plan plan = (Plan) pb.createPlan();
 
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
 
-		ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", startLinkA.getId());
+		Activity act1 = (Activity) pb.createActivityFromLinkId("home", startLinkA.getId());
 		act1.setEndTime(7*3600. + 49.);
-		LegImpl leg = (LegImpl) pb.createLeg(TransportMode.car);
+		Leg leg = (Leg) pb.createLeg(TransportMode.car);
 
-		NetworkRoute networkRouteA = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 
 		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
 		linkListA.add(Id.create("1011", Link.class)); 
@@ -247,7 +246,7 @@ public class CarPassingBusTest {
 		networkRouteA.setLinkIds(startLinkA.getId(), linkListA, endLinkA.getId());
 		leg.setRoute(networkRouteA);
 
-		ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", endLinkA.getId());
+		Activity act2 = (Activity) pb.createActivityFromLinkId("work", endLinkA.getId());
 
 		population.addPerson(person);
 		person.addPlan(plan);

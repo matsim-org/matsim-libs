@@ -23,9 +23,9 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
@@ -46,7 +46,7 @@ public class WaitAndRandomSearchAsBackup extends RandomParkingSearch{
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 
@@ -58,7 +58,7 @@ public class WaitAndRandomSearchAsBackup extends RandomParkingSearch{
 				startSearchTime.put(personId, aem.getMessageArrivalTime());
 			}
 
-			ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+			Activity nextNonParkingAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),

@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -26,6 +26,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
+
+import playground.dhosse.gap.Global;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -173,9 +175,9 @@ public class GeometryUtils {
 			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
 					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),
-					link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(),
+					link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((Link)link)),
 					link.getCapacity(), link.getFreespeed(), CollectionUtils.setToString(link.getAllowedModes()),
-					link.getNumberOfLanes(), ((LinkImpl)link).getOrigId()}, null);
+					link.getNumberOfLanes(), NetworkUtils.getOrigId( ((Link)link) )}, null);
 			linkFeatures.add(ft);
 		}
 		
@@ -306,6 +308,23 @@ public class GeometryUtils {
 		}
 		
 		return wkb.toString();
+		
+	}
+	
+	public static Coord shoot(Geometry geometry){
+		
+		Point point = null;
+		double x, y;
+		
+		do{
+			
+			x = geometry.getEnvelopeInternal().getMinX() + Global.random.nextDouble() * (geometry.getEnvelopeInternal().getMaxX() - geometry.getEnvelopeInternal().getMinX());
+	  	    y = geometry.getEnvelopeInternal().getMinY() + Global.random.nextDouble() * (geometry.getEnvelopeInternal().getMaxY() - geometry.getEnvelopeInternal().getMinY());
+	  	    point = MGC.xy2Point(x, y);
+			
+		}while(!geometry.contains(point));
+		
+		return MGC.point2Coord(point);
 		
 	}
 	

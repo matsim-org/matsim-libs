@@ -11,9 +11,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.households.Household;
@@ -34,7 +34,7 @@ public class HouseholdsFromPlans {
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population plans = scenario.getPopulation();
-		final PopulationReader matsimPlansReader = new MatsimPopulationReader(scenario);
+		final MatsimReader matsimPlansReader = new PopulationReader(scenario);
 		matsimPlansReader.readFile(args[0]);
 		Map<Id<ActivityFacility>, Household> facilityIdsHouseholds = new HashMap<Id<ActivityFacility>, Household>();
 		Households households = new HouseholdsImpl();

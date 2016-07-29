@@ -30,7 +30,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 /**
  * @author nagel
  */
-class MyPlanSelector implements PlanSelector, ActivityEndEventHandler
+class MyPlanSelector implements PlanSelector<Plan, Person>, ActivityEndEventHandler
 {
 	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
 

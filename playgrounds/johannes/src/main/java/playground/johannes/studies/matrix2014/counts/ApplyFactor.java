@@ -41,7 +41,7 @@ public class ApplyFactor {
 
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.parse(inFile);
+		reader.readFile(inFile);
 
 		Counts<Link> newCounts = new Counts();
 		newCounts.setDescription(counts.getDescription());

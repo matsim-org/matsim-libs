@@ -12,13 +12,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -67,7 +69,8 @@ public class ShortestBusPathTree {
 			links[0].add(scenario.getNetwork().getLinks().get(mainStop.getLinkId()));
 			int k=0, numAccessStops = 0, total = scenario.getTransitSchedule().getFacilities().size();
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values()) {
-				List<Leg> legs = transitRouter.calcRoute(mainStop.getCoord(), stop.getCoord(), time, null);
+				final double departureTime = time;
+				List<Leg> legs = transitRouter.calcRoute( new FakeFacility(mainStop.getCoord()), new FakeFacility(stop.getCoord()), departureTime, null );
 				if(legs==null)
 					continue;
 				for(int j=0; j<legs.size(); j++)

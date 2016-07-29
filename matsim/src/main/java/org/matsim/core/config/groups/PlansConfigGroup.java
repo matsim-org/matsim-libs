@@ -20,6 +20,8 @@
 
 package org.matsim.core.config.groups;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -72,7 +74,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		comments.put(
 				SUBPOPULATION_ATTRIBUTE,
 				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
-				" (as freight, through traffic, etc.). The attribute must be of String type." );
+				" (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations." );
 
 		StringBuilder str = new StringBuilder() ;
 		for ( PlansConfigGroup.ActivityDurationInterpretation itp : PlansConfigGroup.ActivityDurationInterpretation.values() ) {
@@ -101,7 +103,15 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
 	}
-	
+
+	public URL getInputFileURL(URL context) {
+		try {
+			return new URL(context, this.inputFile);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
@@ -110,6 +120,14 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
+	}
+
+	public URL getInputPersonAttributeFileURL(URL context) {
+		try {
+			return new URL(context, this.inputPersonAttributeFile);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@StringGetter( NETWORK_ROUTE_TYPE )

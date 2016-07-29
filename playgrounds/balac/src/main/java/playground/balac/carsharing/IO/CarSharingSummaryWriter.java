@@ -5,10 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.ActivityImpl;
-
 import org.matsim.core.population.PersonUtils;
 import playground.balac.carsharing.router.CarSharingStation;
 
@@ -48,7 +47,7 @@ public class CarSharingSummaryWriter
     }
   }
 
-  public void write(Person person, LinkImpl startLink, CarSharingStation fromStation, CarSharingStation toStation, LinkImpl endLink, double departureTime, double arrivalTime, ActivityImpl actBefore, ActivityImpl actAfter)
+  public void write(Person person, Link startLink, CarSharingStation fromStation, CarSharingStation toStation, Link endLink, double departureTime, double arrivalTime, Activity actBefore, Activity actAfter)
   {
     try
     {

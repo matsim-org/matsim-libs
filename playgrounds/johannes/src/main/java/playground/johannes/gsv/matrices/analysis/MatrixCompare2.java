@@ -63,7 +63,7 @@ public class MatrixCompare2 {
 		 */
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(refFile);
+		reader.readFile(refFile);
 		NumericMatrix m1 = reader.getMatrix();
 
 		MatrixOperations.applyFactor(m1, 1 / 365.0);
@@ -74,7 +74,7 @@ public class MatrixCompare2 {
 //		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
 //		reader2.setValidating(false);
 //		reader2.parse(simFile);
-		reader.parse(simFile);
+		reader.readFile(simFile);
 		NumericMatrix m2 = reader.getMatrix();
 //		KeyMatrix simulation = reader2.getMatrix().toKeyMatrix("gsvId");
 
@@ -83,7 +83,7 @@ public class MatrixCompare2 {
 		/*
 		 * load zones
 		 */
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");

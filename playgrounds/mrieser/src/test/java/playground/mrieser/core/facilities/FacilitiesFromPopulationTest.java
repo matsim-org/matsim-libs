@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -56,7 +55,7 @@ public class FacilitiesFromPopulationTest {
 
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
 		generator.setOneFacilityPerLink(true);
-		generator.setAssignLinksToFacilitiesIfMissing(true, (NetworkImpl) f.scenario.getNetwork());
+		generator.setAssignLinksToFacilitiesIfMissing(true, (Network) f.scenario.getNetwork());
 		generator.run(f.scenario.getPopulation());
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
@@ -83,7 +82,7 @@ public class FacilitiesFromPopulationTest {
 		
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
 		generator.setOneFacilityPerLink(true);
-		generator.setAssignLinksToFacilitiesIfMissing(true, (NetworkImpl) f.scenario.getNetwork());
+		generator.setAssignLinksToFacilitiesIfMissing(true, (Network) f.scenario.getNetwork());
 		PlanCalcScoreConfigGroup config = new PlanCalcScoreConfigGroup();
 		ActivityParams homeParams = new ActivityParams("home");
 		ActivityParams workParams = new ActivityParams("work");
@@ -118,7 +117,7 @@ public class FacilitiesFromPopulationTest {
 		
 		FacilitiesFromPopulation generator = new FacilitiesFromPopulation(f.scenario.getActivityFacilities());
 		generator.setOneFacilityPerLink(false);
-		generator.setAssignLinksToFacilitiesIfMissing(true, (NetworkImpl) f.scenario.getNetwork());
+		generator.setAssignLinksToFacilitiesIfMissing(true, (Network) f.scenario.getNetwork());
 		generator.run(f.scenario.getPopulation());
 		
 //		for (ActivityFacility af : f.scenario.getActivityFacilities().getFacilities().values()) {

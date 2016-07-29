@@ -22,7 +22,6 @@ package org.matsim.api.core.v01.network;
 import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -89,7 +88,7 @@ public interface Link extends BasicLocation<Link> {
 	 * in the network file (the capperiod attribute).
 	 * @return the capacity per network's capperiod timestep
 	 *
-	 * @see NetworkImpl#getCapacityPeriod()
+	 * @see Network#getCapacityPeriod()
 	 */
 	public double getCapacity();
 
@@ -100,7 +99,7 @@ public interface Link extends BasicLocation<Link> {
 	 * @param time the time at which the capacity is requested. Use {@link Time#UNDEFINED_TIME} to get the default value.
 	 * @return the capacity per network's capperiod timestep
 	 *
-	 * @see NetworkImpl#getCapacityPeriod()
+	 * @see Network#getCapacityPeriod()
 	 */
 	public double getCapacity(double time);
 
@@ -118,5 +117,9 @@ public interface Link extends BasicLocation<Link> {
 	 * @return an <b>immutable</b> set containing all transport modes that are allowed on that link.
 	 */
 	public Set<String> getAllowedModes();
+
+	double getFlowCapacityPerSec();
+
+	double getFlowCapacityPerSec(double time);
 
 }

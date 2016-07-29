@@ -24,18 +24,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -75,7 +75,7 @@ public class TinyScenarioPreparator {
 		this.geometry = readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/untersuchungsraumAll.shp");
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		new MatsimPopulationReader(scenario).readFile(popFile);
+		new PopulationReader(scenario).readFile(popFile);
 		convertNetwork(scenario.getNetwork());
 		
 		Scenario newScen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -103,7 +103,8 @@ public class TinyScenarioPreparator {
 				}
 					else if (pe instanceof Activity){
 						Coord c = dest.transform(((Activity) pe).getCoord());
-						((Activity) pe).getCoord().setXY(c.getX(), c.getY());
+//						((Activity) pe).getCoord().setXY(c.getX(), c.getY());
+						((Activity) pe).setCoord( c );
 					}
 				}
 			if	(clone){
@@ -122,7 +123,7 @@ public class TinyScenarioPreparator {
 	private void convertNetwork(Network network) {
 		for (Node node : network.getNodes().values()){
 			
-			((NodeImpl)node).setCoord(dest.transform(node.getCoord()));
+			((Node)node).setCoord(dest.transform(node.getCoord()));
 			
 		}
 		

@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
@@ -107,7 +107,7 @@ public class VolumesShapefileWriter{
 		attribs[5] = link.getCapacity();
 		attribs[6] = link.getNumberOfLanes();
 		attribs[7] = link.getNumberOfLanes();
-		attribs[8] = ((LinkImpl) link).getType();
+		attribs[8] = NetworkUtils.getType(((Link) link));
 		attribs[9] = ks2010Volume;
 		attribs[10] = scaledKs2010Volume;
 		attribs[11] = matsimVolume;

@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -62,7 +62,7 @@ public class EventHandling {
 	EventsManager manager = EventsUtils.createEventsManager();
 	manager.addHandler(calculator);
 	manager.addHandler(volumes);
-	new EventsReaderXMLv1(manager).parse(eventsfile);
+	new EventsReaderXMLv1(manager).readFile(eventsfile);
 	
 	TravelTime tt = calculator.getLinkTravelTimes();
 	System.out.println("TT");

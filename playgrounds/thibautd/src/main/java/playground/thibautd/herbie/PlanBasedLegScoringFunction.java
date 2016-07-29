@@ -22,9 +22,9 @@ package playground.thibautd.herbie;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 import java.util.Iterator;

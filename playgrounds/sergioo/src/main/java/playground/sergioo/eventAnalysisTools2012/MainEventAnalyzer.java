@@ -16,15 +16,17 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 
@@ -352,9 +354,9 @@ public class MainEventAnalyzer {
 	public static void main(String[] args) throws IOException {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		scenario.getConfig().transit().setUseTransit(true);
-		new TransitScheduleReaderV1(scenario).parse("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
+		new TransitScheduleReaderV1(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(), 15*60, 30*3600, scenario.getConfig().travelTimeCalculator());
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(ttc);
@@ -372,7 +374,9 @@ public class MainEventAnalyzer {
 			Coord start = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3])));
 			Coord end = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[4]), Double.parseDouble(parts[5])));
 			double distance = 0;
-			List<Leg> legs = transitRouter.calcRoute(start, end, new Double(parts[6]), null);
+			final Coord fromCoord = start;
+			final Coord toCoord = end;
+			List<Leg> legs = transitRouter.calcRoute( new FakeFacility(fromCoord), new FakeFacility(toCoord), new Double(parts[6]), null );
 			double distancePT = 0, timePT = 0;
 			if(legs!=null) {
 				for(Leg leg:legs) {

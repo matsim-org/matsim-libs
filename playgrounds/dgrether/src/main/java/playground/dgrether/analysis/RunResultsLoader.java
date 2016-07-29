@@ -29,8 +29,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lanes;
@@ -111,7 +111,7 @@ public class RunResultsLoader {
 		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(c) ;
 		builder.setNetwork(this.network) ;
 		Scenario sc = builder.build() ;
-		MatsimPopulationReader pr= new MatsimPopulationReader(sc);
+		PopulationReader pr= new PopulationReader(sc);
 		pr.readFile(path);
 		return sc.getPopulation();
 	}

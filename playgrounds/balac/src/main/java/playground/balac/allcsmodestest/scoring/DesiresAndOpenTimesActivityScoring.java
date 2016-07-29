@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
+import org.matsim.core.scoring.functions.FacilityOpeningIntervalCalculator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
@@ -39,7 +39,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  * @author cdobler
  *
  */
-public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesActivityScoring {
+public class DesiresAndOpenTimesActivityScoring extends org.matsim.deprecated.scoring.functions.CharyparNagelOpenTimesActivityScoring {
 
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;

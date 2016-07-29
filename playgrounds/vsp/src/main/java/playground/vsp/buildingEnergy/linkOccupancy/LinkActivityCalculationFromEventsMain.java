@@ -42,13 +42,15 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 
 /**
@@ -191,9 +193,11 @@ public final class LinkActivityCalculationFromEventsMain {
 	 */
 	private static Scenario prepareScenario(String plansFile, String networkFile) {
 		log.info("load scenario-data.");
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = ScenarioUtils.createMutableScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
+//		final Population population = (Population) sc.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
+		reader.addAlgorithm(new PersonAlgorithm() {
 			
 			@Override
 			public void run(Person person) {
@@ -206,8 +210,9 @@ public final class LinkActivityCalculationFromEventsMain {
 				}
 			}
 		});
-		new MatsimPopulationReader(sc).readFile(plansFile);
-		((PopulationImpl) sc.getPopulation()).runAlgorithms();
+//		new PopulationReader(sc).readFile(plansFile);
+//		reader.runAlgorithms();
+		reader.readFile(plansFile);
 		log.info("finished (load scenario-data).");
 		return sc;
 	}

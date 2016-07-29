@@ -29,14 +29,14 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -52,13 +52,13 @@ import others.sergioo.util.dataBase.NoConnectionException;
 public class PlansFilterNoRoute {
 	Scenario localScenario = ScenarioUtils.createScenario(ConfigUtils
 			.createConfig());
-	private PopulationImpl badPop;
-	private PopulationWriter pw;
+	private Population badPop;
+	private StreamingPopulationWriter pw;
 
 	public void run(Population plans, String badPopFileName, Network network) {
-		badPop = (PopulationImpl) plans;
-		badPop.setIsStreaming(true);
-		pw = new PopulationWriter(badPop, network);
+		badPop = (Population) plans;
+		StreamingUtils.setIsStreaming(badPop, true);
+		pw = new StreamingPopulationWriter(badPop, network);
 		pw.startStreaming(badPopFileName);
 		this.run(plans);
 	}
@@ -86,13 +86,13 @@ public class PlansFilterNoRoute {
 					boolean hasNoRoute = false;
 
 					for (int j = 1; j < plan.getPlanElements().size(); j += 2) {
-						LegImpl leg = (LegImpl) plan.getPlanElements().get(j);
+						Leg leg = (Leg) plan.getPlanElements().get(j);
 
 						if (leg.getRoute() == null
 								&& !leg.getMode().equals("transit_walk")) {
 							hasNoRoute = true;
 							// write origin and destination
-							ActivityImpl act = (ActivityImpl) plan
+							Activity act = (Activity) plan
 									.getPlanElements().get(j - 1);
 							String query = String
 									.format("insert into unrouteable_plans values(%d,\'%s\',%f,%f);",
@@ -102,7 +102,7 @@ public class PlansFilterNoRoute {
 													.getX(), act.getCoord()
 													.getY());
 							dba.executeStatement(query);
-							act = (ActivityImpl) plan.getPlanElements().get(
+							act = (Activity) plan.getPlanElements().get(
 									j + 1);
 							query = String
 									.format("insert into unrouteable_plans values(%d,\'%s\',%f,%f);",

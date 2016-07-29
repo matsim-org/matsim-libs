@@ -24,15 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Test;
 
 import playground.fabrice.primloc.CumulativeDistribution;
 
-public class CumulativeDistributionTest extends MatsimTestCase{
+public class CumulativeDistributionTest{
 	private final Logger log = Logger.getLogger(CumulativeDistributionTest.class);
 	private CumulativeDistribution cd1;
 	private CumulativeDistribution cd2;
 	
+	@Test
 	public void testGetValue() throws Exception{
 		setupCdf();
 		cd1.print();

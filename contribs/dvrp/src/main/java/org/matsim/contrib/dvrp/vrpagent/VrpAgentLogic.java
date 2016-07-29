@@ -29,6 +29,10 @@ import org.matsim.contrib.dynagent.*;
 public class VrpAgentLogic
     implements DynAgentLogic
 {
+    public static final String BEFORE_SCHEDULE_ACTIVITY_TYPE = "BeforeVrpSchedule";
+    public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
+
+
     public interface DynActionCreator
     {
         DynAction createAction(Task task, double now);
@@ -98,7 +102,7 @@ public class VrpAgentLogic
 
     private DynActivity createBeforeScheduleActivity()
     {
-        return new AbstractDynActivity("Before schedule") {
+        return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
             public double getEndTime()
             {
                 Schedule<?> s = vehicle.getSchedule();
@@ -118,6 +122,6 @@ public class VrpAgentLogic
 
     private DynActivity createAfterScheduleActivity()
     {
-        return new StaticDynActivity("After schedule", Double.POSITIVE_INFINITY);
+        return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
     }
 }

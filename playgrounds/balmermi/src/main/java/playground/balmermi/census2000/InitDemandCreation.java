@@ -26,10 +26,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -110,37 +112,44 @@ public class InitDemandCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
-		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
+//		Population sReader = (Population) scenario.getPopulation();
+		StreamingPopulationReader sReader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(sReader, true);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		plans.addAlgorithm(new PersonLicenseModel(persons));
-		plans.addAlgorithm(new PersonDistributeActChains(actchains));
-		plans.addAlgorithm(new PersonSetHomeLoc(facilities, persons));
-		plans.addAlgorithm(new PersonSetPrimLoc(facilities, matrices, persons, (ZoneLayer)world.getLayer(Id.create("municipality", Layer.class))));
-		plans.addAlgorithm(new PersonSetSecLoc(facilities, persons));
-		plans.addAlgorithm(new PersonMobilityToolModel(persons));
-		plans.addAlgorithm(new PersonModeChoiceModel(persons));
+		sReader.addAlgorithm(new PersonLicenseModel(persons));
+		sReader.addAlgorithm(new PersonDistributeActChains(actchains));
+		sReader.addAlgorithm(new PersonSetHomeLoc(facilities, persons));
+		sReader.addAlgorithm(new PersonSetPrimLoc(facilities, matrices, persons, (ZoneLayer)world.getLayer(Id.create("municipality", Layer.class))));
+		sReader.addAlgorithm(new PersonSetSecLoc(facilities, persons));
+		sReader.addAlgorithm(new PersonMobilityToolModel(persons));
+		sReader.addAlgorithm(new PersonModeChoiceModel(persons));
 		//////////////////////////////////////////////////////////////////////
 		PersonsSummaryTable pst = new PersonsSummaryTable("output/summaryTable.txt");
-		plans.addAlgorithm(pst);
+		final PersonAlgorithm algo = pst;
+		sReader.addAlgorithm(algo);
 		PersonSummary ps = new PersonSummary();
-		plans.addAlgorithm(ps);
+		final PersonAlgorithm algo1 = ps;
+		sReader.addAlgorithm(algo1);
 		PersonCensusSummaryTables pcst = new PersonCensusSummaryTables("output/output_persons.txt",persons);
-		plans.addAlgorithm(pcst);
+		final PersonAlgorithm algo2 = pcst;
+		sReader.addAlgorithm(algo2);
 		PersonMunicipalitySummaryTable pmst = new PersonMunicipalitySummaryTable("output/output_municipalities.txt",persons);
-		plans.addAlgorithm(pmst);
+		final PersonAlgorithm algo3 = pmst;
+		sReader.addAlgorithm(algo3);
 		PersonZoneSummary pzs = new PersonZoneSummary((ZoneLayer)world.getLayer(Id.create("municipality", Layer.class)),persons,"output/output_zones.txt");
-		plans.addAlgorithm(pzs);
+		final PersonAlgorithm algo4 = pzs;
+		sReader.addAlgorithm(algo4);
 		//////////////////////////////////////////////////////////////////////
-		PersonRoundTimes prt = new PersonRoundTimes(); // must be last one!!!
-		plans.addAlgorithm(prt);
+		PersonRoundTimes prt = new PersonRoundTimes();
+		final PersonAlgorithm algo5 = prt; // must be last one!!!
+		sReader.addAlgorithm(algo5);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
@@ -148,9 +157,11 @@ public class InitDemandCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		final PersonAlgorithm algo6 = plansWriter;
+		sReader.addAlgorithm(algo6);
+//		plansReader.readFile(config.plans().getInputFile());
+		sReader.readFile(config.plans().getInputFile());
+		PopulationUtils.printPlansCount(sReader) ;
 		plansWriter.closeStreaming();
 		System.out.println("  done.");
 

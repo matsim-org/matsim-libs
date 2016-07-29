@@ -21,12 +21,15 @@
 package playground.balmermi.datapuls;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -58,22 +61,24 @@ public class CBPopulationPreparation {
 		if (args.length != 3) { printUsage(); return; }
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final PopulationImpl population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		PopulationWriter plansWriter = new PopulationWriter(population, scenario.getNetwork());
+//		final Population population = (Population) scenario.getPopulation();
+		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(population, true);
+		MatsimReader plansReader = new PopulationReader(scenario);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
 		plansWriter.startStreaming(args[1].trim());
 
 		ActivityFacilities afs = scenario.getActivityFacilities();
-
+		
 		System.out.println("adding algorithms...");
 		population.addAlgorithm(new PersonAdaptPlanAndCreateFacilities(afs));
-		population.addAlgorithm(plansWriter);
+		final PersonAlgorithm algo = plansWriter;
+		population.addAlgorithm(algo);
 		System.out.println("done. (adding algorithms)");
 
 		System.out.println("stream population...");
 		plansReader.readFile(args[0].trim());
-		population.printPlansCount();
+		PopulationUtils.printPlansCount(population) ;
 		plansWriter.closeStreaming();
 		Gbl.printMemoryUsage();
 		System.out.println("done. (stream population)");

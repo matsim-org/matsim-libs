@@ -32,10 +32,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
@@ -130,7 +131,8 @@ public class PopulationTransitCleaner {
 							} else {
 								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 							}
-							((PlanImpl) plan).removeActivity(i); // also removes the following leg
+							final int index = i;
+							PopulationUtils.removeActivity(((Plan) plan), index); // also removes the following leg
 							n -= 2;
 							i--;
 						}

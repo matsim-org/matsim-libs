@@ -26,12 +26,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
@@ -39,21 +40,27 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.*;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicDestinationSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoiceSituation;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.CodebookUtils;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author thibautd
@@ -69,14 +76,14 @@ public class RunCapeTownTripChoiceSetConversion {
 		Logger.getLogger( MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
 		if ( new File( group.getOutputPath() ).exists() ) throw new RuntimeException( group.getOutputPath()+" exists" );
-		MoreIOUtils.initOut( group.getOutputPath() );
+		MoreIOUtils.initOut( group.getOutputPath() , config );
 
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
 		final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(sc.getNetwork());
 		final Network carNetwork = NetworkUtils.createNetwork();
 		filter.filter(carNetwork, Collections.singleton( "car" ));
-		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (NetworkImpl) carNetwork);
+		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (Network) carNetwork);
 
 		new XY2Links( carNetwork , sc.getActivityFacilities() ).run(sc.getPopulation());
 
@@ -107,17 +114,26 @@ public class RunCapeTownTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new CapeTownMainModeIdentifier());
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											// Assume o[ther] activities to be "stages".
+											// Not the case for all, but it seems to hold for the majority.
+											// actually, "o" corresponds to the following (south africa playground):
+											// UNKNOWN
+											// PICKUP_OTHER
+											// TRANSFER
+											// FUEL
+											// SERVICE
+											// WATER
+											// TEND_ANIMALS
+											// OTHER1
+											// OTHER2
+											"o",
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new CapeTownMainModeIdentifier(),
+									group.getModes() ) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()
@@ -149,24 +165,34 @@ public class RunCapeTownTripChoiceSetConversion {
 						tripRouter.getRoutingModule(
 								TransportMode.car)));
 
+		tripRouter.setMainModeIdentifier( new CapeTownMainModeIdentifier() );
+
 		return tripRouter;
 	}
 
 	private static class CapeTownMainModeIdentifier implements MainModeIdentifier {
 		@Override
 		public String identifyMainMode( List<? extends PlanElement> tripElements ) {
-			if ( tripElements.size() > 1 ) throw new IllegalArgumentException( tripElements+" has size "+tripElements.size() );
+			final Set<String> usedModes =
+					tripElements.stream()
+							.filter( pe -> pe instanceof Leg )
+							.map( pe -> ( (Leg) pe ).getMode() )
+							.collect( Collectors.toSet() );
 
-			final Leg l = (Leg) tripElements.get( 0 );
-			switch ( l.getMode() ) {
-				// aggregate the different PT modes
-				case "brt":
-				case "bus":
-				case "rail":
-					return TransportMode.pt;
-				default:
-					return l.getMode();
-			}
+			// "hierarchy" of modes
+			if ( containsAny( usedModes , "brt" , "bus" , "rail" ) ) return TransportMode.pt;
+			// TODO: handle differently than formal pt
+			if ( containsAny( usedModes , "taxi" ) ) return "taxi";
+			// handle mode from the router (not strictly necessary)
+			if ( containsAny( usedModes , TransportMode.pt ) ) return TransportMode.pt;
+			if ( containsAny( usedModes , "car" ) ) return TransportMode.car;
+			if ( containsAny( usedModes , "ride" ) ) return TransportMode.ride;
+			if ( containsAny( usedModes , "walk" ) ) return TransportMode.walk;
+			return "other";
 		}
+	}
+
+	private static boolean containsAny( Set<String> usedModes , String... modes ) {
+		return CollectionUtils.intersects( usedModes , Arrays.asList( modes ) );
 	}
 }

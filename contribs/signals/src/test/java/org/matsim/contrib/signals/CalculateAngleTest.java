@@ -16,8 +16,8 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -40,7 +40,7 @@ public class CalculateAngleTest {
 	public void testGetLeftLane() {
 		Config conf = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(conf.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).parse(conf.network().getInputFileURL(conf.getContext()));
 
 		Assert.assertEquals("Has to be 'null', since there is no other way back but Link 11.",
 				null, NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("1", Link.class))));

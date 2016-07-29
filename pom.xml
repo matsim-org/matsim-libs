@@ -4,11 +4,12 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-all</artifactId>
 	<packaging>pom</packaging>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<name>MATSim-All</name>
 	<modules>
 		<module>matsim</module>
 		<module>contribs</module>
 		<module>playgrounds</module>
+		<module>distribution</module>
 	</modules>
 </project>

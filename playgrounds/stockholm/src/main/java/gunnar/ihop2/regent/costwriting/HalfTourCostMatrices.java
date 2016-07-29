@@ -1,7 +1,5 @@
 package gunnar.ihop2.regent.costwriting;
 
-import static floetteroed.utilities.math.Histogram.newHistogramWithUniformBins;
-
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -78,7 +76,7 @@ public class HalfTourCostMatrices {
 
 		Histogram histogram = actType2timeHist.get(actType);
 		if (histogram == null) {
-			histogram = newHistogramWithUniformBins(
+			histogram = Histogram.newHistogramWithUniformBins(
 					this.tripCostMatrices.getStartTime_s(),
 					this.tripCostMatrices.getBinSize_s(),
 					this.tripCostMatrices.getBinCnt());
@@ -220,6 +218,11 @@ public class HalfTourCostMatrices {
 		}
 	}
 
+	// TODO NEW
+	public Matrices getHalfTourCostMatrices(final String costType) {
+		return this.costType2halfTourCostMatrices.get(costType);
+	}
+	
 	public void writeHistogramsToFile(final String histogramFileName) {
 
 		try {

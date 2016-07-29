@@ -1,7 +1,6 @@
 package playground.dhosse.prt.events;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

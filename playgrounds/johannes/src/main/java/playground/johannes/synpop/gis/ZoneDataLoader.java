@@ -61,7 +61,7 @@ public class ZoneDataLoader implements DataLoader {
             try {
                 ZoneCollection zones;
                 if(file.endsWith(".json") || file.endsWith(".geojson"))
-                    zones = ZoneGeoJsonIO.readFromGeoJSON(file, primaryKey);
+                    zones = ZoneGeoJsonIO.readFromGeoJSON(file, primaryKey, layerName);
                 else if(file.endsWith(".shp")) {
                     zones = ZoneEsriShapeIO.read(file);
                     zones.setPrimaryKey(primaryKey);

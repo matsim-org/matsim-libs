@@ -24,33 +24,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 
-public final class LegImpl implements Leg {
+/* deliberately package */  final class LegImpl  implements Leg {
 
-	protected Route route = null;
+	private Route route = null;
 
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
 	private String mode;
 
-	private double arrTime = Time.UNDEFINED_TIME;
-
-	public LegImpl(final String transportMode) {
+	/* deliberately package */  LegImpl(final String transportMode) {
 		this.mode = transportMode;
-	}
-
-	/**
-	 * Makes a deep copy of this leg, however only when the Leg has a route which is
-	 * instance of Route or BasicRoute. Other route instances are not considered.
-	 * @param leg
-	 */
-	public LegImpl(final LegImpl leg) {
-		this(leg.getMode());
-		this.setDepartureTime(leg.getDepartureTime());
-		this.setTravelTime(leg.getTravelTime());
-		this.setArrivalTime(leg.getArrivalTime());
-		if (leg.getRoute() != null) {
-			this.setRoute(leg.getRoute().clone());
-		}
 	}
 
 	@Override
@@ -83,14 +66,6 @@ public final class LegImpl implements Leg {
 		this.travTime = travTime;
 	}
 
-	public final double getArrivalTime() {
-		return this.arrTime;
-	}
-
-	public final void setArrivalTime(final double arrTime) {
-		this.arrTime = arrTime;
-	}
-
 	@Override
 	public Route getRoute() {
 		return this.route;
@@ -106,7 +81,7 @@ public final class LegImpl implements Leg {
 		return "[mode=" + this.getMode() + "]" +
 				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
 				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +
+				"[arrTime=" + Time.writeTime(this.getDepartureTime() + this.getTravelTime()) + "]" +
 				"[route=" + this.route + "]";
 	}
 

@@ -102,7 +102,7 @@ final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVeh
 			for (String scenarioId : scenarioIds) {
 				ana.reset(0);
 				String eventsFile = "e:/_runs-svn/run1650/all2all_" + scenarioId + "/ITERS/it.10000/all2all_" + scenarioId + ".10000.events.xml.gz";
-				reader.parse(eventsFile);
+				reader.readFile(eventsFile);
 				ana.writeToFile(writer, scenarioId);			
 			}
 		

@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -35,19 +37,19 @@ import org.matsim.vehicles.Vehicle;
  * <p/>
  * Contains all the logic for the QLinks which make up the QNetwork.
  * <p/>
- * My current intuition is that the QSim and even the QNetsimEngine are now more general, and could deal with more general links and nodes.
- * However, the links and nodes need to work together.  The QLinks are, in consequence, those links which (are simple enough
- * to) work together with the QNodes.  
- * (The somewhat separate logic for QLinkLanesImpl in QNodes is already an exception to this, and optimally it should be removed.)
+ * One can argue that the QNetsimEngine could treat more general links than just "queues".  However, in the end they live with 
+ * "(qlane.)addFromUpstream" and "(qlane.)addFromUpstream", which is quite restricted, since it does not pass the velocity.
+ * Not passing the velocity means that it cannot be used for more general mobsims.
  * 
  * @author nagel
  *
  */
-/**
- * @author nagel
- *
- */
-abstract class QLinkI implements NetsimLink {
+abstract class QLinkI implements NetsimLink, TimeVariantLink {
+	// yyyy might make make sense to also pass the "isAccepting/addFromUpstream" through something like 
+	// "getFromNodeQueueLanes". kai, feb'16
+	
+	// yyyy my intuition is to unify all the "registerDriverAgentForCar" etc. methods into something like
+	// registerAdditionalAgentOnLink( MobsimAgent agent, String reason ) ;
 	
 
 	abstract QNode getToNode() ;
@@ -93,7 +95,6 @@ abstract class QLinkI implements NetsimLink {
 	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
 	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
 	 */
-//	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) ;
 	abstract void letVehicleDepart(QVehicle vehicle, double now) ;
 
 	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId, double now);
@@ -124,26 +125,20 @@ abstract class QLinkI implements NetsimLink {
 	 */
 	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) ;
 
-	abstract List<QLaneI> getToNodeQueueLanes() ;
+	abstract List<QLaneI> getOfferingQLanes() ;
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15
 	 */
-	abstract boolean doSimStep(final double now);
+	abstract boolean doSimStep();
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15 
 	 */
 	abstract void clearVehicles();
 
-	/**
-	 * <br>
-	 * seems ok as public interface function. kai, aug'15
-	 */
-	abstract void addFromUpstream(final QVehicle veh);
-
 	abstract boolean isNotOfferingVehicle();
 
-	abstract boolean isAcceptingFromUpstream();
+	abstract QLaneI getAcceptingQLane() ;
 
 }

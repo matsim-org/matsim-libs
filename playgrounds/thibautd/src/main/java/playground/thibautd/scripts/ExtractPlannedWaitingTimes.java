@@ -69,7 +69,7 @@ public class ExtractPlannedWaitingTimes {
 		String outFile = args[ 1 ];
 
 		PlansFileParser parser = new PlansFileParser();
-		parser.parse( plansFile );
+		parser.readFile( plansFile );
 		try {
 			parser.getTimes().writeWaitingTimesToFile( outFile );
 		} catch (IOException e) {

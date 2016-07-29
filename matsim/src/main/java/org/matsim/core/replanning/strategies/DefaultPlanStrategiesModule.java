@@ -73,44 +73,44 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
         // strategy packages that only select:
         if (usedStrategyNames.contains(DefaultSelector.KeepLastSelected.toString())) {
-            addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelected.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.BestScore.toString())) {
-            addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBestPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBest.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectExpBeta.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBetaPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBeta.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.ChangeExpBeta.toString())) {
-            addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBetaPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBeta.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectRandom.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandomPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandom.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectPathSizeLogit.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogitPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogit.class);
         }
 
         // strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
         // at least once).
 
         if (usedStrategyNames.contains(DefaultStrategy.ReRoute.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoutePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoute.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutatorPlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutator.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator_ReRoute.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoute.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.SubtourModeChoice.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoicePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoice.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeTripMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripModePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripMode.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleTripMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModePlanStrategyProvider.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripMode.class);
         }
 
         // td, 15 feb 16: removed the "Leg" versions of strategies. Notify the users that they should switch to the
@@ -122,14 +122,14 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
             log.error( DefaultStrategy.ChangeSingleLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
         }
         if ( usedStrategyNames.contains( DefaultStrategy.TripSubtourModeChoice.toString() ) ) {
-            log.error( DefaultStrategy.TripSubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.TripSubtourModeChoice+" instead." );
+            log.error( DefaultStrategy.TripSubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.SubtourModeChoice+" instead." );
         }
     }
 
     public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
 
-    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, ChangeLegMode, TimeAllocationMutator_ReRoute, 
-    	ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, TripSubtourModeChoice }
+    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, @Deprecated ChangeLegMode, TimeAllocationMutator_ReRoute, 
+    	@Deprecated ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, @Deprecated TripSubtourModeChoice }
     
     // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 
     // (i.e. Provider<GenericPlanSelector<Plan,Person>)?  kai, jan'15

@@ -48,11 +48,11 @@ public class LinkActsAndLegs {
 	public static void main(String[] args) throws IOException {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
+		parser.readFile("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO", null);
 		List<Zone> list = new ArrayList<>(zones.getZones());
 
 		long counter = 0;

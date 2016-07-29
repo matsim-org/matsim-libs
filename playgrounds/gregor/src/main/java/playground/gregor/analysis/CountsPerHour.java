@@ -83,13 +83,13 @@ public class CountsPerHour implements LinkEnterEventHandler {
 		String cFile = "/Users/laemmel/devel/nyc/gct_vicinity/counts.xml.gz";
 		
 		Counts c = new Counts();
-		new CountsReaderMatsimV1(c).parse(cFile);
+		new CountsReaderMatsimV1(c).readFile(cFile);
 		
 		CountsPerHour cph = new CountsPerHour(c);
 		EventsManagerImpl em = new EventsManagerImpl();
 		em.addHandler(cph);
 		
-		new EventsReaderXMLv1(em).parse(eFile);
+		new EventsReaderXMLv1(em).readFile(eFile);
 		
 		
 		List<Result> results = new ArrayList<>();

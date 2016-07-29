@@ -41,7 +41,7 @@ public final class ZurichScenarioUtils {
 			final ObjectAttributesXmlReader reader =
 				new ObjectAttributesXmlReader(
 						scenario.getPopulation().getPersonAttributes());
-			reader.parse(
+			reader.readFile(
 				config.plans().getInputPersonAttributeFile() );
 
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {

@@ -21,10 +21,10 @@ package playground.wrashid.artemis.checks;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
@@ -35,7 +35,7 @@ public class NumberOfParkingsPerLinkAndHub {
 
 	public static void main(String[] args) {
 		Matrix stringMatrix = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/inputs/linkHubMappings/linkHub.mappingTable.txt", "\t");
-		NetworkImpl network = (NetworkImpl) GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
+		Network network = (Network) GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
 		String parkingBasePath =	"H:/data/experiments/TRBAug2011/parkings/flat/";
 		
 		LinkedList<PParking> privateParkingCityZH=getParkingCollection(parkingBasePath + "privateParkings_v1_kti.xml");
@@ -70,7 +70,7 @@ public class NumberOfParkingsPerLinkAndHub {
 		
 	}
 
-	private static IntegerValueHashMap<Id> getNumberOfParkingsPerLink(NetworkImpl network,
+	private static IntegerValueHashMap<Id> getNumberOfParkingsPerLink(Network network,
 			LinkedList<PParking> privateParkingCityZH) {
 		IntegerValueHashMap<Id> numberOfParkingsAttachedToLinks=new IntegerValueHashMap<Id>();
 		

@@ -10,7 +10,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
@@ -126,12 +127,14 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 						@Override
 						public ControlerListener get() {
 							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-							GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution));
 							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-								listener.setComputingAccessibilityForMode(mode, true);
+								accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
 							}
-							listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-							listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, minX, minY, maxX, maxY, resolution);
 
 							//add grid data exchange listener to get accessibilities
 							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);

@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.shunting.ShuntingTableToMATSimScheduleEnricher;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,11 +68,11 @@ public class MATSimScheduleEnricherMain {
 	public MATSimScheduleEnricherMain(String networkFile, String transitScheduleFile, String transitVehiclesFile, String transitVehicleAttributesFile) {
 		Config config = Utils.getDefaultWagonSimConfig();
 		scenario = ScenarioUtils.createScenario(config);
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
 		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 		new VehicleReaderV1(((MutableScenario)scenario).getTransitVehicles()).readFile(transitVehiclesFile);
 		vehicleAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(vehicleAttributes).parse(transitVehicleAttributesFile);
+		new ObjectAttributesXmlReader(vehicleAttributes).readFile(transitVehicleAttributesFile);
 	}
 
 	//////////////////////////////////////////////////////////////////////

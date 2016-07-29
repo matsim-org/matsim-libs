@@ -85,16 +85,12 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 	}
 
 	public void testGetOpeningInterval() {
-		final Config config = loadConfig(null);
 		Activity act =  (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
 
-		CharyparNagelOpenTimesActivityScoring testee =
-				new CharyparNagelOpenTimesActivityScoring(
-						new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(), this.facilities);
+		FacilityOpeningIntervalCalculator testee =
+				new FacilityOpeningIntervalCalculator(this.facilities);
 
-		double[] openInterval = null;
-
-		openInterval = testee.getOpeningInterval(act);
+		double[] openInterval = testee.getOpeningInterval(act);
 
 		assertEquals(6.0 * 3600, openInterval[0], EPSILON);
 		assertEquals(19.0 * 3600, openInterval[1], EPSILON);

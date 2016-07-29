@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+
 import playground.boescpa.lib.obj.BoxedHashMap;
 
 import java.util.*;
@@ -96,14 +97,14 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 	}
 
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
+	final public void handleEvent(PersonArrivalEvent event) {
 		//store endLink and endTime for the current stage
 		stageEndLinkId.put(event.getPersonId(), event.getLinkId());
 		stageEndTime.put(event.getPersonId(), event.getTime());
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	final public void handleEvent(PersonDepartureEvent event) {
         Id<Person> personId = event.getPersonId();
 		// do not add departure if it's only a stage
 		if (!currentTripList.contains(personId)) {
@@ -135,7 +136,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 	}
 
 	@Override
-	public void handleEvent(ActivityStartEvent event) {
+	final public void handleEvent(ActivityStartEvent event) {
 		// do not add activity if it's a pt interaction
 		if (!event.getActType().equals("pt interaction")) {
             Id<Person> personId = event.getPersonId();
@@ -144,12 +145,12 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 	}
 
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
+	final public void handleEvent(PersonStuckEvent event) {
         handleTripEnd(event.getPersonId(), event.getLinkId(), event.getTime(), "stuck");
 	}
 
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+	final public void handleEvent(LinkLeaveEvent event) {
 		List<List<Id<Link>>> al = path.getValues(event.getVehicleId().toString());
 		if (al != null) {
 			List<Id<Link>> currentPath = al.get(al.size() - 1);
@@ -170,7 +171,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
         this.currentTripList.remove(personId);
     }
 
-    public List<Trip> getTrips() {
+    final public List<Trip> getTrips() {
         if (tripsChanged) {
             this.createTrips();
             tripsChanged = false;
@@ -183,7 +184,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
         int incognitoPersonId = 0;
         Trip tempTrip;
         for (Id<Person> personId : agents) {
-            if (!personId.toString().contains("pt")) {
+            if (agentIsToConsider(personId)) {
                 // get the agent's trips
                 List<Id<Link>> startLinks = this.startLink.getValues(personId);
                 List<String> modes = this.mode.getValues(personId);
@@ -233,4 +234,8 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
             }
         }
     }
+
+	protected boolean agentIsToConsider(Id<Person> personId) {
+		return !personId.toString().contains("pt");
+	}
 }

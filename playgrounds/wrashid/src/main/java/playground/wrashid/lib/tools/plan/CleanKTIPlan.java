@@ -1,12 +1,12 @@
 package playground.wrashid.lib.tools.plan;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 
 public class CleanKTIPlan {
@@ -24,16 +24,16 @@ public class CleanKTIPlan {
 		
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			
-			PersonImpl p=(PersonImpl) person;
+			Person p=(Person) person;
 			PersonUtils.removeUnselectedPlans(p);
 			
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
+				if (pe instanceof Activity) {
 					
 				}
 				
-				if (pe instanceof LegImpl) {
-					LegImpl leg=(LegImpl) pe;
+				if (pe instanceof Leg) {
+					Leg leg=(Leg) pe;
 					if (leg.getMode().equalsIgnoreCase("pt")){
 						leg.setRoute(null);
 					}

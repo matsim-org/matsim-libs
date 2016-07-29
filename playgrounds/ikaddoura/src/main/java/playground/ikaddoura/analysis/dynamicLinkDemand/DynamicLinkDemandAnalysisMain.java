@@ -43,7 +43,8 @@ public class DynamicLinkDemandAnalysisMain {
 			
 		} else {
 			
-			OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";			
+//			OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
+			OUTPUT_BASE_DIR = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/";		
 		}
 
 		DynamicLinkDemandAnalysisMain analysis = new DynamicLinkDemandAnalysisMain();
@@ -54,7 +55,11 @@ public class DynamicLinkDemandAnalysisMain {
 		
 		
 		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
-		config.plans().setInputFile(null);		
+		config.households().setInputHouseholdAttributesFile(null);
+		config.transit().setTransitScheduleFile(null);
+		config.transit().setVehiclesFile(null);
+		config.plans().setInputFile(null);
+		config.network().setChangeEventsInputFile(null);
 		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);

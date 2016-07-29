@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class LinkLeaveEvent extends Event {
+public class LinkLeaveEvent extends Event implements HasLinkId {
 
 	public static final String EVENT_TYPE = "left link";
 	public static final String ATTRIBUTE_LINK = "link";
@@ -36,7 +36,8 @@ public class LinkLeaveEvent extends Event {
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	final static String missingDriverIdMessage = "driver (or person) id does no longer exist in LinkEnter/LeaveEvent; use vehicle ID instead.  See Vehicle2DriverEventHandler for an approach to reconstruct the driver id.";
+	final static String missingDriverIdMessage = "driver (or person) ID does no longer exist in LinkEnter/LeaveEvent; use vehicle ID instead. "
+			+ "See Vehicle2DriverEventHandler for an approach to reconstruct the driver ID and/or EventsConverterXML to convert your old event file.";
 
 	public LinkLeaveEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
@@ -61,6 +62,7 @@ public class LinkLeaveEvent extends Event {
 		throw new RuntimeException(missingDriverIdMessage ) ;
 	}
 
+	@Override
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}

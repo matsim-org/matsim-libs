@@ -33,8 +33,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -56,6 +60,16 @@ public final class TripRouter implements MatsimExtensionPoint {
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+
+	public TripRouter() {}
+
+	@Inject
+	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+			setRoutingModule(entry.getKey(), entry.getValue().get());
+		}
+		setMainModeIdentifier(mainModeIdentifier);
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -151,6 +165,9 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final double departureTime,
 			final Person person) {
 		
+		Gbl.assertNotNull( fromFacility );
+		Gbl.assertNotNull( toFacility );
+		
 		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {
@@ -230,6 +247,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * returned by the {@link Plan#getPlanElements()} method of a plan. Note
 	 * that the plan will be modified only if the returned list is the internal
 	 * reference!
+	 * <p/>
+	 * Note that this methods returns a unique solution because it expects the activity object references as arguments, which are unique.
 	 *
 	 * @param plan the plan to modify
 	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.
@@ -251,6 +270,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	/**
 	 * Inserts a trip between two activities in a sequence of plan elements.
+	 * <p/>
+	 * Note that this methods returns a unique solution because it expects the activity object references as arguments, which are unique.
 	 * @param plan the sequence of plan elements to modify
 	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.
 	 * @param trip the trip to insert
@@ -273,7 +294,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			}
 			if (pe == destination) {
 				indexOfDestination = currentIndex;
-				if ( indexOfOrigin < 0 ) {
+				if (indexOfDestination < indexOfOrigin ) {
 					throw new RuntimeException(
 							"destination "+destination+" found before origin "+
 							origin+" in "+plan );

@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEvent
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
@@ -285,7 +285,7 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		int lastIteration = new Integer(args[1]);
 		int iterationsInterval = new Integer(args[2]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {

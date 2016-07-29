@@ -23,13 +23,13 @@ package org.matsim.core.replanning.selectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected GenericPlanSelector<Plan, Person> getPlanSelector() {
+	protected PlanSelector<Plan, Person> getPlanSelector() {
 		return new WorstPlanForRemovalSelector();
 	}
 
@@ -39,17 +39,17 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_nullType() {
-		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		PlanSelector<Plan, Person> selector = getPlanSelector();
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
-		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan1 = PopulationUtils.createPlan(person);
 		plan1.setScore(15.0);
-		PlanImpl plan2 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan2 = PopulationUtils.createPlan(person);
 		plan2.setScore(22.0);
-		PlanImpl plan3 = new org.matsim.core.population.PlanImpl(person);
-		PlanImpl plan4 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan3 = PopulationUtils.createPlan(person);
+		Plan plan4 = PopulationUtils.createPlan(person);
 		plan4.setScore(1.0);
-		PlanImpl plan5 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan5 = PopulationUtils.createPlan(person);
 		plan5.setScore(18.0);
 		person.addPlan(plan1);
 		person.addPlan(plan2);
@@ -79,7 +79,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_withTypes() {
-		GenericPlanSelector<Plan, Person> selector = getPlanSelector();
+		PlanSelector<Plan, Person> selector = getPlanSelector();
 		/* The used plans, ordered by score:
 		 * plan2: b, 22.0
 		 * plan6: b, 21.0
@@ -88,18 +88,18 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 		 * plan4: b,  1.0
 		 * plan3: a, null
 		 */
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
-		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan1 = PopulationUtils.createPlan(person);
 		plan1.setScore(15.0);
-		PlanImpl plan2 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan2 = PopulationUtils.createPlan(person);
 		plan2.setScore(22.0);
-		PlanImpl plan3 = new org.matsim.core.population.PlanImpl(person);
-		PlanImpl plan4 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan3 = PopulationUtils.createPlan(person);
+		Plan plan4 = PopulationUtils.createPlan(person);
 		plan4.setScore(1.0);
-		PlanImpl plan5 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan5 = PopulationUtils.createPlan(person);
 		plan5.setScore(18.0);
-		PlanImpl plan6 = new org.matsim.core.population.PlanImpl(person);
+		Plan plan6 = PopulationUtils.createPlan(person);
 		plan6.setScore(21.0);
 
 		plan1.setType("type1");

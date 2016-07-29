@@ -21,13 +21,13 @@ package org.matsim.contrib.dynagent;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 
-public class DynAgent
+public final class DynAgent
     implements MobsimDriverPassengerAgent
 {
     private DynAgentLogic agentLogic;
@@ -50,23 +50,23 @@ public class DynAgent
 
     // =====
 
-    private DynLeg dynLeg;
-
     private Id<Link> currentLinkId;
 
     // =====
 
+    private DynLeg dynLeg;
     private DynActivity dynActivity;
 
 
     // =====
 
-    public DynAgent(Id<Person> id, Id<Link> startLinkId, Netsim netsim, DynAgentLogic agentLogic)
+    public DynAgent(Id<Person> id, Id<Link> startLinkId, EventsManager events,
+            DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
-        this.events = netsim.getEventsManager();
+        this.events = events;
 
         // initial activity
         dynActivity = this.agentLogic.computeInitialActivity(this);
@@ -104,7 +104,6 @@ public class DynAgent
     {
         events.processEvent(
                 new ActivityEndEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
-
         computeNextAction(dynActivity, now);
     }
 
@@ -112,8 +111,7 @@ public class DynAgent
     @Override
     public void endLegAndComputeNextState(double now)
     {
-        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, TransportMode.car));
-
+        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));
         computeNextAction(dynLeg, now);
     }
 
@@ -128,6 +126,21 @@ public class DynAgent
     public DynAgentLogic getAgentLogic()
     {
         return agentLogic;
+    }
+
+
+    public DynAction getCurrentAction()
+    {
+        switch (state) {
+            case ACTIVITY:
+                return dynActivity;
+
+            case LEG:
+                return dynLeg;
+
+            default:
+                throw new IllegalStateException();
+        }
     }
 
 
@@ -305,16 +318,18 @@ public class DynAgent
     }
 
 
-@Override
-public Facility<? extends Facility<?>> getCurrentFacility() {
-	// TODO Auto-generated method stub
-	throw new RuntimeException("not implemented") ;
-}
+    @Override
+    public Facility<? extends Facility<?>> getCurrentFacility()
+    {
+        // TODO Auto-generated method stub
+        throw new RuntimeException("not implemented");
+    }
 
 
-@Override
-public Facility<? extends Facility<?>> getDestinationFacility() {
-	// TODO Auto-generated method stub
-	throw new RuntimeException("not implemented") ;
-}
+    @Override
+    public Facility<? extends Facility<?>> getDestinationFacility()
+    {
+        // TODO Auto-generated method stub
+        throw new RuntimeException("not implemented");
+    }
 }

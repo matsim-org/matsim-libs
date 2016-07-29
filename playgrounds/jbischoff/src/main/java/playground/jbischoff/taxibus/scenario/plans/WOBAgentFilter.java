@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.zone.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -54,7 +54,7 @@ private void run()
 {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/tb.output_plans.xml.gz");
+	new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/tb.output_plans.xml.gz");
 	new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml");
 	zones = Zones.readZones("../../../shared-svn/projects/vw_rufbus/scenario/input/zones/wob.xml", "../../../shared-svn/projects/vw_rufbus/scenario/input/zones/wob.shp");
 	

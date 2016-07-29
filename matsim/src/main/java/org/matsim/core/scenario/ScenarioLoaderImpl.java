@@ -19,18 +19,24 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import com.google.inject.Inject;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -42,9 +48,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -120,19 +124,10 @@ class ScenarioLoaderImpl {
 	 */
 	private void loadNetwork() {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-			final String networkFileName = this.config.network().getInputFile();
-
-			log.info("loading network from " + networkFileName);
-
-			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
-
-			if (this.config.network().isTimeVariantNetwork()) {
-				log.info("use TimeVariantLinks in NetworkFactory.");
-				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-			}
-
+			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
+			log.info("loading network from " + networkUrl);
 			if ( config.network().getInputCRS() == null ) {
-				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkUrl);
 			}
 			else {
 				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
@@ -140,21 +135,23 @@ class ScenarioLoaderImpl {
 						TransformationFactory.getCoordinateTransformation(
 								config.network().getInputCRS(),
 								config.global().getCoordinateSystem() );
-				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse( networkFileName );
+				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse(networkUrl);
 			}
 
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-				parser.parse(this.config.network().getChangeEventsInputFile());
-				network.setNetworkChangeEvents(parser.getEvents());
+				Network network = this.scenario.getNetwork();
+				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
+				parser.readFile(this.config.network().getChangeEventsInputFile());
+				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
 		}
 	}
 
 	private void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
-			String facilitiesFileName = this.config.facilities().getInputFile();
+			URL facilitiesFileName = this.config.facilities().getInputFileURL(config.getContext());
 			log.info("loading facilities from " + facilitiesFileName);
 
 			final String inputCRS = config.facilities().getInputCRS();
@@ -183,7 +180,7 @@ class ScenarioLoaderImpl {
 			log.info("loading facility attributes from " + facilitiesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.parse(facilitiesAttributesFileName);
+			reader.readFile(facilitiesAttributesFileName);
 		}
 		else {
 			log.info("no facility-attributes file set in config, not loading any facility attributes");
@@ -192,11 +189,11 @@ class ScenarioLoaderImpl {
 
 	private void loadPopulation() {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
-			String populationFileName = this.config.plans().getInputFile();
+			URL populationFileName = this.config.plans().getInputFileURL(this.config.getContext());
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
-				new MatsimPopulationReader(this.scenario).parse(populationFileName);
+				new PopulationReader(this.scenario).parse(populationFileName);
 			}
 			else {
 				final String inputCRS = config.plans().getInputCRS();
@@ -209,22 +206,20 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new MatsimPopulationReader(transformation , this.scenario).parse(populationFileName);
+				new PopulationReader(transformation , this.scenario).parse(populationFileName);
 			}
 
-			if (this.scenario.getPopulation() instanceof PopulationImpl) {
-				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
-			}
+			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
 		}
 		else {
 			log.info("no population file set in config, not able to load population");
 		}
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
-			String personAttributesFileName = this.config.plans().getInputPersonAttributeFile();
-			log.info("loading person attributes from " + personAttributesFileName);
+			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
+			log.info("loading person attributes from " + personAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.parse(personAttributesFileName);
+			reader.parse(personAttributesURL);
 		}
 		else {
 			log.info("no person-attributes file set in config, not loading any person attributes");
@@ -235,7 +230,7 @@ class ScenarioLoaderImpl {
 		final String householdsFile = this.config.households().getInputFile();
 		if ( (this.config.households() != null) && (householdsFile != null) ) {
 			log.info("loading households from " + householdsFile);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).readFile(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
@@ -246,7 +241,7 @@ class ScenarioLoaderImpl {
 			log.info("loading household attributes from " + householdAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.parse(householdAttributesFileName);
+			reader.readFile(householdAttributesFileName);
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -261,7 +256,7 @@ class ScenarioLoaderImpl {
 			final String internalCRS = config.global().getCoordinateSystem();
 
 			if ( inputCRS == null ) {
-				new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+				new TransitScheduleReader(this.scenario).readURL(this.config.transit().getTransitScheduleFileURL(this.config.getContext()));
 			}
 			else {
 				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
@@ -283,7 +278,7 @@ class ScenarioLoaderImpl {
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.parse(transitLinesAttributesFileName);
+			reader.readFile(transitLinesAttributesFileName);
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
@@ -291,7 +286,7 @@ class ScenarioLoaderImpl {
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.parse(transitStopsAttributesFileName);
+			reader.readFile(transitStopsAttributesFileName);
 		}
 	}
 
@@ -299,7 +294,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading transit vehicles from " + vehiclesFile);
-			new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(vehiclesFile);
+			new VehicleReaderV1(this.scenario.getTransitVehicles()).parse(this.config.transit().getVehiclesFileURL(this.config.getContext()));
 		}
 		else {
 			log.info("no transit vehicles file set in config, not loading any transit vehicles");

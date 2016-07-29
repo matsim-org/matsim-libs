@@ -19,8 +19,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
+import playground.nmviljoen.gridExperiments.NmvLink;
+import playground.nmviljoen.gridExperiments.NmvNode;
 import playground.southafrica.utilities.Header;
 import edu.uci.ics.jung.algorithms.generators.GraphGenerator;
 import edu.uci.ics.jung.algorithms.generators.random.EppsteinPowerLawGenerator;

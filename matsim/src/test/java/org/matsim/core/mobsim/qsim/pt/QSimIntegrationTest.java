@@ -47,7 +47,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -224,7 +224,7 @@ public class QSimIntegrationTest {
 				"	</plan>" +
 				"</person>" +
 				"</plans>";
-		new MatsimPopulationReader(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
+		new PopulationReader(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
@@ -306,7 +306,7 @@ public class QSimIntegrationTest {
 		"	</plan>" +
 		"</person>" +
 		"</plans>";
-		new MatsimPopulationReader(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
+		new PopulationReader(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,

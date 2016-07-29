@@ -1,7 +1,6 @@
 package gunnar.ihop2.regent.costwriting;
 
 import static org.matsim.core.network.NetworkUtils.getConnectingLink;
-import gunnar.ihop2.regent.demandreading.Zone;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +16,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatrixUtils;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
+
+import gunnar.ihop2.regent.demandreading.Zone;
 
 /**
  * 

@@ -40,7 +40,7 @@ import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -73,7 +73,7 @@ public class TransitRouterNetworkThinner {
 		log.info("Reading transit router network from file...");
 		Gbl.startMeasurement();
 		TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
-		new TransitRouterNetworkReaderMatsimV1(scenario, transitRouterNetwork).parse(args[1]);
+		new TransitRouterNetworkReaderMatsimV1(scenario, transitRouterNetwork).readFile(args[1]);
 		Gbl.printElapsedTime();
 		Gbl.printMemoryUsage();
 		System.gc();

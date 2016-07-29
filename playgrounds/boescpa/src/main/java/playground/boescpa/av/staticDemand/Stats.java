@@ -76,8 +76,8 @@ public class Stats {
     private int numberOfAVs;
 
     public Stats(StaticAVSim.SimBase simBase) {
-        demand = Collections.unmodifiableList(simBase.demand);
-        fleet = Collections.unmodifiableList(simBase.fleet);
+        demand = Collections.unmodifiableList(simBase.getDemand());
+        fleet = Collections.unmodifiableList(simBase.getFleet());
         numberOfAgents = StaticDemand.getAllAgents(demand).size();
         numberOfAVs = fleet.size();
 

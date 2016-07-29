@@ -1,12 +1,13 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalLinkId;
-import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 /**
  * 

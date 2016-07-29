@@ -40,7 +40,7 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SetupFreight {
@@ -64,14 +64,14 @@ public class SetupFreight {
 		config.controler().setLastIteration(10);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).parse(NETFILENAME);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETFILENAME);
 
 		/* Set up freight specific stuff. */
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS);
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS);
 		
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES);
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES);
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 		
 		/* Create a plan for each carrier. The plan is the result of a VRP instance solved. */

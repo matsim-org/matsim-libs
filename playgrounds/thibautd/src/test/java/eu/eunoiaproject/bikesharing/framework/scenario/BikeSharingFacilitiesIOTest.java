@@ -48,7 +48,7 @@ public class BikeSharingFacilitiesIOTest {
 		final String file = utils.getOutputDirectory() +"/myDumpedFacilities.xml";
 		new BikeSharingFacilitiesWriter( facilities ).write( file );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new BikeSharingFacilitiesReader( scenario ).parse( file );
+		new BikeSharingFacilitiesReader( scenario ).readFile( file );
 
 		final BikeSharingFacilities newFacilities = (BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
 

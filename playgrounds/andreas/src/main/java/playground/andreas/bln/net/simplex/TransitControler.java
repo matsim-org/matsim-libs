@@ -156,7 +156,7 @@ public final class TransitControler {
 				new TransitScheduleReaderV1(event.getServices().getScenario().getTransitSchedule(), event.getServices().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
 			}
 			if (this.config.getVehiclesFile() != null) {
-				new VehicleReaderV1(((MutableScenario) event.getServices().getScenario()).getTransitVehicles()).parse(this.config.getVehiclesFile());
+				new VehicleReaderV1(((MutableScenario) event.getServices().getScenario()).getTransitVehicles()).readFile(this.config.getVehiclesFile());
 			}
 			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
 					event.getServices().getScenario().getNetwork(), event

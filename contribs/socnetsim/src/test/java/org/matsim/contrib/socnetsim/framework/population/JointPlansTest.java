@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 /**
@@ -45,9 +44,9 @@ public class JointPlansTest {
 	}
 
 	private static void testExceptionAdd( final boolean withCache ) throws Exception {
-		Plan p1 = createPlan(PopulationUtils.createPerson(Id.createPersonId(1)), withCache );
-		Plan p2 = createPlan(PopulationUtils.createPerson(Id.createPersonId(2)), withCache );
-		Plan p3 = createPlan(PopulationUtils.createPerson(Id.createPersonId(3)), withCache );
+		Plan p1 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(1)), withCache );
+		Plan p2 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(2)), withCache );
+		Plan p3 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(3)), withCache );
 
 		Map<Id<Person>, Plan> jp1 = new HashMap< >();
 		jp1.put( p1.getPerson().getId() , p1 );
@@ -85,8 +84,8 @@ public class JointPlansTest {
 	}
 
 	private static void testExceptionRemove( final boolean withCache ) throws Exception {
-		Plan p1 = createPlan(PopulationUtils.createPerson(Id.createPersonId(1)), withCache );
-		Plan p2 = createPlan(PopulationUtils.createPerson(Id.createPersonId(2)), withCache );
+		Plan p1 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(1)), withCache );
+		Plan p2 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(2)), withCache );
 
 		Map<Id<Person>, Plan> jp1 = new HashMap< >();
 		jp1.put( p1.getPerson().getId() , p1 );
@@ -126,8 +125,8 @@ public class JointPlansTest {
 	}
 
 	private static void testAddAndGetSeveralInstances( final boolean withCache ) {
-		final Plan p1 = createPlan(PopulationUtils.createPerson(Id.createPersonId(1)), withCache );
-		final Plan p2 = createPlan(PopulationUtils.createPerson(Id.createPersonId(2)), withCache );
+		final Plan p1 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(1)), withCache );
+		final Plan p2 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(2)), withCache );
 
 		final Map<Id<Person>, Plan> jp = new HashMap< >();
 		jp.put( p1.getPerson().getId() , p1 );
@@ -211,8 +210,8 @@ public class JointPlansTest {
 	}
 
 	private static void testClear( final boolean withCache ) {
-		Plan p1 = createPlan(PopulationUtils.createPerson(Id.createPersonId(1)), withCache );
-		Plan p2 = createPlan(PopulationUtils.createPerson(Id.createPersonId(2)), withCache );
+		Plan p1 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(1)), withCache );
+		Plan p2 = createPlan(PopulationUtils.getFactory().createPerson(Id.createPersonId(2)), withCache );
 
 		Map<Id<Person>, Plan> jp1 = new HashMap< >();
 		jp1.put( p1.getPerson().getId() , p1 );
@@ -234,7 +233,7 @@ public class JointPlansTest {
 
 	private static Plan createPlan( final Person person , final boolean withCache ) {
 		if ( withCache ) return new PlanWithCachedJointPlan( person );
-		else return new PlanImpl( person );
+		else return PopulationUtils.createPlan(person);
 	}
 }
 

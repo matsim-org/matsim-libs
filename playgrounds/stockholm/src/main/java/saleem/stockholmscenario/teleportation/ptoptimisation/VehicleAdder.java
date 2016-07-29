@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -15,7 +14,6 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import saleem.stockholmscenario.teleportation.ptoptimisation.utils.OptimisationUtils;
 import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class VehicleAdder {
@@ -62,6 +60,7 @@ public class VehicleAdder {
 			ArrayList<Id<Departure>> depadded = new ArrayList<Id<Departure>>();
 			departures = dtm.sortDepartures(departures);//Sort as per time
 			int size = departures.size();
+			Map<Id<Vehicle>, Vehicle> vehinstances = vehicles.getVehicles();
 			for(int i=1;i<size;i++) {//For each departure, there is a "fraction" percent chance to add a new departure
 				if(Math.random()<=fraction){
 					Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(1000000 * Math.random()), Vehicle.class);
@@ -73,14 +72,16 @@ public class VehicleAdder {
 						departure.setVehicleId(vehid);
 						if(!depadded.contains(departure.getId())){
 							depadded.add(departure.getId());
-							troute.addDeparture(departure);
-							System.out.println("Added Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
-							Vehicle vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
-							//To remove the chances of null pointer exception
-							while(vehicle==null)vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
-							VehicleType vtype = vehicle.getType();
-							Vehicle veh = new VehicleImpl(vehid, vtype);
-							vehicles.addVehicle(veh);
+							if(!troute.getDepartures().containsKey(departure.getId())){//If not already added a departure with the same id
+								troute.addDeparture(departure);
+								System.out.println("Added Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
+								Vehicle vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
+								//To remove the chances of null pointer exception
+								while(vehicle==null)vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
+								VehicleType vtype = vehicle.getType();
+								Vehicle veh = new VehicleImpl(vehid, vtype);
+								vehicles.addVehicle(veh);
+							}
 						}
 						
 //						System.out.println("Departure Added: " + departure.getId() + " based on " + troute.getId() + " : " + departures.get(i).getId());

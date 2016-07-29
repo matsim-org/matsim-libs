@@ -22,14 +22,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
 
@@ -44,7 +44,7 @@ public class MatsimIo {
 
 	public static Config loadConfig(final Config conf, final String filename) {
 		ConfigReader reader = new ConfigReader(conf);
-		reader.parse(filename);
+		reader.readFile(filename);
 		return conf;
 	}
 
@@ -61,7 +61,7 @@ public class MatsimIo {
 		Scenario scenario = new ScenarioBuilder( ConfigUtils.createConfig() ).setNetwork(network).build() ;
 		Population plans = scenario.getPopulation();
 		log.info("  reading plans xml file... ");
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		MatsimReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(filename);
 		log.info("  done");
 		return plans;

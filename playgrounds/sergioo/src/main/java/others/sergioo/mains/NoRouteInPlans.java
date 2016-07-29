@@ -4,14 +4,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class NoRouteInPlans implements PersonAlgorithm {
 	
@@ -36,9 +37,9 @@ public class NoRouteInPlans implements PersonAlgorithm {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new MatsimFacilitiesReader((MutableScenario) scenario).readFile(args[1]);
-		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new NoRouteInPlans());
-		new MatsimPopulationReader(scenario).readFile(args[2]);
+		StreamingUtils.setIsStreaming(((Population)scenario.getPopulation()), true);
+		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), new NoRouteInPlans());
+		new PopulationReader(scenario).readFile(args[2]);
 	}
 
 }

@@ -1,19 +1,19 @@
 package gunnar.ihop2.scaper;
 
 import static gunnar.ihop2.regent.demandreading.ShapeUtils.drawPointFromGeometry;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
 
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.xml.sax.helpers.DefaultHandler;
 
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**

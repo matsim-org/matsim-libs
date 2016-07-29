@@ -23,10 +23,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -54,13 +55,14 @@ public class Facilities2Links {
 		
 		logger.info("Loading network...");
 		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		netReader.parse(args[1]);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		netReader.readFile(args[1]);
+		Network network = (Network) scenario.getNetwork();
 		
 		logger.info("Conneting facilities...");
 		for(ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Coord coord = facility.getCoord();
-			Link link = network.getNearestLinkExactly(coord);
+			final Coord coord1 = coord;
+			Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 			((ActivityFacilityImpl)facility).setLinkId(link.getId());
 		}
 		

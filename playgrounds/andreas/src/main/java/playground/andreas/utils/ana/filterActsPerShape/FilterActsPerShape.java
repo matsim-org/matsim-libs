@@ -3,13 +3,16 @@ package playground.andreas.utils.ana.filterActsPerShape;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
 public class FilterActsPerShape {
 	
@@ -25,16 +28,17 @@ public class FilterActsPerShape {
 		log.info("Reading network from " + networkFile);
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
-		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
-		plans.setIsStreaming(true);
+		final Population plans = (Population) sc.getPopulation();
+		StreamingUtils.setIsStreaming(plans, true);
 
 		WorkHomeShapeCounter wHSC = new WorkHomeShapeCounter(minXY, maxXY, actTypeOne, actTypeTwo, shapeFile);
-		plans.addAlgorithm(wHSC);
+		final PersonAlgorithm algo = wHSC;
+		StreamingUtils.addAlgorithm(plans, algo);
 		
-		PopulationReader plansReader = new MatsimPopulationReader(sc);		
+		MatsimReader plansReader = new PopulationReader(sc);		
 		log.info("Reading plans file from " + plansFile);
 		plansReader.readFile(plansFile);
-		plans.printPlansCount();
+		PopulationUtils.printPlansCount(plans) ;
 		log.info(wHSC.toString());
 		wHSC.toFile(filename);		
 		log.info("Finished");

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.TaxiDriveTask;
+import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 
-public class NPersonsPickupDriveTask extends TaxiDriveTask{
+public class NPersonsPickupDriveTask extends TaxiEmptyDriveTask{
 
 	List<TaxiRequest> requests;
 	
@@ -19,7 +19,7 @@ public class NPersonsPickupDriveTask extends TaxiDriveTask{
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DRIVE_EMPTY;
+        return TaxiTaskType.EMPTY_DRIVE;
     }
 
     public List<TaxiRequest> getRequests()

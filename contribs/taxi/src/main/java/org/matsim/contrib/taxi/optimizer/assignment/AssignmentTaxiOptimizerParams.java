@@ -20,8 +20,8 @@
 package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentProblem.Mode;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 
 
 public class AssignmentTaxiOptimizerParams
@@ -33,6 +33,7 @@ public class AssignmentTaxiOptimizerParams
     public static final String VEH_PLANNING_HORIZON_OVERSUPPLY = "vehPlanningHorizonOversupply";
     public static final String VEH_PLANNING_HORIZON_UNDERSUPPLY = "vehPlanningHorizonUndersupply";
 
+    //TODO should we adjust both the limits based on the current demand-supply relation?
     public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
     public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
 
@@ -61,12 +62,5 @@ public class AssignmentTaxiOptimizerParams
 
         nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
         nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
-    }
-
-
-    @Override
-    public AssignmentTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new AssignmentTaxiOptimizer(optimContext);
     }
 }

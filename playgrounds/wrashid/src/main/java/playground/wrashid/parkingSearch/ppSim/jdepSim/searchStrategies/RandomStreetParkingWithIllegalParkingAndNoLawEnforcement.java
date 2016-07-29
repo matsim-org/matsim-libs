@@ -23,9 +23,9 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -40,7 +40,7 @@ public class RandomStreetParkingWithIllegalParkingAndNoLawEnforcement extends Ra
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 
 		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
@@ -49,7 +49,7 @@ public class RandomStreetParkingWithIllegalParkingAndNoLawEnforcement extends Ra
 
 		if (endOfLegReached) {
 
-			ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+			Activity nextNonParkingAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),

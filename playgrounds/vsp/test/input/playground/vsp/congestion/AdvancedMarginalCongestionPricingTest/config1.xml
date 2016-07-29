@@ -3,12 +3,12 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/playground/vsp/congestion/AdvancedMarginalCongestionPricingTest/network1.xml" />
+		<param name="inputNetworkFile" value="network1.xml" />
 	</module>
 	
 	<module name="plans" >
 		<param name="removingUnnecessaryPlanAttributes" value="true" />
-		 <param name="inputPlansFile" value="test/input/playground/vsp/congestion/AdvancedMarginalCongestionPricingTest/population1.xml" />
+		 <param name="inputPlansFile" value="population1.xml" />
 	</module>
 	
 	<module name="controler">

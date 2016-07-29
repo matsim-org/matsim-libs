@@ -21,8 +21,8 @@ package playground.wrashid.tryouts.plan;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 
 /**
  * Helper class, for handling plansfiles *
@@ -33,12 +33,12 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  *
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
-	protected PopulationWriter popWriter;
+	protected StreamingPopulationWriter popWriter;
 	protected Network net;
 
 	public NewPopulation(final Network network, final Population population, final String filename) {
 		this.net = network;
-		this.popWriter = new PopulationWriter(population, this.net);
+		this.popWriter = new StreamingPopulationWriter(population, this.net);
 		this.popWriter.writeStartPlans(filename);
 	}
 

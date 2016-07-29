@@ -45,8 +45,13 @@ import playground.vsp.congestion.events.CongestionEvent;
 
 /** 
  * 
- * 1) For each agent leaving a link a total delay is calculated as the difference of actual leaving time and the leaving time according to freespeed.
- * 2) The delay due to the flow capacity of that link is computed and marginal congestion events are thrown, indicating the affected agent, the causing agent and the delay in sec. 
+ * For each agent leaving a link: Compute a delay as the difference between free speed travel time and actual travel time.
+ * 
+ * In this implementation, the delay is partially allocated to ALL agents ahead in the flow queue.
+ * Each agent has to pay for 1 / c_flow.
+ * 
+ * Spill-back effects are not taken into account.
+ *  
  * @author ikaddoura
  *
  */
@@ -152,7 +157,7 @@ public final class CongestionHandlerImplV8 implements CongestionHandler {
 		} else {
 			// The agent was leaving the link with a delay.
 
-			// go throw the flow queue and charge all causing agents the inverse of the flow capacity
+			// go through the flow queue and charge all causing agents the inverse of the flow capacity
 			LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
 			
 			for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {

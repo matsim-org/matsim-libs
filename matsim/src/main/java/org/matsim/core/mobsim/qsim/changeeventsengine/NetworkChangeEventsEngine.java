@@ -21,12 +21,15 @@
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.Collection;
 import java.util.PriorityQueue;
@@ -51,7 +54,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)this.mobsim.getScenario().getNetwork()).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network)this.mobsim.getScenario().getNetwork()));
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
@@ -69,7 +72,12 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)) {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
-				this.mobsim.getNetsimNetwork().getNetsimLink(link.getId()).recalcTimeVariantAttributes(time);
+				final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
+				if ( netsimLink instanceof TimeVariantLink ) {
+					((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
+				} else {
+					throw new RuntimeException("link not time variant") ;
+				}
 			}
 		}
 	}

@@ -22,23 +22,20 @@ package org.matsim.withinday.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.router.*;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
-import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import javax.inject.Inject;
@@ -137,7 +134,6 @@ public class WithinDayControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		this.initWithinDayEngine(this.numReplanningThreads);
 		this.createAndInitMobsimDataProvider();
-		this.initTravelTimeCollector();
 		this.createAndInitActivityReplanningMap();
 		this.createAndInitLinkReplanningMap();
 	}
@@ -154,11 +150,6 @@ public class WithinDayControlerListener implements StartupListener {
 	 */
 	private void initWithinDayEngine(int numOfThreads) {
 		log.info("Initialize WithinDayEngine");
-	}
-
-	private void initTravelTimeCollector() {
-		fosl.addSimulationListener(travelTimeCollector);
-		this.eventsManager.addHandler(travelTimeCollector);
 	}
 
 	private void createAndInitMobsimDataProvider() {

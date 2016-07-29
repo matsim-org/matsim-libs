@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -79,7 +79,8 @@ public class ShapeFileToNetworkDelhi {
 				Node node1;
 
 				if(!network.getNodes().containsKey((fromNodeId))){
-					node1 = ((NetworkImpl) network).createAndAddNode(fromNodeId, CT.transform(fromCoord));
+					final Id<Node> id = fromNodeId;
+					node1 = NetworkUtils.createAndAddNode(((Network) network), id, CT.transform(fromCoord));
 				}else{
 					node1=network.getNodes().get((fromNodeId));
 				}
@@ -103,7 +104,8 @@ public class ShapeFileToNetworkDelhi {
 				Node node2;
 
 				if(!network.getNodes().containsKey((toNodeId))){
-					node2 = ((NetworkImpl) network).createAndAddNode(toNodeId, CT.transform(toCoord));
+					final Id<Node> id = toNodeId;
+					node2 = NetworkUtils.createAndAddNode(((Network) network), id, CT.transform(toCoord));
 				}else{
 					node2 = network.getNodes().get((toNodeId));
 				}
@@ -124,11 +126,25 @@ public class ShapeFileToNetworkDelhi {
 
 				// add links to network
 				if (!network.getLinks().containsKey(linkId1)) {
-					((NetworkImpl) network).createAndAddLink(linkId1, node1, node2,	linkLength, freeSpeed, capacity,numberOfLanes);
+					final Id<Link> id = linkId1;
+					final Node fromNode = node1;
+					final Node toNode = node2;
+					final double length = linkLength;
+					final double freespeed = freeSpeed;
+					final double capacity1 = capacity;
+					final double numLanes = numberOfLanes;
+					NetworkUtils.createAndAddLink(((Network) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
 				}
 
 				if (!network.getLinks().containsKey(linkId2)) {
-					((NetworkImpl) network).createAndAddLink(linkId2, node2, node1,	linkLength, freeSpeed, capacity,numberOfLanes);
+					final Id<Link> id = linkId2;
+					final Node fromNode = node2;
+					final Node toNode = node1;
+					final double length = linkLength;
+					final double freespeed = freeSpeed;
+					final double capacity1 = capacity;
+					final double numLanes = numberOfLanes;
+					NetworkUtils.createAndAddLink(((Network) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
 				}
 			}
 		}

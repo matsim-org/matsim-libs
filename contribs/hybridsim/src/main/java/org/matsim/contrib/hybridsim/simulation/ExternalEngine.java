@@ -20,24 +20,22 @@
 package org.matsim.contrib.hybridsim.simulation;
 
 
-import io.grpc.stub.StreamObserver;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.hybridsim.events.XYVxVyEventImpl;
 import org.matsim.contrib.hybridsim.grpc.GRPCExternalClient;
-//import org.matsim.contrib.hybridsim.grpc.GRPCInternalServer;
-//import org.matsim.contrib.hybridsim.interfacedef.Interfacedef;
-//import org.matsim.contrib.hybridsim.interfacedef.MATSimInterfaceServiceGrpc;
 import org.matsim.contrib.hybridsim.proto.HybridSimProto;
-import org.matsim.contrib.hybridsim.proto.HybridSimulationGrpc;
+import org.matsim.contrib.hybridsim.run.Example;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -46,10 +44,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalIAdapter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-
-import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 
 public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceGrpc.MATSimInterfaceService {
 
@@ -61,6 +55,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	private final EventsManager em;
 	private final Netsim sim;
 	private final Network net;
+	private final Scenario sc;
 //	private final CyclicBarrier clientBarrier = new CyclicBarrier(2);
 
 	private GRPCExternalClient client;
@@ -69,7 +64,8 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		this.em = eventsManager;
 		this.sim = sim;
 		this.net = sim.getScenario().getNetwork();
-		this.client = new GRPCExternalClient("localhost", 8989);
+		this.client = new GRPCExternalClient(Example.REMOTE_HOST, Example.REMOTE_PORT);
+		this.sc = sim.getScenario();
 	}
 
 	public void registerAdapter(QLinkInternalIAdapter external2qAdapterLink) {
@@ -250,17 +246,9 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	@Override
 	public void onPrepareSim() {
 
-//		try {
-//			this.clientBarrier.await(); //to make sure matsim --> extern connection is working
-//		} catch (InterruptedException | BrokenBarrierException e) {
-//			throw new RuntimeException(e);
-//		}
-//		if (this.client == null){
-//			throw new RuntimeException("client is null");
-//		}
-//
-//		Interfacedef.ExternOnPrepareSim prep = Interfacedef.ExternOnPrepareSim.newBuilder().build();
-//		Interfacedef.ExternOnPrepareSimConfirmed resp = this.client.getBlockingStub().reqExternOnPrepareSim(prep);
+		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
+
+		this.client.getBlockingStub().initScenario(hsc);
 
 	}
 

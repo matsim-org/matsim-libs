@@ -27,8 +27,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,11 +49,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -97,7 +96,7 @@ public class AccessEgressDemoSimple {
 
 	private void createNetwork() {
 		Network network = this.scenario.getNetwork();
-		((NetworkImpl) network).setCapacityPeriod(3600.0);
+		((Network) network).setCapacityPeriod(3600.0);
 		
 		Node n01, n10, n11, n12, n13, n14;
 		double x1 = -500;
@@ -164,7 +163,7 @@ public class AccessEgressDemoSimple {
 		// transit line A		
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
-		NetworkRoute networkRouteA = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 		
 		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
 		linkListA.add(Id.create("1011", Link.class)); 
@@ -184,7 +183,7 @@ public class AccessEgressDemoSimple {
 		// transit line B		
 		Link startLinkB = this.scenario.getNetwork().getLinks().get(Id.create("0220", Link.class));
 		Link endLinkB = this.scenario.getNetwork().getLinks().get(Id.create("2324", Link.class));
-		NetworkRoute networkRouteB = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, startLinkB.getId(), endLinkB.getId());
+		NetworkRoute networkRouteB = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkB.getId(), endLinkB.getId());
 		
 		ArrayList<Id<Link>> linkListB = new ArrayList<Id<Link>>();
 		linkListB.add(Id.create("2021", Link.class));
@@ -249,12 +248,12 @@ public class AccessEgressDemoSimple {
 		TransitRoute tRoute = tLine.getRoutes().get(Id.create("A", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopTrain; j++) {
 			Person person = pb.createPerson(Id.create("A - " + j, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)).getLinkId());
+			Plan plan = (Plan) pb.createPlan();
+			Activity act1 = (Activity) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalTrain);
-			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
+			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)), tLine, tRoute, schedule.getFacilities().get(Id.create("13", TransitStopFacility.class))));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("13", TransitStopFacility.class)).getLinkId());
+			Activity act2 = (Activity) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("13", TransitStopFacility.class)).getLinkId());
 
 			population.addPerson(person);
 			person.addPlan(plan);
@@ -269,12 +268,12 @@ public class AccessEgressDemoSimple {
 		tRoute = tLine.getRoutes().get(Id.create("B", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopBus; j++) {
 			Person person = pb.createPerson(Id.create("B - " + j, Person.class));
-			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)).getLinkId());
+			Plan plan = (Plan) pb.createPlan();
+			Activity act1 = (Activity) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalBus);
-			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
+			Leg leg = (Leg) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)), tLine, tRoute, schedule.getFacilities().get(Id.create("23", TransitStopFacility.class))));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("23", TransitStopFacility.class)).getLinkId());
+			Activity act2 = (Activity) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("23", TransitStopFacility.class)).getLinkId());
 
 			population.addPerson(person);
 			person.addPlan(plan);

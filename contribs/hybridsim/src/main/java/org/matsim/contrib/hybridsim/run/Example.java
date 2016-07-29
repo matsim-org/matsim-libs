@@ -13,9 +13,10 @@
 
 package org.matsim.contrib.hybridsim.run;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -23,53 +24,66 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.hybridsim.proto.HybridSimProto;
 import org.matsim.contrib.hybridsim.simulation.HybridMobsimProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 
 /**
  * Created by laemmel on 09.03.16.
  */
 public class Example {
 
+
+	public static String REMOTE_HOST = "localhost";
+	public static int REMOTE_PORT = 9000;
+
 	private static final Logger log = Logger.getLogger(Example.class);
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		ExternalRunner r = new ExternalRunner();
-		Thread t1 = new Thread(r);
-		t1.start();
+		if (args.length == 2) {
+			REMOTE_HOST = args[0];
+			REMOTE_PORT = Integer.parseInt(args[1]);
+		}
+
 
 		Config c = ConfigUtils.createConfig();
 		c.controler().setLastIteration(0);
 		c.controler().setWriteEventsInterval(1);
 
+
+
+
 		final Scenario sc = ScenarioUtils.createScenario(c);
+		enrichConfig(c);
 		createNetwork(sc);
 		createPopulation(sc);
+		createHybridsimScenario(sc); //enable for grpc_jps_as_a_service branch
 
 		final Controler controller = new Controler(sc);
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-
-		final HybridNetworkFactory netFac = new HybridNetworkFactory();
 
 		final EventsManager eventsManager = EventsUtils.createEventsManager();
 
@@ -78,7 +92,8 @@ public class Example {
 			protected void configure() {
 				bind(Scenario.class).toInstance(sc);
 				bind(EventsManager.class).toInstance(eventsManager);
-				bind(HybridNetworkFactory.class).toInstance(netFac);
+				bind(HybridNetworkFactory.class).toInstance(new HybridNetworkFactory());
+				bind(QNetworkFactory.class).to(HybridNetworkFactory.class); ;
 			}
 
 		});
@@ -86,13 +101,246 @@ public class Example {
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Mobsim.class).toProvider(mobsimProvider);
-
+				bindMobsim().toProvider(mobsimProvider);
+				bindEventsManager().toInstance(eventsManager);
 			}
 		});
 		controller.run();
 
 
+	}
+
+	private static void createHybridsimScenario(Scenario sc) {
+		HybridSimProto.Scenario.Builder scb = HybridSimProto.Scenario.newBuilder();
+		scb.setSeed(42);
+		HybridSimProto.Environment.Builder eb = scb.getEnvironmentBuilder();
+		HybridSimProto.Room.Builder rb = eb.addRoomBuilder();
+
+
+		rb.setId(0);
+		rb.setCaption("hall");
+		HybridSimProto.Subroom.Builder srb = rb.addSubroomBuilder();
+		srb.setId(0);
+		srb.setClosed(0);
+		{
+			HybridSimProto.Polygon.Builder srpb = srb.addPolygonBuilder();
+			srpb.setCaption("wall");
+			HybridSimProto.Coordinate.Builder c1 = srpb.addCoordinateBuilder();
+			c1.setX(200.0);
+			c1.setY(109.35);
+			HybridSimProto.Coordinate.Builder c2 = srpb.addCoordinateBuilder();
+			c2.setX(113.85);
+			c2.setY(109.35);
+		}
+		{
+			HybridSimProto.Polygon.Builder srpb = srb.addPolygonBuilder();
+			srpb.setCaption("wall");
+			HybridSimProto.Coordinate.Builder c1 = srpb.addCoordinateBuilder();
+			c1.setX(113.85);
+			c1.setY(110.85);
+			HybridSimProto.Coordinate.Builder c2 = srpb.addCoordinateBuilder();
+			c2.setX(200.0);
+			c2.setY(110.85);
+		}
+		{
+			HybridSimProto.Transition.Builder tb = eb.addTransitionBuilder();
+			tb.setId(0);
+			tb.setCaption("exit");
+			tb.setType("emergency");
+			tb.setRoom1Id(0);
+			tb.setSubroom1Id(0);
+			tb.setRoom2Id(-1);
+			tb.setSubroom2Id(-1);
+			HybridSimProto.Coordinate.Builder c1 = tb.getVert1Builder();
+			c1.setX(200.0);
+			c1.setY(109.35);
+			HybridSimProto.Coordinate.Builder c2 = tb.getVert2Builder();
+			c2.setX(200.0);
+			c2.setY(110.85);
+		}
+		{
+			HybridSimProto.Transition.Builder tb = eb.addTransitionBuilder();
+			tb.setId(1);
+			tb.setCaption("entrance");
+			tb.setType("emergency");
+			tb.setRoom1Id(0);
+			tb.setSubroom1Id(0);
+			tb.setRoom2Id(-1);
+			tb.setSubroom2Id(-1);
+			HybridSimProto.Coordinate.Builder c1 = tb.getVert1Builder();
+			c1.setX(113.85);
+			c1.setY(110.85);
+			HybridSimProto.Coordinate.Builder c2 = tb.getVert2Builder();
+			c2.setX(113.85);
+			c2.setY(109.35);
+		}
+
+		{
+			HybridSimProto.Goal.Builder gb = scb.addGoalBuilder();
+			gb.setId(0);
+			gb.setFinal(true);
+			gb.setCaption("goal0");
+			HybridSimProto.Polygon.Builder pb = gb.getPBuilder();
+			HybridSimProto.Coordinate.Builder cb1 = pb.addCoordinateBuilder();
+			cb1.setX(198);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = pb.addCoordinateBuilder();
+			cb2.setX(198);
+			cb2.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb3 = pb.addCoordinateBuilder();
+			cb3.setX(200.5);
+			cb3.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb4 = pb.addCoordinateBuilder();
+			cb4.setX(200.5);
+			cb4.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb5 = pb.addCoordinateBuilder();
+			cb5.setX(198);
+			cb5.setY(109.35);
+		}
+		{
+			HybridSimProto.Goal.Builder gb = scb.addGoalBuilder();
+			gb.setId(1);
+			gb.setFinal(true);
+			gb.setCaption("goal1");
+			HybridSimProto.Polygon.Builder pb = gb.getPBuilder();
+			HybridSimProto.Coordinate.Builder cb1 = pb.addCoordinateBuilder();
+			cb1.setX(115.85);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = pb.addCoordinateBuilder();
+			cb2.setX(115.85);
+			cb2.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb3 = pb.addCoordinateBuilder();
+			cb3.setX(113.35);
+			cb3.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb4 = pb.addCoordinateBuilder();
+			cb4.setX(113.35);
+			cb4.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb5 = pb.addCoordinateBuilder();
+			cb5.setX(115.85);
+			cb5.setY(109.35);
+		}
+
+		{
+			HybridSimProto.Group.Builder gb = scb.addGroupBuilder();
+			gb.setGroupId(0);
+			gb.setRoomId(0);
+			gb.setSubroomId(0);
+			gb.setNumber(0);
+			gb.setRouterId(1);
+			HybridSimProto.Coordinate.Builder cb1 = gb.getMinXYBuilder();
+			cb1.setX(198.5);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = gb.getMaxXYBuilder();
+			cb2.setX(201);
+			cb2.setY(110.85);
+		}
+		{
+			HybridSimProto.Group.Builder gb = scb.addGroupBuilder();
+			gb.setGroupId(1);
+			gb.setRoomId(0);
+			gb.setSubroomId(0);
+			gb.setNumber(0);
+			gb.setRouterId(1);
+			HybridSimProto.Coordinate.Builder cb1 = gb.getMinXYBuilder();
+			cb1.setX(112.85);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = gb.getMaxXYBuilder();
+			cb2.setX(115.35);
+			cb2.setY(110.85);
+		}
+		{
+			HybridSimProto.Source.Builder srcb = scb.addSourceBuilder();
+			srcb.setId(0);
+			srcb.setFrequency(5);
+			srcb.setMaxAgents(5);
+			srcb.setGroupId(0);
+			srcb.setCaption("source1");
+		}
+		{
+			HybridSimProto.Source.Builder srcb = scb.addSourceBuilder();
+			srcb.setId(1);
+			srcb.setFrequency(5);
+			srcb.setMaxAgents(5);
+			srcb.setGroupId(1);
+			srcb.setCaption("source2");
+		}
+
+		HybridSimProto.Model.Builder mb = scb.getModelBuilder();
+		mb.setType(HybridSimProto.Model.Type.Gompertz);
+		HybridSimProto.Gompertz.Builder gb = mb.getGompertzBuilder();
+		gb.setSolver("euler");
+		gb.setStepsize(0.01);
+		gb.setExitCrossingStrategy(3);
+		gb.setLinkedCellsEnabled(true);
+		gb.setCellSize(2.2);
+		HybridSimProto.Force.Builder pfb = gb.getForcePedBuilder();
+		pfb.setNu(3);
+		pfb.setB(0.25);
+		pfb.setC(3.0);
+		HybridSimProto.Force.Builder wfb = gb.getForceWallBuilder();
+		wfb.setNu(10);
+		wfb.setB(0.7);
+		wfb.setC(3.0);
+
+		HybridSimProto.AgentParams.Builder ab = gb.getAgentParamsBuilder();
+		HybridSimProto.Distribution.Builder v0b = ab.getV0Builder();
+		v0b.setMu(0.5);
+		v0b.setSigma(0.0);
+		HybridSimProto.Distribution.Builder bmaxb = ab.getBMaxBuilder();
+		bmaxb.setMu(0.25);
+		bmaxb.setSigma(0.001);
+		HybridSimProto.Distribution.Builder bminb = ab.getBMinBuilder();
+		bminb.setMu(0.2);
+		bminb.setSigma(0.001);
+		HybridSimProto.Distribution.Builder aminb = ab.getAMinBuilder();
+		aminb.setMu(0.18);
+		aminb.setSigma(0.001);
+		HybridSimProto.Distribution.Builder taub = ab.getTauBuilder();
+		taub.setMu(0.5);
+		taub.setSigma(0.001);
+		HybridSimProto.Distribution.Builder ataub = ab.getAtauBuilder();
+		ataub.setMu(0.5);
+		ataub.setSigma(0.001);
+
+		HybridSimProto.Router.Builder roub = scb.addRouterBuilder();
+		roub.setRouterId(1);
+		roub.setDescription("global_shortest");
+
+		sc.addScenarioElement("hybrid_scenario",scb.build());
+
+//		Object gb = scb
+
+
+//		HybridSimProto.roo
+//		room = e.add
+//		e.add
+	}
+
+	private static void enrichConfig(Config c) {
+		PlanCalcScoreConfigGroup.ActivityParams pre = new PlanCalcScoreConfigGroup.ActivityParams("origin");
+		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
+		// running a simulation one gets
+		// "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision. see also comment in
+		// ActivityUtilityParameters.java (gl)
+		pre.setMinimalDuration(49);
+		pre.setClosingTime(49);
+		pre.setEarliestEndTime(49);
+		pre.setLatestStartTime(49);
+		pre.setOpeningTime(49);
+
+		PlanCalcScoreConfigGroup.ActivityParams post = new PlanCalcScoreConfigGroup.ActivityParams("destination");
+		post.setTypicalDuration(49); // dito
+		post.setMinimalDuration(49);
+		post.setClosingTime(49);
+		post.setEarliestEndTime(49);
+		post.setLatestStartTime(49);
+		post.setOpeningTime(49);
+		c.planCalcScore().addActivityParams(pre);
+		c.planCalcScore().addActivityParams(post);
+
+		c.planCalcScore().setLateArrival_utils_hr(0.);
+		c.planCalcScore().setPerforming_utils_hr(0.);
 	}
 
 	private static void createPopulation(Scenario sc) {
@@ -103,34 +351,34 @@ public class Example {
 			pop.addPerson(pers);
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
-			Activity a0 = fac.createActivityFromLinkId("h",Id.createLinkId(0));
+			Activity a0 = fac.createActivityFromLinkId("origin",Id.createLinkId(0));
 			a0.setEndTime(i);
 			plan.addActivity(a0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity a1 = fac.createActivityFromLinkId("h",Id.createLinkId(3));
+			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId(3));
 			plan.addActivity(a1);
 		}
-		for (int i = 20; i < 40; i++) {
-			Person pers = fac.createPerson(Id.createPersonId(i));
-			pop.addPerson(pers);
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-			Activity a0 = fac.createActivityFromLinkId("h",Id.createLinkId("3r"));
-			a0.setEndTime(i-20);
-			plan.addActivity(a0);
-			Leg leg = fac.createLeg("car");
-			plan.addLeg(leg);
-			Activity a1 = fac.createActivityFromLinkId("h",Id.createLinkId("0r"));
-			plan.addActivity(a1);
-		}
+//		for (int i = 20; i < 40; i++) {
+//			Person pers = fac.createPerson(Id.createPersonId(i));
+//			pop.addPerson(pers);
+//			Plan plan = fac.createPlan();
+//			pers.addPlan(plan);
+//			Activity a0 = fac.createActivityFromLinkId("origin",Id.createLinkId("3r"));
+//			a0.setEndTime(i-20);
+//			plan.addActivity(a0);
+//			Leg leg = fac.createLeg("car");
+//			plan.addLeg(leg);
+//			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId("0r"));
+//			plan.addActivity(a1);
+//		}
 	}
 
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
-		((NetworkImpl)net).setCapacityPeriod(1);
-		((NetworkImpl)net).setEffectiveLaneWidth(0.71);
-		((NetworkImpl)net).setEffectiveCellSize(0.26);
+		net.setCapacityPeriod(1);
+		net.setEffectiveLaneWidth(0.71);
+		net.setEffectiveCellSize(0.26);
 		NetworkFactory fac = net.getFactory();
 		Node n0 = fac.createNode(Id.createNodeId(0), CoordUtils.createCoord(93.85, 110.1));
 		net.addNode(n0);
@@ -181,53 +429,5 @@ public class Example {
 
 
 
-	}
-
-	private static final class ExternalRunner implements Runnable {
-
-
-		private Process process;
-
-		public ExternalRunner() {
-		}
-
-		@Override
-		public void run() {
-			try {
-				//TODO: this requires jpscore from the sumo_grpc branch to be installed
-				//probably it would be good to have jpscore as a maven dependency [gl Mar'16]
-				this.process = new ProcessBuilder("/usr/local/bin/jpscore", "./src/main/resources/corridor_ini.xml").start();
-				logToLog(process);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public void destroy() {
-			this.process.destroy();
-		}
-	}
-
-	private static void logToLog(Process p1) throws IOException {
-		{
-			InputStream is = p1.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.info("FROM EXTERN:" + l);
-				l = br.readLine();
-			}
-		}
-		{
-			InputStream is = p1.getErrorStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.error("FROM EXTERN:" + l);
-				l = br.readLine();
-			}
-		}
 	}
 }

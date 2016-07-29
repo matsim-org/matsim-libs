@@ -26,10 +26,9 @@ import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import java.io.PrintStream;
@@ -106,7 +105,7 @@ public class PopulationLegDistanceDistribution extends AbstractClassifiedFrequen
 					distance = DistanceCalculations.getWalkDistance((GenericRouteImpl)leg.getRoute(), network);
 				}
 				else{
-					if(leg instanceof LegImpl && leg.getRoute() == null && !(leg.getRoute() instanceof LinkNetworkRouteImpl) && !(leg.getRoute() instanceof ExperimentalTransitRoute)){
+					if(leg instanceof Leg && leg.getRoute() == null && !(leg.getRoute() instanceof LinkNetworkRouteImpl) && !(leg.getRoute() instanceof ExperimentalTransitRoute)){
 						log.warn("Not enough information on leg-object. Distance is set to 0.0 for this leg. Therefore no distance contribution....");
 					}
 					else{						

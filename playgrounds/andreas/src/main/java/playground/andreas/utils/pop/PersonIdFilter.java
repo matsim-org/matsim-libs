@@ -25,7 +25,7 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 
 /**
  * 

@@ -51,26 +51,26 @@ public class CalcShares {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/itp.xml");
 		NumericMatrix carItpMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(carItpMatrix, 1/365.0);
 				
-		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.819.2.xml");
+		reader.readFile("/home/johannes/gsv/matrices/simmatrices/miv.819.2.xml");
 		NumericMatrix carSimMatrix = reader.getMatrix();
 //		MatrixOperations.symmetrize(carSimMatrix);
 //		MatrixOperations.multiply(carSimMatrix, 11.8);
 		
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
 		NumericMatrix carTomTomMatrix = reader.getMatrix();
 		
-		reader.parse("/home/johannes/gsv/matrices/analysis/marketShares/rail.all.nuts3.xml");
+		reader.readFile("/home/johannes/gsv/matrices/analysis/marketShares/rail.all.nuts3.xml");
 		NumericMatrix railSimMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(railSimMatrix, 1/365.0);
 		
-		reader.parse("/home/johannes/gsv/matrices/analysis/marketShares/car.share.xml");
+		reader.readFile("/home/johannes/gsv/matrices/analysis/marketShares/car.share.xml");
 		NumericMatrix shareRefMatrix = reader.getMatrix();
 		
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;

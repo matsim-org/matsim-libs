@@ -21,13 +21,13 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import patryk.popgen2.Building;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+
+import patryk.popgen2.Building;
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**
  * 

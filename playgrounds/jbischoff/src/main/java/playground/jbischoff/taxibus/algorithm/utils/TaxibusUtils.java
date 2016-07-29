@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusVehicleRequestPath;
+import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**
  * @author  jbischoff
@@ -47,7 +47,7 @@ public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
 
 
 
-public static void printRequestPath(TaxibusVehicleRequestPath best) {
+public static void printRequestPath(TaxibusDispatch best) {
 	System.out.println("RequestPath for vehicle : "+best.vehicle.getId());
 	for (TaxibusRequest r : best.requests){
 	System.out.println(r.toString() + "\tfrom\t"+ r.getFromLink().getId().toString() + "\tto:\t"+ r.getToLink().getId().toString());

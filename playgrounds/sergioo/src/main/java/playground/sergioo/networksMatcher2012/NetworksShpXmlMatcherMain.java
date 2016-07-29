@@ -32,11 +32,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -110,10 +109,13 @@ public class NetworksShpXmlMatcherMain {
 					if(nodes[n]==null) {
 						nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 						nodeLongId++;
-						if(n==0)
-							((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("INODE").toString());
-						else if(n==nodes.length-1)
-							((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("JNODE").toString());
+						if(n==0) {
+							Node r = ((Node)nodes[n]);
+							NetworkUtils.setOrigId( r, (String) feature.getAttribute("INODE").toString() ) ;
+						} else if(n==nodes.length-1) {
+							Node r1 = ((Node)nodes[n]);
+							NetworkUtils.setOrigId( r1, (String) feature.getAttribute("JNODE").toString() ) ;
+						}
 					}
 				}
 				for(int n=0; n<nodes.length-1; n++) {
@@ -122,7 +124,7 @@ public class NetworksShpXmlMatcherMain {
 					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n], nodes[n+1]);
 					link.setCapacity((Double)feature.getAttribute("DATA2"));
 					link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
-					((LinkImpl)link).setOrigId(feature.getID());
+					NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 				}
@@ -155,7 +157,7 @@ public class NetworksShpXmlMatcherMain {
 				link.setCapacity((Double)feature.getAttribute("DATA2"));
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));
-				((LinkImpl)link).setOrigId(feature.getID());
+				NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 				network.addLink(link);
 			}
 		return network;

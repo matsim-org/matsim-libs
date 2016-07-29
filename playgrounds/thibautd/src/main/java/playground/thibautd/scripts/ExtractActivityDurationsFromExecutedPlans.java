@@ -39,7 +39,7 @@ public class ExtractActivityDurationsFromExecutedPlans {
 		final String outDatFile = args[ 1 ];
 
 		final Parser p = new Parser( outDatFile );
-		p.parse( inPopFile );
+		p.readFile( inPopFile );
 		p.close();
 	}
 

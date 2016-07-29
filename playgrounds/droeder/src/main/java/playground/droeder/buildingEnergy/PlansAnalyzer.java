@@ -31,20 +31,22 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author droeder
@@ -73,11 +75,12 @@ final class PlansAnalyzer {
 		log.info("outputpath: " + outputpath);
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
+		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
 		MyPersonAlgorithm pa = new MyPersonAlgorithm();
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(pa);
+		final PersonAlgorithm algo = pa;
+		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
-		new MatsimPopulationReader(sc).readFile(plansfile);
+		new PopulationReader(sc).readFile(plansfile);
 		pa.dumpStatistics(outputpath, "base");
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
@@ -94,9 +97,9 @@ final class PlansAnalyzer {
 			Activity a = (Activity) pe.get(0);
 			getAStats(a.getType()).add(a);
 			for(int i = 2; i < (pe.size() - 1); i += 2){
-				ActivityImpl start = (ActivityImpl) pe.get(i-2);
-				LegImpl leg = (LegImpl) pe.get(i-1);
-				ActivityImpl end= (ActivityImpl) pe.get(i);
+				Activity start = (Activity) pe.get(i-2);
+				Leg leg = (Leg) pe.get(i-1);
+				Activity end= (Activity) pe.get(i);
 				getAStats(end.getType()).add(end);
 				getLStats(leg.getMode()).add(leg, start.getCoord(), end.getCoord());
 			}
@@ -195,7 +198,7 @@ final class PlansAnalyzer {
 	private static class LegStatistics{
 		List<SingleLegStat> delegate = new ArrayList<SingleLegStat>();
 		
-		void add(LegImpl l, Coord from, Coord to){
+		void add(Leg l, Coord from, Coord to){
 			double dist = ((from == null) || (to == null)) ? Double.NaN : CoordUtils.calcEuclideanDistance(from, to); 
 			double tt = l.getTravelTime();
 			double speed = (dist == Double.NaN) ? Double.NaN : (dist / tt);

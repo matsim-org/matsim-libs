@@ -44,90 +44,10 @@ public class PrintEventsOfSingleAgent {
 		//reader.readFile(eventsFile);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 	}
 	
-	private static class SingleAgentEventsPrinter implements ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, 
-	PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
-	VehicleEntersTrafficEventHandler /*, LinkEnterEventHandler, LinkLeaveEventHandler*/{
-
-		private final Id<Person> filterEventsForAgentId;
-
-		public SingleAgentEventsPrinter(Id<Person> agentId){
-			this.filterEventsForAgentId = agentId;
-		}
-		
-		@Override
-		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-			
-		}
-
-//		@Override
-//		public void handleEvent(LinkLeaveEvent event) {
-//			if (event.getDriverId().equals(filterEventsForAgentId)){
-//				System.out.println(event.toString());
-//			}
-//		}
-//
-//
-//		@Override
-//		public void handleEvent(LinkEnterEvent event) {
-//			if (event.getDriverId().equals(filterEventsForAgentId)){
-//				System.out.println(event.toString());
-//			}
-//		}
-
-		@Override
-		public void handleEvent(VehicleEntersTrafficEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}
-		}
-
-		@Override
-		public void handleEvent(PersonMoneyEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}			
-		}
-
-		@Override
-		public void handleEvent(PersonStuckEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}			
-		}
-
-		@Override
-		public void handleEvent(PersonDepartureEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}			
-		}
-
-		@Override
-		public void handleEvent(PersonArrivalEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}			
-		}
-
-		@Override
-		public void handleEvent(ActivityStartEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}		
-		}
-
-		@Override
-		public void handleEvent(ActivityEndEvent event) {
-			if (event.getPersonId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}		
-		}
-		
-	}
+	
 	
 }

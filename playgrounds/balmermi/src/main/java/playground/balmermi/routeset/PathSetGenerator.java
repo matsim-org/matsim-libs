@@ -27,12 +27,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -150,8 +151,11 @@ public class PathSetGenerator {
 	}
 
 	private void removeLinkFromNetwork(Link link) {
-		((NodeImpl)link.getFromNode()).removeOutLink(link);
-		((NodeImpl)link.getToNode()).removeInLink(link);
+		final Link outlink = link;
+		final Id<Link> outLinkId = outlink.getId();
+		((Node)link.getFromNode()).removeOutLink(outLinkId);
+		final Link inlink = link;
+		((Node)link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private final boolean containsPath(Set<Path> paths, Path path) {

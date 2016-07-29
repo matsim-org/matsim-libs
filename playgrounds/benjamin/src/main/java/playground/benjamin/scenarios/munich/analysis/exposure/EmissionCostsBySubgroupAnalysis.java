@@ -98,7 +98,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, links2cells);
 		eventsManager.addHandler(intervalHandlerGroups);
-		eventsReader.parse(inputData.getEventsFileCompareCase());
+		eventsReader.readFile(inputData.getEventsFileCompareCase());
 		
 		totalDurations = intervalHandlerGroups.getTotalDurations();
 		groupDurations = intervalHandlerGroups.getGroupDurations();
@@ -125,7 +125,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		EmissionCostsByGroupsAndTimeBinsHandler emissionCostsByGroupsAndTimeBinsHandler = new EmissionCostsByGroupsAndTimeBinsHandler(timeBinSize , numberOfTimeBins);
 		
 		eventsManager.addHandler(emissionCostsByGroupsAndTimeBinsHandler);
-		emissionReader.parse(inputData.getEmissionFileForCompareCase());
+		emissionReader.readFile(inputData.getEmissionFileForCompareCase());
 		timeBin2causingUserGroup2links2flatEmissionCosts = emissionCostsByGroupsAndTimeBinsHandler.getAllFlatCosts();
 		logger.info("Done calculating flat emission costs.");
 	}

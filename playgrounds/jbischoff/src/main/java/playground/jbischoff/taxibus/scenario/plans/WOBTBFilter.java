@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -37,7 +37,7 @@ public class WOBTBFilter {
 public static void main(String[] args) {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/vw028.100pct.output_plans.xml.gz");
+	new PopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/vw028.100pct.output_plans.xml.gz");
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Population pop2 = scenario2.getPopulation();
 	int i = 0;

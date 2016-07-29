@@ -19,10 +19,11 @@
 
 package playground.dhosse.prt;
 
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 
 
 public interface VehicleRequestPathCost
 {
-    double getCost(BestDispatchFinder.Dispatch vrp);
+    double getCost(BestDispatchFinder.Dispatch<TaxiRequest> vrp);
 }

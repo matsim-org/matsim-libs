@@ -497,7 +497,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 
-		reader.parse(eventsFile); // where we find events data
+		reader.readFile(eventsFile); // where we find events data
 		for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType.values()) {
 			HashMap<Id<Link>, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(flowType);
 			HashMap<Id<Link>, int[]> linkOutFlow = flowAndDensityCollector.getLinkOutFlow(flowType);

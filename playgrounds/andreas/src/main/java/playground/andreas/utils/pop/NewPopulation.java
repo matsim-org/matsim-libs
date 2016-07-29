@@ -22,8 +22,8 @@ package playground.andreas.utils.pop;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 
 /**
  * Helper class, for handling plansfiles *
@@ -33,11 +33,11 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	private static final Logger log = Logger.getLogger(NewPopulation.class);
-	protected PopulationWriter popWriter;
+	protected StreamingPopulationWriter popWriter;
 	protected Network net;
 
 	public NewPopulation(final Network network, final Population population, final String filename) {
-		this.popWriter = new PopulationWriter(population, network);
+		this.popWriter = new StreamingPopulationWriter(population, network);
 		this.popWriter.writeStartPlans(filename);
 	}
 

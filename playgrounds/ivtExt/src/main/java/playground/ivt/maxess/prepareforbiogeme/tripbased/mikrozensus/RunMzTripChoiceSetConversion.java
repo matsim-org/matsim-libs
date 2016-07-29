@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
@@ -37,13 +37,16 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.*;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicDestinationSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoiceSituation;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoicesIdentifier;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
@@ -65,14 +68,14 @@ public class RunMzTripChoiceSetConversion {
 		Logger.getLogger( MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
 		if ( new File( group.getOutputPath() ).exists() ) throw new RuntimeException( group.getOutputPath()+" exists" );
-		MoreIOUtils.initOut( group.getOutputPath() );
+		MoreIOUtils.initOut( group.getOutputPath() , config );
 
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
 		final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(sc.getNetwork());
 		final Network carNetwork = NetworkUtils.createNetwork();
 		filter.filter(carNetwork, Collections.singleton( "car" ));
-		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (NetworkImpl) carNetwork);
+		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (Network) carNetwork);
 
 		new XY2Links( carNetwork , sc.getActivityFacilities() ).run(sc.getPopulation());
 
@@ -100,17 +103,13 @@ public class RunMzTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new MainModeIdentifierImpl());
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new MainModeIdentifierImpl(),
+									group.getModes() ) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()
@@ -131,6 +130,7 @@ public class RunMzTripChoiceSetConversion {
 		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(sc.getConfig().planCalcScore());
 
 		final TripRouterFactoryBuilderWithDefaults b = new TripRouterFactoryBuilderWithDefaults();
+		b.setTransitRouterFactory( TripRouterFactoryBuilderWithDefaults.createDefaultTransitRouter( sc ) );
 		b.setTravelTime( tt );
 		b.setTravelDisutility( tt );
 		final TripRouter tripRouter = b.build(sc).get();

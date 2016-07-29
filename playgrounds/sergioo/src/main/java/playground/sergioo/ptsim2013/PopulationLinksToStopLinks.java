@@ -3,21 +3,22 @@ package playground.sergioo.ptsim2013;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -38,24 +39,24 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 	}
 
 	private void processPlan(final Plan plan) {
-		ActivityImpl act = null, ptAct = null;
+		Activity act = null, ptAct = null;
 		Id<TransitStopFacility> eStopId = null, eStopId2 = null;
 		ExperimentalTransitRouteFactory factory = new ExperimentalTransitRouteFactory();
 		for (PlanElement planElement : plan.getPlanElements()) {
-			if(planElement instanceof ActivityImpl && !((ActivityImpl)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+			if(planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				if(act!=null) {
 					act.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
 					ptAct.setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
-					((ActivityImpl) planElement).setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
+					((Activity) planElement).setLinkId(NetworkUtils.getNearestLink((network), act.getCoord()).getId());
 				}
-				act = (ActivityImpl) planElement;
+				act = (Activity) planElement;
 				if(eStopId2!=null) {
 					act.setLinkId(Id.createLinkId(eStopId2));
 					eStopId2 = null;
 				}
 			}
-			else if(planElement instanceof ActivityImpl) {
-				ptAct = (ActivityImpl) planElement;
+			else if(planElement instanceof Activity) {
+				ptAct = (Activity) planElement;
 				if(eStopId!=null) {
 					ptAct.setLinkId(Id.createLinkId(eStopId));
 					eStopId2 = eStopId;
@@ -85,12 +86,13 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
-		((PopulationImpl) scenario.getPopulation()).setIsStreaming(true);
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		StreamingUtils.setIsStreaming(((Population) scenario.getPopulation()), true);
+		MatsimReader plansReader = new PopulationReader(scenario);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		plansWriter.startStreaming(args[2]);
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PopulationLinksToStopLinks(scenario.getNetwork()));
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(plansWriter);
+		StreamingUtils.addAlgorithm(((Population) scenario.getPopulation()), new PopulationLinksToStopLinks(scenario.getNetwork()));
+		final PersonAlgorithm algo = plansWriter;
+		StreamingUtils.addAlgorithm(((Population) scenario.getPopulation()), algo);
 		plansReader.readFile(args[0]);
 		plansWriter.closeStreaming();
 	}

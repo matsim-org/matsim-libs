@@ -54,23 +54,23 @@ public class ShareCorrelation {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/itp.xml");
 //		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.798.xml");
 		NumericMatrix sim = reader.getMatrix();
 //		MatrixOperations.multiply(sim, 1/365.0);
 		
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
 		NumericMatrix ref = reader.getMatrix();
 		MatrixOperations.applyFactor(ref, 1/16.0);
 		removeLowVolumeEntries(ref, 100);
 		
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.miv-share.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/itp.miv-share.xml");
 		NumericMatrix share = reader.getMatrix();
 		
 		NumericMatrix err = new NumericMatrix();
 		MatrixOperations.errorMatrix(ref, sim, err);
 		
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;

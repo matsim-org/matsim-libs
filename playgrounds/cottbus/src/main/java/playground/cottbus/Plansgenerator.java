@@ -26,16 +26,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -336,21 +336,21 @@ public class Plansgenerator {
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
 			homeEndtime = START_TIME;
 
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PopulationUtils.createPlan(p);
 			p.addPlan(plan);
 			//home
 			homeEndtime += Math.floor(Math.random() * DURATION); //0.05 * 60;
-			ActivityImpl a = plan.createAndAddActivity("h", homeCoord);
+			Activity a = PopulationUtils.createAndAddActivityFromCoord(plan, (String) "h", homeCoord);
 			a.setLinkId(start.getId());
 			a.setEndTime(homeEndtime);
 			//leg to work
-			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			Leg leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
 			NetworkRoute route = new LinkNetworkRouteImpl(start.getId(), target.getId());
 			route.setLinkIds(start.getId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(network, ROUTE))), target.getId());
 			leg.setRoute(route);
 			//work
-			a = plan.createAndAddActivity("w", workCoord);
+			a = PopulationUtils.createAndAddActivityFromCoord(plan, (String) "w", workCoord);
 			a.setLinkId(target.getId());
 
 			this.plans.addPerson(p);

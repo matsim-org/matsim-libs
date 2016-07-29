@@ -29,10 +29,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -56,7 +57,8 @@ public class TransitActsRemover implements PlanAlgorithm {
 				if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
 					double travelTime = ((Leg) plan.getPlanElements().get(i-1)).getTravelTime();
 					Route route = ((Leg) plan.getPlanElements().get(i-1)).getRoute();
-					((PlanImpl) plan).removeActivity(i);
+					final int index = i;
+					PopulationUtils.removeActivity(((Plan) plan), index);
 					((Leg) plan.getPlanElements().get(i-1)).setTravelTime(travelTime);
 					((Leg) plan.getPlanElements().get(i-1)).setRoute(route);
 					n -= 2;

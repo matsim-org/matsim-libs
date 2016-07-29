@@ -23,6 +23,8 @@ package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,12 +38,15 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
@@ -54,7 +59,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -118,14 +123,14 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
-			String outFolder ="/car/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
+			String outFolder ="/carMotorbikeBikeSeepage_bikeSeep/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car"; // travel (main) modes
-			args[2] = "5.0"; // modal split in pcu
-			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
-			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[1] = "car,motorbike,bike"; // travel (main) modes
+			args[2] = "1.0,1.0,1.0"; // modal split in pcu
+			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
+			args[4] = LinkDynamics.SeepageQ.toString(); // isPassingAllowed
 			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}
@@ -253,7 +258,7 @@ public class GenerateFundamentalDiagramData {
 		}
 		
 		//set up number of Points to run.
-		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
 	
@@ -294,7 +299,7 @@ public class GenerateFundamentalDiagramData {
 		this.startingPoint = new Integer[] {1,1};
 
 		maxAgentDistribution = new Integer [travelModes.length];
-		double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) this.scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		for(int ii=0;ii<maxAgentDistribution.length;ii++){
@@ -363,10 +368,9 @@ public class GenerateFundamentalDiagramData {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData);
-		passingEventsUpdator  = new PassingEventsUpdator();
+		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes());
 
 		events.addHandler(globalFlowDynamicsUpdator);
-		
 		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
@@ -379,11 +383,28 @@ public class GenerateFundamentalDiagramData {
 			eventWriter = new EventWriterXML(eventsDir+"/events"+pointToRun.toString()+".xml");
 			events.addHandler(eventWriter);
 		}
+		
+		this.scenario.getConfig().controler().setOutputDirectory(this.runDir);
+		
+		Controler controler = new Controler( scenario ) ;
+		
+		final Netsim qSim = createModifiedQSim(this.scenario, events);
 
-		Netsim qSim = createModifiedQSim(this.scenario, events);
-
-		qSim.run();
-
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindMobsim().toInstance( qSim );
+			}
+		});
+		
+		controler.run();
+		
+		if(! inputs.getSnapshotFormats().isEmpty()) {
+			//remove and renaming of the files which are generated from controler and not required.
+			updateTransimFileNameAndDir(pointToRun);
+		}
+		cleanOutputDir();
+		
 		boolean stableState = true;
 		for(int index=0;index<travelModes.length;index++){
 			Id<VehicleType> veh = Id.create(travelModes[index], VehicleType.class);
@@ -395,7 +416,6 @@ public class GenerateFundamentalDiagramData {
 				LOG.warn("Flow stability is not reached for travel mode "+veh.toString()
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + flowUnstableWarnCount[index]+ "th warning.");
-				//				log.warn("Increasing simulation time could be a possible solution to avoid it.");
 			}
 			if(!mode2FlowData.get(veh).isSpeedStable()) 
 			{
@@ -410,7 +430,7 @@ public class GenerateFundamentalDiagramData {
 		if(!globalFlowDynamicsUpdator.isPermanent()) stableState=false;
 
 		// sometimes higher density points are also executed (stuck time), to exclude them density check.
-		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		if(stableState){
@@ -439,8 +459,6 @@ public class GenerateFundamentalDiagramData {
 			if( travelModes.length > 1 ) {
 
 				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
-
-				writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
 
 				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			}
@@ -511,6 +529,31 @@ public class GenerateFundamentalDiagramData {
 
 		return qSim;
 	}
+	
+	private void updateTransimFileNameAndDir(List<Integer> runningPoint) {
+		String outputDir = scenario.getConfig().controler().getOutputDirectory();
+		//Check if Transim veh dir exists, if not create it
+		if(! new File(outputDir+"/TransVeh/").exists() ) new File(outputDir+"/TransVeh/").mkdir();
+		//first, move T.veh.gz file
+		String sourceTVehFile = outputDir+"/ITERS/it.0/0.T.veh.gz"; 
+		String targetTVehFilen = outputDir+"/TransVeh/T_"+runningPoint.toString()+".veh.gz"; 
+		try {
+			Files.move(new File(sourceTVehFile).toPath(), new File(targetTVehFilen).toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new RuntimeException("File not found.");
+		}
+	}
+	
+	private void cleanOutputDir(){
+		String outputDir = scenario.getConfig().controler().getOutputDirectory();
+		IOUtils.deleteDirectory(new File(outputDir+"/ITERS/"), false);
+		IOUtils.deleteDirectory(new File(outputDir+"/tmp/"), false);
+		new File(outputDir+"/logfile.log").delete();
+		new File(outputDir+"/logfileWarningsErrors.log").delete();
+		new File(outputDir+"/scorestats.txt").delete();
+		new File(outputDir+"/stopwatch.txt").delete();
+		new File(outputDir+"/traveldistancestats.txt").delete();
+	}
 
 	private void openFileAndWriteHeader(String dir) {
 		try {
@@ -545,8 +588,6 @@ public class GenerateFundamentalDiagramData {
 		
 		if( travelModes.length > 1 ) {
 			writer.print("noOfCarsPerkm \t");
-
-			writer.print("totalBikesPassedByAllCarsPerKm \t");
 
 			writer.print("avgBikePassingRatePerkm \t");
 		}
@@ -595,7 +636,7 @@ public class GenerateFundamentalDiagramData {
 		layout.setConversionPattern(conversionPattern);
 		FileAppender appender;
 		try {
-			appender = new FileAppender(layout, runDir+"/logfile.log",false);
+			appender = new FileAppender(layout, runDir+"/fdlogfile.log",false);
 		} catch (IOException e1) {
 			throw new RuntimeException("File not found.");
 		}
@@ -747,15 +788,12 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
 	}
 }

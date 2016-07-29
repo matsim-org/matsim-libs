@@ -8,12 +8,12 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
@@ -109,7 +109,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 			if(followingActivities.size()==0) {
 				EmptyTime emptyTime = (EmptyTime) plan.getPlanElements().get(emptyTimeIndex);
 				Activity nextActivity = (Activity) plan.getPlanElements().get(emptyTimeIndex+1);
-				Activity newActivity = new ActivityImpl(nextActivity);
+				Activity newActivity = PopulationUtils.createActivity(nextActivity);
 				futureActivityStartTime-=emptyTime.getTravelTime()/2;
 				newActivity.setStartTime(futureActivityStartTime);
 				newActivity.setEndTime(futureActivityStartTime+PLAN_STEP);
@@ -134,13 +134,13 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 			for(SchedulingLink link:path)
 				if(link instanceof ActivitySchedulingLink) {
 					ActivitySchedulingLink activityLink = (ActivitySchedulingLink)link;
-					ActivityImpl activity = new ActivityImpl(activityLink.getActivityType(), activityLink.getCoord());
+					Activity activity = PopulationUtils.createActivityFromCoord(activityLink.getActivityType(), activityLink.getCoord());
 					activity.setEndTime(((SchedulingNode)link.getToNode()).getTime());
 					activity.setLinkId(facilities.getFacilities().get(activityLink.getFacilityId()).getLinkId());
 					activity.setFacilityId(activityLink.getFacilityId());
 					if(planElements.size()>0 && planElements.get(planElements.size()-1) instanceof Activity)
 						if(((Activity)planElements.get(planElements.size()-1)).getCoord().equals(activity.getCoord())) {
-							Leg leg = new LegImpl("transit_walk");
+							Leg leg = PopulationUtils.createLeg("transit_walk");
 							leg.setTravelTime(0);
 							Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),
 									facilities.getFacilities().get(currentFacilityId).getLinkId());
@@ -158,7 +158,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 					Id<ActivityFacility> nextFacilityId = Id.create(link.getToNode().getId().toString().split("\\(")[0], ActivityFacility.class);
 					if(facilities.getFacilities().get(currentFacilityId).getLinkId().equals(facilities.getFacilities().
 							get(nextFacilityId).getLinkId())) {
-						Leg leg = new LegImpl("transit_walk");
+						Leg leg = PopulationUtils.createLeg("transit_walk");
 						leg.setTravelTime(0);
 						Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),
 								facilities.getFacilities().get(currentFacilityId).getLinkId());
@@ -173,7 +173,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 						if(routeElements!=null && routeElements.size()>0)
 							planElements.addAll(routeElements);
 						else {
-							Leg leg = new LegImpl("transit_walk");
+							Leg leg = PopulationUtils.createLeg("transit_walk");
 							double distance = WALK_FACTOR*CoordUtils.calcEuclideanDistance(facilities.getFacilities().get(currentFacilityId).getCoord(), facilities.getFacilities().get(nextFacilityId).getCoord()); 
 							leg.setTravelTime((int)(distance/WALK_SPEED));
 							Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),
@@ -188,7 +188,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 		else
 			if(facilities.getFacilities().get(currentFacilityId).getLinkId().equals(facilities.getFacilities().
 					get(endFacilityId).getLinkId())) {
-				Leg leg = new LegImpl("transit_walk");
+				Leg leg = PopulationUtils.createLeg("transit_walk");
 				leg.setTravelTime(0);
 				Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),
 						facilities.getFacilities().get(currentFacilityId).getLinkId());
@@ -202,7 +202,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 				if(routeElements!=null && routeElements.size()>0)
 					planElements.addAll(routeElements);
 				else {
-					Leg leg = new LegImpl("transit_walk");
+					Leg leg = PopulationUtils.createLeg("transit_walk");
 					double distance = WALK_FACTOR*CoordUtils.calcEuclideanDistance(facilities.getFacilities().get(currentFacilityId).getCoord(), facilities.getFacilities().get(endFacilityId).getCoord()); 
 					leg.setTravelTime((int)(distance/WALK_SPEED));
 					Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),

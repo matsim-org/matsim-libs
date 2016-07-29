@@ -21,12 +21,12 @@ package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.List;
 import java.util.Random;
@@ -71,7 +71,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
-					((ActivityImpl) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
+					((Activity) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
 					break;
 				case MUTATE_END:
 					a.setEndTime( mutateTime( a.getEndTime() ) );

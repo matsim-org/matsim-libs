@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -78,7 +78,7 @@ public class PopulationAnalysis {
 		String plansFile = runPath + "output/output_plans.xml.gz";
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).parse(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		
 		Set<Person> plansWithNegativeScores = new HashSet<Person>();
 		
@@ -121,7 +121,7 @@ public class PopulationAnalysis {
 		Map<Id<Person>, Person> carUsersWoCarAvailable = new TreeMap<Id<Person>, Person>();
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).parse(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 	
 		//collect agents using car on their tour
 		for(Person person : scenario.getPopulation().getPersons().values()){
@@ -140,7 +140,7 @@ public class PopulationAnalysis {
 		//read attributes -- carAvail?
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader attrReader = new ObjectAttributesXmlReader(attributes);
-		attrReader.parse(attributesFile);
+		attrReader.readFile(attributesFile);
 		
 		//write car availability to car users.
 		for (String agentIdString : agentIdString2CarAvail.keySet()) {

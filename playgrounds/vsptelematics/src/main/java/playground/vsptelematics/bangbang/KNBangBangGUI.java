@@ -24,7 +24,7 @@ import org.matsim.run.gui.Gui;
 public class KNBangBangGUI {
 
 	public static void main(String[] args) {
-		Gui.show("MATSim: Bang Bang", KNBangBang.class);
+		Gui.show("MATSim: Bang Bang", KNAccidentScenario.class);
 	}
 
 	/* To start this class upon double-clicking the jar-file, add the following lines to the pom.xml

@@ -21,6 +21,7 @@ package org.matsim.contrib.transEnergySim.vehicles.api;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 public interface Vehicle extends Identifiable<Vehicle>{
@@ -30,4 +31,6 @@ public interface Vehicle extends Identifiable<Vehicle>{
 	public double updateEnergyUse(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven);
 	
 	public void reset();
+
+	public VehicleAgent getVehicleAgent();
 }

@@ -21,10 +21,13 @@
 package playground.toronto.demand.modechoice;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -44,12 +47,13 @@ public class PrepareModeChoicePlans {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
+		Population population = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(population, true);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(network, population, outputPlansFile);
-		population.addAlgorithm(planGenerator);
-		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		final PersonAlgorithm algo = planGenerator;
+		StreamingUtils.addAlgorithm(population, algo);
+		new PopulationReader(scenario).readFile(inputPlansFile);
+		PopulationUtils.printPlansCount(population) ;
 		planGenerator.writeEndPlans();
 		System.out.println("done.");
 	}

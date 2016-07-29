@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -41,8 +43,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -221,34 +222,50 @@ class CongestionPricingTestExample {
 	 */
 	private void createTolledNetwork (){
 
-		NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		Network network = (Network) sc.getNetwork();
 
 		// nodes between o-d1 (all horizonal links)
 		double x = -100;
-		Node no = network.createAndAddNode(Id.createNodeId("o"), new Coord(x, (double) 0));
-		Node n1 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 0, (double) 0));
-		Node n2 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 1000, (double) 0));
-		Node n3 = network.createAndAddNode(Id.createNodeId(3), new Coord((double) 2000, (double) 0));
-		Node n4 = network.createAndAddNode(Id.createNodeId(4), new Coord((double) 3000, (double) 0));
-		Node nd1 = network.createAndAddNode(Id.createNodeId("d1"), new Coord((double) 3100, (double) 0));
+		Node no = NetworkUtils.createAndAddNode(network, Id.createNodeId("o"), new Coord(x, (double) 0));
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord((double) 1000, (double) 0));
+		Node n3 = NetworkUtils.createAndAddNode(network, Id.createNodeId(3), new Coord((double) 2000, (double) 0));
+		Node n4 = NetworkUtils.createAndAddNode(network, Id.createNodeId(4), new Coord((double) 3000, (double) 0));
+		Node nd1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("d1"), new Coord((double) 3100, (double) 0));
+		final Node fromNode = no;
+		final Node toNode = n1;
 
-		lo = network.createAndAddLink(Id.createLinkId("o"), no, n1, 100, 15, 3600, 1);
-		network.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 15, 3600, 1);
-		network.createAndAddLink(Id.createLinkId(2), n2, n3, 1000, 15, 3600, 1);
-		network.createAndAddLink(Id.createLinkId(3), n3, n4, 1000, 15, 3600, 1);
-		ld1 = network.createAndAddLink(Id.createLinkId("d1"), n4, nd1, 100, 15, 3600, 1);
+		lo = NetworkUtils.createAndAddLink(network,Id.createLinkId("o"), fromNode, toNode, (double) 100, (double) 15, (double) 3600, (double) 1 );
+		final Node fromNode1 = n1;
+		final Node toNode1 = n2;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(1), fromNode1, toNode1, (double) 1000, (double) 15, (double) 3600, (double) 1 );
+		final Node fromNode2 = n2;
+		final Node toNode2 = n3;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(2), fromNode2, toNode2, (double) 1000, (double) 15, (double) 3600, (double) 1 );
+		final Node fromNode3 = n3;
+		final Node toNode3 = n4;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(3), fromNode3, toNode3, (double) 1000, (double) 15, (double) 3600, (double) 1 );
+		final Node fromNode4 = n4;
+		final Node toNode4 = nd1;
+		ld1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("d1"), fromNode4, toNode4, (double) 100, (double) 15, (double) 3600, (double) 1 );
 
 		double y1 = -1000;
-		Node n6 = network.createAndAddNode(Id.createNodeId(6), new Coord((double) 2000, y1));
+		Node n6 = NetworkUtils.createAndAddNode(network, Id.createNodeId(6), new Coord((double) 2000, y1));
 		double y = -1100;
-		Node nd2 = network.createAndAddNode(Id.createNodeId("d2"), new Coord((double) 2000, y));
+		Node nd2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("d2"), new Coord((double) 2000, y));
+		final Node fromNode5 = n3;
+		final Node toNode5 = n6;
 
 		//bottleneck link
-		network.createAndAddLink(Id.createLinkId(4), n3, n6, 600, 15, 600, 1);
-		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 15, 1500, 1);
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(4), fromNode5, toNode5, (double) 600, (double) 15, (double) 600, (double) 1 );
+		final Node fromNode6 = n6;
+		final Node toNode6 = nd2;
+		ld2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("d2"), fromNode6, toNode6, (double) 100, (double) 15, (double) 1500, (double) 1 );
+		final Node fromNode7 = n1;
+		final Node toNode7 = n6;
 
 		// an alternative link with higher disutility
-		network.createAndAddLink(Id.createLinkId(5), n1, n6, 12750, 15, 2700, 1);
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(5), fromNode7, toNode7, (double) 12750, (double) 15, (double) 2700, (double) 1 );
 
 		new NetworkWriter(network).write(outputDir+"/input/input_network.xml");
 	}

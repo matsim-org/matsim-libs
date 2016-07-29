@@ -72,7 +72,7 @@ class MIPGurobiSolver
         this.vData = vData;
 
         n = rData.dimension;
-        m = vData.dimension;
+        m = vData.getSize();
     }
 
 

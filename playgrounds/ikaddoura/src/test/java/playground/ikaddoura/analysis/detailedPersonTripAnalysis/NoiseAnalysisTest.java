@@ -253,7 +253,7 @@ public class NoiseAnalysisTest {
 		log.info("Reading the events file...");
 
 		CNEventsReader reader = new CNEventsReader(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 
 //		MatsimEventsReader reader = new MatsimEventsReader(events);
 //		reader.readFile(eventsFile);

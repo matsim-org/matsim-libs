@@ -70,7 +70,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			
 			EvacuationConfigModule gcm2 = new EvacuationConfigModule("grips");
 			EvacuationConfigReader reader = new EvacuationConfigReader(gcm2);
-			reader.parse(outputFile);
+			reader.readFile(outputFile);
 			
 			assertEquals(evacuationAreaFile, gcm2.getEvacuationAreaFileName());
 			assertEquals(networkFile, gcm2.getNetworkFileName());

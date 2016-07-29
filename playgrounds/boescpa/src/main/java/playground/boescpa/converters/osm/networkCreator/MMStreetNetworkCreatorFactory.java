@@ -71,4 +71,14 @@ public class MMStreetNetworkCreatorFactory {
 		return networkCreator;
 	}
 
+	public static MultimodalNetworkCreator getCircleWithinRectangle(Network network, Coord center, double radius, Coord coordNW, Coord coordSE) {
+		MultimodalNetworkCreatorStreets networkCreator = new MultimodalNetworkCreatorStreets(network);
+		// detailed street network only in the circle:
+		networkCreator.addOsmFilter(new OsmFilter.OSMFilterCircle(
+				transformation.transform(center), radius, 6));
+		// but take all highway network:
+		networkCreator.addOsmFilter(new OsmFilter.OsmFilterRectangle(
+				transformation.transform(coordNW), transformation.transform(coordSE), 3));
+		return networkCreator;
+	}
 }

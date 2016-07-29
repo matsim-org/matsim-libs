@@ -27,9 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -41,7 +39,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	public void testReplaceActivity() {
 		Plan plan = createSamplePlan();
 		Activity oldActivity = (Activity)plan.getPlanElements().get(0);
-		Activity newActivity = new ActivityImpl("s", new Coord((double) 200, (double) 200));
+		Activity newActivity = PopulationUtils.createActivityFromCoord("s", new Coord((double) 200, (double) 200));
 		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the activities is null
@@ -65,7 +63,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	public void testReplaceLeg() {
 		Plan plan = createSamplePlan();
 		Leg oldLeg = (Leg)plan.getPlanElements().get(1);
-		Leg newLeg = new LegImpl(TransportMode.walk);
+		Leg newLeg = PopulationUtils.createLeg(TransportMode.walk);
 		ReplacePlanElements rpe = new ReplacePlanElements();
 		
 		// expect rpe to return false if the plan or one of the legs is null
@@ -87,13 +85,13 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private Plan createSamplePlan() {
-		PlanImpl plan = new PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
-		plan.createAndAddActivity("h", new Coord(0, 0));
-		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("w", new Coord((double) 100, (double) 100));
-		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("h", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "w", new Coord((double) 100, (double) 100));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord((double) 0, (double) 0));
 		
 		return plan;
 	}

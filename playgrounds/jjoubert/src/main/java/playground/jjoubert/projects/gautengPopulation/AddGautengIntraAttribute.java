@@ -24,7 +24,7 @@ package playground.jjoubert.projects.gautengPopulation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -60,8 +60,8 @@ public class AddGautengIntraAttribute {
 	public static void run(String populationFile, String inputPopulationAtrributeFile,
 			String shapefile, String outputPopulationAttributeFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(populationFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputPopulationAtrributeFile);
+		new PopulationReader(sc).readFile(populationFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(inputPopulationAtrributeFile);
 		
 		Scenario adaptedScenario = IntraAreaIdentifier.run(sc, shapefile, false, "intraGauteng");
 		

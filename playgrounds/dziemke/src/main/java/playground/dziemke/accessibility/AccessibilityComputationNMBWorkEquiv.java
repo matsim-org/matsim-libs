@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -31,14 +36,15 @@ import javax.inject.Provider;
 public class AccessibilityComputationNMBWorkEquiv {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBWorkEquiv.class);
 	
-	private static final double cellSize = 1000.;
+//	private static final double cellSize = 1000.;
+	private static final double cellSize = 10000.;
 
 	
 	public static void main(String[] args) {
 		// Input and output	
-		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
-		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../accessibility-sa/data/12/";
+		String networkFile = "../../../matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
+		String facilitiesFile = "../../../matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
+		String outputDirectory = "../../../accessibility-sa/data/12/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -97,7 +103,7 @@ public class AccessibilityComputationNMBWorkEquiv {
 		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
 		
 //		double[] mapViewExtent = {100000,-3720000,180000,-3675000}; // choose map view a bit bigger
-		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // what actually needs to be drawn
+		Envelope envelope = new Envelope(115000,-3718000,161000,-3679000); // what actually needs to be dran
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -110,10 +116,13 @@ public class AccessibilityComputationNMBWorkEquiv {
 
 					@Override
 					public ControlerListener get() {
-						GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(amenities, null, config, scenario, travelTimes, travelDisutilityFactories);
-						listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+						BoundingBox bb = BoundingBox.createBoundingBox(((Scenario) scenario).getNetwork());
+						AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+						accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize));
+						GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) amenities, null, config, scenario, travelTimes,
+						travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
+						accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 						listener.addAdditionalFacilityData(homes) ;
-						listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 						listener.writeToSubdirectoryWithName("w-eq");
 						listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 						return listener;
@@ -131,10 +140,10 @@ public class AccessibilityComputationNMBWorkEquiv {
 			String actSpecificWorkingDirectory =  workingDirectory + typeWEQ + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
-				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+//				VisualizationUtils.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+				VisualizationUtils.createQGisOutput(typeWEQ, mode, envelope, workingDirectory, crs, includeDensityLayer,
 						lowerBound, upperBound, range, symbolSize, populationThreshold);
-				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 //		}
 	}

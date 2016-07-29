@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
-import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
@@ -42,6 +42,8 @@ public class TestInductiveChargingController extends MatsimTestCase {
 
 	public void testBasic(){
 		Config config= loadConfig(getClassInputDirectory()+"config.xml");
+		
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 		
 		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
 		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<>();
@@ -90,6 +92,6 @@ public class TestInductiveChargingController extends MatsimTestCase {
 	
 
 	private void isBatteryFullyChargedAtEndOfSimulation(HashMap<Id<Vehicle>, Vehicle> vehicles, int batteryCapacityInJoules, Id<Vehicle> agentId) {
-		assertEquals(batteryCapacityInJoules, ((AbstractVehicleWithBattery) vehicles.get(agentId)).getSocInJoules(),1.0);
+		assertEquals(batteryCapacityInJoules, ((VehicleWithBattery) vehicles.get(agentId)).getSocInJoules(),1.0);
 	}
 }

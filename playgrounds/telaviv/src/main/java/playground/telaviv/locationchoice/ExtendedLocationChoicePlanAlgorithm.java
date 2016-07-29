@@ -30,15 +30,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.telaviv.facilities.FacilitiesCreator;
@@ -185,9 +185,9 @@ public class ExtendedLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		/*
 		 * Replace LinkId, FacilityId and the Coordinate
 		 */
-		((ActivityImpl) activityToRelocate).setLinkId(newLinkId);
-		((ActivityImpl) activityToRelocate).setFacilityId(newLinkId);
-		((ActivityImpl) activityToRelocate).setCoord(facility.getCoord());
+		((Activity) activityToRelocate).setLinkId(newLinkId);
+		((Activity) activityToRelocate).setFacilityId(newLinkId);
+		((Activity) activityToRelocate).setCoord(facility.getCoord());
 		
 		/*
 		 * If it is an Education Activity we probably have to update the activity type.
@@ -214,7 +214,7 @@ public class ExtendedLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			 * Not every Zone has education facilities. If such a zone was chosen, 
 			 * we select another one. 
 			 */
-			if (educationType != null) ((ActivityImpl) activityToRelocate).setType(educationType);
+			if (educationType != null) ((Activity) activityToRelocate).setType(educationType);
 			else relocateActivity(type, homeActivity, activityToRelocate, departureTime);
 		}
 	}

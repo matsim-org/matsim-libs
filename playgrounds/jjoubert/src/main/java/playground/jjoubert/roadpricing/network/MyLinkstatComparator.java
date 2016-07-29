@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -89,7 +89,7 @@ public class MyLinkstatComparator {
 			
 			// Read the network file if the number of lanes are specified.
 			NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-			nr.parse(args[6]);
+			nr.readFile(args[6]);
 		}
 		
 		mlc.compare(sc.getNetwork(), minimumLanes, threshold);

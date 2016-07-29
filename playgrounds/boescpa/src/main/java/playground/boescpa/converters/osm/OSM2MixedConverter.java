@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -58,7 +58,6 @@ public class OSM2MixedConverter {
 		// Get an empty network and an empty schedule:
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 		network = scenario.getNetwork();
 		schedule = scenario.getTransitSchedule();
 		vehicles = scenario.getTransitVehicles();

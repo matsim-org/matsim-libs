@@ -33,11 +33,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -65,13 +63,13 @@ public class InvertertedNetworkLegRouterTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new Builder( TransportMode.car, f.s.getConfig().planCalcScore() );
+		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Leg leg = new LegImpl(TransportMode.car);
-		Activity fromAct = new ActivityImpl("h", Id.create("12", Link.class));
-		Activity toAct = new ActivityImpl("h", Id.create("78", Link.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
+		Activity fromAct = PopulationUtils.createActivityFromLinkId("h", Id.create("12", Link.class));
+		Activity toAct = PopulationUtils.createActivityFromLinkId("h", Id.create("78", Link.class));
 
 		InvertedNetworkRoutingModule router =
 				new InvertedNetworkRoutingModule(

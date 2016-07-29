@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -75,7 +75,7 @@ public class ConvertXYToBikeSharingStations {
 
 		final String prefix = args.getValue( "-p" );
 
-		final NetworkImpl network = readNetwork( netFile );
+		final Network network = readNetwork( netFile );
 
 		final ObjectAttributes attributes = new ObjectAttributes();
 
@@ -137,10 +137,10 @@ public class ConvertXYToBikeSharingStations {
 		if ( outAttributes != null ) new ObjectAttributesXmlWriter( attributes ).writeFile( outAttributes );
 	}
 
-	private static NetworkImpl readNetwork(final String netFile) {
+	private static Network readNetwork(final String netFile) {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
-		return (NetworkImpl) sc.getNetwork();
+		return (Network) sc.getNetwork();
 	}
 
 	private static Collection<AttributeIndex> parseHeader( final String line ) {

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 
 import com.vividsolutions.jts.geom.Envelope;
 /**
@@ -89,7 +89,7 @@ public class DgAnalysisPopulation {
 	public int calculateNumberOfCarPlans(String runId) {
 		int carplans = 0;
 		for (DgPersonData d : table.values()) {
-			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(TransportMode.car)){
+			if (((Plan) d.getPlanData().get(runId).getPlan()).getType().equals(TransportMode.car)){
 				carplans++;
 			}
 		}
@@ -139,28 +139,32 @@ public class DgAnalysisPopulation {
 	
 	
 	private void calculateBoundingBox(){
-		Coord minNW = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
-		Coord maxSE = new Coord(Double.MIN_VALUE, Double.MIN_VALUE);
+//		Coord minNW = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+//		Coord maxSE = new Coord(Double.MIN_VALUE, Double.MIN_VALUE);
+		double minNW_X = Double.POSITIVE_INFINITY ;
+		double minNW_Y = Double.POSITIVE_INFINITY ;
+		double maxSE_X = Double.NEGATIVE_INFINITY ;
+		double maxSE_Y = Double.NEGATIVE_INFINITY ;
 		for (DgPersonData pers : this.getPersonData().values()){
 			Coord current = pers.getFirstActivity().getCoord();
 			if (current == null) {
 				throw new IllegalStateException("Person id " + pers.getPersonId() + " has no coord for home activity!");
 			}
-			if (current.getX() < minNW.getX()){
-				minNW.setX(current.getX());
+			if (current.getX() < minNW_X){
+				minNW_X = current.getX();
 			}
-			if (current.getY() < minNW.getY()){
-				minNW.setY(current.getY());
+			if (current.getY() < minNW_Y){
+				minNW_Y = current.getY();
 			}
-			if (current.getX() > maxSE.getX()){
-				maxSE.setX(current.getX());
+			if (current.getX() > maxSE_X){
+				maxSE_X = current.getX() ;
 			}
-			if (current.getY() > maxSE.getY()){
-				maxSE.setY(current.getY());
+			if (current.getY() > maxSE_Y){
+				maxSE_Y = current.getY() ;
 			}
 		}
 		this.boundingBox = new Envelope();
-		this.boundingBox.init(minNW.getX(), maxSE.getX(), minNW.getY(), maxSE.getY());
+		this.boundingBox.init(minNW_X, maxSE_X, minNW_Y, maxSE_Y);
 	}
 	
 	public Double getMinIncome() {

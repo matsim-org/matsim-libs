@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -67,7 +67,7 @@ public class TmpUtilities {
 	
 	public static void checkWalkLegs(){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse("/Users/jwjoubert/Documents/Projects/CapeTownMultimodal/001pct/population.xml.gz");
+		new PopulationReader(sc).readFile("/Users/jwjoubert/Documents/Projects/CapeTownMultimodal/001pct/population.xml.gz");
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter("/Users/jwjoubert/Downloads/walkLegs.csv");
 		try{

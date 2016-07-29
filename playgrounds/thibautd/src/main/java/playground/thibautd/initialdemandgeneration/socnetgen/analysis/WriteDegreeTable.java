@@ -40,7 +40,7 @@ public class WriteDegreeTable {
 		final String outputRawFile = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( socialNetworkFile );
+		new SocialNetworkReader( sc ).readFile( socialNetworkFile );
 	
 		final SocialNetwork socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		writeDegreeTable( outputRawFile, socialNetwork );

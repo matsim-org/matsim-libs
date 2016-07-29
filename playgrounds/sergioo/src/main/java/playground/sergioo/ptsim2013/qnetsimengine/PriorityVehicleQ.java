@@ -20,7 +20,7 @@
 package playground.sergioo.ptsim2013.qnetsimengine;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 
 import java.util.AbstractQueue;
 import java.util.Iterator;

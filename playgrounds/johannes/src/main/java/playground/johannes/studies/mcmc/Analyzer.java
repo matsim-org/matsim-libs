@@ -26,7 +26,7 @@ import org.matsim.contrib.socnetgen.sna.graph.social.analysis.SocialAnalyzerTask
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.ExtendedSpatialAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.SpatialAnalyzerTask;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
@@ -44,7 +44,7 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(args[0]);
 	
 		SocialSparseGraphMLReader graphReader = new SocialSparseGraphMLReader();

@@ -82,7 +82,7 @@ public class ODAdjustorListener implements IterationStartsListener {
 //		}
 //		return zones;
 		try {
-			return ZoneGeoJsonIO.readFromGeoJSON(filename, ODAdjustor.ZONE_ID_KEY);
+			return ZoneGeoJsonIO.readFromGeoJSON(filename, ODAdjustor.ZONE_ID_KEY, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

@@ -2,7 +2,6 @@ package playground.dhosse.prt.optimizer;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -14,41 +13,29 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
-import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 
 public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
 
-	protected final IdleRankVehicleFinder idleVehicleFinder;
 	protected final Collection<TaxiRequest> unplannedRequests;
 	
 	protected boolean requiresReoptimization = false;
 	
 	private Set<Vehicle> idleVehicles;
 	
-	private final MatsimVrpContext context;
+	//private final VrpData data;
 	private final TaxiScheduler scheduler;
-	private TaxiOptimizerContext optimizerConfig;
+	private TaxiOptimizerContext optimizerContext;
 	
 	private final NPersonsVehicleRequestPathFinder vrpFinder;
 	
-	public PrtOptimizer(TaxiOptimizerContext optimizerConfig){
+	public PrtOptimizer(TaxiOptimizerContext optimizerContext){
 		
-		this(optimizerConfig.context, optimizerConfig, optimizerConfig.scheduler, new IdleRankVehicleFinder(optimizerConfig.context,
-						optimizerConfig.scheduler));
+		this.optimizerContext = optimizerContext;
+		this.scheduler = optimizerContext.scheduler;
+		this.unplannedRequests = new ArrayList<TaxiRequest>();
 		
-	}
-	
-	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerContext optimizerConfig, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
-		
-		this.optimizerConfig = optimizerConfig;
-		this.context = context;
-		this.scheduler = scheduler;
-		this.idleVehicleFinder = vehicleFinder;
-		this.unplannedRequests = new ArrayList<TaxiRequest>() {
-		};
-		
-		int vehicleCapacity = ((PrtOptimizerConfiguration)optimizerConfig).prtConfigGroup.getVehicleCapacity();
-		vrpFinder =  new NPersonsVehicleRequestPathFinder(optimizerConfig, vehicleCapacity);
+		int vehicleCapacity = ((PrtOptimizerContext)optimizerContext).prtConfigGroup.getVehicleCapacity();
+		vrpFinder =  new NPersonsVehicleRequestPathFinder(optimizerContext, vehicleCapacity);
 		
 	}
 	
@@ -102,7 +89,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
     {
         idleVehicles = new HashSet<>();
 
-        for (Vehicle veh : this.context.getVrpData().getVehicles().values()) {
+        for (Vehicle veh : this.optimizerContext.taxiData.getVehicles().values()) {
             if (this.scheduler.isIdle(veh)) {
                 idleVehicles.add(veh);
             }
@@ -117,11 +104,11 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 
 //            Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
 //                    req);
-            BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
+            BestDispatchFinder.Dispatch<TaxiRequest> best = vrpFinder.findBestVehicleForRequest(req,
                     idleVehicles);
 
             if (best != null) {
-                this.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+                this.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
                 reqIter.remove();
                 idleVehicles.remove(best.vehicle);
             }

@@ -39,7 +39,10 @@ import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask;
 public class TaxibusActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
-    private final PassengerEngine passengerEngine;
+    public static final String TAXIBUS_STAY_NAME = "TaxibusStay";
+	public static final String TAXIBUS_DROPOFF_NAME = "TaxibusDropoff";
+	public final static String TAXIBUS_PICKUP_NAME = "TaxibusPickup";
+	private final PassengerEngine passengerEngine;
     private final VrpLegs.LegCreator legCreator;
     private final double pickupDuration;
 
@@ -66,14 +69,14 @@ public class TaxibusActionCreator
             case PICKUP:
                 final TaxibusPickupTask pst = (TaxibusPickupTask)task;
                 return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
-                        pickupDuration);
+                        pickupDuration, TAXIBUS_PICKUP_NAME);
 
             case DROPOFF:
                 final TaxibusDropoffTask dst = (TaxibusDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
+                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest(), TAXIBUS_DROPOFF_NAME);
 
             case STAY:
-                return new VrpActivity("Stay", (TaxibusStayTask)task);
+                return new VrpActivity(TAXIBUS_STAY_NAME, (TaxibusStayTask)task);
 
             default:
                 throw new IllegalStateException();

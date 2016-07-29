@@ -29,7 +29,7 @@ import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer;
 import org.matsim.contrib.wagonSim.network.NEMOInfraParser;
 import org.matsim.contrib.wagonSim.network.NEMOInfraToMATSimNetworkConverter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -63,7 +63,7 @@ public class NEMOInfraToMATSimNetworkConverterMain {
 	
 	public final void convertFromFile(String nemoInfraXmlFile) {
 		NEMOInfraDataContainer dataContainer = new NEMOInfraDataContainer();
-		new NEMOInfraParser(dataContainer).parse(nemoInfraXmlFile);
+		new NEMOInfraParser(dataContainer).readFile(nemoInfraXmlFile);
 		NEMOInfraToMATSimNetworkConverter converter = new NEMOInfraToMATSimNetworkConverter(scenario.getNetwork(),nodeAttributes,linkAttributes);
 		converter.convert(dataContainer);
 		converter.makeNetworkBiDirectional();

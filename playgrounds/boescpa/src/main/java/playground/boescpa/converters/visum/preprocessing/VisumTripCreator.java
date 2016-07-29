@@ -24,6 +24,7 @@ package playground.boescpa.converters.visum.preprocessing;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+
 import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
 import playground.boescpa.analysis.trips.*;
 import playground.boescpa.lib.tools.NetworkUtils;
@@ -50,10 +51,10 @@ public class VisumTripCreator {
 
         Network network = NetworkUtils.readNetwork(networkFile);
         SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new SHPFileCutter(shpFile), network);
-        trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
+        trips = new EventsToTrips(network).createTripsFromEvents(eventsFile);
         trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
         trips = TripFilter.removeUnfinishedTrips(trips, failedAgents);
-        new TripWriter().writeTrips(trips, tripFile);
+        TripWriter.writeTrips(trips, tripFile);
 	}
 
 

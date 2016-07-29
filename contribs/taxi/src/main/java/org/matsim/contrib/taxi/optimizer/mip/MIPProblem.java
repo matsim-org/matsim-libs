@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class MIPProblem
@@ -125,8 +126,8 @@ public class MIPProblem
 
     private boolean initDataAndCheckIfSchedulingRequired()
     {
-        vData = new VehicleData(optimContext);
-        if (vData.dimension == 0) {
+        vData = new VehicleData(optimContext, optimContext.taxiData.getVehicles().values());
+        if (vData.getSize() == 0) {
             return false;
         }
 
@@ -142,7 +143,7 @@ public class MIPProblem
     {
         initialSolution = new MIPSolutionFinder(optimContext, rData, vData).findInitialSolution();
 
-        stats = new MIPTaxiStats(optimContext.context.getVrpData());
+        stats = new MIPTaxiStats(optimContext.taxiData);
         stats.calcInitial();
 
         optimContext.scheduler.removeAwaitingRequestsFromAllSchedules();
@@ -163,12 +164,9 @@ public class MIPProblem
 
         stats.calcSolved();
 
-        try (PrintWriter pw = new PrintWriter(workingDirectory + "MIP_stats")) {
-            stats.print(pw);
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(workingDirectory + "MIP_stats"));
+        stats.print(pw);
+        pw.close();
     }
 
 
@@ -181,7 +179,7 @@ public class MIPProblem
             }
 
             int n = rData.dimension;
-            int m = vData.dimension;
+            int m = vData.getSize();
 
             boolean[][] x = new boolean[m + n][m + n];
             for (int u = 0; u < m + n; u++) {
@@ -217,7 +215,7 @@ public class MIPProblem
 
     private int getPlanningHorizon()
     {
-        return vData.dimension * MODE.reqsPerVeh;
+        return vData.getSize() * MODE.reqsPerVeh;
     }
 
 

@@ -19,16 +19,18 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scripts;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
 
@@ -48,28 +50,29 @@ public class FilterDefaultSubpopulation {
 		final String inAttributes = parsed.getValue( "-a" );
 		final String outPlansFile = parsed.getValue( "-o" );
 
-		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((PopulationImpl) sc.getPopulation()).setIsStreaming( true );
+		final MutableScenario sc = ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() );
+//		final Population population = (Population) sc.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
+		StreamingUtils.setIsStreaming(reader, true);
 
 		final String attName = new PlansConfigGroup().getSubpopulationAttributeName();
-		final PopulationWriter writer = new PopulationWriter( sc.getPopulation() , sc.getNetwork() );
+		final StreamingPopulationWriter writer = new StreamingPopulationWriter( sc.getPopulation() , sc.getNetwork() );
 
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(
-				new PersonAlgorithm() {
-					@Override
-					public void run(final Person person) {
-						final String subpop = (String)
-							sc.getPopulation().getPersonAttributes().getAttribute(
-								person.getId().toString(),
-								attName );
-						if ( subpop == null ) writer.writePerson( person );
-					}
-				});
+		reader.addAlgorithm(new PersonAlgorithm() {
+			@Override
+			public void run(final Person person) {
+				final String subpop = (String)
+					sc.getPopulation().getPersonAttributes().getAttribute(
+						person.getId().toString(),
+						attName );
+				if ( subpop == null ) writer.writePerson( person );
+			}
+		});
 
-		new ObjectAttributesXmlReader( sc.getPopulation().getPersonAttributes() ).parse( inAttributes );
+		new ObjectAttributesXmlReader( sc.getPopulation().getPersonAttributes() ).readFile( inAttributes );
 
 		writer.startStreaming( outPlansFile );
-		new MatsimPopulationReader( sc ).readFile( inPlansFile );
+		new PopulationReader( sc ).readFile( inPlansFile );
 		writer.closeStreaming();
 	}
 }

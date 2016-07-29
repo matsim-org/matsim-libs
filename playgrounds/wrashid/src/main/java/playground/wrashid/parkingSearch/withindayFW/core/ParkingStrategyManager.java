@@ -3,6 +3,8 @@ package playground.wrashid.parkingSearch.withindayFW.core;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -14,8 +16,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
@@ -66,13 +67,13 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 				
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
-					if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
+					if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
 
-						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+						Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 
 						if (leg.getMode().equals(TransportMode.car)) {
 							//+1/2 would be parking act/walk leg
-							ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 3);
+							Activity activity = (Activity) selectedPlan.getPlanElements().get(i + 3);
 
 							startNewRandomStrategy(agent, i, activity);
 						}
@@ -90,13 +91,13 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
 
-					if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
+					if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
 
-						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+						Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 
 
 						if (leg.getMode().equals(TransportMode.car)) {
-							ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 3);
+							Activity activity = (Activity) selectedPlan.getPlanElements().get(i + 3);
 //							if (!legModeActivityTypes.get(agent.getId(), i).equals(leg.getMode())
 //									|| !legModeActivityTypes.get(agent.getId(), i + 3).equals(activity.getType())) {
 //
@@ -146,7 +147,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 //		}
 	}
 
-	private void selectStrategyAtRandom(PersonDriverAgentImpl agent, int i, ActivityImpl activity) {
+	private void selectStrategyAtRandom(PersonDriverAgentImpl agent, int i, Activity activity) {
 		Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
 				activity.getType());
 		
@@ -164,7 +165,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
 	}
 
-	private void selectStrategyWithHighestScore(PersonDriverAgentImpl agent, int legPlanElementIndex, ActivityImpl activity) {
+	private void selectStrategyWithHighestScore(PersonDriverAgentImpl agent, int legPlanElementIndex, Activity activity) {
 		Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
 				activity.getType());
 
@@ -197,7 +198,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 		getCurrentlySelectedParkingStrategies().removeValue(agent.getId(), i);
 	}
 
-	private void startNewRandomStrategy(PersonDriverAgentImpl agent, int i, ActivityImpl activity) {
+	private void startNewRandomStrategy(PersonDriverAgentImpl agent, int i, Activity activity) {
 		Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
 				activity.getType());
 
@@ -229,11 +230,11 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 		for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 
-			if (selectedPlan.getPlanElements().get(i) instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i);
+			if (selectedPlan.getPlanElements().get(i) instanceof Activity) {
+				Activity activity = (Activity) selectedPlan.getPlanElements().get(i);
 				legModeActivityTypes.put(agent.getId(), i, activity.getType());
-			} else if (selectedPlan.getPlanElements().get(i) instanceof LegImpl) {
-				LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+			} else if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
+				Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 				legModeActivityTypes.put(agent.getId(), i, leg.getMode());
 			}
 		}

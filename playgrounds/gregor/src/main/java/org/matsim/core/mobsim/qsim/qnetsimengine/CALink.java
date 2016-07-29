@@ -41,7 +41,10 @@ public class CALink extends QLinkI {
 		this.l = l;
 		this.dir = dir;
 	}
-	
+	@Override
+	QLaneI getAcceptingQLane() {
+		throw new RuntimeException("not implemented") ;
+	}
 	
 	@Override
 	public Link getLink() {
@@ -50,7 +53,7 @@ public class CALink extends QLinkI {
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
+	public void recalcTimeVariantAttributes() {
 		throw new RuntimeException("Not yet implemented!");
 
 	}
@@ -170,7 +173,7 @@ public class CALink extends QLinkI {
 	}
 
 	@Override
-	boolean doSimStep(double now) {
+	boolean doSimStep() {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -188,25 +191,13 @@ public class CALink extends QLinkI {
 	}
 
 	@Override
-	void addFromUpstream(QVehicle veh) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	boolean isNotOfferingVehicle() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	boolean isAcceptingFromUpstream() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		return null ;
 	}
 

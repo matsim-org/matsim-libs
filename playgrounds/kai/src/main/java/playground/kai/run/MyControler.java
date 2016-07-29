@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
@@ -16,6 +17,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -39,6 +41,9 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 class MyControler {
 	
 	public static void main ( String[] args ) {
+		ControlerUtils.initializeOutputLogging();
+		
+
 		Logger.getLogger("blabla").warn("here") ;
 		
 		// prepare the config:
@@ -59,27 +64,22 @@ class MyControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-//		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-//		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisLiveModule());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;
 		
 		controler.addOverridingModule(new AbstractModule(){
-			@Override
-			public void install() {
+			@Override public void install() {
 				this.addEventHandlerBinding().toInstance(new BasicEventHandler(){
-					@Override
-					public void reset(int iteration) {
-					}
-
-					@Override
-					public void handleEvent(Event event) {
+					@Override public void reset(int iteration) { }
+					@Override public void handleEvent(Event event) {
 						if ( event instanceof HasPersonId ) {
 							if ( ((HasPersonId)event).getPersonId().equals( Id.createPersonId("5441604") ) ) {
 								Logger.getLogger(getClass()).warn( event );
 							}
 						}
-					}});
+					}
+				});
 			}
 		});
 		

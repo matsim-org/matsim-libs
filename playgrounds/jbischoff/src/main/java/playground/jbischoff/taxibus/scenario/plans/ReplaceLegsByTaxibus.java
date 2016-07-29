@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
@@ -49,7 +49,7 @@ public static void main(String[] args) {
 	for (double threshold = 0.1; threshold < 0.6; threshold = threshold + 0.1) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	String filename = "../../../shared-svn/projects/vw_rufbus/scenario/input/subpopulations/taxibusplans_"+df.format(threshold)+".xml.gz";
-	new MatsimPopulationReader(scenario).readFile(filename);
+	new PopulationReader(scenario).readFile(filename);
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		for (Plan plan : p.getPlans()){
 			Leg l1 = (Leg) plan.getPlanElements().get(1);

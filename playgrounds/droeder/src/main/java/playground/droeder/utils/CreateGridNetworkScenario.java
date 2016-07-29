@@ -33,15 +33,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -198,7 +198,7 @@ class CreateGridNetworkScenario {
 				
 				home = pFac.createActivityFromCoord("home", origin);
 				home.setEndTime(start);
-				((ActivityImpl) home).setLinkId(o.getId());
+				((Activity) home).setLinkId(o.getId());
 				plan.addActivity(home);
 				
 				l = pFac.createLeg(TransportMode.pt);
@@ -206,7 +206,7 @@ class CreateGridNetworkScenario {
 				plan.addLeg(l);
 				
 				work = pFac.createActivityFromCoord("work", destination);
-				((ActivityImpl) work).setLinkId(d.getId());
+				((Activity) work).setLinkId(d.getId());
 				plan.addActivity(work);
 				
 				per.addPlan(plan);

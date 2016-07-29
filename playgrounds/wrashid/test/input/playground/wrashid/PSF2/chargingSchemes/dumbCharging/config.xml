@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY INBASE  "test/scenarios/chessboard">
+		<!ENTITY INBASE  "../../../../../scenarios/chessboard">
 		<!ENTITY OUTBASE "test/output/playground/wrashid/PSF2/chargingSchemes/dumbCharging/0">
 		<!ENTITY TESTBASE  "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging">
 	]

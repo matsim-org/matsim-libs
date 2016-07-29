@@ -43,12 +43,16 @@ public class NetworkIncident {
 		return id;
 	}
 
+	public void setLink(Link link) {
+		this.link = link;
+	}
+	
 	public Link getLink() {
 		return link;
 	}
-
-	public void setLink(Link link) {
-		this.link = link;
+	
+	public void setIncidentLink(Link trafficIncidentLink) {
+		this.incidentLink = trafficIncidentLink;
 	}
 
 	public Link getIncidentLink() {
@@ -64,18 +68,16 @@ public class NetworkIncident {
 	}
 
 	public String parametersToString() {
-		return "NetworkIncident [startTime=" + startTime + ", endTime=" + endTime + ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes()
-				+ ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes() + "]";
-	}
-
-	public void setIncidentLink(Link trafficIncidentLink) {
-		this.incidentLink = trafficIncidentLink;
+		return "NetworkIncident [startTime=" + startTime + ", endTime=" + endTime
+				+ ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes() + "-" + incidentLink.getAllowedModes()
+				+ ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes() + "-" + link.getAllowedModes() + "]";
 	}
 
 	@Override
 	public String toString() {
-		return "NetworkIncident [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes()
-				+ ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes() + "]";
+		return "NetworkIncident [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime
+				+ ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes() + "-" + link.getAllowedModes()
+				+ ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes() + "-" + incidentLink.getAllowedModes() + "]";
 	}
 
 }

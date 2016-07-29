@@ -21,24 +21,24 @@
 
 package playground.boescpa.ivtBaseline;
 
-import org.junit.Before;
+import static playground.boescpa.ivtBaseline.TestRunBaseline.createFacilities;
+import static playground.boescpa.ivtBaseline.TestRunBaseline.createPrefs;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
 import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
-
-import static playground.boescpa.ivtBaseline.TestRunBaseline.createFacilities;
-import static playground.boescpa.ivtBaseline.TestRunBaseline.createPrefs;
 
 /**
  * What is it for?
@@ -50,31 +50,50 @@ public class TestRunIVTBaselineCalibration {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
-	public void prepareTests() {
+	@Test
+	public void testScenario() {
+		// NOTE: The original path setup didn't work any more after paths in the config were made relative to the location where the config
+		// file was, while all other paths are still relative to the JVM root.  Thus the setup is a bit different now.  kai, jul'16
+
+		// write, and then read:		
+		final String pathToFacilities = "facilities.xml";
+		final String pathToPrefs = "prefs.xml";
+		final String pathToPopulation = "population.xml";
+		final String pathToF2L = "f2l.f2l";
+		{
+
+			final String pathToInitialPopulation = "population2.xml";
+			final String pathToOnlyStreetNetwork = "onlystreetnetwork.xml";
+
+			// ---
+
+			// write, and then read:
+
+			// ---
+
+			Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			new MatsimNetworkReader(tempScenario.getNetwork()).readFile(utils.getClassInputDirectory() + pathToOnlyStreetNetwork);
+			new PopulationReader(tempScenario).readFile(utils.getClassInputDirectory() + pathToInitialPopulation);
+			createPrefs(tempScenario, utils.getClassInputDirectory() + pathToPrefs);
+			createFacilities(tempScenario, utils.getClassInputDirectory() + pathToFacilities);
+			F2LCreator.createF2L(tempScenario, utils.getClassInputDirectory() + pathToF2L);
+			new PopulationWriter(tempScenario.getPopulation()).write(utils.getClassInputDirectory() + pathToPopulation);
+
+		}
+
+		final String pathToConfig = utils.getClassInputDirectory() + "config.xml";
+
+		// not included in input files directory "automagic":
 		final String pathToPTLinksToMonitor = utils.getClassInputDirectory() + "ptLinksToMonitor.txt";
-		final String pathToPTStationsToMonitor = utils.getClassInputDirectory() + "ptStationsToMonitor.txt";
+		final String pathToPTStationsToMonitor = utils.getClassInputDirectory() + "ptStationsToMonitor.txt"; 
 		final String pathToStreetLinksDailyToMonitor = utils.getClassInputDirectory() + "streetLinksDailyToMonitor.txt";
 		final String pathToStreetLinksHourlyToMonitor = utils.getClassInputDirectory() + "streetLinksHourlyToMonitor.txt";
 
-		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
-		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
-		final String pathToInitialPopulation = utils.getClassInputDirectory() + "population.xml";
-		final String pathToPopulation = utils.getOutputDirectory() + "population.xml";
-		final String pathToPrefs = utils.getOutputDirectory() + "prefs.xml";
-		final String pathToFacilities = utils.getOutputDirectory() + "facilities.xml";
-		final String pathToF2L = utils.getOutputDirectory() + "f2l.f2l";
-		final String pathToConfig = utils.getOutputDirectory() + "config.xml";
-		final String pathToSchedule = utils.getClassInputDirectory() + "transitschedule.xml";
-		final String pathToVehicles = "test/scenarios/pt-tutorial/transitVehicles.xml";
+		final String pathToNetwork = "multimodalnetwork.xml";
+		final String pathToSchedule = "transitschedule.xml";
+//		final String pathToVehicles = "test/scenarios/pt-tutorial/transitVehicles.xml";
+		final String pathToVehicles = "transitVehicles.xml";
 
-		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(tempScenario.getNetwork()).readFile(pathToOnlyStreetNetwork);
-		new MatsimPopulationReader(tempScenario).readFile(pathToInitialPopulation);
-		createPrefs(tempScenario, pathToPrefs);
-		createFacilities(tempScenario, pathToFacilities);
-		F2LCreator.createF2L(tempScenario, pathToF2L);
-		new PopulationWriter(tempScenario.getPopulation()).write(pathToPopulation);
 
 		// create config
 		String[] argsConfig = {pathToConfig, "100"};
@@ -82,10 +101,10 @@ public class TestRunIVTBaselineCalibration {
 		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
 		// Reduce iterations to one write out interval + 1
-		config.setParam("controler", "lastIteration", "11");
+		config.setParam("controler", "lastIteration", "3");
 		// Set files
 		config.setParam("facilities", "inputFacilitiesFile", pathToFacilities);
-		config.setParam("f2l", "inputF2LFile", pathToF2L);
+		config.setParam("f2l", "inputF2LFile", utils.getClassInputDirectory() + pathToF2L); // not included in input files directory "automagic"
 		config.setParam("households", "inputFile", "null");
 		config.setParam("households", "inputHouseholdAttributesFile", "null");
 		config.setParam("network", "inputNetworkFile", pathToNetwork);
@@ -106,10 +125,5 @@ public class TestRunIVTBaselineCalibration {
 		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor, pathToPTStationsToMonitor,
 				pathToStreetLinksDailyToMonitor, pathToStreetLinksHourlyToMonitor};
 		RunIVTBaselineCalibration.main(argsSim);
-	}
-
-	@Test
-	public void testScenario() {
-
 	}
 }

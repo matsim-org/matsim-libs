@@ -20,28 +20,33 @@
 package playground.sergioo.typesPopulation2013.scenario;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -161,17 +166,18 @@ public class ScenarioLoaderImpl {
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();
 			log.info("loading network from " + networkFileName);
-			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+			Network network = (Network) this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
-			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+			new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFileName);
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-				parser.parse(config.network().getChangeEventsInputFile());
-				network.setNetworkChangeEvents(parser.getEvents());
+				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, changeEvents );
+				parser.readFile(config.network().getChangeEventsInputFile());
+				NetworkUtils.setNetworkChangeEvents(network,changeEvents) ;
 			}
 		}
 	}
@@ -187,7 +193,7 @@ public class ScenarioLoaderImpl {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
-				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+				new MatsimFacilitiesReader(this.scenario).readFile(facilitiesFileName);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -207,10 +213,10 @@ public class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new MatsimPopulationReader(this.scenario).parse(populationFileName);
+			new PopulationReader(this.scenario).readFile(populationFileName);
 			
-			if (this.scenario.getPopulation() instanceof PopulationImpl) {
-				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
+			if (this.scenario.getPopulation() instanceof Population) {
+				PopulationUtils.printPlansCount(((Population)this.scenario.getPopulation())) ;
 			}
 		}
 		else {
@@ -219,7 +225,7 @@ public class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
 			String personAttributesFileName = this.config.plans().getInputPersonAttributeFile();
 			log.info("loading person attributes from " + personAttributesFileName);
-			new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes()).parse(personAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes()).readFile(personAttributesFileName);
 		}
 		else {
 			log.info("no person-attributes file set in config, not loading any person attributes");
@@ -230,7 +236,7 @@ public class ScenarioLoaderImpl {
 		if ((this.scenario.getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 			String hhFileName = this.config.households().getInputFile();
 			log.info("loading households from " + hhFileName);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(hhFileName);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).readFile(hhFileName);
 			log.info("households loaded.");
 		}
 		else {
@@ -243,12 +249,12 @@ public class ScenarioLoaderImpl {
 		if ((this.config.transit() != null) && (this.config.transit().getTransitLinesAttributesFile() != null)) {
 			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
-			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes()).parse(transitLinesAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes()).readFile(transitLinesAttributesFileName);
 		}
 		if ((this.config.transit() != null) && (this.config.transit().getTransitStopsAttributesFile() != null)) {
 			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
-			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes()).parse(transitStopsAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes()).readFile(transitStopsAttributesFileName);
 		}
 	}
 

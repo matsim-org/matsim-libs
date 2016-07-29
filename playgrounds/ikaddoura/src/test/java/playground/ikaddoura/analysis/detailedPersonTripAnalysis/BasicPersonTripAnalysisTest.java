@@ -28,7 +28,7 @@ import playground.tschlenther.createNetwork.ForkNetworkCreator;
  */
 public class BasicPersonTripAnalysisTest {
 	
-	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
+	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisMain.class);
 
 	private static final boolean printResults = false;
 	
@@ -186,7 +186,7 @@ public class BasicPersonTripAnalysisTest {
 //		reader.readFile(eventsFile);
 		
 		CNEventsReader cnReader = new CNEventsReader(events);
-		cnReader.parse(eventsFile);
+		cnReader.readFile(eventsFile);
 		
 		log.info("Reading the events file... Done.");
 		

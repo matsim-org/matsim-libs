@@ -25,10 +25,10 @@ package playground.jjoubert.projects.capeTownFreight;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -52,12 +52,12 @@ public class ConvertNetworkToWgs {
 		
 		/* Read the network. */
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(input);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(input);
 		
 		/* Transform each node. */
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "EPSG:3857");
 		for(Node node : scenario.getNetwork().getNodes().values()){
-			((NodeImpl)node).setCoord(ct.transform(node.getCoord()));
+			((Node)node).setCoord(ct.transform(node.getCoord()));
 		}
 		
 		/* Write the resulting network. */

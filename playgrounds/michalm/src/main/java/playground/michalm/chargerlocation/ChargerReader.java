@@ -24,27 +24,28 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.zone.Zone;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.ev.*;
-import playground.michalm.taxi.data.*;
+import playground.michalm.ev.data.*;
 
 
 public class ChargerReader
 {
-    private final NetworkImpl network;
-    private final ETaxiData data;
+    private final Network network;
+    private final EvData data;
     private final Map<Id<Zone>, Zone> zones;
     private final double power;
 
 
-    public ChargerReader(Scenario scenario, ETaxiData data, Map<Id<Zone>, Zone> zones, double power)
+    public ChargerReader(Scenario scenario, EvData data, Map<Id<Zone>, Zone> zones, double power)
     {
-        this.network = (NetworkImpl)scenario.getNetwork();
+        this.network = (Network)scenario.getNetwork();
         this.data = data;
         this.zones = zones;
         this.power = power;
@@ -66,13 +67,10 @@ public class ChargerReader
                 Zone zone = zones.get(Id.create(id, Zone.class));
                 Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION
                         .transform(zone.getCoord());
-                Link link = network.getNearestLinkExactly(coord);
+		final Coord coord1 = coord;
+                Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
                 data.addCharger(
                         new ChargerImpl(Id.create(id, Charger.class), power, capacity, link));
-
-                //???
-                data.addTaxiRank(
-                        new TaxiRank(Id.create(id, TaxiRank.class), id, link, 10 * capacity));
             }
         }
         catch (IOException e) {
@@ -91,12 +89,12 @@ public class ChargerReader
                 + "scenarios/2015_08_only_berlin_v1/chargers_out_of_231_COLD_WINTER_FOSSIL_HEATING_noDeltaSOC.csv";
         double power = 50_000;//50kW 
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);
 
-        ETaxiData data = new ETaxiData();
+        EvData data = new EvDataImpl();
 
         new ChargerReader(scenario, data, zones, power).readFile(file);
         System.out.println(data.getChargers().size());

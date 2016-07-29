@@ -56,7 +56,7 @@ public class TransitLineAttributes {
 	public static TransitLineAttributes createFromFile(String file) {
 		TransitLineAttributes attributes = new TransitLineAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attributes.attributes);
-		reader.parse(file);
+		reader.readFile(file);
 		
 		return attributes;
 	

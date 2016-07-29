@@ -40,7 +40,7 @@ public class GeographicClassifierCallable implements Callable<Tuple<Id<Vehicle>,
 	public Tuple<Id<Vehicle>, Integer> call() throws Exception{
 		/* Read the Digicore vehicle file. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(this.vehicleFile.getAbsolutePath());
+		dvr.readFile(this.vehicleFile.getAbsolutePath());
 		DigicoreVehicle vehicle = dvr.getVehicle();
 
 		/* Determine if intra, inter, or extra. */

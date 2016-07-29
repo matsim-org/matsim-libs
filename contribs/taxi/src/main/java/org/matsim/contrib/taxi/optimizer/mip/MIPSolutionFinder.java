@@ -39,8 +39,7 @@ class MIPSolutionFinder
     private final VehicleData vData;
 
 
-    MIPSolutionFinder(TaxiOptimizerContext optimContext, MIPRequestData rData,
-            VehicleData vData)
+    MIPSolutionFinder(TaxiOptimizerContext optimContext, MIPRequestData rData, VehicleData vData)
     {
         this.optimContext = optimContext;
         this.rData = rData;
@@ -50,7 +49,7 @@ class MIPSolutionFinder
 
     MIPSolution findInitialSolution()
     {
-        final int m = vData.dimension;
+        final int m = vData.getSize();
         final int n = rData.dimension;
 
         final boolean[][] x = new boolean[m + n][m + n];
@@ -66,7 +65,7 @@ class MIPSolutionFinder
 
         for (int k = 0; k < m; k++) {
             Schedule<TaxiTask> schedule = TaxiSchedules
-                    .asTaxiSchedule(vData.entries.get(k).vehicle.getSchedule());
+                    .asTaxiSchedule(vData.getEntry(k).vehicle.getSchedule());
             Iterable<TaxiRequest> reqs = TaxiSchedules.getTaxiRequests(schedule);
             Iterable<TaxiRequest> plannedReqs = Iterables.filter(reqs, TaxiRequests.IS_PLANNED);
 

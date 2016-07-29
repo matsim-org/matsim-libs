@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * For performance reasons.
@@ -51,7 +51,7 @@ public final class PlanWithCachedJointPlan implements Plan {
 	private int accessCount = 0;
 
 	public PlanWithCachedJointPlan( final Person person ) {
-		delegate = new PlanImpl( person ) ;
+		delegate = PopulationUtils.createPlan(person) ;
 
 		for ( int i=0; i < SIZE; i++ ) {
 			lastAccess[ i ] = -1;
@@ -177,9 +177,7 @@ public final class PlanWithCachedJointPlan implements Plan {
 	
 	public final void copyFrom( Plan in) {
 		// yy we really need a more systematic way for plans copying.  kai, nov15
-		((PlanImpl) this.delegate).copyFrom(in);
+		PopulationUtils.copyFromTo(in, delegate);
 	}
-	
-	
 }
 

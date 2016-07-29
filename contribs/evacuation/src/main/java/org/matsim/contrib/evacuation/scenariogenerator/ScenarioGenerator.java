@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.evacuation.scenariogenerator;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
@@ -42,22 +42,27 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.utils.gis.matsim2esri.network.*;
+import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
+import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import java.io.File;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Evacuation scenario generator workflow: GIS Metaformat --> ScenarioGenertor -->
@@ -102,7 +107,7 @@ public class ScenarioGenerator {
 			gcm = new EvacuationConfigModule("evacuation");//, this.configFile);
 			this.matsimConfig.addModule(gcm);
 			EvacuationConfigReader parser = new EvacuationConfigReader(gcm);
-			parser.parse(this.configFile);
+			parser.readFile(this.configFile);
 //			gcm.setFileNamesAbsolute();
 			String crs = getCRSFromEvacArea(gcm.getEvacuationAreaFileName());
 			this.matsimConfig.global().setCoordinateSystem(crs);
@@ -145,14 +150,12 @@ public class ScenarioGenerator {
 		ScenarioCRSTransformation.transform(this.matsimScenario, VIS_CRS);
 		this.matsimConfig.global().setCoordinateSystem(VIS_CRS);
 		//save network
-		String networkOutputFile = gcm.getOutputDir() + "/network.xml.gz";
-		new NetworkWriter(this.matsimScenario.getNetwork()).write(networkOutputFile);
-		this.matsimScenario.getConfig().network().setInputFile(networkOutputFile);
+		new NetworkWriter(this.matsimScenario.getNetwork()).write(gcm.getOutputDir() + "/network.xml.gz");
+		this.matsimScenario.getConfig().network().setInputFile("network.xml.gz");
 		//save population
-		String outputPopulationFile = gcm.getOutputDir() + "/population.xml.gz";
 		new PopulationWriter(this.matsimScenario.getPopulation(), this.matsimScenario.getNetwork(),
-				gcm.getSampleSize()).write(outputPopulationFile);
-		this.matsimScenario.getConfig().plans().setInputFile(outputPopulationFile);
+				gcm.getSampleSize()).write(gcm.getOutputDir() + "/population.xml.gz");
+		this.matsimScenario.getConfig().plans().setInputFile("population.xml.gz");
 
 
 		log.info("saving matsim config file to:" + this.matsimConfigFile);
@@ -175,6 +178,7 @@ public class ScenarioGenerator {
 		this.matsimConfig.travelTimeCalculator().setTravelTimeCalculatorType(
 				"TravelTimeCalculatorHashMap");
 
+        this.matsimConfig.removeModule("evacuation");
 		new ConfigWriter(this.matsimConfig).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(),
 				"scenario generation finished.");
@@ -328,15 +332,15 @@ public class ScenarioGenerator {
 			reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, laneCap);
 			reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
 			// max density is set to 5.4 p/m^2
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 			reader.setKeepPaths(true);
 			reader.parse(evacuationNetworkFile);
 		} else if (gcm.getMainTrafficType().equals("mixed")) {
 			// TODO OSMReader for mixed
 			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(
 					sc.getNetwork(), ct, true);
 			reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, 1);

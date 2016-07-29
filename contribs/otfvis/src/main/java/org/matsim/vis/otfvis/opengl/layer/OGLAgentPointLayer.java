@@ -90,7 +90,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 	public void onDraw(GL2 gl) {
 		gl.glEnable(GL2.GL_POINT_SPRITE);
 
-		setAgentSize(gl);
+		gl.glPointSize(OTFClientControl.getInstance().getOTFVisConfig().getAgentSize() / 10.f);
 
 		gl.glEnableClientState (GL2.GL_COLOR_ARRAY);
 		gl.glEnableClientState (GL2.GL_VERTEX_ARRAY);
@@ -118,11 +118,6 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		}
 
 		gl.glDisable(GL2.GL_POINT_SPRITE);
-	}
-
-	private static void setAgentSize(GL2 gl) {
-		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize() / 10.f;
-		gl.glPointSize(agentSize);
 	}
 
 	private void drawArray(GL2 gl) {

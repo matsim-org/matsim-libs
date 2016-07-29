@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
@@ -26,7 +26,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import cadyts.utilities.misc.StreamFlushHandler;
 import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.Time;
@@ -40,6 +39,7 @@ import gunnar.ihop2.regent.costwriting.TripCostMatrices;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.scaper.ScaperPopulationCreator;
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**
  * 
@@ -434,7 +434,7 @@ public class MATSimDummy {
 					final ObjectAttributes linkAttributes = new ObjectAttributes();
 					final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 							linkAttributes);
-					reader.parse(linkAttributeFileName);
+					reader.readFile(linkAttributeFileName);
 					Logger.getLogger(MATSimDummy.class.getName())
 							.warning(
 									"Removing all expanded links. This *should* have no "

@@ -1,9 +1,9 @@
 package org.matsim.core.network;
 
-import org.matsim.api.core.v01.network.Link;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * An optimized data structure to answer nearest-neighbor queries for links in a
@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author mrieser / senozon
  */
-public class LinkQuadTree {
+public final class LinkQuadTree {
 
 	private final Node top;
 

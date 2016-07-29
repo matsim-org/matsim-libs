@@ -22,10 +22,9 @@ package playground.johannes.studies.matrix2014.config;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.ConfigGroup;
-import playground.johannes.studies.matrix2014.analysis.MatrixComparator;
-import playground.johannes.studies.matrix2014.analysis.MatrixDistanceCompare;
-import playground.johannes.studies.matrix2014.analysis.MatrixMarginalsCompare;
-import playground.johannes.studies.matrix2014.analysis.MatrixVolumeCompare;
+import playground.johannes.studies.matrix2014.analysis.*;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayerLoader;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.HistogramWriter;
@@ -55,9 +54,12 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
 
     private final FileIOContext ioContext;
 
-    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, FileIOContext ioContext) {
+    private final MatrixBuilderFactory factory;
+
+    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, MatrixBuilderFactory factory, FileIOContext ioContext) {
         this.config = config;
         this.dataPool = dataPool;
+        this.factory = factory;
         this.ioContext = ioContext;
     }
 
@@ -65,7 +67,7 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
     public Object load() {
         String zoneLayerName = config.getValue(ZONE_LAYER_NAME);
 
-        FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+        ActivityLocationLayer locationLayer = (ActivityLocationLayer) dataPool.get(ActivityLocationLayerLoader.KEY);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer(zoneLayerName);
 
@@ -77,10 +79,6 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
             threshold = Double.parseDouble(strThreshold);
 
         NumericMatrix m = NumericMatrixIO.read(path);
-
-//        MatrixAnalyzer analyzer = new MatrixAnalyzer(facilityData.getAll(), zones, m, name);
-//        analyzer.setFileIOContext(ioContext);
-//        analyzer.setVolumeThreshold(threshold);
 
         AnalyzerTaskComposite<Pair<NumericMatrix, NumericMatrix>> composite = new AnalyzerTaskComposite<>();
 
@@ -101,7 +99,7 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         composite.addComponent(distTask);
         composite.addComponent(marTask);
 
-        MatrixComparator analyzer = new MatrixComparator(m, facilityData.getAll(), zones, composite);
+        MatrixComparator analyzer = new MatrixComparator(m, factory.create(locationLayer, zones), composite);
         analyzer.setVolumeThreshold(threshold);
 
         return analyzer;

@@ -50,9 +50,8 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -254,11 +253,13 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	public void testLongTravelTimeInEmptySlot() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(1000, 0));
-		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 100.0, 3600.0, 1.0);
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(1000, 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 100.0, 3600.0, 1.0 );
 
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
@@ -307,7 +308,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
 		EventsManager events = EventsUtils.createEventsManager(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 
@@ -546,7 +547,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
-		((NetworkImpl) network).setCapacityPeriod(3600.0);
+		((Network) network).setCapacityPeriod(3600.0);
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(1000, 0));
 		network.addNode(node1);

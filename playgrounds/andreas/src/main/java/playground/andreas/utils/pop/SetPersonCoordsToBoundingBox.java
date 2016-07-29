@@ -3,16 +3,16 @@ package playground.andreas.utils.pop;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -47,8 +47,8 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 			Plan plan = person.getPlans().get(0);
 
 			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof ActivityImpl){
-					ActivityImpl act = (ActivityImpl) planElement;
+				if(planElement instanceof Activity){
+					Activity act = (Activity) planElement;
 					double x = Double.NaN;
 					double y = Double.NaN;
 
@@ -107,7 +107,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		SetPersonCoordsToBoundingBox dp = new SetPersonCoordsToBoundingBox(net, inPop, outPlansFile, minXY, maxXY);

@@ -83,7 +83,7 @@ public class CountsModule extends AbstractModule {
 
                     counts_parser = new MatsimCountsReader( transformation , counts );
                 }
-				counts_parser.readFile(config.getCountsFileName());
+				counts_parser.parse(config.getCountsFileURL(scenario.getConfig().getContext()));
             }
             return counts;
         }

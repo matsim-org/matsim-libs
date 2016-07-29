@@ -2,6 +2,7 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -20,7 +21,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -70,7 +70,7 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 		PC2Parking parking=currentVehicleLocation.get(vehicleId);
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 
-        NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
+        Network network = (Network) getControler().getScenario().getNetwork();
 		
         //why score parking of a free-floating vehicle? balac Sept '15
         
@@ -101,7 +101,7 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 
 	@Override
 	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double arrivalTime) {
-        NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
+        Network network = (Network) getControler().getScenario().getNetwork();
 		
 		String groupName = getAcceptableParkingGroupName();
 		PC2Parking parking=getParkingInfrastructureManager().parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
@@ -134,7 +134,7 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 			vehicleLocationsRect.registerCoord(parking.getCoordinate());
 		}
 
-        vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((NetworkImpl) getControler().getScenario().getNetwork());
+        vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((Network) getControler().getScenario().getNetwork());
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
 			PC2Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());

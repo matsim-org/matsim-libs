@@ -19,7 +19,9 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.evacuation.scenariogenerator.EvacuationNetworkGenerator;
 import org.matsim.core.config.Config;
@@ -43,8 +46,8 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.Dijkstra;
@@ -58,6 +61,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -67,17 +72,16 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class EvacuationPatnaScenarioGenerator {
 
-	private final String dir = "../../../repos/runs-svn/patnaIndia/";
-
-	private final String networkFile = dir+"/inputs/networkUniModal.xml";
-	private final String outNetworkFile = dir+"/run105/input/evac_network.xml.gz";
-
-	private final String popFile = dir+"/run105/input/patna_evac_plans_100Pct.xml.gz";
-	private final String outPopFile = dir+"/run105/input/patna_evac_plans_100Pct_filtered.xml.gz";
+	private final String dir = "../../../../repos/runs-svn/patnaIndia/run109/";
 	
-	private final String outConfigFile = dir+"/run105/input/patna_evac_config.xml.gz";
+	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaNetworkType.shpNetwork.toString()+"/network.xml.gz";
+	private final String outNetworkFile = "evac_network.xml.gz";
 
-	private final String areShapeFile = dir+"/run105/input/area_epsg24345.shp";
+	private final String outPopFile = "patna_evac_plans_100Pct_filtered.xml.gz";
+	
+	private final String outConfigFile = "patna_evac_config.xml.gz";
+
+	private final String areaShapeFile = "area_epsg24345.shp";
 	private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
 
 	private Scenario scenario;
@@ -90,7 +94,7 @@ public class EvacuationPatnaScenarioGenerator {
 	void run(){
 		scenario =  ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		createEvacNetwork();
-		scenario.getConfig().network().setInputFile(outNetworkFile);
+		scenario.getConfig().network().setInputFile(dir+"/input/"+outNetworkFile);
 
 		// population
 		ScenarioUtils.loadScenario(scenario);
@@ -104,7 +108,7 @@ public class EvacuationPatnaScenarioGenerator {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(outNetworkFile);
 		config.plans().setInputFile(outPopFile);
-		config.controler().setOutputDirectory(dir+"/run105/100pct/");
+		config.controler().setOutputDirectory("../100pct/");
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
@@ -138,8 +142,6 @@ public class EvacuationPatnaScenarioGenerator {
 		//vsp default
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
-		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		//vsp default
 
@@ -156,30 +158,36 @@ public class EvacuationPatnaScenarioGenerator {
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("walk");
 			mrp.setTeleportedModeSpeed(4./3.6);
-			mrp.setBeelineDistanceFactor(1.0);
+			mrp.setBeelineDistanceFactor(1.5);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("pt");
 			mrp.setTeleportedModeSpeed(20./3.6);
-			mrp.setBeelineDistanceFactor(1.3);
+			mrp.setBeelineDistanceFactor(1.5);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
-		new ConfigWriter(config).write(outConfigFile);
+		new ConfigWriter(config).write(dir+"/input/"+outConfigFile);
 	}
 
 	private Scenario createEvacNetwork(){
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(popFile, networkFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork( networkFile );
 		//read shape file and get area
 		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize(areShapeFile);
+		Collection<SimpleFeature> features = reader.readFileAndInitialize(dir+"/input/"+areaShapeFile);
 		evavcuationArea = (Geometry) features.iterator().next().getDefaultGeometry();
 
 		// will create a network connecting with safe node.
 		EvacuationNetworkGenerator net = new EvacuationNetworkGenerator(sc, evavcuationArea, safeLinkId);
 		net.run();
+		
+		//since the original network is multi-mode, the new links should also allow all modes
+		for (Link l : sc.getNetwork().getLinks().values()){
+			Set<String> allowedModes = new HashSet<>(PatnaUtils.ALL_MAIN_MODES);
+			l.setAllowedModes(allowedModes);
+		}
 
-		new NetworkWriter(sc.getNetwork()).write(outNetworkFile);
+		new NetworkWriter(sc.getNetwork()).write(dir+"/input/"+outNetworkFile);
 		return sc;
 	}
 
@@ -187,16 +195,22 @@ public class EvacuationPatnaScenarioGenerator {
 		// population, (home - evac)
 		Population popOut = scenario.getPopulation();
 		PopulationFactory popFact = popOut.getFactory();
-
-		Scenario scIn = LoadMyScenarios.loadScenarioFromPlans(popFile);
 		
-		for(Person p : scIn.getPopulation().getPersons().values()){
+		// 100% cloned.
+		UrbanDemandGenerator udg = new UrbanDemandGenerator(100);
+		udg.startProcessing();
+		Population regularPop = udg.getPopulation();
+		
+		for(Person p : regularPop.getPersons().values()){
 
 			PlanElement actPe = p.getSelectedPlan().getPlanElements().get(0); // first plan element is of activity
-			Activity home = popFact.createActivityFromLinkId(((Activity)actPe).getType(), ((Activity)actPe).getLinkId());
-
+			Activity homeExisting = (Activity)actPe;
+			Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), homeExisting.getCoord());
+			
+			Activity home = popFact.createActivityFromLinkId( homeExisting.getType(), link.getId() );
+			
 			//check if the person is in the area shape, if not leave them out
-			Coord actCoord = ((Activity)actPe).getCoord();
+			Coord actCoord = homeExisting.getCoord();
 			if(actCoord!=null && !evavcuationArea.contains(MGC.coord2Point(actCoord)) ){
 				continue;
 			}
@@ -222,8 +236,23 @@ public class EvacuationPatnaScenarioGenerator {
 
 			if(PatnaUtils.URBAN_MAIN_MODES.contains(leg.getMode())){
 				TripRouter router = new TripRouter();
-				router.setRoutingModule(leg.getMode(), DefaultRoutingModules.createPureNetworkRouter(leg.getMode(), popFact, scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()) , new FreeSpeedTravelTime())));
-				List<? extends PlanElement> routeInfo = router.calcRoute(leg.getMode(), new ActivityWrapperFacility(home), new ActivityWrapperFacility(evacAct), home.getEndTime(), pOut);
+				router.setRoutingModule(
+						leg.getMode(), 
+						DefaultRoutingModules.createPureNetworkRouter(
+								leg.getMode(), 
+								popFact, 
+								scenario.getNetwork(), 
+								new Dijkstra( scenario.getNetwork(), 
+										new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()), 
+										new FreeSpeedTravelTime())
+								)
+						);
+				List<? extends PlanElement> routeInfo = router.calcRoute(
+						leg.getMode(), 
+						new ActivityWrapperFacility(home), 
+						new ActivityWrapperFacility(evacAct), 
+						home.getEndTime(), 
+						pOut);
 
 				Route route = ((Leg)routeInfo.get(0)).getRoute();
 				route.setStartLinkId(home.getLinkId());
@@ -249,6 +278,6 @@ public class EvacuationPatnaScenarioGenerator {
 			}
 			popOut.addPerson(pOut);
 		}
-		new PopulationWriter(popOut).write(outPopFile);		
+		new PopulationWriter(popOut).write(dir+"/input/"+outPopFile);		
 	}
 }

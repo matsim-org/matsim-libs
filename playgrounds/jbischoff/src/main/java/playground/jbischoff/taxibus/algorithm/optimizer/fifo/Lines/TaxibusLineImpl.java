@@ -52,7 +52,7 @@ public class TaxibusLineImpl implements TaxibusLine {
 	private double singleTripTravelTime;
 	private double currentTwMax;
 	private double currentLambda = 0.;
-	private double currentOccupationRate = 8;
+	private double currentOccupationRate;
 	/**
 	 * @param lineId the Line Id
 	 * @param holdingPosition Link Id where taxibusses stand by for line dispatch
@@ -61,13 +61,14 @@ public class TaxibusLineImpl implements TaxibusLine {
 	 * @param twMax time waited between first pickup and departure towards destination in seconds
 	 */
 	public TaxibusLineImpl(Id<TaxibusLine> lineId, Id<Link> holdingPosition, MultiPolygon departureZone,
-			MultiPolygon arrivalZone, double twMax, int maxvehicles) {
+			MultiPolygon arrivalZone, double twMax, int maxvehicles, int vehCap) {
 		this.lineId = lineId;
 		this.holdingPosition = holdingPosition;
 		this.departureZone = departureZone;
 		this.arrivalZone = arrivalZone;
 		this.currentTwMax = twMax;
 		this.maxVehicles = maxvehicles;
+		this.currentOccupationRate = vehCap;
 	}
 
 	@Override

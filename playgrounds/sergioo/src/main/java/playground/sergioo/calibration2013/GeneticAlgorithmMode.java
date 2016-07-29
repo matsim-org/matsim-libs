@@ -3,22 +3,23 @@ package playground.sergioo.calibration2013;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,7 +33,7 @@ import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
+import playground.sergioo.typesPopulation2013.population.PopulationReader;
 
 import javax.inject.Provider;
 import java.io.FileWriter;
@@ -101,10 +102,10 @@ public class GeneticAlgorithmMode {
 		private void calculateScore(final Scenario scenario) {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = PopulationUtils.createPerson(person.getId());
+				Person copyPerson = PopulationUtils.getFactory().createPerson(person.getId());
 				PersonUtils.setCarAvail(copyPerson, PersonUtils.getCarAvail(person));
-				PlanImpl copyPlan = new PlanImpl(copyPerson);
-				copyPlan.copyFrom(person.getSelectedPlan());
+				Plan copyPlan = PopulationUtils.createPlan(copyPerson);
+				PopulationUtils.copyFromTo(person.getSelectedPlan(), copyPlan);
 				copyPerson.addPlan(copyPlan);
 				transitActsRemover.run(copyPlan);
 				for(PlanElement planElement:copyPlan.getPlanElements())
@@ -200,7 +201,7 @@ public class GeneticAlgorithmMode {
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).setConstant((double) 10);
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfDistance((double) 10);
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 10);
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[3]);
 		new TransitScheduleReader(scenario).readFile(args[4]);
@@ -211,14 +212,14 @@ public class GeneticAlgorithmMode {
 		}
 		Set<String> carMode = new HashSet<String>();
 		carMode.add("car");
-		NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
+		Network justCarNetwork = NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(scenario.getNetwork()).filter(justCarNetwork, carMode);
 		for(Person person:scenario.getPopulation().getPersons().values())
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
 				if(planElement instanceof Activity)
-					((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
+					((Activity)planElement).setLinkId(NetworkUtils.getNearestLinkExactly(justCarNetwork,((Activity)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(justCarNetwork,facility.getCoord()).getId());
 		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		events.addHandler(travelTimeCalculator);
@@ -229,7 +230,7 @@ public class GeneticAlgorithmMode {
 		if(!args[5].equals("NO"))
 			new MatsimEventsReader(events).readFile(args[5]);
 		routerManager = new RouterManager(scenario.getConfig().global().getNumberOfThreads(), scenario, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		final TravelDisutilityFactory factory = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
+		final TravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() );
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		int numIterations = new Integer(args[6]);

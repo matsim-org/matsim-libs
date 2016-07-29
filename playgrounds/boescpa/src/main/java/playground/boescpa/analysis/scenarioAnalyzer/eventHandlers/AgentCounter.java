@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.network.Network;
+
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
@@ -50,7 +51,7 @@ public class AgentCounter extends ScenarioAnalyzerEventHandler implements Activi
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (!event.getPersonId().toString().contains("pt")) {
+		if (isPersonToConsider(event.getPersonId())) {
 			agentsAndLinks.add(new String[]{event.getPersonId().toString(), event.getLinkId().toString()});
 		}
 	}

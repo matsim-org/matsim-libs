@@ -26,8 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
@@ -47,7 +48,7 @@ public class TMCAlerts {
 	private final Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
 	private int warnCnt = 0;
 	
-	private final boolean printLogStatements = false;
+	private final boolean printLogStatements = true;
 	
 	public static final boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
 		
@@ -108,7 +109,7 @@ public class TMCAlerts {
 			} else {
 				
 				Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
-				NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+				NetworkFactory nf = network.getFactory();
 								
 				// closed roads
 				if (containsOrEndsWith(trafficItem, "C1")
@@ -119,8 +120,8 @@ public class TMCAlerts {
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
 					incidentLink.setAllowedModes(link.getAllowedModes());
-					incidentLink.setCapacity(1.0);
-					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setCapacity(0.1);
+					incidentLink.setNumberOfLanes(0.1);
 					incidentLink.setFreespeed(0.22227);
 				
 				} else if (containsOrEndsWith(trafficItem, "C31")) { // closed for cars
@@ -132,8 +133,8 @@ public class TMCAlerts {
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
 					incidentLink.setAllowedModes(allowedModes);
-					incidentLink.setCapacity(1.0);
-					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setCapacity(0.1);
+					incidentLink.setNumberOfLanes(0.1);
 					incidentLink.setFreespeed(0.22227);
 				
 				// one (or maybe more?) lane(s) closed
@@ -237,12 +238,13 @@ public class TMCAlerts {
 					incidentLink.setNumberOfLanes(2.0);
 					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
+				// one alternating lane closed per direction
 				} else if (containsOrEndsWith(trafficItem, "E14")) {
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
 					incidentLink.setAllowedModes(link.getAllowedModes());
-					incidentLink.setCapacity(1.5 * (link.getCapacity() / link.getNumberOfLanes()));
-					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setCapacity((link.getNumberOfLanes() - 0.5) * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(link.getNumberOfLanes() - 0.5);
 					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 								
 				// accidents, e.g. B1: accident, .. TODO: Adjust according to type
@@ -340,6 +342,16 @@ public class TMCAlerts {
 			}
 			
 		return changedFreeSpeed;
+	}
+
+	public double getAdditionalTravelTime(TrafficItem trafficItem) {
+		
+		// Q: 
+		if (trafficItem.getTMCAlert().getPhraseCode().contains("Q1(5)")) {
+			return 5 * 60.;
+		} else {
+			return 0.;
+		}
 	}
 
 }

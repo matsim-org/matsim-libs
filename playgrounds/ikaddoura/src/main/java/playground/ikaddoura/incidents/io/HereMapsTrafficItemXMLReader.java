@@ -220,7 +220,7 @@ public class HereMapsTrafficItemXMLReader {
 	private String convertDateTimeFormat(String datetimeString) {
 		
 		// current format: MM/DD/YYYY HH:MM:SS
-		// target format: YYYY/MM/DD HH:MM:SS
+		// target format: YYYY-MM-DD HH:MM:SS
 
 		String dateTimeDelimiter = " ";
 		String[] datetime = StringUtils.explode(datetimeString, dateTimeDelimiter.charAt(0));
@@ -234,10 +234,12 @@ public class HereMapsTrafficItemXMLReader {
 		String year = date[2];
 		
 		if (year.length() != 4) {
-			throw new RuntimeException("Expecting the traffic incidents to have the time format MM/DD/YYYY HH:MM:SS. This is something else: " + datetimeString + " Aborting...");
+			
+			log.warn("Expecting the traffic incidents to have the time format MM/DD/YYYY HH:MM:SS. This is something else: " + datetimeString + " Aborting...");
+			year = "0";
 		}
 		
-		String newFormat = year + "/" + month + "/" + day + " " + timeStr;
+		String newFormat = year + "-" + month + "-" + day + " " + timeStr;
 		return newFormat;
 	}
 	

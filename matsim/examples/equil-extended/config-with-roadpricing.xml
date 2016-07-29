@@ -8,15 +8,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="./network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./plans2000.xml.gz" />
+		<param name="inputPlansFile" value="plans2000.xml.gz" />
 	</module>
 
 	<module name="roadpricing" >
-		<param name="tollLinksFile" value="./toll.xml" />
+		<param name="tollLinksFile" value="toll.xml" />
 	</module>
 
 	<module name="controler">

@@ -25,10 +25,10 @@ import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
-import org.matsim.core.network.NetworkImpl;
 
 /**
  * 
@@ -104,7 +104,7 @@ public class LinkVisualizationQueue {
 		
 		PriorityQueue<SortableMapObject<LinkEvent>> priorityQueue = linkEventQueues.get(linkId);
 		
-		while (priorityQueue!=null && priorityQueue.size()>0 && priorityQueue.peek().getScore()<=time){
+		while (priorityQueue!=null && priorityQueue.size()>0 && priorityQueue.peek().getWeight()<=time){
 			SortableMapObject<LinkEvent> poll = priorityQueue.poll();
 			
 			currentValueAtLink.incrementBy(linkId, poll.getKey().getValue());

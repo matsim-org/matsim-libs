@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.rules;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 
 
@@ -53,12 +53,4 @@ public class RuleBasedTaxiOptimizerParams
 
         cellSize = optimizerConfig.getDouble(CELL_SIZE);//1000 m tested for Berlin
     }
-
-
-    @Override
-    public RuleBasedTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new RuleBasedTaxiOptimizer(optimContext);
-    }
-
 }

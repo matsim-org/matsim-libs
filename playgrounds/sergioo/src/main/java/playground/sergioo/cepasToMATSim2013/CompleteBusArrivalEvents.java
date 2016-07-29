@@ -44,7 +44,7 @@ public class CompleteBusArrivalEvents implements VehicleArrivesAtFacilityEventHa
 		outEventsManager.addHandler(new EventWriterXML(args[2]));
 		EventsManager inEventsManager = EventsUtils.createEventsManager();
 		inEventsManager.addHandler(new CompleteBusArrivalEvents());
-		new EventsReaderXMLv1(inEventsManager).parse(args[1]);
+		new EventsReaderXMLv1(inEventsManager).readFile(args[1]);
 	}
 
 }

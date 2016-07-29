@@ -59,7 +59,7 @@ public class EventFilter implements EventHandler, PersonDepartureEventHandler, P
 			EventsManager em = new EventsManagerImpl();
 			em.addHandler(filter);
 			EventsReaderXMLv1 r = new EventsReaderXMLv1(em);
-			r.parse(events);
+			r.readFile(events);
 		}
 		filter.it1 = false;
 		EventsManager em = new EventsManagerImpl();
@@ -69,7 +69,7 @@ public class EventFilter implements EventHandler, PersonDepartureEventHandler, P
 		filter.em = em2;
 		EventWriterXML w = new EventWriterXML("/Users/laemmel/devel/padang/debug/events.xml.gz");
 		em2.addHandler(w);
-		r.parse(events);
+		r.readFile(events);
 	}
 
 	@Override

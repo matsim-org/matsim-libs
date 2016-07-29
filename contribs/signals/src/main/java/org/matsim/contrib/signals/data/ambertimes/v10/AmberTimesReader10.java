@@ -29,21 +29,22 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**
  * @author jbischoff
  * @author dgrether
  */
-public class AmberTimesReader10 extends MatsimJaxbXmlParser {
+public class AmberTimesReader10 extends MatsimJaxbXmlParser implements MatsimReader {
 
 	private static final Logger log = Logger.getLogger(AmberTimesReader10.class);
 	private AmberTimesData amberTimesData;

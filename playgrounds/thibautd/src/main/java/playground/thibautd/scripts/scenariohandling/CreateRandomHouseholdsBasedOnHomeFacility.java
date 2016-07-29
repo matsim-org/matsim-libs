@@ -48,7 +48,7 @@ public class CreateRandomHouseholdsBasedOnHomeFacility {
 		final Random random = new Random( 1234 );
 
 		PlansParser parser = new PlansParser();
-		parser.parse( inFile );
+		parser.readFile( inFile );
 
 		Counter counter = new Counter( "creating clique # " );
 		Counter facilitycounter = new Counter( "examining facility # " );

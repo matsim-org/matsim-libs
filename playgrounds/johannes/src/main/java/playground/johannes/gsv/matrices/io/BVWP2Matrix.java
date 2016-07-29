@@ -59,7 +59,7 @@ public class BVWP2Matrix {
 		reader = new VisumMatrixReader(mU);
 		reader.readFile("/home/johannes/gsv/matrices/IV_EKL_U.fma");
 		
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");

@@ -55,7 +55,7 @@ public class NUTSCompare {
 		String tomtomFile  = "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml";
 		String simFile = "/home/johannes/gsv/matrices/simmatrices/miv.744.xml";
 		
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;
@@ -67,7 +67,7 @@ public class NUTSCompare {
 		 */
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(itpFile);
+		reader.readFile(itpFile);
 		NumericMatrix itpNuts3 = reader.getMatrix();
 		
 		MatrixOperations.applyFactor(itpNuts3, 1/365.0);
@@ -75,13 +75,13 @@ public class NUTSCompare {
 		/*
 		 * tomtom
 		 */
-		reader.parse(tomtomFile);
+		reader.readFile(tomtomFile);
 		NumericMatrix tomtomNuts3 = reader.getMatrix();
 		removeEntries(tomtomNuts3, zones, distThreshold);
 		/*
 		 * sim
 		 */
-		reader.parse(simFile);
+		reader.readFile(simFile);
 		NumericMatrix simNuts3 = reader.getMatrix();
 		
 		MatrixOperations.applyFactor(simNuts3, 11);

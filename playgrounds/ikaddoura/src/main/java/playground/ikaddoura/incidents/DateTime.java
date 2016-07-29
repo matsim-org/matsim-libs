@@ -19,20 +19,28 @@
 
 package playground.ikaddoura.incidents;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 
 
+
 /**
-* Expected Input date+time format: YYYY/MM/DD HH:MM:SS, other formats are not accepted.
-* Only YYYY/MM/DD or HH:MM:SS should also work.  
+* Expected Input date+time format: YYYY-MM-DD HH:MM:SS, other formats are not accepted.
+* Only YYYY-MM-DD or HH:MM:SS should also work.  
 * 
 * @author ikaddoura
 */
 
 public class DateTime {
 	
-	public static final double parseDateTimeToDateTimeSeconds( String dateTimeString ) {
+	public static final double parseDateTimeToDateTimeSeconds( String dateTimeString ) throws ParseException {
+				
 		double timeSec = 0.;
 		double dateSec = 0.;
 		
@@ -42,9 +50,11 @@ public class DateTime {
 			if (datetime[0].contains(":")) {
 				// only time
 				timeSec = Time.parseTime(datetime[0]);
-			} else if (datetime[0].contains("/")) {
+			} else if (datetime[0].contains("-")) {
 				// only date
 				dateSec = computeDateSec(datetime[0]);
+			} else {
+				throw new RuntimeException("Expecting the following date/time/date+time formats: YYYY-MM-DD HH:MM:SS OR YYYY-MM-DD OR HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 			}
 			
 		} else if (datetime.length == 2) {
@@ -52,27 +62,27 @@ public class DateTime {
 			dateSec = computeDateSec(datetime[0]);
 			timeSec = Time.parseTime(datetime[1]);
 		} else {
-			throw new RuntimeException("Expecting the traffic incidents to have the date+time format YYYY/MM/DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
+			throw new RuntimeException("Expecting the following date+time format: YYYY-MM-DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 		}
 		
 		double seconds = dateSec + timeSec;
 		return seconds;
 	}
 
-	private static double computeDateSec(String dateString) {
+	private static double computeDateSec(String dateString) throws ParseException {
 		
-		String dateDelimiter = "/";
-		String[] date = StringUtils.explode(dateString, dateDelimiter.charAt(0));
+		String dateDelimiter = "-";
+		String[] dateArray = StringUtils.explode(dateString, dateDelimiter.charAt(0));
 				
-		if (date.length != 3 || date[0].length() != 4 || date[1].length() != 2 || date[2].length() != 2) {
-			throw new RuntimeException("Expecting the traffic incidents to have the date format YYYY/MM/DD.  Cannot interpret the following text: " + dateString + " Aborting...");
+		if (dateArray.length != 3 || dateArray[0].length() != 4 || dateArray[1].length() != 2 || dateArray[2].length() != 2) {
+			throw new RuntimeException("Expecting the following date format: YYYY-MM-DD.  Cannot interpret the following text: " + dateString + " Aborting...");
 		}
-		
-		double year = Double.valueOf(date[0]);
-		double month = Double.valueOf(date[1]);
-		double day = Double.valueOf(date[2]);
-			
-		double dateSec = year * 12 * 30.436875 * 24 * 3600 + month * 30.436875 * 24 * 3600 + day * 24 * 3600;
+					
+		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+		Date date = sdf.parse(dateString + " 00:00:00");
+		long dateMilliSec = date.getTime();
+		double dateSec = (double) dateMilliSec / 1000.;
 		return dateSec;
 	}
 
@@ -85,16 +95,16 @@ public class DateTime {
 			if (datetime[0].contains(":")) {
 				// only time
 				timeSec = Time.parseTime(datetime[0]);
-			} else if (datetime[0].contains("/")) {
+			} else if (datetime[0].contains("-")) {
 				// only date
-				throw new RuntimeException("Expecting the time format HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
+				throw new RuntimeException("Expecting the following time format: HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 			}
 			
 		} else if (datetime.length == 2) {
 			// date + time
 			timeSec = Time.parseTime(datetime[1]);
 		} else {
-			throw new RuntimeException("Expecting the date+time format YYYY/MM/DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
+			throw new RuntimeException("Expecting the following date+time format: YYYY-MM-DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 		}
 		
 		return timeSec;
@@ -102,20 +112,33 @@ public class DateTime {
 
 	public static String secToDateTimeString(double dateTimeInSec) {
 		
-		int year = (int) ( dateTimeInSec / (12 * 30.436875 * 24 * 3600) );
-		int month = (int) ( (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600)) / (30.436875 * 24 * 3600) );
-		int day = (int) ( (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600) - (month * 30.436875 * 24 * 3600) ) / (24 * 3600) );
+		Date date = new Date((long) (dateTimeInSec * 1000));
+		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+		return sdf.format(date);
+	}
+	
+	public static String secToDateString(double dateTimeInSec) {
 		
-		double seconds = (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600.) - (month * 30.436875 * 24 * 3600.) - (day * 24 * 3600.)) / 3600.;
-		String time = Time.writeTime(seconds);
+		BigDecimal dateTimeInSec2 = BigDecimal.valueOf( dateTimeInSec ) ;
+		Date date = new Date( dateTimeInSec2.multiply(BigDecimal.valueOf(1000)).longValue() ) ;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+		String dateString = sdf.format(date);
+		return dateString;
 
-		String dateTime = year + "-" + month + "-" + day;
-
-		if (seconds > 0.) {
-			dateTime = dateTime + "_" + time;
-		}
-		
-		return dateTime;
+//		BigInteger secsAsInt = BigInteger.valueOf( (long) dateTimeInSec );
+//		if ( secsAsInt.longValue() == dateTimeInSec ) {
+//			Date date = new Date( secsAsInt.multiply(BigInteger.valueOf(1000)).longValue() ) ;
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+//			String dateString = sdf.format(date);
+//			return dateString;
+//		} else {
+//			Date date = new Date((long) (dateTimeInSec * 1000));
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+//			String dateString = sdf.format(date);
+//			return dateString;
+//		}
 	}
 }
 

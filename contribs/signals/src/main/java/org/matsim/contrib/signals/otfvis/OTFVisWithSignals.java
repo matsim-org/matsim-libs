@@ -44,6 +44,7 @@ import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 public class OTFVisWithSignals {
 
@@ -62,22 +63,21 @@ public class OTFVisWithSignals {
 	}
 
 	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-
-		// this is the start/stop facility, which may be used outside of otfvis:
-		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
-		server.setNotificationListener( playPauseMobsimListener ) ;
-		qSim.addQueueSimulationListeners(playPauseMobsimListener);
-
-		server.setSimulation(qSim);
-
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
 		if (config.transit().isUseTransit()) {
-
 			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
 			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
-			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
+
+//			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
+			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+			linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
+			if (! Double.isNaN(network.getEffectiveLaneWidth())){
+				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+			}
+			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+
 			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
 			server.addAdditionalElement(facilityWriter);
 		}

@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
@@ -13,7 +14,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -65,10 +66,11 @@ public static void main(final String[] args) throws IOException {
 		    	
 		    	String[] arr = s.split("\t", -1);
 		    	Coord coord = new Coord(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
+			final Coord coord1 = coord;
 		    	
 		    	
 		    	
-                Link l = ((NetworkImpl)controler.getScenario().getNetwork()).getNearestLinkExactly(coord);
+                Link l = NetworkUtils.getNearestLinkExactly(((Network)controler.getScenario().getNetwork()),coord1);
 		    	
 		    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
 		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(Id.create(Integer.toString(i), Vehicle.class), l.getCoord());

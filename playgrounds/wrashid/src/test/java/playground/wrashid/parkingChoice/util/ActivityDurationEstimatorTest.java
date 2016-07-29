@@ -35,7 +35,11 @@ import playground.wrashid.parkingChoice.ParkingConfigModule;
 public class ActivityDurationEstimatorTest extends MatsimTestCase {
 
 	public void testConfig1(){
-		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig1.xml");
+		Config config= super.loadConfig("test/input/scenarios/chessConfig1.xml");
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false); 
+		// tested code makes fairly strong assumptions on where in plan certain activity or leg types are.  kai, jun'16 
+		
 		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
 
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
@@ -45,7 +49,11 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	}
 	
 	public void testConfig2(){
-		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig2.xml");
+		Config config= super.loadConfig("test/input/scenarios/chessConfig2.xml");
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false); 
+		// tested code makes fairly strong assumptions on where in plan certain activity or leg types are.  kai, jun'16 
+		
 		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
 
 
@@ -56,7 +64,7 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	}
 	
 	public void testConfig3(){
-		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/config3.xml");
+		Config config= super.loadConfig("test/input/scenarios/config3.xml");
 		
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
 	
@@ -66,7 +74,11 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	}
 	
 	public void testConfig4(){
-		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig4.xml");
+		Config config= super.loadConfig("test/input/scenarios/chessConfig4.xml");
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false); 
+		// tested code makes fairly strong assumptions on where in plan certain activity or leg types are.  kai, jun'16 
+		
 		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
 
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
@@ -77,7 +89,11 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	
 	//TODO: go through the numbers of this test...
 	public void testConfig5(){
-		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
+		Config config= super.loadConfig("test/input/scenarios/chessConfig5.xml");
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false); 
+		// tested code makes fairly strong assumptions on where in plan certain activity or leg types are.  kai, jun'16 
+		
 		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
 
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );

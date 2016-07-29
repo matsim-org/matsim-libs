@@ -160,7 +160,7 @@ public class SpatialAveragingDistribution {
 		GeneratedEmissionsHandler generatedEmissionsHandler = new GeneratedEmissionsHandler(0.0, distConfig.getTimeBinSize(), link2xbin, link2ybin, warmPollutant2analyze, coldPollutant2analyze);
 		eventsManager.addHandler(generatedEmissionsHandler);
 		
-		emissionReader.parse(emissionFile);
+		emissionReader.readFile(emissionFile);
 
 		//TODO something wrong here, em per cell deleted???
 		emissionPerBin = generatedEmissionsHandler.getEmissionsPerCell();

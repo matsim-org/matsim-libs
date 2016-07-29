@@ -30,8 +30,8 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	
@@ -147,6 +147,12 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 
 		@Override
 		public void setLinkId(Id<Link> id) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public void setCoord(Coord coord) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}	

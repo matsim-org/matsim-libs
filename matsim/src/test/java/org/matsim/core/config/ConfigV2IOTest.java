@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,7 +49,7 @@ public class ConfigV2IOTest {
 		new ConfigWriter( outConfig ).writeFileV2( file );
 
 		final Config inConfig = ConfigUtils.createConfig();
-		new ConfigReaderMatsimV2( inConfig ).parse( file );
+		new ConfigReaderMatsimV2( inConfig ).readFile( file );
 
 		assertTheSame( outConfig , inConfig );
 	}
@@ -62,9 +63,12 @@ public class ConfigV2IOTest {
 				inConfig.getModules().keySet() );
 
 		for ( String name : outConfig.getModules().keySet() ) {
-			assertTheSame(
-					outConfig.getModule( name ),
-					inConfig.getModule( name ) );
+			if ( !name.equals( ChangeLegModeConfigGroup.CONFIG_MODULE ) ) {
+				// special case to allow error message.  remove eventually.  kai, may'16
+				assertTheSame(
+						outConfig.getModule( name ),
+						inConfig.getModule( name ) );
+			}
 		}
 	}
 

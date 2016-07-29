@@ -31,6 +31,7 @@ import java.util.*;
  */
 public class ContourBuilder {
 
+    private static final double EPSILON = 0.000001;
     private QuadEdgeSubdivision triangulation;
 
     private GeometryFactory geometryFactory = new GeometryFactory();
@@ -62,9 +63,9 @@ public class ContourBuilder {
                 // Add a point to polyline
                 Coordinate cC;
                 if (triangulation.isFrameVertex(e.orig())) {
-                    cC = e.dest().getCoordinate();
+                    cC = moveEpsilonTowards(e.dest().getCoordinate(), e.orig().getCoordinate());
                 } else if (triangulation.isFrameVertex(e.dest())) {
-                    cC = e.orig().getCoordinate();
+                    cC = moveEpsilonTowards(e.orig().getCoordinate(), e.dest().getCoordinate());
                 } else {
                     cC = e.orig().midPoint(e.dest()).getCoordinate();
                 }
@@ -97,6 +98,10 @@ public class ContourBuilder {
         }
         List<Polygon> retval = punchHoles(rings);
         return geometryFactory.createMultiPolygon(retval.toArray(new Polygon[retval.size()]));
+    }
+
+    private Coordinate moveEpsilonTowards(Coordinate coordinate, Coordinate distantFrameCoordinate) {
+        return new Coordinate(coordinate.x + EPSILON * (distantFrameCoordinate.x - coordinate.x), coordinate.y + EPSILON * (distantFrameCoordinate.y - coordinate.y));
     }
 
     private int cut(double za, double zb, double z0) {

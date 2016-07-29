@@ -19,38 +19,42 @@
 
 package org.matsim.vis.otfvis.gui;
 
+import java.awt.*;
 import java.util.Collection;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.util.Animator;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 
-public class OTFHostControl {
+public class OTFHostControl implements GLEventListener {
 
 	private static Logger log = Logger.getLogger(OTFHostControl.class);
+	private final Component canvas;
 
-	private BoundedRangeModel simTime;
+	private final BoundedRangeModel simTime;
 
-	private int loopStart = 0;
+	private volatile int loopStart = 0;
 
-	private int loopEnd = Integer.MAX_VALUE;
+	private volatile int loopEnd = Integer.MAX_VALUE;
 
-	private MovieTimer movieTimer = null;
+	private final Animator animator;
 
-	private OTFHostControlBar hostControlBar;
+	private final OTFServer server;
+	private volatile boolean playing = false;
+	private volatile boolean syncronizedPlay = true;
 
-	private OTFServer server;
-
-	public OTFHostControl(OTFServer server, OTFHostControlBar hostControlBar) {
-		this.server = server;
-		this.hostControlBar = hostControlBar;
+	public OTFHostControl(OTFServer aServer, Component aCanvas) {
+		server = aServer;
+		canvas = aCanvas;
 		Collection<Double> steps = getTimeStepsdrawer();
 		if (steps != null) {
 			// Movie mode with timesteps
@@ -62,92 +66,27 @@ public class OTFHostControl {
 			// Live mode without timesteps
 			simTime = new DefaultBoundedRangeModel(0 /* value */, 0 /* extent */, 0 /* value */, Integer.MAX_VALUE /* max */);
 		}
-
 		simTime.addChangeListener(new ChangeListener() {
-
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				invalidateDrawers();
-				OTFHostControl.this.hostControlBar.updateTimeLabel();
+				canvas.repaint();
 			}
-
 		});
+		animator = new Animator();
+		animator.add(((GLAutoDrawable) canvas));
+		((GLAutoDrawable) canvas).addGLEventListener(this);
+		simTime.setValue(server.getLocalTime());
 	}
 
 	public void toStart() {
-		stopMovie();
-		if(isLive()) {
-			cancel();
-			requestTimeStep(0, OTFServer.TimePreference.LATER);
-			simTime.setValue(0);
-		} else {
-			requestTimeStep(loopStart, OTFServer.TimePreference.LATER);
-			log.debug("To start...");
-		}
-	}
-
-	private void cancel() {
-		throw new RuntimeException("Can't do that at the moment.");
-	}
-
-	public void stopMovie() {
-		if (movieTimer != null) {
-			movieTimer.terminate();
-			movieTimer = null;
-		}
-	}
-
-	/**
-	 * Called when user clicks on the time line displayed when playing movies.
-	 */
-	public void setNEWTime() {
-		gotoTime(getSimTime(), null);
+		requestTimeStep(loopStart);
+		log.debug("To start...");
 	}
 
 
-	void gotoTime(int gotoTime, OTFAbortGoto progressBar) {
-		// yy I have no clear idea what the following means.  Going backwards is only possible in file mode, 
-		// and in consequence there may have been the idea to go backwards in live situations by restarting
-		// at the beginning.  However, given our typically sizes this clearly does not make sense and
-		// thus was never implemented.  In consequence, TimePreference.RESTART is only used
-		// at two locations, one of them being here.  Where it is finally caught (in OnTheFlyServer), 
-		// the result with earlier times is the same as when called with another time preference except
-		// that the returned boolean may different, but I don't think that that is used in a consistent
-		// way.  
-		// I guess that the more complicated mechanics is necessary to "loop around" in file mode.
-		// kai, jan'16
-		
-		if (gotoTime < getSimTime()){
-//			requestTimeStep(gotoTime, OTFServer.TimePreference.RESTART);
-			// I don't think that this is doing anything at all. ??? kai, jan'16
-		} else if (!requestTimeStep(gotoTime, OTFServer.TimePreference.EARLIER)) {
-			requestTimeStep(gotoTime, OTFServer.TimePreference.LATER);
-		}
-		if (progressBar != null) {
-			progressBar.terminate = true;
-		}
-		fetchTimeAndStatus();
-		hostControlBar.updateTimeLabel();
-	}
-
-	public void fetchTimeAndStatus() {
-		int localTime = server.getLocalTime();
-		simTime.setValue(localTime);
-	}
-
-	boolean requestTimeStep(int newTime, OTFServer.TimePreference prefTime) {
-		if (requestNewTime(newTime, prefTime)) {
-			simTime.setValue(server.getLocalTime());
-			return true;
-		} else {
-			log.info("No such timestep found.");
-			return false;
-		}
-	}
-
-	boolean requestNewTime(int newTime, OTFServer.TimePreference prefTime) {
-		boolean requestNewTime = server.requestNewTime(newTime, prefTime);
-		return requestNewTime;
+	void requestTimeStep(int newTime) {
+		server.requestNewTime(newTime);
+		simTime.setValue(server.getLocalTime());
 	}
 
 	public boolean isLive() {
@@ -162,24 +101,27 @@ public class OTFHostControl {
 		return simTime;
 	}
 
-	void setSimTime(int simTime) {
-		this.simTime.setValue(simTime);
-	}
-
 	public void play(boolean synchronizedPlay) {
-		log.debug("Pressed PLAY, creating movie timer.");
-		movieTimer = new MovieTimer();
-		movieTimer.start();
+		log.debug("Pressed PLAY, creating animator.");
+		playing = true;
+		syncronizedPlay = synchronizedPlay;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				animator.start();
+			}
+		}).start();
 		if (!synchronizedPlay) {
-			pressPlayOnServer();
+			((OTFLiveServer) server).play();
 		}
 	}
 
 	public void pause() {
 		if (server.isLive()) {
-			pressPauseOnServer();
+			((OTFLiveServer) server).pause();
 		}
-		stopMovie();
+		animator.stop();
+		playing = false;
 	}
 
 
@@ -187,26 +129,6 @@ public class OTFHostControl {
 		return server.getTimeSteps();
 	}
 
-
-	private void pressPlayOnServer() {
-		((OTFLiveServer) server).play();
-	}
-
-	private void pressPauseOnServer() {
-		((OTFLiveServer) server).pause();
-	}
-
-	void updateSyncPlay(boolean synchronizedPlay) {
-		if (!server.isLive()) {
-			return;
-		}
-		if (synchronizedPlay) {
-			pressPauseOnServer();
-		} else {
-			pressPlayOnServer();
-		}
-		fetchTimeAndStatus();
-	}
 
 	/**
 	 *  sets the loop that the movieplayer should loop
@@ -222,52 +144,42 @@ public class OTFHostControl {
 		}
 	}
 
-	public void invalidateDrawers() {
-		hostControlBar.redrawDrawers();
+	@Override
+	public void init(GLAutoDrawable glAutoDrawable) {
+
 	}
 
-	class MovieTimer extends Thread {
+	@Override
+	public void dispose(GLAutoDrawable glAutoDrawable) {
 
-		private boolean terminate = false;
+	}
 
-		public MovieTimer() {
-			setDaemon(true);
-		}
-
-		public void terminate() {
-			this.terminate = true;
-		}
-
-		@Override
-		public void run() {
-			int delay = 30;
-			while (!terminate) {
+	@Override
+	public void display(GLAutoDrawable glAutoDrawable) {
+		int delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
+		if (playing) {
+			if (syncronizedPlay) {
 				try {
-					delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
-					sleep(delay);
-					if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServer.TimePreference.LATER))) {
-						requestNewTime(loopStart, OTFServer.TimePreference.LATER);
-					}
-					simTime.setValue(server.getLocalTime());
-					SwingUtilities.invokeLater(new Runnable() { // This is important. Code below modifies stuff which is "owned" by swing, so it must run on the Swing thread! 
-						
-						int actTime = 0;
-						
-						@Override
-						public void run() {
-							actTime = getSimTime();
-							hostControlBar.updateTimeLabel();
-							if (simTime.getValue() != actTime) {
-								hostControlBar.repaint();
-							}
-						}
-					});
-					
+					Thread.sleep(delay);
 				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
+					e.printStackTrace();
+				}
+				server.requestNewTime(getSimTime() + 1);
+				if (simTime.getValue() >= loopEnd) {
+					server.requestNewTime(loopStart);
+					simTime.setValue(server.getLocalTime());
 				}
 			}
+			simTime.setValue(server.getLocalTime());
+			if (server.isFinished()) {
+				animator.stop();
+			}
 		}
+	}
+
+	@Override
+	public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
+
 	}
 
 }

@@ -42,10 +42,11 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -54,8 +55,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -273,7 +272,7 @@ public class Matsim2030Utils {
 		// but this would make creation of object attributes tricky.
 		// This also makes sampling easier
 		final Scenario tempSc = ScenarioUtils.createScenario( scenario.getConfig() );
-		new MatsimPopulationReader( tempSc ).readFile( subpopulationFile );
+		new PopulationReader( tempSc ).readFile( subpopulationFile );
 
 		final String attribute = scenario.getConfig().plans().getSubpopulationAttributeName();
 		int inputCount = 0;
@@ -338,7 +337,7 @@ public class Matsim2030Utils {
 		// allocate a link here (before loading the PT part of the network)
 		for ( ActivityFacility fac : sc.getActivityFacilities().getFacilities().values() ) {
 			if ( fac.getLinkId() == null ) {
-				final NetworkImpl net = (NetworkImpl) sc.getNetwork();
+				final Network net = (Network) sc.getNetwork();
 				((ActivityFacilityImpl) fac).setLinkId( NetworkUtils.getNearestLink(net, fac.getCoord()).getId() );
 			}
 		}
@@ -417,7 +416,7 @@ public class Matsim2030Utils {
 			final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
 			new TransitRouterNetworkReader(
 					scenario.getTransitSchedule(),
-					transitRouterNetwork ).parse(
+					transitRouterNetwork ).readFile(
 						matsim2030conf.getThinnedTransitRouterNetworkFile() );
 	
 			final TransitRouterWithThinnedNetworkFactory transitRouterFactory =

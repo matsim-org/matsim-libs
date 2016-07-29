@@ -55,13 +55,13 @@ public class TravelTimeFourWaysTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	private Scenario createTestScenario(){
-		Config conf = ConfigUtils.createConfig();
+		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		conf.controler().setMobsim("qsim");
-		conf.network().setInputFile(this.testUtils.getClassInputDirectory() + "network.xml.gz");
+		conf.network().setInputFile("network.xml.gz");
 		String laneDefinitions = this.testUtils.getClassInputDirectory()
 				+ "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
+		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFileURL(conf.getContext()).getFile());
 		conf.network().setLaneDefinitionsFile(lanes20);
 		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(false);
@@ -96,7 +96,7 @@ public class TravelTimeFourWaysTest {
 	@Test
 	public void testTrafficLightIntersection4arms() {
 		Scenario scenario = this.createTestScenario();
-		scenario.getConfig().plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans.xml.gz");
+		scenario.getConfig().plans().setInputFile("plans.xml.gz");
 		
 		ScenarioUtils.loadScenario(scenario);
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
@@ -116,7 +116,7 @@ public class TravelTimeFourWaysTest {
 	@Test
 	public void testTrafficLightIntersection4armsWithUTurn() {
 		Scenario scenario = this.createTestScenario();
-		scenario.getConfig().plans().setInputFile(this.testUtils.getClassInputDirectory() + "plans_uturn.xml.gz");
+		scenario.getConfig().plans().setInputFile("plans_uturn.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
 
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;

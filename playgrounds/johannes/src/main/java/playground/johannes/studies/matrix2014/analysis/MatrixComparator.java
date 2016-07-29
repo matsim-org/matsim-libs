@@ -21,8 +21,6 @@ package playground.johannes.studies.matrix2014.analysis;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.matrix.MatrixBuilder;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
 import playground.johannes.synpop.analysis.AnalyzerTask;
@@ -30,7 +28,6 @@ import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.matrix.MatrixOperations;
 import playground.johannes.synpop.matrix.NumericMatrix;
 
@@ -48,26 +45,25 @@ public class MatrixComparator implements AnalyzerTask<Collection<? extends Perso
 
     private final NumericMatrix refMatrix;
 
-    private Predicate<Segment> legPredicate;
-
     private ODPredicate<String, Double> normPredicate;
 
     private double volumeThreshold;
 
-    private boolean useWeights;
-
     private AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> tasks;
 
-    public MatrixComparator(NumericMatrix refMatrix, ActivityFacilities facilities,
-                            ZoneCollection zones, AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> tasks) {
+    public MatrixComparator(NumericMatrix refMatrix, MatrixBuilder builder, AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> tasks) {
         this.refMatrix = refMatrix;
-        builder = new MatrixBuilder(facilities, zones);
         this.tasks = tasks;
+        this.builder = builder;
         volumeThreshold = 0;
     }
 
-    public void setLegPredicate(Predicate<Segment> legPredicate) {
-        this.legPredicate = legPredicate;
+    public void setLegPredicate(Predicate<Segment> predicate) {
+        builder.setLegPredicate(predicate);
+    }
+
+    public void setUseWeights(boolean useWeights) {
+        builder.setUseWeights(useWeights);
     }
 
     public void setNormPredicate(ODPredicate<String, Double> normPredicate) {
@@ -78,13 +74,9 @@ public class MatrixComparator implements AnalyzerTask<Collection<? extends Perso
         this.volumeThreshold = threshold;
     }
 
-    public void setUseWeights(boolean useWeights) {
-        this.useWeights = useWeights;
-    }
-
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        NumericMatrix simMatrix = builder.build(persons, legPredicate, useWeights);
+        NumericMatrix simMatrix = builder.build(persons);
         NumericMatrix tmpSimMatrix = simMatrix;
         if (normPredicate != null) {
             tmpSimMatrix = (NumericMatrix) MatrixOperations.subMatrix(normPredicate, simMatrix, new NumericMatrix());

@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -78,12 +78,14 @@ private Network network;
 
 	@Override
 	public void process(Person person) {
-		ActivityImpl origin = (ActivityImpl) person.getPlans().get(0).getPlanElements().get(0);
+		Activity origin = (Activity) person.getPlans().get(0).getPlanElements().get(0);
 		Activity destination = (Activity) person.getPlans().get(0).getPlanElements().get(2);
 		Coord quelle = origin.getCoord();
-		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle);
+		final Coord coord = quelle;
+		Node quellNode = NetworkUtils.getNearestNode(((Network) network),coord);
 		Coord ziel = destination.getCoord();
-		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel);
+		final Coord coord1 = ziel;
+		Node zielNode = NetworkUtils.getNearestNode(((Network) network),coord1);
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, person, null);
 		if (isInteresting(path)) {
 			origin.setEndTime(origin.getEndTime() + travelTimeToEntry);

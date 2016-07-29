@@ -61,5 +61,11 @@ public class FilteredPopulation implements Population {
 	public ObjectAttributes getPersonAttributes() {
 		return null;
 	}
+
+	@Override
+	public Person removePerson(Id<Person> personId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 	
 }

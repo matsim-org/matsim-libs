@@ -53,7 +53,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	private final Counter count = new Counter("Import of trip # ");
 
 	public JoinableTripsXmlReader() {
-		super(false);
+		setValidating(false);
 	}
 
 	@Override

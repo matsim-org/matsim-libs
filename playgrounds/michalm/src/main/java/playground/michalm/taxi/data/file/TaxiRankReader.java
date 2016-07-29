@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.michalm.ev.*;
 import playground.michalm.taxi.data.*;
 
 
@@ -35,19 +34,14 @@ public class TaxiRankReader
     extends MatsimXmlParser
 {
     private final static String RANK = "rank";
-    private final static String CHARGER = "charger";
 
     private final static int DEFAULT_RANK_CAPACITY = Integer.MAX_VALUE;
-    private final static int DEFAULT_CHARGER_CAPACITY = 1;
-    private final static int DEFAULT_CHARGER_POWER = 50;//50kW
 
-    private final ETaxiData data;
+    private final TaxiDataWithRanks data;
     private Map<Id<Link>, ? extends Link> links;
 
-    private TaxiRank currentRank;
 
-
-    public TaxiRankReader(Scenario scenario, ETaxiData data)
+    public TaxiRankReader(Scenario scenario, TaxiDataWithRanks data)
     {
         this.data = data;
         links = scenario.getNetwork().getLinks();
@@ -58,11 +52,7 @@ public class TaxiRankReader
     public void startTag(String name, Attributes atts, Stack<String> context)
     {
         if (RANK.equals(name)) {
-            TaxiRank currentRank = createRank(atts);
-            data.addTaxiRank(currentRank);
-        }
-        else if (CHARGER.equals(name)) {
-            data.addCharger(createCharger(atts));
+            data.addTaxiRank(createRank(atts));
         }
     }
 
@@ -79,14 +69,5 @@ public class TaxiRankReader
         Link link = links.get(Id.createLinkId(atts.getValue("link")));
         int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_RANK_CAPACITY);
         return new TaxiRank(id, name, link, capacity);
-    }
-
-
-    private Charger createCharger(Attributes atts)
-    {
-        Id<Charger> id = Id.create(atts.getValue("id"), Charger.class);
-        double power = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER) * 1000;//kW --> W
-        int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_CHARGER_CAPACITY);
-        return new ChargerImpl(id, power, capacity, currentRank.getLink());
     }
 }

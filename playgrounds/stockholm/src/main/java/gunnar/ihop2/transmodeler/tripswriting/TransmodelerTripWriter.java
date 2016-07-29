@@ -2,8 +2,6 @@ package gunnar.ihop2.transmodeler.tripswriting;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.TMLINKDIRPREFIX_ATTR;
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.TMPATHID_ATTR;
-import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
-import gunnar.ihop2.utils.TabularFileWriter;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -29,6 +27,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
+import gunnar.ihop2.utils.TabularFileWriter;
 
 /**
  * 
@@ -300,7 +301,7 @@ public class TransmodelerTripWriter {
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				linkAttributes);
-		reader.parse(linkAttributesFileName);
+		reader.readFile(linkAttributesFileName);
 
 		final TransmodelerTripWriter tripWriter = new TransmodelerTripWriter(
 				scenario.getPopulation(), linkAttributes);

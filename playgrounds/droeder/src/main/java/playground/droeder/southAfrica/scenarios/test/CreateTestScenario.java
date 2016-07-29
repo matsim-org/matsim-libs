@@ -33,16 +33,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -451,13 +451,13 @@ class CreateTestScenario {
 			
 			//TODO problems if loopLinks are used... maybe because of QLinkImpl line 306ff
 			h1 = pFac.createActivityFromLinkId("h", Id.create("B3-A", Link.class));
-			((ActivityImpl) h1).setCoord(sc.getNetwork().getLinks().get(h1.getLinkId()).getToNode().getCoord());
+			((Activity) h1).setCoord(sc.getNetwork().getLinks().get(h1.getLinkId()).getToNode().getCoord());
 			h1.setEndTime(end1);
 			w = pFac.createActivityFromLinkId("w", Id.create("B3-C", Link.class));
-			((ActivityImpl) w).setCoord(sc.getNetwork().getLinks().get(w.getLinkId()).getToNode().getCoord());
+			((Activity) w).setCoord(sc.getNetwork().getLinks().get(w.getLinkId()).getToNode().getCoord());
 			w.setEndTime(end2);
 			h2 = pFac.createActivityFromLinkId("h", Id.create("B3-A", Link.class));
-			((ActivityImpl) h2).setCoord(sc.getNetwork().getLinks().get(h2.getLinkId()).getToNode().getCoord());
+			((Activity) h2).setCoord(sc.getNetwork().getLinks().get(h2.getLinkId()).getToNode().getCoord());
 			
 			Plan plan = pFac.createPlan();
 			plan.addActivity(h1);

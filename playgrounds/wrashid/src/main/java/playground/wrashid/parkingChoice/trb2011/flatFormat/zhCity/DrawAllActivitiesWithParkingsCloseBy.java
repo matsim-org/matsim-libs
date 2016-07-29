@@ -4,11 +4,11 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -39,8 +39,8 @@ public class DrawAllActivitiesWithParkingsCloseBy {
 		for (Person person:population.getPersons().values()){
 			for (PlanElement pe:person.getSelectedPlan().getPlanElements()){
 				
-				if (pe instanceof ActivityImpl){
-					ActivityImpl activity=(ActivityImpl) pe;
+				if (pe instanceof Activity){
+					Activity activity=(Activity) pe;
 					Coord actCoord = activity.getCoord();
 					PParking parking = parkingsQuadTree.getClosest(actCoord.getX(), actCoord.getY());
 					

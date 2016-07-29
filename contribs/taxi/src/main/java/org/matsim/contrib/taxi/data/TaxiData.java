@@ -28,39 +28,30 @@ import org.matsim.contrib.dvrp.data.*;
 public class TaxiData
     extends VrpDataImpl
 {
-//    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
+    //    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
 
-//    private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
-//            .unmodifiableMap(taxiRanks);
+    //    private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
+    //            .unmodifiableMap(taxiRanks);
 
-
-//    public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
-//    {
-//        return unmodifiableTaxiRanks;
-//    }
-
-
-//    public Map<Id<Vehicle>, Taxi> getTaxis()
-//    {
-//        return convertMap(getVehicles());
-//    }
-
+    //    public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
+    //    {
+    //        return unmodifiableTaxiRanks;
+    //    }
 
     public Map<Id<Request>, TaxiRequest> getTaxiRequests()
     {
         return convertMap(getRequests());
     }
 
-
-//    public void addTaxiRank(TaxiRank taxiRank)
-//    {
-//        taxiRanks.put(taxiRank.getId(), taxiRank);
-//    }
+    //    public void addTaxiRank(TaxiRank taxiRank)
+    //    {
+    //        taxiRanks.put(taxiRank.getId(), taxiRank);
+    //    }
 
 
     //casts Collection of supertype S to Collection of type T
     @SuppressWarnings("unchecked")
-    private static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
+    protected static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
     {
         return (Map<I, T>)collection;
     }

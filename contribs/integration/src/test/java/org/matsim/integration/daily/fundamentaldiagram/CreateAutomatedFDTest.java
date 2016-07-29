@@ -53,10 +53,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -69,10 +71,9 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -89,43 +90,53 @@ import org.matsim.vehicles.VehicleUtils;
 @RunWith(Parameterized.class)
 public class CreateAutomatedFDTest {
 
-	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
+	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics, InflowConstraint inflowConstraint) {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
+		this.inflowConstraint = inflowConstraint;
 		this.travelModes = new String [] {"car","bike"};
 	}
 
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
+	private InflowConstraint inflowConstraint;
 	private final Map<Id<Person>,String> person2Mode = new HashMap<Id<Person>, String>();
 
-	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}")
+	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}; InflowConstraint == {2};")
 	public static Collection<Object[]> createFds() {
-		Object[] [] fdData = new Object [][] { 
-				{LinkDynamics.FIFO, TrafficDynamics.queue},
-				{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
-				{LinkDynamics.PassingQ,TrafficDynamics.queue},
-				{LinkDynamics.PassingQ,TrafficDynamics.withHoles},
-				{LinkDynamics.SeepageQ,TrafficDynamics.queue},
-				{LinkDynamics.SeepageQ,TrafficDynamics.withHoles}
-		};
-		return Arrays.asList(fdData);
+		Object [][] combos2run = new Object [12][3];
+		int index = 0;
+		for (LinkDynamics ld : LinkDynamics.values()) {
+			for (TrafficDynamics td : TrafficDynamics.values()) {
+				for (InflowConstraint ic : InflowConstraint.values()) {
+					combos2run[index] = new Object [] {ld, td, ic};
+					index++;
+				}
+			}
+		}
+		return Arrays.asList(combos2run);
 	}
 
 	@Test
 	public void fdsCarTruck(){
 		this.travelModes = new String [] {"car","truck"};
-		run(this.linkDynamics, this.trafficDynamics,false);
+		run(this.linkDynamics, this.trafficDynamics,this.inflowConstraint,false);
 	}
 
 	@Test
 	public void fdsCarBike(){
-		run(this.linkDynamics, this.trafficDynamics,false);
+		run(this.linkDynamics, this.trafficDynamics,this.inflowConstraint,false);
 	}
 
 	@Test 
 	public void fdsCarBikeFastCapacityUpdate(){
-		run(this.linkDynamics,this.trafficDynamics,true);
+		run(this.linkDynamics,this.trafficDynamics,this.inflowConstraint,true);
+	}
+	
+	@Test
+	public void fdsCarOnly(){
+		this.travelModes = new String [] {"car"};
+		run(this.linkDynamics,this.trafficDynamics,this.inflowConstraint,false);
 	}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
@@ -139,7 +150,7 @@ public class CreateAutomatedFDTest {
 
 	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
-	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final boolean isUsingFastCapacityUpdate) {
+	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final InflowConstraint inflowConstraint, final boolean isUsingFastCapacityUpdate) {
 
 		MatsimRandom.reset();
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
@@ -150,9 +161,10 @@ public class CreateAutomatedFDTest {
 		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
 		scenario.getConfig().qsim().setEndTime(14*3600);
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
+		scenario.getConfig().qsim().setInflowConstraint(inflowConstraint);
 	
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
-			scenario.getConfig().qsim().setSeepMode("bike");
+			scenario.getConfig().qsim().setSeepModes(Arrays.asList("bike"));
 			scenario.getConfig().qsim().setSeepModeStorageFree(false);
 			scenario.getConfig().qsim().setRestrictingSeepage(true);
 		}
@@ -162,33 +174,26 @@ public class CreateAutomatedFDTest {
 
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
-		//equal modal split run
-		Map<String, Integer> minSteps = new HashMap<String, Integer>();
-
-		double pcu1 = modeVehicleTypes.get(travelModes[0]).getPcuEquivalents();
-		double pcu2 = modeVehicleTypes.get(travelModes[1]).getPcuEquivalents();
-
-		if(pcu1==1 && pcu2 == 0.25) { //car bike
-			minSteps.put(travelModes[0], 1);
-			minSteps.put(travelModes[1], 4);
-		} else { //car truck
-			minSteps.put(travelModes[0], 3);
-			minSteps.put(travelModes[1], 1);
-		}
-
-		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
-
 		double networkDensity = 3.*(1000./7.5);
-		double sumOfPCUInEachStep = (modeVehicleTypes.get(travelModes[0]).getPcuEquivalents() * minSteps.get(travelModes[0]) ) + 
-				(modeVehicleTypes.get(travelModes[1]).getPcuEquivalents() * minSteps.get(travelModes[1]) );
-		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * sumOfPCUInEachStep))+5;
+		
+		double sumOfPCUInEachStep = 0.;
+		
+		//equal modal split run
+		for (String mode : travelModes) {
+			sumOfPCUInEachStep += modeVehicleTypes.get(mode).getPcuEquivalents() *  getMinNumberOfAgentAtStart(mode) ;
+		};
+		
+		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
+		if( sumOfPCUInEachStep >=3 ) reduceNoOfDataPointsInPlot = 1 ;
+		
+		int numberOfPoints = (int) Math.ceil( networkDensity/ (reduceNoOfDataPointsInPlot * sumOfPCUInEachStep) ) + 5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
 
 		for (int m=1; m<numberOfPoints; m++){
 			Map<String,Integer> pointToRun = new HashMap<>();
 			for (String mode:travelModes){
-				pointToRun.put(mode,minSteps.get(mode)*m*reduceNoOfDataPointsInPlot);
+				pointToRun.put(mode,  getMinNumberOfAgentAtStart(mode)   * m * reduceNoOfDataPointsInPlot);
 			}
 
 			double density =0 ;
@@ -278,9 +283,12 @@ public class CreateAutomatedFDTest {
 		 */
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
-		String fileName = linkDynamics+"_"+trafficDynamics+".png";
+		String fileName = linkDynamics+"_"+trafficDynamics+"_"+inflowConstraint+".png";
+		
+		new File(outDir+ linkDynamics+"_"+trafficDynamics+".png").deleteOnExit();
+		
 		String outFile ; 
-		//ZZ_TODO : what is there exists some different directory => changing method name will keep collecting the old data.
+		//ZZ_TODO : what if, there exists some different directory (or files with old filename) => changing method name will keep collecting the old data.
 		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
 			outFile = helper.getOutputDirectory()+fileName;
 		} else {
@@ -289,6 +297,17 @@ public class CreateAutomatedFDTest {
 
 		//plotting data
 		scatterPlot(outData,outFile);
+	}
+	
+	int getMinNumberOfAgentAtStart(final String mode) {//equal modal split run
+		// only three different modes (and pcus) are used in this test ie -- car(1), truck(3), bike(0.25)
+		switch (mode) {
+		case "car": return 1;
+		case "truck": return 3;
+		case "motorbike":
+		case "bike": return 4;
+		default : throw new RuntimeException("The test is not designed for this "+ mode + "yet.");
+		}
 	}
 	
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
@@ -351,7 +370,6 @@ public class CreateAutomatedFDTest {
 			} else if(LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId )){
 				return BASE_LINK_ID;
 			} else return null; // returning null so that agent will arrive.
-
 		}
 
 		@Override
@@ -433,13 +451,11 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}
@@ -470,20 +486,36 @@ public class CreateAutomatedFDTest {
 	}
 
 	private void createNetwork(){
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		double x = -50;
-		Node nodeHome = network.createAndAddNode(Id.createNodeId("home"), new Coord(x, (double) 0));
-		Node node1 = network.createAndAddNode(Id.createNodeId(0), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.createNodeId(1), new Coord((double) 1000, (double) 0));
-		Node node3 = network.createAndAddNode(Id.createNodeId(2), new Coord((double) 500, 866.0));
-		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
+		Node nodeHome = NetworkUtils.createAndAddNode(network, Id.createNodeId("home"), new Coord(x, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId(0), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId(1), new Coord((double) 1000, (double) 0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId(2), new Coord((double) 500, 866.0));
+		Node nodeWork = NetworkUtils.createAndAddNode(network, Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
 
-		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, 60, 27000, 1);
-		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, 60, 27000, 1);
+		double freeSpeedOnLink = 60/3.6;
+		final Node fromNode = nodeHome;
+		final Node toNode = node1;
+		final double freespeed = freeSpeedOnLink;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId("home"), fromNode, toNode, (double) 25, freespeed, (double) 7200, (double) 1 );
+		final Node fromNode1 = node1;
+		final Node toNode1 = node2;
+		final double freespeed1 = freeSpeedOnLink;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(0), fromNode1, toNode1, (double) 1000, freespeed1, (double) 1600, (double) 1 );
+		final Node fromNode2 = node2;
+		final Node toNode2 = node3;
+		final double freespeed2 = freeSpeedOnLink;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(1), fromNode2, toNode2, (double) 1000, freespeed2, (double) 1600, (double) 1 );
+		final Node fromNode3 = node3;
+		final Node toNode3 = node1;
+		final double freespeed3 = freeSpeedOnLink;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId(2), fromNode3, toNode3, (double) 1000, freespeed3, (double) 1600, (double) 1 );
+		final Node fromNode4 = node2;
+		final Node toNode4 = nodeWork;
+		final double freespeed4 = freeSpeedOnLink;
+		NetworkUtils.createAndAddLink(network,Id.createLinkId("work"), fromNode4, toNode4, (double) 25, freespeed4, (double) 7200, (double) 1 );
 
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.addAll(Arrays.asList(travelModes));
@@ -496,28 +528,33 @@ public class CreateAutomatedFDTest {
 	private void scatterPlot (Map<Double, Map<String, Tuple<Double, Double>>> inputData, String outFile){
 
 		String mode1 = travelModes[0];
-		String mode2 = travelModes[1];
-
 		XYSeries carFlow = new XYSeries(mode1+" flow");
-		XYSeries bikeFlow = new XYSeries(mode2+" flow");
 		XYSeries carSpeed = new XYSeries(mode1+" speed");
-		XYSeries bikeSpeed = new XYSeries(mode2+" speed");
+
+		XYSeries bikeFlow = null;
+		XYSeries bikeSpeed = null;
+		
+		if(travelModes.length==2) {
+			bikeFlow = new XYSeries(travelModes[1]+" flow");
+			bikeSpeed = new XYSeries(travelModes[1]+" speed");
+		}
 
 		for(double d :inputData.keySet()){
 			carFlow.add(d, inputData.get(d).get(mode1).getFirst());
 			carSpeed.add(d, inputData.get(d).get(mode1).getSecond());
-
-			bikeFlow.add(d, inputData.get(d).get(mode2).getFirst());
-			bikeSpeed.add(d, inputData.get(d).get(mode2).getSecond());
+			
+			if(travelModes.length == 2) {
+				bikeFlow.add(d, inputData.get(d).get(travelModes[1]).getFirst());
+				bikeSpeed.add(d, inputData.get(d).get(travelModes[1]).getSecond());
+			}
 		}
 
 		// flow vs density
 		XYSeriesCollection flowDataset = new XYSeriesCollection();
 		flowDataset.addSeries(carFlow);
-		flowDataset.addSeries(bikeFlow);
 
 		NumberAxis flowAxis = new NumberAxis("Flow (PCU/h)");
-		flowAxis.setRange(0.0, 2100.0);
+		flowAxis.setRange(0.0, 1700.0);
 
 		XYPlot plot1 = new XYPlot(flowDataset, null, flowAxis, new XYLineAndShapeRenderer(false,true));
 		plot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -525,16 +562,20 @@ public class CreateAutomatedFDTest {
 		// speed vs density
 		XYSeriesCollection speedDataset = new XYSeriesCollection();
 		speedDataset.addSeries(carSpeed);
-		speedDataset.addSeries(bikeSpeed);
+		
+		if ( travelModes.length==2 ) {
+			flowDataset.addSeries(bikeFlow);
+			speedDataset.addSeries(bikeSpeed);
+		}
 
 		NumberAxis speedAxis = new NumberAxis("Speed (m/s)");
-		speedAxis.setRange(0.0, 17.0);
+		speedAxis.setRange(0.0, 17.0); 
 
 		XYPlot plot2 = new XYPlot(speedDataset, null, speedAxis, new XYLineAndShapeRenderer(false,true));
 		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
 
 		NumberAxis densityAxis = new NumberAxis("Overall density (PCU/km)");
-		densityAxis.setRange(0.0,150.00);
+		densityAxis.setRange(0.0,140.00);
 
 		CombinedDomainXYPlot plot = new CombinedDomainXYPlot(densityAxis);
 		plot.setGap(10.);

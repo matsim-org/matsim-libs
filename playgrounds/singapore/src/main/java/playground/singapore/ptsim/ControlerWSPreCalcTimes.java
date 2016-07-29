@@ -20,13 +20,17 @@
 
 package playground.singapore.ptsim;
 
-import com.google.inject.Provider;
+import java.io.IOException;
+
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimePreCalcSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -42,16 +46,16 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
+
+import com.google.inject.Provider;
+
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
 import playground.singapore.ptsim.qnetsimengine.PTLinkSpeedCalculatorWithPreCalcTimes;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -99,12 +103,12 @@ public class ControlerWSPreCalcTimes {
         );
         //need to make MRT slower, so identify the links with this mode with a hotfix
         for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
-            LinkImpl l1 = (LinkImpl) l;
+            Link l1 = (Link) l;
             String[] parts = l.getId().toString().split(TransitSheduleToNetwork.SEPARATOR);
             if (parts[0].matches("[A-Z]+[0-9]*[_a-z]*")) {
-                l1.setType("rail");
+                NetworkUtils.setType( l1, (String) "rail");
             }else{
-                l1.setType("road");
+                NetworkUtils.setType( l1, (String) "road");
             }
         }
         final PTLinkSpeedCalculatorWithPreCalcTimes linkSpeedCalculatorWithPreCalcTimes = new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes, true);
@@ -136,8 +140,13 @@ public class ControlerWSPreCalcTimes {
                         qSim.addMobsimEngine(activityEngine);
                         qSim.addActivityHandler(activityEngine);
                         //
-                        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-                        netsimEngine.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
+                        EventsManager events = controler.getEvents() ;
+                        Scenario scenario = controler.getScenario() ;
+                        Network network = scenario.getNetwork() ;
+                        ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario ) ;
+                        factory.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
+                        QNetsimEngine netsimEngine = new QNetsimEngine(qSim, factory);
+                        //
                         qSim.addMobsimEngine(netsimEngine);
                         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
                         //

@@ -71,7 +71,7 @@ public class ExtractFlowsAndAltitudes {
 		final BikeSharingFacilities stations = readStations( stationsFile );
 
 		final ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader( atts ).parse( attributesFile );
+		new ObjectAttributesXmlReader( atts ).readFile( attributesFile );
 		
 		final Map<Od, Od> flows = new HashMap<Od, Od>();
 		final Map<Id, AggregatedFlow> aggFlows = new HashMap<Id, AggregatedFlow>();
@@ -174,7 +174,7 @@ public class ExtractFlowsAndAltitudes {
 
 	public static BikeSharingFacilities readStations( final String stationsFile ) {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new BikeSharingFacilitiesReader( scenario ).parse( stationsFile );
+		new BikeSharingFacilitiesReader( scenario ).readFile( stationsFile );
 		return (BikeSharingFacilities)
 				scenario.getScenarioElement(
 					BikeSharingFacilities.ELEMENT_NAME );

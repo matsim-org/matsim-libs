@@ -29,7 +29,7 @@ public class NumericMatrixIO {
         if(file.endsWith(".xml") || file.endsWith(".xml.gz")) {
             NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
             reader.setValidating(false);
-            reader.parse(file);
+            reader.readFile(file);
             return reader.getMatrix();
         } else {
             try {

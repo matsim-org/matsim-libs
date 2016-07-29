@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -46,9 +48,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -162,14 +162,13 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
 
-		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory() ) ;
+		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() ) ;
 		
 		// new Route for current Leg.
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
 		final Person person = ((HasPerson) agent).getPerson();
 		final Integer linkIdx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
-//		EditRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now, scenario.getNetwork(), tripRouter);
 		editRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now) ;
 		
 		// the route _from_ the modified activity also needs to be replanned:

@@ -48,7 +48,7 @@ public class StrategyManagerSubpopulationsTest {
 		final Population population = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 1000; i++) {
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			population.addPerson(p);
 			final int group = r.nextInt(3);
 			switch (group) {

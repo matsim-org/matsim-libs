@@ -15,7 +15,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -39,7 +39,7 @@ public class CalculateCarsharingTripDistance {
 			Purpose purpose = new Purpose(scenario.getNetwork());
 	    	
 	    	events.addHandler(purpose);
-	    	reader.parse(s);
+	    	reader.readFile(s);
 	    	for (int i = 0; i < purpose.distanceTraveled.length; i++) 
 				System.out.println((double)purpose.distanceTraveled[i]/(double)purpose.count * 100.0);
 	    }

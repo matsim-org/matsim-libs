@@ -47,10 +47,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -133,7 +133,7 @@ public class CTUtilities {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(input);
+		new PopulationReader(sc).readFile(input);
 		for(Id<Person> pId : sc.getPopulation().getPersons().keySet()){
 			Plan plan = sc.getPopulation().getPersons().get(pId).getSelectedPlan();
 			for(PlanElement pe : plan.getPlanElements()){
@@ -180,7 +180,7 @@ public class CTUtilities {
 	public static void ConvertPlanCoordinates(){
 		LOG.info("Converting plans to EPSG:3857");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse("/Volumes/Nifty/workspace/coct-data/matsim/20150930/output/ITERS/it.0/0.plans.xml.gz");
+		new PopulationReader(sc).readFile("/Volumes/Nifty/workspace/coct-data/matsim/20150930/output/ITERS/it.0/0.plans.xml.gz");
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "EPSG:3857");
 		
@@ -224,7 +224,7 @@ public class CTUtilities {
 		Map<Integer, Integer> countMap = new TreeMap<>();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse("/Volumes/Nifty/workspace/coct-data/matsim/20150930/output/ITERS/it.0/0.plans.xml.gz");
+		new PopulationReader(sc).readFile("/Volumes/Nifty/workspace/coct-data/matsim/20150930/output/ITERS/it.0/0.plans.xml.gz");
 
 		for(Person person : sc.getPopulation().getPersons().values()){
 			int affected = countNumberOfAffectedFacilities(person.getSelectedPlan());
@@ -276,7 +276,7 @@ public class CTUtilities {
 	public static void checkEndTimeDuration(){
 		LOG.info("Check that all activities (except last) has either end time or duration.");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/relocatedPlans_Belcon.xml.gz");
+		new PopulationReader(sc).readFile("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/relocatedPlans_Belcon.xml.gz");
 		
 		for(Person person : sc.getPopulation().getPersons().values()){
 			Plan plan = person.getSelectedPlan();
@@ -304,8 +304,8 @@ public class CTUtilities {
 	public static void generateFacilitiesFile(){
 		LOG.info("Generating facilities file...");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/relocatedPlans_Belcon.xml.gz");
-		new MatsimNetworkReader(sc.getNetwork()).parse("/Volumes/Nifty/workspace/coct-data/matsim/20150930/network.xml.gz");
+		new PopulationReader(sc).readFile("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/relocatedPlans_Belcon.xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile("/Volumes/Nifty/workspace/coct-data/matsim/20150930/network.xml.gz");
 		
 		ActivityFacilities facilities = sc.getActivityFacilities();
 		ActivityFacilitiesFactory aff = facilities.getFactory();
@@ -386,7 +386,7 @@ public class CTUtilities {
 		}
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
 		try {
 			mfr.readMultizoneShapefile(shapefile, idField);
@@ -403,7 +403,7 @@ public class CTUtilities {
 		/*================= Base =================*/
 		LOG.info("Reading base case...");
 		Scenario scBase = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scBase).parse(basePopulation);
+		new PopulationReader(scBase).readFile(basePopulation);
 		LOG.info("Processing base case...");
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		Map<Id<Person>, Future<Double>> mapOfJobs = new TreeMap<>();
@@ -439,7 +439,7 @@ public class CTUtilities {
 		LOG.info("Reading Belcon case...");
 		counter.reset();
 		Scenario scBelcon = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scBelcon).parse(belconPopulation);
+		new PopulationReader(scBelcon).readFile(belconPopulation);
 		LOG.info("Processing Belcon case...");
 		threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		mapOfJobs = new TreeMap<>();
@@ -474,7 +474,7 @@ public class CTUtilities {
 		LOG.info("Reading Kraaicon case...");
 		counter.reset();
 		Scenario scKraaicon = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scKraaicon).parse(kraaiconPopulation);
+		new PopulationReader(scKraaicon).readFile(kraaiconPopulation);
 		LOG.info("Processing Kraaicon case...");
 		threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		mapOfJobs = new TreeMap<>();

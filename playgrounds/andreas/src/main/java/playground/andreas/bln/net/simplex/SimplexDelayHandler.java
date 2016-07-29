@@ -46,7 +46,7 @@ public class SimplexDelayHandler {
 		this.handlerList.add(handler);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 	}
 	
 	public LinkedList<DelayHandler> getHandler(){

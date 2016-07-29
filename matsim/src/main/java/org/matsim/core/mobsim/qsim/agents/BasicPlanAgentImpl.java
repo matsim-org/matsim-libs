@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -27,7 +28,6 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.VehicleUsingAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.ActivityWrapperFacility;
@@ -197,8 +197,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 		if (firstTimeToGetModifiablePlan) {
 			firstTimeToGetModifiablePlan = false ;
-			PlanImpl newPlan = new PlanImpl(this.getCurrentPlan().getPerson());
-			newPlan.copyFrom(this.getCurrentPlan());
+			Plan newPlan = PopulationUtils.createPlan(this.getCurrentPlan().getPerson());
+			PopulationUtils.copyFromTo(this.getCurrentPlan(), newPlan);
 			this.plan = newPlan;
 		}
 		return this.getCurrentPlan();

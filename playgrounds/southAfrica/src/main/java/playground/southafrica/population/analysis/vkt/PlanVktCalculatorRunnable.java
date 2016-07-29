@@ -28,15 +28,15 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.AStarLandmarks;
@@ -48,7 +48,7 @@ import org.matsim.core.utils.misc.Counter;
 public class PlanVktCalculatorRunnable implements Runnable {
 	private final Logger LOG = Logger.getLogger(PlanVktCalculatorRunnable.class);
 	private Plan plan;
-	private NetworkImpl network;
+	private Network network;
 	private AStarLandmarks router;
 	private String filename;
 	private Map<RoadType, Double> typeVkmTotal;
@@ -127,15 +127,15 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			Object a1 = plan.getPlanElements().get(i);
 			Node fromNode = null;
 			if(a1 instanceof Activity){
-				fromNode = network.getNearestNode(((Activity) a1).getCoord());
+				fromNode = NetworkUtils.getNearestNode(network,((Activity) a1).getCoord());
 			} else{
 				LOG.error("Origin node not of type Activity.");
 			}
 			
 			Object l = plan.getPlanElements().get(i+1);
-			LegImpl leg = null;
+			Leg leg = null;
 			if(l instanceof Leg){
-				leg = (LegImpl) l;
+				leg = (Leg) l;
 			} else{
 				LOG.error("PlanElement between " + ((Activity)a1).getType() + " and " +
 						((Activity)l).getType() + " is not a Leg.");
@@ -144,7 +144,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			Object a2 = plan.getPlanElements().get(i+2);
 			Node toNode = null;
 			if(a2 instanceof Activity){
-				toNode = network.getNearestNode(((Activity) a2).getCoord());
+				toNode = NetworkUtils.getNearestNode(network,((Activity) a2).getCoord());
 			} else{
 				LOG.error("Destination node not of type Activity.");
 			}
@@ -172,8 +172,8 @@ public class PlanVktCalculatorRunnable implements Runnable {
 
 	private void splitVkmOnRoadType(List<Link> links){
 		for(Link link : links){
-			LinkImpl li = (LinkImpl) link;
-			RoadType roadType = RoadType.getRoadType(li.getType());
+			Link li = (Link) link;
+			RoadType roadType = RoadType.getRoadType(NetworkUtils.getType(li));
 			double oldValue = typeVkmTotal.get(roadType);
 			typeVkmTotal.put(roadType, oldValue + (li.getLength()/1000));
  		}

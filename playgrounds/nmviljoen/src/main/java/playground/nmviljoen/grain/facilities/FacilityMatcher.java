@@ -115,7 +115,7 @@ public class FacilityMatcher {
 
 		/* Match the facilities with the nodes in the network. */
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
-		nr.parse(network);
+		nr.readFile(network);
 		PathDependentNetwork pdn = nr.getPathDependentNetwork();
 		pdn.writeNetworkStatisticsToConsole();
 		ActivityFacilities matchedFacilities = fm.matchFacilitiesWithNetworkNodes(facilities, pdn);
@@ -164,7 +164,7 @@ public class FacilityMatcher {
 	
 	public ActivityFacilities parseFacilities(String filename){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader(scenario ).parse(filename);
+		new MatsimFacilitiesReader(scenario ).readFile(filename);
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		return facilities;
 	}

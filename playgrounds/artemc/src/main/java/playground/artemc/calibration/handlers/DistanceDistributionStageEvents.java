@@ -41,7 +41,7 @@ import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEvent
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
@@ -328,7 +328,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(scenario.getNetwork()).parse(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		int lastIteration = new Integer(args[2]);
 		int iterationsInterval = new Integer(args[3]);

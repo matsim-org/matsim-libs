@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
@@ -37,9 +38,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.router.TripRouter;
@@ -354,7 +354,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			String vehicleId, double now) {
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl)pf).getModeRouteFactory() ;
+		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 		
 		Vehicle vehicle = null ;
 		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), destinationLink.getFromNode(), 
@@ -377,7 +377,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl)pf).getModeRouteFactory() ;
+		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 		
 		Route routeWalk = routeFactory.createRoute( Route.class, startLink.getId(), destinationLink.getId() ) ; 
 		

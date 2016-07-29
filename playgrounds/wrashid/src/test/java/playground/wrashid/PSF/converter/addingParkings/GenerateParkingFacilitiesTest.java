@@ -20,8 +20,8 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestCase;
@@ -38,7 +38,7 @@ public class GenerateParkingFacilitiesTest extends MatsimTestCase {
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
+		new PopulationReader(scenario).readFile(inputPlansFile);
 		
 		GenerateParkingFacilities.generateParkingFacilties(scenario);
 		

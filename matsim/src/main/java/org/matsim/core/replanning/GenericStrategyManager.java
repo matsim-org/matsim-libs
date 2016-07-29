@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -69,7 +69,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 
 	private int maxPlansPerAgent = 0;
 
-	private GenericPlanSelector<T, I> removalPlanSelector = new GenericWorstPlanForRemovalSelector<>();
+	private PlanSelector<T, I> removalPlanSelector = new GenericWorstPlanForRemovalSelector<>();
 
 	private String subpopulationAttributeName = null;
 
@@ -343,7 +343,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<T, I> planSelector) {
+	public final void setPlanSelectorForRemoval(final PlanSelector<T, I> planSelector) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector = planSelector;
 	}

@@ -59,7 +59,7 @@ public class ManteuffelFilterEvents {
 		eventsManager.addHandler(new ManteuffelEmissionEventsFilter(mew, eew));
 		
 		EmissionEventsReader emissionEventsReader = new EmissionEventsReader(eventsManager);
-		emissionEventsReader.parse(emissionEventsFile);
+		emissionEventsReader.readFile(emissionEventsFile);
 		
 		mew.closeFile();
 		eew.closeFile();

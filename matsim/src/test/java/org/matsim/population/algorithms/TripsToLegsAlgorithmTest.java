@@ -36,10 +36,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -68,25 +66,25 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testMonoLegPlan() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("id", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
 		final Id<Link> id2 = Id.create( 2, Link.class );
 
-		Activity act = new ActivityImpl( "act_1" , id1 );
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
-		Leg leg = new LegImpl( "mode_1" );
+		Leg leg = PopulationUtils.createLeg("mode_1");
 		plan.addLeg( leg );
 		structure.add( leg );
-		act = new ActivityImpl( "act_2" , id2 );
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
-		leg = new LegImpl( "mode_2" );
+		leg = PopulationUtils.createLeg("mode_2");
 		plan.addLeg( leg );
 		structure.add( leg );
-		act = new ActivityImpl( "act_3" , id1 );
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -99,35 +97,35 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testMultiLegPlan() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("id", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
 		final Id<Link> id2 = Id.create( 2, Link.class );
 
-		Activity act = new ActivityImpl( "act_1" , id1 );
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
-		Leg leg = new LegImpl( "mode_1" );
+		Leg leg = PopulationUtils.createLeg("mode_1");
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		leg = new LegImpl( "mode_1bis" );
+		leg = PopulationUtils.createLeg("mode_1bis");
 		plan.addLeg( leg );
 
-		act = new ActivityImpl( "act_2" , id2 );
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
-		leg = new LegImpl( "mode_2" );
+		leg = PopulationUtils.createLeg("mode_2");
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		leg = new LegImpl( "mode_2bis" );
+		leg = PopulationUtils.createLeg("mode_2bis");
 		plan.addLeg( leg );
 
-		act = new ActivityImpl( "act_3" , id1 );
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -140,42 +138,42 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testDummyActsPlan() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("id", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
 		final Id<Link> id2 = Id.create( 2, Link.class );
 		final Id<Link> id3 = Id.create( 3, Link.class );
 
-		Activity act = new ActivityImpl( "act_1" , id1 );
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
-		Leg leg = new LegImpl( "mode_1" );
+		Leg leg = PopulationUtils.createLeg("mode_1");
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		act = new ActivityImpl( DUMMY_1 , id3 );
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_1, id3);
 		plan.addActivity( act );
 
-		leg = new LegImpl( "mode_1bis" );
+		leg = PopulationUtils.createLeg("mode_1bis");
 		plan.addLeg( leg );
 
-		act = new ActivityImpl( "act_2" , id2 );
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
-		leg = new LegImpl( "mode_2" );
+		leg = PopulationUtils.createLeg("mode_2");
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		act = new ActivityImpl( DUMMY_2 , id3 );
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_2, id3);
 		plan.addActivity( act );
 
-		leg = new LegImpl( "mode_2bis" );
+		leg = PopulationUtils.createLeg("mode_2bis");
 		plan.addLeg( leg );
 
-		act = new ActivityImpl( "act_3" , id1 );
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
@@ -188,46 +186,46 @@ public class TripsToLegsAlgorithmTest {
 
 	@Test
 	public void testPtPlan() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("id", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("id", Person.class)));
 		final List<PlanElement> structure = new ArrayList<PlanElement>();
 
 		final Id<Link> id1 = Id.create( 1, Link.class );
 		final Id<Link> id2 = Id.create( 2, Link.class );
 		final Id<Link> id3 = Id.create( 3, Link.class );
 
-		Activity act = new ActivityImpl( "act_1" , id1 );
+		Activity act = PopulationUtils.createActivityFromLinkId("act_1", id1);
 		plan.addActivity( act );
 		structure.add( act );
 
-		Leg leg = new LegImpl( TransportMode.transit_walk );
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		plan.addLeg( leg );
 
-		act = new ActivityImpl( DUMMY_1 , id3 );
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_1, id3);
 		plan.addActivity( act );
 
-		leg = new LegImpl( TransportMode.pt );
+		leg = PopulationUtils.createLeg(TransportMode.pt);
 		plan.addLeg( leg );
 		structure.add( leg );
 
-		act = new ActivityImpl( "act_2" , id2 );
+		act = PopulationUtils.createActivityFromLinkId("act_2", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
-		act = new ActivityImpl( "act_2bis" , id2 );
+		act = PopulationUtils.createActivityFromLinkId("act_2bis", id2);
 		plan.addActivity( act );
 		structure.add( act );
 
-		leg = new LegImpl( TransportMode.transit_walk );
+		leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		plan.addLeg( leg );
-		structure.add( new LegImpl( TransportMode.pt ) );
+		structure.add( PopulationUtils.createLeg(TransportMode.pt) );
 
-		act = new ActivityImpl( DUMMY_2 , id3 );
+		act = PopulationUtils.createActivityFromLinkId(DUMMY_2, id3);
 		plan.addActivity( act );
 
-		leg = new LegImpl( "mode_2bis" );
+		leg = PopulationUtils.createLeg("mode_2bis");
 		plan.addLeg( leg );
 
-		act = new ActivityImpl( "act_3" , id1 );
+		act = PopulationUtils.createActivityFromLinkId("act_3", id1);
 		plan.addActivity( act );
 		structure.add( act );
 

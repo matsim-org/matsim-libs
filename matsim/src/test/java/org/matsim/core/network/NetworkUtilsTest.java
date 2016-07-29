@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,8 +42,8 @@ public class NetworkUtilsTest {
 	@Test
 	public final void testIsMultimodal() {
 
-		Config config = ConfigUtils.createConfig() ;
-		config.network().setInputFile( utils.getInputDirectory() + "/network.xml" );
+		Config config = utils.createConfigWithInputResourcePathAsContext();
+		config.network().setInputFile("network.xml" );
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		

@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.Dijkstra;
@@ -87,12 +87,12 @@ public class MapMatching {
 			//TODO: Do I need to modify the network to include loops at stops?
 				
 			//filter the network by mode
-			NetworkImpl BusNetwork = NetworkImpl.createNetwork(); //for buses
-			NetworkImpl TrainNetwork = NetworkImpl.createNetwork(); //for GO trains
-			NetworkImpl StreetcarNetwork = NetworkImpl.createNetwork(); //for mixed-ROW streetcars
-			NetworkImpl SubwayNetwork = NetworkImpl.createNetwork(); //for underground heavy rail
-			NetworkImpl SRTNetwork = NetworkImpl.createNetwork(); //for Scarborough RT
-			NetworkImpl LRTNetwork = NetworkImpl.createNetwork(); //for dedicated-ROW streetcars
+			Network BusNetwork = NetworkUtils.createNetwork(); //for buses
+			Network TrainNetwork = NetworkUtils.createNetwork(); //for GO trains
+			Network StreetcarNetwork = NetworkUtils.createNetwork(); //for mixed-ROW streetcars
+			Network SubwayNetwork = NetworkUtils.createNetwork(); //for underground heavy rail
+			Network SRTNetwork = NetworkUtils.createNetwork(); //for Scarborough RT
+			Network LRTNetwork = NetworkUtils.createNetwork(); //for dedicated-ROW streetcars
 			//NetworkImpl GOBUSNetwork = NetworkImpl.createNetwork();
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.network);
 			//filter.filter(GOBUSNetwork, CollectionUtils.stringToSet("GO_Bus"));
@@ -175,7 +175,7 @@ public class MapMatching {
 						continue;
 					}
 					
-					Person person = PopulationUtils.createPerson(Id.create("transit driver", Person.class));
+					Person person = PopulationUtils.getFactory().createPerson(Id.create("transit driver", Person.class));
 					VehicleImpl veh = new VehicleImpl(Id.create("test vehicle", Vehicle.class), new VehicleTypeImpl(Id.create("no type", VehicleType.class)));
 					
 					P = pather.calcLeastCostPath(fromNode, toNode, 0F, person, veh);

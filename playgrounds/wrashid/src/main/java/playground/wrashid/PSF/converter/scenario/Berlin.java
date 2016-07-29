@@ -1,8 +1,8 @@
 package playground.wrashid.PSF.converter.scenario;
 
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -21,7 +21,7 @@ public class Berlin {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		new MatsimPopulationReader(scenario).readFile(basePathOfData + "plans_hwh_1pct.xml.gz");
+		new PopulationReader(scenario).readFile(basePathOfData + "plans_hwh_1pct.xml.gz");
 
 		// generate parking facilities
 		GenerateParkingFacilities.generateParkingFacilties(scenario);		

@@ -25,17 +25,18 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -80,9 +81,9 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		Plan plan = person.getSelectedPlan();
 		
 		for (PlanElement plan_element : plan.getPlanElements()) {
-			if (plan_element instanceof ActivityImpl){
+			if (plan_element instanceof Activity){
 				this.nAct++;
-				ActivityImpl act = (ActivityImpl) plan_element;
+				Activity act = (Activity) plan_element;
 				if(checkIsSourceArea(act)){
 					if(this.actSourceArea.get(act.getType()) == null){
 						this.actSourceArea.put(act.getType(), new Integer(1));
@@ -90,10 +91,11 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 						this.actSourceArea.put(act.getType(), new Integer(this.actSourceArea.get(act.getType()).intValue() + 1 ));
 					}
 					if(this.kmlOutputEnabled){
-						this.kmlWriter.addActivity(new ActivityImpl(act));
+						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
-					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
-                    ((PersonImpl) person).setId(Id.create(person.getId().toString() + "_source-target", Person.class));
+//					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
+					act.setCoord( new Coord(this.targetCoord.getX(), this.targetCoord.getY()));
+                    PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_source-target", Person.class) ) ;
                 }
 			}
 		}
@@ -124,7 +126,7 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		MoveAllPersonActsFromAreaToCoord dp = new MoveAllPersonActsFromAreaToCoord(net, inPop, outPlansFile, minSourceCoord, maxSourceCoord, targetCoord);

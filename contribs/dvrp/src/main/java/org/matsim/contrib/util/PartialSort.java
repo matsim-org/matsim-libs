@@ -27,7 +27,7 @@ import java.util.*;
  * values negated: {@code PartialSort.add(element, -value)}. Works fine for small k (k << n);
  * otherwise, one should consider a partial version of heapsort or quicksort.
  * <p>
- * More info: {@link http://en.wikipedia.org/wiki/Partial_sorting}
+ * More info: <a href="http://en.wikipedia.org/wiki/Partial_sorting">Partial sorting</a>
  * 
  * @param <T>
  */
@@ -81,19 +81,19 @@ public class PartialSort<T>
 
 
     /**
-     * Gets and removes them (the queue gets empty).
+     * Gets k smallest elements (side effect: they are removed from the queue -- the queue gets
+     * empty).
      * 
-     * @return
+     * @return list containing k smallest elements sorted ascending: from the smallest to the k-th
+     *         smallest
      */
     public List<T> retriveKSmallestElements()
     {
-        List<T> list = new ArrayList<>(kSmallestElements.size());
-
-        while (!kSmallestElements.isEmpty()) {
-            list.add(kSmallestElements.poll().element);
+        @SuppressWarnings("unchecked")
+        T[] array = (T[])new Object[kSmallestElements.size()];
+        for (int i = array.length - 1; i >= 0; i--) {
+            array[i] = kSmallestElements.poll().element;
         }
-
-        Collections.reverse(list);
-        return list;
+        return Arrays.asList(array);
     }
 }

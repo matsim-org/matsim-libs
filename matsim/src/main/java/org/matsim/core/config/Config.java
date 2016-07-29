@@ -31,6 +31,10 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +85,7 @@ public class Config implements MatsimExtensionPoint {
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 	private PtCountsConfigGroup ptCounts = null;
 	private VehiclesConfigGroup vehicles = null ;
-	private ChangeLegModeConfigGroup changeLegMode = null;
+	private ChangeModeConfigGroup changeMode = null;
 	private JDEQSimConfigGroup jdeqSim = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
@@ -91,6 +95,7 @@ public class Config implements MatsimExtensionPoint {
 	private static final Logger log = Logger.getLogger(Config.class);
 
 	private boolean locked = false;
+	private URL context;
 
 
 	// ////////////////////////////////////////////////////////////////////
@@ -98,7 +103,13 @@ public class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public Config() {
-		// nothing to do
+		try {
+			URL currentDir = Paths.get("").toUri().toURL();
+			setContext(currentDir);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+		log.info( "context=[" + context + "]" ) ;
 	}
 
 	/**
@@ -173,8 +184,11 @@ public class Config implements MatsimExtensionPoint {
 		this.vehicles = new VehiclesConfigGroup() ;
 		this.modules.put( VehiclesConfigGroup.GROUP_NAME , this.vehicles ) ;
 
-		this.changeLegMode = new ChangeLegModeConfigGroup();
-		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, this.changeLegMode);
+		this.changeMode = new ChangeModeConfigGroup();
+		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, this.changeMode);
+
+		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
+		// only to provide error messages. kai, may'16
 
 		this.jdeqSim = new JDEQSimConfigGroup();
 		this.modules.put(JDEQSimConfigGroup.NAME, this.jdeqSim);
@@ -313,7 +327,7 @@ public class Config implements MatsimExtensionPoint {
 	 *             if the module or parameter does not exist
 	 * @see #findParam(String, String)
 	 */
-	@Deprecated
+	@Deprecated // use "typed" config group instead
 	public final String getParam(final String moduleName, final String paramName) {
 		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
@@ -341,7 +355,7 @@ public class Config implements MatsimExtensionPoint {
 	 *
 	 * @see #getParam(String, String)
 	 */
-	@Deprecated
+	@Deprecated // use "typed" config group instead
 	public final String findParam(final String moduleName, final String paramName) {
 		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
@@ -379,6 +393,7 @@ public class Config implements MatsimExtensionPoint {
 	 * @param paramName
 	 * @param value
 	 */
+	@Deprecated // use "typed" config group instead
 	public final void setParam(final String moduleName, final String paramName, final String value) {
 		checkIfLocked();
 		ConfigGroup m = this.modules.get(moduleName);
@@ -479,8 +494,8 @@ public class Config implements MatsimExtensionPoint {
 		return this.subtourModeChoice;
 	}
 
-	public ChangeLegModeConfigGroup changeLegMode() {
-		return this.changeLegMode;
+	public ChangeModeConfigGroup changeMode() {
+		return this.changeMode;
 	}
 
 	public JDEQSimConfigGroup jdeqSim() {
@@ -515,4 +530,11 @@ public class Config implements MatsimExtensionPoint {
 		return vehicles;
 	}
 
+	public void setContext(URL context) {
+		this.context = context;
+	}
+
+	public URL getContext() {
+		return context;
+	}
 }

@@ -27,8 +27,6 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -36,12 +34,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.router.NetworkRouting;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Singleton;
-import org.matsim.core.router.util.TravelTime;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
@@ -77,7 +73,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
             }
         }));
 
-        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car, getConfig().planCalcScore()));
+        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
         addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
 
         addControlerListenerBinding().to(RoadPricingControlerListener.class);
@@ -130,7 +126,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
                             + "construct a zero toll file and insert that. ") ;
                 }
                 RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-                new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
+                new RoadPricingReaderXMLv1(rpsImpl).readFile(tollLinksFile);
                 return rpsImpl;
             }
         }
@@ -149,13 +145,13 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
         @Override
         public TravelDisutilityFactory get() {
-            RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+            final Config config = scenario.getConfig();
             final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 //			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
                 RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-                        originalTravelDisutilityFactory, scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+                        originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
                 );
-                travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
+                travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
                 return travelDisutilityFactory;
 //            } else {
 //                return originalTravelDisutilityFactory;

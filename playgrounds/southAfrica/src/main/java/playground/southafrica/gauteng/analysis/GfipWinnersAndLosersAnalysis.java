@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -61,11 +61,11 @@ public class GfipWinnersAndLosersAnalysis {
 		
 		/* Read the first (base) plan. */
 		Scenario sc1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc1).parse(file1);
+		new PopulationReader(sc1).readFile(file1);
 
 		/* Read the second plan. */
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc2).parse(file2);
+		new PopulationReader(sc2).readFile(file2);
 		
 		/* Calculate the gains/losses for each person. */
 //		Map<Id, Double> map = new TreeMap<Id, Double>();
@@ -105,8 +105,8 @@ public class GfipWinnersAndLosersAnalysis {
 				bw.write(String.format("%s,%s,%.2f,%.2f,%.6f,%.6f,%.2f,%.2f\n", 
 						id.toString(), 
 						classId, 
-						((PlanImpl)sc1.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
-						((PlanImpl)sc2.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
+						((Plan)sc1.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
+						((Plan)sc2.getPopulation().getPersons().get(id).getSelectedPlan()).getScore(), 
 						cLong, cLat, cX, cY));
 			}
 			

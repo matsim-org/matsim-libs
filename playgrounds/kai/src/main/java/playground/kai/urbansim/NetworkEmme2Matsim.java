@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -64,8 +63,8 @@ public class NetworkEmme2Matsim {
 
 	public static void readNetwork( Scenario sc ) {
 		Network network = sc.getNetwork() ;
-		((NetworkImpl) network).setCapacityPeriod(3600.) ;
-		((NetworkImpl) network).setEffectiveLaneWidth(3.75) ;
+		((Network) network).setCapacityPeriod(3600.) ;
+		((Network) network).setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
 
 		// read emme3 network

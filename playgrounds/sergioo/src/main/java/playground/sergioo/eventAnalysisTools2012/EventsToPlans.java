@@ -7,10 +7,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -32,7 +31,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 	public EventsToPlans(Scenario scenario) {
 		this.scenario = scenario;
 		for (Person person : scenario.getPopulation().getPersons().values())
-			this.agentRecords.put(person.getId(), new PlanImpl());
+			this.agentRecords.put(person.getId(), PopulationUtils.createPlan());
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
-		new MatsimPopulationReader(scenario).readFile(args[1]);
+		new PopulationReader(scenario).readFile(args[1]);
 		EventsToPlans eventsToPlans = new EventsToPlans(scenario);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToActivities eventsToActivities = new EventsToActivities();
@@ -78,7 +77,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 		eventsToLegs.addLegHandler(eventsToPlans);
 		eventsManager.addHandler(eventsToActivities);
 		eventsManager.addHandler(eventsToLegs);
-		new EventsReaderXMLv1(eventsManager).parse(args[2]);
+		new EventsReaderXMLv1(eventsManager).readFile(args[2]);
 		eventsToPlans.writeExperiencedPlans(args[3]);
 	}
 

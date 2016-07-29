@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
@@ -11,7 +12,7 @@ import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacility;
@@ -36,7 +37,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final Scenario scenario;
 	private final TravelTime ttc;
 
-//	private final double departureTime;
 	private final double betaWalkTT;
 	private final double betaWalkTD;
 	private final double walkSpeedMeterPerHour;
@@ -49,13 +49,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final Scenario scenario){
 		this.scenario = scenario;
-
-//		AccessibilityConfigGroup moduleAPCM =
-//				ConfigUtils.addOrGetModule(
-//						scenario.getConfig(),
-//						AccessibilityConfigGroup.GROUP_NAME,
-//						AccessibilityConfigGroup.class);
-//		this.departureTime = moduleAPCM.getTimeOfDay();
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
@@ -96,58 +89,56 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
-		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
 
+		// === (1) ORIGIN to LINK to NODE:
 		// captures the distance (as walk time) between the origin via the link to the node:
 		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
-		// get stored network node (this is the nearest node next to an aggregated work place)
-		Node destinationNode = destination.getNearestNode();
-
-		// TODO: extract this walk part?
-		// In the state found before modularization (june 15), this was anyway not consistent accross modes
-		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
-		// distance to road, and then to node:
+		// (a) ORIGIN FACILITY to LINK:
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
-
-		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-		double sumExpVjkWalk = destination.getSum();
-
-
-		// this contains the current toll based on the toll scheme
-		double road2NodeToll_money = getToll(nearestLink, scheme, departureTime); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
-		double toll_money 							= 0.;
-		if ( scheme != null ) {
-			if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType()))
-				toll_money = road2NodeToll_money;
-			else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()))
-				toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
-			else
-				throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
-		}
-
-		// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
+		
+		// (b) TRAVEL ON NETWORK to FIRST NODE:
+		double toll_money = getTollMoney(departureTime, nearestLink, distance);
 		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, departureTime, null, null);
 		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
+		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
+				+ (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
 
-		double congestedCarDisutility = - lcpt.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
-		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
-		// This is equivalent to the sum of the exponential of the utilities for all destinations (I had to write it on
-		// paper to check it is correct...)
-		// yy who is "I" in the above statement?  kai, aug'15
+		// === (2) REMAINING TRAVEL ON NETWORK:
+		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();	
+		// travel disutility congested car on road network (including toll)
+
+		// === (3) Pre-computed effect of all opportunities reachable from destination network node:
+		double sumExpVjkWalk = destination.getSum();
+		// works because something like exp(A+c1) + exp(A+c2) + ... = exp(A) * [ exp(c1) + exp(c2) + ...]  =: exp(A) * sumExpVjkWalk
+		
+		// === (4) Everything together:
+		// note that exp(a+b+c) = exp(a) * exp(b) * exp(c), so for b and c the exponentiation has already been done.
 		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
 				expVhiWalk * sumExpVjkWalk;
 	}
 
-	private static double getToll( final Link nearestLink, final RoadPricingScheme scheme, final double departureTime) {
+
+	private double getTollMoney(Double departureTime, Link nearestLink, Distances distance) {
+		// yy there should be a way of doing this that is closer to the mobsim (and thus more general/automatic).  kai, jun'16
+		
+		double result = 0. ;
 		if(scheme != null){
 			RoadPricingSchemeImpl.Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), departureTime, null, null);
 			if(cost != null) {
-				return cost.amount;
+				result = cost.amount;
+			}
+			if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
+				// do nothing
+			} else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
+				result *= distance.getDistanceRoad2Node();
+			} else {
+				throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
 			}
 		}
-		return 0.;
+		return result ;
 	}
 }

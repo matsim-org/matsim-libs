@@ -284,7 +284,7 @@ public class LinkStatsControlerListenerTest {
 	
 	@Test
 	public void test_writeLinkStatsInterval() {
-		Config config = this.util.loadConfig(null);
+		Config config = this.util.loadConfig((String) null);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 		
 		lsConfig.setWriteLinkStatsInterval(3);
@@ -321,7 +321,7 @@ public class LinkStatsControlerListenerTest {
 	
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
-		Config config = this.util.loadConfig(null);
+		Config config = this.util.loadConfig((String) null);
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);

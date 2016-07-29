@@ -70,7 +70,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 
-			if( this.calcOffset == true) {
+			if(this.calcOffset) {
 				float east = (float)drawer.getQuad().offsetEast;
 				float north = (float)drawer.getQuad().offsetNorth;
 
@@ -129,7 +129,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 	private String agentId;
 	private Result result;
-	private final List<String> allIds = new LinkedList<String>();
+	private final List<String> allIds = new LinkedList<>();
 
 	private Network net = null;
 
@@ -140,7 +140,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 	}
 
 	private float[] buildRoute(Plan plan) {
-		List<Id<Link>> drivenLinks = new LinkedList<Id<Link>> ();
+		List<Id<Link>> drivenLinks = new LinkedList<>();
 
 		List<PlanElement> actslegs = plan.getPlanElements();
 		for (PlanElement pe : actslegs) {

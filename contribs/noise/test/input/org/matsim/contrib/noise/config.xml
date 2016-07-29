@@ -3,11 +3,11 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/org/matsim/contrib/noise/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/org/matsim/contrib/noise/population.xml" />
+		 <param name="inputPlansFile" value="population.xml" />
 	</module>
 	
 	<module name="controler">
@@ -83,9 +83,6 @@
 
 		<!-- Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels. -->
 		<param name="timeBinSizeNoiseComputation" value="3600.0" />
-
-		<!-- coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4' -->
-		<param name="transformationFactory" value="DHDN_GK4" />
 
 		<!-- Specifies the tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile'). -->
 		<param name="tunnelLinkIDs" value="null" />

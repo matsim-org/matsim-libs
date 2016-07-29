@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -44,7 +45,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
-import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
@@ -129,9 +129,13 @@ public class ReadVsCreatePopulationTest {
 		
 		Controler controler = new Controler(scenario);
 					
-		// add a controller listener to analyze results
 		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler, false));
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(handler);
+			}
+		});
 		
 		controler.run();
 		

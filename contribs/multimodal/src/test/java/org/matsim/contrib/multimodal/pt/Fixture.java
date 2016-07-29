@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -222,10 +222,10 @@ import org.matsim.vehicles.VehiclesFactory;
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("0", Link.class));
-		((ActivityImpl) from).setCoord(this.nodes[0].getCoord());
+		((Activity) from).setCoord(this.nodes[0].getCoord());
 		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);
 		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("3", Link.class));
-		((ActivityImpl) to).setCoord(this.nodes[4].getCoord());
+		((Activity) to).setCoord(this.nodes[4].getCoord());
 		
 		from.setEndTime(8*3600);
 		leg.setDepartureTime(8*3600);

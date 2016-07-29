@@ -19,26 +19,28 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import playground.ivt.utils.ArgParser;
-import playground.ivt.utils.ArgParser.Args;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
 
 /**
  * @author thibautd
@@ -68,18 +70,18 @@ public class SamplePersons {
 		final double rate = args.getDoubleValue( "-r" );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming( true );
+		final Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 
-		final PopulationWriter writer =
-			new PopulationWriter(
+		final StreamingPopulationWriter writer =
+			new StreamingPopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
 		writer.writeStartPlans( outPopulation );
 
 		final Random random = new Random( 1234 );
 		final Set<Id<Person>> kept = new HashSet< >();
-		pop.addAlgorithm( new PersonAlgorithm() {
+		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				if ( random.nextDouble() > rate ) return;
@@ -88,7 +90,7 @@ public class SamplePersons {
 			}
 		});
 
-		new MatsimPopulationReader( scenario ).parse( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 
 		if ( inAttributes != null ) filterAttributes( kept, inAttributes, outAttributes );

@@ -25,22 +25,27 @@ import java.io.File;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.XY2Links} functions properly, e.g. really
- * writes out modified plans. It does <em>not</em> test that {@link org.matsim.population.algorithms.XY2Links}
+ * writes out modified plans. It does <em>not</em> test that {@link org.matsim.core.population.algorithms.XY2Links}
  * works correctly, e.g. that it assigns the right links.
  *
  * @author mrieser
@@ -57,14 +62,14 @@ public class XY2LinksTest extends MatsimTestCase {
 		// prepare data like world and network
 		MutableScenario scenario =  (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse(NETWORK_FILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		population.addPerson(person);
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", new Coord(50, 25));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity a1 = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(50, 25));
 		a1.setEndTime(3600);
 
 		// write person to file
@@ -84,13 +89,13 @@ public class XY2LinksTest extends MatsimTestCase {
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
 		Population population2 = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
+		new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);
-		ActivityImpl act2 = (ActivityImpl) plan2.getPlanElements().get(0);
+		Activity act2 = (Activity) plan2.getPlanElements().get(0);
 		assertNotNull("no link assigned.", act2.getLinkId());
 	}
 

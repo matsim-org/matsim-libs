@@ -48,7 +48,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -191,7 +191,7 @@ public class RunNationalFreight {
 		final Provider<PlanStrategy> newPlanStrategyFactory = new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
-				GenericPlanSelector<Plan, Person> planSelector = new ExpBetaPlanSelector<>(1.0);
+				PlanSelector<Plan, Person> planSelector = new ExpBetaPlanSelector<>(1.0);
 				Builder builder = new Builder(planSelector );
 				builder.addStrategyModule(new NewDigicorePlanStrategyModule());
 				return builder.build();
@@ -217,7 +217,7 @@ public class RunNationalFreight {
 
 		public NewDigicorePlanStrategyModule() {
 			DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
-			nr.parse(PATH_DEPENDENT_NETWORK);
+			nr.readFile(PATH_DEPENDENT_NETWORK);
 			network = nr.getPathDependentNetwork();
 		}
 

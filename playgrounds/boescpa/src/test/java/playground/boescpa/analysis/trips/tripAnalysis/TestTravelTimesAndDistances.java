@@ -46,9 +46,8 @@ public class TestTravelTimesAndDistances {
 	
 	@Test
 	public void testTripProcessing() {
-		// Run Scenario "equil"
-		final Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.setParam("controler", "outputDirectory", utils.getOutputDirectory());
+		final Config config = utils.loadConfig("test/scenarios/pt-tutorial/config.xml");
+		ConfigUtils.loadConfig(config, utils.getClassInputDirectory() + "config.xml");
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// (otherwise the numbers change; the simulation may still be correct. kai, feb'16)  
@@ -59,10 +58,10 @@ public class TestTravelTimesAndDistances {
 
         // Load events file
         String eventsFile = this.utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
-        List<Trip> trips = EventsToTrips.createTripsFromEvents(eventsFile, scenario.getNetwork());
+        List<Trip> trips = new EventsToTrips(scenario.getNetwork()).createTripsFromEvents(eventsFile);
 		
 		// run postprocessing
-        new TripWriter().writeTrips(trips, this.utils.getOutputDirectory() + "tripResults.txt");
+        TripWriter.writeTrips(trips, this.utils.getOutputDirectory() + "tripResults.txt");
         HashMap<String, Double[]> results = TravelTimesAndDistances.calcTravelTimeAndDistance(trips, this.utils.getOutputDirectory() + "analResults.txt");
         Double[] car = results.get("car");
         Double[] pt = results.get("pt");

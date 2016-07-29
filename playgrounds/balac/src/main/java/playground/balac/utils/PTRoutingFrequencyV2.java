@@ -10,10 +10,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -160,7 +160,7 @@ public class PTRoutingFrequencyV2 {
 
 
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
-	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
+	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).readFile("./transitRouterNetwork_thinned.xml.gz");
 
 	//	new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitRouterNetwork_thinned.xml.gz");
 		//config.planCalcScore().setUtilityOfLineSwitch(0.0);
@@ -769,7 +769,7 @@ public class PTRoutingFrequencyV2 {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()
 //				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
 		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
-        ).writeFileV4("./plans_pt_trips_"+args[0]+".xml.gz");
+        ).writeV4("./plans_pt_trips_"+args[0]+".xml.gz");
 
 
 }

@@ -48,7 +48,7 @@ public class NetworkWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV1(final String filename) {
-		new org.matsim.core.network.NetworkWriter(network).writeFileV1(filename);
+		new org.matsim.core.network.io.NetworkWriter(network).writeFileV1(filename);
 	}
 	
 }

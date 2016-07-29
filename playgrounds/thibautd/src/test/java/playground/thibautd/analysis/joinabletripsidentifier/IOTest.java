@@ -132,7 +132,7 @@ public class IOTest {
 
 	private static JoinableTrips read( final String inFile ) {
 		JoinableTripsXmlReader reader = new JoinableTripsXmlReader();
-		reader.parse(inFile);
+		reader.readFile(inFile);
 		return reader.getJoinableTrips();
 	}
 

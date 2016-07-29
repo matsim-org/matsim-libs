@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.network.NetworkImpl;
 
 public class TravelTimeListener implements BasicEventHandler {
 	private BufferedWriter out = null;
@@ -40,7 +40,7 @@ public class TravelTimeListener implements BasicEventHandler {
 	public HashMap<String, String> getPaxModes() {
 		return paxModes;
 	}
-	private NetworkImpl network;
+	private Network network;
 	public void reset(int iteration) {
 	}
 

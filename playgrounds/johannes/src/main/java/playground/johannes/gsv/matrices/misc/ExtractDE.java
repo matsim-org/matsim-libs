@@ -34,7 +34,7 @@ import java.util.Set;
 public class ExtractDE {
 
 	public static NumericMatrix extract(NumericMatrix m, String zonefile, String key) throws IOException {
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonefile, key);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonefile, key, null);
 
 		NumericMatrix newM = new NumericMatrix();
 		Set<String> keys = m.keys();

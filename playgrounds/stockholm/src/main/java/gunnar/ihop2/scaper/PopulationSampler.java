@@ -9,11 +9,13 @@ import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UnicodeInputStream;
 
@@ -59,20 +61,21 @@ public final class PopulationSampler{
 			}
 		}
 		
-		PopulationImpl pop = (PopulationImpl) sc.getPopulation();
-		pop.setIsStreaming(true);
-		PopulationWriter writer = null;
+		Population pop = (Population) sc.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
+		StreamingPopulationWriter writer = null;
 		try {
-			writer = new PopulationWriter(pop, null, samplesize);
+			writer = new StreamingPopulationWriter(pop, null, samplesize);
 			writer.startStreaming(outputPopulationFile.getAbsolutePath());
-			pop.addAlgorithm(writer);
+			final PersonAlgorithm algo = writer;
+			StreamingUtils.addAlgorithm(pop, algo);
 			try (FileInputStream fis = new FileInputStream(inputPopulationFile);
 				BufferedInputStream is = (inputPopulationFile.getName().toLowerCase(Locale.ROOT).endsWith(".gz")) ? 
 					new BufferedInputStream(new UnicodeInputStream(new GZIPInputStream(fis))) :
 						new BufferedInputStream(new UnicodeInputStream(fis))
 				) {
 				try {
-					new MatsimPopulationReader(sc).parse(is);
+					new PopulationReader(sc).parse(is);
 				} finally {
 					;
 				}

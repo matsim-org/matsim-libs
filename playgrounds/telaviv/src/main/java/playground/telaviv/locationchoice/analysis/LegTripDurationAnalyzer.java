@@ -43,8 +43,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -105,7 +105,7 @@ public class LegTripDurationAnalyzer implements PersonDepartureEventHandler, Per
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		// load population
-		new MatsimPopulationReader(scenario).readFile(populationFile);
+		new PopulationReader(scenario).readFile(populationFile);
 
 		new LegTripDurationAnalyzer(scenario);
 	}

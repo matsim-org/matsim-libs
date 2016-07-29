@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.evacuation.io;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -27,16 +33,8 @@ import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 /**
  * all i/origin functions involving the configuration files
@@ -59,12 +57,11 @@ public class ConfigIO
 
 			scenario.getConfig().network().setTimeVariantNetwork(true);
 			String changeEventsFile = scenarioPath + "/networkChangeEvents.xml";
-			scenario.getConfig().network().setChangeEventInputFile(changeEventsFile);
+			scenario.getConfig().network().setChangeEventsInputFile(changeEventsFile);
 			new ConfigWriter(scenario.getConfig()).write(configFile);
 			
 			// create change event
 			Collection<NetworkChangeEvent> evs = new ArrayList<NetworkChangeEvent>();
-			NetworkChangeEventFactory fac = new NetworkChangeEventFactoryImpl();
 
 			Iterator<Entry<Id<Link>, String>> it = roadClosures.entrySet().iterator();
 			while (it.hasNext())
@@ -77,9 +74,9 @@ public class ConfigIO
 				try
 				{
 					double time = Time.parseTime(timeString);
-					NetworkChangeEvent ev = fac.createNetworkChangeEvent(time);
+					NetworkChangeEvent ev = new NetworkChangeEvent(time);
 					 ev.setFreespeedChange(new
-					 ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+					 ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0));
 //					ev.setFlowCapacityChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
 
 					ev.addLink(scenario.getNetwork().getLinks().get(currentId));

@@ -19,16 +19,15 @@
 
 package playground.wrashid.parkingSearch.planLevel.initDemand;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -41,7 +40,7 @@ import java.util.List;
 public class PlanGeneratorWithParkingActivities {
 
 	ClosestParkingMatrix closestParkingMatrix;
-	NetworkImpl network;
+	Network network;
 	MutableScenario scenario;
 
 	public MutableScenario getScenario() {
@@ -53,12 +52,12 @@ public class PlanGeneratorWithParkingActivities {
 
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilePath);
 
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 
 		this.closestParkingMatrix = new ClosestParkingMatrix(scenario.getActivityFacilities(), network);
 
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(inputPlansFilePath);
 	}
 
@@ -83,12 +82,12 @@ public class PlanGeneratorWithParkingActivities {
 	}
 
 	private void addWalkLegAndParkingAct(List<PlanElement> planElements, int index) {
-		addParkingAct(planElements, index, (ActivityImpl) planElements.get(index - 1));
+		addParkingAct(planElements, index, (Activity) planElements.get(index - 1));
 		addWalkLeg(planElements, index);
 	}
 
 	private void addWalkLeg(List<PlanElement> planElements, int index) {
-		Leg leg = new LegImpl("walk");
+		Leg leg = PopulationUtils.createLeg("walk");
 		planElements.add(index, leg);
 	}
 
@@ -100,12 +99,12 @@ public class PlanGeneratorWithParkingActivities {
 	 * @param index
 	 * @param parkingFacility
 	 */
-	private void addParkingAct(List<PlanElement> planElements, int index, ActivityImpl relatedActivity) {
+	private void addParkingAct(List<PlanElement> planElements, int index, Activity relatedActivity) {
 		double parkingActivityDuration = 30; // in seconds
 
 		ActivityFacilityImpl parkingFacility = closestParkingMatrix.getClosestParkings(relatedActivity.getCoord(), 1, 1).get(0);
 
-		ActivityImpl newParkingActivity = new ActivityImpl("parking", parkingFacility.getCoord());
+		Activity newParkingActivity = PopulationUtils.createActivityFromCoord("parking", parkingFacility.getCoord());
 		newParkingActivity.setFacilityId(parkingFacility.getId());
 		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, parkingFacility.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);
@@ -115,7 +114,7 @@ public class PlanGeneratorWithParkingActivities {
 
 	private void addParkingActAndWalkLeg(List<PlanElement> planElements, int index) {
 		addWalkLeg(planElements, index);
-		addParkingAct(planElements, index, (ActivityImpl) planElements.get(index + 1));
+		addParkingAct(planElements, index, (Activity) planElements.get(index + 1));
 	}
 
 	/**

@@ -45,9 +45,7 @@ public class StrategyManagerModule extends AbstractModule {
 		int externalCounter = 0;
 		install(new DefaultPlanStrategiesModule());
 		bind(StrategyManager.class).in(Singleton.class);
-		bind(ReplanningContextImpl.class).asEagerSingleton();
-		bind(ReplanningContext.class).to(ReplanningContextImpl.class);
-		addControlerListenerBinding().to(ReplanningContextImpl.class);
+		bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
 		MapBinder<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), StrategyConfigGroup.StrategySettings.class, PlanStrategy.class);
 		for (StrategyConfigGroup.StrategySettings settings : getConfig().strategy().getStrategySettings()) {
 			String name = settings.getStrategyName() ;

@@ -35,8 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
@@ -135,7 +134,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 		TripRouter.insertTrip(
 				passengerPlan , 
 				tripWithLeg.getOriginActivity(),
-				Collections.singletonList( new LegImpl( TransportMode.pt ) ),
+				Collections.singletonList( PopulationUtils.createLeg(TransportMode.pt) ),
 				tripWithLeg.getDestinationActivity() );
 	}
 
@@ -162,7 +161,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			final JointPlan plan) {
 		final List<TripStructureUtils.Trip> subtrips = getDriverTrip( toRemove , plan.getIndividualPlan( toRemove.getDriverId() ) );
 		final List<PlanElement> newTrip = new ArrayList<PlanElement>();
-		newTrip.add( new LegImpl( TransportMode.car ) );
+		newTrip.add( PopulationUtils.createLeg(TransportMode.car) );
 
 		// "state" variables, changed in the loop:
 		// - keeps track of the passengers currently in the vehicle.
@@ -178,11 +177,9 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			// note that no check of the mode is done...
 			if ( !newPassengers.equals( currentPassengers ) ) {
 				newTrip.add(
-						new ActivityImpl(
-							JointActingTypes.INTERACTION,
-							route != null ?
-								route.getStartLinkId() :
-									subtrip.getOriginActivity().getLinkId() ) );
+						PopulationUtils.createActivityFromLinkId(JointActingTypes.INTERACTION, route != null ?
+							route.getStartLinkId() :
+								subtrip.getOriginActivity().getLinkId()) );
 
 				// as the spatial structure of the trip is modified, it is possible
 				// that some pre-existing subtours are removed. Thus, a driver that may
@@ -193,7 +190,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 				// XXX It could be done in a smarter way, so that if no subtour is removed, no modification is done
 				// For instance, when removing an "intern" trip, first PU and last DO are
 				// left untouched, and thus access and egress leg need not be touched.
-				newTrip.add( leg != null ? leg : new LegImpl( TransportMode.car ) );
+				newTrip.add( leg != null ? leg : PopulationUtils.createLeg(TransportMode.car) );
 				currentPassengers = newPassengers;
 			}
 		}

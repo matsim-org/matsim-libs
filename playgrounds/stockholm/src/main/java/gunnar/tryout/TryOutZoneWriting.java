@@ -1,19 +1,18 @@
 package gunnar.tryout;
 
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 
+import gunnar.ihop2.regent.demandreading.Zone;
 import patryk.popgen2.PopulationParser;
 import patryk.popgen2.SelectZones;
 

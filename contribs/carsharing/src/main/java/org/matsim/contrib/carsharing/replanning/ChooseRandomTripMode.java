@@ -7,12 +7,12 @@ import java.util.Random;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * @author balacm
  */
@@ -67,7 +67,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
-					Collections.singletonList( new LegImpl( "onewaycarsharing" ) ),
+					Collections.singletonList( PopulationUtils.createLeg("onewaycarsharing") ),
 					trip.getDestinationActivity());
 		}
 		else {
@@ -75,7 +75,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
-					Collections.singletonList( new LegImpl( "freefloating" ) ),
+					Collections.singletonList( PopulationUtils.createLeg("freefloating") ),
 					trip.getDestinationActivity());
 		}
 		}
@@ -84,7 +84,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
-					Collections.singletonList( new LegImpl( possibleModes[0] ) ),
+					Collections.singletonList( PopulationUtils.createLeg(possibleModes[0]) ),
 					trip.getDestinationActivity());
 		}
 		else

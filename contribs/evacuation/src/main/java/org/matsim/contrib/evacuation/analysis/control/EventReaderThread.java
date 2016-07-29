@@ -33,7 +33,7 @@ public class EventReaderThread implements Runnable {
 
 	@Override
 	public void run() {
-		this.reader.parse(this.eventFile);
+		this.reader.readFile(this.eventFile);
 
 	}
 

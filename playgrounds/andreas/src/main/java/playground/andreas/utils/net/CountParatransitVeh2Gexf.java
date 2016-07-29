@@ -21,7 +21,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -100,7 +100,7 @@ public class CountParatransitVeh2Gexf extends MatsimJaxbXmlWriter {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			eventsManager.addHandler(handler);
 			EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-			eventsReader.parse(path + runName + "/ITERS/it." + iteration + "/" + runName +"." + iteration + ".events.xml.gz");
+			eventsReader.readFile(path + runName + "/ITERS/it." + iteration + "/" + runName +"." + iteration + ".events.xml.gz");
 			
 			addValuesToGexf(iteration, handler);
 			

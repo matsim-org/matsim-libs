@@ -21,6 +21,9 @@
 
 package playground.boescpa.lib.tools.spatialCutting;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,19 +31,20 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import playground.boescpa.lib.tools.coordUtils.CoordFilter;
 
 /**
  * Geographically cuts a MATSim population to a specified area.
@@ -77,41 +81,41 @@ public class PopulationCutter {
         int radius = Integer.parseInt(args[3]);
 
         PopulationCutter cutter = new PopulationCutter(scenario);
-        cutter.createSubscenario(config.plans().getInputFile(), args[4], center, radius);
+		log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
+        cutter.createSubscenario(config.plans().getInputFile(), args[4], new CoordFilter.CoordFilterCircle(center, radius), center, radius);
     }
 
-    private void createSubscenario(String populationInputFile, String populationOutputFile, Coord center, int radius) {
-        PopulationImpl population = (PopulationImpl)scenario.getPopulation();
+    private void createSubscenario(String populationInputFile, String populationOutputFile, CoordFilter coordFilter, Coord centerAlternative, int radiusAlternative) {
+        Population population = (Population)scenario.getPopulation();
         Network network = scenario.getNetwork();
 
-        log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
         // Identify all links within area of interest:
         final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
         for (Link link : network.getLinks().values()) {
             final Node from = link.getFromNode();
             final Node to = link.getToNode();
-            if ((CoordUtils.calcEuclideanDistance(from.getCoord(), center) <= radius)
-                    || (CoordUtils.calcEuclideanDistance(to.getCoord(), center) <= radius)) {
+            if (coordFilter.coordCheck(from.getCoord()) || coordFilter.coordCheck(to.getCoord())) {
                 areaOfInterest.put(link.getId(),link);
             }
         }
         log.info(" AOI contains: " + areaOfInterest.size() + " links.");
 
         log.info(" Setting up population objects...");
-        population.setIsStreaming(true);
-        PopulationWriter pop_writer = new PopulationWriter(population, scenario.getNetwork());
+        StreamingUtils.setIsStreaming(population, true);
+        StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(population, scenario.getNetwork());
         pop_writer.startStreaming(populationOutputFile);
-        PopulationReader pop_reader = new MatsimPopulationReader(scenario);
+        MatsimReader pop_reader = new PopulationReader(scenario);
 
         log.info(" Adding person modules...");
         PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer, areaOfInterest, network);
-        filter.setAlternativeAOI(center, radius);
-        population.addAlgorithm(filter);
+        filter.setAlternativeAOI(centerAlternative, radiusAlternative);
+	final PersonAlgorithm algo = filter;
+        StreamingUtils.addAlgorithm(population, algo);
 
         log.info(" Reading, processing, writing plans...");
         pop_reader.readFile(populationInputFile);
         pop_writer.closeStreaming();
-        population.printPlansCount();
+        PopulationUtils.printPlansCount(population) ;
         log.info(" Filtered persons: " + filter.getCount());
     }
 }

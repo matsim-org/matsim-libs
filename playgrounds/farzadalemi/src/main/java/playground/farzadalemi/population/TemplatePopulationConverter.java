@@ -21,22 +21,25 @@
 
 package playground.farzadalemi.population;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Set;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Template for a network converter
@@ -100,13 +103,13 @@ public class TemplatePopulationConverter {
 							double yCoord = Double.parseDouble(lineArgs[i++]);
 							double startTime = Double.parseDouble(lineArgs[i++]); // in seconds from midnight
 							double endTime = Double.parseDouble(lineArgs[i++]); // in seconds from midnight
-							Activity act = new ActivityImpl(activityType, new Coord(xCoord, yCoord));
+							Activity act = PopulationUtils.createActivityFromCoord(activityType, new Coord(xCoord, yCoord));
 							act.setStartTime(startTime);
 							act.setEndTime(endTime);
 							plan.addActivity(act);
 						} else {
 							String transportMode = lineArgs[i++];
-							Leg leg = new LegImpl(transportMode);
+							Leg leg = PopulationUtils.createLeg(transportMode);
 							plan.addLeg(leg);
 						}
 					}
@@ -132,6 +135,6 @@ public class TemplatePopulationConverter {
 	 * this is a first indication that the transformation was (technically) successful.
 	 */
 	private void testPopulation(String pathToOutputFile) {
-		new PopulationReaderMatsimV5(ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(pathToOutputFile);
+		new PopulationReader(ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(pathToOutputFile);
 	}
 }

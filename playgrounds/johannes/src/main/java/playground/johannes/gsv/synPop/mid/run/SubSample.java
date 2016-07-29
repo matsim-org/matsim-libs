@@ -57,7 +57,7 @@ public class SubSample {
 		parser.addToBlacklist("purpose");
 		parser.addToBlacklist("delete");
 		
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
 		double proba = Double.parseDouble(args[1]);

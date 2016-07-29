@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 
 /**
@@ -42,28 +42,16 @@ public class TestActivityWrapperFacility {
 	public void init() {
 		activities = new ArrayList<Activity>();
 
-		Activity act = new ActivityImpl(
-				"type",
-				new Coord((double) 1, (double) 2),
-				Id.create( "bouh", Link.class ));
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId("type", new Coord((double) 1, (double) 2), Id.create( "bouh", Link.class ));
 		activities.add( act );
 
-		act = new ActivityImpl(
-				"another_type",
-				new Coord((double) 5, (double) 2),
-				Id.create( "an_id", Link.class ));
+		act = PopulationUtils.createActivityFromCoordAndLinkId("another_type", new Coord((double) 5, (double) 2), Id.create( "an_id", Link.class ));
 		activities.add( act );
 
-		act = new ActivityImpl(
-				"h2g2",
-				new Coord((double) 42, (double) 42),
-				Id.create( "42", Link.class ));
+		act = PopulationUtils.createActivityFromCoordAndLinkId("h2g2", new Coord((double) 42, (double) 42), Id.create( "42", Link.class ));
 		activities.add( act );
 
-		act = new ActivityImpl(
-				"nothing",
-				new Coord((double) 0, (double) 0),
-				Id.create( "0", Link.class ));
+		act = PopulationUtils.createActivityFromCoordAndLinkId("nothing", new Coord((double) 0, (double) 0), Id.create( "0", Link.class ));
 		activities.add( act );
 
 	}

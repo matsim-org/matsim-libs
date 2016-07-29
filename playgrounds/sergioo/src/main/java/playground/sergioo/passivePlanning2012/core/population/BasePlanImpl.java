@@ -8,18 +8,18 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
@@ -59,7 +59,7 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(((PlanImpl)plan).getLastActivity()))
+				else if(!planElement.equals(PopulationUtils.getLastActivity(((Plan)plan))))
 					throw new RuntimeException("Activity without time information");
 			}
 			else if(planElement instanceof Activity) {
@@ -71,11 +71,11 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(((PlanImpl)plan).getLastActivity()))
+				else if(!planElement.equals(PopulationUtils.getLastActivity(((Plan)plan))))
 					throw new RuntimeException("Activity without time information");
 			}
 			else {
-				toBeAdded = new LegImpl((LegImpl)planElement);
+				toBeAdded = PopulationUtils.createLeg((Leg)planElement);
 				prevTime = time;
 				if(((Leg)planElement).getTravelTime()!=Time.UNDEFINED_TIME)
 					time += ((Leg)planElement).getTravelTime();
@@ -132,7 +132,7 @@ public class BasePlanImpl implements BasePlan {
 		newPerson.setBasePlan(copyPlan);
 	}
 	public static void convertToBasePlan(BasePersonImpl newPerson, Plan plan) {
-		PlanImpl newPlan = new PlanImpl(newPerson);
+		Plan newPlan = PopulationUtils.createPlan(newPerson);
 		EmptyTime time = null;
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Activity) {
@@ -226,14 +226,14 @@ public class BasePlanImpl implements BasePlan {
 	public void copyFrom(final Plan in) {
 		for(PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity)
-				addActivity(new ActivityImpl((Activity) pe));
+				addActivity(PopulationUtils.createActivity((Activity) pe));
 			else if (pe instanceof Leg)
 				if (pe instanceof EmptyTime || ((Leg)pe).getMode().equals(EMPTY)) {
 					EmptyTime emptyTime = new EmptyTimeImpl(((Leg)pe).getRoute().getStartLinkId(), ((EmptyTime)pe).getTravelTime());
 					addLeg(emptyTime);
 				}
 				else
-					addLeg(new LegImpl((LegImpl)pe));
+					addLeg(PopulationUtils.createLeg((Leg)pe));
 			else
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
 		}
@@ -264,10 +264,10 @@ public class BasePlanImpl implements BasePlan {
 			}
 			else {
 				// remove an in-between act
-				LegImpl prev_leg = (LegImpl)getPlanElements().get(index-1); // prev leg;
+				Leg prev_leg = (Leg)getPlanElements().get(index-1); // prev leg;
 				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
-				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
+				prev_leg.setTravelTime( Time.UNDEFINED_TIME - prev_leg.getDepartureTime() );
 				prev_leg.setRoute(null);
 
 				getPlanElements().remove(index+1); // following leg
@@ -287,10 +287,10 @@ public class BasePlanImpl implements BasePlan {
 		else {
 			if (index != getPlanElements().size()-2) {
 				// not the last leg
-				LegImpl next_leg = (LegImpl)getPlanElements().get(index+2);
+				Leg next_leg = (Leg)getPlanElements().get(index+2);
 				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
 				next_leg.setTravelTime(Time.UNDEFINED_TIME);
-				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
+				next_leg.setTravelTime( Time.UNDEFINED_TIME - next_leg.getDepartureTime() );
 				next_leg.setRoute(null);
 			}
 			getPlanElements().remove(index+1); // following act

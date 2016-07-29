@@ -35,9 +35,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -242,7 +243,7 @@ public class BkHouseholdsCreatorZurich {
 			if (plan == null) {
 				throw new IllegalStateException("Person " + p.getId() + " has no plans");
 			}
-			Coord coord = ((PlanImpl) plan).getFirstActivity().getCoord();
+			Coord coord = PopulationUtils.getFirstActivity( ((Plan) plan) ).getCoord();
 			SimpleFeatureIterator it = fsource.getFeatures().features();
 			SimpleFeature f = null;
 			while (it.hasNext()) {

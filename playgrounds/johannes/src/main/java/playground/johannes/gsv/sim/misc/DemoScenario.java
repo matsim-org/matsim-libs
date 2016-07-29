@@ -26,20 +26,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -78,7 +78,7 @@ public class DemoScenario {
 		 * remove foreign persons and extract subsample
 		 */
 		logger.info("Loading persons...");
-		MatsimPopulationReader pReader = new MatsimPopulationReader(scenario);
+		PopulationReader pReader = new PopulationReader(scenario);
 		pReader.readFile(popFile);
 		logger.info("Done.");
 		
@@ -208,7 +208,7 @@ public class DemoScenario {
 				e.printStackTrace();
 			}
 
-			((NodeImpl) node).setCoord(new Coord(points[0], points[1]));
+			((Node) node).setCoord(new Coord(points[0], points[1]));
 		}
 		logger.info("Done.");
 		

@@ -90,7 +90,7 @@ public class PtTutorialTest {
 		log.info( AbstractController.DIVIDER ) ;
 		log.info( AbstractController.DIVIDER ) ;
 
-		config.plans().setInputFile( config.controler().getOutputDirectory() + "/" + it1Plans ); 
+		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/" + it1Plans).getAbsolutePath());
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
 		// note: cannot delete directory since some of the input resides there. kai, sep'15

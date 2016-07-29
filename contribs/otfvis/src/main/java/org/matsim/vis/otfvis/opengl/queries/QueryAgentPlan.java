@@ -185,10 +185,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	public static class Result implements OTFQueryResult {
 
 		private String agentId;
-		private List<Coord> vertex = new ArrayList<Coord>();
-		private List<Color> colors = new ArrayList<Color>();
+		private List<Coord> vertex = new ArrayList<>();
+		private List<Color> colors = new ArrayList<>();
 		private FloatBuffer vert;
-		private List<MyInfoText> acts = new ArrayList<MyInfoText>();
+		private List<MyInfoText> acts = new ArrayList<>();
 		private List<InfoText> activityTexts;
 		private InfoText agentText = null;
 		private ByteBuffer cols;
@@ -213,7 +213,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				} else if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
 					if ( leg.getRoute() instanceof NetworkRoute && level==Level.ROUTES) {
-						Link startLink = net.getLinks().get(((NetworkRoute) leg.getRoute()).getStartLinkId());
+						Link startLink = net.getLinks().get(leg.getRoute().getStartLinkId());
 						Coord from = startLink.getToNode().getCoord();
 						addCoord(from, carColor);
 						for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
@@ -222,7 +222,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 							Coord coord = node.getCoord();
 							addCoord(coord, carColor);
 						}
-						Link endLink = net.getLinks().get(((NetworkRoute) leg.getRoute()).getEndLinkId());
+						Link endLink = net.getLinks().get(leg.getRoute().getEndLinkId());
 						Coord to = endLink.getToNode().getCoord();
 						addCoord(to, carColor);
 					} else {
@@ -309,8 +309,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private Point2D.Double tryToFindAgentPosition(OGLAgentPointLayer layer) {
-			Point2D.Double pos = getAgentPositionFromPointLayer(this.agentId, layer);
-			return pos;
+			return getAgentPositionFromPointLayer(this.agentId, layer);
 		}
 
 		private void drawPlanPoly(GL2 gl) {
@@ -358,7 +357,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void createActivityTextsIfNecessary(OTFOGLDrawer drawer) {
-			activityTexts = new ArrayList<InfoText>();
+			activityTexts = new ArrayList<>();
 			for (MyInfoText activityEntry : this.acts ) {
 				InfoText activityText = new InfoText(
 						activityEntry.name, activityEntry.east, activityEntry.north);

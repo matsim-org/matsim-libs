@@ -22,13 +22,17 @@ package playground.andreas.utils.pop;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.*;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -49,11 +53,11 @@ public class StripPersonPlan extends NewPopulation {
 	@Override
 	public void run(Person pp) {
 
-		PersonImpl person = (PersonImpl) pp;
+		Person person = (Person) pp;
 
 		this.personshandled++;
 
-		person.setId(Id.create("p" + personshandled, Person.class));
+		PopulationUtils.changePersonId( person, Id.create("p" + personshandled, Person.class) ) ;
 		PersonUtils.setAge(person, Integer.MIN_VALUE);
 		PersonUtils.setCarAvail(person, null);
 		PersonUtils.setEmployed(person, (Boolean) null);
@@ -61,8 +65,8 @@ public class StripPersonPlan extends NewPopulation {
 		PersonUtils.setSex(person, null);
 		
 		for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
-			if (pE instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pE;
+			if (pE instanceof Activity) {
+				Activity act = (Activity) pE;
 				int x = (int) (act.getCoord().getX() / 100.0);
 				int y = (int) (act.getCoord().getY() / 100.0);
 				act.setCoord(new Coord(x * 100.0, y * 100.0));
@@ -85,7 +89,7 @@ public class StripPersonPlan extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		StripPersonPlan dp = new StripPersonPlan(net, inPop, outPlansFile);

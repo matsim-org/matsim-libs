@@ -20,7 +20,6 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -29,8 +28,8 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 /**
  * @author nagel
  */
-public class PopulationWriter implements MatsimWriter {
-
+public final class PopulationWriter implements MatsimWriter {
+	
 	private final CoordinateTransformation transformation;
 	private final Population population;
 	private final Network network;
@@ -43,9 +42,18 @@ public class PopulationWriter implements MatsimWriter {
 		this.population = population;
 		this.network = network;
 	}
-
+	public PopulationWriter(
+			final CoordinateTransformation transformation,
+			Population population) {
+		// w/o network works for V5
+		this( transformation, population, null ) ;
+	}
 	public PopulationWriter(Population population, Network network) {
 		this( new IdentityTransformation() , population , network );
+	}
+	public PopulationWriter(Population population) {
+		// w/o network works for V5
+		this( new IdentityTransformation() , population , null );
 	}
 
 	/**
@@ -53,7 +61,7 @@ public class PopulationWriter implements MatsimWriter {
 	 */
 	@Override
 	public void write(final String filename) {
-		writeV5(filename);
+		new org.matsim.core.population.io.PopulationWriter(transformation , this.population, this.network).write(filename);
 	}
 
 	/**
@@ -62,7 +70,7 @@ public class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new org.matsim.core.population.PopulationWriter(transformation , this.population, this.network).writeFileV4(filename);
+		new org.matsim.core.population.io.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
 	}
 
 	/**
@@ -71,7 +79,7 @@ public class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV5(final String filename) {
-		new org.matsim.core.population.PopulationWriter( transformation , this.population, this.network).writeFileV5(filename);
+		new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
 	}
 
 }

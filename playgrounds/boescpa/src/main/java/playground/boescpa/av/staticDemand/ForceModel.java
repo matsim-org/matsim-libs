@@ -70,7 +70,7 @@ public class ForceModel {
 		return new Force(weight*xPart, weight*yPart);
 	}
 
-	protected class Force {
+	public class Force {
 		public final double xPart;
 		public final double yPart;
 		public int identifier;

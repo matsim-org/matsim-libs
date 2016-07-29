@@ -22,8 +22,8 @@ package playground.mrieser.svi.controller;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;

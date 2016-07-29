@@ -25,11 +25,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -74,7 +75,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 			if (!this.isInteger(p.getId().toString()) ||
 					Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.idExclusion)) continue;
 					
-			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
+			Plan plan = (Plan) p.getSelectedPlan();
 			
 			if (bestOrSelected.equals("best")) {
 				double bestPlanScore = -999.0;
@@ -87,22 +88,22 @@ public class ComparingDistanceStats implements IterationEndsListener {
 					}
 					cnt++;
 				}
-				plan = (PlanImpl) p.getPlans().get(bestIndex);	
+				plan = (Plan) p.getPlans().get(bestIndex);	
 				//log.info(plan.getScore() + "\t" + bestIndex + "\tperson " + p.getId());
 			}		
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							plan.getPreviousLeg((Activity)pe).getMode().equals(this.mode)) {
+							PopulationUtils.getPreviousLeg(plan, (Activity)pe).getMode().equals(this.mode)) {
 						double distance = -1.0;
-						Leg previousLeg = plan.getPreviousLeg((Activity)pe);
+						Leg previousLeg = PopulationUtils.getPreviousLeg(plan, (Activity)pe);
 						Route route = previousLeg.getRoute();
 						if (route instanceof NetworkRoute) {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
 							else distance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, event.getServices().getScenario().getNetwork());
 						} else {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
-							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
+							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord());
 						}
 						this.bins.addVal(distance, 1.0);
 					}	

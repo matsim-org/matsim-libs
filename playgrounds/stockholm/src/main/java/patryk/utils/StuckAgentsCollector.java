@@ -13,7 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -29,7 +29,7 @@ public class StuckAgentsCollector {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         
-        PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(scenario);
+        PopulationReader popReader = new PopulationReader(scenario);
         popReader.readFile("600.plans.xml.gz");
         Population population = scenario.getPopulation();
 		

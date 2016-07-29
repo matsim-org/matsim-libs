@@ -68,7 +68,7 @@ public class AdjustTypes {
     public static void main(String args[]) throws IOException {
         BufferedReader reader = IOUtils.getBufferedReader(args[0]);
         BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO", null);
 
         dayLabels = new ArrayList<>(5);
         dayLabels.add("1");
@@ -89,7 +89,7 @@ public class AdjustTypes {
 
         XMLHandler parser = new XMLHandler(new PlainFactory());
         parser.setValidating(false);
-        parser.parse(args[3]);
+        parser.readFile(args[3]);
         Set<? extends Person> persons = parser.getPersons();
         TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
         TaskRunner.run(new ReplaceActTypes(), persons);

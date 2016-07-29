@@ -75,7 +75,7 @@ public class SearchTrafficDeltaCountForGIS {
 		TrafficCount trafficOnRoadsCount = new TrafficCount(center,network,radius);
 		events.addHandler(trafficOnRoadsCount);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFileBaseCase);
+		reader.readFile(eventsFileBaseCase);
 		return trafficOnRoadsCount;
 	}
 	

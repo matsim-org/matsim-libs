@@ -47,7 +47,8 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		Id<Person> id = Id.createPersonId( 1 );
 		{
-			final Person person = PopulationUtils.createPerson(id);
+			final Id<Person> id1 = id;
+			final Person person = PopulationUtils.getFactory().createPerson(id1);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -65,7 +66,8 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		id = Id.createPersonId( 2 );
 		{
-			final Person person = PopulationUtils.createPerson(id);
+			final Id<Person> id1 = id;
+			final Person person = PopulationUtils.getFactory().createPerson(id1);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -83,7 +85,8 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		id = Id.createPersonId( 3 );
 		{
-			final Person person = PopulationUtils.createPerson(id);
+			final Id<Person> id1 = id;
+			final Person person = PopulationUtils.getFactory().createPerson(id1);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );

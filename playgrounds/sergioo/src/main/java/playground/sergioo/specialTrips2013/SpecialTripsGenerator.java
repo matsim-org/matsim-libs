@@ -9,13 +9,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SpecialTripsGenerator {
@@ -69,7 +69,7 @@ public class SpecialTripsGenerator {
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		(new MatsimPopulationReader(scenario)).readFile(args[0]);
+		(new PopulationReader(scenario)).readFile(args[0]);
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		System.out.println(scenario.getPopulation().getPersons().size());
 		List<Trip> trips = new ArrayList<Trip>();
@@ -125,9 +125,9 @@ public class SpecialTripsGenerator {
 		}
 		for(Trip trip:trips)
 			if(trip.type1.equals(Type1.CHECK))
-				((LegImpl)trip.person.getSelectedPlan().getPlanElements().get(1)).setDepartureTime(getRandomTime(startTime, endTime, binSize, distributions[trip.type2.ordinal()%2].getPosition()));
-			else if(trip.type1.equals(Type1.TOURISM) && ((LegImpl)trip.person.getSelectedPlan().getPlanElements().get(1)).getDepartureTime()>86400)
-				((LegImpl)trip.person.getSelectedPlan().getPlanElements().get(1)).setDepartureTime(getRandomTime(0, 24*3600, 900, tourismDist.getPosition()));
+				((Leg)trip.person.getSelectedPlan().getPlanElements().get(1)).setDepartureTime(getRandomTime(startTime, endTime, binSize, distributions[trip.type2.ordinal()%2].getPosition()));
+			else if(trip.type1.equals(Type1.TOURISM) && ((Leg)trip.person.getSelectedPlan().getPlanElements().get(1)).getDepartureTime()>86400)
+				((Leg)trip.person.getSelectedPlan().getPlanElements().get(1)).setDepartureTime(getRandomTime(0, 24*3600, 900, tourismDist.getPosition()));
 		(new PopulationWriter(scenario.getPopulation(), scenario.getNetwork())).write(args[6]);
 	}
 

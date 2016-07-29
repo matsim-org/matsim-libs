@@ -58,7 +58,7 @@ public class TransferShares {
     private static Set<String> zoneKeys = new HashSet<>();
 
     public static void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[3], "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[3], "NO", null);
         loadZoneIdMapping(zones, "NUTS3_CODE");
 
         refMatricesModena = loadRefMatrix(args[0]);

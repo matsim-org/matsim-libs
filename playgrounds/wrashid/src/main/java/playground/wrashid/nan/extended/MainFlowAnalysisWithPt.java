@@ -55,10 +55,10 @@ public class MainFlowAnalysisWithPt {
 		double radiusInMeters=2000;
 		
 		
-		Map<Id<Link>, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id<Link>, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		
 		
-		OutFlowInfoCollectorWithPt flowAnalyzer=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
+		OutFlowInfoCollectorWithPt flowAnalyzer=new OutFlowInfoCollectorWithPt((Map<Id<Link>, Link>) links,isOldEventFile,binSizeInSeconds); 
 		// in order for FlowInfoCollector functioning, we call links from NetworkReadExample
 		//InFlowInfoCollectorWithPt inflowAnalyzer=new InFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds);		
 		

@@ -35,7 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author mrieser
  */
-public class ExpBetaPlanSelector<T extends BasicPlan, I> implements GenericPlanSelector<T, I>{
+public class ExpBetaPlanSelector<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;

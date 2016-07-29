@@ -120,8 +120,8 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 
 	boolean isRelevantPerson(Id<Person> personId) {
 		// return (personId.toString().endsWith("vw") ? true : false);
-		return ((personId.toString().startsWith("BS_WB") || (personId.toString().startsWith("WB_BS"))) ? true : false);
-		// return (personId.toString().startsWith("BS_WB") ? true : false);
+//		return ((personId.toString().startsWith("BS_WB") || (personId.toString().startsWith("WB_BS"))) ? true : false);
+		 return (personId.toString().startsWith("BS_WB") ? true : false);
 
 		// return true;
 	}

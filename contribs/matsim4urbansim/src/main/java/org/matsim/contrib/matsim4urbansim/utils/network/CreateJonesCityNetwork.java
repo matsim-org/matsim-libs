@@ -30,14 +30,15 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -83,7 +84,7 @@ public class CreateJonesCityNetwork {
 		scenario.getConfig().global().setCoordinateSystem(defaultCRS);
 		
 		// create empty network
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(filename);
@@ -123,7 +124,7 @@ public class CreateJonesCityNetwork {
 	/**
 	 * @param network
 	 */
-	private static void concistencyCheck(NetworkImpl network) {
+	private static void concistencyCheck(Network network) {
 		int nodeSize = network.getNodes().values().size();
 		int linkSize = network.getLinks().values().size();
 		int steps = (int)Math.sqrt(nodeSize);
@@ -142,7 +143,7 @@ public class CreateJonesCityNetwork {
 	 * @throws IOException
 	 * @throws NumberFormatException
 	 */
-	private static Iterator<Node> addNodes2Network(NetworkImpl network,
+	private static Iterator<? extends Node> addNodes2Network(Network network,
 			BufferedReader reader, final int indexXCoodinate,
 			final int indexYCoodinate, final int indexZoneID)
 			throws IOException, NumberFormatException {
@@ -165,11 +166,12 @@ public class CreateJonesCityNetwork {
 			double y = Double.parseDouble( parts[indexYCoodinate] );
 
 			coord = new Coord(x, y);
+			final Coord coord1 = coord;
 
 			// create a new node
-			NodeImpl node = (NodeImpl)network.createAndAddNode(Id.create(zoneID, Node.class), coord);
-			node.setOrigId(zoneID.toString());
-			node.setType("unknownType");		
+			Node node = (Node)NetworkUtils.createAndAddNode(network, Id.create(zoneID, Node.class), coord1);
+			NetworkUtils.setOrigId( node, zoneID.toString() ) ;
+			NetworkUtils.setType(node,"unknownType");		
 		}
 		return network.getNodes().values().iterator();
 	}
@@ -177,7 +179,7 @@ public class CreateJonesCityNetwork {
 	/**
 	 * @param network
 	 */
-	private static void addLinks2Network(NetworkImpl network) {
+	private static void addLinks2Network(Network network) {
 		
 		int zones = network.getNodes().size();
 		int steps = (int)Math.sqrt(zones)-1;
@@ -191,7 +193,7 @@ public class CreateJonesCityNetwork {
 			for(double y = minValue; y < maxValue; y = y+length){
 				System.out.println("Y-Coord:" + y);
 
-				Node currentNode = network.getNearestNode(new Coord(x, y));
+				Node currentNode = NetworkUtils.getNearestNode(network,new Coord(x, y));
 				// add link to above neighbor
 				linkID = addLink(network, maxValue, linkID, currentNode, new Coord(x, y + length));
 				// add link to left neighbor
@@ -207,16 +209,29 @@ public class CreateJonesCityNetwork {
 	 * @param currentNode
 	 * @param neighbor
 	 */
-	private static long addLink(NetworkImpl network, double maxValue,
+	private static long addLink(Network network, double maxValue,
 								long linkID, Node currentNode, Coord neighbor) {
 		
 		if (neighbor.getX() < maxValue
 		 && neighbor.getY() < maxValue) {
 			
-			Node neighborNode = network.getNearestNode(neighbor);
+			final Coord coord = neighbor;
+			Node neighborNode = NetworkUtils.getNearestNode(network,coord);
 			if(neighborNode != currentNode){
-				network.createAndAddLink(Id.create(linkID++, Link.class), currentNode, neighborNode, length, freeSpeed, capacity, lanes);
-				network.createAndAddLink(Id.create(linkID++, Link.class), neighborNode, currentNode, length, freeSpeed, capacity, lanes);
+				final Node fromNode = currentNode;
+				final Node toNode = neighborNode;
+				final double length1 = length;
+				final double freespeed = freeSpeed;
+				final double capacity1 = capacity;
+				final double numLanes = lanes;
+				NetworkUtils.createAndAddLink(network,Id.create(linkID++, Link.class), fromNode, toNode, length1, freespeed, capacity1, numLanes );
+				final Node fromNode1 = neighborNode;
+				final Node toNode1 = currentNode;
+				final double length2 = length;
+				final double freespeed1 = freeSpeed;
+				final double capacity2 = capacity;
+				final double numLanes1 = lanes;
+				NetworkUtils.createAndAddLink(network,Id.create(linkID++, Link.class), fromNode1, toNode1, length2, freespeed1, capacity2, numLanes1 );
 			}
 		}
 		else

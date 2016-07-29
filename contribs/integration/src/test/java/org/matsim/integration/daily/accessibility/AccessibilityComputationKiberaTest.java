@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,9 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityStartupListener;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -26,129 +47,104 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class AccessibilityComputationKiberaTest {
-	public static final Logger log = Logger.getLogger( AccessibilityComputationKiberaTest.class ) ;
+import com.vividsolutions.jts.geom.Envelope;
 
-//	private static final double cellSize = 25.;
-	private static final Double cellSize = 100.;
+/**
+ * @author dziemke
+ */
+public class AccessibilityComputationKiberaTest {
+	public static final Logger log = Logger.getLogger(AccessibilityComputationKiberaTest.class);
+
+	private static final Double cellSize = 10.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-
 	@Test
 	public void doAccessibilityTest() throws IOException {
-		// Input
+		// Input and output
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
-
-		// adapt folder structure that may be different on different machines, esp. on server
+		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-
 		networkFile = folderStructure + networkFile ;
-		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
-
-		// no pt input
-		
+		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
+		final String outputDirectory = utils.getOutputDirectory();
 		
 		// Parameters
-		boolean createQGisOutput = false;
-		boolean includeDensityLayer = false;
-		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		String name = "ke_kibera_" + cellSize.toString().split("\\.")[0];
+		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
+		final String name = "ke_kibera_" + cellSize.toString().split("\\.")[0];
 		
-		Double lowerBound = 2.;
-		Double upperBound = 5.5;
-		Integer range = 9; // in the current implementation, this need always be 9
-		int symbolSize = 110;
-		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-
+		// QGis parameters
+		boolean createQGisOutput = true;
+		final boolean includeDensityLayer = false;
+		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
+		final Double upperBound = 3.5;
+		final Integer range = 9; // in the current implementation, this need always be 9
+		final int symbolSize = 110;
+		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
-		// config and scenario
-		final Config config = ConfigUtils.createConfig(new MatrixBasedPtRouterConfigGroup());
+		// Config and scenario
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
-
-		// some (otherwise irrelevant) settings to make the vsp check happy:
+		
+		// Choose modes for accessibility computation
+		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
+		}
+		
+		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
-
-		{
-			StrategySettings stratSets = new StrategySettings();
-			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-			stratSets.setWeight(1.);
-			config.strategy().addStrategySettings(stratSets);
-		}
-
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
+		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		
+		StrategySettings stratSets = new StrategySettings();
+		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+		stratSets.setWeight(1.);
+		config.strategy().addStrategySettings(stratSets);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		
-		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		double xMin = boundingBox.getXMin();
-		double xMax = boundingBox.getXMax();
-		double yMin = boundingBox.getYMin();
-		double yMax = boundingBox.getYMax();
-		double[] mapViewExtent = {xMin, yMin, xMax, yMax};
-
-		
-		// no pt block
-		
-		
 		assertNotNull(config);
 		
-
-		// collect activity types
-		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
-		log.warn( "found activity types: " + activityTypes );
-		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
-		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
-
-		// collect homes
-//		String activityFacilityType = "h";
-//		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
-
-
-//		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+		// Network bounds
+		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
+		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
 		
-		// network density points
-		ActivityFacilities measuringPoints = 
-				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);		
+		// Collect activity types
+//		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+//		log.info("Found activity types: " + activityTypes);
+		final List<String> activityTypes = new ArrayList<>();
+		activityTypes.add(FacilityTypes.DRINKING_WATER);
+//		activityTypes.add(FacilityTypes.TOILETS);
 		
+		// Network density points
+		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
-				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
+		final ActivityFacilities densityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
-		final Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
+		// Controller
+		final Controler controler = new Controler(scenario);
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
 		controler.run();
-
-
+		
+		// QGis
 		if (createQGisOutput == true) {
-			String workingDirectory =  config.controler().getOutputDirectory();
 			String osName = System.getProperty("os.name");
-
+			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if (!actType.equals("drinking_water")) {
-						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-						continue ;
-					}
-					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}

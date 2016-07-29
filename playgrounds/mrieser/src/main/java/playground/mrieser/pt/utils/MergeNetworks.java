@@ -25,8 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * Merges two networks into one, by copying all nodes and links from the two
@@ -75,7 +74,7 @@ public class MergeNetworks {
 	 * @param prefixB
 	 * @param mergedNetwork
 	 */
-	public static void merge(final Network networkA, final String prefixA, final Network networkB, final String prefixB, final NetworkImpl mergedNetwork) {
+	public static void merge(final Network networkA, final String prefixA, final Network networkB, final String prefixB, final Network mergedNetwork) {
 		double capacityFactor = mergedNetwork.getCapacityPeriod() / networkA.getCapacityPeriod();
 		NetworkFactory factory = mergedNetwork.getFactory();
 		for (Node node : networkA.getNodes().values()) {
@@ -98,7 +97,7 @@ public class MergeNetworks {
 		}
 		capacityFactor = mergedNetwork.getCapacityPeriod() / networkB.getCapacityPeriod();
 		for (Node node : networkB.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) factory.createNode(Id.create(prefixB + node.getId().toString(), Node.class), node.getCoord());
+			Node node2 = (Node) factory.createNode(Id.create(prefixB + node.getId().toString(), Node.class), node.getCoord());
 			mergedNetwork.addNode(node2);
 		}
 		for (Link link : networkB.getLinks().values()) {

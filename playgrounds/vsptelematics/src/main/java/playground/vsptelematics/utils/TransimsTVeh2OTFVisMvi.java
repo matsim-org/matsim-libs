@@ -41,10 +41,10 @@ import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter.Labels;
  */
 public class TransimsTVeh2OTFVisMvi implements MatsimReader {
 	private double skipUntil = 0.0;
-	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
+	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
 	private double snapshotPeriod = 1 ;
 	private int lastSnapshotIndex = -1 ;
-	Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+	Collection<AgentSnapshotInfo> positions = new ArrayList<>();
 	
 	public TransimsTVeh2OTFVisMvi() {
 		throw new RuntimeException("this class seems to have all the necessary mechanics.  But I never tested it since I eventually "
@@ -52,7 +52,7 @@ public class TransimsTVeh2OTFVisMvi implements MatsimReader {
 	}
 
 	@Override
-	public void read(String filename) {
+	public void readFile(String filename) {
 
 		TabularFileParser reader = new TabularFileParser() ;
 		// ---

@@ -1,12 +1,13 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
-import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
-import floetteroed.utilities.tabularfileparser.TabularFileParser;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
+import floetteroed.utilities.tabularfileparser.TabularFileParser;
 
 /**
  * TODO Are there nodes that should be left out?

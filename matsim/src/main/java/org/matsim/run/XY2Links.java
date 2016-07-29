@@ -22,16 +22,15 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -101,23 +100,24 @@ public class XY2Links {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		Scenario scenario;
 		this.config = ConfigUtils.loadConfig(this.configfile);
 		MatsimRandom.reset(this.config.global().getRandomSeed());
-		scenario = ScenarioUtils.createScenario(this.config);
+		MutableScenario scenario = ScenarioUtils.createMutableScenario(this.config);
+//		scenario.setPopulation( PopulationUtils.createStreamingPopulation( config.plans(), null)) ;
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		this.config = scenario.getConfig();
 
-		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
-		plans.setIsStreaming(true);
-		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
+//		final Population plans = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+//		StreamingUtils.setIsStreaming(reader, true);
+//		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, network);
 		plansWriter.startStreaming(this.plansfile);
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(scenario));
-		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(this.config.plans().getInputFile());
-		plans.printPlansCount();
+		reader.addAlgorithm(new org.matsim.core.population.algorithms.XY2Links(scenario));
+		reader.addAlgorithm(plansWriter);
+		reader.readFile(this.config.plans().getInputFile());
+		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 
 		System.out.println("done.");

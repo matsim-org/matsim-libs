@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.events.Event;
 
 import playground.dgrether.events.filters.EventFilter;
 

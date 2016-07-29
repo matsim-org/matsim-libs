@@ -8,17 +8,17 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/pt-simple/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/pt-simple/population.xml" />
+		<param name="inputPlansFile" value="population.xml" />
 	</module>
 
 	<module name="transit">
 		<param name="useTransit" value="true" />
-		<param name="transitScheduleFile" value="test/scenarios/pt-simple/transitschedule.xml" />
-		<param name="vehiclesFile" value="test/scenarios/pt-simple/transitVehicles.xml" />
+		<param name="transitScheduleFile" value="transitschedule.xml" />
+		<param name="vehiclesFile" value="transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
 

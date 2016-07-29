@@ -14,13 +14,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -161,7 +162,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
 
         					LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
-        					LegImpl li = new LegImpl(TransportMode.car);
+        					Leg li = PopulationUtils.createLeg(TransportMode.car);
         					li.setDepartureTime(0.0D);
                             handleCarLeg(li, link, this.controler.getScenario().getNetwork().getLinks().get(linklpa.getId()), network, routeAlgo);
 
@@ -191,7 +192,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
 
         					LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
-        					LegImpl li = new LegImpl(TransportMode.car);
+        					Leg li = PopulationUtils.createLeg(TransportMode.car);
         					li.setDepartureTime(0.0D);
                             handleCarLeg(li, link, this.controler.getScenario().getNetwork().getLinks().get(linknpa.getId()), network, routeAlgo);
 
@@ -256,7 +257,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
   
   private double getLegScore(Leg leg, ScoringFunction function)
   {
-	  if ((leg instanceof LegImpl))
+	  if ((leg instanceof Leg))
 	    {
 	      function.handleLeg(leg);
 	    }
@@ -302,7 +303,8 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
 
     leg.setDepartureTime(depTime);
     leg.setTravelTime(travTime);
-    ((LegImpl)leg).setArrivalTime(depTime + travTime);
+Leg r = ((Leg)leg);
+    r.setTravelTime( depTime + travTime - r.getDepartureTime() );
     return travTime;
   }
 

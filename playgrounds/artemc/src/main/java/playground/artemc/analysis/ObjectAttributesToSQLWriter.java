@@ -1,16 +1,5 @@
 package playground.artemc.analysis;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import playground.artemc.analysis.postgresql.PostgresType;
-import playground.artemc.analysis.postgresql.PostgresqlCSVWriter;
-import playground.artemc.analysis.postgresql.PostgresqlColumnDefinition;
-import playground.artemc.utils.DataBaseAdmin;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -20,6 +9,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import playground.artemc.analysis.postgresql.PostgresType;
+import playground.artemc.analysis.postgresql.PostgresqlCSVWriter;
+import playground.artemc.analysis.postgresql.PostgresqlColumnDefinition;
+import playground.artemc.utils.DataBaseAdmin;
 
 /**
  * Created by artemc on 8/5/15.
@@ -45,8 +46,8 @@ public class ObjectAttributesToSQLWriter {
 	private void readFile(String populationPath, String personAttributePath) {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new PopulationReaderMatsimV5(scenario).readFile(populationPath);
-		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(personAttributePath);
+		new PopulationReader(scenario).readFile(populationPath);
+		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(personAttributePath);
 	}
 
 	public void writeToDatabase(String connectionPropertiesFile, String schema, String tableName) {

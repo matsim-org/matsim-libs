@@ -27,20 +27,20 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.Persons;
 import playground.balmermi.world.Zone;
@@ -252,11 +252,11 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 	@Override
 	public void run(final Person person) {
-		ArrayList<ActivityImpl> work_list = new ArrayList<ActivityImpl>();
-		ArrayList<ActivityImpl> educ_list = new ArrayList<ActivityImpl>();
+		ArrayList<Activity> work_list = new ArrayList<Activity>();
+		ArrayList<Activity> educ_list = new ArrayList<Activity>();
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				if (W.equals(act.getType())) {
 					work_list.add(act);
 				} else if (E.equals(act.getType())) {
@@ -282,7 +282,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 			Coord coord = to_fac.getCoord();
 			for (int i= 0; i<work_list.size(); i++) {
-				ActivityImpl a = work_list.get(i);
+				Activity a = work_list.get(i);
 				a.setCoord(coord);
 			}
 		}
@@ -304,7 +304,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 			}
 			Coord coord = to_fac.getCoord();
 			for (int i= 0; i<educ_list.size(); i++) {
-				ActivityImpl a = educ_list.get(i);
+				Activity a = educ_list.get(i);
 				a.setCoord(coord);
 			}
 		}

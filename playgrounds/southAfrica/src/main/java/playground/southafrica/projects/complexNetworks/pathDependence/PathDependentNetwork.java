@@ -232,7 +232,7 @@ public class PathDependentNetwork {
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		for(File f : fileList){
 			/* Read the vehicle file. */
-			dvr.parse(f.getAbsolutePath());
+			dvr.readFile(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Process vehicle's chains. */

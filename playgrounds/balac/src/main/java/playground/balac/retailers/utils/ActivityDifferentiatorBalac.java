@@ -8,12 +8,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -83,11 +83,11 @@ public class ActivityDifferentiatorBalac {
 				if (person.getPlans().size() > 1) {
 					log.error("More than one plan for person: " + person.getId());
 				}
-				PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+				Plan selectedPlan = (Plan)person.getSelectedPlan();
 
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j=j+2) {
-					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("s")) {
 						numberOfShopActs++;
 					}
@@ -213,16 +213,16 @@ public class ActivityDifferentiatorBalac {
 			Object[] arrayfacilitynongrocery =  facilitiesNongrocery.values().toArray();
 			
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-				PersonImpl pi = (PersonImpl)person;
+				Person pi = (Person)person;
 				// intitially only one plan is available
 				if (pi.getPlans().size() > 1) {
 					log.error("More than one plan for person: " + pi.getId());
 				}
-				PlanImpl selectedPlan = (PlanImpl)pi.getSelectedPlan();
+				Plan selectedPlan = (Plan)pi.getSelectedPlan();
 				//Double duration = pi.getDesires().getActivityDuration("shop");
 				final List<? extends PlanElement> actslegs = selectedPlan.getPlanElements();
 				for (int j = 0; j < actslegs.size(); j = j + 2) {
-					final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+					final Activity act = (Activity)actslegs.get(j);
 					if (act.getType().startsWith("s")) {
 						
 						double random = MatsimRandom.getRandom().nextDouble();
@@ -287,12 +287,12 @@ public class ActivityDifferentiatorBalac {
 			log.info("Share:\t"+ (100.0 * assignedNumberOf_GroceryActs / this.numberOfShopActs));
 		}
 
-		private void modifyDesires(ActivityImpl act, PersonImpl pi) {
+		private void modifyDesires(Activity act, Person pi) {
 			ModifyDesires desiresModificator = new ModifyDesires (act, pi);
 			desiresModificator.run();
 		}
 
-		private void assignFacility(Object[] facilities, ActivityImpl act) {
+		private void assignFacility(Object[] facilities, Activity act) {
 			
 			int rd = MatsimRandom.getRandom().nextInt(facilities.length);
 			ActivityFacility facility = ((ActivityFacility)facilities[rd]);

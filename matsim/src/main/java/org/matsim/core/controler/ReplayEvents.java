@@ -48,6 +48,9 @@ public class ReplayEvents {
     Set<ControlerListener> controlerListenersDeclaredByModules;
 
     @Inject
+    ControlerListenerManager controlerListenerManager;
+
+    @Inject
     EventsManager eventsManager;
 
     public static Results run(final Config config, final String eventsFilename, final AbstractModule... modules) {
@@ -74,32 +77,38 @@ public class ReplayEvents {
     }
 
     public void playEventsFile(String eventsFilename, int iterationNumber) {
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerStartupEvent();
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof StartupListener) {
                 ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
             }
         }
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationStartsEvent(iterationNumber);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof IterationStartsListener) {
                 ((IterationStartsListener) controlerListener).notifyIterationStarts(new IterationStartsEvent(null, iterationNumber));
             }
         }
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerBeforeMobsimEvent(iterationNumber);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof BeforeMobsimListener) {
                 ((BeforeMobsimListener) controlerListener).notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber));
             }
         }
         new MatsimEventsReader(eventsManager).readFile(eventsFilename);
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerAfterMobsimEvent(iterationNumber);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof AfterMobsimListener) {
                 ((AfterMobsimListener) controlerListener).notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber));
             }
         }
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationEndsEvent(iterationNumber);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof IterationEndsListener) {
                 ((IterationEndsListener) controlerListener).notifyIterationEnds(new IterationEndsEvent(null, iterationNumber));
             }
         }
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerShutdownEvent(false);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof ShutdownListener) {
                 ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false));
@@ -111,6 +120,7 @@ public class ReplayEvents {
         @Override
 		public void install() {
 			bind(ReplayEvents.class).asEagerSingleton();
+            bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class).asEagerSingleton();
 		}
     }
 }

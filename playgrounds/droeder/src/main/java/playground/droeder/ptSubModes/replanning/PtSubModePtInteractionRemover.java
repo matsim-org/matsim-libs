@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -84,7 +84,7 @@ class PtSubModePtInteractionRemover implements PlanAlgorithm {
 									}else{
 										// if more modes used than one, assume there is no fixed mode. Thus set TransportMode.pt
 										if(!((Leg) temp.get(ii)).getMode().equals(((Leg) delegate).getMode())){
-											delegate = new LegImpl(TransportMode.pt);
+											delegate = PopulationUtils.createLeg(TransportMode.pt);
 										}
 									}
 								}

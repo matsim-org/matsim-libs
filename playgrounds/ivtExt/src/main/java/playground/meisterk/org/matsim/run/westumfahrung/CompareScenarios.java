@@ -31,22 +31,21 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonFilter;
 import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
 import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.misc.Time;
-import playground.balmermi.world.World;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,7 +163,10 @@ public class CompareScenarios {
 		log.info("Init...done.");
 		System.out.flush();
 		log.info("Performing analyses...");
-		this.doAnalyses(null);
+		if (true)
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
+
+		//this.doAnalyses(null);
 		log.info("Performing analyses...done.");
 		System.out.flush();
 		log.info("Writing out results...");
@@ -324,6 +326,7 @@ public class CompareScenarios {
 	 *
 	 * Summarize their average trip travel times, the scores of their selected plans, and their home locations.
 	 */
+	/*
 	private void doAnalyses(World world) {
 
 		TreeMap<Integer, TreeMap<String, PersonIdRecorder>> personIdRecorders = new TreeMap<Integer, TreeMap<String, PersonIdRecorder>>();
@@ -494,7 +497,7 @@ public class CompareScenarios {
 		}
 
 	}
-
+*/
 	private void writeComparison(final List<CaseStudyResult> results) {
 
 		this.scenarioComparisonLines.add("casestudy\tn_{agents}\tscore_{avg}\tt_{trip, avg}\td_{trip, avg}[m]");

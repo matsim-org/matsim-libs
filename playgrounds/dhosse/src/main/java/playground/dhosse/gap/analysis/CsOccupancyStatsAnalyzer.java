@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
@@ -16,14 +17,18 @@ import playground.dhosse.utils.io.AbstractCsvReader;
 
 public class CsOccupancyStatsAnalyzer {
 
+	private static final Logger log = Logger.getLogger(CsOccupancyStatsAnalyzer.class);
+	
 	private static double[] busyVehiclesAtTimeSlice = new double[31];
 	
-	private static String scenario = "mutable";
-	private static int[] runIds = new int[]{45,47,49,51};
+	private static String scenario = "mutable-reducedCosts";
+//	private static int[] runIds = new int[]{45,47,49,51};
+	private static int[] runIds = new int[]{46};
 	private static double nVehicles = 0;
 	
-	private static String inputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/"
-			+ "2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/";
+//	private static String inputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/"
+//			+ "2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/";
+	private static String inputPath = "/home/dhosse/stats/";
 	
 	private static Map<Integer, Set<Id<Vehicle>>> timeStep2UsedVehicleIds = 
 			new HashMap<Integer, Set<Id<Vehicle>>>();
@@ -57,6 +62,8 @@ public class CsOccupancyStatsAnalyzer {
 			nVehicles = 4 * 204;
 			
 		}
+		
+		log.info("There were " + (int)nVehicles + " car sharing vehicles found...");
 		
 		AbstractCsvReader reader = new AbstractCsvReader(" ", true) {
 			
@@ -105,7 +112,7 @@ public class CsOccupancyStatsAnalyzer {
 		}
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter("/home/dhosse/stats/occupiedVehicles_" +
-				scenario + ".csv");
+				scenario + "2.csv");
 		
 		try {
 		

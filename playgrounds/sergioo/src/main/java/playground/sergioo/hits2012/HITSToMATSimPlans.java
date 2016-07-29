@@ -16,11 +16,11 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -108,7 +108,7 @@ public class HITSToMATSimPlans {
 							tripMode.distance = CoordUtils.calcEuclideanDistance(cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getEndPostalCode()).getCoord()));
 							String activityT = getActivity(previousTrip.getPurpose(), getSeconds(previousTrip.getEndTime()), getSeconds(trip.getStartTime()), person.getEducation()); 
 							Activity activity = factory.createActivityFromLinkId(activityT, facility.getLinkId());
-							((ActivityImpl)activity).setFacilityId(facility.getId());
+							((Activity)activity).setFacilityId(facility.getId());
 							activity.setStartTime(getSeconds(previousTrip.getEndTime()));
 							activity.setEndTime(getSeconds(trip.getStartTime()));
 							plan.addActivity(activity);
@@ -219,8 +219,8 @@ public class HITSToMATSimPlans {
 					allPersonGood = false;
 				if(allPersonGood) {
 					org.matsim.api.core.v01.population.Person personM = factory.createPerson(Id.createPersonId(person.getId()));
-					((ActivityImpl)plan.getPlanElements().get(0)).setStartTime(((Activity)plan.getPlanElements().get(0)).getStartTime()-24*3600);
-					((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getEndTime()+24*3600);
+					((Activity)plan.getPlanElements().get(0)).setStartTime(((Activity)plan.getPlanElements().get(0)).getStartTime()-24*3600);
+					((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getEndTime()+24*3600);
 					personM.addPlan(plan);
 					scenario.getPopulation().addPerson(personM);
 				}

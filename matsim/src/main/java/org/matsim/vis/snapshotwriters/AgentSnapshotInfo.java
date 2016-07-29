@@ -47,10 +47,4 @@ public interface AgentSnapshotInfo {
 	int getUserDefined() ;
 	void setUserDefined( int tmp ) ; // needs to be a primitive type because of the byte buffer. kai, jan'10
 
-	@Deprecated // yyyy I don't know what this is.  kai, jan'10
-	public int getType();
-
-	@Deprecated // yyyy I don't know what this is.  kai, jan'10
-	public void setType(int tmp);
-
 }

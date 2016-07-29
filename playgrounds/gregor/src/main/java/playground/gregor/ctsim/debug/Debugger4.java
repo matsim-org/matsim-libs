@@ -37,7 +37,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -126,9 +125,9 @@ public class Debugger4 {
 	}
 
 	public static void setupConfig(Scenario sc) {
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.26);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.71);
+		((Network) sc.getNetwork()).setCapacityPeriod(1);
 		Config c = sc.getConfig();
 
 		c.strategy().addParam("Module_1", "ChangeExpBeta");

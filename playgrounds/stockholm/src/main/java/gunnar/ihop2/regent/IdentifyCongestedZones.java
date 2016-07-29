@@ -1,8 +1,5 @@
 package gunnar.ihop2.regent;
 
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -15,6 +12,8 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatsimMatricesReader;
 
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**

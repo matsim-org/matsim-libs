@@ -20,14 +20,17 @@
 
 package playground.meisterk.org.matsim.run.portland;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -35,8 +38,6 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-
-import java.io.IOException;
 
 public class GenerateDemand {
 
@@ -68,26 +69,28 @@ public class GenerateDemand {
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");
-		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
-		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans, networkLayer);
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, networkLayer);
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("Setting up plans objects...done.");
 
 		System.out.println("Setting up person modules...");
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		plans.addAlgorithm(
-				new PlanRouter(
-						new TripRouterFactoryBuilderWithDefaults().build(
-								scenario ).get(
-						) ) );
+		reader.addAlgorithm(new PlanRouter(
+		new TripRouterFactoryBuilderWithDefaults().build(
+				scenario ).get(
+		) ));
 		System.out.println("Setting up person modules...done.");
 
 		System.out.println("Reading, processing and writing plans...");
-		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		final PersonAlgorithm algo = plansWriter;
+		reader.addAlgorithm(algo);
+//		plansReader.readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
+		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 		System.out.println("Reading, processing and writing plans...done.");
 

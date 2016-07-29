@@ -95,7 +95,9 @@ public class DigicoreFilesSorter {
 		}
 		fileCounter.printCounter();
 		
-		log.info("Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
+		if(maxFile != null){
+			log.info("Largest file is " + maxFile.getName() + " and has " + maxLines + " gps records.");
+		}
 	}
 
 

@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -140,7 +140,7 @@ public class RidershipTracking implements Runnable {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler(handler);
         EventsReaderXMLv1 eventReader = new EventsReaderXMLv1(eventsManager);
-        eventReader.parse(eventsFile);
+        eventReader.readFile(eventsFile);
 
     }
 

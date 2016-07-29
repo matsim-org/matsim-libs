@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -105,7 +105,7 @@ PersonArrivalEventHandler, MobsimEngine
         chargerRegister.get(c.getLinkId()).put(c.getId(), c);
     }
     
-    public void addVehicle(AbstractVehicleWithBattery bev){
+    public void addVehicle(VehicleWithBattery bev){
         this.vehicleRegister.put(bev.getId(), bev);
     }
     
@@ -115,8 +115,8 @@ PersonArrivalEventHandler, MobsimEngine
         
         for (Vehicle bev : this.vehicleRegister.values()) {
             if (! (bev instanceof BatteryElectricVehicle)) continue;
-            double soc = ((AbstractVehicleWithBattery)bev).getSocInJoules();
-            double rsoc = soc / ((AbstractVehicleWithBattery)bev).getUsableBatteryCapacityInJoules();
+            double soc = ((VehicleWithBattery)bev).getSocInJoules();
+            double rsoc = soc / ((VehicleWithBattery)bev).getUsableBatteryCapacityInJoules();
             this.soCLog.add(new SocLogRow(bev.getId(), time, soc, rsoc));
             currentSoc.add(soc);
         }

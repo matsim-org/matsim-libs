@@ -21,7 +21,11 @@
 
 package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.vehicles.Vehicle;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 /**
@@ -32,6 +36,7 @@ import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 public abstract class ScenarioAnalyzerEventHandler implements EventHandler {
 
     protected static int ANALYSIS_END_TIME = 108000; // default 30h
+	private static final boolean EXCLUDEPT = true;
 
     public static void setAnalysisEndTime(int endTimeInSeconds) {
         ANALYSIS_END_TIME = endTimeInSeconds;
@@ -42,4 +47,8 @@ public abstract class ScenarioAnalyzerEventHandler implements EventHandler {
 	 * @return Results of the analysis in form of a (multiline) string.
 	 */
 	public abstract String createResults(SpatialCutter spatialEventCutter, int scaleFactor);
+
+	protected boolean isPersonToConsider(Id<Person> personId) {
+		return !EXCLUDEPT || !personId.toString().contains(TransportMode.pt);
+	}
 }

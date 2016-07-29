@@ -23,7 +23,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.sergioo.eventAnalysisTools2012.gui.VariableSizeSelectionNetworkPainter;
@@ -91,7 +91,7 @@ public class PublicTranportTeleportAnalizer implements PersonDepartureEventHandl
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		PublicTranportTeleportAnalizer publicTranportTeleportAnalizer = new PublicTranportTeleportAnalizer();
 		EventsManager events = (EventsManager)EventsUtils.createEventsManager();
 		events.addHandler(publicTranportTeleportAnalizer);

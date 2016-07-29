@@ -69,7 +69,7 @@ public class ExtractTripModeSharesLocatedInArea {
 
 	private static ObjectAttributes readAttributes(final String personAttributes) {
 		final ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader( atts ).parse( personAttributes );
+		new ObjectAttributesXmlReader( atts ).readFile( personAttributes );
 		return atts;
 	}
 }

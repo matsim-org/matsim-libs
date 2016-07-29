@@ -29,7 +29,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -96,7 +97,7 @@ public class RandomJointLocationChoiceTest {
 			final String type,
 			final Id<ActivityFacility> facilityId,
 			final Coord coord) {
-		final ActivityImpl act = new ActivityImpl( type , coord );
+		final Activity act = PopulationUtils.createActivityFromCoord(type, coord);
 
 		act.setFacilityId( facilityId );
 		activities.add( act );

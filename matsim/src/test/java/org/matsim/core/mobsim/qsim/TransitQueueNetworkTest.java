@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,18 +49,18 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -106,19 +107,23 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(1, allVehicles.size());
         assertEquals(f.normalVehicle, f.qlink2.getAllVehicles().toArray(new MobsimVehicle[1])[0]); // first the normal vehicle
 
+        f.qsim.getSimTimer().setTime(103);
         f.simEngine.doSimStep(103);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(119);
         f.simEngine.doSimStep(119);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(120);
         f.simEngine.doSimStep(120); // 100 (departure) + 19 (stop delay) + 1 (buffer2node)
         assertEquals(2, f.qlink2.getAllVehicles().size());
         MobsimVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new MobsimVehicle[2]);
         assertEquals(f.normalVehicle, vehicles[0]);
         assertEquals(f.transitVehicle, vehicles[1]); // second the transit vehicle
 
-        f.simEngine.doSimStep(117);
+        f.qsim.getSimTimer().setTime(117); // yy time going backwards??
+        f.simEngine.doSimStep(117); // yy time going backwards??
         assertEquals(2, f.qlink2.getAllVehicles().size());
     }
 
@@ -138,26 +143,32 @@ public class TransitQueueNetworkTest extends TestCase {
     public void testBlockingStop_FirstLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(1, true, 0, false);
 
+        f.qsim.getSimTimer().setTime(100);
         f.simEngine.doSimStep(100);
         assertEquals(0, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(101);
         f.simEngine.doSimStep(101);
         assertEquals(1, f.qlink2.getAllVehicles().size());
         assertEquals(f.normalVehicle, f.qlink2.getAllVehicles().toArray(new MobsimVehicle[1])[0]); // first the normal vehicle
 
+        f.qsim.getSimTimer().setTime(102);
         f.simEngine.doSimStep(102);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(119);
         f.simEngine.doSimStep(119);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(120);
         f.simEngine.doSimStep(120); // 100 (departure) + 19 (stop delay) + 1 (buffer2node)
         assertEquals(2, f.qlink2.getAllVehicles().size());
         MobsimVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new MobsimVehicle[2]);
         assertEquals(f.normalVehicle, vehicles[0]);
         assertEquals(f.transitVehicle, vehicles[1]); // second the transit vehicle
 
-        f.simEngine.doSimStep(117);
+        f.qsim.getSimTimer().setTime(117); // yy time going backwards??
+        f.simEngine.doSimStep(117); // yy time going backwards??
         assertEquals(2, f.qlink2.getAllVehicles().size());
     }
 
@@ -997,15 +1008,28 @@ public class TransitQueueNetworkTest extends TestCase {
             Id<Link> linkId3 = Id.create("3", Link.class);
 
             // setup: network
-            NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-            Node node1 = network.createAndAddNode(nodeId1, new Coord((double) 0, (double) 0));
-            Node node2 = network.createAndAddNode(nodeId2, new Coord((double) 1000, (double) 0));
-            Node node3 = network.createAndAddNode(nodeId3, new Coord((double) 2000, (double) 0));
-            Node node4 = network.createAndAddNode(nodeId4, new Coord((double) 3000, (double) 0));
+            Network network = (Network) scenario.getNetwork();
+		final Id<Node> id3 = nodeId1;
+            Node node1 = NetworkUtils.createAndAddNode(network, id3, new Coord((double) 0, (double) 0));
+		final Id<Node> id4 = nodeId2;
+            Node node2 = NetworkUtils.createAndAddNode(network, id4, new Coord((double) 1000, (double) 0));
+		final Id<Node> id5 = nodeId3;
+            Node node3 = NetworkUtils.createAndAddNode(network, id5, new Coord((double) 2000, (double) 0));
+		final Id<Node> id6 = nodeId4;
+            Node node4 = NetworkUtils.createAndAddNode(network, id6, new Coord((double) 3000, (double) 0));
             Link[] links = new Link[4];
-            links[1] = network.createAndAddLink(linkId1, node1, node2, 1000.0, 10.0, 3600.0, 1);
-            links[2] = network.createAndAddLink(linkId2, node2, node3, 1000.0, 10.0, 3600.0, 1);
-            links[3] = network.createAndAddLink(linkId3, node3, node4, 1000.0, 10.0, 3600.0, 1);
+		final Id<Link> id = linkId1;
+		final Node fromNode = node1;
+		final Node toNode = node2;
+            links[1] = NetworkUtils.createAndAddLink(network,id, fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1 );
+		final Id<Link> id1 = linkId2;
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+            links[2] = NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1 );
+		final Id<Link> id2 = linkId3;
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+            links[3] = NetworkUtils.createAndAddLink(network,id2, fromNode2, toNode2, 1000.0, 10.0, 3600.0, (double) 1 );
 
             // setup: population
             Population population = scenario.getPopulation();
@@ -1054,7 +1078,10 @@ public class TransitQueueNetworkTest extends TestCase {
 			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
-            QNetsimEngineModule.configure(qSim);
+            QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		  qSim.addMobsimEngine(netsimEngine);
+		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		  this.simEngine = netsimEngine ;
 			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
@@ -1073,7 +1100,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.qlink1 = (QLinkImpl) qnet.getNetsimLink(linkId1);
             this.qlink2 = (QLinkImpl) qnet.getNetsimLink(linkId2);
             this.qlink3 = (QLinkImpl) qnet.getNetsimLink(linkId3);
-            this.simEngine = qsim.getNetsimEngine();
+//            this.simEngine = qsim.getNetsimEngine();
             this.simEngine.onPrepareSim();
             TransitStopAgentTracker tracker = transitEngine.getAgentTracker();
             tracker.addAgentToStop(90, new FakeAgent(null, null), stop1.getId()); // just add some agent so the transit vehicle has to stop

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
 import org.matsim.contrib.evacuation.control.eventlistener.AbstractListener;
@@ -57,7 +58,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -375,7 +376,7 @@ public class Controller {
 		try {
 			this.evacuationConfigModule = new EvacuationConfigModule("evacuation");//, selectedFile.getAbsolutePath());
 			EvacuationConfigReader parser = new EvacuationConfigReader(this.evacuationConfigModule);
-			parser.parse(selectedFile.getAbsolutePath());
+			parser.readFile(selectedFile.getAbsolutePath());
 
 			this.scenarioPath = selectedFile.getParent();
 			this.evacuationFile = selectedFile.getAbsolutePath();
@@ -522,8 +523,8 @@ public class Controller {
 					reader.setHighwayDefaults(6, "pedestrian", 2, 1.34, 1.0, laneCap);
 
 					// max density is set to 5.4 p/m^2
-					((NetworkImpl) this.scenario.getNetwork()).setEffectiveLaneWidth(.6);
-					((NetworkImpl) this.scenario.getNetwork()).setEffectiveCellSize(.31);
+					((Network) this.scenario.getNetwork()).setEffectiveLaneWidth(.6);
+					((Network) this.scenario.getNetwork()).setEffectiveCellSize(.31);
 					reader.parse(networkFileName);
 				}
 				else {
@@ -572,7 +573,7 @@ public class Controller {
 		if (processLinks) {
 			this.links = new LinkQuadTree(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY());
 			this.linkList = new ArrayList<Link>();
-			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
+			Network net = (Network) this.scenario.getNetwork();
 			for (Link link : net.getLinks().values()) {
 				// ignore end links
 				if (link.getId().toString().contains("el")) {
@@ -1042,7 +1043,7 @@ public class Controller {
 
 	public boolean openNetworkChangeEvents() {
 		if (this.scenario != null) {
-			Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl) this.scenario.getNetwork()).getNetworkChangeEvents();
+			Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network) this.scenario.getNetwork()));
 			int id = this.visualizer.getPrimaryShapeRenderLayer().getId();
 
 			if (changeEvents != null) {

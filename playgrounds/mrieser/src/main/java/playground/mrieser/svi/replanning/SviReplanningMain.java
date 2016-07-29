@@ -22,9 +22,10 @@ package playground.mrieser.svi.replanning;
 import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -99,15 +100,15 @@ public class SviReplanningMain {
 
 		// stream and replan population
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming(true);
+		Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 
 //		SviReplanner replanner = new SviReplanner();
 //		DynamicODDemandCollector ods = new DynamicODDemandCollector();
 //		pop.addAlgorithm(replanner);
 //		pop.addAlgorithm(ods);
 
-		new MatsimPopulationReader(scenario).parse(inputPopulationFilename);
+		new PopulationReader(scenario).readFile(inputPopulationFilename);
 
 		// write new demand matrices
 		// TODO [MR] need description of format

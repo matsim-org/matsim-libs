@@ -60,7 +60,7 @@ public class EvacTimeAnalyzer implements PersonDepartureEventHandler, LinkEnterE
 		EventsManagerImpl m = new EventsManagerImpl();
 		EvacTimeAnalyzer handl = new EvacTimeAnalyzer();
 		m.addHandler(handl);
-		new EventsReaderXMLv1(m).parse(events);
+		new EventsReaderXMLv1(m).readFile(events);
 //		new TxtEventsFileReader(m).runEventsFile(events);
 		BufferedWriter w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/padang/analysis/CT")));
 		System.out.println(handl);

@@ -1,21 +1,19 @@
 package playground.boescpa.ivtBaseline.preparation;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
+import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Creates a default config for the ivt baseline scenarios.
@@ -27,7 +25,8 @@ public class IVTConfigCreator {
 	// Scenario
     protected final static int NUMBER_OF_THREADS = 8;
     protected final static String INBASE_FILES = "";
-    protected final static int WRITE_OUT_INTERVAL = 10;
+	private static final int NUMBER_OF_ITERATIONS = 1000;
+    protected final static int WRITE_OUT_INTERVAL = 100;
     protected final static String COORDINATE_SYSTEM = "CH1903_LV03_Plus";
 
 	// ActivityTypes
@@ -52,7 +51,7 @@ public class IVTConfigCreator {
     public static final String VEHICLES = "mmVehicles.xml.gz";
     public static final String FACILITIES2LINKS = "facilitiesLinks.f2l";
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         int prctScenario = Integer.parseInt(args[1]); // the percentage of the scenario in percent (e.g. 1%-Scenario -> "1")
         // Create config and add kti-scoring and destination choice
         Config config = ConfigUtils.createConfig();
@@ -61,7 +60,9 @@ public class IVTConfigCreator {
     }
 
     protected void makeConfigIVT(Config config, final int prctScenario) {
-        // Correct routing algorithm
+        // Set the number of iterations
+		config.controler().setLastIteration(NUMBER_OF_ITERATIONS);
+		// Correct routing algorithm
 		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
         // Change write out intervals
 		config.controler().setWriteEventsInterval(WRITE_OUT_INTERVAL);
@@ -69,28 +70,19 @@ public class IVTConfigCreator {
 		config.controler().setWriteSnapshotsInterval(WRITE_OUT_INTERVAL);
 		config.counts().setWriteCountsInterval(WRITE_OUT_INTERVAL);
 		config.ptCounts().setPtCountsInterval(WRITE_OUT_INTERVAL);
+		config.linkStats().setWriteLinkStatsInterval(WRITE_OUT_INTERVAL);
         // Add f2l
         config.createModule(WorldConnectLocations.CONFIG_F2L);
         // Set coordinate system
 		config.global().setCoordinateSystem(COORDINATE_SYSTEM);
-        // Add activity parameters
-        //  <-> We have these as agent-specific parameters now...
-        /*Map<String, Double> activityDescr = getActivityDescr();
-        for (String activity : activityDescr.keySet()) {
-            PlanCalcScoreConfigGroup.ActivityParams activitySet = new PlanCalcScoreConfigGroup.ActivityParams();
-            activitySet.setActivityType(activity);
-            activitySet.setTypicalDuration(activityDescr.get(activity));
-            config.planCalcScore().addParameterSet(activitySet);
-        }*/
         // Set end time
 		config.qsim().setEndTime(108000); // 30:00:00
+		// Set stuck time
+		config.qsim().setStuckTime(600); // 00:10:00
         // Add strategies
-        Map<String, Double> strategyDescr = getStrategyDescr();
-        for (String strategy : strategyDescr.keySet()) {
-            StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
-            strategySettings.setStrategyName(strategy);
-            strategySettings.setWeight(strategyDescr.get(strategy));
-            config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategySettings);
+        List<StrategyConfigGroup.StrategySettings> strategyDescrs = getStrategyDescr();
+        for (StrategyConfigGroup.StrategySettings strategy : strategyDescrs) {
+            config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategy);
         }
 		// Add black listed time mutation and the black listed modes:
 		// (black listed are all modes which are not free for the agent to decide the start and end times)
@@ -103,12 +95,27 @@ public class IVTConfigCreator {
 		timeMutationBlackList.add(ESCORT_OTHER);
 		blTAM.setBlackList(timeMutationBlackList);
 		config.addModule(blTAM);
+		// Add location choice
+		DestinationChoiceConfigGroup destChoiConfigGroup = new DestinationChoiceConfigGroup();
+		destChoiConfigGroup.setFlexibleTypes("remote_work, leisure, shop, escort_kids, escort_other");
+		destChoiConfigGroup.setEpsilonScaleFactors("0.3, 0.1, 0.1, 0.1, 0.2");
+		destChoiConfigGroup.setTravelTimeApproximationLevel(DestinationChoiceConfigGroup.ApproximationLevel.localRouting);
+		destChoiConfigGroup.setPrefsFile(INBASE_FILES + POPULATION_ATTRIBUTES);
+		config.addModule(destChoiConfigGroup);
         // Activate transit and correct it to ivt-experience
 		config.transit().setUseTransit(true);
 		config.planCalcScore().setUtilityOfLineSwitch(-2.0);
 		config.transitRouter().setSearchRadius(2000.0);
+		config.transitRouter().setAdditionalTransferTime(0.5);
 		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = getModeParamsTransitWalk(config);
 		transitWalkSet.setMarginalUtilityOfTraveling(-12.0);
+		// Add scoring for subpopulations
+		PlanCalcScoreConfigGroup.ScoringParameterSet scoringParams = config.planCalcScore().getOrCreateScoringParameters(null);
+		scoringParams.getOrCreateActivityParams("cbHome").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("cbWork").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("cbShop").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("cbLeisure").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("freight").setScoringThisActivityAtAll(false);
         // Set threads to NUMBER_OF_THREADS
 		config.global().setNumberOfThreads(NUMBER_OF_THREADS);
 		config.parallelEventHandling().setNumberOfThreads(NUMBER_OF_THREADS);
@@ -123,8 +130,8 @@ public class IVTConfigCreator {
 		config.households().setInputFile(INBASE_FILES + HOUSEHOLDS);
 		config.households().setInputHouseholdAttributesFile(INBASE_FILES + HOUSEHOLD_ATTRIBUTES);
 		config.network().setInputFile(INBASE_FILES + NETWORK);
-		config.plans().setInputFile(INBASE_FILES + POPULATION_ATTRIBUTES);
-		config.plans().setInputPersonAttributeFile(INBASE_FILES + POPULATION);
+		config.plans().setInputFile(INBASE_FILES + POPULATION);
+		config.plans().setInputPersonAttributeFile(INBASE_FILES + POPULATION_ATTRIBUTES);
 		config.transit().setTransitScheduleFile(INBASE_FILES + SCHEDULE);
 		config.transit().setVehiclesFile(INBASE_FILES + VEHICLES);
     }
@@ -138,28 +145,33 @@ public class IVTConfigCreator {
 		return transitWalkSet;
 	}
 
-	protected Map<String, Double> getStrategyDescr() {
-        Map<String, Double> strategyDescr = new HashMap<>();
-        strategyDescr.put("ChangeExpBeta", 0.5);
-        strategyDescr.put("ReRoute", 0.2);
-		strategyDescr.put("BlackListedTimeAllocationMutator", 0.1);
-        strategyDescr.put("SubtourModeChoice", 0.1);
-        return strategyDescr;
+	protected List<StrategyConfigGroup.StrategySettings> getStrategyDescr() {
+		List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+		// main pop
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.2));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2));
+		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
+		strategySettings.add(getStrategySetting("SubtourModeChoice", 0.1));
+		strategySettings.add(getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 0.1));
+		// cb pop
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.2, CreateCBPop.CB_TAG));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2, CreateCBPop.CB_TAG));
+		// freight pop
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.2, CreateFreightTraffic.FREIGHT_TAG));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2, CreateCBPop.CB_TAG));
+        return strategySettings;
     }
 
-    protected Map<String, Double> getActivityDescr() {
-        Map<String, Double> activityDescr = new HashMap<>();
-        activityDescr.put("home", 43200.);
-        activityDescr.put("shop", 7200.);
-        activityDescr.put("remote_home", 43200.);
-        activityDescr.put("remote_work", 14400.);
-        activityDescr.put("leisure", 14400.);
-        activityDescr.put("escort_other", 3600.);
-        activityDescr.put("education", 28800.);
-        activityDescr.put("primary_work", 14400.);
-        activityDescr.put("work", 14400.);
-        activityDescr.put("escort_kids", 3600.);
-        return activityDescr;
-    }
+	protected static StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight, String subPopulation) {
+		StrategyConfigGroup.StrategySettings strategySetting = getStrategySetting(strategyName, strategyWeight);
+		strategySetting.setSubpopulation(subPopulation);
+		return strategySetting;
+	}
 
+	protected static StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight) {
+		StrategyConfigGroup.StrategySettings strategySetting = new StrategyConfigGroup.StrategySettings();
+		strategySetting.setStrategyName(strategyName);
+		strategySetting.setWeight(strategyWeight);
+		return strategySetting;
+	}
 }

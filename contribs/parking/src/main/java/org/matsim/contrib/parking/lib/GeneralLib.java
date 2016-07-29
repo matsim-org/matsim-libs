@@ -59,17 +59,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.*;
+import org.matsim.core.network.io.KmlNetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -108,7 +114,7 @@ public class GeneralLib {
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(plansFile);
 
 		return scenario;
@@ -138,14 +144,11 @@ public class GeneralLib {
 	 */
 	@Deprecated // use centralized infrastructure
 	public static Network readNetwork(String networkFile) {
-		MutableScenario sc = (MutableScenario) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 
-		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
-
-		ScenarioUtils.loadScenario(sc);
-
-		return sc.getNetwork();
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		return scenario.getNetwork();
 	}
 
 	public static void writeNetwork(Network network,
@@ -717,7 +720,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network) {
-        PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(((MutableScenario) null).getConfig(), ((MutableScenario) null).getNetwork()), network);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(PopulationUtils.createPopulation(((MutableScenario) null).getConfig(), ((MutableScenario) null).getNetwork()), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -736,7 +739,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network, MutableScenario scenario) {
-        PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()), network);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -753,9 +756,9 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		Person newPerson = PopulationUtils.createPerson(person.getId());
-		PlanImpl newPlan = new PlanImpl();
-		newPlan.copyFrom(person.getSelectedPlan());
+		Person newPerson = PopulationUtils.getFactory().createPerson(person.getId());
+		Plan newPlan = PopulationUtils.createPlan();
+		PopulationUtils.copyFromTo(person.getSelectedPlan(), newPlan);
 		newPlan.setPerson(newPerson);
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);

@@ -56,7 +56,7 @@ public class TTMatrixFromEvents extends TTMatrix {
 		events.addHandler(tTMatrixTimesHandler);
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 
 		linkTravelTimes=tTMatrixTimesHandler.getLinkTravelTimes();
 	}

@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.optimizer.rules;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -35,34 +35,33 @@ import org.matsim.contrib.zone.*;
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    private static ZonalSystem zonalSystem;//TODO
-
     protected final BestDispatchFinder dispatchFinder;
 
-    private final IdleTaxiZonalRegistry idleTaxiRegistry;
+    protected final IdleTaxiZonalRegistry idleTaxiRegistry;
     private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
     private final RuleBasedTaxiOptimizerParams params;
 
 
-    public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext)
+    public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext,
+            RuleBasedTaxiOptimizerParams params)
     {
-        super(optimContext, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
+        this(optimContext, params, new SquareGridSystem(optimContext.network, params.cellSize));
+    }
 
-        this.params = (RuleBasedTaxiOptimizerParams)optimContext.optimizerParams;
+
+    public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext,
+            RuleBasedTaxiOptimizerParams params, ZonalSystem zonalSystem)
+    {
+        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
+
+        this.params = params;
 
         if (optimContext.scheduler.getParams().vehicleDiversion) {
             throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
         }
 
         dispatchFinder = new BestDispatchFinder(optimContext);
-
-        //TODO temp solution
-        if (zonalSystem == null) {
-            Network network = optimContext.context.getScenario().getNetwork();
-            zonalSystem = new SquareGridSystem(network, params.cellSize);
-        }
-
         idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, optimContext.scheduler);
         unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
     }
@@ -97,7 +96,7 @@ public class RuleBasedTaxiOptimizer
 
             case DEMAND_SUPPLY_EQUIL:
                 int awaitingReqCount = Requests.countRequests(unplannedRequests,
-                        new Requests.IsUrgentPredicate(optimContext.context.getTime()));
+                        new Requests.IsUrgentPredicate(optimContext.timer.getTimeOfDay()));
 
                 return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
 
@@ -121,10 +120,10 @@ public class RuleBasedTaxiOptimizer
                             params.nearestVehiclesLimit)
                     : idleTaxiRegistry.getVehicles();
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    selectedVehs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestVehicleForRequest(req, selectedVehs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
@@ -141,18 +140,19 @@ public class RuleBasedTaxiOptimizer
             Vehicle veh = vehIter.next();
 
             Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
-            Iterable<TaxiRequest> selectedReqs = unplannedRequests.size() > params.nearestRequestsLimit
-                    ? unplannedRequestRegistry.findNearestRequests(link.getToNode(),
-                            params.nearestRequestsLimit)
-                    : unplannedRequests;
+            Iterable<TaxiRequest> selectedReqs = unplannedRequests
+                    .size() > params.nearestRequestsLimit
+                            ? unplannedRequestRegistry.findNearestRequests(link.getToNode(),
+                                    params.nearestRequestsLimit)
+                            : unplannedRequests;
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestRequestForVehicle(veh,
-                    selectedReqs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestRequestForVehicle(veh, selectedReqs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-            unplannedRequests.remove(best.request);
-            unplannedRequestRegistry.removeRequest(best.request);
+            unplannedRequests.remove(best.destination);
+            unplannedRequestRegistry.removeRequest(best.destination);
         }
     }
 
@@ -182,7 +182,7 @@ public class RuleBasedTaxiOptimizer
         else {
             if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
                 TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
-                if (previousTask.getTaxiTaskType() == TaxiTaskType.STAY) {
+                if (isWaitStay(previousTask)) {
                     idleTaxiRegistry.removeVehicle(schedule.getVehicle());
                 }
             }
@@ -193,6 +193,12 @@ public class RuleBasedTaxiOptimizer
     @Override
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        return newCurrentTask.getTaxiTaskType() == TaxiTaskType.STAY;
+        return isWaitStay(newCurrentTask);
+    }
+
+
+    protected boolean isWaitStay(TaxiTask task)
+    {
+        return task.getTaxiTaskType() == TaxiTaskType.STAY;
     }
 }

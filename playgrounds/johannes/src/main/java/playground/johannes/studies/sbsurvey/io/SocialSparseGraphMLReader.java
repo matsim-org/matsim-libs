@@ -28,7 +28,7 @@ import org.matsim.contrib.socnetgen.sna.graph.social.*;
 import org.matsim.contrib.socnetgen.sna.graph.social.io.SocialGraphML;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphML;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.Attributes;
 
@@ -118,7 +118,7 @@ public class SocialSparseGraphMLReader
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		if(population == null) {
-			MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+			PopulationReader reader = new PopulationReader(scenario);
 			reader.readFile(baseDir + "/" + popFile);
 			population = scenario.getPopulation();
 		}

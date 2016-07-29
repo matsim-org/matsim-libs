@@ -20,7 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.fifo;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 
 
 public class FifoTaxiOptimizerParams
@@ -30,12 +30,4 @@ public class FifoTaxiOptimizerParams
     {
         super(optimizerConfig);
     }
-
-
-    @Override
-    public FifoTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new FifoTaxiOptimizer(optimContext);
-    }
-
 }

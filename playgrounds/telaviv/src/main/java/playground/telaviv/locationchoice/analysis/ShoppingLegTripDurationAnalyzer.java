@@ -45,8 +45,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -88,7 +88,7 @@ public class ShoppingLegTripDurationAnalyzer implements PersonDepartureEventHand
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		// load population
-		new MatsimPopulationReader(scenario).readFile(populationFile);
+		new PopulationReader(scenario).readFile(populationFile);
 
 		new ShoppingLegTripDurationAnalyzer(scenario);
 	}

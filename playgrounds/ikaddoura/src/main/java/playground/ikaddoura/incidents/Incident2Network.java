@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -50,7 +49,7 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 
 public class Incident2Network {
 	private static final Logger log = Logger.getLogger(Incident2Network.class);
-	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+	private final CoordinateTransformation ct;
 
 	private Network carNetwork = null;
 	private Scenario scenario = null;
@@ -59,10 +58,11 @@ public class Incident2Network {
 	private final Map<String, Path> trafficItemId2path = new HashMap<>();
 	private final Set<String> trafficItemsToCheck = new HashSet<>();
 	
-	public Incident2Network(Scenario scenario, Map<String, TrafficItem> trafficItems) {
+	public Incident2Network(Scenario scenario, Map<String, TrafficItem> trafficItems, String targetCRS) {
 		this.scenario = scenario;
 		this.carNetwork = loadCarNetwork(scenario);
 		this.trafficItems = trafficItems;
+		ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, targetCRS);
 	}
 
 	public void computeIncidentPaths() {
@@ -73,19 +73,19 @@ public class Incident2Network {
 			final Coord coordFromWGS84 = new Coord(Double.valueOf(trafficItems.get(id).getOrigin().getLongitude()), Double.valueOf(trafficItems.get(id).getOrigin().getLatitude()));
 			final Coord coordToWGS84 = new Coord(Double.valueOf(trafficItems.get(id).getTo().getLongitude()), Double.valueOf(trafficItems.get(id).getTo().getLatitude()));
 			
-			final Coord coordFromGK4 = ct.transform(coordFromWGS84);
-			final Coord coordToGK4 = ct.transform(coordToWGS84);			
-			double beelineDistance = NetworkUtils.getEuclideanDistance(coordFromGK4, coordToGK4);
+			final Coord coordFromTargetCRS = ct.transform(coordFromWGS84);
+			final Coord coordToTargetCRS = ct.transform(coordToWGS84);			
+			double beelineDistance = NetworkUtils.getEuclideanDistance(coordFromTargetCRS, coordToTargetCRS);
 						
 			// first just use the nearest link functionality
-			Link nearestLinkFrom = NetworkUtils.getNearestLink(carNetwork, coordFromGK4);
-			Link nearestLinkTo = NetworkUtils.getNearestLink(carNetwork, coordToGK4);		
+			Link nearestLinkFrom = NetworkUtils.getNearestLink(carNetwork, coordFromTargetCRS);
+			Link nearestLinkTo = NetworkUtils.getNearestLink(carNetwork, coordToTargetCRS);		
 			
 			final DijkstraFactory f = new DijkstraFactory();
 			final TravelDisutility travelCosts = TravelDisutilityUtils.createFreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 			final Path incidentPath = f.createPathCalculator(scenario.getNetwork(), travelCosts, new FreeSpeedTravelTime()).calcLeastCostPath(scenario.getNetwork().getNodes().get(nearestLinkFrom.getToNode().getId()), scenario.getNetwork().getNodes().get(nearestLinkTo.getFromNode().getId()), 0., null, null);
 			
-			double[] incidentVector = computeVector(coordFromGK4, coordToGK4);			
+			double[] incidentVector = computeVector(coordFromTargetCRS, coordToTargetCRS);			
 			
 			// now cut the ends to avoid circles and other weird effects		
 			
@@ -186,7 +186,7 @@ public class Incident2Network {
 		log.info("Creating car network... ");
 
 		Network carNetwork = NetworkUtils.createNetwork();
-		NetworkFactory factory = new NetworkFactoryImpl(carNetwork);
+		NetworkFactory factory = carNetwork.getFactory();
 		
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (link.getAllowedModes().contains(TransportMode.car)) {

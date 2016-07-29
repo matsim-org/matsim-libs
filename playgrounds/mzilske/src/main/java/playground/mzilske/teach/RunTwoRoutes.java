@@ -30,8 +30,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -65,7 +65,7 @@ public class RunTwoRoutes {
         }
         final Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).parse(this.getClass().getResourceAsStream("two-routes.xml"));
-        new MatsimPopulationReader(scenario).parse(this.getClass().getResourceAsStream("thirty.xml"));
+        new PopulationReader(scenario).parse(this.getClass().getResourceAsStream("thirty.xml"));
         Controler controler = new Controler(scenario);
         controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
             @Override

@@ -23,12 +23,13 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import playground.gregor.casim.simulation.physics.CALink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
@@ -72,7 +73,7 @@ public class CANetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)this.mobsim.getScenario().getNetwork()).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network)this.mobsim.getScenario().getNetwork()));
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);

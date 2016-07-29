@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import util.geometry.Point2D;
@@ -93,7 +92,9 @@ public class Shape {
 	public double getDistance(Link link) {
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(Coord coord:points.values()) {
-			double distance = ((LinkImpl)link).calcDistance(coord);
+			final Coord coord1 = coord;
+			Link r = ((Link)link);
+			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if(distance<nearestDistance)
 				nearestDistance = distance;
 		}

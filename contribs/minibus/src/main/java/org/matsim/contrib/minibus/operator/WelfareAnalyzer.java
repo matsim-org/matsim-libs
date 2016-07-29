@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -71,7 +71,7 @@ public class WelfareAnalyzer {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimPopulationReader(scenario).readFile(initialScoresFile);
+		new PopulationReader(scenario).readFile(initialScoresFile);
 		
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			

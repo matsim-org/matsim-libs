@@ -23,10 +23,10 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import javax.inject.Provider;
 

@@ -42,7 +42,7 @@ public class ParseEstablishmentConnectivity {
 		String rFile = args[1];
 		
 		DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
-		nr.parse(networkFile);
+		nr.readFile(networkFile);
 		PathDependentNetwork network = nr.getPathDependentNetwork();
 
 		int[] vertices = {39371, 39324, 35418, 36506, 39890};

@@ -14,11 +14,11 @@
   </module>
   
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/org/matsim/contrib/locationchoice/plans.xml" />
+		<param name="inputPlansFile" value="plans.xml" />
 	</module>
 	
 	<module name="locationchoice">
@@ -33,7 +33,7 @@
 	</module>
 		
 	<module name="facilities" >
-		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+		<param name="inputFacilitiesFile" value="facilities.xml" />
 	</module>	
 	
 	<module name="qsim">

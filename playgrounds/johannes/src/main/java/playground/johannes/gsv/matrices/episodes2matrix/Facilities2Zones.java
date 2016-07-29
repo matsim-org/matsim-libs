@@ -65,7 +65,7 @@ public class Facilities2Zones {
         facReader.readFile(facIn);
 
         logger.info("Loading zones...");
-        ZoneCollection zones = new ZoneCollection();
+        ZoneCollection zones = new ZoneCollection(null);
         String data = new String(Files.readAllBytes(Paths.get(zonesIn)));
         zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
         zones.setPrimaryKey(zoneIdKey);
@@ -73,7 +73,7 @@ public class Facilities2Zones {
         logger.info("Loading persons...");
         XMLHandler parser = new XMLHandler(new PlainFactory());
         parser.setValidating(false);
-        parser.parse(popIn);
+        parser.readFile(popIn);
         logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
         Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();

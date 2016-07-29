@@ -32,8 +32,8 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
  */
 public interface OTFLiveServer extends OTFServer, PlayPauseSimulationControlI {
 	
-	public OTFQueryRemote answerQuery(AbstractQuery query);
+	OTFQueryRemote answerQuery(AbstractQuery query);
 
-	public void removeQueries();
+	void removeQueries();
 	
 }

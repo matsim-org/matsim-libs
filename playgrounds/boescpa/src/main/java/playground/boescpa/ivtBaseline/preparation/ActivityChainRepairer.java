@@ -1,21 +1,23 @@
 package playground.boescpa.ivtBaseline.preparation;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Counter;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.HOME;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.REMOTE_HOME;
 
 import java.util.List;
 import java.util.Random;
 
-import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Repairs incomplete and / or broken activity chains.
@@ -31,7 +33,7 @@ public class ActivityChainRepairer {
         final String pathToOutputPopulation = args[1];
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+        PopulationReader plansReader = new PopulationReader(scenario);
         plansReader.readFile(pathToInputPopulation);
         Population population = scenario.getPopulation();
 
@@ -49,7 +51,7 @@ public class ActivityChainRepairer {
             counter.incCounter();
             if (p.getSelectedPlan() != null) {
                 plan = p.getSelectedPlan().getPlanElements();
-                ActivityImpl lastAct = (ActivityImpl) plan.get(plan.size()-1);
+                Activity lastAct = (Activity) plan.get(plan.size()-1);
                 if (!lastAct.getType().equals(HOME) && !lastAct.getType().equals(REMOTE_HOME)) {
                     // add end-time to lastAct given typical duration
                     minDurationLastAct = PrefsCreator.actCharacteristics.valueOf(lastAct.getType().toUpperCase()).getMinDur();
@@ -60,11 +62,11 @@ public class ActivityChainRepairer {
                     }
                     lastAct.setEndTime(lastAct.getStartTime() + durationLastAct);
                     // create leg to return home...
-                    LegImpl lastLeg = (LegImpl) plan.get(plan.size()-2);
-                    LegImpl newLeg = new LegImpl(lastLeg.getMode());
+                    Leg lastLeg = (Leg) plan.get(plan.size()-2);
+                    Leg newLeg = PopulationUtils.createLeg(lastLeg.getMode());
                     // create final home activity (assumption that first activity was home or remote_home)...
-                    ActivityImpl firstAct = (ActivityImpl) plan.get(0);
-                    ActivityImpl newAct = new ActivityImpl(firstAct.getType(), firstAct.getCoord());
+                    Activity firstAct = (Activity) plan.get(0);
+                    Activity newAct = PopulationUtils.createActivityFromCoord(firstAct.getType(), firstAct.getCoord());
                     newAct.setFacilityId(firstAct.getFacilityId());
                     newAct.setStartTime(lastAct.getEndTime() + 1);
                     // complete act chain...

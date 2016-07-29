@@ -170,14 +170,14 @@ public class ProxyPlans2Matrix {
 		facReader.readFile(args[1]);
 
 		logger.info("Loading zones...");
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get(args[2])));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 
 		logger.info("Loading persons...");
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();

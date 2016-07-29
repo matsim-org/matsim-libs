@@ -177,7 +177,7 @@ if ( true ) {
   private static RoadPricingScheme loadTollLinksFile(String tollLinksFilePath) {
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 	  RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
-		reader.parse(tollLinksFilePath);
+		reader.readFile(tollLinksFilePath);
 		return scheme;
 	}
 

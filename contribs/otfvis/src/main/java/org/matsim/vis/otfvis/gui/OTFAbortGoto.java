@@ -24,7 +24,6 @@ import javax.swing.ProgressMonitor;
 
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
-import org.matsim.vis.otfvis.interfaces.OTFServer.TimePreference;
 
 
 /**
@@ -37,23 +36,21 @@ public class OTFAbortGoto extends Thread  {
 	public boolean terminate = false;
 	private final OTFServer host;
 	private final int toTime;
-	private ProgressMonitor progressMonitor;
 
-	public OTFAbortGoto(OTFServer host, int toTime, int toIter) {
+	public OTFAbortGoto(OTFServer host, int toTime) {
 		this.toTime = toTime;
 		this.host = host;
 	}
 
 	@Override
 	public void run() {
-		int actTime = 0;
-		actTime = host.getLocalTime();
+		int actTime = host.getLocalTime();
 		int from = actTime;
 		int to = toTime;
 		// this is a reset! start from 00:00:00
 		if(from > to) from = 0;
 
-		progressMonitor = new ProgressMonitor(null,
+		ProgressMonitor progressMonitor = new ProgressMonitor(null,
 				"Running Simulation forward to " + Time.writeTime(toTime),
 				"hat", from, to);
 
@@ -66,7 +63,7 @@ public class OTFAbortGoto extends Thread  {
 					if(actTime == -1) actTime = 0;
 				}
 
-				String message = String.format("Completed to Time: "+ Time.writeTime(actTime));
+				String message = "Completed to Time: "+ Time.writeTime(actTime);
 				progressMonitor.setNote(message);
 				double pastMidnight = (actTime > 24*3600) ? (actTime -24*3600)/3600. : 0;
 				int progress = (pastMidnight>0 ? 24*3600 + (int)(5*3600*(pastMidnight/(pastMidnight+1))) : actTime);
@@ -74,9 +71,8 @@ public class OTFAbortGoto extends Thread  {
 				if ( (actTime >= toTime) || progressMonitor.isCanceled()) {
 					terminate = true;
 				}
-				//System.out.println("Loc time " + actTime);
-				if ((actTime < toTime) && terminate == true) {
-					host.requestNewTime(actTime, TimePreference.EARLIER);
+				if ((actTime < toTime) && terminate) {
+					host.requestNewTime(actTime);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

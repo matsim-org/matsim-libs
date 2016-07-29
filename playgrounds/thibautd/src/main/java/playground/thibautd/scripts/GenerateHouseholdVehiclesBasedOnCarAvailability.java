@@ -23,10 +23,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.households.Household;
@@ -35,7 +37,6 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import playground.ivt.utils.ArgParser;
@@ -73,8 +74,11 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		if ( args.isSwitched( "--cliques" ) ) {
 			log.info( "read households using cliques reader" );
 
-			new MatsimXmlParser( false ) {
+			new MatsimXmlParser(  ) {
 				HouseholdImpl currentHousehold = null;
+				{
+					this.setValidating(false);
+				}
 				@Override
 				public void startTag(
 						final String name,
@@ -95,7 +99,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 						final String name,
 						final String content,
 						final Stack<String> context) {}
-			}.parse( inhh );
+			}.readFile( inhh );
 		}
 		else {
 			log.info( "read households using households reader" );
@@ -112,26 +116,26 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		}
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final PopulationImpl pop = (PopulationImpl) sc.getPopulation();
+		final Population pop = (Population) sc.getPopulation();
 
 		log.info( "parse persons" );
 		final Set<Id> hhsWithSometimes = new HashSet<Id>();
-		pop.setIsStreaming( true );
-		pop.addAlgorithm( new PersonAlgorithm() {
+		StreamingUtils.setIsStreaming(pop, true);
+		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				final Household hh = person2hh.get( person.getId() );
 				if ( "always".equals( PersonUtils.getCarAvail(person) ) ) {
 					((HouseholdImpl) hh).getVehicleIds().add( Id.create(person.getId().toString(), Vehicle.class) );
 				}
-
+		
 				if ( "sometimes".equals( PersonUtils.getCarAvail(person) ) ) {
 					hhsWithSometimes.add( hh.getId() );
 				}
 			}
 		});
 
-		new MatsimPopulationReader( sc ).readFile( inpop );
+		new PopulationReader( sc ).readFile( inpop );
 
 		log.info( "correction: do not let households with only \"sometimes\" without a car" );
 		int c=0;

@@ -41,8 +41,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -88,7 +87,7 @@ public class OsmNetworkReaderJohan {
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private long id = 0;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
-	private final NetworkImpl network;
+	private final Network network;
 	/*package*/ final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
@@ -115,7 +114,7 @@ public class OsmNetworkReaderJohan {
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
 	public OsmNetworkReaderJohan(final Network network, final CoordinateTransformation transformation, boolean useHighwayDefaults) {
-		this.network = (NetworkImpl) network;
+		this.network = (Network) network;
 		this.transform = transformation;
 
 		if (useHighwayDefaults) {
@@ -173,14 +172,14 @@ public class OsmNetworkReaderJohan {
 			if (stream != null) {
 //				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
 			if (stream != null) {
 //				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
@@ -188,7 +187,7 @@ public class OsmNetworkReaderJohan {
 			if (stream != null) {
 //				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 		}
 		convert();
@@ -377,7 +376,7 @@ public class OsmNetworkReaderJohan {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				this.network.createAndAddNode(Id.create(node.id, Node.class), node.coord);
+				NetworkUtils.createAndAddNode(this.network, Id.create(node.id, Node.class), node.coord);
 			}
 		}
 
@@ -422,7 +421,7 @@ public class OsmNetworkReaderJohan {
 		}
 	}
 
-	private void createLink(final NetworkImpl network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
+	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
 		String highway = way.tags.get("highway");
 
 		// load defaults
@@ -507,13 +506,21 @@ public class OsmNetworkReaderJohan {
 		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
 
 			if (!onewayReverse) {
-				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed1, capacity1, numLanes );
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed1, capacity1, numLanes );
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				this.id++;
 			}
 
@@ -545,7 +552,7 @@ public class OsmNetworkReaderJohan {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public Coord coord;
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
@@ -633,7 +640,8 @@ public class OsmNetworkReaderJohan {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord = c ;
 						this.nodeCounter.incCounter();
 					}
 				}

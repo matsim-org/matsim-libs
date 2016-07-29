@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,9 +44,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class CASimFZJ {
@@ -138,7 +138,7 @@ public class CASimFZJ {
 		for (Id<Link> r : rm) {
 			sc.getNetwork().removeLink(r);
 		}
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
+		((Network) sc.getNetwork()).setCapacityPeriod(1);
 
 	}
 
@@ -146,7 +146,7 @@ public class CASimFZJ {
 		PopulationFactory fac = sc.getPopulation().getFactory();
 		for (Person p : sc.getPopulation().getPersons().values()) {
 			for (Plan pl : p.getPlans()) {
-				ActivityImpl a = (ActivityImpl) pl.getPlanElements().get(0);
+				Activity a = (Activity) pl.getPlanElements().get(0);
 
 				Coord c0 = sc.getNetwork().getLinks()
 						.get(Id.createLinkId(a.getLinkId())).getCoord();
@@ -160,7 +160,7 @@ public class CASimFZJ {
 
 				Activity home = fac.createActivityFromLinkId("home",
 						Id.createLinkId("el1"));
-				((ActivityImpl) home).setCoord(sc.getNetwork().getLinks()
+				((Activity) home).setCoord(sc.getNetwork().getLinks()
 						.get(Id.createLinkId("el1")).getCoord());
 				double homeEndTime = 7 * 3600 + getGausianEndTime(600., 7200.);
 				home.setEndTime(homeEndTime);
@@ -177,7 +177,7 @@ public class CASimFZJ {
 				alunch.setEndTime(endTime + 45 * 60);
 				Coord rndC1 = getGausianRndCoord(sc.getNetwork().getLinks()
 						.get(alunch.getLinkId()).getCoord());
-				((ActivityImpl) alunch).setCoord(rndC1);
+				((Activity) alunch).setCoord(rndC1);
 				pl.addActivity(alunch);
 
 				Leg leg2 = fac.createLeg("walkca");
@@ -188,7 +188,7 @@ public class CASimFZJ {
 				double endTimeW = 16 * 3600 + 37 * 60
 						+ getGausianEndTime(600, 7200);
 				a2.setEndTime(endTimeW);
-				((ActivityImpl) a2).setCoord(a.getCoord());
+				((Activity) a2).setCoord(a.getCoord());
 
 				pl.addActivity(a2);
 
@@ -196,7 +196,7 @@ public class CASimFZJ {
 
 				Activity home2 = fac.createActivityFromLinkId("home",
 						Id.createLinkId("el1"));
-				((ActivityImpl) home2).setCoord(sc.getNetwork().getLinks()
+				((Activity) home2).setCoord(sc.getNetwork().getLinks()
 						.get(Id.createLinkId("el1")).getCoord());
 				pl.addActivity(home2);
 			}

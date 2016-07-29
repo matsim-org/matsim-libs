@@ -49,7 +49,11 @@ public class IntegrationTest2 extends MatsimTestCase {
 	}
 	
 	private void performSingleAgentRun(){
-		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() + "config-event-file-based-oneAgent.xml", null);
+		PSSControler pssControler=new PSSControlerDumbCharging( "test/input/scenarios/config-event-file-based-oneAgent.xml", null);
+
+		pssControler.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
 		pssControler.runMATSimIterations();
 	}
 

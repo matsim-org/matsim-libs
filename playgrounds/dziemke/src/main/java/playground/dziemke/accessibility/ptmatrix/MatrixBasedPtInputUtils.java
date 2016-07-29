@@ -8,8 +8,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -36,29 +37,29 @@ public class MatrixBasedPtInputUtils {
 		TransitScheduleReader transitScheduleReader = new TransitScheduleReader(scenario);
 		transitScheduleReader.readFile(transitScheduleFile);
 		
-		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new HashMap<Id<Coord>, Coord>();
+//		Map<Id<Facility<?>>, Facility<?>> ptMatrixLocationsMap = new HashMap<>();
 		
-		for (TransitStopFacility transitStopFacility: scenario.getTransitSchedule().getFacilities().values()) {
-			Id<Coord> id = Id.create(transitStopFacility.getId(), Coord.class);
-			Coord coord = transitStopFacility.getCoord();
-			ptMatrixLocationsMap.put(id, coord);
-		}
+//		for (TransitStopFacility transitStopFacility: scenario.getTransitSchedule().getFacilities().values()) {
+//			Id<Coord> id = Id.create(transitStopFacility.getId(), Coord.class);
+//			Coord coord = transitStopFacility.getCoord();
+//			ptMatrixLocationsMap.put(id, transitStopFaciilty);
+//		}
 				
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFile);
 
-		createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
+		createStopsFile(scenario.getTransitSchedule().getFacilities(), outputRoot + "ptStops.csv", ",");
 		
 		// The locationFacilitiesMap is passed twice: Once for origins and once for destinations.
 		// In other uses the two maps may be different -- thus the duplication here.
-		new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);		
+		new ThreadedMatrixCreator(scenario, scenario.getTransitSchedule().getFacilities(), scenario.getTransitSchedule().getFacilities(), departureTime, outputRoot, " ", 1);		
 	}
 	
 	
 	/**
 	 * Creates a csv file containing the public transport stops or measure points
 	 */
-	public static void createStopsFile(Map<Id<Coord>, Coord> locationFacilitiesMap, String outputFileStops, String separator) {
+	public static void createStopsFile(Map<? extends Id,? extends Facility> locationFacilitiesMap, String outputFileStops, String separator) {
 		final CSVFileWriter stopsWriter = new CSVFileWriter(outputFileStops, separator);
 		
 		stopsWriter.writeField("id");
@@ -66,11 +67,10 @@ public class MatrixBasedPtInputUtils {
 		stopsWriter.writeField("y");
 		stopsWriter.writeNewLine();
 
-		for (Id<Coord> id : locationFacilitiesMap.keySet()) {
-			Coord coord = locationFacilitiesMap.get(id);
-			stopsWriter.writeField(id);
-			stopsWriter.writeField(coord.getX());
-			stopsWriter.writeField(coord.getY());
+		for (Facility fac : locationFacilitiesMap.values() ) {
+			stopsWriter.writeField(fac.getId());
+			stopsWriter.writeField(fac.getCoord().getX());
+			stopsWriter.writeField(fac.getCoord().getY());
 			stopsWriter.writeNewLine();
 		}
 		

@@ -32,15 +32,25 @@ import org.apache.log4j.Logger;
  */
 public final class Counter {
 	private final String prefix;
-	private AtomicLong counter = new AtomicLong(0);
-	private AtomicLong nextCounter = new AtomicLong(1);
+	private final String suffix;
+	private final AtomicLong counter = new AtomicLong(0);
+	private final AtomicLong nextCounter = new AtomicLong(1);
 	private static final Logger log = Logger.getLogger(Counter.class);
 
 	/**
 	 * @param prefix Some text that is output just before the counter-value.
 	 */
 	public Counter(final String prefix) {
+		this( prefix , "" );
+	}
+
+	/**
+	 * @param prefix Some text that is output just before the counter-value.
+	 * @param suffix Some text that is output just after the counter-value.
+	 */
+	public Counter(final String prefix, final String suffix) {
 		this.prefix = prefix;
+		this.suffix = suffix;
 	}
 
 	public void incCounter() {
@@ -48,13 +58,13 @@ public final class Counter {
 		long n = this.nextCounter.get();
 		if (i >= n) {
 			if (this.nextCounter.compareAndSet(n, n*2)) {
-				log.info(this.prefix + n);
+				log.info(this.prefix + n + this.suffix);
 			}
 		}
 	}
 
 	public void printCounter() {
-		log.info(this.prefix + this.counter.get());
+		log.info(this.prefix + this.counter.get() + this.suffix);
 	}
 
 	public long getCounter() {

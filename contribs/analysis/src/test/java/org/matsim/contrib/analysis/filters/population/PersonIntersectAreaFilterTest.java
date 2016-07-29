@@ -26,11 +26,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
@@ -45,32 +49,44 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 	public void testFilter() throws Exception {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node0 = network.createAndAddNode(Id.create("0", Node.class), new Coord((double) 0, (double) 0));
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 10, (double) 10));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 90, (double) 10));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 10, (double) 90));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 90, (double) 90));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 100, (double) 100));
-		Link link0 = network.createAndAddLink(Id.create("0", Link.class), node0, node1, 20, 20, 100, 1);
-/*	Link link1=*/network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 20, 100, 1);
-		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node4, 100, 20, 100, 1);
-/*	Link link3=*/network.createAndAddLink(Id.create("3", Link.class), node1, node3, 100, 20, 100, 1);
-		Link link4 = network.createAndAddLink(Id.create("4", Link.class), node3, node4, 100, 20, 100, 1);
-		Link link5 = network.createAndAddLink(Id.create("5", Link.class), node4, node5, 20, 20, 100, 1);
+		Network network = NetworkUtils.createNetwork();
+		Node node0 = NetworkUtils.createAndAddNode(network, Id.create("0", Node.class), new Coord((double) 0, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 10, (double) 10));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 90, (double) 10));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 10, (double) 90));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 90, (double) 90));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 100, (double) 100));
+		final Node fromNode = node0;
+		final Node toNode = node1;
+		Link link0 = NetworkUtils.createAndAddLink(network,Id.create("0", Link.class), fromNode, toNode, (double) 20, (double) 20, (double) 100, (double) 1 );
+		final Node fromNode1 = node1;
+		final Node toNode1 = node2;
+/*	Link link1=*/NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode1, toNode1, (double) 100, (double) 20, (double) 100, (double) 1 );
+final Node fromNode2 = node2;
+final Node toNode2 = node4;
+		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode2, toNode2, (double) 100, (double) 20, (double) 100, (double) 1 );
+		final Node fromNode3 = node1;
+		final Node toNode3 = node3;
+/*	Link link3=*/NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode3, toNode3, (double) 100, (double) 20, (double) 100, (double) 1 );
+final Node fromNode4 = node3;
+final Node toNode4 = node4;
+		Link link4 = NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode4, toNode4, (double) 100, (double) 20, (double) 100, (double) 1 );
+		final Node fromNode5 = node4;
+		final Node toNode5 = node5;
+		Link link5 = NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode5, toNode5, (double) 20, (double) 20, (double) 100, (double) 1 );
 
 		// create a test person
-		Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
-		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
 
-		ActivityImpl act1 = plan.createAndAddActivity("h", link0.getId());
+		Activity act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link0.getId());
 		act1.setEndTime(8.0*3600);
 
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		leg.setDepartureTime(8.0*3600);
 		leg.setTravelTime(2.0*60);
 
-		plan.createAndAddActivity("w", link5.getId());
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
 
 		NetworkRoute route = new LinkNetworkRouteImpl(link0.getId(), link5.getId());
 		leg.setRoute(route);

@@ -192,7 +192,7 @@ public class SpatialGridAnalysis {
 			events.addHandler(noiseHandler);
 			
 			NoiseEventsReader noiseEventReader = new NoiseEventsReader(events);		
-			noiseEventReader.parse(eventsFile);
+			noiseEventReader.readFile(eventsFile);
 		}
 		
 		log.info("Reading events file... Done.");

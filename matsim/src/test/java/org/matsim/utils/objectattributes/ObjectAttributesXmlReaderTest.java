@@ -100,7 +100,7 @@ public class ObjectAttributesXmlReaderTest {
 	public void testParse_withDtd() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getPackageInputDirectory() + "objectattributes_withDtd_v1.xml";
 		ObjectAttributes oa = new ObjectAttributes();
-		new ObjectAttributesXmlReader(oa).parse(filename);
+		new ObjectAttributesXmlReader(oa).readFile(filename);
 
 		Object o = oa.getAttribute("one", "a");
 		Assert.assertTrue(o instanceof String);
@@ -119,7 +119,7 @@ public class ObjectAttributesXmlReaderTest {
 	public void testParse_withoutDtd() throws SAXException, ParserConfigurationException, IOException {
 		String filename = this.utils.getPackageInputDirectory() + "objectattributes_withoutDtd_v1.xml";
 		ObjectAttributes oa = new ObjectAttributes();
-		new ObjectAttributesXmlReader(oa).parse(filename);
+		new ObjectAttributesXmlReader(oa).readFile(filename);
 
 		Object o = oa.getAttribute("one", "a");
 		Assert.assertTrue(o instanceof String);

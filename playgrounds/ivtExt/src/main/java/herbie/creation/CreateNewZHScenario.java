@@ -19,32 +19,39 @@
 
 package herbie.creation;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.population.algorithms.XY2Links;
-import utils.BuildTrees;
-
 import java.io.File;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
+import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+
+import utils.BuildTrees;
 
 public class CreateNewZHScenario {
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
@@ -94,7 +101,7 @@ public class CreateNewZHScenario {
 		log.info("\tReading network, facilities and plans .............................");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
+		PopulationReader populationReader = new PopulationReader(this.scenario);
 		populationReader.readFile(plansV2filePath);
 	}
 	
@@ -126,7 +133,7 @@ public class CreateNewZHScenario {
 				ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
+		PopulationReader populationReader = new PopulationReader(sTmp);
 		populationReader.readFile(plansFilePath);
 		
 		this.map2Network(sTmp.getPopulation());
@@ -171,7 +178,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						
 						BuildTrees util = new BuildTrees();
 						if (trees.get(act.getType()) == null) {
@@ -249,7 +256,7 @@ public class CreateNewZHScenario {
 				int cnt = 0;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						
 						// activity is not first or last activity
 						if (cnt > 0 && cnt < plan.getPlanElements().size() -1) {
@@ -263,7 +270,8 @@ public class CreateNewZHScenario {
 						}
 						else if (cnt == plan.getPlanElements().size() - 1) {
 							// get end time of previous activity and set it as start time
-							double previousEndTime = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act)).getEndTime();
+							final Activity act1 = act;
+							double previousEndTime = PopulationUtils.getPreviousActivity(((Plan)plan), PopulationUtils.getPreviousLeg(((Plan)plan), act1)).getEndTime();
 							act.setStartTime(previousEndTime);
 						}						
 					}
@@ -281,7 +289,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						double duration = 12.0 * 3600.0;
 						if (!act.getType().equals("tta")) {
@@ -293,7 +301,7 @@ public class CreateNewZHScenario {
 					}
 					//reset route
 					if (pe instanceof Leg) {
-						LegImpl leg = (LegImpl)pe;
+						Leg leg = (Leg)pe;
 						leg.setRoute(null);
 					}
 				}
@@ -306,7 +314,7 @@ public class CreateNewZHScenario {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
-						LegImpl leg = (LegImpl)pe;
+						Leg leg = (Leg)pe;
 						leg.setRoute(null);
 					}
 				}

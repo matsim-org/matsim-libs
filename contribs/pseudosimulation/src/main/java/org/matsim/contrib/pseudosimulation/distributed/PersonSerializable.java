@@ -41,7 +41,7 @@ public class PersonSerializable implements Serializable {
     private Boolean isEmployed;
 
     public Person getPerson() {
-        Person person = PopulationUtils.createPerson(Id.createPersonId(id));
+        Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId(id));
         PersonUtils.setAge(person, age);
         PersonUtils.setCarAvail(person, carAvail);
 

@@ -22,10 +22,11 @@ package org.matsim.contrib.locationchoice.constrained;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.Initializer;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SubChain;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -54,8 +55,8 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		RecursiveLocationMutator locationmutator = this.initialize();
 		Plan plan = scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		locationmutator.run(plan);
-		assertEquals(((PlanImpl) plan).getFirstActivity().getCoord().getX(), -25000.0, EPSILON);
-		assertEquals(((PlanImpl) plan).getNextLeg(((PlanImpl) plan).getFirstActivity()).getRoute(), null);
+		assertEquals(PopulationUtils.getFirstActivity( ((Plan) plan) ).getCoord().getX(), -25000.0, EPSILON);
+		assertEquals(PopulationUtils.getNextLeg(((Plan) plan), PopulationUtils.getFirstActivity( ((Plan) plan) )).getRoute(), null);
 	}
 
 	public void testCalcActChains() {

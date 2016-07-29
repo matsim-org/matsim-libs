@@ -9,9 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
 import playground.artemc.plansTools.PlanRouteStripper;
@@ -144,7 +142,7 @@ public class ChoiceSetAndCrowdingAnalysisGenerator implements ShutdownListener {
 					Plan planForModeChange = population.getPersons().get(personId).getSelectedPlan();
 
 					for (int j = 1; j < planForModeChange.getPlanElements().size(); j += 2) {
-						LegImpl leg = (LegImpl) planForModeChange.getPlanElements().get(j);
+						Leg leg = (Leg) planForModeChange.getPlanElements().get(j);
 						leg.setMode(mode);
 					}
 
@@ -158,7 +156,7 @@ public class ChoiceSetAndCrowdingAnalysisGenerator implements ShutdownListener {
 				Plan planForModeChange = population.getPersons().get(personId).getSelectedPlan();
 				planForModeChange = optimalWalkPlanFinder.findOptimalWalkPlan(planForModeChange);
 				for (int j = 1; j < planForModeChange.getPlanElements().size(); j += 2) {
-					LegImpl leg = (LegImpl) planForModeChange.getPlanElements().get(j);
+					Leg leg = (Leg) planForModeChange.getPlanElements().get(j);
 					leg.setMode("walk");
 				}
 

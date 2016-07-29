@@ -22,6 +22,8 @@ package playground.jbischoff.taxibus.run.sim;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.router.*;
 
+import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
+
 import javax.inject.Provider;
 
 /**
@@ -41,7 +43,7 @@ public class TaxibusTripRouterFactory implements Provider<TripRouter> {
 		final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
 
         TripRouter tr = delegate.get();
-        tr.setRoutingModule("taxibus", new TaxibusServiceRoutingModule(controler));
+        tr.setRoutingModule(TaxibusUtils.TAXIBUS_MODE, new TaxibusServiceRoutingModule(controler));
 		return tr;
 	}
 

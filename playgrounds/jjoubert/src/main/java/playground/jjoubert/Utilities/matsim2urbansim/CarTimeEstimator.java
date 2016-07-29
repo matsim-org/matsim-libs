@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -180,7 +180,7 @@ public class CarTimeEstimator {
 		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
 		nr.readFile(networkFilename);
 		// 1d. Read plans file.
-		MatsimPopulationReader mpr = new MatsimPopulationReader(s);
+		PopulationReader mpr = new PopulationReader(s);
 		mpr.readFile(plansFilename);
 		// 1e. Process plans.
 		MyPlansProcessor mpp = new MyPlansProcessor(s, zones);

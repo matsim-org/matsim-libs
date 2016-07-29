@@ -1,9 +1,7 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -65,10 +63,10 @@ public class QGisFileWriter {
 		out.write("\t\t<units>" + this.writer.getUnit().toString() + "</units>\n");
 		out.write("\t\t<extent>\n");
 		
-		out.write("\t\t\t<xmin>" + this.writer.getExtent()[0] + "</xmin>\n");
-		out.write("\t\t\t<ymin>" + this.writer.getExtent()[1] + "</ymin>\n");
-		out.write("\t\t\t<xmax>" + this.writer.getExtent()[2] + "</xmax>\n");
-		out.write("\t\t\t<ymax>" + this.writer.getExtent()[3] + "</ymax>\n");
+		out.write("\t\t\t<xmin>" + this.writer.getEnvelope().getMinX() + "</xmin>\n");
+		out.write("\t\t\t<ymin>" + this.writer.getEnvelope().getMinY() + "</ymin>\n");
+		out.write("\t\t\t<xmax>" + this.writer.getEnvelope().getMaxX() + "</xmax>\n");
+		out.write("\t\t\t<ymax>" + this.writer.getEnvelope().getMaxY() + "</ymax>\n");
 		
 		out.write("\t\t</extent>\n");
 		out.write("\t\t<projections>1</projections>\n");

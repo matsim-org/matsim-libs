@@ -30,8 +30,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -112,7 +112,7 @@ public class AnalysisRunner {
 		new VehicleReaderV1(((MutableScenario) sc).getTransitVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));
 		new MatsimNetworkReader(sc.getNetwork()).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimFacilitiesReader((MutableScenario) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
-		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
+		new PopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
 		
 		BVGLines2PtModes bvgLines2PtModes = new BVGLines2PtModes();
 		bvgLines2PtModes.setPtModesForEachLine(sc.getTransitSchedule(), "para");

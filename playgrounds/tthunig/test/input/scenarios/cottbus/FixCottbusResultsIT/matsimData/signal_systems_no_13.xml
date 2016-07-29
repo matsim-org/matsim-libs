@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalSystems xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem id="19">
+        <signals>
+            <signal linkIdRef="10517" id="2209">
+            </signal>
+            <signal linkIdRef="10616" id="2212">
+            </signal>
+            <signal linkIdRef="6280" id="2201">
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="27">
+        <signals>
+            <signal linkIdRef="295" id="3003">
+              <lane refId="3003"/>
+            </signal>
+            <signal linkIdRef="295" id="3001">
+               <lane refId="3001"/>
+            </signal>
+            <signal linkIdRef="7300" id="3010">
+            </signal>
+            <signal linkIdRef="7414" id="3004">
+            </signal>
+            <signal linkIdRef="7427" id="3007">
+              <lane refId="3007"/>
+            </signal>
+             <signal linkIdRef="7427" id="3008">
+               <lane refId="3008"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="17">
+        <signals>
+            <signal linkIdRef="40" id="2109">
+                <lane refId="2109"/>
+            </signal>
+            <signal linkIdRef="9969" id="2111">
+                <lane refId="2111"/>
+            </signal>
+            <signal linkIdRef="9969" id="2110">
+                <lane refId="2110"/>
+            </signal>
+            <signal linkIdRef="3503" id="2103">
+                <lane refId="2103"/>
+            </signal>
+            <signal linkIdRef="9969" id="2112">
+                <lane refId="2112"/>
+            </signal>
+            <signal linkIdRef="6216" id="2104">
+                <lane refId="2104"/>
+            </signal>
+            <signal linkIdRef="3503" id="2101">
+                <lane refId="2101"/>
+            </signal>
+            <signal linkIdRef="3503" id="2102">
+                <lane refId="2102"/>
+            </signal>
+            <signal linkIdRef="40" id="2107">
+                <lane refId="2107"/>
+            </signal>
+            <signal linkIdRef="40" id="2108">
+                <lane refId="2108"/>
+            </signal>
+            <signal linkIdRef="6216" id="2105">
+                <lane refId="2105"/>
+            </signal>
+            <signal linkIdRef="6216" id="2106">
+                <lane refId="2106"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="18">
+        <signals>
+            <signal linkIdRef="6230" id="2008">
+                <lane refId="2008"/>
+            </signal>
+            <signal linkIdRef="6230" id="2009">
+                <lane refId="2009"/>
+            </signal>
+            <signal linkIdRef="10101" id="2006">
+                <lane refId="2006"/>
+            </signal>
+            <signal linkIdRef="6230" id="2007">
+                <lane refId="2007"/>
+            </signal>
+            <signal linkIdRef="10101" id="2004">
+                <lane refId="2004"/>
+            </signal>
+            <signal linkIdRef="10101" id="2005">
+                <lane refId="2005"/>
+            </signal>
+            <signal linkIdRef="8342" id="2002">
+                <lane refId="2002"/>
+            </signal>
+            <signal linkIdRef="8342" id="2003">
+                <lane refId="2003"/>
+            </signal>
+            <signal linkIdRef="8251" id="2012">
+                <lane refId="2012"/>
+            </signal>
+            <signal linkIdRef="8251" id="2011">
+                <lane refId="2011"/>
+            </signal>
+            <signal linkIdRef="8251" id="2010">
+                <lane refId="2010"/>
+            </signal>
+            <signal linkIdRef="8342" id="2001">
+                <lane refId="2001"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="21">
+        <signals>
+            <signal linkIdRef="5888" id="2403">
+                <lane refId="2403"/>
+            </signal>
+            <signal linkIdRef="5888" id="2402">
+                <lane refId="2402"/>
+            </signal>
+            <signal linkIdRef="5888" id="2401">
+                <lane refId="2401"/>
+            </signal>
+            <signal linkIdRef="5772" id="2410">
+                <lane refId="2410"/>
+            </signal>
+            <signal linkIdRef="5772" id="2412">
+                <lane refId="2412"/>
+            </signal>
+            <signal linkIdRef="7871" id="2404">
+                <lane refId="2404"/>
+            </signal>
+            <signal linkIdRef="7871" id="2405">
+                <lane refId="2405"/>
+            </signal>
+            <signal linkIdRef="7871" id="2406">
+                <lane refId="2406"/>
+            </signal>
+            <signal linkIdRef="5772" id="2411">
+                <lane refId="2411"/>
+            </signal>
+            <signal linkIdRef="5884" id="2409">
+                <lane refId="2409"/>
+            </signal>
+            <signal linkIdRef="5884" id="2408">
+                <lane refId="2408"/>
+            </signal>
+            <signal linkIdRef="5884" id="2407">
+                <lane refId="2407"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="23">
+        <signals>
+            <signal linkIdRef="6711" id="2608">
+                <lane refId="2608"/>
+            </signal>
+            <signal linkIdRef="6711" id="2609">
+                <lane refId="2609"/>
+            </signal>
+            <signal linkIdRef="583" id="2606">
+                <lane refId="2606"/>
+            </signal>
+            <signal linkIdRef="6711" id="2607">
+                <lane refId="2607"/>
+            </signal>
+            <signal linkIdRef="583" id="2604">
+                <lane refId="2604"/>
+            </signal>
+            <signal linkIdRef="583" id="2605">
+                <lane refId="2605"/>
+            </signal>
+            <signal linkIdRef="2759" id="2602">
+                <lane refId="2602"/>
+            </signal>
+            <signal linkIdRef="6708" id="2611">
+                <lane refId="2611"/>
+            </signal>
+            <signal linkIdRef="2759" id="2603">
+                <lane refId="2603"/>
+            </signal>
+            <signal linkIdRef="6708" id="2612">
+                <lane refId="2612"/>
+            </signal>
+            <signal linkIdRef="2759" id="2601">
+                <lane refId="2601"/>
+            </signal>
+            <signal linkIdRef="6708" id="2610">
+                <lane refId="2610"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="24">
+        <signals>
+            <signal linkIdRef="4587" id="2704">
+            </signal>
+            <signal linkIdRef="588" id="2701">
+            </signal>
+            <signal linkIdRef="1680" id="2707">
+            </signal>
+            <signal linkIdRef="561" id="2710">
+            </signal>   
+            <signal linkIdRef="1685" id="2713">
+            </signal>                       
+        </signals>
+    </signalSystem>
+    <signalSystem id="25">
+        <signals>
+            <signal linkIdRef="9648" id="2804">
+            </signal>
+            <signal linkIdRef="1760" id="2801">
+            </signal>
+            <signal linkIdRef="4586" id="2807">
+            </signal>
+            <signal linkIdRef="138" id="2810">
+            </signal>     
+        </signals>
+	</signalSystem>
+	<signalSystem id="26">
+        <signals>
+            <signal linkIdRef="139" id="2910">
+            	<lane refId="2910"/>
+            </signal>
+            <signal linkIdRef="139" id="2911">
+            	<lane refId="2911"/>
+            </signal>
+            <signal linkIdRef="1777" id="2901">
+            	<lane refId="2901"/>
+            </signal>
+            <signal linkIdRef="1777" id="2902">
+            	<lane refId="2902"/>
+            </signal>
+            <signal linkIdRef="10284" id="2904">
+            	<lane refId="2904"/>
+            </signal>
+            <signal linkIdRef="10284" id="2905">
+            	<lane refId="2905"/>
+            </signal>      
+            <signal linkIdRef="5744" id="2907">
+            </signal>    
+        </signals>    
+    </signalSystem>
+    <signalSystem id="16">
+        <signals>
+            <signal linkIdRef="9345" id="1204">
+                <lane refId="1204"/>
+            </signal>
+            <signal linkIdRef="1449" id="1201">
+                <lane refId="1201"/>
+            </signal>
+            <signal linkIdRef="3026" id="1207">
+            </signal>
+            <signal linkIdRef="4909" id="1210">
+            </signal>                        
+        </signals>
+    </signalSystem>
+    <signalSystem id="14">
+        <signals>
+            <signal linkIdRef="7919" id="1110">
+                <lane refId="1110"/>
+            </signal>
+            <signal linkIdRef="5153" id="1108">
+                <lane refId="1108"/>
+            </signal>
+            <signal linkIdRef="5153" id="1109">
+                <lane refId="1109"/>
+            </signal>
+            <signal linkIdRef="9347" id="1106">
+                <lane refId="1106"/>
+            </signal>
+            <signal linkIdRef="7919" id="1111">
+                <lane refId="1111"/>
+            </signal>
+            <signal linkIdRef="5153" id="1107">
+                <lane refId="1107"/>
+            </signal>
+            <signal linkIdRef="7919" id="1112">
+                <lane refId="1112"/>
+            </signal>
+            <signal linkIdRef="9347" id="1104">
+                <lane refId="1104"/>
+            </signal>
+            <signal linkIdRef="9347" id="1105">
+                <lane refId="1105"/>
+            </signal>
+            <signal linkIdRef="2475" id="1102">
+                <lane refId="1102"/>
+            </signal>
+            <signal linkIdRef="2475" id="1103">
+                <lane refId="1103"/>
+            </signal>
+            <signal linkIdRef="2475" id="1101">
+                <lane refId="1101"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="28">
+        <signals>
+            <signal linkIdRef="2515" id="3201">
+                <lane refId="3201"/>
+            </signal>
+            <signal linkIdRef="2515" id="3202">
+                <lane refId="3202"/>
+            </signal>
+            <signal linkIdRef="2515" id="3203">
+                <lane refId="3203"/>
+            </signal>
+            <signal linkIdRef="1503" id="3204">
+                <lane refId="3204"/>
+            </signal>
+            <signal linkIdRef="1503" id="3205">
+                <lane refId="3205"/>
+            </signal>
+            <signal linkIdRef="1503" id="3206">
+                <lane refId="3206"/>
+            </signal>
+            <signal linkIdRef="9761" id="3207">
+                <lane refId="3207"/>
+            </signal>
+            <signal linkIdRef="7428" id="3212">
+                <lane refId="3212"/>
+            </signal>
+            <signal linkIdRef="9761" id="3208">
+                <lane refId="3208"/>
+            </signal>
+            <signal linkIdRef="9761" id="3209">
+                <lane refId="3209"/>
+            </signal>
+            <signal linkIdRef="7428" id="3211">
+                <lane refId="3211"/>
+            </signal>
+            <signal linkIdRef="7428" id="3210">
+                <lane refId="3210"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="3">
+        <signals>
+            <signal linkIdRef="5892" id="3501">
+               </signal>
+            <signal linkIdRef="2501" id="3504">
+                <lane refId="3504"/>
+            </signal>
+            <signal linkIdRef="2501" id="3506">
+                <lane refId="3506"/>
+            </signal>  
+            <signal linkIdRef="3029" id="3507">
+            </signal>
+            <signal linkIdRef="2781" id="3510">
+            </signal>
+        </signals>
+    </signalSystem>    
+    <signalSystem id="29">
+        <signals>
+            <signal linkIdRef="1502" id="3101">
+                <lane refId="3101"/>
+            </signal>
+            <signal linkIdRef="7829" id="3110">
+                <lane refId="3110"/>
+            </signal>
+            <signal linkIdRef="7829" id="3111">
+                <lane refId="3111"/>
+            </signal>
+            <signal linkIdRef="1502" id="3102">
+                <lane refId="3102"/>
+            </signal>
+            <signal linkIdRef="3409" id="3105">
+                <lane refId="3105"/>
+            </signal>
+            <signal linkIdRef="3409" id="3104">
+                <lane refId="3104"/>
+            </signal>
+            <signal linkIdRef="6015" id="3107">
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="12">
+        <signals>
+            <signal linkIdRef="9653" id="1409">
+                <lane refId="1409"/>
+            </signal>
+            <signal linkIdRef="1281" id="1411">
+                <lane refId="1411"/>
+            </signal>
+            <signal linkIdRef="1281" id="1410">
+                <lane refId="1410"/>
+            </signal>
+            <signal linkIdRef="8213" id="1405">
+                <lane refId="1405"/>
+            </signal>
+            <signal linkIdRef="8213" id="1406">
+                <lane refId="1406"/>
+            </signal>
+            <signal linkIdRef="9653" id="1407">
+                <lane refId="1407"/>
+            </signal>
+            <signal linkIdRef="9653" id="1408">
+                <lane refId="1408"/>
+            </signal>
+            <signal linkIdRef="1281" id="1412">
+                <lane refId="1412"/>
+            </signal>
+            <signal linkIdRef="1451" id="1401">
+                <lane refId="1401"/>
+            </signal>
+            <signal linkIdRef="1451" id="1402">
+                <lane refId="1402"/>
+            </signal>
+            <signal linkIdRef="1451" id="1403">
+                <lane refId="1403"/>
+            </signal>
+            <signal linkIdRef="8213" id="1404">
+                <lane refId="1404"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <!--signalSystem id="2" steht auf dauergrün und ist zu klein>
+        <signals>
+            <signal linkIdRef="5933" id="1709">
+                <lane refId="1709"/>
+            </signal>
+            <signal linkIdRef="1754" id="1712">
+                <lane refId="1712"/>
+            </signal>
+        </signals>
+    </signalSystem-->
+    <signalSystem id="20">
+        <signals>
+            <signal linkIdRef="8952" id="2307">
+                <lane refId="2307"/>
+            </signal>
+            <signal linkIdRef="8952" id="2308">
+                <lane refId="2308"/>
+            </signal>
+            <signal linkIdRef="8952" id="2309">
+                <lane refId="2309"/>
+            </signal>
+            <signal linkIdRef="6663" id="2303">
+                <lane refId="2303"/>
+            </signal>
+            <signal linkIdRef="6067" id="2304">
+                <lane refId="2304"/>
+            </signal>
+            <signal linkIdRef="6067" id="2305">
+                <lane refId="2305"/>
+            </signal>
+            <signal linkIdRef="6067" id="2306">
+                <lane refId="2306"/>
+            </signal>
+            <signal linkIdRef="10019" id="2312">
+                <lane refId="2312"/>
+            </signal>
+            <signal linkIdRef="6663" id="2301">
+                <lane refId="2301"/>
+            </signal>
+            <signal linkIdRef="10019" id="2310">
+                <lane refId="2310"/>
+            </signal>
+            <signal linkIdRef="6663" id="2302">
+                <lane refId="2302"/>
+            </signal>
+            <signal linkIdRef="10019" id="2311">
+                <lane refId="2311"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="1">
+        <signals>
+            <signal linkIdRef="5377" id="1909">
+                <lane refId="1909"/>
+            </signal>
+            <signal linkIdRef="5377" id="1908">
+                <lane refId="1908"/>
+            </signal>
+            <signal linkIdRef="314" id="1910">
+                <lane refId="1910"/>
+            </signal>
+            <signal linkIdRef="10218" id="1901">
+                <lane refId="1901"/>
+            </signal>
+            <signal linkIdRef="10218" id="1902">
+                <lane refId="1902"/>
+            </signal>
+            <signal linkIdRef="10218" id="1903">
+                <lane refId="1903"/>
+            </signal>
+            <signal linkIdRef="169" id="1904">
+                <lane refId="1904"/>
+            </signal>
+            <signal linkIdRef="169" id="1905">
+                <lane refId="1905"/>
+            </signal>
+            <signal linkIdRef="169" id="1906">
+                <lane refId="1906"/>
+            </signal>
+            <signal linkIdRef="314" id="1911">
+                <lane refId="1911"/>
+            </signal>
+            <signal linkIdRef="5377" id="1907">
+                <lane refId="1907"/>
+            </signal>
+            <signal linkIdRef="314" id="1912">
+                <lane refId="1912"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="7">
+        <signals>
+            <signal linkIdRef="6779" id="3305">
+                <lane refId="3305"/>
+            </signal>
+            <signal linkIdRef="6779" id="3304">
+                <lane refId="3304"/>
+            </signal>
+            <signal linkIdRef="6782" id="3301">
+                <lane refId="3301"/>
+            </signal>
+            <signal linkIdRef="6782" id="3302">
+                <lane refId="3302"/>
+            </signal>
+            <signal linkIdRef="3874" id="3311">
+                <lane refId="3311"/>
+            </signal>
+            <signal linkIdRef="3874" id="3310">
+                <lane refId="3310"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="6">
+        <signals>
+            <signal linkIdRef="4510" id="1512">
+                <lane refId="1512"/>
+            </signal>
+            <signal linkIdRef="4510" id="1511">
+                <lane refId="1511"/>
+            </signal>
+            <signal linkIdRef="6495" id="1503">
+                <lane refId="1503"/>
+            </signal>
+            <signal linkIdRef="6495" id="1502">
+                <lane refId="1502"/>
+            </signal>
+            <signal linkIdRef="4932" id="1509">
+                <lane refId="1509"/>
+            </signal>
+            <signal linkIdRef="4932" id="1508">
+                <lane refId="1508"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="5">
+        <signals>
+            <signal linkIdRef="5930" id="1808">
+                <lane refId="1808"/>
+            </signal>
+            <signal linkIdRef="5930" id="1807">
+                <lane refId="1807"/>
+            </signal>
+            <signal linkIdRef="3411" id="1806">
+                <lane refId="1806"/>
+            </signal>
+            <signal linkIdRef="3411" id="1805">
+                <lane refId="1805"/>
+            </signal>
+            <signal linkIdRef="3411" id="1804">
+                <lane refId="1804"/>
+            </signal>
+            <signal linkIdRef="3416" id="1803">
+                <lane refId="1803"/>
+            </signal>
+            <signal linkIdRef="3416" id="1802">
+                <lane refId="1802"/>
+            </signal>
+            <signal linkIdRef="1756" id="1810">
+                <lane refId="1810"/>
+            </signal>
+            <signal linkIdRef="3416" id="1801">
+                <lane refId="1801"/>
+            </signal>
+            <signal linkIdRef="1756" id="1811">
+                <lane refId="1811"/>
+            </signal>
+            <signal linkIdRef="1756" id="1812">
+                <lane refId="1812"/>
+            </signal>
+            <signal linkIdRef="5930" id="1809">
+                <lane refId="1809"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="9">
+        <signals>
+            <signal linkIdRef="2498" id="3401">
+            </signal>
+            <signal linkIdRef="6667" id="3404">
+            </signal>
+            <signal linkIdRef="5621" id="3407">
+            </signal>            
+        </signals>
+    </signalSystem>
+        <signalSystem id="8">
+        <signals>
+            <signal linkIdRef="5934" id="1609">
+            </signal>
+            <signal linkIdRef="593500" id="1612">
+            </signal>
+            <signal linkIdRef="7534" id="1601">
+            </signal>       
+            <signal linkIdRef="7529" id="1604">
+            </signal>                  
+        </signals>
+    </signalSystem>
+</signalSystems>

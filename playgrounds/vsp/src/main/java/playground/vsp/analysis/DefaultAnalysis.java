@@ -94,7 +94,7 @@ public class DefaultAnalysis {
 					"that are based on events will not produce any results!");
 		} else {
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
-			reader.parse(this.eventsFile);
+			reader.readFile(this.eventsFile);
 		}
 	}
 	

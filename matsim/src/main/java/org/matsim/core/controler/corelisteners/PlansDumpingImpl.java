@@ -76,7 +76,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			}
 			else {
-				log.info( "re-projecting population from "+internalCRS+" to "+inputCRS+" for export" );
+				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
 
 				final CoordinateTransformation transformation =
 						TransformationFactory.getCoordinateTransformation(

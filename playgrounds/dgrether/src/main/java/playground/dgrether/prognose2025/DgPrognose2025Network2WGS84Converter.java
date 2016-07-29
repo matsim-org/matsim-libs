@@ -22,8 +22,8 @@ package playground.dgrether.prognose2025;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -55,7 +55,8 @@ public class DgPrognose2025Network2WGS84Converter {
 		Coord c = null;
 		for (Node n : sc.getNetwork().getNodes().values()){
 			c = transform.getTransformed(n.getCoord());
-			n.getCoord().setXY(c.getX(), c.getY());
+//			n.getCoord().setXY(c.getX(), c.getY());
+			n.setCoord(c);
 		}
 
 		NetworkWriter netWriter = new NetworkWriter(sc.getNetwork());

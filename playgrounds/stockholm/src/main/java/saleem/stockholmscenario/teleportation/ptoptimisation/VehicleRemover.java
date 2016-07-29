@@ -1,17 +1,12 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
@@ -60,12 +55,24 @@ public class VehicleRemover {
 			ArrayList<Departure> departures = cutil.toArrayList(troute.getDepartures().values().iterator());
 			departures = dtm.sortDepartures(departures);//Sort as per time
 			int depsize = departures.size();
-			for(int i=1;i<depsize;i++) {
+			for(int i=0;i<depsize;i++) {
 				if(Math.random()<=fraction){
 					Departure departure = departures.get(i);
-					troute.removeDeparture(departure);
+					if(troute.getDepartures().size()==1){
+						double time = 115200;//Hypothetical departure after end time;delete all other departures; effectively a route that doesn't exist.
+						Departure hypodeparture = schedule.getFactory().createDeparture(Id.create("DepHypo"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
+						hypodeparture.setVehicleId(departure.getVehicleId());
+						//Making sure at least one hypothetical departure after simulation end time exists, which doesnt affect the results,
+						//as atleast one departure is neccessary by design
+						troute.addDeparture(hypodeparture);
+						troute.removeDeparture(departure);
+						
+					}else{
+						troute.removeDeparture(departure);
+						vehicles.removeVehicle(departure.getVehicleId());
+
+					}
 					System.out.println("Deleted Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
-					vehicles.removeVehicle(departure.getVehicleId());
 					if(i+1<depsize){
 						double time = dtm.adjustTimeDepartureRemoved(departures, i);
 						Departure nextdeparture = departures.get(i+1);//Remove next departure and add again with adjusted time

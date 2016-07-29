@@ -26,6 +26,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -61,7 +62,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
                 });
             }
         } else {
-            bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
+            bind(TravelTimeCalculator.class).in(Singleton.class);
             if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
                 for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
                     addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
@@ -70,44 +71,6 @@ public class TravelTimeCalculatorModule extends AbstractModule {
             if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
                 bind(LinkToLinkTravelTime.class).toProvider(ObservedLinkToLinkTravelTimes.class);
             }
-        }
-    }
-
-    private static class ObservedLinkTravelTimes implements Provider<TravelTime> {
-
-        @Inject
-        TravelTimeCalculator travelTimeCalculator;
-
-        @Override
-        public TravelTime get() {
-            return travelTimeCalculator.getLinkTravelTimes();
-        }
-
-    }
-
-    private static class ObservedLinkToLinkTravelTimes implements Provider<LinkToLinkTravelTime> {
-
-        @Inject
-        TravelTimeCalculator travelTimeCalculator;
-
-        @Override
-        public LinkToLinkTravelTime get() {
-            return travelTimeCalculator.getLinkToLinkTravelTimes();
-        }
-
-    }
-
-    private static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
-
-        @Inject TravelTimeCalculatorConfigGroup config;
-        @Inject EventsManager eventsManager;
-        @Inject Network network;
-
-        @Override
-        public TravelTimeCalculator get() {
-            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), config.isFilterModes(), CollectionUtils.stringToSet(config.getAnalyzedModes()));
-            eventsManager.addHandler(calculator);
-            return TravelTimeCalculator.configure(calculator, config, network);
         }
     }
 
@@ -125,7 +88,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
         @Override
         public TravelTimeCalculator get() {
-            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
+            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), config.getMaxTime(), config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
             eventsManager.addHandler(calculator);
             return TravelTimeCalculator.configure(calculator, config, network);
         }

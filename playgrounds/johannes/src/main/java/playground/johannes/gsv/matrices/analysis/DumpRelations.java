@@ -65,25 +65,25 @@ public class DumpRelations {
 		 */
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(refFile1);
+		reader.readFile(refFile1);
 		NumericMatrix itp = reader.getMatrix();
 
 		MatrixOperations.applyFactor(itp, 1 / 365.0);
 
-		reader.parse(refFile2);
+		reader.readFile(refFile2);
 		NumericMatrix tomtom = reader.getMatrix();
 
 		/*
 		 * load simulated matrix
 		 */
-		reader.parse(simFile);
+		reader.readFile(simFile);
 		NumericMatrix simulation = reader.getMatrix();
 		removeUnknownZones(simulation);
 		// MatrixOperations.symmetrize(simulation);
 		// MatrixOperations.multiply(simulation, 11.8);
 		// MatrixOperations.applyDiagonalFactor(simulation, 1.3);
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;

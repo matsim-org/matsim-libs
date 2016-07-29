@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.data.file;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -41,10 +41,10 @@ public class VehicleReader
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public VehicleReader(Scenario scenario, VrpData data)
+    public VehicleReader(Network network, VrpData data)
     {
         this.data = data;
-        links = scenario.getNetwork().getLinks();
+        links = network.getLinks();
     }
 
 
@@ -62,13 +62,19 @@ public class VehicleReader
     {}
 
 
-    protected Vehicle createVehicle(Attributes atts)
+    private Vehicle createVehicle(Attributes atts)
     {
         Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
         Link startLink = links.get(Id.createLinkId(atts.getValue("start_link")));
         double capacity = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
         double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
         double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
+        return createVehicle(id, startLink, capacity, t0, t1, atts);
+    }
+    
+    
+    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1, Attributes atts)
+    {
         return new VehicleImpl(id, startLink, capacity, t0, t1);
     }
 }

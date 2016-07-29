@@ -20,16 +20,17 @@
 
 package playground.wrashid.parkingSearch.planLevel.replanning;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
@@ -84,9 +85,9 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// changed==============
 		// first select such, for which the capacity violation happened
 		// if this is not the case select at random for improvement
-		ActivityImpl targetActivity = null;
+		Activity targetActivity = null;
 
-		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingRoot.getParkingOccupancyMaintainer()
+		LinkedList<Activity> targetActivitiesWithParkingCapacityViolations = ParkingRoot.getParkingOccupancyMaintainer()
 				.getActivitiesWithParkingConstraintViolations(plan);
 
 		if (targetActivitiesWithParkingCapacityViolations.size() != 0) {
@@ -102,7 +103,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 			// if no parking capacity violation happened, then select a random
 			// parking and try to improve it.
 
-			LinkedList<ActivityImpl> parkingTargetActivities = ParkingGeneralLib.getParkingTargetActivities(plan);
+			LinkedList<Activity> parkingTargetActivities = ParkingGeneralLib.getParkingTargetActivities(plan);
 			int index = MatsimRandom.getRandom().nextInt(parkingTargetActivities.size());
 			targetActivity = parkingTargetActivities.get(index);
 		}
@@ -137,7 +138,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 
         replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
-				(NetworkImpl) GlobalRegistry.controler.getScenario().getNetwork());
+				(Network) GlobalRegistry.controler.getScenario().getNetwork());
 		
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 		
@@ -155,11 +156,11 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	 * @param controler
 	 * @param network
 	 */
-	public static void replaceParking(final Plan plan, ActivityImpl targetActivity, ActivityFacilityImpl newParking,
-			MatsimServices controler, NetworkImpl network) {
+	public static void replaceParking(final Plan plan, Activity targetActivity, ActivityFacilityImpl newParking,
+			MatsimServices controler, Network network) {
 		// make new parking activity activity
 
-		ActivityImpl newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
+		Activity newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
 				.getActivityDuration(newParking.getId(), plan.getPerson().getId()));
 
 		// change the previous and next parking of the targetActivity
@@ -167,8 +168,8 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		if (isFirstOrLastActivity(plan, targetActivity)) {
 			// for the first/last activity (usually home)
 
-			ActivityImpl firstActivity = (ActivityImpl) plan.getPlanElements().get(0);
-			ActivityImpl lastActivity = (ActivityImpl) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+			Activity firstActivity = (Activity) plan.getPlanElements().get(0);
+			Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 
 			// if the plan intended to be used without facilities, the facility Id of the activities will be 
 			// missing, therefore it is set here.
@@ -204,26 +205,26 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		router.run(plan);
 	}
 
-	private static boolean isFirstOrLastActivity(final Plan plan, ActivityImpl targetActivity) {
+	private static boolean isFirstOrLastActivity(final Plan plan, Activity targetActivity) {
 		List<PlanElement> pe = plan.getPlanElements();
 		return pe.indexOf(targetActivity) == 0 || pe.indexOf(targetActivity) == pe.size() - 1;
 	}
 
-	private static void changePreviousParking(final Plan plan, ActivityImpl targetActivity, ActivityImpl newParkingActivity) {
+	private static void changePreviousParking(final Plan plan, Activity targetActivity, Activity newParkingActivity) {
 		int indexOfArrivalParkingAct = ParkingGeneralLib.getArrivalParkingActIndex(plan, targetActivity);
 		plan.getPlanElements().remove(indexOfArrivalParkingAct);
 		plan.getPlanElements().add(indexOfArrivalParkingAct, newParkingActivity);
 	}
 
-	private static void changeNextParking(final Plan plan, ActivityImpl targetActivity, ActivityImpl newParkingActivity) {
+	private static void changeNextParking(final Plan plan, Activity targetActivity, Activity newParkingActivity) {
 		int indexOfDepartingParkingAct = ParkingGeneralLib.getDepartureParkingActIndex(plan, targetActivity);
 		plan.getPlanElements().remove(indexOfDepartingParkingAct);
 		plan.getPlanElements().add(indexOfDepartingParkingAct, newParkingActivity);
 	}
 
-	private static ActivityImpl createNewParkingActivity(ActivityFacilityImpl newParking, NetworkImpl network,
+	private static Activity createNewParkingActivity(ActivityFacilityImpl newParking, Network network,
 			double parkingActivityDuration) {
-		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
+		Activity newParkingActivity = PopulationUtils.createActivityFromCoord("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
 		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, newParking.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);

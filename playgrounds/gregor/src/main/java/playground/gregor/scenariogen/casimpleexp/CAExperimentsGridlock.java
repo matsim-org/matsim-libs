@@ -42,8 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class CAExperimentsGridlock {
@@ -58,9 +57,9 @@ public class CAExperimentsGridlock {
 
 		createNetwork(sc);
 
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
-		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(3600);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.26);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.71);
+		((Network) sc.getNetwork()).setCapacityPeriod(3600);
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 
@@ -277,8 +276,8 @@ public class CAExperimentsGridlock {
 		net.addLink(l3Rev);
 		net.addLink(l4Rev);
 
-		((NetworkImpl) net).setCapacityPeriod(1);
-		((NetworkImpl) net).setEffectiveCellSize(.26);
-		((NetworkImpl) net).setEffectiveLaneWidth(.71);
+		((Network) net).setCapacityPeriod(1);
+		((Network) net).setEffectiveCellSize(.26);
+		((Network) net).setEffectiveLaneWidth(.71);
 	}
 }

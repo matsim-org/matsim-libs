@@ -21,7 +21,6 @@
 
 package playground.boescpa.projects.topdad.postprocessing;
 
-import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.spatialCutters.CirclePointCutter;
 import playground.boescpa.analysis.trips.*;
 import playground.boescpa.analysis.trips.tripAnalysis.TravelTimesAndDistances;
@@ -29,6 +28,8 @@ import playground.boescpa.lib.tools.NetworkUtils;
 
 import java.util.HashMap;
 import java.util.List;
+
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Creates and evaluates trips for topdad-postprocessing.
@@ -49,10 +50,10 @@ public class TopdadTripCreator {
 
         Network network = NetworkUtils.readNetwork(networkFile);
         SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new CirclePointCutter(zoneRadius, 683518.0, 246836.0), network);
-        trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
+        trips = new EventsToTrips(network).createTripsFromEvents(eventsFile);
         trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
         travelTimesAndDistances = TravelTimesAndDistances.calcTravelTimeAndDistance(trips, valueFile);
-        new TripWriter().writeTrips(trips, tripFile);
+        TripWriter.writeTrips(trips, tripFile);
     }
 
 }

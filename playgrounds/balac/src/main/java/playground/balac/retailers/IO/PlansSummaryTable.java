@@ -4,10 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 public class PlansSummaryTable implements PlanAlgorithm {
 	
@@ -50,7 +50,7 @@ public class PlansSummaryTable implements PlanAlgorithm {
 			//out.write(plan.getScore() + "\t");
 			for (int i=1; i<plan.getPlanElements().size()-2; i=i+2) {
 				//Leg l = (Leg)plan.getActsLegs().get(i);
-				ActivityImpl a = (ActivityImpl)plan.getPlanElements().get(i+1);
+				Activity a = (Activity)plan.getPlanElements().get(i+1);
 				if (a.getType().contains("shopgrocery")) {
 					//Link arr_link = a.getLink();
 					//out.write(a.getType() + "\t");

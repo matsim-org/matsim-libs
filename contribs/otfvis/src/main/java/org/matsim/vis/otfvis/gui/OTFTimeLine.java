@@ -167,7 +167,8 @@ public class OTFTimeLine extends JToolBar implements ActionListener, ChangeListe
 	/** Listen to the slider. */
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		hostControl.setNEWTime();
+		int gotoTime = hostControl.getSimTime();
+		hostControl.requestTimeStep(gotoTime);
 	}
 
 }

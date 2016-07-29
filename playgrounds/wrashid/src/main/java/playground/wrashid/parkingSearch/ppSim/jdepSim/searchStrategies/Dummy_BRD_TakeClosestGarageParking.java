@@ -20,8 +20,8 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
@@ -36,7 +36,7 @@ public class Dummy_BRD_TakeClosestGarageParking extends Dummy_ARD_TakeClosestGar
 
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
-		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+		Activity nextAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
 
 		if (GeneralLib.getDistance(getCurrentLink(aem).getCoord(), network.getLinks().get(nextAct.getLinkId()).getCoord()) < distanceToDestinationForStartingRandomSearch) {

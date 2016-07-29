@@ -27,9 +27,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -46,7 +47,7 @@ public class ModifyPopulation {
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml.gz");
-		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
+		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/"
 				+ "commuter_population_wgs84_utm33n_car_only.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -65,8 +66,28 @@ public class ModifyPopulation {
 			}
 		}
 		
-		new PopulationWriter(scenario.getPopulation()).write(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
+		new PopulationWriter(scenario.getPopulation()).write(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/"
 				+ "commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
+	}
+	
+	public static void removeRoutesLeaveFirstPlan(Population population){
+		
+		for (Person person : population.getPersons().values()){
+			boolean firstPlanHandled = false;
+			for (Plan plan : person.getPlans()){
+				// remove all plans except the first
+				if (firstPlanHandled){
+					person.removePlan(plan);
+				} else {
+					// remove route of the first plan
+					for (PlanElement pe : plan.getPlanElements()) {
+						if (pe instanceof Leg) {
+							((Leg) pe).setRoute(null);
+						}
+					}
+				}
+			}
+		}		
 	}
 
 }

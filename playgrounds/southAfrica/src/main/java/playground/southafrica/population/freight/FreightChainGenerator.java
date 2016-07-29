@@ -36,15 +36,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
@@ -86,7 +87,7 @@ public class FreightChainGenerator {
 		
 		/* Read the path-dependent complex network. */
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
-		nr.parse(complexNetworkFile);
+		nr.readFile(complexNetworkFile);
 		PathDependentNetwork pathDependentNetwork = nr.getPathDependentNetwork();
 		pathDependentNetwork.writeNetworkStatisticsToConsole();
 		
@@ -240,13 +241,13 @@ public class FreightChainGenerator {
 			}
 			
 			/* Set up the plan. */
-			PlanImpl plan = (PlanImpl) pf.createPlan();
+			Plan plan = (Plan) pf.createPlan();
 			
 			/* Now add all the activities in the chain sequence. Start with the
 			 * first 'major' activity. */
 			Id<Node> firstId = Id.createNodeId(chainList.get(0).split(",")[1]);
 			Coord coord = network.getPathDependentNode(firstId).getCoord();
-			ActivityImpl firstActivity = new ActivityImpl("major", coord);
+			Activity firstActivity = PopulationUtils.createActivityFromCoord("major", coord);
 			firstActivity.setFacilityId(Id.create(firstId.toString(), ActivityFacility.class));
 
 			int startHour = chainAttributes[0];
@@ -263,7 +264,7 @@ public class FreightChainGenerator {
 				Id<Node> thisId = Id.createNodeId(chainList.get(i).split(",")[1]);
 
 				Coord thisCoord = network.getPathDependentNode(thisId).getCoord();
-				ActivityImpl activity = new ActivityImpl("minor", thisCoord);
+				Activity activity = PopulationUtils.createActivityFromCoord("minor", thisCoord);
 				activity.setFacilityId(Id.create(thisId.toString(), ActivityFacility.class));
 				
 				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
@@ -278,7 +279,7 @@ public class FreightChainGenerator {
 			/* Add the final 'major' activity. */
 			Id<Node> finalId = Id.createNodeId(chainList.get(chainList.size()-1).split(",")[1]);
 			Coord finalCoord = network.getPathDependentNode(finalId).getCoord();
-			ActivityImpl finalActivity = new ActivityImpl("major", finalCoord);
+			Activity finalActivity = PopulationUtils.createActivityFromCoord("major", finalCoord);
 			finalActivity.setFacilityId(Id.create(finalId, ActivityFacility.class));
 			plan.addActivity(finalActivity);
 			

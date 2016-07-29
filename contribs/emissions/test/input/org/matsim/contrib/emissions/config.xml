@@ -4,23 +4,7 @@
 
 <!-- ====================================================================== -->
 
-	<module name="TimeAllocationMutator" >
-		<param name="mutationAffectsDuration" value="true" />
-
-		<!-- Default:1800.0; Defines how many seconds a time mutation can maximally shift a time. -->
-		<param name="mutationRange" value="1800.0" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="controler" >
-
-		<!-- Default=false;  -->
-		<param name="enableLinkToLinkRouting" value="false" />
-
-		<!-- Default=xml; Specifies the file format for writing events. Currently supported: txt, xml.
-		Multiple values can be specified separated by commas (','). -->
-		<param name="eventsFileFormat" value="xml" />
 
 		<!-- Default=0;  -->
 		<param name="firstIteration" value="0" />
@@ -28,62 +12,16 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="5" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
-		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
-		For 'qsim', add a module 'qsim' to the config. -->
-		<param name="mobsim" value="qsim" />
-
 		<param name="outputDirectory" value="./test/output/" />
 
-		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
-		<param name="routingAlgorithmType" value="Dijkstra" />
-
-		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
-		<param name="runId" value="null" />
-
-		<!-- Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'. -->
-		<param name="snapshotFormat" value="" />
-
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
-		<param name="writeEventsInterval" value="10" />
+		<!-- <param name="writeEventsInterval" value="10" /> -->
+		<param name="writeEventsInterval" value="5" />
 
 		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
-		<param name="writePlansInterval" value="10" />
+		<!-- <param name="writePlansInterval" value="10" /> -->
+		<param name="writePlansInterval" value="5" />
 
-		<!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations snapshots are written to a file. `0' disables snapshots writing completely -->
-		<param name="writeSnapshotsInterval" value="1" />
-	</module>
-
-<!-- ====================================================================== -->
-
-	<module name="counts" >
-
-		<!-- Transport modes that will be respected for the counts comparison. 'car' is default, which includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true! -->
-		<param name="analyzedModes" value="car" />
-
-		<!-- Specifies over how many iterations the link volumes should be averaged that are used for the counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeCountsInterval -->
-		<param name="averageCountsOverIterations" value="5" />
-
-		<!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
-		<param name="countsScaleFactor" value="1.0" />
-
-		<!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
-		<param name="distanceFilter" value="null" />
-
-		<!-- node id for center node of distance filter -->
-		<param name="distanceFilterCenterNode" value="null" />
-
-		<!-- If true, link counts from legs performed on modes not included in the 'analyzedModes' parameter are ignored. -->
-		<param name="filterModes" value="false" />
-
-		<!-- input file name to counts package -->
-		<param name="inputCountsFile" value="null" />
-
-		<!-- possible values: `html', `kml', `txt', `all' -->
-		<param name="outputformat" value="txt" />
-
-		<!-- Specifies how often the counts comparison should be calculated and written. -->
-		<param name="writeCountsInterval" value="10" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -152,7 +90,7 @@
 
 <!-- ====================================================================== -->
 
-	<module name="locationchoice" >
+	<!-- <module name="locationchoice" >
 		<param name="algorithm" value="bestResponse" />
 		<param name="analysisBinSize" value="20000" />
 		<param name="analysisBoundary" value="200000" />
@@ -181,13 +119,13 @@
 		<param name="travelSpeed_car" value="8.5" />
 		<param name="travelSpeed_pt" value="5.0" />
 		<param name="tt_approximationLevel" value="1" />
-	</module>
+	</module> -->
 
 <!-- ====================================================================== -->
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="./test/input/org/matsim/contrib/emissions/sample_network.xml" />
+		<param name="inputNetworkFile" value="sample_network.xml" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -277,7 +215,7 @@
 			<param name="mode" value="car" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -294,7 +232,7 @@
 			<param name="mode" value="pt" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -311,7 +249,7 @@
 			<param name="mode" value="walk" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -328,7 +266,7 @@
 			<param name="mode" value="bike" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -345,7 +283,7 @@
 			<param name="mode" value="other" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 	</module>
 
@@ -359,7 +297,7 @@
 		<!-- Path to a file containing person attributes (required file format: ObjectAttributes). -->
 		<param name="inputPersonAttributesFile" value="null" />
 
-		<param name="inputPlansFile" value="./test/input/org/matsim/contrib/emissions/sample_population.xml" />
+		<param name="inputPlansFile" value="sample_population.xml" />
 
 		<!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
 		<param name="networkRouteType" value="LinkNetworkRoute" />
@@ -376,7 +314,8 @@
 		<param name="beelineDistanceFactor" value="1.3" />
 
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
-		<param name="networkModes" value="car,ride" />
+		<!-- <param name="networkModes" value="car,ride" /> -->
+		<param name="networkModes" value="car" />
 
 		<parameterset type="teleportedModeParameters" >
 			<param name="mode" value="bike" />
@@ -493,9 +432,6 @@
 		<!-- `queue' for the standard queue model, `withHoles' (experimental!!) for the queue model with holes -->
 		<param name="trafficDynamics" value="queue" />
 
-		<!-- If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties. -->
-		<param name="useDefaultVehicles" value="true" />
-
 		<!-- If a route does not reference a vehicle, agents will use the vehicle with the same id as their own. -->
 		<param name="usePersonIdForMissingVehicleId" value="true" />
 
@@ -508,24 +444,30 @@
 	<module name="scenario" >
 
 		<!-- Set this parameter to true if households should be used, false if not. -->
-		<param name="useHouseholds" value="false" />
+		<!-- <param name="useHouseholds" value="false" /> -->
+		<!-- This switch does not seem to exist anymore. Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if lanes should be used, false if not. -->
-		<param name="useLanes" value="false" />
+		<!-- <param name="useLanes" value="false" /> -->
+		<!-- This switch does not seem to exist anymore. Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if signal systems should be used, false if not. -->
-		<param name="useSignalsystems" value="false" />
+		<!-- <param name="useSignalsystems" value="false" /> -->
+		<!-- This does not seem to exist (at this location) anymore. Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if transit should be simulated, false if not. -->
-		<param name="useTransit" value="false" />
+		<!-- <param name="useTransit" value="false" /> -->
+		<!-- "The useTransit switch has moved to the transit section of the config file." Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if vehicles should be used, false if not. -->
-		<param name="useVehicles" value="false" />
+		<!-- <param name="useVehicles" value="false" /> -->
+		<!-- "The useVehicles switch is no longer operational.  The file is loaded if the file name is different from null." Was on "false" anyways. I outcommend it. dz may'16 -->
+		
 	</module>
 
 <!-- ====================================================================== -->
 
-	<module name="signalsystems" >
+	<!-- <module name="signalsystems" >
 		<param name="ambertimes" value="null" />
 		<param name="intergreentimes" value="null" />
 		<param name="signalcontrol" value="null" />
@@ -533,7 +475,7 @@
 		<param name="signalsystems" value="null" />
 		<param name="useAmbertimes" value="false" />
 		<param name="useIntergreentimes" value="false" />
-	</module>
+	</module> -->
 
 <!-- ====================================================================== -->
 
@@ -566,10 +508,10 @@
 			<param name="executionPath" value="null" />
 
 			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-			<param name="moduleName" value="ChangeExpBeta" />
+			<param name="strategyName" value="ChangeExpBeta" />
 
 			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-			<param name="probability" value="1.0" />
+			<param name="weight" value="1.0" />
 
 			<!-- subpopulation to which the module applies. "null" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute) -->
 			<param name="subpopulation" value="null" />
@@ -651,43 +593,9 @@
 
 	<module name="vspExperimental" >
 
-		<!-- (do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. "car,bike", "car" -->
-		<param name="chainBasedModes" value="car" />
-
-		<!-- fraction of iterations at which MSA score averaging is started. The matsim theory department suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet. -->
-		<param name="fractionOfIterationsToStartScoreMSA" value="null" />
-
-		<!-- (do not use) Set this filename of MZ05 daily analysis -->
-		<param name="inputMZ05File" value="" />
-
-		<!-- (do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, set the following to true. -->
-		<param name="isAbleToOverwritePtInteractionParams" value="false" />
-
-		<param name="isGeneratingBoardingDeniedEvent" value="false" />
-
-		<!-- if an approximation of the opportunity cost of time is included into the radius calculation for location choice.`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility. -->
-		<param name="isUsingOpportunityCostOfTimeForLocationChoice" value="true" />
-
-		<param name="logitScaleParamForPlansRemoval" value="1.0" />
-
-		<!-- changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats -->
-		<param name="matsimGlobalTimeformat" value="HH:mm:ss" />
-
-		<!-- (do not use) set the traffic mode option for subTourModeChoice by Yu -->
-		<param name="modes" value="car, pt" />
-
-		<!-- (not tested) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
-		<param name="removingUnnecessaryPlanAttributes" value="false" />
-
-		<!-- (deprecated, use fractionOfIterationsToStartScoreMSA) first iteration of MSA score averaging. The matsim theory department suggests to use this together with switching of choice set innovation, but it has not been tested yet. -->
-		<param name="scoreMSAStartsAtIteration" value="null" />
-
 		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.
 		When violating VSP defaults, this results in nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
-		<param name="vspDefaultsCheckingLevel" value="ignore" />
-
-		<!-- if true then writes output_events in output directory.  default is `false'. Will only work when lastIteration is multiple of events writing interval -->
-		<param name="writingOutputEvents" value="false" />
+		<param name="vspDefaultsCheckingLevel" value="warn" />
 	</module>
 
 <!-- ====================================================================== -->

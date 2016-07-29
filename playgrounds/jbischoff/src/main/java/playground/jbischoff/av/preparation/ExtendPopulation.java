@@ -8,17 +8,17 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -35,7 +35,7 @@ public class ExtendPopulation {
 private Geometry geometry;
 private Scenario scenario;	
 private Random random = MatsimRandom.getRandom();
-private NetworkImpl network;
+private Network network;
 public static void main(String[] args) {
 	ExtendPopulation et = new ExtendPopulation();
 	et.run();
@@ -45,9 +45,9 @@ private void run() {
 	this.geometry = readShapeFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Untersuchungsraum.shp");
 	Config config = ConfigUtils.createConfig();	
 	scenario = ScenarioUtils.createScenario(config);
-	new  MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/plansWithCarsR0.10.xml.gz");
+	new  PopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/plansWithCarsR0.10.xml.gz");
 	new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz");
-	this.network = (NetworkImpl) scenario.getNetwork();
+	this.network = (Network) scenario.getNetwork();
 	
 	Config config2 = ConfigUtils.createConfig();	
 	Scenario scenario2 = ScenarioUtils.createScenario(config2);

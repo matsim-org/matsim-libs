@@ -33,7 +33,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.utils.collections.Tuple;
@@ -92,7 +93,8 @@ public class NetworkAddEmmeManeuverRestrictions {
 				Node fn = network.getNodes().get(fnid);
 				Node tn = network.getNodes().get(tnid);
 				if ((n != null) && (fn != null) && (tn != null)) {
-					if (((NodeImpl) n).getInNodes().containsKey(fn.getId()) && (((NodeImpl) n).getOutNodes().containsKey(tn.getId()))) {
+					Node r = ((Node) n);
+					if (((Map<Id<Node>, ? extends Node>) NetworkUtils.getInNodes(r)).containsKey(fn.getId()) && (((Map<Id<Node>, ? extends Node>) NetworkUtils.getOutNodes(((Node) n))).containsKey(tn.getId()))) {
 						ArrayList<TurnInfo> mns = illegalManeuvers.get(n.getId());
 						if (mns == null) {
 							mns = new ArrayList<TurnInfo>();

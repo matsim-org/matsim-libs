@@ -22,7 +22,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 /**
@@ -44,26 +43,26 @@ public final class DefaultRoutingModules {
 				net,
 				routeAlgo,
 				params.getTeleportedModeFreespeedFactor(),
-				params.getBeelineDistanceFactor(),
-				((PopulationFactoryImpl) popFac).getModeRouteFactory() ) ;
+				params.getBeelineDistanceFactor()) ;
 	}
 
 	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
 				popFac,
-				((PopulationFactoryImpl) popFac).getModeRouteFactory(),
 				params.getTeleportedModeSpeed(),
                 params.getBeelineDistanceFactor() );
 	}
 
+	/**
+	 * Creates network router without access/egress.
+	 */
 	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
 		return new NetworkRoutingModule(	
 				mode,
 				popFact,
 				net,
-				routeAlgo,
-				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
+				routeAlgo);
 	}
 	
 	public static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net, 
@@ -73,7 +72,7 @@ public final class DefaultRoutingModules {
 				popFact,
 				net,
 				routeAlgo,
-				((PopulationFactoryImpl) popFact).getModeRouteFactory(), calcRouteConfig );
+				calcRouteConfig );
 	}
 
 }

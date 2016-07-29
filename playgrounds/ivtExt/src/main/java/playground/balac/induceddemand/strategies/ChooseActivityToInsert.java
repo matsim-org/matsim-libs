@@ -3,15 +3,15 @@ package playground.balac.induceddemand.strategies;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.List;
 import java.util.Random;
@@ -64,14 +64,13 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			
 			Activity primaryActivity;
 			
-			ActivityImpl newActivity;
+			Activity newActivity;
 			
 			if (allActTypes[index].equals("home")) {
 				
 				primaryActivity = getPersonHomeLocation(t);					
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						primaryActivity.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -85,8 +84,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonWorkLocation(t);
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						primaryActivity.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -100,8 +98,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				primaryActivity = getPersonEducationLocation(t);
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						primaryActivity.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
@@ -115,7 +112,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				actFacility = findActivityLocation(allActTypes[index], 
 						((Activity)plan.getPlanElements().get(actIndex)).getCoord());
 				
-				newActivity = new ActivityImpl(allActTypes[index], actFacility.getLinkId());
+				newActivity = PopulationUtils.createActivityFromLinkId(allActTypes[index], actFacility.getLinkId());
 				
 				newActivity.setFacilityId(actFacility.getId());
 				newActivity.setCoord(actFacility.getCoord());
@@ -129,9 +126,9 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			
 			plan.getPlanElements().add(actIndex, newActivity);
 			if (actIndex == 0)
-				plan.getPlanElements().add(actIndex + 1, new LegImpl( ( (Leg) plan.getPlanElements().get(actIndex + 2) ).getMode() ));			
+				plan.getPlanElements().add(actIndex + 1, PopulationUtils.createLeg(( (Leg) plan.getPlanElements().get(actIndex + 2) ).getMode()));			
 			else
-				plan.getPlanElements().add(actIndex + 1, new LegImpl( ( (Leg) plan.getPlanElements().get(actIndex - 1) ).getMode() ));			
+				plan.getPlanElements().add(actIndex + 1, PopulationUtils.createLeg(( (Leg) plan.getPlanElements().get(actIndex - 1) ).getMode()));			
 		}		
 	}
 

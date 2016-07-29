@@ -21,9 +21,9 @@ package playground.jbischoff.taxibus.scenario.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -36,7 +36,7 @@ public class FilterWobBsPaxOnly {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/vw073.120.plans.xml.gz");
+		new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/vw073.120.plans.xml.gz");
 		
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			if (p.getId().toString().startsWith("BS_WB")) scenario2.getPopulation().addPerson(p);

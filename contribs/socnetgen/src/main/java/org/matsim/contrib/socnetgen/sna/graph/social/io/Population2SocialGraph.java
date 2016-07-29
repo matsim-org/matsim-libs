@@ -29,7 +29,7 @@ import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraphBuilder;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -42,7 +42,7 @@ public class Population2SocialGraph {
 
 	public SocialSparseGraph read(String filename, CoordinateReferenceSystem crs) {
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(filename);
 		Population populatio = scenario.getPopulation();
 		

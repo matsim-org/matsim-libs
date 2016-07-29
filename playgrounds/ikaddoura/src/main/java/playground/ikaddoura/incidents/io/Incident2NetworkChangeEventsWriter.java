@@ -19,13 +19,15 @@
 
 package playground.ikaddoura.incidents.io;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -56,22 +56,24 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 public class Incident2NetworkChangeEventsWriter {
 
 	private static final Logger log = Logger.getLogger(Incident2NetworkChangeEventsWriter.class);
-
+	private final double dayEndTime = (24 * 3600.) - 1.;
+	
+	private boolean debug = false;
+	
 	private Map<String, TrafficItem> trafficItems = null;
 	private Map<String, Path> trafficItemId2path = null;
 	private TMCAlerts tmc = null;
+	private String crs = null;
 	
-	private final NetworkChangeEventFactory nceFactory = new NetworkChangeEventFactoryImpl();
-	
-	private Map<Id<Link>, List<NetworkIncident>> linkId2incidents = new HashMap<>();
-	
-	public Incident2NetworkChangeEventsWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path) {
+
+	public Incident2NetworkChangeEventsWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path, String crs) {
 		this.tmc = tmc;
 		this.trafficItems = trafficItems;
-		this.trafficItemId2path = trafficItemId2path;		
+		this.trafficItemId2path = trafficItemId2path;
+		this.crs = crs;
 	}
 
-	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) {
+	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) throws IOException, ParseException {
 				
 		final double startDate = DateTime.parseDateTimeToDateTimeSeconds(startDateTime);
 		final double endDate = DateTime.parseDateTimeToDateTimeSeconds(endDateTime);
@@ -79,250 +81,280 @@ public class Incident2NetworkChangeEventsWriter {
 		double dateInSec = startDate;
 		while (dateInSec <= endDate) {
 			
-			log.info("Writing network change events for day " + DateTime.secToDateTimeString(dateInSec));
-			linkId2incidents.clear();
+			log.info("Writing network change events for day " + DateTime.secToDateString(dateInSec) + " (date in seconds: " + dateInSec + ")");
 			
-			collectDayLinkIncidents(dateInSec);
-			
-			List<NetworkIncident> processedNetworkIncidents = processLinkIncidents();
-			List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(processedNetworkIncidents);
+			Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidentsCurrentDay = collectDayLinkIncidents(dateInSec);
+			Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay = processLinkIncidents(linkId2rawIncidentsCurrentDay);
+			List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(linkId2processedIncidentsCurrentDay);
 
-			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateTimeString(dateInSec) + ".xml.gz", allChangeEvents);
+			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateString(dateInSec) + ".xml.gz", allChangeEvents);
+			Incident2CSVWriter.writeProcessedNetworkIncidents(linkId2processedIncidentsCurrentDay, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateString(dateInSec) + ".csv");
+			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(linkId2processedIncidentsCurrentDay, outputDirectory, dateInSec, crs);
 			dateInSec = dateInSec + 24 * 3600.;
 		}
 		
 		log.info("Writing network change events completed.");
-
 	}
 	
-	private List<NetworkIncident> processLinkIncidents() {
+	private Map<Id<Link>, List<NetworkIncident>> processLinkIncidents(Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidentsCurrentDay) {
 		
 		log.info("Processing the network incidents...");
 		
 		Map<Id<Link>, List<NetworkIncident>> linkId2linkIncidentsProcessed = new HashMap<>();
 		
 		int counter = 0;
-		for (Id<Link> linkId : this.linkId2incidents.keySet()) {
+		for (Id<Link> linkId : linkId2rawIncidentsCurrentDay.keySet()) {
 			
 			counter++;
-			if (counter % 1000 == 0) {
-				log.info("Link: #" + counter + " (" + (int) (( counter / (double) this.linkId2incidents.size()) * 100) + "%)"); 
+			if (counter % 100 == 0) {
+				log.info("Link: #" + counter + " (" + (int) (( counter / (double) linkId2rawIncidentsCurrentDay.size()) * 100) + "%)"); 
 			}
 			
-			log.warn("#############################################");
-			log.warn("Processing " + this.linkId2incidents.get(linkId).size() + " incidents on link " + linkId + "...");
+			if (debug) log.warn("#############################################");
+			if (debug) log.warn("Processing " + linkId2rawIncidentsCurrentDay.get(linkId).size() + " incidents on link " + linkId + "...");
 
-			for (NetworkIncident incidentNotInMap : this.linkId2incidents.get(linkId)) {
-				log.warn("Incident which is not in the map: " + incidentNotInMap.toString());
-
-				if (linkId2linkIncidentsProcessed.containsKey(linkId)) {
-					// compare the incident which is not in the map with all other incidents (on the same link)
-
-					log.warn("---");
-					
-					log.warn("Before processing the incidents:");
-					for (NetworkIncident ni : linkId2linkIncidentsProcessed.get(linkId)) {
-						log.warn(ni.toString());
-					}
-					
-					List<NetworkIncident> nonOverlappingIncidents = new ArrayList<>();
-					nonOverlappingIncidents = addIncidentAndSplitOverlappingIncidents(incidentNotInMap, linkId2linkIncidentsProcessed.get(linkId));
-					
-					linkId2linkIncidentsProcessed.put(linkId, nonOverlappingIncidents);
-					
-					log.warn("After processing the incidents:");
-					for (NetworkIncident ni : linkId2linkIncidentsProcessed.get(linkId)) {
-						log.warn(ni.toString());
-					} 
-					
-				} else {
-					// first processed incident on link
-					log.warn("First incident on link. Adding incident to map: " + incidentNotInMap.toString());
-
-					List<NetworkIncident> incidents = new ArrayList<>();
-					incidents.add(incidentNotInMap);
-					linkId2linkIncidentsProcessed.put(linkId, incidents);
-				}
+			if (debug) log.warn("##### Raw incidents:");
+			for (NetworkIncident ni : linkId2rawIncidentsCurrentDay.get(linkId)) {
+				if (debug) log.warn("	" + ni.toString());
 			}
+					
+			List<NetworkIncident> processedIncidents = processIncidents(linkId2rawIncidentsCurrentDay.get(linkId));
+			linkId2linkIncidentsProcessed.put(linkId, processedIncidents);	
+					
+			if (debug) log.warn("##### Processed incidents:");
+			for (NetworkIncident ni : linkId2linkIncidentsProcessed.get(linkId)) {
+				if (debug) log.warn("	" + ni.toString());
+			} 
 		}
 		
 		log.info("Processing the network incidents... Done.");
-		log.info("Adding all network incidents to one list...");
-
-		List<NetworkIncident> allNetworkIncidentsFromLinks = new ArrayList<>();
-		for (Id<Link> linkId : linkId2linkIncidentsProcessed.keySet()) {
-			allNetworkIncidentsFromLinks.addAll(linkId2linkIncidentsProcessed.get(linkId));
-		}
-		log.info("Adding all network incidents to one list... Done.");
-
-		return allNetworkIncidentsFromLinks;
+		
+		return linkId2linkIncidentsProcessed;
 	}
 	
-	private List<NetworkIncident> addIncidentAndSplitOverlappingIncidents(NetworkIncident incidentNotInMap, List<NetworkIncident> incidents) {
-		log.warn("		(a) Incident not in map: " + incidentNotInMap);
-
-		boolean addNonOverlappingIncident = true;
-		
+	private List<NetworkIncident> processIncidents(List<NetworkIncident> incidents) {
 		List<NetworkIncident> incidentsProcessed = new ArrayList<>();
 		incidentsProcessed.addAll(incidents);
-				
-		ListIterator<NetworkIncident> it = incidentsProcessed.listIterator();
-		while (it.hasNext()) {
-			NetworkIncident existingIncident = it.next();
-			
-			log.warn("		(b) Incident in map: " + existingIncident);
 
-			if (incidentNotInMap.parametersToString().equals(existingIncident.parametersToString())) {
-				addNonOverlappingIncident = false;
-				log.warn("			--> Equal incidents. Do not add the (a) to the map.");
-
-			} else if ((int) incidentNotInMap.getStartTime() == (int) existingIncident.getStartTime() || (int) existingIncident.getEndTime() == (int) incidentNotInMap.getEndTime()) {
-				addNonOverlappingIncident = false;
-
-				NetworkIncident moreRestrictiveIncident = new NetworkIncident(incidentNotInMap.getId() + "+(m)+" + existingIncident.getId(), existingIncident.getStartTime(), existingIncident.getEndTime());
-				moreRestrictiveIncident.setIncidentLink(getMoreRestrictiveIncidentLink(incidentNotInMap, existingIncident));
-				moreRestrictiveIncident.setLink(incidentNotInMap.getLink());
-				it.remove();
-				it.add(moreRestrictiveIncident);
-				
-				log.warn("			--> Same times. Adding the more restrictive incident and removing the existing incident.");
-
-			} else if ((int) incidentNotInMap.getStartTime() >= (int) existingIncident.getEndTime() || (int) existingIncident.getStartTime() >= (int) incidentNotInMap.getEndTime()) {
-				// no overlap --> keep existing
-				log.warn("			--> No overlap between (a) and (b). Check also the other existing incidents. If there is no overlap with any other incident, add (a) to map.");
-				
-			} else {
-				// overlap --> split the incident in three parts, add the three parts and remove the old one
-				addNonOverlappingIncident = false;
-
-				log.warn("			--> Overlap between (a) and (b). Splitting the overlapping incidents in three parts and removing the existing incident.");
-
-				NetworkIncident firstPartIncident = null;
-				NetworkIncident middlePartIncident = null;
-				NetworkIncident lastPartIncident = null;
-
-				// first part
-				if (incidentNotInMap.getStartTime() < existingIncident.getStartTime()) {
-					firstPartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(f)+" + existingIncident.getId(), incidentNotInMap.getStartTime(), existingIncident.getStartTime());
-					firstPartIncident.setIncidentLink(incidentNotInMap.getIncidentLink());
-				} else if (existingIncident.getStartTime() < incidentNotInMap.getStartTime()) {
-					firstPartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(f)+" + existingIncident.getId(), existingIncident.getStartTime(), incidentNotInMap.getStartTime());
-					firstPartIncident.setIncidentLink(existingIncident.getIncidentLink());
-				} else {
-					// same start time
-					firstPartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(f)+" + existingIncident.getId(), incidentNotInMap.getStartTime(), existingIncident.getStartTime());
-					firstPartIncident.setIncidentLink(incidentNotInMap.getIncidentLink());
-				}
-				firstPartIncident.setLink(incidentNotInMap.getLink());
-														
-				// last part
-				if (incidentNotInMap.getEndTime() < existingIncident.getEndTime()) {
-					lastPartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(l)+" + existingIncident.getId(), incidentNotInMap.getEndTime(), existingIncident.getEndTime());
-					lastPartIncident.setIncidentLink(existingIncident.getIncidentLink());
-				} else if (existingIncident.getEndTime() < incidentNotInMap.getEndTime()) {
-					lastPartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(l)+" + existingIncident.getId(), existingIncident.getEndTime(), incidentNotInMap.getEndTime());
-					lastPartIncident.setIncidentLink(incidentNotInMap.getIncidentLink());
-				} else {
-					// same end time
-					lastPartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(l)+" + existingIncident.getId(), incidentNotInMap.getEndTime(), existingIncident.getEndTime());
-					lastPartIncident.setIncidentLink(existingIncident.getIncidentLink());
-				}
-				lastPartIncident.setLink(incidentNotInMap.getLink());
-				
-				// middle part
-				middlePartIncident = new NetworkIncident(incidentNotInMap.getId() + "+(m)+" + existingIncident.getId(), firstPartIncident.getEndTime(), lastPartIncident.getStartTime());
-				middlePartIncident.setIncidentLink(getMoreRestrictiveIncidentLink(incidentNotInMap, existingIncident));
-				middlePartIncident.setLink(incidentNotInMap.getLink());
-								
-				it.remove();
-				
-				if ((int) firstPartIncident.getEndTime() > (int) firstPartIncident.getStartTime()) {
-					log.warn("		--> First part incident: " + firstPartIncident);
-					incidentsProcessed = addIncidentAndSplitOverlappingIncidents(firstPartIncident, incidentsProcessed);
-				}
-
-				if ((int) middlePartIncident.getEndTime() > (int) middlePartIncident.getStartTime()) {
-					log.warn("		--> Middle part incident: " + middlePartIncident);
-					incidentsProcessed = addIncidentAndSplitOverlappingIncidents(middlePartIncident, incidentsProcessed);
-				}
-				
-				if ((int) lastPartIncident.getEndTime() > (int) lastPartIncident.getStartTime()) {
-					log.warn("		--> Last part incident: " + lastPartIncident);
-					incidentsProcessed = addIncidentAndSplitOverlappingIncidents(lastPartIncident, incidentsProcessed);
-				}
-			}
-			
+		// empty list
+		if (incidents.isEmpty()) {
+			log.warn("	> Empty list.");
+			return incidentsProcessed;
 		}
 		
-		if (addNonOverlappingIncident) {
-
-			incidentsProcessed.add(incidentNotInMap);
-
-			log.warn("No overlap with any other incident. Adding (a) to map.");
-						
-			log.warn("Before adding:");
+		// easier for debugging
+		if (incidentsProcessed.size() > 1) {
+			Collections.sort(incidentsProcessed, new IntervalComparatorStartTimeEndTime());	
+		}
+				
+		// remove equal incidents
+		if (incidentsProcessed.size() > 1) {
+			incidentsProcessed = removeEqualIncidents(incidentsProcessed);
+			if (debug) log.warn("	> After removing duplicate incidents:");
 			for (NetworkIncident ni : incidentsProcessed) {
-				log.warn(ni.toString());
+				if (debug) log.warn("		>> " + ni.toString());
 			}
-			
-			log.warn(" --> Adding " + incidentNotInMap.toString());
-			
-			log.warn("After adding:");
+		}
+				
+		// split overlaps
+		if (incidentsProcessed.size() > 1) {
+			incidentsProcessed = breakOverlappingIntervals(incidentsProcessed);
+			if (debug) log.warn("	> After breaking overlapping incidents:");
 			for (NetworkIncident ni : incidentsProcessed) {
-				log.warn(ni.toString());
-			} 	
+				if (debug) log.warn("		>> " + ni.toString());
+			}
 		}
 		
-		// check if there is any overlap...
-		for (NetworkIncident incident1 : incidentsProcessed) {
-			for (NetworkIncident incident2 : incidentsProcessed) {
-				if (incident1 != incident2) {
-					if ((int) incident1.getStartTime() >= (int) incident2.getEndTime() || (int) incident2.getStartTime() >= (int) incident1.getEndTime()) {
-						// no overlap
-					} else {
-						log.warn("Overlap1: " + incident1.toString());
-						log.warn("Overlap2: " + incident2.toString());
-						throw new RuntimeException("there should not be any overlap...");
-					}
+		// test
+		NetworkIncident current = incidentsProcessed.get(0);
+		for (int i = 1; i < incidentsProcessed.size(); i++) {
+			NetworkIncident next = incidentsProcessed.get(i);
+			if ( (int) next.getStartTime() < (int) current.getEndTime() ) {
+				throw new RuntimeException("Overlap. Aborting...");
+			}
+		}
+				
+        return incidentsProcessed;
+	}
+	
+	private static List<NetworkIncident> removeEqualIncidents(List<NetworkIncident> incidents) {
+	
+		List<NetworkIncident> incidentsProcessed = new ArrayList<>();
+		
+		for (NetworkIncident incidentToCheck : incidents) {
+			boolean equalToAnExistingIncident = false;
+
+			for (NetworkIncident existingIncident : incidentsProcessed) {
+				if (incidentToCheck.parametersToString().equals(existingIncident.parametersToString())) {
+					equalToAnExistingIncident = true;
 				}
 			}
+			
+			if (equalToAnExistingIncident == false) {
+				incidentsProcessed.add(incidentToCheck);
+			}
 		}
-		
-		
 		return incidentsProcessed;
 	}
 
-	private List<NetworkChangeEvent> getNetworkChangeEvents(List<NetworkIncident> incidents) {
+	private static List<NetworkIncident> breakOverlappingIntervals( List<NetworkIncident> incidents ) {
+
+	    TreeMap<Integer,Integer> endPoints = new TreeMap<>();
+
+	    for ( NetworkIncident incident : incidents ) {
+	    	
+	        Integer startTime = (int) incident.getStartTime();
+	        
+	        if ( endPoints.containsKey(startTime)) {
+	            endPoints.put(startTime, endPoints.get(startTime) + 1);
+	        } else {
+	            endPoints.put(startTime, 1);
+	        }
+	        
+	        Integer endTime = (int) incident.getEndTime();
+	        if ( endPoints.containsKey(endTime)) {
+	            endPoints.put(endTime, endPoints.get(startTime) - 1);
+	        } else {
+	            endPoints.put(endTime, -1);
+	        }
+	        
+	    }
+
+	    int curr = 0;
+	    Integer currStart = null;
+
+	    List<NetworkIncident> incidentsProcessedTmp = new ArrayList<>();
+	    for ( Map.Entry<Integer,Integer> e : endPoints.entrySet() ) {
+	        if ( curr > 0 ) {
+	        	NetworkIncident incidentPart = new NetworkIncident("xxx", currStart, e.getKey());
+	        	incidentsProcessedTmp.add(incidentPart);
+	        }
+	        curr += e.getValue();
+	        currStart = e.getKey();
+	    }
+	    
+	    // for each split interval go through all incidents and get the most restrictive incident from the original incident.
+	    List<NetworkIncident> incidentsProcessed = new ArrayList<>();
+	    for (NetworkIncident processedIncidentTmp : incidentsProcessedTmp) {
+	    	Link incidentLink = null;
+	    	String id = "";
+
+	    	for (NetworkIncident incident : incidents) {
+	    		
+	    		if (incident.getStartTime() <= processedIncidentTmp.getStartTime() && incident.getEndTime() >= processedIncidentTmp.getEndTime()) {
+	    			// in relevant interval
+	    			
+	    			if (incidentLink == null) {
+	    				incidentLink = incident.getIncidentLink();
+	    				id = incident.getId();
+	    			} else {
+	    				incidentLink = getMoreRestrictiveIncidentLink(incidentLink, incident.getIncidentLink());
+	    				id = id + "+" + incident.getId();
+	    			}
+	    			
+	    		} else {
+	    			// not in the relevant interval
+	    		}
+	    	}
+	    	
+	    	if (incidentLink != null) {
+	    		NetworkIncident incidentPart = new NetworkIncident(id, processedIncidentTmp.getStartTime(), processedIncidentTmp.getEndTime());
+	        	incidentPart.setLink(incidents.get(0).getLink());
+	        	incidentPart.setIncidentLink(incidentLink);
+	        	incidentsProcessed.add(incidentPart);
+	    	} else {
+	    		// This interval is a gap between two other incident intervals.
+	    	}
+	    }
+	    
+	    return incidentsProcessed;
+	}
+
+	class IntervalComparatorStartTimeEndTime implements Comparator<Object> {
+        public int compare(Object o1, Object o2){
+        	NetworkIncident i1 = (NetworkIncident) o1;
+        	NetworkIncident i2 = (NetworkIncident) o2;
+        	
+        	if ((int) i1.getStartTime() < (int) i2.getStartTime()) {
+        		return -1;
+        	} else if ((int) i1.getStartTime() > (int) i2.getStartTime()) {
+        		return +1;
+        	} else {
+        		if ((int) i1.getEndTime() < (int) i2.getEndTime()) {
+        			return -1;
+        		} else if ((int) i1.getEndTime() > (int) i2.getEndTime()) {
+        			return +1;
+        		} else {
+        			return 0;
+        		}
+        	}
+        }
+	}
+	
+	private List<NetworkChangeEvent> getNetworkChangeEvents(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay) {
 		
 		List<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 		
-		for (NetworkIncident incident : incidents) {
+		for (Id<Link> linkId : linkId2processedIncidentsCurrentDay.keySet()) {
+
+			if (debug) log.warn("***" + linkId);
+
+			List<NetworkIncident> incidents = linkId2processedIncidentsCurrentDay.get(linkId);
+			incidents.sort(new IntervalComparatorStartTimeEndTime());
 			
-			// incident start: change values
-			NetworkChangeEvent nceStart = nceFactory.createNetworkChangeEvent(incident.getStartTime());
-			nceStart.addLink(incident.getLink());
-			
-			nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getCapacity()));
-			nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getFreespeed()));
-			nceStart.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getNumberOfLanes()));
-			
-			networkChangeEvents.add(nceStart);
-			
-			// incident end: set back to original values
-			NetworkChangeEvent nceEnd = nceFactory.createNetworkChangeEvent(incident.getEndTime());
-			nceEnd.addLink(incident.getLink());
-			
-			nceEnd.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getCapacity()));
-			nceEnd.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getFreespeed()));
-			nceEnd.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getNumberOfLanes()));
-			
-			networkChangeEvents.add(nceEnd);
+			for (int i = 0; i < incidents.size(); i++) {
+				
+				NetworkIncident incident = incidents.get(i);
+				
+				if (debug) log.warn(incident.parametersToString());
+				
+				// incident start: change values
+				NetworkChangeEvent nceStart = new NetworkChangeEvent(incident.getStartTime());
+				nceStart.addLink(incident.getLink());
+				
+				if (incident.getIncidentLink() == null) {
+					log.warn("Incident link " +  incident.getId() + " for link " + linkId + " is null.");
+					log.warn("Incident link: " + incident.toString());
+				}
+				
+				nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, Math.round((incident.getIncidentLink().getCapacity() / 3600.) * 1000) / 1000.0));
+				nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getIncidentLink().getFreespeed()));
+				nceStart.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getIncidentLink().getNumberOfLanes()));
+				
+				networkChangeEvents.add(nceStart);
+				
+				boolean setBackToOriginalValues = false;
+				if (i == incidents.size() - 1) {
+					// last incident during the day
+					setBackToOriginalValues = true;
+				} else {
+					if ((int) incidents.get(i+1).getStartTime() == (int) incident.getEndTime()) {
+						// the current incident will immediately be followed by another incident
+					} else {
+						setBackToOriginalValues = true;
+					}
+				}
+				
+				if (setBackToOriginalValues) {
+					// incident end: set back to original values
+					NetworkChangeEvent nceEnd = new NetworkChangeEvent(incident.getEndTime());
+					nceEnd.addLink(incident.getLink());
+					
+					nceEnd.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, Math.round((incident.getLink().getCapacity() / 3600.) * 1000) / 1000.0));
+					nceEnd.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getLink().getFreespeed()));
+					nceEnd.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getLink().getNumberOfLanes()));
+					
+					networkChangeEvents.add(nceEnd);
+				}
+			}
 		}
 		return networkChangeEvents;
 	}
 	
-	private void collectDayLinkIncidents(double dateInSec) {
+	private Map<Id<Link>, List<NetworkIncident>> collectDayLinkIncidents(double dateInSec) throws ParseException {
 				
+		Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidents = new HashMap<>();
+		
 		log.info("Collecting all incidents that are relevant for this day...");
 		int counter = 0;
 		
@@ -337,32 +369,38 @@ public class Incident2NetworkChangeEventsWriter {
 			double startTime = Double.NEGATIVE_INFINITY;
 			double endTime = Double.NEGATIVE_INFINITY;
 			
-			if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) < dateInSec 
+			String info = null;
+			
+			if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) <= dateInSec 
 					|| DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec + (24 * 3600.)) {
 				// traffic item ends on a previous day or starts on a later day --> the traffic item is not relevant for this day
-			
-			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec
-					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec + (24 * 3600.)) {
+				info = "not relevant for this day";
+				
+			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec
+					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) >= dateInSec + (24 * 3600.)) {
 				// traffic item starts on a previous day and ends on a later day
 				
 				startTime = 0.;
-				endTime = 24. * 3600.;
+				endTime = dayEndTime;
+				info = "A";
 				
-			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec
+			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) < dateInSec + (24 * 3600.)) {
 				// traffic item starts on a previous day and ends on this day
 				
 				startTime = 0.;
 				endTime = DateTime.parseDateTimeToTimeSeconds(item.getEndDateTime());
-									
-			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec
-					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec + (24 * 3600.)
-					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec + (24 * 3600.)) {
+				info = "B";
+
+			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) >= dateInSec
+					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec + (24 * 3600.)
+					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) >= dateInSec + (24 * 3600.)) {
 				// traffic item starts on this day and ends on a later day
 
 				startTime = DateTime.parseDateTimeToTimeSeconds(item.getStartDateTime());
-				endTime = 24. * 3600.;
+				endTime = dayEndTime;
+				info = "C";
 								
 			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec + (24 * 3600.)
@@ -372,7 +410,8 @@ public class Incident2NetworkChangeEventsWriter {
 
 				startTime = DateTime.parseDateTimeToTimeSeconds(item.getStartDateTime());
 				endTime = DateTime.parseDateTimeToTimeSeconds(item.getEndDateTime());
-									
+				info = "D";
+				
 			} else {
 				throw new RuntimeException("Aborting..." + item.toString());
 			}
@@ -380,50 +419,41 @@ public class Incident2NetworkChangeEventsWriter {
 			// store the traffic item info which is relevant for this day.
 			if (startTime >= 0. && endTime >= 0.) {
 				
-				if (endTime <= startTime) {
+				if (endTime == startTime) {
+					log.warn("Info: " + info);
+					log.warn("Start time: " + startTime + " - End time: " + endTime + " - Traffic item: " + item.toString());
+				
+				} else if (endTime < startTime) {
+					log.warn("Info: " + info);
 					throw new RuntimeException("Start time: " + startTime + " - End time: " + endTime + " - Traffic item: " + item.toString());
-				}				
+				
+				} else {
+					for (Link link : this.trafficItemId2path.get(item.getId()).links) {
+						NetworkIncident incident = new NetworkIncident(item.getId(), startTime, endTime);
+						incident.setLink(link);
+						incident.setIncidentLink(tmc.getTrafficIncidentLink(link, this.trafficItems.get(item.getId())));
+						
+						if (incident.getIncidentLink() != null) {
+													
+							if (linkId2rawIncidents.containsKey(link.getId())) {
+								linkId2rawIncidents.get(link.getId()).add(incident);
 								
-				for (Link link : this.trafficItemId2path.get(item.getId()).links) {
-					NetworkIncident incident = new NetworkIncident(item.getId(), startTime, endTime);
-					incident.setLink(link);
-					incident.setIncidentLink(tmc.getTrafficIncidentLink(link, this.trafficItems.get(item.getId())));
-					
-					if (incident.getIncidentLink() != null) {
-												
-						if (linkId2incidents.containsKey(link.getId())) {
-							linkId2incidents.get(link.getId()).add(incident);
-							
-						} else {
-														
-							List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
-							dayNetworkIncidents.add(incident);
-							linkId2incidents.put(link.getId(), dayNetworkIncidents);
+							} else {
+															
+								List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
+								dayNetworkIncidents.add(incident);
+								linkId2rawIncidents.put(link.getId(), dayNetworkIncidents);
+							}
 						}
 					}
 				}
 			}
 		}
 		log.info("Collecting all incidents that are relevant for this day... Done.");
-	}
-	
-	private Link getMoreRestrictiveIncidentLink(NetworkIncident incident1, NetworkIncident incident2) {
-		Link trafficIncidentLink1 = incident1.getIncidentLink();
-		Link trafficIncidentLink2 = incident2.getIncidentLink();
-		
-		if (trafficIncidentLink1 == null && trafficIncidentLink2 == null) {
-			return null;
-		} else if (trafficIncidentLink1 == null && trafficIncidentLink2 != null) {
-			return incident2.getIncidentLink();
-		} else if (trafficIncidentLink1 != null && trafficIncidentLink2 == null) {
-			return incident1.getIncidentLink();
-		} else {
-			Link moreRestrictiveIncidentLink = getMoreRestrictiveIncidentLink(trafficIncidentLink1, trafficIncidentLink2);
-			return moreRestrictiveIncidentLink;
-		}
+		return linkId2rawIncidents;
 	}
 
-	private Link getMoreRestrictiveIncidentLink(Link incidentLink1, Link incidentLink2) {
+	private static Link getMoreRestrictiveIncidentLink(Link incidentLink1, Link incidentLink2) {
 		if (incidentLink1.getCapacity() < incidentLink2.getCapacity()) {
 			return incidentLink1;
 		} else if (incidentLink1.getCapacity() > incidentLink2.getCapacity()) {
@@ -439,12 +469,16 @@ public class Incident2NetworkChangeEventsWriter {
 				} else if (incidentLink1.getNumberOfLanes() > incidentLink2.getNumberOfLanes()) {
 					return incidentLink2;
 				} else {
-					return incidentLink1;
+					if (incidentLink1.getAllowedModes().size() < incidentLink2.getAllowedModes().size()) {
+						return incidentLink1;
+					} else if (incidentLink1.getAllowedModes().size() > incidentLink2.getAllowedModes().size()) {
+						return incidentLink2;
+					} else {
+						return incidentLink1;
+					}
 				}
 			}
 		}
 	}
-
-
 }
 

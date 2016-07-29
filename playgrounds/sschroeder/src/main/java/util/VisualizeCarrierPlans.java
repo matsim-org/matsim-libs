@@ -8,7 +8,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.utils.Visualiser;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class VisualizeCarrierPlans {
@@ -23,12 +23,12 @@ public class VisualizeCarrierPlans {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap15.xml");
 		
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read("output/0.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");
+		new CarrierPlanXmlReaderV2(carriers).readFile("output/0.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");
 //        new CarrierPlanXmlReaderV2(carriers).read("scenarios/single_cordon/2.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");
 //        new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/scenarios/multipleCarriers_withoutTW_withDepots_withPlan.xml");
 		
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes_v2.xml");
+		new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes_v2.xml");
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		
 		new Visualiser(config, scenario).visualizeLive(carriers);

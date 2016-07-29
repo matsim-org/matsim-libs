@@ -35,7 +35,7 @@ import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorModule;
 
 import javax.inject.Named;
 import java.util.HashMap;
@@ -44,9 +44,8 @@ import java.util.Map;
 public class WithinDayModule extends AbstractModule {
     @Override
     public void install() {
-        binder().bind(TravelTimeCollector.class);
-        bindNetworkTravelTime().to(TravelTimeCollector.class);
-        binder().bind(WithinDayEngine.class);
+        install(new TravelTimeCollectorModule());
+        bind(WithinDayEngine.class);
         bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
         bind(FixedOrderSimulationListener.class).asEagerSingleton();
         addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
@@ -58,8 +57,9 @@ public class WithinDayModule extends AbstractModule {
         bind(EarliestLinkExitTimeProvider.class).asEagerSingleton();
     }
 
+    @SuppressWarnings("static-method")
     @Provides @Named("lowerBound") Map<String, TravelTime> provideEarliestLinkExitTravelTimes(Map<String, TravelTime> travelTimes) {
-        Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<String, TravelTime>();
+        Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<>();
         earliestLinkExitTravelTimes.putAll(travelTimes);
         earliestLinkExitTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
         return earliestLinkExitTravelTimes;

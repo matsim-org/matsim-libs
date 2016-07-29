@@ -183,7 +183,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 //		eventsManager.addHandler(weeh);
 //		SimpleColdEmissionEventHandler ceeh = new SimpleColdEmissionEventHandler();
 //	eventsManager.addHandler(ceeh);
-		emissionReader.parse(emissionFile1);
+		emissionReader.readFile(emissionFile1);
 		
 		logger.info("done parsing emission file");
 //		emissionsPerCell = geh.emissionPerCell;

@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.pt.PtConstants;
@@ -258,7 +258,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 	}
 
 	private void handleLeg(final double time) {
-		LegImpl leg = (LegImpl) this.plan.getPlanElements().get(this.index);
+		Leg leg = (Leg) this.plan.getPlanElements().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index += 2;
 	}

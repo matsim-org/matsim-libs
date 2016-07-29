@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -47,7 +47,7 @@ public class EnrichPopulationAttributesOfMZPopulationFromHouseholds {
 		final String outputPopulationAttributes = args[ 3 ];
 
 		final ObjectAttributes attributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader( attributes ).parse( inputPopulationAttributes );
+		new ObjectAttributesXmlReader( attributes ).readFile( inputPopulationAttributes );
 
 		final Map<String, Collection<Id<Person>>> personsInHousehold = new HashMap<>();
 		for ( Person p : readPopulation( inputPopulationFile ) ) {
@@ -101,7 +101,7 @@ public class EnrichPopulationAttributesOfMZPopulationFromHouseholds {
 
 	private static Iterable<? extends Person> readPopulation( final String inputPopulationFile ) {
 		final Scenario s = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( s ).readFile( inputPopulationFile );
+		new PopulationReader( s ).readFile( inputPopulationFile );
 		return s.getPopulation().getPersons().values();
 	}
 }

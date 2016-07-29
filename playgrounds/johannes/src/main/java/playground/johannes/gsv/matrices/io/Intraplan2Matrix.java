@@ -47,7 +47,7 @@ public class Intraplan2Matrix {
 		 * read nuts to gsv mappings
 		 */
 //		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
-        ZoneCollection zones = new ZoneCollection();
+        ZoneCollection zones = new ZoneCollection(null);
         String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
         zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 

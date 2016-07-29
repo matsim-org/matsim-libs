@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,111 +23,40 @@ package playground.boescpa.av.staticDemand;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
 import playground.boescpa.analysis.trips.Trip;
-import playground.boescpa.analysis.trips.TripReader;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * WHAT IS IT FOR?
- * WHAT DOES IT?
  *
  * @author boescpa
  */
-public class StaticDemand {
-    private static Logger log = Logger.getLogger(StaticDemand.class);
-    private static Random random = MatsimRandom.getRandom();
+public abstract class StaticDemand {
+	protected static Logger log = Logger.getLogger(StaticDemand.class);
 
-    private final double shareOfOriginalAgentsServedByAV;
-    private final String[] modes;
+	public abstract List<Trip> getOriginalDemand();
 
-    private final List<Trip> originalDemand;
-    private final List<Trip> filteredDemand;
-    private final List<Trip> sortedDemand;
+	public abstract List<Trip> getFilteredDemand();
 
-    public StaticDemand(String pathToTripFile, String[] modes, double shareOfOriginalAgentsServedByAV) {
-        this.shareOfOriginalAgentsServedByAV = shareOfOriginalAgentsServedByAV;
-        this.modes = modes;
-        log.info("Read demand...");
-        this.originalDemand = TripReader.createTripCollection(pathToTripFile);
-        log.info("Read demand... done.");
-        log.info("Filter demand...");
-        this.filteredDemand = filterTrips(TripReader.createTripCollection(pathToTripFile));
-        log.info("Filter demand... done.");
-        log.info("Sort demand...");
-        this.sortedDemand = new ArrayList<>();
-        this.sortedDemand.addAll(this.filteredDemand);
-        sortTripsByStartTime(this.sortedDemand);
-        log.info("Sort demand... done.");
-    }
+	public abstract List<Trip> getSortedDemand();
 
-    public List<Trip> getOriginalDemand() {
-        return Collections.unmodifiableList(originalDemand);
-    }
+	public static List<Id> getAllAgents(List<Trip> modeFilteredTrips) {
+		log.info("Filter demand for agents...");
+		List<Id> agents = new ArrayList<>();
+		Set<Id> agentsSet = new HashSet<>();
+		for (Trip trip : modeFilteredTrips) {
+			if (!agentsSet.contains(trip.agentId)) {
+				agentsSet.add(trip.agentId);
+				agents.add(trip.agentId);
+			}
+		}
+		log.info("Filter demand for agents... done.");
+		log.info("Total " + agents.size() + " driving agents found.");
+		return agents;
+	}
 
-    public List<Trip> getFilteredDemand() {
-        return Collections.unmodifiableList(filteredDemand);
-    }
-
-    public List<Trip> getSortedDemand() {
-        return Collections.unmodifiableList(sortedDemand);
-    }
-
-    private void sortTripsByStartTime(List<Trip> trips) {
-        Collections.sort(trips, new Comparator<Trip>() {
-            @Override
-            public int compare(Trip o1, Trip o2) {
-                return (int) (o2.startTime - o1.startTime);
-            }
-        });
-    }
-
-    /**
-     * Filter trips for modes and for number...
-     * @return
-     */
-    private List<Trip> filterTrips(List<Trip> originalDemand) {
-        List<Trip> modeFilteredTrips = new ArrayList<>();
-        // filter mode:
-        for (String mode : modes) {
-            for (Trip trip : originalDemand) {
-                if (mode.equals(trip.mode)) {
-                    modeFilteredTrips.add(trip);
-                }
-            }
-        }
-        // sample demand via share of agents:
-        List<Id> agents = getAllAgents(modeFilteredTrips);
-        log.info("Sample demand...");
-        long shareToRemove = Math.round(agents.size() * (1- shareOfOriginalAgentsServedByAV));
-        for (int i = 0; i < shareToRemove; i++) {
-            agents.remove(random.nextInt(agents.size()));
-        }
-        Set<Id> sampledAgents = new HashSet<>();
-        sampledAgents.addAll(agents);
-        List<Trip> filteredTrips = new ArrayList<>();
-        for (Trip trip : modeFilteredTrips) {
-            if (sampledAgents.contains(trip.agentId)) {
-                filteredTrips.add(trip);
-            }
-        }
-        log.info("Sample demand... done.");
-        return filteredTrips;
-    }
-
-    protected static List<Id> getAllAgents(List<Trip> modeFilteredTrips) {
-        log.info("Filter demand for agents...");
-        List<Id> agents = new ArrayList<>();
-        Set<Id> agentsSet = new HashSet<>();
-        for (Trip trip : modeFilteredTrips) {
-            if (!agentsSet.contains(trip.agentId)) {
-                agentsSet.add(trip.agentId);
-                agents.add(trip.agentId);
-            }
-        }
-        log.info("Filter demand for agents... done.");
-        log.info("Total " + agents.size() + " driving agents found.");
-        return agents;
-    }
 }

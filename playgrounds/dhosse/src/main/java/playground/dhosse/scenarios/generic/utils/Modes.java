@@ -24,7 +24,8 @@ public class Modes {
 	public static final String FF = "freefloating";
 	
 	//misc
-	public static final String motorcycle = "motorcycle";
-	public static final String pedelec = "pedelec";
+	public static final String MOTORCYCLE = "motorcycle";
+	public static final String PEDELEC = "pedelec";
+	public static final String SCOOTER = "scooter";
 		
 }

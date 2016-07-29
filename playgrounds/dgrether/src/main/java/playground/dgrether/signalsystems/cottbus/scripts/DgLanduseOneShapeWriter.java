@@ -26,7 +26,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.signalsystems.cottbus.commuterdemand.DgLanduseReader;
+import playground.vsp.demandde.commuterDemandCottbus.DgLanduseReader;
 
 
 /**

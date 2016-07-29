@@ -23,8 +23,7 @@ public class NPersonsProblem {
     public NPersonsProblem(TaxiOptimizerContext optimConfig)
     {
         this.optimConfig = optimConfig;
-        router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
+        router = new Dijkstra(optimConfig.network, optimConfig.travelDisutility, optimConfig.travelTime);
         
         vrpFinder = new BestDispatchFinder(optimConfig);
     }
@@ -47,14 +46,14 @@ public class NPersonsProblem {
     public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests)
     {
         while (!unplannedRequests.isEmpty()) {
-        	if(optimConfig.context.getVrpData().getVehicles().size()>0&&optimConfig.context.getTime() > 32000){
+        	if(optimConfig.taxiData.getVehicles().size()>0&&optimConfig.timer.getTimeOfDay() > 32000){
         		System.out.print("");
         	}
-        	List<BestDispatchFinder.Dispatch> requests = new ArrayList<BestDispatchFinder.Dispatch>();
+        	List<BestDispatchFinder.Dispatch<TaxiRequest>> requests = new ArrayList<BestDispatchFinder.Dispatch<TaxiRequest>>();
             TaxiRequest req = unplannedRequests.peek();
 
-            BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles().values());
+            BestDispatchFinder.Dispatch<TaxiRequest> best = vrpFinder.findBestVehicleForRequest(req,
+                    optimConfig.taxiData.getVehicles().values());
 
             if (best == null) {
 //            	log.info("No vrp found for request " + req.getId().toString() + " at " + 

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.IntegerCache;
 
 /**
@@ -79,7 +79,8 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 
 		TimeStruct ts = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
 		if (ts == null) {
-			return ((LinkImpl)this.link).getFreespeedTravelTime(now);
+			Link r = ((Link)this.link);
+			return NetworkUtils.getFreespeedTravelTime(r, now) ;
 		}
 		return ts.timeSum / ts.cnt;
 	}

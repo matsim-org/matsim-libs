@@ -3,13 +3,13 @@ package playground.sergioo.passivePlanning2012.core.population.decisionMakers;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -219,7 +219,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 			simpleTravelTime.setMode(mode);
 			LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
 			LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(scenario.getSimplerNetwork(mode), simpleTravelDisutility, simpleTravelTime); 
-			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), start.getCoord()).getFromNode(), NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), end.getCoord()).getToNode(), time, null, null);
+			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestLink(((Network) scenario.getSimplerNetwork(mode)), start.getCoord()).getFromNode(), NetworkUtils.getNearestLink(((Network) scenario.getSimplerNetwork(mode)), end.getCoord()).getToNode(), time, null, null);
 			if(path.travelTime<minTime) {
 				minTime = path.travelTime;
 				bestPath = path.links;
@@ -230,7 +230,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		mode.add(bestMode);
 		leastCostPathCalculator.setModeRestriction(mode);
 		NetworkRoute networkRoute = getFullNetworkRoute(bestPath, start.getLinkId(), end.getLinkId(), time);
-		Leg leg = new LegImpl(bestMode);
+		Leg leg = PopulationUtils.createLeg(bestMode);
 		leg.setRoute(networkRoute);
 		return Arrays.asList(leg);
 	}

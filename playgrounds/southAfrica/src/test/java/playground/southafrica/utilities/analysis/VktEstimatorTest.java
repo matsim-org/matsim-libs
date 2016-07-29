@@ -30,8 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -81,23 +80,23 @@ public class VktEstimatorTest {
 		
 		/* Create the plans. */
 		PopulationFactory pf = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
-		Plan plan1 = new PlanImpl();
+		Plan plan1 = PopulationUtils.createPlan();
 		plan1.addActivity(pf.createActivityFromCoord("D", new Coord(5.0, 5.0)));
-		plan1.addLeg(new LegImpl("walk"));
+		plan1.addLeg(PopulationUtils.createLeg("walk"));
 		plan1.addActivity(pf.createActivityFromCoord("E", new Coord(9.0, 5.0)));
 		plans.add(plan1);
 		
-		Plan plan2 = new PlanImpl();
+		Plan plan2 = PopulationUtils.createPlan();
 		plan2.addActivity(pf.createActivityFromCoord("D", new Coord(5.0, 5.0)));
-		plan2.addLeg(new LegImpl("walk"));
+		plan2.addLeg(PopulationUtils.createLeg("walk"));
 		plan2.addActivity(pf.createActivityFromCoord("F", new Coord(5.0, 0.0)));
 		plans.add(plan2);
 		
-		Plan plan3 = new PlanImpl();
+		Plan plan3 = PopulationUtils.createPlan();
 		plan3.addActivity(pf.createActivityFromCoord("F", new Coord(5.0, 0.0)));
-		plan3.addLeg(new LegImpl("walk"));
+		plan3.addLeg(PopulationUtils.createLeg("walk"));
 		plan3.addActivity(pf.createActivityFromCoord("D", new Coord(5.0, 5.0)));
-		plan3.addLeg(new LegImpl("walk"));
+		plan3.addLeg(PopulationUtils.createLeg("walk"));
 		plan3.addActivity(pf.createActivityFromCoord("E", new Coord(9.0, 5.0)));
 		plans.add(plan3);
 	}

@@ -39,9 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -104,7 +102,7 @@ public class FacilityRelocator {
 	 * @return
 	 */
 	public Plan processPlan(Plan plan){
-		Plan newPlan = new PlanImpl();
+		Plan newPlan = PopulationUtils.createPlan();
 		List<String> affectedFacilities = CTUtilities.getAffectedFacilities();
 		List<Activity> partialPlan = new ArrayList<>();
 		List<Activity> relocatedActivities = new ArrayList<>();
@@ -150,7 +148,7 @@ public class FacilityRelocator {
 		}
 		
 		/* Build a complete plan from the list of activities. */
-		Leg commercialLeg = new LegImpl("commercial");
+		Leg commercialLeg = PopulationUtils.createLeg("commercial");
 		for(int i = 0; i < bestInsertionList.size()-1; i++){
 			newPlan.addActivity(bestInsertionList.get(i));
 			newPlan.addLeg(commercialLeg);
@@ -255,7 +253,7 @@ public class FacilityRelocator {
 	 * @return
 	 */
 	private Activity getRelocationActivity(){
-		Activity act = new ActivityImpl("minor", ct.transform(this.relocation.getCoord()));
+		Activity act = PopulationUtils.createActivityFromCoord("minor", ct.transform(this.relocation.getCoord()));
 		act.setFacilityId(Id.create(this.relocation.toString().toLowerCase(), ActivityFacility.class));
 		return act;
 	}

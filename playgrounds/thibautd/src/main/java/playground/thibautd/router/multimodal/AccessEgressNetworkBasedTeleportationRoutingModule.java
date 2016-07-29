@@ -26,9 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -55,7 +54,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		Logger.getLogger(AccessEgressNetworkBasedTeleportationRoutingModule.class);
 
 	private final String mode;
-	private final NetworkImpl accessibleNetwork;
+	private final Network accessibleNetwork;
 	private final double crowFlyDistanceFactor;
 	private final double crowFlySpeed;
 	private final LeastCostPathCalculator routeAlgo;
@@ -67,7 +66,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 			final double crowFlySpeed,
 			final LeastCostPathCalculator routeAlgo) {
 		this.mode = mode;
-		this.accessibleNetwork = (NetworkImpl) accessibleNetwork;
+		this.accessibleNetwork = (Network) accessibleNetwork;
 		this.crowFlySpeed = crowFlySpeed;
 		this.crowFlyDistanceFactor = crowFlyDistanceFactor;
 		this.routeAlgo = routeAlgo;
@@ -115,7 +114,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		route.setLinks( toIds( path.links ) ); 
 		route.setEgressTime( egressTime );
 
-		final Leg leg = new LegImpl( mode );
+		final Leg leg = PopulationUtils.createLeg(mode);
 		leg.setRoute( route );
 		leg.setTravelTime( route.getTravelTime() );
 

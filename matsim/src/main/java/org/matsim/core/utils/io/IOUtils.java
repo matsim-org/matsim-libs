@@ -33,6 +33,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -54,6 +56,19 @@ public class IOUtils {
 	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
 	private final static Logger log = Logger.getLogger(IOUtils.class);
+
+	public static URL getUrlFromFileOrResource(String filename) {
+		File file = new File(filename);
+		if (file.exists()) {
+			try {
+				return file.toURI().toURL();
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		URL resourceAsStream = IOUtils.class.getClassLoader().getResource(filename);
+		return resourceAsStream;
+	}
 
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.
@@ -611,5 +626,16 @@ public class IOUtils {
 			if (i2 != null) i2.close();
 		}
 	}
-	
+
+	public static URL newUrl(URL context, String spec) {
+		try {
+			return new URL(context, spec);
+		} catch (MalformedURLException e) {
+			try {
+				return new File(spec).toURI().toURL();
+			} catch (MalformedURLException e1) {
+				throw new RuntimeException(e1);
+			}
+		}
+	}
 }

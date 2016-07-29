@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,12 +51,11 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -65,7 +65,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
@@ -79,6 +78,10 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 	public void testInsertParkingActivities() {
 		Config config = super.loadConfig(null);
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with "true".  kai, jun'16
+		
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		createFacilities(sc);
@@ -90,33 +93,33 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		Plan plan = factory.createPlan();
 		person.addPlan(plan);
 
-		ActivityImpl activity;
+		Activity activity;
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("work", Id.create("l4", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("work", Id.create("l4", Link.class));
 		activity.setFacilityId(Id.create("f4", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.walk));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("shopping", Id.create("l5", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("shopping", Id.create("l5", Link.class));
 		activity.setFacilityId(Id.create("f5", ActivityFacility.class));
 		plan.addActivity(activity);
 
 		plan.addLeg(factory.createLeg(TransportMode.pt));
 
-		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
+		activity = (Activity) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
 
@@ -124,8 +127,8 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		 * Set activity durations and coordinates
 		 */
 		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof ActivityImpl) {
-				activity = (ActivityImpl) planElement;
+			if (planElement instanceof Activity) {
+				activity = (Activity) planElement;
 				activity.setMaximumDuration(3600);
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 			}
@@ -135,7 +138,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime ) ;
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime ) ;
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults() ;
 		builder.setLeastCostPathCalculatorFactory( new DijkstraFactory() );

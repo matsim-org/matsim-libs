@@ -100,7 +100,7 @@ public class CountsParserWriterTest {
 		new CountsWriter(f.counts).write(filename);
 
 		Counts counts2 = new Counts();
-		new CountsReaderMatsimV1(counts2).parse(filename);
+		new CountsReaderMatsimV1(counts2).readFile(filename);
 		Assert.assertEquals("", counts2.getName());
 	}
 }

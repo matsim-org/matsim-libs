@@ -39,11 +39,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.KmlNetworkWriter;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.KmlNetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -137,7 +136,7 @@ public class NetworkEmme2MATSim {
 	
 	private static String separator = ",";
 	
-	public static void readNetwork(NetworkImpl network, boolean useWGS84) {
+	public static void readNetwork(Network network, boolean useWGS84) {
 		network.setCapacityPeriod(3600.) ;
 		network.setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
@@ -168,7 +167,7 @@ public class NetworkEmme2MATSim {
 				String carAssignStr = parts[3];
 				
 				if (useWGS84) {
-					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new Coord(Double.parseDouble(xxStrWGS84), Double.parseDouble(yyStrWGS84)));
+					Node node = NetworkUtils.createAndAddNode(network, Id.create(idStr, Node.class), new Coord(Double.parseDouble(xxStrWGS84), Double.parseDouble(yyStrWGS84)));
 				}
 				else {
 					double xx = Double.valueOf(xxStr);
@@ -182,7 +181,7 @@ public class NetworkEmme2MATSim {
 					xx = (xx + 50) * 1000;
 					yy = (yy + 500) * 1000;
 
-					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new Coord(xx, yy));
+					Node node = NetworkUtils.createAndAddNode(network, Id.create(idStr, Node.class), new Coord(xx, yy));
 				}
 			}
 			
@@ -249,8 +248,17 @@ public class NetworkEmme2MATSim {
 
 				Id<Link> id = Id.create(String.valueOf(linkCnt), Link.class);
 				linkCnt++;
+				final Id<Link> id1 = id;
+				final Node fromNode1 = fromNode;
+				final Node toNode1 = toNode;
+				final double length1 = length;
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = permlanes;
+				final String origId = oridId;
+				final String type1 = type;
 
-				network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, permlanes, oridId, type);
+				NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, length1, freespeed1, capacity1, numLanes, origId, type1);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -261,8 +269,8 @@ public class NetworkEmme2MATSim {
 
 
 	public static void main(String[] args) {
-		NetworkImpl networkITM = NetworkImpl.createNetwork();
-		NetworkImpl networkWGS84 = NetworkImpl.createNetwork();
+		Network networkITM = NetworkUtils.createNetwork();
+		Network networkWGS84 = NetworkUtils.createNetwork();
 
 		log.info("reading network ...");
 		readNetwork(networkITM, false);
@@ -342,7 +350,7 @@ public class NetworkEmme2MATSim {
 		for (Link link : network.getLinks().values()) {
 			SimpleFeature ft = factory.createPolyline(
 					new Coordinate [] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), ((LinkImpl)link).getType()},
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(),link.getLength(), NetworkUtils.getType(((Link)link))},
 					link.getId().toString()
 					);
 			features.add(ft);

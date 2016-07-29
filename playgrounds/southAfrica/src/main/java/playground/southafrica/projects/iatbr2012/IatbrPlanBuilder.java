@@ -30,15 +30,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -92,29 +92,29 @@ public class IatbrPlanBuilder {
 		/* READ THE VARIOUS INPUT FILES */	
 		/* Read SACSC shopping facilities */
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.parse(sacscFile);
+		fr.readFile(sacscFile);
 		processSacscQT(sc);
 		
 		/* Read SACSC shopping facility attributes */
 		sacscAttributes = new ObjectAttributes();
 		ObjectAttributesXmlReader or = new ObjectAttributesXmlReader(sacscAttributes);
-		or.parse(sacscAttributeFile);
+		or.readFile(sacscAttributeFile);
 		
 		/* Read the general amenities file. */
 		MutableScenario scAmenities = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader mfr = new MatsimFacilitiesReader(scAmenities);
-		mfr.parse(amenityFile);
+		mfr.readFile(amenityFile);
 		processAmenities(scAmenities);
 		
 		/* Read network */
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.parse(sc.getConfig().network().getInputFile());
+		nr.readFile(sc.getConfig().network().getInputFile());
 		LOG.info("Number of links: " + sc.getNetwork().getLinks().size());
 		LOG.info("Number of nodes: " + sc.getNetwork().getNodes().size());
 
 		/* Read plans */
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
-		pr.parse(plansFile);
+		PopulationReader pr = new PopulationReader(sc);
+		pr.readFile(plansFile);
 		createPrimaryActivityFacilities(sc.getPopulation());
 		
 		
@@ -130,7 +130,7 @@ public class IatbrPlanBuilder {
 		 * This is necessary since the controller will later read in this file 
 		 * when executing. */		
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
-		pw.writeFileV5(sc.getConfig().plans().getInputFile());
+		pw.writeV5(sc.getConfig().plans().getInputFile());
 		
 		
 		/* Try location choice */
@@ -235,8 +235,8 @@ public class IatbrPlanBuilder {
 		while(iterator.hasNext()){
 			Id<Person> id = iterator.next();
 			Person person = population.getPersons().get(id);
-			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
-			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
+			Activity firstActivity = ((Activity) person.getSelectedPlan().getPlanElements().get(0));
+			Activity lastActivity = ((Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
 			if(firstActivity.getType().startsWith("h") && lastActivity.getType().startsWith("h")){
 
 				/* Check for home activity */
@@ -263,7 +263,7 @@ public class IatbrPlanBuilder {
 				for(int i = 1; i < person.getSelectedPlan().getPlanElements().size()-1; i++){
 					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 					if(pe instanceof Activity){
-						ActivityImpl act = (ActivityImpl) pe;
+						Activity act = (Activity) pe;
 						if(act.getType().startsWith("h")){
 							act.setFacilityId(home.getId());
 						} else if(act.getType().startsWith("w")){

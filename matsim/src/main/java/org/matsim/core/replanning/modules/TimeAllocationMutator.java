@@ -28,20 +28,20 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
+import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
-import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 
 import javax.inject.Provider;
 
 /**
- * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
+ * Wraps the {@link org.matsim.core.population.algorithms.PlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser
- * @see org.matsim.population.algorithms.PlanMutateTimeAllocation
+ * @see org.matsim.core.population.algorithms.PlanMutateTimeAllocation
  */
 public class TimeAllocationMutator extends AbstractMultithreadedModule {
 

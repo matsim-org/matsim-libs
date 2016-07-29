@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,7 +48,7 @@ public class ExtractTravelTimesForModes {
 		final String outputDatFile = args[ 1 ];
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( scenario ).readFile( inputPopulation );
+		new PopulationReader( scenario ).readFile( inputPopulation );
 
 		final Map<String,Collection<TripInfo>> tripInfos = new LinkedHashMap<>();
 

@@ -27,15 +27,16 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.contrib.signals.model.DatabasedSignalPlan;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.lanes.data.v20.Lane;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
@@ -62,7 +63,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	private int secondInSylviaCycle = -1;
 	private Map<Integer, DgExtensionPoint> extensionPointMap = null;
 	private Map<Integer, DgExtensionPoint> forcedExtensionPointMap = null;
-	private Map<Id, Double> greenGroupId2OnsetMap = null;
+	private Map<Id<SignalGroup>, Double> greenGroupId2OnsetMap = null;
 	private int extensionTime = 0;
 	private int secondInCycle = -1; //used for debug output
 
@@ -83,9 +84,9 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		this.activeSylviaPlan = null;
 		this.extensionActive = false;
 		this.forcedExtensionActive = false;
-		this.greenGroupId2OnsetMap = new HashMap<Id, Double>();
-		this.extensionPointMap = new HashMap<Integer, DgExtensionPoint>();
-		this.forcedExtensionPointMap = new HashMap<Integer, DgExtensionPoint>();
+		this.greenGroupId2OnsetMap = new HashMap<>();
+		this.extensionPointMap = new HashMap<>();
+		this.forcedExtensionPointMap = new HashMap<>();
 		this.initCylce();
 	}
 
@@ -167,7 +168,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		return true;
 	}
 	
-	private boolean isGreenTimeLeft(double timeSeconds, Id groupId, int maxGreenTime){
+	private boolean isGreenTimeLeft(double timeSeconds, Id<SignalGroup> groupId, int maxGreenTime){
 		int greenTime = (int) (timeSeconds - this.greenGroupId2OnsetMap.get(groupId));
 		return greenTime < maxGreenTime;
 	}
@@ -183,7 +184,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		if (this.isExtensionTimeLeft()) {
 			//check if there is some green time left of one of the groups is over its maximal green time
 			boolean greenTimeLeft = true;
-			for (Id signalGroupId : extensionPoint.getSignalGroupIds()){
+			for (Id<SignalGroup> signalGroupId : extensionPoint.getSignalGroupIds()){
 					if (! this.isGreenTimeLeft(timeSeconds, signalGroupId, extensionPoint.getMaxGreenTime(signalGroupId))){
 						greenTimeLeft = false;
 					}
@@ -207,7 +208,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 				}
 			}
 			else {
-				for (Id laneId : signal.getLaneIds()){
+				for (Id<Lane> laneId : signal.getLaneIds()){
 					noCars = this.sensorManager.getNumberOfCarsOnLane(signal.getLinkId(), laneId);
 					if (noCars > 0){
 						return true;
@@ -248,7 +249,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	private Tuple<SignalPlan,DgSylviaSignalPlan> searchActivePlans() {
 		DgSylviaSignalPlan sylviaPlan = null;
 		SignalPlan fixedTimePlan = null;
-		for (Id planId : this.signalPlans.keySet()){
+		for (Id<SignalPlan> planId : this.signalPlans.keySet()){
 			if (planId.toString().startsWith(DgSylviaPreprocessData.SYLVIA_PREFIX)){
 				sylviaPlan = (DgSylviaSignalPlan) this.signalPlans.get(planId);
 			}
@@ -304,7 +305,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		log.debug("  Maximal time for extension: " + this.activeSylviaPlan.getMaxExtensionTime());
 		for (DgExtensionPoint p : this.extensionPointMap.values()){
 			log.debug("  ExtensionPoint at: " + p.getSecondInPlan() + " groups: ");
-			for (Id sgId : p.getSignalGroupIds()){
+			for (Id<SignalGroup> sgId : p.getSignalGroupIds()){
 				log.debug("    SignalGroup: " + sgId + " maxGreen: "+ p.getMaxGreenTime(sgId));
 			}
 		}
@@ -314,7 +315,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	private void initializeSensoring(){
 		for (DgExtensionPoint extPoint : this.extensionPointMap.values()){
 			Set<SignalData> extPointSignals = new HashSet<SignalData>();
-			for (Id signalGroupId : extPoint.getSignalGroupIds()){
+			for (Id<SignalGroup> signalGroupId : extPoint.getSignalGroupIds()){
 				SignalSystemData systemData = this.system.getSignalSystemsManager().getSignalsData().getSignalSystemsData().getSignalSystemData().get(this.system.getId());
 				SignalGroupData signalGroup = this.system.getSignalSystemsManager().getSignalsData().getSignalGroupsData().getSignalGroupDataBySystemId(systemData.getId()).get(signalGroupId);
 				Set<SignalData> signals = DgSignalsUtils.getSignalDataOfSignalGroup(systemData, signalGroup);
@@ -326,7 +327,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 					this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter());
 				}
 				else {
-					for (Id laneId : signal.getLaneIds()){
+					for (Id<Lane> laneId : signal.getLaneIds()){
 						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
 					}
 				}

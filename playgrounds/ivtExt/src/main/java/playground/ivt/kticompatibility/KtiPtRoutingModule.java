@@ -26,10 +26,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -39,9 +37,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.pt.PtConstants;
-import playground.balmermi.world.Layer;
-import playground.balmermi.world.World;
-import playground.balmermi.world.Zone;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
@@ -58,14 +54,14 @@ public class KtiPtRoutingModule implements RoutingModule {
 	private final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 
 	private final  PlansCalcRouteConfigGroup config;
-	private final NetworkImpl network;
+	private final Network network;
 	private final KtiPtRoutingModuleInfo info;
 
 	public KtiPtRoutingModule(
 			final PlansCalcRouteConfigGroup config,
 			final KtiPtRoutingModuleInfo info,
 			final Network network) {
-		this.network = (NetworkImpl) network;
+		this.network = (Network) network;
 		this.config = config;
 		this.info = info;
 	}
@@ -92,7 +88,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 					stop1.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg1 = distanceLeg1 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
 
-		final Leg walk1 = new LegImpl( TransportMode.transit_walk );
+		final Leg walk1 = PopulationUtils.createLeg(TransportMode.transit_walk);
 		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , linkStartPt.getId() );
 		walk1.setTravelTime( travelTimeLeg1 );
 		route1.setTravelTime( travelTimeLeg1 );
@@ -107,12 +103,15 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		// pt
 		// ---------------------------------------------------------------------
-		final Layer municipalities = info.world.getLayer("municipality");
-		final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
-		final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
-		final Zone fromMunicipality = froms.get(0);
-		final Zone toMunicipality = tos.get(0);
+		if (true)
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
 
+	//	final Layer municipalities = info.world.getLayer("municipality");
+	//	final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
+	//	final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
+	//	final Zone fromMunicipality = froms.get(0);
+	//	final Zone toMunicipality = tos.get(0);
+/*
 		final Entry ptTravelTimeEntry =
 			info.ptTravelTimes.getEntry(
 					fromMunicipality.getId().toString(),
@@ -161,14 +160,14 @@ public class KtiPtRoutingModule implements RoutingModule {
 		route2.setDistance( distanceLeg2 );
 		walk2.setRoute( route2 );
 		trip.add( walk2 );
-
+*/
 		return trip;
 	}
 
 	private static Activity createInteraction(
 			final Coord coord,
 			final Id link) {
-		final Activity act = new ActivityImpl( PtConstants.TRANSIT_ACTIVITY_TYPE , coord , link );
+		final Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, coord, link);
 		act.setMaximumDuration( 0 );
 		return act;
 	}
@@ -181,7 +180,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 	public static class KtiPtRoutingModuleInfo {
 		private final Matrix ptTravelTimes;
 		private final SwissHaltestellen ptStops;
-		private final World world;
+		//private final World world;
 		private final double intrazonalSpeed;
 
 		public KtiPtRoutingModuleInfo(
@@ -213,7 +212,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 			this.ptTravelTimes = ptInfo.getPtTravelTimes();
 			this.ptStops = ptInfo.getHaltestellen();
-			this.world = ptInfo.getLocalWorld();
+			//this.world = ptInfo.getLocalWorld();
 		}
 	}
 }

@@ -145,10 +145,6 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 	private final Map<Integer,SceneGraph> cachedTimes = new HashMap<Integer,SceneGraph>();
 
-	public void clearCache() {
-		this.cachedTimes.clear();
-	}
-
 	/**
 	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
 	 */

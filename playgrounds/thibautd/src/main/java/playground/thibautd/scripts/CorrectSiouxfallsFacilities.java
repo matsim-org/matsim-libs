@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -65,7 +65,7 @@ public class CorrectSiouxfallsFacilities {
 		final String outputFacilities = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader( sc ).readFile(inputPopulation);
+		new PopulationReader( sc ).readFile(inputPopulation);
 		new MatsimFacilitiesReader( sc ).readFile(inputFacilities);
 
 		for (Person p : sc.getPopulation().getPersons().values() ) {

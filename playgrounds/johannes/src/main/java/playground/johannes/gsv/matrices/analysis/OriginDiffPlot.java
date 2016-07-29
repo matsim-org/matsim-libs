@@ -57,13 +57,13 @@ public class OriginDiffPlot {
 	public static void main(String[] args) throws IOException {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.sym.xml");
+		reader.readFile("/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.sym.xml");
 		NumericMatrix simMatrix = reader.getMatrix();
 
-		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
+		reader.readFile("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
 		NumericMatrix refMatrix = reader.getMatrix();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.json", "gsvId");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.json", "gsvId", null);
 
 		ODUtils.cleanDistances(refMatrix, zones, 100000, WGS84DistanceCalculator.getInstance());
 		// ODUtils.cleanDistances(simMatrix, zones, 100000,

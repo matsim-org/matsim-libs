@@ -41,10 +41,7 @@ public class Initializer {
 		this.controler = new Controler(config);
         this.controler.getConfig().controler().setCreateGraphs(false);
         this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
-		this.controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		this.controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		this.controler.run();
 	}
 

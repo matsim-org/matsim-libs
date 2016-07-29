@@ -21,7 +21,16 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
 import playground.gregor.TransportMode;
 import playground.gregor.casim.simulation.CANetsimEngine;
 
@@ -33,17 +42,42 @@ import playground.gregor.casim.simulation.CANetsimEngine;
  * <li> It would probably be much better to have this in a separate package.  But this means to move a lot of scopes from
  * "package" to protected.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
  */
-public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory {
+public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 
 
 	private final CANetsimEngine hybridEngine;
+	private NetsimInternalInterface netsimEngine;
+	private final Scenario sc;
+	private NetsimEngineContext context;
+	private final EventsManager events;
 
-	public HybridQSimCANetworkFactory(CANetsimEngine e, Scenario sc) {
+	public HybridQSimCANetworkFactory(CANetsimEngine e, Scenario sc, EventsManager events) {
 		this.hybridEngine = e;
+		this.sc = sc ;
+		this.events = events ;
 	}
 
 	@Override
-	public QLinkI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+		QSimConfigGroup qsimConfig = sc.getConfig().qsim() ;
+		
+		this.netsimEngine = netsimEngine1 ;
+		
+		double effectiveCellSize = ((Network) sc.getNetwork()).getEffectiveCellSize() ;
+
+		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
+		if (! Double.isNaN(sc.getNetwork().getEffectiveLaneWidth())){
+			linkWidthCalculator.setLaneWidth( sc.getNetwork().getEffectiveLaneWidth() );
+		}
+		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+		AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( sc, linkWidthCalculator );
+		
+		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
+	}
+
+	@Override
+	public QLinkI createNetsimLink(final Link link, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walkca);
 
@@ -53,7 +87,7 @@ public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory {
 		if (qSim2DTransitionLink) {
 			qLink = new CALink(link,1);
 		} else {
-			qLink = new QLinkImpl(link, network, toQueueNode);
+//			qLink = new QLinkImpl(link, network, toQueueNode);
 			throw new RuntimeException("Not yet implemented!");
 		}
 
@@ -97,9 +131,10 @@ public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(final Node node, QNetwork network) {
+	public QNode createNetsimNode(final Node node) {
 		//TODO CA Node;
-		return new QNode(node, network);
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 
 }

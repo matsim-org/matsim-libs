@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -76,7 +76,7 @@ public class ParkingInfrastructure  {
 	//	facilityToLinkMapping = new HashMap<Id, Id>(); 
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 		
-		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(((MutableScenario) scenario).getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
+		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(((MutableScenario) scenario).getActivityFacilities(), (Network) scenario.getNetwork());
 		
 		// Create a quadtree containing all parking facilities
 		double minx = Double.POSITIVE_INFINITY;

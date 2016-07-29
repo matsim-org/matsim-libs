@@ -20,6 +20,7 @@ package playground.ikaddoura.incidents;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,17 +30,12 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
 import playground.ikaddoura.incidents.io.HereMapsTrafficItemXMLReader;
@@ -54,40 +50,76 @@ import playground.ikaddoura.incidents.io.Incident2SHPWriter;
  *
  */
 public class IncidentDataAnalysis {
-	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
- 
-//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-//	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
-	
-	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private final String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
+	private final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
 
-//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-//	private final String inputDirectory = "/Users/ihab/Desktop/testXmlFiles1/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-test/";
-//	
-//	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
-//	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-germany/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-germany-analysis/";
+	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private String crs = TransformationFactory.DHDN_GK4;
+//	private String crs = TransformationFactory.WGS84_UTM33N;
 	
-	private final boolean writeCSVFileForEachXMLFile = false;
-
-	private final String startDateTime = "2016/02/13";
-	private final String endDateTime = "2016/02/15";
-		
+	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
+//	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin_2016-05-19_a/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin_2016-05-19_b/";
+	
+	private boolean writeCSVFileForEachXMLFile = false;
+	
+	private boolean writeAllTrafficItems2ShapeFile = false;
+	
+	private boolean writeDaySpecificTrafficItems2ShapeFile = true;
+//	private String shpFileStartDateTime = "2016-02-11";
+//	private String shpFileEndDateTime = "2016-03-26";
+	private String shpFileStartDateTime = "2016-03-29";
+	private String shpFileEndDateTime = "2016-05-18";
+	
+	private boolean writeNetworkChangeEventFiles = true;
+//	private String networkChangeEventStartDateTime = "2016-02-11";
+//	private String networkChangeEventEndDateTime = "2016-03-26";
+	private String networkChangeEventStartDateTime = "2016-03-29";
+	private String networkChangeEventEndDateTime = "2016-05-18";
+	
 // ##################################################################
 	
 	private final Map<String, TrafficItem> trafficItems = new HashMap<>();
 	private final TMCAlerts tmc = new TMCAlerts();
 
-	public static void main(String[] args) throws XMLStreamException, IOException {
+	public static void main(String[] args) throws XMLStreamException, IOException, ParseException {
+		
 		IncidentDataAnalysis incidentAnalysis = new IncidentDataAnalysis();
 		incidentAnalysis.run();	
 	}
+	
+	public IncidentDataAnalysis() {
+		log.warn("Using the default constructor...");
+	}
+	
+	public IncidentDataAnalysis(
+			String networkFile,
+			String crs,
+			String inputDirectory,
+			String outputDirectory,
+			boolean writeCSVFileForEachXMLFile,
+			boolean writeAllTrafficItems2ShapeFile,
+			boolean writeDaySpecificTrafficItems2ShapeFile,
+			String shpStartDateTime,
+			String shpEndDateTime,
+			boolean writeNetworkChangeEventFiles,
+			String nceStartDateTime,
+			String nceEndDateTime) {
+		
+		this.networkFile = networkFile;
+		this.crs = crs;
+		this.inputDirectory = inputDirectory;
+		this.outputDirectory = outputDirectory;
+		this.writeCSVFileForEachXMLFile = writeCSVFileForEachXMLFile;
+		this.writeAllTrafficItems2ShapeFile = writeAllTrafficItems2ShapeFile;
+		this.writeDaySpecificTrafficItems2ShapeFile = writeDaySpecificTrafficItems2ShapeFile;
+		this.shpFileStartDateTime = shpStartDateTime;
+		this.shpFileEndDateTime = shpEndDateTime;
+		this.writeNetworkChangeEventFiles = writeNetworkChangeEventFiles;
+		this.networkChangeEventStartDateTime = nceStartDateTime;
+		this.networkChangeEventEndDateTime = nceEndDateTime;
+	}
 
-	public void run() throws XMLStreamException, IOException {
+	public void run() throws XMLStreamException, IOException, ParseException {
 		
 		OutputDirectoryLogging.catchLogEntries();
 		try {
@@ -97,28 +129,49 @@ public class IncidentDataAnalysis {
 		}
 		
 		collectTrafficItems(); // traffic items that have the same traffic item IDs are updated by the more recent information or by the update traffic item
+		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData_beforeConsideringUpdateMessages.csv");
+	
 		updateTrafficItems(); // update all traffic items that are updated or canceled by another traffic item
 		
-		// write csv file
-		final Incident2CSVWriter csvWriter = new Incident2CSVWriter();
-		csvWriter.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData.csv");
-		
-		final Scenario scenario = loadScenario();
-		
+		// write CSV file which contains all information (start point, end point, type, ...) 
+		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData.csv");
+				
 		// map incidents on network
-		final Incident2Network networkMapper = new Incident2Network(scenario, this.trafficItems);
+		final Incident2Network networkMapper = new Incident2Network(loadScenario(), this.trafficItems, this.crs);
 		networkMapper.computeIncidentPaths();
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
-		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
 
-//		// write shape file
-//		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
-//		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinks.shp", this.trafficItems.keySet());
-//		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinksToCheck.shp", trafficItemsToCheck);
+		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
 
-		// write network change events
-		final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
-		nceWriter.writeIncidentLinksToNetworkChangeEventFile(this.startDateTime, this.endDateTime, this.outputDirectory); 
+		if (writeAllTrafficItems2ShapeFile) {
+			log.info("Writing all traffic items to shape file...");
+			
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_all.shp", this.trafficItems.keySet(), this.crs);
+			
+			final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_WARNING.shp", trafficItemsToCheck, this.crs);
+		}
+		
+		if (writeDaySpecificTrafficItems2ShapeFile) {
+			log.info("Writing filtered traffic items to shape file(s)...");
+
+			final Set<String> filteredTrafficItems = new HashSet<>();
+			for (TrafficItem item : this.trafficItems.values()) {
+				if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) < DateTime.parseDateTimeToDateTimeSeconds(shpFileStartDateTime)
+						|| DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > DateTime.parseDateTimeToDateTimeSeconds(shpFileEndDateTime) + (24 * 3600.)) {
+				} else {
+					filteredTrafficItems.add(item.getId());
+				}
+			}
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems, crs);
+			shpWriter.writeCongestionInfo2ShapeFile(outputDirectory + "delays_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems, crs);
+		}
+		
+		if (writeNetworkChangeEventFiles) {
+			// write network change events file and network incident shape file for each day
+			final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path, this.crs);
+			nceWriter.writeIncidentLinksToNetworkChangeEventFile(this.networkChangeEventStartDateTime, this.networkChangeEventEndDateTime, this.outputDirectory);
+		}
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
@@ -149,8 +202,7 @@ public class IncidentDataAnalysis {
 				if (writeCSVFileForEachXMLFile) {
 					String outputCSVFile = inputXmlFile.substring(0, inputXmlFile.length() - 4) + ".csv";
 					log.info("Writing xml file to csv file: " + outputCSVFile);
-					Incident2CSVWriter writer = new Incident2CSVWriter();
-					writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
+					Incident2CSVWriter.writeTrafficItems(trafficItemReader.getTrafficItems(), outputCSVFile);
 				}
 				
 				int counterNew = 0;
@@ -281,7 +333,7 @@ public class IncidentDataAnalysis {
 	
 	private void updateTrafficItems() throws IOException {
 		
-		log.info("Updating all traffic items using the update message codes...");
+		log.info("Updating all traffic items using the update message codes or the original Id information...");
 		Set<String> updateItemsToBeDeleted = new HashSet<>();
 
 		for (TrafficItem updateItem : this.trafficItems.values()) {
@@ -298,19 +350,73 @@ public class IncidentDataAnalysis {
 						// the update and original traffic items' locations are the same
 						
 					} else {
-						log.warn("An update message should only update the incident's endtime. The location should remain the same. Compare the following traffic items:");
-						log.warn("Normal traffic item: " + originalItem);
-						log.warn("Update traffic item: " + updateItem);
 						
-						log.warn("The from and to locations' descriptions are the same. Ok, probably some minor location coordinate corrections. Proceed...");
-						log.warn("The from and to locations' descriptions are not the same. Assuming that this is still the update for the previous traffic item. Proceed....");
+						if (originalItem.getOrigin() == null && originalItem.getTo() == null) {
+							// Ok, probably some minor location coordinate corrections. Proceed...
+							
+						} else {
+							log.warn("An update message should only update the incident's endtime. The location should remain the same. Compare the following traffic items:");
+							log.warn("Normal traffic item: " + originalItem);
+							log.warn("Update traffic item: " + updateItem);
+							
+							log.warn("If the from and to locations' descriptions are not the same: Assuming that this is still the update for the previous traffic item. Proceed....");
+						}						
 					}
 					originalItem.setEndDateTime(updateItem.getStartDateTime());
 					updateItemsToBeDeleted.add(updateItem.getId());
 				}
 				
 			} else {
-				// nothing to update
+
+				// some traffic items have no update code but provide update information for an existing traffic item
+				
+				if (updateItem.getId().equals(updateItem.getOriginalId())) {
+					// The item's Id and original Id are the same. Considering this item not to be an update item.
+					
+				} else {
+					// This item is considered as an update item providing information for an existing traffic item (original Id).
+					
+					if (this.trafficItems.get(updateItem.getOriginalId()) == null) {
+						// original traffic item not in map
+						
+					} else {
+						TrafficItem originalItem = this.trafficItems.get(updateItem.getOriginalId());
+
+						if (updateItem.getOrigin().toString().equals(originalItem.getOrigin().toString())
+								&& updateItem.getTo().toString().equals(originalItem.getTo().toString())
+								&& updateItem.getTMCAlert().getPhraseCode().equals(originalItem.getTMCAlert().getPhraseCode())) {
+							
+							// the update and original traffic items' locations and alert codes are the same
+							// only update the end time
+							
+							originalItem.setEndDateTime(updateItem.getEndDateTime());
+							updateItemsToBeDeleted.add(updateItem.getId());
+							
+						} else {
+							
+							if (updateItem.getTMCAlert().getPhraseCode().equals(originalItem.getTMCAlert().getPhraseCode()) ||  ( updateItem.getTMCAlert().getPhraseCode().startsWith("Q1(") && originalItem.getTMCAlert().getPhraseCode().startsWith("Q1("))) {
+								
+//								log.warn("An update item should only update the incident's endtime. The location and alert code should remain the same. Compare the following traffic items:");
+//								log.warn("Original traffic item: " + originalItem);
+//								log.warn("Update traffic item: " + updateItem);
+//								log.warn("The same alert code --> Updating the end time and the location information...");
+								
+								originalItem.setEndDateTime(updateItem.getEndDateTime());
+								originalItem.setOrigin(updateItem.getOrigin());
+								originalItem.setTo(updateItem.getTo());
+								
+								updateItemsToBeDeleted.add(updateItem.getId());
+							
+							} else {
+								
+								log.warn("An update item should only update the incident's endtime. The location and alert code should remain the same. Compare the following traffic items:");
+								log.warn("Original traffic item: " + originalItem);
+								log.warn("Update traffic item: " + updateItem);
+								log.warn("Different alert codes --> Considering the update traffic item as a new traffic item...");								
+							}
+						}						
+					}
+				}				
 			}
 		}
 		log.info("+++ " + updateItemsToBeDeleted.size() + " original traffic item(s) updated according to update message(s)");
@@ -348,6 +454,10 @@ public class IncidentDataAnalysis {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		return scenario;
+	}
+
+	public Map<String, TrafficItem> getTrafficItems() {
+		return trafficItems;
 	}
 	
 }

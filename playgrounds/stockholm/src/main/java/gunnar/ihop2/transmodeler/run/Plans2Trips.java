@@ -3,13 +3,12 @@ package gunnar.ihop2.transmodeler.run;
 import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_EPSG3857;
 import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_SWEREF99;
 import static saleem.stockholmscenario.utils.StockholmTransformationFactory.getCoordinateTransformation;
-import gunnar.ihop2.regent.demandreading.ActivityLocationSampler;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 import java.util.LinkedHashSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -17,10 +16,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.XY2Links;
+
+import gunnar.ihop2.regent.demandreading.ActivityLocationSampler;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 /**
  * 
@@ -67,7 +69,7 @@ public class Plans2Trips {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	private void resampleLocation(final Person person, final ActivityImpl act) {
+	private void resampleLocation(final Person person, final Activity act) {
 		act.setLinkId(null);
 		final String personIdStr = person.getId().toString();
 		// TODO NEW >>>
@@ -125,9 +127,8 @@ public class Plans2Trips {
 							.getFactory().createPlan();
 					clone.addPlan(clonePlan);
 
-					final ActivityImpl newStartAct = new ActivityImpl(
-							(Activity) selectedPlan.getPlanElements().get(
-									tripPlanElementIndex - 1));
+					final Activity newStartAct = PopulationUtils.createActivity((Activity) selectedPlan.getPlanElements().get(
+							tripPlanElementIndex - 1));
 					clonePlan.addActivity(newStartAct);
 					this.resampleLocation(person, newStartAct);
 
@@ -136,9 +137,8 @@ public class Plans2Trips {
 					clonePlan.addLeg(newLeg);
 					newLeg.setRoute(null);
 
-					final ActivityImpl newEndAct = new ActivityImpl(
-							(Activity) selectedPlan.getPlanElements().get(
-									tripPlanElementIndex + 1));
+					final Activity newEndAct = PopulationUtils.createActivity((Activity) selectedPlan.getPlanElements().get(
+							tripPlanElementIndex + 1));
 					clonePlan.addActivity(newEndAct);
 					this.resampleLocation(person, newEndAct);
 					newEndAct.setEndTime(Time.UNDEFINED_TIME);

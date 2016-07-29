@@ -134,7 +134,7 @@ public class DefaultAnalysis_ik {
 		try {
 			log.info("Trying to parse eventsFile " + this.eventsFile);
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
-			reader.parse(this.eventsFile);
+			reader.readFile(this.eventsFile);
 		} catch (UncheckedIOException e) {
 			log.warn("Failed parsing " + this.eventsFile + ". Skipping events handling...");
 		}

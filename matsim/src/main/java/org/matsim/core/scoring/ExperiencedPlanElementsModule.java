@@ -10,15 +10,6 @@ public class ExperiencedPlanElementsModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(EventsToActivities.class).asEagerSingleton();
-		addControlerListenerBinding().toInstance(new AfterMobsimListener() {
-			@Inject
-			EventsToActivities eventsToActivities;
-
-			@Override
-			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				eventsToActivities.finish();
-			}
-		});
 		bind(EventsToLegs.class).asEagerSingleton();
 	}
 }

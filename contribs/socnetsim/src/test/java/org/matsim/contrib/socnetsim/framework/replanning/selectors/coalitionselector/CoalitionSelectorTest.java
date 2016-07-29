@@ -34,8 +34,8 @@ import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
@@ -89,15 +89,15 @@ public class CoalitionSelectorTest {
 
 						final List<Plan> toBeSelected = new ArrayList<Plan>();
 
-						Person person = PopulationUtils.createPerson(Id.create("tintin", Person.class));
+						Person person = PopulationUtils.getFactory().createPerson(Id.create("tintin", Person.class));
 						group.addPerson( person );
-						PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+						Plan plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 1d );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 5d );
 						toBeSelected.add( plan );
 
-						person = PopulationUtils.createPerson(Id.create("milou", Person.class));
+						person = PopulationUtils.getFactory().createPerson(Id.create("milou", Person.class));
 						group.addPerson( person );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 10d );
@@ -105,7 +105,7 @@ public class CoalitionSelectorTest {
 						plan.setScore( 5000d );
 						toBeSelected.add( plan );
 
-						person = PopulationUtils.createPerson(Id.create("tim", Person.class));
+						person = PopulationUtils.getFactory().createPerson(Id.create("tim", Person.class));
 						group.addPerson( person );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 10d );
@@ -115,7 +115,7 @@ public class CoalitionSelectorTest {
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( -5000d );
 
-						person = PopulationUtils.createPerson(Id.create("struppy", Person.class));
+						person = PopulationUtils.getFactory().createPerson(Id.create("struppy", Person.class));
 						group.addPerson( person );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( -10d );
@@ -143,15 +143,15 @@ public class CoalitionSelectorTest {
 						final Map<Id<Person>, Plan> jp2 = new HashMap< >();
 						final Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
-						Person person = PopulationUtils.createPerson(Id.createPersonId("tintin"));
+						Person person = PopulationUtils.getFactory().createPerson(Id.createPersonId("tintin"));
 						group.addPerson( person );
-						PlanImpl plan = PersonUtils.createAndAddPlan(person, false);
+						Plan plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 1d );
 						jp1.put( person.getId() , plan );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( -1d );
 
-						person = PopulationUtils.createPerson(Id.createPersonId("milou"));
+						person = PopulationUtils.getFactory().createPerson(Id.createPersonId("milou"));
 						group.addPerson( person );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( -10d );
@@ -160,7 +160,7 @@ public class CoalitionSelectorTest {
 						plan.setScore( 5000000000d );
 						jp2.put( person.getId() , plan );
 
-						person = PopulationUtils.createPerson(Id.createPersonId("tim"));
+						person = PopulationUtils.getFactory().createPerson(Id.createPersonId("tim"));
 						group.addPerson( person );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( 10d );
@@ -169,7 +169,7 @@ public class CoalitionSelectorTest {
 						plan.setScore( 5d );
 						jp2.put( person.getId() , plan );
 
-						person = PopulationUtils.createPerson(Id.createPersonId("struppy"));
+						person = PopulationUtils.getFactory().createPerson(Id.createPersonId("struppy"));
 						group.addPerson( person );
 						plan = PersonUtils.createAndAddPlan(person, false);
 						plan.setScore( -10d );

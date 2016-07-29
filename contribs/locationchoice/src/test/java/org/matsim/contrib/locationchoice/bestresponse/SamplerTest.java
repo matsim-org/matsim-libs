@@ -40,8 +40,8 @@ public class SamplerTest extends MatsimTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        String configFile = this.getPackageInputDirectory() + "/config.xml";
-        Config config = ConfigUtils.loadConfig(configFile, new DestinationChoiceConfigGroup());
+        Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new DestinationChoiceConfigGroup());
+        ConfigUtils.loadConfig(config, this.getPackageInputDirectory() + "/config.xml");
         scenario = ScenarioUtils.loadScenario(config);
         this.context = new DestinationChoiceBestResponseContext(this.scenario);
         this.context.init();

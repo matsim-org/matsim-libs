@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -41,7 +41,7 @@ public class WOBBSPersonsFilter {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimPopulationReader(scenario).readFile(
+		new PopulationReader(scenario).readFile(
 				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw032.100pct/vw032.100pct.output_plans.xml.gz");
 		// new
 		// MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/initial_plans1.0.xml.gz");

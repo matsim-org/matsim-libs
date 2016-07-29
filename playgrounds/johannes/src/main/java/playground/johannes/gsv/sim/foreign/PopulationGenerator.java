@@ -21,6 +21,7 @@ package playground.johannes.gsv.sim.foreign;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
@@ -33,7 +34,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLWriter;
@@ -93,7 +93,7 @@ public class PopulationGenerator {
 		logger.info("Loading geometries...");
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
 		Set<Zone> zones = ZoneGeoJsonIO.parseFeatureCollection(data);
-		ZoneCollection zoneCollection = new ZoneCollection();
+		ZoneCollection zoneCollection = new ZoneCollection(null);
 		zoneCollection.addAll(zones);
 		zoneCollection.setPrimaryKey("NO");
 
@@ -108,7 +108,7 @@ public class PopulationGenerator {
 		}
 		logger.info(String.format("%s de zones, %s eu zones.", deZones.size(), euZones.size()));
 
-		ZoneCollection deZoneLayer = new ZoneCollection();
+		ZoneCollection deZoneLayer = new ZoneCollection(null);
 		deZoneLayer.addAll(deZones);
 		deZoneLayer.setPrimaryKey("NO");
 		/*

@@ -21,24 +21,24 @@ package playground.dgrether.matsimkml;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.vis.kml.KMZWriter;
+import org.matsim.vis.kml.MatsimKmlStyleFactory;
+import org.matsim.vis.kml.NetworkFeatureFactory;
+import org.matsim.vis.kml.NetworkKmlStyleFactory;
+
 import net.opengis.kml._2.AbstractFeatureType;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.StyleType;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.vis.kml.KMZWriter;
-import org.matsim.vis.kml.MatsimKmlStyleFactory;
-import org.matsim.vis.kml.NetworkFeatureFactory;
-import org.matsim.vis.kml.NetworkKmlStyleFactory;
 
 
 /**
@@ -76,14 +76,16 @@ public class KmlPlansWriter {
 		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 //		folder.addStyle(this.networkLinkStyle);
 //		folder.addStyle(this.networkNodeStyle);
+		
+		// the following was manually repaired after a refactoring error.  In the current version, it looks to me like it is not writing
+		// out the final activity.  I am skeptic if it did so before my changes.  kai, jun'16
 		Activity act;
 		FolderType planFolder;
-		Leg leg;
 		AbstractFeatureType abstractFeature;
 		for (Plan plan : planSet) {
 			planFolder = kmlObjectFactory.createFolderType();
 			planFolder.setName("Selected Plan of Person: " + plan.getPerson().getId());
-			act = ((PlanImpl) plan).getFirstActivity();
+			act = PopulationUtils.getFirstActivity( (plan) );
 			do {
 				abstractFeature = this.featureFactory.createActFeature(act, this.networkNodeStyle);
 				if (abstractFeature.getClass().equals(PlacemarkType.class)) {
@@ -91,18 +93,18 @@ public class KmlPlansWriter {
 				} else {
 					log.warn("Not yet implemented: Adding act KML features of type " + abstractFeature.getClass());
 				}
-
-				leg = ((PlanImpl) plan).getNextLeg(act);
+				// ---
+				Leg leg = PopulationUtils.getNextLeg(plan, act);
 				abstractFeature = this.featureFactory.createLegFeature(leg, this.networkLinkStyle);
 				if (abstractFeature.getClass().equals(FolderType.class)) {
 					planFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder((FolderType) abstractFeature));
 				} else {
 					log.warn("Not yet implemented: Adding leg KML features of type " + abstractFeature.getClass());
 				}
-
-				act = ((PlanImpl) plan).getNextActivity(leg);
+				// ---
+				act = PopulationUtils.getNextActivity(plan, leg);
 			}
-			while (((PlanImpl) plan).getNextLeg(act) != null);
+			while (PopulationUtils.getNextLeg(plan, act) != null);
 			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(planFolder));
 		}
 

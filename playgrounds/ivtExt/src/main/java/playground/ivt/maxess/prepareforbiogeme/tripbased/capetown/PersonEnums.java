@@ -277,11 +277,11 @@ public class PersonEnums {
 			this.description = descr;
 		}
 		
-		int getCode(){ return this.code; }
+		public int getCode(){ return this.code; }
 		
 		String getDescription(){ return this.description; }
 		
-		static LicenseCar parseFromDescription(String descr){
+		public static LicenseCar parseFromDescription( String descr ){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if(descr.equalsIgnoreCase("Yes")){
@@ -318,11 +318,11 @@ public class PersonEnums {
 			this.description = descr;
 		}
 		
-		int getCode(){ return this.code; }
+		public int getCode(){ return this.code; }
 		
 		String getDescription(){ return this.description; }
 		
-		static LicenseMotorcycle parseFromDescription(String descr){
+		public static LicenseMotorcycle parseFromDescription( String descr ){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if(descr.equalsIgnoreCase("Yes")){

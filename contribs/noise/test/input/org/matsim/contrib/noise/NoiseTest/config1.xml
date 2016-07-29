@@ -3,11 +3,11 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/org/matsim/contrib/noise/NoiseTest/network1.xml" />
+		<param name="inputNetworkFile" value="network1.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/org/matsim/contrib/noise/NoiseTest/population1.xml" />
+		 <param name="inputPlansFile" value="population1.xml" />
 	</module>
 	
 	<module name="controler">
@@ -64,7 +64,7 @@
 		<param name="searchRadius" value="1000.0" />
 	</module>
 	
-	<module name="changeLegMode">
+	<module name="changeMode">
 		<param name="modes" value="car,pt,walk" />
 		<param name="ignoreCarAvailability" value="false" />
 	</module>

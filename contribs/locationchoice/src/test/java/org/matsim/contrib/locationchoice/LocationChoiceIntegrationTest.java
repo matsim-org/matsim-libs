@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
@@ -51,9 +53,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
@@ -214,7 +215,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
-		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
+		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 		//		assertTrue( !newWork.getFacilityId().equals(Id.create(1) ) ) ; // should be different from facility number 1 !!
@@ -280,10 +281,12 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		// setup network
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
+		Network network = (Network) scenario.getNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
 		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 0, (double) 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
 		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 0, (double) 400));
@@ -347,7 +350,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 
-		PlanImpl plan = (PlanImpl) population.getFactory().createPlan() ;
+		Plan plan = (Plan) population.getFactory().createPlan() ;
 		person.addPlan(plan) ;
 
 		{
@@ -360,10 +363,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		{
 			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getFacilities().get(facility1.getId()).getCoord() ) ;
 			act.setEndTime(workActEndTime);
-			((ActivityImpl)act).setFacilityId(facility1.getId());
+			((Activity)act).setFacilityId(facility1.getId());
 			plan.addActivity(act) ;
 		}
-		plan.createAndAddLeg(TransportMode.car);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		{
 			//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 			//		act.setLinkId(link.getId());

@@ -193,7 +193,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
         RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME , scheme);
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
-		reader.parse(tollFile);
+		reader.readFile(tollFile);
 		assertEquals(tollType, scheme.getType());
 
 		Fixture.createPopulation1(scenario);
@@ -206,6 +206,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll);
 		events.addHandler(paidToll);
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
+		scoring.beginIteration(0);
 
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();

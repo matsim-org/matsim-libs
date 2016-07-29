@@ -24,8 +24,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -42,6 +45,7 @@ import org.matsim.facilities.FacilitiesUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.swing.event.CellEditorListener;
 
 /**
  * @author nagel
@@ -118,18 +122,24 @@ final public class RunAccessibilityExample {
 
 						@Override
 						public ControlerListener get() {
-							GridBasedAccessibilityControlerListenerV3 listener =
-									new GridBasedAccessibilityControlerListenerV3(opportunities, null, scenario.getConfig(), scenario, travelTimes, travelDisutilityFactories);
+							Double cellSizeForCellBasedAccessibility = Double.parseDouble(scenario.getConfig().getModule("accessibility").getValue("cellSizeForCellBasedAccessibility"));
+							Config config = scenario.getConfig();
+							if (cellSizeForCellBasedAccessibility <= 0) {
+								throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+							}
+							BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility));
+
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, null, config, scenario, travelTimes, travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility);
 
 							// define the modes that will be considered
 							// here, the accessibility computation is only done for freespeed
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 
 							// add additional facility data to an additional column in the output
 							// here, an additional population density column is used
 							listener.addAdditionalFacilityData(homes) ;
-							Double cellSizeForCellBasedAccessibility = Double.parseDouble(scenario.getConfig().getModule("accessibility").getValue("cellSizeForCellBasedAccessibility"));
-							listener.generateGridsAndMeasuringPointsByNetwork(cellSizeForCellBasedAccessibility);
 							listener.writeToSubdirectoryWithName(actType);
 							return listener;
 						}

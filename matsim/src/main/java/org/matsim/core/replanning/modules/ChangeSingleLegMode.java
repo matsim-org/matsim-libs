@@ -20,15 +20,12 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.population.algorithms.ChooseRandomSingleLegMode;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.ChooseRandomSingleLegMode;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen
@@ -39,7 +36,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * be used, it can be done so in the configuration. Also, this module is able to (optionally)
  * respect car-availability:
  * <pre>
- * &lt;module name="changeLegMode">
+ * &lt;module name="changeMode">
  *   &lt!-- provide a comma-separated list of leg modes -->
  *   &lt;param name="modes" value="car,walk,bike" />
  *   &lt;param name="ignoreCarAvailability" value="false" />
@@ -55,7 +52,7 @@ public class ChangeSingleLegMode extends AbstractMultithreadedModule {
 	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
 
-	public ChangeSingleLegMode(final GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup) {
+	public ChangeSingleLegMode(final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
 		super(globalConfigGroup.getNumberOfThreads());
 		this.availableModes = changeLegModeConfigGroup.getModes();
 		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();

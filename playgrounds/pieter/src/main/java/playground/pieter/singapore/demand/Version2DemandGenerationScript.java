@@ -16,11 +16,16 @@ import javax.management.timer.Timer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -103,9 +108,9 @@ public class Version2DemandGenerationScript {
 	}
 
 	private void createPlans() {
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming(true);
-		PopulationWriter popWriter = new PopulationWriter(pop,
+		Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(pop,
 				scenario.getNetwork());
 		String plansFile = diverseScriptProperties.getProperty("plansFile");
 		popWriter.startStreaming(plansFile);
@@ -131,7 +136,7 @@ public class Version2DemandGenerationScript {
 			person.getCustomAttributes().put("synth_hh_id",
 					pax.household.synthHouseholdId);
 			person.getCustomAttributes().put("occup", pax.occup);
-			PlanImpl plan = (PlanImpl) popFactory.createPlan();
+			Plan plan = (Plan) popFactory.createPlan();
 			// skip this guy if he doesn't have a chain
 			if (pax.chain.equals("NA"))
 				continue;
@@ -139,15 +144,15 @@ public class Version2DemandGenerationScript {
 			int actNumber = 1;
 			int chainLength = st.countTokens();
 			// need to refer to the previous act
-			ActivityImpl lastAct = null;
+			Activity lastAct = null;
 			double dayStartTime = getHomeDepartTime(pax, chainLength);
 			double dayEndTime = getDayEndTime(pax, chainLength);
 			double lastActEndTime = 0;
 			while (st.hasMoreElements()) {
 				String actType = st.nextToken();
-				ActivityImpl act = null;
+				Activity act = null;
 				if (actType.equals("h")) {
-					act = (ActivityImpl) popFactory.createActivityFromCoord(
+					act = (Activity) popFactory.createActivityFromCoord(
 							"home", null);
 					act.setFacilityId(Id.create(pax.household.homeFacilityId, ActivityFacility.class));
 					if (lastAct == null) {
@@ -160,7 +165,7 @@ public class Version2DemandGenerationScript {
 					// no further elses; this is the last home act for the day
 				}
 				if (actType.equals("w")) {
-					act = (ActivityImpl) popFactory.createActivityFromCoord(
+					act = (Activity) popFactory.createActivityFromCoord(
 							pax.mainActType, null);
 					act.setFacilityId(Id.create(pax.mainActFacility,ActivityFacility.class));
 					if (pax.chainType.equals("workOnly")
@@ -174,7 +179,7 @@ public class Version2DemandGenerationScript {
 				}
 				if (actType.equals("s")) {
 					if (pax.chainType.equals("schoolAfterWork")) {
-						act = (ActivityImpl) popFactory
+						act = (Activity) popFactory
 								.createActivityFromCoord("s_tertiary", null);
 						String destinationFacilityId = assignSchoolActivity(pax);
 						act.setFacilityId(Id.create(destinationFacilityId,ActivityFacility.class));
@@ -183,7 +188,7 @@ public class Version2DemandGenerationScript {
 								Time.parseTime("02:00:00"), chainLength,
 								actNumber));
 					} else {
-						act = (ActivityImpl) popFactory
+						act = (Activity) popFactory
 								.createActivityFromCoord(pax.mainActType, null);
 						act.setFacilityId(Id.create(pax.mainActFacility,ActivityFacility.class));
 						// default duration of 4 hours' school
@@ -195,7 +200,7 @@ public class Version2DemandGenerationScript {
 				}
 				if (actType.equals("b") || actType.equals("l")) {
 					actType = assignSecondaryActivityType(actType, pax);
-					act = (ActivityImpl) popFactory.createActivityFromCoord(
+					act = (Activity) popFactory.createActivityFromCoord(
 							actType, null);
 					String destinationFacilityId = assignSecondaryActivityLocation(
 							actType, pax, lastAct.getFacilityId());

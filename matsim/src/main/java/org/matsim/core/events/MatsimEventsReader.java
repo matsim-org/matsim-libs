@@ -26,9 +26,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -38,7 +37,7 @@ import org.xml.sax.SAXException;
  *
  * @author mrieser
  */
-public class MatsimEventsReader implements MatsimSomeReader {
+public class MatsimEventsReader implements MatsimReader {
 
 	private final static Logger log = Logger.getLogger(MatsimEventsReader.class);
 	private final EventsManager events;
@@ -57,6 +56,7 @@ public class MatsimEventsReader implements MatsimSomeReader {
 	 *
 	 * @param filename The name of the file to parse.
 	 */
+	@Override
 	public void readFile(final String filename) {
 		String lcFilename = filename.toLowerCase(Locale.ROOT);
 		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
@@ -97,17 +97,6 @@ public class MatsimEventsReader implements MatsimSomeReader {
 		@Override
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			this.delegate.endTag(name, content, context);
-		}
-
-		/**
-		 * Parses the specified events file. This method calls {@link #parse(String)}, but handles all
-		 * possible exceptions on its own.
-		 *
-		 * @param filename The name of the file to parse.
-		 * @throws UncheckedIOException
-		 */
-		public void readFile(final String filename) throws UncheckedIOException {
-			parse(filename);
 		}
 
 		@Override

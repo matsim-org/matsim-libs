@@ -36,17 +36,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -133,7 +134,7 @@ public class WalkDistanceEstimator {
 		 *---------------------------------------------------------------------*/
 		// Set up router.
 		TravelTimeCalculator ttc = TravelTimeCalculator.create(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new Builder( TransportMode.car, sAll.getConfig().planCalcScore() );
+		TravelDisutilityFactory tccf = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, sAll.getConfig().planCalcScore() );
 		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes());
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(ttc);
@@ -257,10 +258,11 @@ public class WalkDistanceEstimator {
 		spCounter = 0;
 		spMultiplier = 1;
 		log.info("Calculating sub-place distances.");
-		NetworkImpl ni = (NetworkImpl) sPt.getNetwork();
+		Network ni = (Network) sPt.getNetwork();
 		for(MyZone sp : spList){
 			Coord centroid = new Coord(sp.getCentroid().getX(), sp.getCentroid().getY());
-			Node closest = ni.getNearestNode(centroid);
+			final Coord coord = centroid;
+			Node closest = NetworkUtils.getNearestNode(ni,coord);
 			Double d = CoordUtils.calcEuclideanDistance(centroid, closest.getCoord());
 			distanceMap.put(sp.getId(), d);			
 			
@@ -303,8 +305,8 @@ public class WalkDistanceEstimator {
 		}
 	}
 	
-	public NetworkImpl getPtNetwork(){
-		return (NetworkImpl) this.sPt.getNetwork();
+	public Network getPtNetwork(){
+		return (Network) this.sPt.getNetwork();
 	}
 	
 }

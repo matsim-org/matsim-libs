@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -71,7 +71,7 @@ public class EstimateVktFromLegDistances {
 		
 		/* Parse population */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(population);
+		new PopulationReader(sc).readFile(population);
 		
 		/* Parse shapefile */
 		ShapeFileReader sfr = new ShapeFileReader();
@@ -88,7 +88,7 @@ public class EstimateVktFromLegDistances {
 		}
 		
 		/* Parse the network */
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		
 		/* Set up the multithreaded infrastructure. */
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);

@@ -54,6 +54,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
 	private final AccessibilityCalculator delegate;
 	private UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2;
+	private ActivityFacilitiesImpl opportunities;
 	
 
 	// ////////////////////////////////////////////////////////////////////
@@ -69,10 +70,12 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
 		assert(measuringPoints != null);
-		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
+		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
-		delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
+		if (ptMatrix != null) {
+			delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
+		}
 		assert(scenario != null);
 
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
@@ -81,11 +84,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		String matsimOutputDirectory = scenario.getConfig().controler().getOutputDirectory();
 		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory, matsimOutputDirectory);
 		delegate.addFacilityDataExchangeListener(urbanSimZoneCSVWriterV2);
-
-		delegate.initAccessibilityParameters(scenario.getConfig());
-
-		// aggregating facilities to their nearest node on the road network
-		delegate.aggregateOpportunities(opportunities, scenario.getNetwork());
+		this.opportunities = opportunities;
 		// yyyy ignores the "capacities" of the facilities. kai, mar'14
 		
 		
@@ -95,8 +94,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
-		delegate.initDefaultContributionCalculators();
-
 		if(delegate.getIsComputingMode().isEmpty()) {
 			log.error("No transport mode for accessibility calculation is activated! For this reason no accessibilities can be calculated!");
 			log.info("Please activate at least one transport mode by using the corresponding method when initializing the accessibility listener to fix this problem:");
@@ -112,7 +109,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		// get the controller and scenario
 		MatsimServices controler = event.getServices();
 		log.info("Computing and writing zone based accessibility measures ..." );
-		log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
 		AccessibilityConfigGroup moduleAPCM =
 				ConfigUtils.addOrGetModule(
@@ -121,7 +117,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 						AccessibilityConfigGroup.class);
 
 
-		delegate.computeAccessibilities(controler.getScenario(), moduleAPCM.getTimeOfDay() );
+		delegate.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
 	}
 
 	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {

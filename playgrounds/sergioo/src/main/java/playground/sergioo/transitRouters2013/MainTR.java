@@ -7,8 +7,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -39,7 +39,7 @@ public class MainTR {
 		//saveRoutes(numTests, startTime, endTime);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
-		(new MatsimPopulationReader(scenario)).readFile(args[2]);
+		(new PopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		(new VehicleReaderV1(((MutableScenario)scenario).getTransitVehicles())).readFile(args[8]);
 		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
@@ -55,7 +55,7 @@ public class MainTR {
 		eventsManager.addHandler(stopStopTimeCalculatorTuple);
 		eventsManager.addHandler(travelTimeCalculator);
 		eventsManager.addHandler(vehicleOccupancyCalculator);
-		(new EventsReaderXMLv1(eventsManager)).parse(args[4]);
+		(new EventsReaderXMLv1(eventsManager)).readFile(args[4]);
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
@@ -91,47 +91,47 @@ public class MainTR {
 		long time;
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouter.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouter.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" W");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWW.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWW.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WW");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckW.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckW.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckW");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWS.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWS.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WS");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWStuple.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWStuple.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WStuple");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckS.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckS.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckS");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckStuple.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckStuple.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckStuple");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWSV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWSV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WSV");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWStupleV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWStupleV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WStupleV");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckSV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckSV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckSV");
 		time = System.currentTimeMillis();
 		for(int i=0; i<numTests; i++)
-			path = transitRouterWstuckStupleV.calcRoute(origin[i], destination[i], dayTime[i], null);
+			path = transitRouterWstuckStupleV.calcRoute( new FakeFacility(origin[i]), new FakeFacility(destination[i]), dayTime[i], null );
 		System.out.println(System.currentTimeMillis()-time+" "+path.size()+" WstuckStupleV");
 	}
 

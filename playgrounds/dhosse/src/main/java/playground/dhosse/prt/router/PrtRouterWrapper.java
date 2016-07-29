@@ -1,24 +1,13 @@
 package playground.dhosse.prt.router;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.*;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -31,13 +20,13 @@ import playground.michalm.taxi.data.TaxiRank;
 public class PrtRouterWrapper implements RoutingModule {
 
 	private RoutingModule walkRouter;
-	private NetworkImpl network;
+	private Network network;
 	private PrtData data;
 	
 	public PrtRouterWrapper(final String mode, Network network, final PopulationFactory populationFactory, 
-			MatsimVrpContextImpl context, PrtData data, final RoutingModule routingModule){
+			PrtData data, final RoutingModule routingModule){
 		this.walkRouter = routingModule;
-		this.network = (NetworkImpl) network;
+		this.network = (Network) network;
 		this.data = data;
 	}
 	
@@ -72,13 +61,13 @@ public class PrtRouterWrapper implements RoutingModule {
 		time += leg.getTravelTime();
         
         //pt interaction
-        Activity act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, accessStop.getLink().getId());
+        Activity act = PopulationUtils.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, accessStop.getLink().getId());
 		act.setMaximumDuration(60);
 		trip.add(act);
 		time += act.getMaximumDuration();
         
         //prtLeg
-		leg = new LegImpl(PrtRequestCreator.MODE);
+		leg = PopulationUtils.createLeg(PrtRequestCreator.MODE);
 		Route route = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 		leg.setRoute(route);
 		leg.setDepartureTime(time);
@@ -86,7 +75,7 @@ public class PrtRouterWrapper implements RoutingModule {
         time += leg.getTravelTime();
 		
 		//interaction
-		act = new ActivityImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, egressStop.getLink().getId());
+		act = PopulationUtils.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, egressStop.getLink().getId());
 		act.setMaximumDuration(0);
 		trip.add(act);
 		

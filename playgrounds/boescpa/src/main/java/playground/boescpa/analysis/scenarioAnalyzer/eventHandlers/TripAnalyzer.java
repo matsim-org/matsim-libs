@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.Trip;
@@ -59,7 +60,12 @@ public class TripAnalyzer extends ScenarioAnalyzerEventHandler implements Person
 	private SpatialCutter spatialEventCutter = null;
 
 	public TripAnalyzer(Network network) {
-		this.tripHandler = new TripEventHandler(network);
+		this.tripHandler = new TripEventHandler(network) {
+			@Override
+			protected boolean agentIsToConsider(Id<Person> personId) {
+				return super.agentIsToConsider(personId) && isPersonToConsider(personId);
+			}
+		};
 		this.network = network;
 		this.reset(0);
 	}

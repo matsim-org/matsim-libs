@@ -79,7 +79,11 @@ public class TtListenerToBindGeneralAnalysis implements IterationEndsListener {
 		log.info("and afterwards: gnuplot " + relativePathToGnuplotScript);
 		
 		try {
-			// "&" splits different commands in one line in windows. Use ";" if you are a linux user.
+			/*
+			 * start the command line ("cmd"),
+			 * execute the commands given by string and separated by "&" (or ";" on a linux machine, respectively),
+			 * terminate the command line afterwards ("/c").
+			 */
 			ProcessBuilder builder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", relativePathToGnuplotScript);
 			Process p = builder.start();
 

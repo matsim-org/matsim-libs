@@ -139,7 +139,7 @@ public class ManteuffelEmissionVehicleGenerator {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		eventsManager.addHandler(new ManteuffelLinkLeaveHandler(outputVehicles, transitLines));
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 		//=== TODO: fix this?
 //		List<String> nonCondideredPersons = new ArrayList<>();

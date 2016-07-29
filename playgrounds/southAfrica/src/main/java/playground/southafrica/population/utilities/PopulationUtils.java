@@ -30,14 +30,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -64,7 +64,7 @@ public class PopulationUtils {
 	 */
 	public static void extractActivityDurations(String populationFile, String outputFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).readFile(populationFile);
 		
 		/*TODO Remove after debugging. */
 		double maxS = Double.NEGATIVE_INFINITY;
@@ -84,7 +84,7 @@ public class PopulationUtils {
 					PlanElement pe = selectedPlan.getPlanElements().get(i);
 					if(pe instanceof Activity){
 						double duration = 0.0;
-						ActivityImpl act = (ActivityImpl) pe;
+						Activity act = (Activity) pe;
 						if(i == 0){
 							/* It is the first (home) activity. */
 							duration = act.getEndTime();
@@ -171,7 +171,7 @@ public class PopulationUtils {
 	public static void printHouseholdStatistics(String householdsFilename){
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 hr = new HouseholdsReaderV10(households);
-		hr.parse(householdsFilename);
+		hr.readFile(householdsFilename);
 		
 		/* Get the number of members. */
 		int members = 0;
@@ -196,7 +196,7 @@ public class PopulationUtils {
 	 */
 	public static void printPopulationStatistics(String populationFilename){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(populationFilename);
 		
 		/* Print the statistics to the console. */
@@ -215,7 +215,7 @@ public class PopulationUtils {
 	 */
 	public static void printActivityStatistics(String populationFilename){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(populationFilename);
 		
 		LOG.info("Population parsed. Analysing activity types...");
@@ -256,7 +256,7 @@ public class PopulationUtils {
 	
 	public static void printNumberOfEmployedPersons(String population){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(population);
 		
 		LOG.info("Population parsed. Analysing employment types...");
@@ -282,7 +282,7 @@ public class PopulationUtils {
 	 */
 	public static void printNumberOfAgentTypes(String population){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		PopulationReader pr = new PopulationReader(sc);
 		pr.readFile(population);
 		
 		Map<String, Integer> map = new TreeMap<String, Integer>();
@@ -302,6 +302,107 @@ public class PopulationUtils {
 			LOG.info("   " + s + ": " + String.valueOf(map.get(s)));
 		}
 		LOG.info("--------------------------------------------");
+	}
+	
+	
+	/**
+	 * Identify all the activity chain types, as well as the number of 
+	 * occurrences of each type.
+	 * @param population
+	 */
+	public static void idActivityChainTypes(String population, String filename){
+		LOG.info("Checking for activity chain types...");
+
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReader pr = new PopulationReader(sc);
+		pr.readFile(population);
+		
+		Map<String, Integer> map = new TreeMap<>();
+		for(Id<Person> pid : sc.getPopulation().getPersons().keySet()){
+			Plan plan = sc.getPopulation().getPersons().get(pid).getSelectedPlan();
+			String chain = "";
+			for(PlanElement pe : plan.getPlanElements()){
+				if(pe instanceof Activity){
+					chain += ((Activity)pe).getType();
+				} else{
+					chain += "-";
+				}
+			}
+			if(map.containsKey(chain)){
+				int oldValue = map.get(chain);
+				map.put(chain, oldValue + 1);
+			} else{
+				map.put(chain, 1);
+			}
+		}
+		
+		/* Write to file. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try{
+			bw.write("chain,occurrences");
+			bw.newLine();
+			for(String s : map.keySet()){
+				bw.write(String.format("%s,%d\n", s, map.get(s)));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		LOG.info("Done");
+	}
+	
+	/**
+	 * Report the number of activity chains, i.e. plans, and trips that have
+	 * mode `ride`.
+	 * 
+	 * @param population
+	 */
+	public static void printNumberOfRideStatistics(String population){
+		LOG.info("Checking for mode 'ride'...");
+		
+		int rideChains = 0;
+		int chains = 0;
+		int rideTrips = 0;
+		int trips = 0;
+
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReader pr = new PopulationReader(sc);
+		pr.readFile(population);
+		
+		for(Id<Person> pid : sc.getPopulation().getPersons().keySet()){
+			Plan plan = sc.getPopulation().getPersons().get(pid).getSelectedPlan();
+			
+			boolean chainHasRide = false;
+			
+			for(PlanElement pe : plan.getPlanElements()){
+				if(pe instanceof Leg){
+					Leg leg = (Leg)pe;
+					if(leg.getMode().equalsIgnoreCase("ride")){
+						rideTrips++;
+						chainHasRide = true;
+					}
+					trips++;
+				}
+			}
+			chains++;
+			if(chainHasRide){
+				rideChains++;
+			}
+		}
+		LOG.info("Done");
+		LOG.info("----------------------------------------------");
+		LOG.info("    Total number of trips: " + trips);
+		LOG.info("   Trips with mode 'ride': " + rideTrips);
+		LOG.info("   Total number of chains: " + chains);
+		LOG.info("  Chains with mode 'ride': " + rideChains);
+		LOG.info("----------------------------------------------");
 	}
 	
 	
@@ -327,6 +428,12 @@ public class PopulationUtils {
 			break;
 		case 5:
 			printNumberOfAgentTypes(args[1]);
+			break;
+		case 6:
+			idActivityChainTypes(args[1], args[2]);
+			break;
+		case 7:
+			printNumberOfRideStatistics(args[1]);
 			break;
 		default:
 			LOG.warn("Cannot print any statistics for option `" + option + "'");

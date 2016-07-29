@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SpecialTripsAnalyzer {
@@ -50,7 +50,7 @@ public class SpecialTripsAnalyzer {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		(new MatsimPopulationReader(scenario)).readFile(args[0]);
+		(new PopulationReader(scenario)).readFile(args[0]);
 		System.out.println(scenario.getPopulation().getPersons().size());
 		List<Trip> trips = new ArrayList<Trip>();
 		for(Person person:scenario.getPopulation().getPersons().values()) {

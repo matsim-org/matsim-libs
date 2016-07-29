@@ -37,12 +37,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -118,7 +116,7 @@ public class BootstrapPopulationGenerator {
 		Counter counter = new Counter("  vehicle # ");
 		for(File f : vehicles){
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.parse(f.getAbsolutePath());
+			dvr.readFile(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Check each activity chain. */
@@ -211,7 +209,7 @@ public class BootstrapPopulationGenerator {
 		Counter counter = new Counter("  vehicle # ");
 		for(File f : vehicles){
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.parse(f.getAbsolutePath());
+			dvr.readFile(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Check each activity chain. */
@@ -245,7 +243,7 @@ public class BootstrapPopulationGenerator {
 	
 	
 	public Plan convertDigicoreChainToPlan(PopulationFactory pf, DigicoreChain chain){
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 		
 		/* Create the first major activity. */
 		DigicoreActivity firstMajor = chain.getFirstMajorActivity();
@@ -260,7 +258,7 @@ public class BootstrapPopulationGenerator {
 		a1.setEndTime(endTime);
 		/* Add the facilityId if available. */
 		if(firstMajor.getFacilityId() != null){
-			((ActivityImpl)a1).setFacilityId(firstMajor.getFacilityId());
+			((Activity)a1).setFacilityId(firstMajor.getFacilityId());
 		}
 
 		plan.addActivity(a1);
@@ -275,7 +273,7 @@ public class BootstrapPopulationGenerator {
 			minor.setMaximumDuration(activity.getDuration());
 			/* Add the facilityId if available. */
 			if(activity.getFacilityId() != null){
-				((ActivityImpl)minor).setFacilityId(activity.getFacilityId());
+				((Activity)minor).setFacilityId(activity.getFacilityId());
 			}
 
 			plan.addActivity(minor);
@@ -289,7 +287,7 @@ public class BootstrapPopulationGenerator {
 		a2.setStartTime(lastMajor.getStartTime()-(daysToDeduct*24*60*60));
 		/* Add the facilityId if available. */
 		if(lastMajor.getFacilityId() != null){
-			((ActivityImpl)a2).setFacilityId(lastMajor.getFacilityId());
+			((Activity)a2).setFacilityId(lastMajor.getFacilityId());
 		}
 
 		plan.addActivity(a2);

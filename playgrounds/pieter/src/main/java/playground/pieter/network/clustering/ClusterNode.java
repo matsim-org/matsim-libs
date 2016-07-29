@@ -6,12 +6,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 
 public class ClusterNode implements Node {
-	private final NodeImpl node;
+	private final Node node;
 
-    public ClusterNode(NodeImpl n ) {
+    public ClusterNode(Node n ) {
 		this.node = n;
 	}
 	
@@ -22,11 +23,13 @@ public class ClusterNode implements Node {
 	}
 
 	public final void setOrigId(String id) {
-		node.setOrigId(id);
+		final String id1 = id;
+		NetworkUtils.setOrigId( node, id1 ) ;
 	}
 
 	public final void setType(String type) {
-		node.setType(type);
+		final String type1 = type;
+		NetworkUtils.setType(node,type1);
 	}
 
 	@Override
@@ -49,35 +52,38 @@ public class ClusterNode implements Node {
 	}
 
 	public final void removeInLink(Link inlink) {
-		node.removeInLink(inlink);
+		final Link inlink1 = inlink;
+		node.removeInLink(inlink1.getId());
 	}
 
 	public final void removeOutLink(Link outlink) {
-		node.removeOutLink(outlink);
+		final Link outlink1 = outlink;
+		final Id<Link> outLinkId = outlink1.getId();
+		node.removeOutLink(outLinkId);
 	}
 
 	public final String getOrigId() {
-		return node.getOrigId();
+		return NetworkUtils.getOrigId( node ) ;
 	}
 
 	public final String getType() {
-		return node.getType();
+		return NetworkUtils.getType( node ) ;
 	}
 
 	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
-		return node.getIncidentLinks();
+		return NetworkUtils.getIncidentLinks( node );
 	}
 
 	public final Map<Id<Node>, ? extends Node> getInNodes() {
-		return node.getInNodes();
+		return NetworkUtils.getInNodes(node);
 	}
 
 	public final Map<Id<Node>, ? extends Node> getOutNodes() {
-		return node.getOutNodes();
+		return NetworkUtils.getOutNodes(node);
 	}
 
 	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
-		return node.getIncidentNodes();
+		return NetworkUtils.getIncidentNodes(node);
 	}
 
 	@Override
@@ -112,6 +118,20 @@ public class ClusterNode implements Node {
 	 */
 	public void setNewRoot(NodeCluster root){
 
+	}
+
+
+	@Override
+	public Link removeInLink(Id<Link> linkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+
+	@Override
+	public Link removeOutLink(Id<Link> outLinkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 
