@@ -7,3 +7,4 @@
 .idea
 matsimExamples
 playgrounds/jjoubert/data
+**/target
