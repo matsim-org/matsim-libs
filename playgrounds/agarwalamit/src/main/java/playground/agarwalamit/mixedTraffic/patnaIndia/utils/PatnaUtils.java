@@ -90,16 +90,18 @@ public final class PatnaUtils {
 		}
 
 		for(Person p:scenario.getPopulation().getPersons().values()){
-			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
-			String travelMode = null;
 			for(PlanElement pe :p.getSelectedPlan().getPlanElements()){
 				if (pe instanceof Leg) {
-					travelMode = ((Leg)pe).getMode();
-					break;
+					String travelMode = ((Leg)pe).getMode();
+					VehicleType vt = modesType.get(travelMode);
+					if (vt!=null) {
+						Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
+						Vehicle veh = VehicleUtils.getFactory().createVehicle(vehicleId, vt);
+						scenario.getVehicles().addVehicle(veh);
+						break;// all trips have same mode and once a vehicle is added just break for the person.
+					}
 				}
 			}
-			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
-			scenario.getVehicles().addVehicle(vehicle);
 		}
 	}
 

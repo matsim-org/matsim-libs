@@ -231,13 +231,31 @@ public class PatnaSimulationTimeWriter {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 
-		ActivityParams workAct = new ActivityParams("work");
-		workAct.setTypicalDuration(8*3600);
-		config.planCalcScore().addActivityParams(workAct);
+		{//activities --> urban
+			ActivityParams workAct = new ActivityParams("work");
+			workAct.setTypicalDuration(8*3600);
+			config.planCalcScore().addActivityParams(workAct);
 
-		ActivityParams homeAct = new ActivityParams("home");
-		homeAct.setTypicalDuration(12*3600);
-		config.planCalcScore().addActivityParams(homeAct);
+			ActivityParams homeAct = new ActivityParams("home");
+			homeAct.setTypicalDuration(12*3600);
+			config.planCalcScore().addActivityParams(homeAct);
+
+			ActivityParams edu = new ActivityParams("educational");
+			edu.setTypicalDuration(7*3600);
+			config.planCalcScore().addActivityParams(edu);
+
+			ActivityParams soc = new ActivityParams("social");
+			soc.setTypicalDuration(5*3600);
+			config.planCalcScore().addActivityParams(soc);
+
+			ActivityParams oth = new ActivityParams("other");
+			oth.setTypicalDuration(5*3600);
+			config.planCalcScore().addActivityParams(oth);
+
+			ActivityParams unk = new ActivityParams("unknown");
+			unk.setTypicalDuration(7*3600);
+			config.planCalcScore().addActivityParams(unk);
+		}
 
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
