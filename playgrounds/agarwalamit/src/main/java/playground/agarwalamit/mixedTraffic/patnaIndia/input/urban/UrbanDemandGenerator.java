@@ -79,12 +79,13 @@ public class UrbanDemandGenerator {
 		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/");
 	}
 
-	public void startProcessing() {
-		this.features = readZoneFilesAndReturnFeatures();
+	public void startProcessing(String inputFilesDir) {
+		String wardFile = inputFilesDir + "/raw/others/wardFile/Wards.shp";
+		this.features = readZoneFilesAndReturnFeatures(wardFile);
 
-		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt"; //Urban_PlanFile.CSV; // urban plans for all zones except 27 to 42.
+		String planFile1 = inputFilesDir+"/raw/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt"; //Urban_PlanFile.CSV; // urban plans for all zones except 27 to 42.
 		//		String planFile2 = PatnaUtils.INPUT_FILES_DIR+"/27TO42zones.CSV";// urban plans for zones 27 to 42
-		String planFile3 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";//"/Slum_PlanFile.CSV";	
+		String planFile3 = inputFilesDir+"/raw/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";//"/Slum_PlanFile.CSV";	
 
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
@@ -92,6 +93,11 @@ public class UrbanDemandGenerator {
 		filesReader(planFile1, "nonSlum_");
 		//		filesReader(planFile2, "nonSlum_");
 		filesReader(planFile3, "slum_");
+	}
+	
+	public void startProcessing() {
+		String inputFilesDir =  PatnaUtils.INPUT_FILES_DIR;
+		startProcessing(inputFilesDir);
 	}
 
 	public void writePlans(final String outputDir){
@@ -104,9 +110,9 @@ public class UrbanDemandGenerator {
 		return scenario.getPopulation();
 	}
 
-	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures() {
+	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures(String wardFile) {
 		ShapeFileReader reader = new ShapeFileReader();
-		return reader.readFileAndInitialize(PatnaUtils.ZONE_FILE);
+		return reader.readFileAndInitialize(wardFile);
 	}
 
 	private void filesReader (final String planFile, final String idPrefix) {
