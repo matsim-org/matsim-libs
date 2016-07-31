@@ -128,7 +128,7 @@ public class PatnaSimulationTimeWriter {
 		
 		if (! new File(outPlans).exists() ) { // run only once and not for every case.
 			UrbanDemandGenerator udg = new UrbanDemandGenerator(cloningFactor);
-			udg.startProcessing();
+			udg.startProcessing(inputFilesDir);
 			new PopulationWriter(udg.getPopulation()).write(outPlans);	
 		}
 		
