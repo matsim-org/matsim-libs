@@ -21,16 +21,22 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactory {
-	@Inject private QSimConfigGroup qsimConfig ;
-	@Inject private EventsManager events ;
-	@Inject Network network ;
-	@Inject Scenario scenario ;
 	
 	private QNode.Builder nodeBuilder;
 	private QLinkImpl.Builder linkBuilder;
+	private Scenario scenario;
+	private EventsManager events;
+	
+	@Inject
+	public AssignmentEmulatingQLaneNetworkFactory( Scenario scenario, EventsManager events ) {
+		this.scenario = scenario ;
+		this.events = events ;
+	}
 
 	@Override
 	void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine) {
+		QSimConfigGroup qsimConfig = scenario.getConfig().qsim() ;
+		Network network = scenario.getNetwork() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -38,7 +44,7 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 
 		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
-		NetsimEngineContext context = new NetsimEngineContext(events, network.getEffectiveCellSize(), agentCounter1, snapshotInfoBuilder, qsimConfig, mobsimTimer1, linkWidthCalculator ) ;
+		final NetsimEngineContext context = new NetsimEngineContext(events, network.getEffectiveCellSize(), agentCounter1, snapshotInfoBuilder, qsimConfig, mobsimTimer1, linkWidthCalculator ) ;
 
 		nodeBuilder = new QNode.Builder( netsimEngine, context );
 

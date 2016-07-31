@@ -57,6 +57,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -69,8 +70,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.AssignmentEmulatingQLaneNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -90,6 +94,9 @@ import org.matsim.vehicles.VehicleUtils;
 @RunWith(Parameterized.class)
 public class CreateAutomatedFDTest {
 
+	/**
+	 * Constructor.  Even if it does not look like one.
+	 */
 	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics, InflowConstraint inflowConstraint) {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
@@ -100,11 +107,11 @@ public class CreateAutomatedFDTest {
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
 	private InflowConstraint inflowConstraint;
-	private final Map<Id<Person>,String> person2Mode = new HashMap<Id<Person>, String>();
+	private final Map<Id<Person>,String> person2Mode = new HashMap<>();
 
 	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}; InflowConstraint == {2};")
 	public static Collection<Object[]> createFds() {
-		Object [][] combos2run = new Object [12][3];
+		Object [][] combos2run = new Object [18][3]; // #ld x #td x #ic x #params
 		int index = 0;
 		for (LinkDynamics ld : LinkDynamics.values()) {
 			for (TrafficDynamics td : TrafficDynamics.values()) {
@@ -115,64 +122,71 @@ public class CreateAutomatedFDTest {
 			}
 		}
 		return Arrays.asList(combos2run);
+		
+		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
+		// before running each test. kai, jul'16
 	}
 
 	@Test
 	public void fdsCarTruck(){
 		this.travelModes = new String [] {"car","truck"};
-		run(this.linkDynamics, this.trafficDynamics,this.inflowConstraint,false);
+		run(false);
 	}
 
 	@Test
 	public void fdsCarBike(){
-		run(this.linkDynamics, this.trafficDynamics,this.inflowConstraint,false);
+		run(false);
 	}
 
 	@Test 
 	public void fdsCarBikeFastCapacityUpdate(){
-		run(this.linkDynamics,this.trafficDynamics,this.inflowConstraint,true);
+		run(true);
 	}
 	
 	@Test
 	public void fdsCarOnly(){
 		this.travelModes = new String [] {"car"};
-		run(this.linkDynamics,this.trafficDynamics,this.inflowConstraint,false);
+		run(false);
 	}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
 	private String [] travelModes;
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
-	private Scenario scenario;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 
 	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
-	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final InflowConstraint inflowConstraint, final boolean isUsingFastCapacityUpdate) {
+	private void run(final boolean isUsingFastCapacityUpdate) {
 
 		MatsimRandom.reset();
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
-		createNetwork();
+
+		final Config config = ConfigUtils.createConfig();
+		config.qsim().setMainModes(Arrays.asList(travelModes));
+		config.qsim().setEndTime(14*3600);
+		config.qsim().setLinkDynamics(linkDynamics.name());
+		config.qsim().setInflowConstraint(inflowConstraint);
+	
+		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
+			config.qsim().setSeepModes(Arrays.asList("bike"));
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
+		}
+		
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
+		config.qsim().setTrafficDynamics(trafficDynamics);
+
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+		
+		// ---
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		createNetwork(scenario);
 
 		storeVehicleTypeInfo();
 
-		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
-		scenario.getConfig().qsim().setEndTime(14*3600);
-		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
-		scenario.getConfig().qsim().setInflowConstraint(inflowConstraint);
-	
-		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
-			scenario.getConfig().qsim().setSeepModes(Arrays.asList("bike"));
-			scenario.getConfig().qsim().setSeepModeStorageFree(false);
-			scenario.getConfig().qsim().setRestrictingSeepage(true);
-		}
-		
-		scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
-		scenario.getConfig().qsim().setTrafficDynamics(trafficDynamics);
-
-		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		double networkDensity = 3.*(1000./7.5);
 		
@@ -188,7 +202,7 @@ public class CreateAutomatedFDTest {
 		
 		int numberOfPoints = (int) Math.ceil( networkDensity/ (reduceNoOfDataPointsInPlot * sumOfPCUInEachStep) ) + 5;
 
-		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
+		List<Map<String,Integer>> points2Run = new ArrayList<>();
 
 		for (int m=1; m<numberOfPoints; m++){
 			Map<String,Integer> pointToRun = new HashMap<>();
@@ -208,7 +222,7 @@ public class CreateAutomatedFDTest {
 			}
 		}
 
-		Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
+		Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<>();
 
 		for(Map<String, Integer> point2run : points2Run){
 
@@ -232,11 +246,17 @@ public class CreateAutomatedFDTest {
 			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+			QNetsimEngine netsimEngine;
+			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
+				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
+				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
+			} else {
+				 netsimEngine = new QNetsimEngine(qSim);
+			}
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-			final Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
+			final Map<String, VehicleType> travelModesTypes = new HashMap<>();
 
 			for(String mode :travelModes){
 				travelModesTypes.put(mode, modeVehicleTypes.get(mode));
@@ -263,11 +283,11 @@ public class CreateAutomatedFDTest {
 
 			qSim.run();
 
-			Map<String, Tuple<Double, Double>> mode2FlowSpeed = new HashMap<String, Tuple<Double,Double>>();
+			Map<String, Tuple<Double, Double>> mode2FlowSpeed = new HashMap<>();
 			for(int i=0; i < travelModes.length; i++){
 
 				Tuple<Double, Double> flowSpeed = 
-						new Tuple<Double, Double>(this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentFlow(),
+						new Tuple<>(this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentFlow(),
 								this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentAverageVelocity());
 				mode2FlowSpeed.put(travelModes[i], flowSpeed);
 				outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
@@ -299,7 +319,7 @@ public class CreateAutomatedFDTest {
 		scatterPlot(outData,outFile);
 	}
 	
-	int getMinNumberOfAgentAtStart(final String mode) {//equal modal split run
+	static int getMinNumberOfAgentAtStart(final String mode) {//equal modal split run
 		// only three different modes (and pcus) are used in this test ie -- car(1), truck(3), bike(0.25)
 		switch (mode) {
 		case "car": return 1;
@@ -461,7 +481,7 @@ public class CreateAutomatedFDTest {
 	}
 
 	private void storeVehicleTypeInfo() {
-		modeVehicleTypes = new HashMap<String, VehicleType>();
+		modeVehicleTypes = new HashMap<>();
 		mode2FlowData = new HashMap<>();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
@@ -485,8 +505,8 @@ public class CreateAutomatedFDTest {
 		}
 	}
 
-	private void createNetwork(){
-		Network network = (Network) scenario.getNetwork();
+	private void createNetwork(Scenario scenario){
+		Network network = scenario.getNetwork();
 
 		double x = -50;
 		Node nodeHome = NetworkUtils.createAndAddNode(network, Id.createNodeId("home"), new Coord(x, (double) 0));
@@ -517,7 +537,7 @@ public class CreateAutomatedFDTest {
 		final double freespeed4 = freeSpeedOnLink;
 		NetworkUtils.createAndAddLink(network,Id.createLinkId("work"), fromNode4, toNode4, (double) 25, freespeed4, (double) 7200, (double) 1 );
 
-		Set<String> allowedModes = new HashSet<String>();
+		Set<String> allowedModes = new HashSet<>();
 		allowedModes.addAll(Arrays.asList(travelModes));
 
 		for(Link l:network.getLinks().values()){
@@ -725,16 +745,16 @@ public class CreateAutomatedFDTest {
 		private void initDynamicVariables() {
 			//numberOfAgents for each mode should be initialized at this point
 			this.decideSpeedTableSize();
-			this.speedTable = new LinkedList<Double>();
+			this.speedTable = new LinkedList<>();
 			for (int i=0; i<this.speedTableSize; i++){
 				this.speedTable.add(0.);
 			}
 			this.flowTime = 0.;
-			this.flowTable900 = new LinkedList<Double>();
+			this.flowTable900 = new LinkedList<>();
 
 			flowTableReset();
 
-			this.lastXFlows900 = new LinkedList<Double>();
+			this.lastXFlows900 = new LinkedList<>();
 			for (int i=0; i<NUMBER_OF_MEMORIZED_FLOWS; i++){
 				this.lastXFlows900.add(0.);
 			}
@@ -880,6 +900,7 @@ public class CreateAutomatedFDTest {
 			this.permanentRegime = false;
 		}
 
+		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (!(permanentRegime)){
 //				Id<Person> personId = Id.createPersonId(event.getDriverId());

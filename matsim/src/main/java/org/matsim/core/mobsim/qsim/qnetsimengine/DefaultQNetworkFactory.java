@@ -76,13 +76,14 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	@Override
 	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
-		double effectiveCellSize = ((Network) scenario.getNetwork()).getEffectiveCellSize() ;
+		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
+
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
-		if (! Double.isNaN( scenario.getNetwork().getEffectiveLaneWidth())){
-			linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
-		}
+		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
+
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(), 
 				mobsimTimer, linkWidthCalculator );
 	}

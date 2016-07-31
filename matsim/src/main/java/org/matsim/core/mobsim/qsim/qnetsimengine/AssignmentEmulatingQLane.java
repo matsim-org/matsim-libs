@@ -274,6 +274,8 @@ class AssignmentEmulatingQLane extends QLaneI {
 			double fraction = (density_per_km - MAX_FLOW_DENSITY_PER_KM )/( JAM_DENSITY_PER_KM - MAX_FLOW_DENSITY_PER_KM) ;
 			earliestExitTime += fraction * fraction * this.qLink.getLink().getLength() / (JAM_SPEED_KM_H / 3.6) ;  
 		}
+		
+		// yyyyyy the above somehow should be anchored at flow, not density.  ???  kai, jul'16
 
 		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
