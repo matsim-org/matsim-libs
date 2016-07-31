@@ -537,7 +537,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		qLink.addParkedVehicle(veh);
 		qLink.letVehicleArrive(veh);
-		qLink.makeVehicleAvailableToNextDriver(veh, now);
+		qLink.makeVehicleAvailableToNextDriver(veh);
 		
 		// remove _after_ processing the arrival to keep link active:
 		removeVehicleFromQueue( veh ) ;

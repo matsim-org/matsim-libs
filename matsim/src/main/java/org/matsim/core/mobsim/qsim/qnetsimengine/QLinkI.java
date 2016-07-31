@@ -95,9 +95,9 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
 	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
 	 */
-	abstract void letVehicleDepart(QVehicle vehicle, double now) ;
+	abstract void letVehicleDepart(QVehicle vehicle) ;
 
-	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId, double now);
+	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId);
 	
 	abstract QVehicle getVehicle(Id<Vehicle> vehicleId) ;
 	
