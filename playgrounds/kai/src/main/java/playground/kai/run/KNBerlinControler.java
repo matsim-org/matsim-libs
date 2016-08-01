@@ -58,7 +58,7 @@ class KNBerlinControler {
 		// controler, global, and related:
 		
 		config.controler().setFirstIteration(0); // with something like "9" we don't get output events! 
-		config.controler().setLastIteration(1); // with something like "9" we don't get output events! 
+		config.controler().setLastIteration(1000); // with something like "9" we don't get output events! 
 		config.controler().setWriteSnapshotsInterval(100);
 		config.controler().setWritePlansInterval(200);
 		config.controler().setWriteEventsInterval(100);
