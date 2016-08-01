@@ -13,35 +13,39 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.net.URL;
+
 /**
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
-	private final String TEST_SCHEDULE = "transitschedule.xml";
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testInput() {
+		URL transitSchedule = IOUtils.newUrl(utils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( originalScenario ).readFile( TEST_SCHEDULE );
+		new TransitScheduleReaderV1( originalScenario ).parse(transitSchedule);
 
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( new Transformation() , reprojectedScenario ).readFile( TEST_SCHEDULE );
+		new TransitScheduleReaderV1( new Transformation() , reprojectedScenario ).parse(transitSchedule);
 
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
 
 	@Test
 	public void testOutput() {
+		URL transitSchedule = IOUtils.newUrl(utils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( originalScenario ).readFile( TEST_SCHEDULE );
+		new TransitScheduleReaderV1( originalScenario ).parse(transitSchedule);
 
 		final String file = utils.getOutputDirectory()+"/schedule.xml";
 		new TransitScheduleWriterV1( new Transformation() , originalScenario.getTransitSchedule() ).write( file );
@@ -63,9 +67,9 @@ public class TransitScheduleReprojectionIOTest {
 		final Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("pt-tutorial"));
 
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
-		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), TEST_SCHEDULE));
+		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));
 
-		config.transit().setTransitScheduleFile( TEST_SCHEDULE );
+		config.transit().setTransitScheduleFile("transitschedule.xml");
 
 		config.transit().setUseTransit( true );
 		config.transit().setInputScheduleCRS( TransformationFactory.CH1903_LV03_GT );
