@@ -573,13 +573,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
 		
-		if ( context.qsimConfig.getTrafficDynamics() == TrafficDynamics.queue 
+		if ( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) 
 				&& context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
 			return storageOk ;
 		}
 		// (continue only if HOLES and/or inflow constraing)
 
-		if(context.qsimConfig.getTrafficDynamics() == TrafficDynamics.queue 
+		if( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles)
 				&& !storageOk) { // irrespective of inflow constrain, storageOk must be respected; amit Aug 2016
 			return storageOk;
 		}
