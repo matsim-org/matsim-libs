@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.kai.integration.ptTutorialProblem;
 
+import java.net.URL;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,9 +41,8 @@ public class PtTutorialProblem {
 	
 	@Test
 	public final void test() {
-		String fileName = utils.getPackageInputDirectory() + "/0.config.xml";
-
-		Config config = ConfigUtils.loadConfig( fileName ) ;
+		final URL configURL = IOUtils.newUrl(getClass().getResource("/test/scenarios/pt-tutorial/"),  "config.xml");
+		Config config = ConfigUtils.loadConfig( configURL ) ;
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		
 		config.controler().setLastIteration(1);

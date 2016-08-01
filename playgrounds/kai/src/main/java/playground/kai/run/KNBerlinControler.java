@@ -132,8 +132,10 @@ class KNBerlinControler {
 			config.timeAllocationMutator().setAffectingDuration(false);
 		}
 		
-
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
+
+		ConfigUtils.loadConfig(config, "~/kairuns/a100/additional-config.xml") ;
+
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();
 
