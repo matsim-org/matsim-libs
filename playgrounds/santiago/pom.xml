@@ -42,5 +42,13 @@
 		<artifactId>gtfs2matsimtransitschedule</artifactId>
 		<version>0.9.0-SNAPSHOT</version>
 	</dependency>
+	
+	<dependency>
+  		<groupId>playground</groupId>  
+		<artifactId>agarwalamit</artifactId>
+  		<version>0.9.0-SNAPSHOT</version>
+ 		 <scope>compile</scope>
+	</dependency>
+	
   </dependencies>
 </project>
