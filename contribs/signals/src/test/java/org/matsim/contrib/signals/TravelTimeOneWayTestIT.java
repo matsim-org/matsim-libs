@@ -77,10 +77,7 @@ public class TravelTimeOneWayTestIT {
 		conf.plans().setInputFile("plans.xml.gz");
 		String signalSystemsFile = null;
 		if (useLanes){
-				String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-				String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-				new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFileURL(conf.getContext()).getFile());
-				conf.network().setLaneDefinitionsFile(lanes20);
+			conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 				conf.qsim().setUseLanes(true);
 				signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
 		}
@@ -108,8 +105,7 @@ public class TravelTimeOneWayTestIT {
 	private static SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
-		return engine;
+		return new QSimSignalEngine(manager);
 	}
 
 	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(MutableScenario scenario){
