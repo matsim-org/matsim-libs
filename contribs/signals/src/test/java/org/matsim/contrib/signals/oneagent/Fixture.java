@@ -31,7 +31,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
@@ -60,7 +59,6 @@ public class Fixture {
 			e.printStackTrace();
 		}
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
-		conf.controler().setMobsim("qsim");
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
 		conf.planCalcScore().addActivityParams(params);
@@ -70,10 +68,7 @@ public class Fixture {
 		settings.setWeight(1.0);
 		conf.strategy().addStrategySettings(settings);
 		conf.network().setInputFile("network.xml.gz");
-		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFileURL(conf.getContext()).getFile());
-		conf.network().setLaneDefinitionsFile(lanes20);
+		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.plans().setInputFile("plans1Agent.xml");
 		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);

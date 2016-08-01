@@ -21,12 +21,10 @@ package org.matsim.contrib.signals.integration;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -36,14 +34,11 @@ import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
@@ -64,11 +59,8 @@ public class SignalSystemsIT {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
-		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFileURL(config.getContext()).getFile());
 
-		config.network().setLaneDefinitionsFile(lanes20);
+		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setWritePlansInterval(10);
 
@@ -165,11 +157,8 @@ public class SignalSystemsIT {
 	public void testSignalSystemsWTryEndTimeThenDuration() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
-		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFileURL(config.getContext()).getFile());
 
-		config.network().setLaneDefinitionsFile(lanes20);
+		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 
 		config.qsim().setStartTime(1.5*3600);
 		config.qsim().setEndTime(5*3600);
