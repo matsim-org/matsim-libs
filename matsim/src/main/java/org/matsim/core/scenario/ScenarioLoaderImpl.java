@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkUtils;
@@ -107,7 +108,7 @@ class ScenarioLoaderImpl {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		this.loadHouseholds();
+		this.loadHouseholds(); // tests internally if the file is there
 		this.loadTransit(); // tests internally if the file is there
 		this.loadTransitVehicles(); // tests internally if the file is there
 		if (this.config.vehicles().getVehiclesFile()!=null ) {
@@ -227,8 +228,8 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadHouseholds() {
-		URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
-		if ( (this.config.households() != null) && (householdsFile != null) ) {
+		if ( (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
+			URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
 			log.info("loading households from " + householdsFile);
 			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
 			log.info("households loaded.");
@@ -236,12 +237,14 @@ class ScenarioLoaderImpl {
 		else {
 			log.info("no households file set in config, not loading households");
 		}
-		if ((this.config.households() != null) && (this.config.households().getInputHouseholdAttributesFile() != null)) {
-			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
+		final String fn = this.config.households().getInputHouseholdAttributesFile();
+		if ((this.config.households() != null) && ( fn != null)) {
+//			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
+			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
 			log.info("loading household attributes from " + householdAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(householdAttributesFileName);
+			reader.parse(householdAttributesFileName);
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -249,9 +252,10 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadTransit() throws UncheckedIOException {
-		URL transitScheduleFile = this.config.transit().getTransitScheduleFileURL(this.config.getContext());
 
-		if ( transitScheduleFile != null ) {
+		if ( this.config.transit().getTransitScheduleFile() != null ) {
+//			URL transitScheduleFile = this.config.transit().getTransitScheduleFileURL(this.config.getContext());
+			String transitScheduleFile = this.config.transit().getTransitScheduleFile() ;
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
@@ -266,7 +270,8 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
+//				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
+				new TransitScheduleReader( transformation , this.scenario).readFile(transitScheduleFile);
 			}
 		}
 		else {

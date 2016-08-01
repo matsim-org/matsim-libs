@@ -94,7 +94,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadHouseholdAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "householdAttributesConfig.xml"));
-		config.households().addParam("inputHouseholdAttributesFile", this.util.getClassInputDirectory() + "householdAttributes.xml");
+		config.households().addParam("inputHouseholdAttributesFile", "householdAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));
 	}
