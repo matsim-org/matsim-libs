@@ -70,7 +70,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadTransitLinesAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "transitConfig.xml"));
-		config.transit().setTransitLinesAttributesFile(this.util.getClassInputDirectory() + "transitLinesAttributes.xml");
+		config.transit().setTransitLinesAttributesFile("transitLinesAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getTransitSchedule().getTransitLinesAttributes().getAttribute("Blue Line", "hello"));
 	}
@@ -78,7 +78,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadTransitStopsAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "transitConfig.xml"));
-		config.transit().setTransitStopsAttributesFile(this.util.getClassInputDirectory() + "transitStopsAttributes.xml");
+		config.transit().setTransitStopsAttributesFile("transitStopsAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals(Boolean.TRUE, scenario.getTransitSchedule().getTransitStopsAttributes().getAttribute("1", "hasP+R"));
 	}
@@ -86,7 +86,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadFacilitiesAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(this.util.classInputResourcePath(), "facilityAttributesConfig.xml"));
-		config.facilities().addParam("inputFacilityAttributesFile", this.util.getClassInputDirectory() + "facilityAttributes.xml");
+		config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getActivityFacilities().getFacilityAttributes().getAttribute("1", "hello"));
 	}

@@ -39,6 +39,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -177,11 +178,11 @@ class ScenarioLoaderImpl {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
-			String facilitiesAttributesFileName = this.config.facilities().getInputFacilitiesAttributesFile();
-			log.info("loading facility attributes from " + facilitiesAttributesFileName);
+			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), this.config.facilities().getInputFacilitiesAttributesFile());
+			log.info("loading facility attributes from " + facilitiesAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(facilitiesAttributesFileName);
+			reader.parse(facilitiesAttributesURL);
 		}
 		else {
 			log.info("no facility-attributes file set in config, not loading any facility attributes");
@@ -239,7 +240,6 @@ class ScenarioLoaderImpl {
 		}
 		final String fn = this.config.households().getInputHouseholdAttributesFile();
 		if ((this.config.households() != null) && ( fn != null)) {
-//			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
 			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
 			log.info("loading household attributes from " + householdAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
@@ -254,8 +254,7 @@ class ScenarioLoaderImpl {
 	private void loadTransit() throws UncheckedIOException {
 
 		if ( this.config.transit().getTransitScheduleFile() != null ) {
-//			URL transitScheduleFile = this.config.transit().getTransitScheduleFileURL(this.config.getContext());
-			String transitScheduleFile = this.config.transit().getTransitScheduleFile() ;
+			URL transitScheduleFile = this.config.transit().getTransitScheduleFileURL(this.config.getContext());
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
@@ -270,8 +269,7 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-//				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
-				new TransitScheduleReader( transformation , this.scenario).readFile(transitScheduleFile);
+				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
 			}
 		}
 		else {
@@ -279,19 +277,19 @@ class ScenarioLoaderImpl {
 		}
 
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
-			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
+			URL transitLinesAttributesFileName = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(transitLinesAttributesFileName);
+			reader.parse(transitLinesAttributesFileName);
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
-			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
-			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
+			URL transitStopsAttributesURL = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
+			log.info("loading transit stop facilities attributes from " + transitStopsAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(transitStopsAttributesFileName);
+			reader.parse(transitStopsAttributesURL);
 		}
 	}
 
@@ -309,7 +307,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
+			new VehicleReaderV1(this.scenario.getVehicles()).parse(IOUtils.newUrl(this.config.getContext(), vehiclesFile));
 		} 
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
