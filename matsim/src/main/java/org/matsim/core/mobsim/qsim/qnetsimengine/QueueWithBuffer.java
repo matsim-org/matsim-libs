@@ -578,7 +578,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// (continue only if HOLES and/or inflow constraing)
 
-		if ( remainingHolesStorageCapacity <=0 ) { 
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles // check the latter condition for holes only (amit Aug 2016)  
+				&& remainingHolesStorageCapacity <=0 ) { 
 			return false ;
 		} 
 		// remainingHolesStorageCapacity is:
