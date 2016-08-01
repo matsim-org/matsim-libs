@@ -32,6 +32,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Implements a generic config-group that stores all parameters in a simple Map.
@@ -212,11 +213,6 @@ public class ConfigGroup implements MatsimExtensionPoint {
 		if (filename.startsWith("~" + File.separator)) {
 			filename = System.getProperty("user.home") + filename.substring(1);
 		}
-	
-		try {
-			return new URL(context, filename ) ;
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+		return IOUtils.newUrl(context, filename);
 	}
 }
