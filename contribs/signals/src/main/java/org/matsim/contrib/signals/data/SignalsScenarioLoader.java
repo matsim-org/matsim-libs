@@ -21,9 +21,7 @@ package org.matsim.contrib.signals.data;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesReader10;
-import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesWriter10;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesReader10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsReader20;
@@ -71,7 +69,7 @@ public class SignalsScenarioLoader {
 
 	private void loadAmberTimes(SignalsData data) {
 		if (this.signalConfig.getAmberTimesFile() != null){
-			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData(), AmberTimesWriter10.AMBERTIMES10);
+			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData());
 			reader.readFile(this.signalConfig.getAmberTimesFile());
 		}
 		else {
@@ -81,7 +79,7 @@ public class SignalsScenarioLoader {
 
 	private void loadControl(SignalsData data){
 		if (this.signalConfig.getSignalControlFile() != null){
-			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData(), MatsimSignalSystemsReader.SIGNALCONTROL20);
+			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData());
 			controlReader.readFile(this.signalConfig.getSignalControlFile());
 		}
 		else {
@@ -91,7 +89,7 @@ public class SignalsScenarioLoader {
 
 	private void loadGroups(SignalsData data) {
 		if (this.signalConfig.getSignalGroupsFile() != null){
-			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData(), MatsimSignalSystemsReader.SIGNALGROUPS20);
+			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData());
 			groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
 		}
 		else {
@@ -101,7 +99,7 @@ public class SignalsScenarioLoader {
 
 	private void loadSystems(SignalsData data){
 		if (this.signalConfig.getSignalSystemFile() != null){
-			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData(), MatsimSignalSystemsReader.SIGNALSYSTEMS20);
+			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData());
 			systemsReader.readFile(this.signalConfig.getSignalSystemFile());
 		}
 		else {

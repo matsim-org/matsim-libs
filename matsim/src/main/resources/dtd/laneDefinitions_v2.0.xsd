@@ -9,7 +9,7 @@
 <!-- Description of the lanes to be used in
 the simulation -->
 
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+<xs:include schemaLocation="matsimCommon.xsd"/>
 
 <xs:element name="laneDefinitions">
   <xs:complexType>

@@ -23,14 +23,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lanedefinitions20.*;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -42,7 +43,7 @@ import java.net.URL;
  * @author dgrether
  *
  */
-class LaneDefinitionsReader20 extends MatsimJaxbXmlParser {
+class LaneDefinitionsReader20  {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader20.class);
@@ -50,17 +51,8 @@ class LaneDefinitionsReader20 extends MatsimJaxbXmlParser {
 	private Lanes laneDefinitions;
 
 	private LaneDefinitionsFactory20 builder;
-	/**
-	 * @param schemaLocation
-	 */
-	public LaneDefinitionsReader20(Lanes laneDefs, String schemaLocation) {
-		super(schemaLocation);
-		this.laneDefinitions = laneDefs;
-		builder = this.laneDefinitions.getFactory();
-	}
 
-	public LaneDefinitionsReader20(Lanes laneDefs) {
-		super();
+	LaneDefinitionsReader20(Lanes laneDefs) {
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
 	}
@@ -68,27 +60,21 @@ class LaneDefinitionsReader20 extends MatsimJaxbXmlParser {
 
 	public void readFile(String filename) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
-		JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		super.validateFile(filename, u);
-		log.info("starting unmarshalling " + filename);
-
 		InputStream stream = IOUtils.getInputStream(filename);
 		parse(stream);
 	}
 
-	public void readURL(URL url) throws JAXBException, SAXException,
+	void readURL(URL url) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
-		// TODO: Validate
-		log.info("starting unmarshalling " + url);
 		InputStream stream = url.openStream();
 		parse(stream);
 	}
 
-	private void parse(InputStream stream) throws JAXBException {
+	private void parse(InputStream stream) throws JAXBException, SAXException {
 		ObjectFactory fac = new ObjectFactory();
 		JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
 		Unmarshaller u = jc.createUnmarshaller();
+		u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/laneDefinitions_v2.0.xsd")));
 
 		XMLLaneDefinitions xmlLaneDefinitions;
 		try {
@@ -103,14 +89,12 @@ class LaneDefinitionsReader20 extends MatsimJaxbXmlParser {
 		}
 
 		//convert the parsed xml-instances to basic instances
-		LanesToLinkAssignment20 l2lAssignment;
-		Lane lane = null;
 		for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 				.getLanesToLinkAssignment()) {
-			l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef
+			LanesToLinkAssignment20 l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef
 					.getLinkIdRef(), Link.class));
 			for (XMLLaneType laneType : lldef.getLane()) {
-				lane = builder.createLane(Id.create(laneType.getId(), Lane.class));
+				Lane lane = builder.createLane(Id.create(laneType.getId(), Lane.class));
 
 				if (!laneType.getLeadsTo().getToLane().isEmpty()) {
 					for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
