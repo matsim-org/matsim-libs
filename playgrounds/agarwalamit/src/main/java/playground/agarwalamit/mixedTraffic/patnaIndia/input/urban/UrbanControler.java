@@ -60,7 +60,7 @@ public class UrbanControler {
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 
 		config.plans().setInputFile(plansFile);
-		config.counts().setCountsFileName(INPUT_FILE_DIR+"/countsCarMotorbikeBike.xml");
+		config.counts().setInputFile(INPUT_FILE_DIR+"/countsCarMotorbikeBike.xml");
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOutputDirectory(OUTPUT_DIR);

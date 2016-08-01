@@ -227,10 +227,10 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadHouseholds() {
-		final String householdsFile = this.config.households().getInputFile();
+		URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
 		if ( (this.config.households() != null) && (householdsFile != null) ) {
 			log.info("loading households from " + householdsFile);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).readFile(householdsFile);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
@@ -249,7 +249,7 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadTransit() throws UncheckedIOException {
-		final String transitScheduleFile = this.config.transit().getTransitScheduleFile();
+		URL transitScheduleFile = this.config.transit().getTransitScheduleFileURL(this.config.getContext());
 
 		if ( transitScheduleFile != null ) {
 			final String inputCRS = config.transit().getInputScheduleCRS();
@@ -266,7 +266,7 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new TransitScheduleReader( transformation , this.scenario).readFile(transitScheduleFile);
+				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
 			}
 		}
 		else {

@@ -633,7 +633,7 @@ public class SantiagoScenarioBuilder {
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
-		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml");
+		counts.setInputFile(pathForMatsim + "input/counts_merged_VEH_C01.xml");
 		counts.setOutputFormat("all");
 		counts.setWriteCountsInterval(writeStuffInterval);
 	}

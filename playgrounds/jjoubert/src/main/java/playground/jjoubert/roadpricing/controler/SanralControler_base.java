@@ -43,7 +43,7 @@ public class SanralControler_base {
 		// Plans.
 		config.plans().setInputFile(root + "plans/car-commercial_plans_2009_10pct.xml.gz");
 		// Counts.
-		config.counts().setCountsFileName(root + "counts/2007/Counts_Wednesday_Total.xml.gz");
+		config.counts().setInputFile(root + "counts/2007/Counts_Wednesday_Total.xml.gz");
 		config.counts().setCountsScaleFactor(10);
 		config.counts().setOutputFormat("kml");
 		

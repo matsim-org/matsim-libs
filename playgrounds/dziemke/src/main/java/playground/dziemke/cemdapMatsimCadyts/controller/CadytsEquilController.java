@@ -72,7 +72,7 @@ public class CadytsEquilController {
 		// counts
 		// String countsFileName = "D:/Workspace/container/examples/equil/input/counts100-200.xml";
 		String countsFileName = "/Users/dominik/Workspace/data/examples/equil/input/counts100-200.xml";
-		config.counts().setCountsFileName(countsFileName);
+		config.counts().setInputFile(countsFileName);
 		//config.counts().setCountsScaleFactor(100);
 		config.counts().setOutputFormat("all");
 		

@@ -148,7 +148,7 @@ public class GAPScenarioRunner {
 		
 		config.plans().setInputFile("/home/dhosse/run12/output_plans.xml.gz");
 		// disable counts
-		 config.counts().setCountsFileName(null);
+		 config.counts().setInputFile(null);
 		 
 		 //set random seed
 		 config.global().setRandomSeed(randomSeed);

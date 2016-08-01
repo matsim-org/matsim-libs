@@ -85,7 +85,7 @@ public class SamplingAgentsFromPop {
 		cc.setOutputDirectory(runsSampledDir + "output/" );
 
 
-		counts.setCountsFileName(runsSampledDir + "input/counts_merged_VEH_C01.xml" );
+		counts.setInputFile(runsSampledDir + "input/counts_merged_VEH_C01.xml" );
 
 		NetworkConfigGroup net = config.network();
 		net.setInputFile(runsSampledDir + "input/network_merged_cl.xml.gz" );

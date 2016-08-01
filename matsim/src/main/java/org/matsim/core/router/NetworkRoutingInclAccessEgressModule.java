@@ -133,11 +133,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 				
 				result.add( accessLeg ) ;
-				log.warn( accessLeg );
+//				log.warn( accessLeg );
 
 				final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId() );
 				result.add( interactionActivity ) ;
-				log.warn( interactionActivity );
+//				log.warn( interactionActivity );
 			}
 		}
 
@@ -148,7 +148,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			now += routeLeg( person, newLeg, accessActLink, egressActLink, now );
 
 			result.add( newLeg ) ;
-			log.warn( newLeg );
+//			log.warn( newLeg );
 		}
 
 		// === egress:
@@ -160,15 +160,15 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 				final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
 				result.add( interactionActivity ) ;
-				log.warn( interactionActivity );
+//				log.warn( interactionActivity );
 
 				Leg egressLeg = this.populationFactory.createLeg( TransportMode.egress_walk ) ;
 				egressLeg.setDepartureTime( now );
 				now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(), egressActLink.getId() ) ;
 				result.add( egressLeg ) ;
-				log.warn( egressLeg );
+//				log.warn( egressLeg );
 			}
-			log.warn( "===" );
+//			log.warn( "===" );
 		}
 
 		return result ;

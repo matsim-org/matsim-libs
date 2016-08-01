@@ -393,7 +393,7 @@ public class GautengControler_subpopulations {
 		String countsFilename = null;
 		if(args.length > 10 && args[10] != null && args[10].length() > 0) {
 			countsFilename = args[10];
-			config.counts().setCountsFileName(countsFilename);
+			config.counts().setInputFile(countsFilename);
 		}
 	}
 	

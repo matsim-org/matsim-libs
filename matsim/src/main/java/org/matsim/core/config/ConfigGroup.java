@@ -20,6 +20,9 @@
 
 package org.matsim.core.config;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -202,6 +205,18 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	public final void testForLocked() {
 		if ( locked ) {
 			throw new RuntimeException( "This config group is locked since material from this config group has already been used.") ;
+		}
+	}
+
+	public static URL getInputFileURL(URL context, String filename) {
+		if (filename.startsWith("~" + File.separator)) {
+			filename = System.getProperty("user.home") + filename.substring(1);
+		}
+	
+		try {
+			return new URL(context, filename ) ;
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

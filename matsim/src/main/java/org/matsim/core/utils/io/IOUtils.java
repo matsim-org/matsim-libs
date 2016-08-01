@@ -58,6 +58,10 @@ public class IOUtils {
 	private final static Logger log = Logger.getLogger(IOUtils.class);
 
 	public static URL getUrlFromFileOrResource(String filename) {
+		if (filename.startsWith("~" + File.separator)) {
+		    filename = System.getProperty("user.home") + filename.substring(1);
+		}
+		
 		File file = new File(filename);
 		if (file.exists()) {
 			try {
@@ -66,7 +70,11 @@ public class IOUtils {
 				throw new RuntimeException(e);
 			}
 		}
+		log.info("String " + filename + " does not exist as file on the file system; trying it as URL resource ..."); 
 		URL resourceAsStream = IOUtils.class.getClassLoader().getResource(filename);
+		if ( resourceAsStream==null ) {
+			throw new RuntimeException("Filename |" + filename + "| not found." ) ;
+		}
 		return resourceAsStream;
 	}
 

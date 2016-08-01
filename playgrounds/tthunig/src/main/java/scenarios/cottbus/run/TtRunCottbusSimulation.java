@@ -300,7 +300,7 @@ public class TtRunCottbusSimulation {
 						+ " because they are not available for the simplified network of other scenario types.");
 			}
 //			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted.xml");
-			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted_v2.xml");
+			config.counts().setInputFile(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted_v2.xml");
 			config.counts().setCountsScaleFactor(1.0 / SCALING_FACTOR); // sample size
 			config.counts().setWriteCountsInterval(config.controler().getLastIteration());
 //			config.counts().setWriteCountsInterval(1);

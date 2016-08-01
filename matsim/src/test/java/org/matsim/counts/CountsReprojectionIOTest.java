@@ -66,7 +66,7 @@ public class CountsReprojectionIOTest {
 
 		final Config config = ConfigUtils.createConfig();
 
-		config.counts().setCountsFileName( file );
+		config.counts().setInputFile( file );
 		config.counts().setInputCRS( TransformationFactory.CH1903_LV03_Plus_GT );
 		// web mercator. This would be a pretty silly choice for simulation,
 		// but does not matter for tests. Just makes sure that (almost) every

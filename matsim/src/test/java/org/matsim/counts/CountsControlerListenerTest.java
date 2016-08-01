@@ -254,7 +254,7 @@ public class CountsControlerListenerTest {
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(1);
 		cConfig.setOutputFormat("txt");
-		cConfig.setCountsFileName("counts.xml"); // just any file to activate the counts feature
+		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
 		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
@@ -292,7 +292,7 @@ public class CountsControlerListenerTest {
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(2);
 		cConfig.setOutputFormat("txt");
-		cConfig.setCountsFileName("counts.xml"); // just any file to activate the counts feature
+		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
@@ -333,7 +333,7 @@ public class CountsControlerListenerTest {
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(2);
 		cConfig.setOutputFormat("txt");
-		cConfig.setCountsFileName("counts.xml"); // just any file to activate the counts feature
+		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);

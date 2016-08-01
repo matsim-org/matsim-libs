@@ -73,7 +73,7 @@ public class BkRun {
 		ccg.setLastIteration(1500);
 
 		CountsConfigGroup countsCg = kontrolle.getConfig().counts();
-		countsCg.setCountsFileName(countsFile);
+		countsCg.setInputFile(countsFile);
 		
 	// network
 		NetworkConfigGroup ncg = kontrolle.getConfig().network();

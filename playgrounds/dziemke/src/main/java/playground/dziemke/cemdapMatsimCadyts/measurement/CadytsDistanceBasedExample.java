@@ -102,7 +102,7 @@ public class CadytsDistanceBasedExample {
 		config.controler().setWritePlansInterval(10);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
-		config.counts().setCountsFileName(countsFileName);
+		config.counts().setInputFile(countsFileName);
 //		config.plans().setInputFile(inputPlansFile);
 //		config.network().setInputFile(inputNetworkFile);
 //		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRate);

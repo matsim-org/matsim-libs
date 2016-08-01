@@ -56,7 +56,7 @@ public class CemdapMatsimCadytsController {
 		
 		config.plans().setInputFile("../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/24/plans.xml.gz");
 		
-		config.counts().setCountsFileName("../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml");
+		config.counts().setInputFile("../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml");
 		config.counts().setCountsScaleFactor(100);
 		config.counts().setOutputFormat("all"); // default is "txt"
 		

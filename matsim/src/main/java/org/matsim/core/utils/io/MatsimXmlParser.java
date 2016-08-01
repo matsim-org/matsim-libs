@@ -22,6 +22,7 @@ package org.matsim.core.utils.io;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.gbl.Gbl;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -149,6 +150,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 	}
 
 	public final void parse(final URL url) throws UncheckedIOException {
+		Gbl.assertNotNull(url);
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
 		if (url.getFile().endsWith(".gz")) {

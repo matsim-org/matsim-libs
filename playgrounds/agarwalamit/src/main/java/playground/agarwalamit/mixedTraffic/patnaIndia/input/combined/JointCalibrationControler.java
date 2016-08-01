@@ -221,7 +221,7 @@ public class JointCalibrationControler {
 		config.controler().setWritePlansInterval(100);
 		config.controler().setOutputDirectory(OUTPUT_DIR);
 
-		config.counts().setCountsFileName(JOINT_COUNTS_10PCT);
+		config.counts().setInputFile(JOINT_COUNTS_10PCT);
 		config.counts().setWriteCountsInterval(100);
 		config.counts().setCountsScaleFactor(1/SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");

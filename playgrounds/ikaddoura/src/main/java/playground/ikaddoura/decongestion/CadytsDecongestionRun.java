@@ -57,7 +57,7 @@ public class CadytsDecongestionRun {
 		
 		final Config config = ConfigUtils.loadConfig(configFile, cadytsSettings) ;
 		config.controler().setOutputDirectory(outputBaseDirectory + "cadyts_weigth_30_decongestion/");
-		config.counts().setCountsFileName("../../../runs-svn/decongestion/input/counts_decongestion.xml");
+		config.counts().setInputFile("../../../runs-svn/decongestion/input/counts_decongestion.xml");
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
