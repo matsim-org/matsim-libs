@@ -39,7 +39,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
@@ -58,11 +57,7 @@ public class TravelTimeFourWaysTest {
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile("network.xml.gz");
-		String laneDefinitions = this.testUtils.getClassInputDirectory()
-				+ "testLaneDefinitions_v1.1.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFileURL(conf.getContext()).getFile());
-		conf.network().setLaneDefinitionsFile(lanes20);
+		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(false);
 		Scenario scenario = ScenarioUtils.createScenario(conf);
@@ -89,8 +84,7 @@ public class TravelTimeFourWaysTest {
 		
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
-		return engine;
+		return new QSimSignalEngine(manager);
 	}
 	
 	@Test
