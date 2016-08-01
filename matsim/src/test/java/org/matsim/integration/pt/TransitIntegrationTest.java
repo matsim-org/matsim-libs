@@ -53,7 +53,7 @@ public class TransitIntegrationTest {
 
 	@Test
 	public void test_RunTutorial() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getScenario("pt-tutorial"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("pt-tutorial"), "config.xml"));
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

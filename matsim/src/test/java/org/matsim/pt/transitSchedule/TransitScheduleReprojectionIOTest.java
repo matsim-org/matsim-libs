@@ -7,12 +7,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -22,7 +22,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class TransitScheduleReprojectionIOTest {
-	private final String TEST_SCHEDULE = "test/scenarios/pt-tutorial/transitschedule.xml";
+	private final String TEST_SCHEDULE = "transitschedule.xml";
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -60,10 +60,11 @@ public class TransitScheduleReprojectionIOTest {
 		// It is thus OK to use a reasonably "high" tolerance compared to usual double comparisons.
 		final double epsilon = 0.01;
 
-		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader( originalScenario ).readFile( TEST_SCHEDULE );
+		final Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("pt-tutorial"));
 
-		final Config config = ConfigUtils.createConfig();
+		final Scenario originalScenario = ScenarioUtils.createScenario(config);
+		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), TEST_SCHEDULE));
+
 		config.transit().setTransitScheduleFile( TEST_SCHEDULE );
 
 		config.transit().setUseTransit( true );

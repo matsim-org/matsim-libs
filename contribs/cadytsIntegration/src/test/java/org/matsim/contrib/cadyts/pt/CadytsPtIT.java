@@ -215,8 +215,8 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -366,8 +366,8 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -523,8 +523,8 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();

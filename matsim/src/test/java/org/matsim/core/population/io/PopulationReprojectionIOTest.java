@@ -20,8 +20,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,7 +45,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = utils.getOutputDirectory() + "/plans.xml.gz";
 
 		// create test file in V0 format
-		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig(utils.getScenario("berlin")));
+		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig(utils.getTestScenarioURL("berlin")));
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
 		new PopulationReader(scenario).readFile(BASE_FILE);
@@ -61,7 +59,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V4 format
-		Config config = ConfigUtils.createConfig(utils.getScenario("berlin"));
+		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -76,7 +74,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V5 format
-		Config config = ConfigUtils.createConfig(utils.getScenario("berlin"));
+		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -91,7 +89,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
-		Config config = ConfigUtils.createConfig(utils.getScenario("berlin"));
+		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -117,7 +115,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
-		Config config = ConfigUtils.createConfig(utils.getScenario("berlin"));
+		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -145,7 +143,7 @@ public class PopulationReprojectionIOTest {
 		final double epsilon = 0.01;
 
 		// read test population
-		URL berlin = utils.getScenario("berlin");
+		URL berlin = utils.getTestScenarioURL("berlin");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig(berlin));
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(berlin, NET_FILE));
@@ -246,7 +244,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// necessary for v4...
-		URL network = IOUtils.newUrl(utils.getScenario("berlin"), NET_FILE);
+		URL network = IOUtils.newUrl(utils.getTestScenarioURL("berlin"), NET_FILE);
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(network);
 		new MatsimNetworkReader(reprojectedScenario.getNetwork()).parse(network);
 

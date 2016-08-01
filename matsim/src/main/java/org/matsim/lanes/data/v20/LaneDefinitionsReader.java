@@ -20,6 +20,7 @@
 package org.matsim.lanes.data.v20;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -50,43 +51,28 @@ public class LaneDefinitionsReader implements MatsimReader {
 	}
 
 
-	/**
-	 * Reads both file formats, 1.1 and 2.0.
-	 */
 	@Override
 	public void readFile(final String filename) {
 		try {
-			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
-			String sid = fileTypeGuesser.getSystemId();
-			LaneDefinitionsReader20 delegate;
-			if (sid != null) {
-				log.debug("creating parser for system id: " + sid);
-				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
-					log.info("Using LaneDefinitionReader11...");
-					throw new RuntimeException("The laneDefinitions_v1.1.xsd file format is used. For the use within the mobility simulation it is strongly recommended to" +
-							"convert the read data to the v2.0.xsd format using the LaneDefinitionsV11ToV20Conversion class. " +
-							"With the 0.5 release of MATSim the automatic conversion is switched off. Simulation will not run if the 1.1 file format" +
-							"is given as input. Please convert manually.");
-				}
-				else if (sid.compareTo(SCHEMALOCATIONV20) == 0){
-					delegate = new LaneDefinitionsReader20(this.laneDefinitions, sid);
-					log.info("Using LaneDefinitionReader20...");
-				}
-				else {
-					throw new RuntimeException("Unsupported file format: " + sid);
-				}
-			}
-			else {
-				log.error(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
-				throw new IllegalArgumentException(MatsimFileTypeGuesser.SYSTEMIDNOTFOUNDMESSAGE);
-			}
+			LaneDefinitionsReader20 delegate = new LaneDefinitionsReader20(this.laneDefinitions);
 			log.info("reading file " + filename);
 			delegate.readFile(filename);
 		} catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void readURL(final URL url) {
+		try {
+			LaneDefinitionsReader20 delegate = new LaneDefinitionsReader20(this.laneDefinitions);
+			log.info("reading file " + url.toString());
+			delegate.readURL(url);
+		} catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
+			throw new RuntimeException(e);
+		}
 
 	}
+
 
 
 }

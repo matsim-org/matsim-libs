@@ -62,7 +62,7 @@ public class InnovationSwitchOffTest {
 	 */
 	@Test
 	public void testInnovationSwitchOff() {
-		Config config = ConfigUtils.createConfig(utils.getScenario("equil"));
+		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("equil"));
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
 
 		config.network().setInputFile("network.xml");

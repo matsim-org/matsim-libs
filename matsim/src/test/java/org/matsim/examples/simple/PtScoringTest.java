@@ -52,7 +52,7 @@ public class PtScoringTest {
 
 	@Test
 	public void test_PtScoringLineswitch() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getScenario("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
@@ -191,7 +191,7 @@ public class PtScoringTest {
 	}
 	@Test
 	public void test_PtScoringLineswitchAndPtConstant() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getScenario("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.planCalcScore().getModes().get(TransportMode.pt).setConstant(1.);
@@ -333,7 +333,7 @@ public class PtScoringTest {
 	}
 	@Test
 	public void test_PtScoring_Wait() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getScenario("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("pt-simple"), "config.xml"));
 
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
@@ -407,7 +407,7 @@ public class PtScoringTest {
 
 	@Test
 	public void test_PtScoring() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getScenario("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("pt-simple"), "config.xml"));
 
 		config.planCalcScore().setWriteExperiencedPlans(true);
 

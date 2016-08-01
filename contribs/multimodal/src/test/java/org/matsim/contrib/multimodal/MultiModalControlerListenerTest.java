@@ -204,7 +204,7 @@ public class MultiModalControlerListenerTest {
 	void runBerlinScenario(int numberOfThreads) {
 
 		String inputDir = this.utils.getClassInputDirectory();
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getScenario("berlin"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());

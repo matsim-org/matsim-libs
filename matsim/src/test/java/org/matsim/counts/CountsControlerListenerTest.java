@@ -248,7 +248,7 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void test_writeCountsInterval() {
-		Config config = this.util.createConfig(util.getScenario("triangle"));
+		Config config = this.util.createConfig(util.getTestScenarioURL("triangle"));
 		CountsConfigGroup cConfig = config.counts();
 		
 		cConfig.setWriteCountsInterval(3);
@@ -284,7 +284,7 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
-		Config config = this.util.createConfig(util.getScenario("triangle"));
+		Config config = this.util.createConfig(util.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 		
 		CountsConfigGroup cConfig = config.counts();
@@ -325,7 +325,7 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testFilterAnalyzedModes() throws IOException {
-		Config config = util.createConfig(util.getScenario("triangle"));
+		Config config = util.createConfig(util.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 		
 		CountsConfigGroup cConfig = config.counts();

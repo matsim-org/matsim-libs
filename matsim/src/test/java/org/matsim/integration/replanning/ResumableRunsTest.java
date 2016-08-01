@@ -55,7 +55,7 @@ public class ResumableRunsTest {
 	 */
 	@Test
 	public void testResumableRuns() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.getScenario("equil"), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setLastIteration(11);
 		config.controler().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test

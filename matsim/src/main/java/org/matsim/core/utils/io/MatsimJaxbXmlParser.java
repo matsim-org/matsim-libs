@@ -85,37 +85,44 @@ public abstract class MatsimJaxbXmlParser implements MatsimSomeReader {
 		this.schemaLocation = schemaLocation;
 	}
 
+	public MatsimJaxbXmlParser(){
+		this.delegate = new ParserDelegate() ;
+	}
+
 	/**
 	 * @throws ParserConfigurationException  
 	 * @throws IOException 
 	 */
 	protected final void validateFile(String filename, Unmarshaller u) throws SAXException, ParserConfigurationException, IOException{
-		URL schemaUrl = null;
-		SchemaFactory schemaFac = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = null;
-		try {
-			//first check if we are online 
-			new URL(this.schemaLocation).openStream();
+		if (schemaLocation != null) { // TODO: Do without this.
+			URL schemaUrl = null;
+			SchemaFactory schemaFac = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = null;
+			try {
+				//first check if we are online
+				new URL(this.schemaLocation).openStream();
 			/* If there was no exception until here, than the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
 			 * would have to fetch the same file again, requiring two accesses to the webserver */
-			schemaUrl = new URL(this.schemaLocation);
-		} catch (IOException e) {
-			// There was a problem getting the (remote) file, just show the error as information for the user
-			log.error(e.toString() + ". May not be fatal." );
-		}
-		// we are online so we can use jaxb directly to validate against the online schema
-		if (schemaUrl != null){
-			schema = schemaFac.newSchema(schemaUrl);
-			u.setSchema(schema);
-			log.info("Validating file against schema online at " + this.schemaLocation);
-		}
-		//we are not online so we use sax parser of MatsimXmlParser to validate file first
-		//afterwards it can be read by the jaxb parser
-		else{
-			log.info("Validating file against schema locally provided in dtd folder");
-			delegate.readFile(filename);
-			log.info("File valid...");
+				schemaUrl = new URL(this.schemaLocation);
+			} catch (IOException e) {
+				// There was a problem getting the (remote) file, just show the error as information for the user
+				log.error(e.toString() + ". May not be fatal." );
+			}
+			// we are online so we can use jaxb directly to validate against the online schema
+			if (schemaUrl != null){
+				schema = schemaFac.newSchema(schemaUrl);
+				u.setSchema(schema);
+				log.info("Validating file against schema online at " + this.schemaLocation);
+			}
+			//we are not online so we use sax parser of MatsimXmlParser to validate file first
+			//afterwards it can be read by the jaxb parser
+			else{
+				log.info("Validating file against schema locally provided in dtd folder");
+				delegate.readFile(filename);
+				log.info("File valid...");
+			}
+
 		}
 	}
 

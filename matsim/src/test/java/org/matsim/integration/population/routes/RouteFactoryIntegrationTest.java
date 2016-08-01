@@ -48,7 +48,7 @@ public class RouteFactoryIntegrationTest {
 	 */
 	@Test
 	public void testRouteFactoryIntegration() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.getScenario("equil"), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile("plans2.xml");
 		Collection<StrategySettings> settings = config.strategy().getStrategySettings();
 		for (StrategySettings setting: settings) {

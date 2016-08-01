@@ -317,18 +317,8 @@ class ScenarioLoaderImpl {
 	private void loadLanes() {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
-			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
-			if (!LaneDefinitionsReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser
-					.getSystemId())) {
-				log.error("Lanes: Wrong file format. With the 0.5 version of matsim the scenario only accepts lane definitions in the "
-						+ "file format version 2.0, i.e. "
-						+ LaneDefinitionsReader.SCHEMALOCATIONV20
-						+ ". An automatic conversion of the 1.1 file format is no longer provided, please call the "
-						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
-				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
-			}
 			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
-			reader.readFile(filename);
+			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
 		}
 		else {
 			log.info("no lanes file set in config, not loading any lanes");
