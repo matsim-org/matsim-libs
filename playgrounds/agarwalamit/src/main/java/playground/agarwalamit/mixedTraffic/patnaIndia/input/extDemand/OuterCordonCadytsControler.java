@@ -19,6 +19,8 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -27,10 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.car.CadytsCarModule;
-import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
-import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -55,14 +54,22 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Counts;
 import org.matsim.vehicles.VehicleWriterV1;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsScoring;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.JointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
@@ -106,7 +113,7 @@ public class OuterCordonCadytsControler {
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -163,17 +170,34 @@ public class OuterCordonCadytsControler {
 	}
 
 	private void addCadytsSetting(final Controler controler, final Config config){
-		controler.addOverridingModule(new CadytsCarModule());
+		
+		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator();
+		occg.run();
+		
+		Map<String, Counts<Link>> mode2counts = occg.getMode2Counts();
+		
+		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
+		config.counts().setAnalyzedModes(modes);
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Key.get(new TypeLiteral<Map<String, Counts<Link>>>(){}, Names.named("calibration"))).toInstance(mode2counts);
+				
+				bind(ModalCadytsContext.class).asEagerSingleton();
+				addControlerListenerBinding().to(ModalCadytsContext.class);
+			}
+		});
+		
 		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfigGroup.setStartTime(0);
 		cadytsConfigGroup.setEndTime(24*3600-1);
-
+		
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Inject Network network;
-			@Inject CadytsContext cContext;
+			@Inject ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
@@ -183,7 +207,7 @@ public class OuterCordonCadytsControler {
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
+				final ModalCadytsScoring<Link> scoringFunction = new ModalCadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
 				final double cadytsScoringWeight = 15.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				sumScoringFunction.addScoringFunction(scoringFunction );
