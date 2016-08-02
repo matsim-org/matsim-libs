@@ -56,9 +56,9 @@ import java.util.TreeSet;
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
  */
-public class CadytsMultiModeContext implements ModalCadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
+public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
-	private final static Logger log = Logger.getLogger(CadytsMultiModeContext.class);
+	private final static Logger log = Logger.getLogger(ModalCadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
@@ -69,7 +69,7 @@ public class CadytsMultiModeContext implements ModalCadytsContextI<Link>, Startu
 	private final boolean writeAnalysisFile;
 
 	private Map<String,AnalyticalCalibrator<Link>> mode2calibrator;
-	private MultiModePlansTranslatorBasedOnEvents plansTranslator;
+	private ModalPlansTranslatorBasedOnEvents plansTranslator;
 	private SimResults<Link> simResults;
 	private Scenario scenario;
 	private EventsManager eventsManager;
@@ -81,7 +81,7 @@ public class CadytsMultiModeContext implements ModalCadytsContextI<Link>, Startu
 	@Named("bike") Counts<Link> bikeCalibrationCounts;
 	
 	@Inject
-	CadytsMultiModeContext(Config config, Scenario scenario, @Named("calibration") Counts<Link> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<Link> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
 		this.modes = CollectionUtils.stringToSet( config.counts().getAnalyzedModes() );
 		
@@ -118,11 +118,11 @@ public class CadytsMultiModeContext implements ModalCadytsContextI<Link>, Startu
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// this collects events and generates cadyts plans from it
-		this.plansTranslator = new MultiModePlansTranslatorBasedOnEvents(scenario);
+		this.plansTranslator = new ModalPlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);
 		
 		for (String mode : this.modes ) {
-			this.simResults = new SimResultsModalContainerImpl(volumesAnalyzer, countsScaleFactor, mode);
+			this.simResults = new ModalSimResultsContainerImpl(volumesAnalyzer, countsScaleFactor, mode);
 			AnalyticalCalibrator<Link> analyticalCalibration = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.mode2calibrationCounts.get(mode) , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 			this.mode2calibrator.put(mode, analyticalCalibration);
 		}

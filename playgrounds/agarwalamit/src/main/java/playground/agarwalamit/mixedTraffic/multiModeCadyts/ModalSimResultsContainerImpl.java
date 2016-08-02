@@ -7,14 +7,14 @@ import org.matsim.api.core.v01.network.Link;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
-/*package*/ class SimResultsModalContainerImpl implements SimResults<Link> {
+/*package*/ class ModalSimResultsContainerImpl implements SimResults<Link> {
 	
 	private static final long serialVersionUID = 1L;
 	private final VolumesAnalyzer volumesAnalyzer;
 	private final double countsScaleFactor;
 	private final String mode;
 
-	SimResultsModalContainerImpl(final VolumesAnalyzer volumesAnalyzer, final double countsScaleFactor, final String mode) {
+	ModalSimResultsContainerImpl(final VolumesAnalyzer volumesAnalyzer, final double countsScaleFactor, final String mode) {
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.countsScaleFactor = countsScaleFactor;
 		this.mode = mode;

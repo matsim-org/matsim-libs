@@ -65,7 +65,7 @@ import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControler
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.CadytsMultiModeContext;
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsScoring;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.JointCalibrationControler;
@@ -191,7 +191,7 @@ public class OuterCordonCadytsControler {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Inject Network network;
-			@Inject CadytsMultiModeContext cContext;
+			@Inject ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );

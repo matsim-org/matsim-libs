@@ -45,10 +45,10 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
-public class MultiModePlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
+public class ModalPlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
-	private static final Logger log = Logger.getLogger(MultiModePlansTranslatorBasedOnEvents.class);
+	private static final Logger log = Logger.getLogger(ModalPlansTranslatorBasedOnEvents.class);
 
 	private final Scenario scenario;
 
@@ -65,7 +65,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
 
 	@Inject
-	MultiModePlansTranslatorBasedOnEvents(final Scenario scenario) {
+	ModalPlansTranslatorBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
 		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
 		for ( String str : abc ) {
