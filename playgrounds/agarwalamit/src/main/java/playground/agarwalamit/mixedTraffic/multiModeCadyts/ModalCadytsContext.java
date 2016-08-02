@@ -20,8 +20,14 @@
 
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.supply.SimResults;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -29,7 +35,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.*;
+import org.matsim.contrib.cadyts.general.CadytsBuilder;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,13 +53,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.counts.Counts;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.supply.SimResults;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -79,6 +83,8 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 	@Inject
 	@Named("car") Counts<Link> carCalibrationCounts;
 	@Named("bike") Counts<Link> bikeCalibrationCounts;
+	@Named("truck") Counts<Link> truckCalibrationCounts;
+	@Named("motorbike") Counts<Link> motorbikeCalibrationCounts;
 	
 	@Inject
 	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<Link> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
@@ -86,8 +92,13 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 		this.modes = CollectionUtils.stringToSet( config.counts().getAnalyzedModes() );
 		
 		for(String mode : modes){
-			this.mode2calibrationCounts.put(mode, carCalibrationCounts);
-			this.mode2calibrationCounts.put(mode, bikeCalibrationCounts);
+			switch(mode){
+			default: 
+			case "car": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+			case "bike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+			case "motorbike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+			case "truck": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+			}
 		}
 		
 		this.eventsManager = eventsManager;

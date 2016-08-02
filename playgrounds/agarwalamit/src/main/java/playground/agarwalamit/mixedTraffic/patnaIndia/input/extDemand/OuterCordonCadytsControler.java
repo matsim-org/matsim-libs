@@ -171,6 +171,8 @@ public class OuterCordonCadytsControler {
 		// create one counts object for each mode type
 		Counts<Link> carCounts = null;
 		Counts<Link> bikeCounts = null;
+		Counts<Link> motorbikeCounts = null;
+		Counts<Link> truckCounts = null;
 		
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -179,6 +181,8 @@ public class OuterCordonCadytsControler {
 			public void install() {
 				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("car"))).toInstance(carCounts);
 				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("bike"))).toInstance(bikeCounts);
+				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("motorbike"))).toInstance(motorbikeCounts);
+				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("truck"))).toInstance(truckCounts);
 			}
 		});
 		
