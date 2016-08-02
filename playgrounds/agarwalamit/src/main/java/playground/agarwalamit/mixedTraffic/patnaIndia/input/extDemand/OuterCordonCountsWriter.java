@@ -38,7 +38,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  * @author amit
  */
 
-public class OuterCordonCountsGenerator {
+public class OuterCordonCountsWriter {
 
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_out = new HashMap<>();
@@ -48,7 +48,7 @@ public class OuterCordonCountsGenerator {
 
 		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/outerCordonCounts_10pct_OC1Excluded.xml.gz";
 
-		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
+		OuterCordonCountsWriter pcg = new OuterCordonCountsWriter();
 	
 //		pcg.processCountingStation("OC1", inputFilesDir+"/oc1_fatua2Patna.txt", inputFilesDir+"/oc1_patna2Fatua.txt");
 		pcg.processCountingStation("OC2", INPUT_FILES_DIR+"/oc2_fatua2Patna.txt", INPUT_FILES_DIR+"/oc2_patna2Fatua.txt");
