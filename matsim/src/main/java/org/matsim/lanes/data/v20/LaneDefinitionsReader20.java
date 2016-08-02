@@ -66,8 +66,8 @@ class LaneDefinitionsReader20  {
 
 	void readURL(URL url) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
-		InputStream stream = url.openStream();
-		parse(stream);
+		InputStream inputStream = IOUtils.getInputStream(url);
+		parse(inputStream);
 	}
 
 	private void parse(InputStream stream) throws JAXBException, SAXException {
