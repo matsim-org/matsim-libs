@@ -87,6 +87,9 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	private final LinkSpeedCalculator linkSpeedCalculator;
 
+	private double lastLinkEntryTime = Double.NaN ;
+
+	private double avHeadway = Double.NaN ;
 
 
 	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
@@ -223,6 +226,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		if (this.context.qsimConfig.isUseLanes()) {
 			this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
 		}
+		vehEnterTimeMap.remove(veh) ;
 		return veh;
 	}
 
@@ -251,6 +255,8 @@ class AssignmentEmulatingQLane extends QLaneI {
 		}
 		buffer.clear();
 	}
+	
+	private static int cnt = 0 ;
 
 	@Override
 	public final void addFromUpstream(final QVehicle veh) {
@@ -259,41 +265,38 @@ class AssignmentEmulatingQLane extends QLaneI {
 		qLink.activateLink();
 		this.vehEnterTimeMap.put( veh.getId(), now ) ;
 		
-		double density_per_km = 1000. * ( vehQueue.size() + buffer.size() ) / this.qLink.getLink().getLength() / this.qLink.getLink().getNumberOfLanes() ;
+		// yyyyyy following does not honour PCU et al! kai, aug'16
+		final double alpha = 0.9 ;
+		double headway = now - lastLinkEntryTime ;
+		if ( Double.isNaN( lastLinkEntryTime ) ) {
+			// do nothing
+		} else {
+			if ( Double.isNaN( avHeadway ) ) {
+				avHeadway = headway ;
+			} else {
+				avHeadway = alpha * avHeadway + (1-alpha) * headway ;
+			}
+		}
+		lastLinkEntryTime = now ;
+		
+		double freeTravelTime = this.length / linkSpeedCalculator.getMaximumVelocity(veh, this.qLink.getLink(), now);
+		
 
-		final double maxVel = linkSpeedCalculator.getMaximumVelocity(veh, this.qLink.getLink(), now);
-		double freeTravelTime = this.length / maxVel;
+		double flow_per_sec = 1./avHeadway/context.qsimConfig.getFlowCapFactor() ;
+		final double cap_per_sec = this.qLink.getLink().getFlowCapacityPerSec(now)/2 ;
 		
-		final double MAX_FLOW_DENSITY_PER_KM = 15 ;
-		final double JAM_DENSITY_PER_KM = 133 ;
-		final double JAM_SPEED_KM_H = 5 ;
+		double linkTTime = freeTravelTime * Math.min( 1 + 0.15 * Math.pow( flow_per_sec/cap_per_sec , 4 ),50. ) ;
+//		// see https://en.wikipedia.org/wiki/Route_assignment.  Volume and capacity can be given in arbitrary units as long as they
+//		// are the same since they cancel out.
 		
-		double earliestExitTime = now + freeTravelTime ;
-		
-		if ( density_per_km > MAX_FLOW_DENSITY_PER_KM ) {
-			double fraction = (density_per_km - MAX_FLOW_DENSITY_PER_KM )/( JAM_DENSITY_PER_KM - MAX_FLOW_DENSITY_PER_KM) ;
-			earliestExitTime += fraction * fraction * this.qLink.getLink().getLength() / (JAM_SPEED_KM_H / 3.6) ;  
+		if ( now > 8*3600 ) {
+			if ( cnt < 10 ) {
+				cnt++ ;
+				log.warn("flow_per_sec=" + flow_per_sec + "; cap_per_sec=" + cap_per_sec + "; avHeadway=" + avHeadway + "; headway=" + headway ) ;
+			}
 		}
 		
-		// yyyyyy the above somehow should be anchored at flow, not density.  ???  kai, jul'16
-
-		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
-		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
-		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)
-		// (I also think it is never triggered for regular lanes since there the numbers are integerized (see below). kai, sep'13)
-		// yyyy this may have changed in the main code; check before continuing here. kai, jul'14
-
-		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
-			//			/* It's a QLane that is directly connected to a QNode,
-			//			 * so we have to floor the freeLinkTravelTime in order the get the same
-			//			 * results compared to the old mobSim */
-			earliestExitTime = Math.floor(earliestExitTime);
-			// yyyy I have no idea why this is in here.  Supposedly pulls the link travel times to "second"
-			// values, but I don't see why this has to be, and worse, it is wrong when the time step is
-			// not one second.  And obviously dangerous if someone tries sub-second time steps.
-			// kai, sep'13
-		}
-		// keeping the above so we have identical speeds in emtpy networks (although I don't like it) 	
+		double earliestExitTime = now + linkTTime ;
 
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(qLink.getLink());
@@ -304,6 +307,20 @@ class AssignmentEmulatingQLane extends QLaneI {
 				context.getEventsManager() .processEvent(new LaneEnterEvent(now, veh.getId(), this.qLink.getLink().getId(), this.getId()));
 			}
 		}
+	}
+	private double additionalTimeBasedOnDensity() {
+		final double MAX_FLOW_DENSITY_PER_KM = 15 ;
+		final double JAM_DENSITY_PER_KM = 133 ;
+		final double JAM_SPEED_KM_H = 5 ;
+		double density_per_km = 1000. * ( vehQueue.size() + buffer.size() ) / this.qLink.getLink().getLength() / this.qLink.getLink().getNumberOfLanes() ;
+		density_per_km /= context.qsimConfig.getStorageCapFactor() ;
+		double additionalTime = 0. ;
+		if ( density_per_km > MAX_FLOW_DENSITY_PER_KM ) {
+			double fraction = (density_per_km - MAX_FLOW_DENSITY_PER_KM )/( JAM_DENSITY_PER_KM - MAX_FLOW_DENSITY_PER_KM) ;
+			additionalTime = fraction * fraction * this.qLink.getLink().getLength() / (JAM_SPEED_KM_H / 3.6) ;  
+		}
+		// yyyyyy the above somehow should be anchored at flow, not density.  ???  kai, jul'16
+		return additionalTime ;
 	}
 
 	@Override

@@ -70,9 +70,11 @@ class KNBerlinControler {
 		config.controler().setWritePlansInterval(100);
 		config.controler().setWriteEventsInterval(100);
 		if ( config.controler().getLastIteration() < 10 ) {
-			config.controler().setWriteMoreUntilIteration(-1); // for fast turn-around, don't write at all
+			config.controler().setWritePlansUntilIteration(-1); // for fast turn-around, don't write at all
+			config.controler().setWriteEventsUntilIteration(-1); 
 		} else {
-			config.controler().setWriteMoreUntilIteration(-1); // under normal circumstances, write at least the 0th iteration
+			config.controler().setWritePlansUntilIteration(-1); // for fast turn-around, don't write at all
+			config.controler().setWriteEventsUntilIteration(0); // under normal circumstances, write at least the 0th iteration
 		}
 		config.vspExperimental().setWritingOutputEvents(true);
 		
@@ -102,7 +104,7 @@ class KNBerlinControler {
 		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
 
-//		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
+		config.qsim().setTrafficDynamics( TrafficDynamics.assignmentEmulating );
 //		config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
 
 		config.qsim().setNumberOfThreads(6);

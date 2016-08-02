@@ -62,7 +62,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 	@Inject
 	PlansDumpingImpl(ControlerConfigGroup config) {
 		this.writePlansInterval = config.getWritePlansInterval();
-		this.writeMoreUntilIteration = config.getWriteMoreUntilIteration() ;
+		this.writeMoreUntilIteration = config.getWritePlansUntilIteration() ;
 	}
 
 	@Override
