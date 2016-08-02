@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -24,7 +26,10 @@ public static void main(String[] args) {
 	
 //	String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
 //	String path = "/home/saleem/input/config.xml";
-	String path = "./ihop2/matsim-input/config - Opt.xml";
+//	String path = "./ihop2/matsim-input/config - Opt.xml";
+	
+	
+	String path = "./ihop2/matsim-input/configSingleJunction.xml";
     Config config = ConfigUtils.loadConfig(path);
     final Scenario scenario = ScenarioUtils.loadScenario(config);
 	Controler controler = new Controler(scenario);
@@ -34,12 +39,16 @@ public static void main(String[] args) {
 	PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 	capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 	
-//	Network network = scenario.getNetwork();
+	controler.getConfig().qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
+	controler.getConfig().qsim().setTrafficDynamics(TrafficDynamics.withHoles);
+
+	//	Network network = scenario.getNetwork();
 //	TransitSchedule schedule = scenario.getTransitSchedule();
 //	new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 //	NetworkWriter networkWriter =  new NetworkWriter(network);
 //	networkWriter.write("/home/saleem/input/PseudoNetwork.xml");
 //	networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
+	
 	controler.run();
 	
 }
