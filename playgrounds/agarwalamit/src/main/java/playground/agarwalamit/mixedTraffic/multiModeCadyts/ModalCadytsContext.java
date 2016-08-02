@@ -80,29 +80,11 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
 
-//	@Inject
-//	@Named("car") Counts<Link> carCalibrationCounts;
-//	@Named("bike") Counts<Link> bikeCalibrationCounts;
-//	@Named("truck") Counts<Link> truckCalibrationCounts;
-//	@Named("motorbike") Counts<Link> motorbikeCalibrationCounts;
-	
 	@Inject
 	ModalCadytsContext(Config config, @Named("calibration") Map<String,Counts<Link>> mode2calibrationCounts, Scenario scenario, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
 		this.modes = CollectionUtils.stringToSet( config.counts().getAnalyzedModes() );
 		this.mode2calibrationCounts = mode2calibrationCounts;
-		
-//		for(String mode : modes){
-//			mode2counts.get(mode);
-//			
-////			switch(mode){
-////			default: 
-////			case "car": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-////			case "bike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-////			case "motorbike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-////			case "truck": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-////			}
-//		}
 		
 		this.eventsManager = eventsManager;
 		this.volumesAnalyzer = volumesAnalyzer;
@@ -163,13 +145,13 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 			if (this.writeAnalysisFile) {
 				String analysisFilepath = null;
 				if (isActiveInThisIteration(event.getIteration(), scenario.getConfig())) {
-					analysisFilepath = controlerIO.getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
+					analysisFilepath = controlerIO.getIterationFilename(event.getIteration(), mode+"_"+FLOWANALYSIS_FILENAME);
 				}
 				this.mode2calibrator.get(mode).setFlowAnalysisFile(analysisFilepath);
 			}
 			this.mode2calibrator.get(mode).afterNetworkLoading(this.simResults);
 			// write some output
-			String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+			String filename = controlerIO.getIterationFilename(event.getIteration(), mode+"_"+LINKOFFSET_FILENAME);
 			try {
 				new CadytsCostOffsetsXMLFileIO<>(new LinkLookUp(scenario), Link.class)
 				.write(filename, this.mode2calibrator.get(mode).getLinkCostOffsets());

@@ -177,30 +177,13 @@ public class OuterCordonCadytsControler {
 		Map<String, Counts<Link>> mode2counts = occg.getMode2Counts();
 		
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
-		
 		config.counts().setAnalyzedModes(modes);
-		
-		// create one counts object for each mode type
-//		Counts<Link> carCounts = mode2counts.get("car");
-//		Counts<Link> motorbikeCounts = mode2counts.get("motorbike");
-//		Counts<Link> bikeCounts = mode2counts.get("bike");
-//		Counts<Link> truckCounts = mode2counts.get("truck");
 
 		controler.addOverridingModule(new AbstractModule() {
-			
 			@Override
 			public void install() {
 				bind(Key.get(new TypeLiteral<Map<String, Counts<Link>>>(){}, Names.named("calibration"))).toInstance(mode2counts);
-//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("car") )).toInstance(carCounts);
-//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("bike"))).toInstance(bikeCounts);
-//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("motorbike"))).toInstance(motorbikeCounts);
-//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("truck"))).toInstance(truckCounts);
-			}
-		});
-		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
+				
 				bind(ModalCadytsContext.class).asEagerSingleton();
 				addControlerListenerBinding().to(ModalCadytsContext.class);
 			}
@@ -210,7 +193,6 @@ public class OuterCordonCadytsControler {
 		cadytsConfigGroup.setStartTime(0);
 		cadytsConfigGroup.setEndTime(24*3600-1);
 		
-
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
