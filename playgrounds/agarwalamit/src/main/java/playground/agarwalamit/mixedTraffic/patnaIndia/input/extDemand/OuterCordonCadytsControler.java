@@ -19,6 +19,8 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -52,6 +54,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -110,7 +113,7 @@ public class OuterCordonCadytsControler {
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -168,21 +171,38 @@ public class OuterCordonCadytsControler {
 
 	private void addCadytsSetting(final Controler controler, final Config config){
 		
-		// create one counts object for each mode type
-		Counts<Link> carCounts = null;
-		Counts<Link> bikeCounts = null;
-		Counts<Link> motorbikeCounts = null;
-		Counts<Link> truckCounts = null;
+		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator();
+		occg.run();
 		
+		Map<String, Counts<Link>> mode2counts = occg.getMode2Counts();
+		
+		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
+		
+		config.counts().setAnalyzedModes(modes);
+		
+		// create one counts object for each mode type
+//		Counts<Link> carCounts = mode2counts.get("car");
+//		Counts<Link> motorbikeCounts = mode2counts.get("motorbike");
+//		Counts<Link> bikeCounts = mode2counts.get("bike");
+//		Counts<Link> truckCounts = mode2counts.get("truck");
 
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
 			public void install() {
-				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("car"))).toInstance(carCounts);
-				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("bike"))).toInstance(bikeCounts);
-				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("motorbike"))).toInstance(motorbikeCounts);
-				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("truck"))).toInstance(truckCounts);
+				bind(Key.get(new TypeLiteral<Map<String, Counts<Link>>>(){}, Names.named("calibration"))).toInstance(mode2counts);
+//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("car") )).toInstance(carCounts);
+//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("bike"))).toInstance(bikeCounts);
+//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("motorbike"))).toInstance(motorbikeCounts);
+//				bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("truck"))).toInstance(truckCounts);
+			}
+		});
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(ModalCadytsContext.class).asEagerSingleton();
+				addControlerListenerBinding().to(ModalCadytsContext.class);
 			}
 		});
 		

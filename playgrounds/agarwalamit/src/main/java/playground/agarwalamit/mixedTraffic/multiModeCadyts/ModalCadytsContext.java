@@ -69,10 +69,10 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 	
 	private final double countsScaleFactor;
 	private final Set<String> modes ;
-	private final Map<String,Counts<Link>> mode2calibrationCounts = new HashMap<>();
+	private final Map<String,Counts<Link>> mode2calibrationCounts ;
 	private final boolean writeAnalysisFile;
 
-	private Map<String,AnalyticalCalibrator<Link>> mode2calibrator;
+	private Map<String,AnalyticalCalibrator<Link>> mode2calibrator = new HashMap<>();
 	private ModalPlansTranslatorBasedOnEvents plansTranslator;
 	private SimResults<Link> simResults;
 	private Scenario scenario;
@@ -80,26 +80,29 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	@Named("car") Counts<Link> carCalibrationCounts;
-	@Named("bike") Counts<Link> bikeCalibrationCounts;
-	@Named("truck") Counts<Link> truckCalibrationCounts;
-	@Named("motorbike") Counts<Link> motorbikeCalibrationCounts;
+//	@Inject
+//	@Named("car") Counts<Link> carCalibrationCounts;
+//	@Named("bike") Counts<Link> bikeCalibrationCounts;
+//	@Named("truck") Counts<Link> truckCalibrationCounts;
+//	@Named("motorbike") Counts<Link> motorbikeCalibrationCounts;
 	
 	@Inject
-	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<Link> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+	ModalCadytsContext(Config config, @Named("calibration") Map<String,Counts<Link>> mode2calibrationCounts, Scenario scenario, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
 		this.modes = CollectionUtils.stringToSet( config.counts().getAnalyzedModes() );
+		this.mode2calibrationCounts = mode2calibrationCounts;
 		
-		for(String mode : modes){
-			switch(mode){
-			default: 
-			case "car": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-			case "bike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-			case "motorbike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-			case "truck": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
-			}
-		}
+//		for(String mode : modes){
+//			mode2counts.get(mode);
+//			
+////			switch(mode){
+////			default: 
+////			case "car": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+////			case "bike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+////			case "motorbike": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+////			case "truck": this.mode2calibrationCounts.put(mode, carCalibrationCounts); break;
+////			}
+//		}
 		
 		this.eventsManager = eventsManager;
 		this.volumesAnalyzer = volumesAnalyzer;
@@ -112,10 +115,11 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 
 
 		Set<String> countedLinks = new TreeSet<>();
-		for (Id<Link> id : this.mode2calibrationCounts.get("car").getCounts().keySet()) {
-			countedLinks.add(id.toString());
+		for (String mode : this.modes) {
+			for (Id<Link> id : this.mode2calibrationCounts.get(mode).getCounts().keySet()) {
+				countedLinks.add(id.toString());
+			}
 		}
-
 		cadytsConfig.setCalibratedItems(countedLinks);
 
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
@@ -148,7 +152,6 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 		// mz 2015
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (String mode : this.modes){
-				this.mode2calibrator.get(mode).addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
 				this.mode2calibrator.get(mode).addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
 			}
 		}

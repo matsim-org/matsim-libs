@@ -42,7 +42,7 @@ public class OuterCordonCountsWriter {
 
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_out = new HashMap<>();
-	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandInputFiles/";
+	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/";
 	
 	public static void main(String[] args) {
 
