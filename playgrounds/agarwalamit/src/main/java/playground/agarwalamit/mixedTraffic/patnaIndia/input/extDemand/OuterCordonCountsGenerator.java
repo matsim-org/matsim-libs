@@ -78,6 +78,7 @@ public class OuterCordonCountsGenerator {
 			for(Integer i : countStation2time2countInfo_out.get(mcs).keySet()){
 				double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(i) * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR);
 				c.createVolume(i, vol );
+				c.setCsId("mode");
 			}
 		}
 		new CountsWriter(counts).write(outCountsFile);
