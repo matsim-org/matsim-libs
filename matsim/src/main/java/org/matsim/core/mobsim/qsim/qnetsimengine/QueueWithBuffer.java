@@ -352,8 +352,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			// equal: rho * (vmax + vhole) = vhole * rhojam
 			// rho(qmax) = vhole * rhojam / (vmax + vhole) 
 			// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
-			this.maxFlowFromFdiag = (1/7.5) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
-			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
+			this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
+//			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
 		}
 	}
 

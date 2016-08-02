@@ -537,9 +537,11 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	private boolean usingTravelTimeCheckInTeleportation = false ;
 	public boolean isUsingTravelTimeCheckInTeleportation() {
+		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation ;
 	}
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
+		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
 	// ---

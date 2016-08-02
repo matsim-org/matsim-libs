@@ -338,5 +338,13 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setDumpDataAtEnd(boolean dumpDataAtEnd) {
 		this.dumpDataAtEnd = dumpDataAtEnd;
 	}
+	// ---
+	int writeMoreUntilIteration = 1 ;
+	public int getWriteMoreUntilIteration() {
+		return this.writeMoreUntilIteration ;
+	}
+	public void setWriteMoreUntilIteration(int val) {
+		this.writeMoreUntilIteration = val ;
+	}
 
 }

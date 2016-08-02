@@ -23,10 +23,12 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -36,7 +38,11 @@ class KNBerlinControler {
 	private static final Logger log = Logger.getLogger(KNBerlinControler.class);
 
 	public static void main ( String[] args ) {
+		OutputDirectoryLogging.catchLogEntries();
+
 		log.warn("here") ;
+		
+		final double sampleFactor = 0.02 ;
 
 		// ### config:
 		Config config = ConfigUtils.createConfig( new NoiseConfigGroup() ) ;
@@ -49,19 +55,25 @@ class KNBerlinControler {
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		config.counts().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml" ) ;
-		config.counts().setOutputFormat("txt,kml");
-		config.counts().setCountsScaleFactor(50.);
+		config.counts().setOutputFormat("all");
+		config.counts().setCountsScaleFactor(1./sampleFactor);
 		config.counts().setWriteCountsInterval(100);
 		
+		config.controler().setOutputDirectory( System.getProperty("user.home") + "/kairuns/a100/output" );
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		// controler, global, and related:
 		
 		config.controler().setFirstIteration(0); // with something like "9" we don't get output events! 
-		config.controler().setLastIteration(1000); // with something like "9" we don't get output events! 
+		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
 		config.controler().setWriteSnapshotsInterval(100);
-		config.controler().setWritePlansInterval(200);
+		config.controler().setWritePlansInterval(100);
 		config.controler().setWriteEventsInterval(100);
+		if ( config.controler().getLastIteration() < 10 ) {
+			config.controler().setWriteMoreUntilIteration(-1); // for fast turn-around, don't write at all
+		} else {
+			config.controler().setWriteMoreUntilIteration(-1); // under normal circumstances, write at least the 0th iteration
+		}
 		config.vspExperimental().setWritingOutputEvents(true);
 		
 		config.global().setCoordinateSystem("GK4");
@@ -73,6 +85,9 @@ class KNBerlinControler {
 		// activity parameters:
 
 		createActivityParameters(config);
+		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
+		}
 
 		// threads:
 		
@@ -82,14 +97,21 @@ class KNBerlinControler {
 		
 		// qsim:
 
-		final double sampleFactor = 0.02 ;
 		config.controler().setMobsim( MobsimType.qsim.toString() );
 		config.qsim().setFlowCapFactor( sampleFactor );
 		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
-		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
+
+//		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
+//		config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
+
 		config.qsim().setNumberOfThreads(6);
 		config.qsim().setUsingFastCapacityUpdate(true);
+
+		config.qsim().setUsingTravelTimeCheckInTeleportation(true) ;
+		
+//		config.qsim().setUsePersonIdForMissingVehicleId(false);
+		// does not work
 
 		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.END_TIME, "36:00:00") ;
@@ -97,7 +119,7 @@ class KNBerlinControler {
 		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
 		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
 		
-		// more parameters:
+		// mode parameters:
 		
 		createModeParameters(config);
 		
@@ -134,7 +156,7 @@ class KNBerlinControler {
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 
-		ConfigUtils.loadConfig(config, "~/kairuns/a100/additional-config.xml") ;
+		ConfigUtils.loadConfig(config, System.getProperty("user.home") + "/kairuns/a100/additional-config.xml") ;
 
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();
@@ -143,6 +165,15 @@ class KNBerlinControler {
 
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		for ( Link link : scenario.getNetwork().getLinks().values() ) {
+			if ( link.getLength()<100 ) {
+				link.setCapacity( 2. * link.getCapacity() ); // double capacity on short links, often roundabouts or short u-turns, etc., with the usual problem
+			}
+			if ( link.getFreespeed() < 77/3.6 ) {
+				link.setFreespeed( 0.5 * link.getFreespeed() );
+			}
+		}
 
 		// ===
 
@@ -159,13 +190,18 @@ class KNBerlinControler {
 		// ===
 		// post-processing:
 
+//		computeNoise(sampleFactor, config, scenario);
+
+	}
+
+	private static void computeNoise(final double sampleFactor, Config config, Scenario scenario) {
 		// noise parameters
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
 				
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 
-		noiseParameters.setReceiverPointGap(200.);
+		noiseParameters.setReceiverPointGap(2000.); // 200 is possible but overkill as long as this is not debugged.
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
@@ -176,7 +212,7 @@ class KNBerlinControler {
 
 		// ---
 
-		String outputDirectory = config.controler().getOutputDirectory() ;
+		String outputDirectory = config.controler().getOutputDirectory()+"/noise/" ;
 		
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
 		noiseCalculation.run();		
@@ -185,7 +221,6 @@ class KNBerlinControler {
 
 		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		mergeNoiseFiles(outputFilePath);
-
 	}
 
 	private static void createModeParameters(Config config) {
@@ -241,6 +276,17 @@ class KNBerlinControler {
 			config.plansCalcRoute().addModeRoutingParams(pars);
 
 			ModeParams params = new ModeParams("pt2") ;
+			params.setConstant(-6.);
+			params.setMarginalUtilityOfTraveling(0.);
+			config.planCalcScore().addModeParams(params);
+		}
+		{
+			ModeRoutingParams pars = new ModeRoutingParams("undefined") ;
+			pars.setBeelineDistanceFactor(1.3);
+			pars.setTeleportedModeSpeed( 50./3.6 );
+			config.plansCalcRoute().addModeRoutingParams(pars);
+
+			ModeParams params = new ModeParams("undefined") ;
 			params.setConstant(-6.);
 			params.setMarginalUtilityOfTraveling(0.);
 			config.planCalcScore().addModeParams(params);
@@ -326,9 +372,6 @@ class KNBerlinControler {
 			ActivityParams params = new ActivityParams("dummy") ; // Personenwirtschaftsverkehr von Sebastian Schneider
 			params.setTypicalDuration(1*3600);
 			config.planCalcScore().addActivityParams(params);
-		}
-		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
-			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 		}
 	}
 

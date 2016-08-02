@@ -91,15 +91,13 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			log.info("Attribute 'type' is deprecated. There's always only ONE network, where the links and nodes define, which " +
 					"transportation mode is allowed to use it (for the future)");
 		}
-		if (this.network instanceof Network) {
-			((Network) this.network).setName(atts.getValue("name"));
-			if (atts.getValue("capDivider") != null) {
-				log.warn("capDivider defined. it will be used but should be gone eventually. " +
-						"-- This is a weird comment, since the matsim public api tells to put this into the network rather than" +
-						" into the ``links''.  kai, jun'11");
-				String capperiod = atts.getValue("capDivider") + ":00:00";
-				((Network) this.network).setCapacityPeriod(Time.parseTime(capperiod));
-			}
+		this.network.setName(atts.getValue("name"));
+		if (atts.getValue("capDivider") != null) {
+			log.warn("capDivider defined. it will be used but should be gone eventually. " +
+					"-- This is a weird comment, since the matsim public api tells to put this into the network rather than" +
+					" into the ``links''.  kai, jun'11");
+			String capperiod = atts.getValue("capDivider") + ":00:00";
+			this.network.setCapacityPeriod(Time.parseTime(capperiod));
 		}
 	}
 
@@ -113,20 +111,20 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			else {
 				log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
 			}
-			((Network) this.network).setCapacityPeriod(capacityPeriod);
+			this.network.setCapacityPeriod(capacityPeriod);
 
 			String effectivecellsize = atts.getValue("effectivecellsize");
 			if (effectivecellsize == null){
-				((Network) this.network).setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
+				this.network.setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
 			} else {
-				((Network) this.network).setEffectiveCellSize(Double.parseDouble(effectivecellsize));
+				this.network.setEffectiveCellSize(Double.parseDouble(effectivecellsize));
 			}
 
 			String effectivelanewidth = atts.getValue("effectivelanewidth");
 			if (effectivelanewidth == null) {
-				((Network) this.network).setEffectiveLaneWidth(3.75); // the default lane width is 3.75
+				this.network.setEffectiveLaneWidth(3.75); // the default lane width is 3.75
 			} else {
-				((Network) this.network).setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
+				this.network.setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
 			}
 
 			if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
@@ -175,8 +173,8 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
 		if (l instanceof Link) {
-			NetworkUtils.setOrigId( ((Link) l), atts.getValue("origid") ) ;
-			NetworkUtils.setType( ((Link) l), atts.getValue("type"));
+			NetworkUtils.setOrigId( (l), atts.getValue("origid") ) ;
+			NetworkUtils.setType( (l), atts.getValue("type"));
 		}
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');

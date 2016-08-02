@@ -185,7 +185,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return trip;
 		}
 
-		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
+		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
 	}
 
 	public static class UnknownModeException extends RuntimeException {
