@@ -6,7 +6,6 @@
             <signal refId="exampleSignal7"/>
         </signalGroup>
         <signalGroup id="exampleSignalGroupB">
-        <!-- signal group not used by signal control: -->
             <signal refId="exampleSignal8"/>
             <signal refId="exampleSignal9"/>
         </signalGroup>

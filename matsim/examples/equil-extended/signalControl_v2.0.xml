@@ -12,6 +12,10 @@
                     <onset sec="0"/>
                     <dropping sec="30"/>
                 </signalGroupSettings>
+                <signalGroupSettings refId="exampleSignalGroupB">
+                    <onset sec="30"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
             </signalPlan>
         </signalSystemController>
     </signalSystem>
