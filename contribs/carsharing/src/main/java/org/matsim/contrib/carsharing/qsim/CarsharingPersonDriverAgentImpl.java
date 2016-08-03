@@ -216,7 +216,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		
-		String typeOfVehicle = "car";			
+		String typeOfVehicle = this.getDesiredVehicleType();			
 
 		
 		//=== access walk leg: ===
@@ -225,7 +225,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		final Link currentLink = scenario.getNetwork().getLinks().get(route.getStartLinkId());
 		final Link destinationLink = scenario.getNetwork().getLinks().get(route.getEndLinkId());		
 		
-		OneWayCarsharingStation station = findClosestAvailableOWCar(currentLink);
+		OneWayCarsharingStation station = findClosestAvailableOWCar(currentLink, typeOfVehicle);
 
 		if (station == null) {
 			this.setStateToAbort(now);
@@ -328,9 +328,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			//=== find out which type of the vehicle the agent will need ===
 			
-			String typeOfVehicle = "car";			
+			String typeOfVehicle = this.getDesiredVehicleType();			
 			
-			TwoWayCarsharingStation pickUpStation = this.findClosestAvailableTWCar(startLink.getId());
+			TwoWayCarsharingStation pickUpStation = this.findClosestAvailableTWCar(startLink.getId(), typeOfVehicle);
 			
 			if (pickUpStation == null) {
 				this.setStateToAbort(now);
@@ -526,9 +526,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	//added methods
 
-	private TwoWayCarsharingStation findClosestAvailableTWCar(Id<Link> linkId) {
+	private TwoWayCarsharingStation findClosestAvailableTWCar(Id<Link> linkId, String vehicleType) {
 		
-		String vehicleType = "car";
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		Network network = scenario.getNetwork();
 		TwoWayCarsharingConfigGroup twConfigGroup = (TwoWayCarsharingConfigGroup) 
@@ -561,10 +560,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		return vehicle;
 	}
 
-	private OneWayCarsharingStation findClosestAvailableOWCar(Link link) {
+	private OneWayCarsharingStation findClosestAvailableOWCar(Link link, String vehicleType) {
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		Network network = scenario.getNetwork();
-		String vehicleType = "car";
 
 		//find the closest available car and reserve it (make it unavailable)
 		//if no cars within certain radius return null
@@ -620,6 +618,12 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		}
 		return closest;
 	}
+	
+	private String getDesiredVehicleType() {
+		
+		return "car";
+	}
+	
 	//the end of added methods	
 
 	void resetCaches() {
