@@ -98,13 +98,13 @@ public class ElevationScoringFunction implements ScoringFunction {
 	 * @return
 	 */
 	private double getExperiencedDistance(Link link){
-		double grade = Utils3D.calculateGrade(link)*100.0;
+		double angle = Utils3D.calculateAngle(link);
 		
 		double factor = 1.0;
 		if(this.vehicleType.equalsIgnoreCase("A")){
 			/* Keep factor 1.0 */
 		} else if(this.vehicleType.equalsIgnoreCase("B")){
-			factor = Math.max(0.0, 2.644847*Math.pow(grade, 2.0) + 380.740361*grade + 490.162370)/490.162370;
+			factor = Math.max(0.0, 2.644847*Math.pow(angle, 2.0) + 380.740361*angle + 490.162370)/490.162370;
 		} else{
 			throw new RuntimeException("Don't know how to interpret the elevation factor for mode type '" + this.vehicleType + "'");
 		}
