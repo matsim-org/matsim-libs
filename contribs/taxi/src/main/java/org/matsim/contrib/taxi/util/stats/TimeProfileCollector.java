@@ -73,10 +73,10 @@ public class TimeProfileCollector
                 .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
 
         try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file))) {
-            writer.writeNext(calculator.getHeader());
+            writer.writeNext(new CSVLineBuilder().add("time").addAll(calculator.getHeader()));
             for (int i = 0; i < timeProfile.size(); i++) {
-                writer.writeNext(new CSVLineBuilder().add( (i * interval) + "")
-                        .addAll(timeProfile.get(i)).build());
+                writer.writeNext(
+                        new CSVLineBuilder().add( (i * interval) + "").addAll(timeProfile.get(i)));
             }
         }
     }
