@@ -72,35 +72,37 @@ public class PatnaBikeTestControler {
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
 		modes.add("bike");
-		modes.add("bike_ext");
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
+		
+		Link l_home = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link179"));
 
+		Link l_intermediate_car = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link177"));
+		Link l_work_car = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link175"));
+		
+		Link l_work_bike = sc.getNetwork().getLinks().get(Id.createLinkId("97952992_link20"));
+		
+		l_home.setAllowedModes(modes);
+		l_intermediate_car.setAllowedModes(modes);
+		l_work_car.setAllowedModes(modes);
+		
 		for(int i=0;i<2;i++){
+			
 			String mode = i%2==0 ? "bike" : "car";
+			
 			PopulationFactory popFact = sc.getPopulation().getFactory();
 			Person p = popFact.createPerson(Id.createPersonId(i));
 			Plan plan = popFact.createPlan();
 
-			Link l = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link179"));
-			l.setAllowedModes(modes );
-			sc.getNetwork().addLink(l);
-
-			Activity home = popFact.createActivityFromLinkId("home", l.getId());
-			home.setEndTime(9.*3600.+50*i);
+			Activity home = popFact.createActivityFromLinkId("home", l_home.getId());
+			home.setEndTime(9.*3600.+5*i);
 			plan.addActivity(home);
 
 			Leg leg = popFact.createLeg(mode);
-
-			if(mode.equals("car") ) {
-				l = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link177"));	
-			}
-			else {
-				l = sc.getNetwork().getLinks().get(Id.createLinkId("97952992_link20"));
-			}
-
-			l.setAllowedModes(modes );
-			sc.getNetwork().addLink(l);
+			
+			Link l =  null;
+			if ( mode.equals("car") ) l = l_work_car;	
+			else	l = l_work_bike;
 
 			Activity work = popFact.createActivityFromLinkId("work",l.getId());
 
