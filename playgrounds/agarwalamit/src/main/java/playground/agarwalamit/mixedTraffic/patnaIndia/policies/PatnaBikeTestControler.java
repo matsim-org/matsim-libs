@@ -21,6 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -36,9 +37,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.BikeTimeDistanceTravelDisutilityFactory;
@@ -55,76 +59,59 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  */
 
 public class PatnaBikeTestControler {
-	
+
 	public static void main(String[] args) {
-		
-		String mode = "bike";
+
 		String net = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
 		String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/testBikeTrack/";
-		
+
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(net);
-		
-		//== allowing car on home and work activity locations
-		
-		//==
-		Scenario sc = ScenarioUtils.loadScenario(config);
-		
-		PopulationFactory popFact = sc.getPopulation().getFactory();
-		Person p = popFact.createPerson(Id.createPersonId("1"));
-		Plan plan = popFact.createPlan();
-		
-		Link l = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link178"));
+		config.vspExperimental().setWritingOutputEvents(true);
 		
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
 		modes.add("bike");
 		modes.add("bike_ext");
-		l.setAllowedModes(modes );
-		sc.getNetwork().addLink(l);
-		
-		Activity home = popFact.createActivityFromLinkId("home", l.getId());
-		home.setEndTime(9.*3600.);
-		plan.addActivity(home);
-		
-		Leg leg = popFact.createLeg(mode);
 
-		l = sc.getNetwork().getLinks().get(Id.createLinkId("97952992_link21"));
-		Activity work = popFact.createActivityFromLinkId("work",l.getId());
-		
-//		TripRouter router = new TripRouter();
-//		router.setRoutingModule(
-//				leg.getMode(), 
-//				DefaultRoutingModules.createPureNetworkRouter(
-//						leg.getMode(), 
-//						popFact, 
-//						sc.getNetwork(), 
-//						new Dijkstra( sc.getNetwork(), 
-//								new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()), 
-//								new FreeSpeedTravelTime())
-//						)
-//				);
-//		List<? extends PlanElement> routeInfo = router.calcRoute(
-//				leg.getMode(), 
-//				new ActivityWrapperFacility(home), 
-//				new ActivityWrapperFacility(work), 
-//				home.getEndTime(), 
-//				p);
-//
-//		Route route = ((Leg)routeInfo.get(0)).getRoute();
-//		route.setStartLinkId(home.getLinkId());
-//		route.setEndLinkId(work.getLinkId());
-//
-//		leg.setRoute(route);
-//		leg.setTravelTime(((Leg)routeInfo.get(0)).getTravelTime());
+		Scenario sc = ScenarioUtils.loadScenario(config);
 
-		plan.addLeg(leg);
-		
-		plan.addActivity(work);
-		p.addPlan(plan);
-		
-		sc.getPopulation().addPerson(p);
-		
+		for(int i=0;i<2;i++){
+			String mode = i%2==0 ? "bike" : "car";
+			PopulationFactory popFact = sc.getPopulation().getFactory();
+			Person p = popFact.createPerson(Id.createPersonId(i));
+			Plan plan = popFact.createPlan();
+
+			Link l = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link179"));
+			l.setAllowedModes(modes );
+			sc.getNetwork().addLink(l);
+
+			Activity home = popFact.createActivityFromLinkId("home", l.getId());
+			home.setEndTime(9.*3600.+50*i);
+			plan.addActivity(home);
+
+			Leg leg = popFact.createLeg(mode);
+
+			if(mode.equals("car") ) {
+				l = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link177"));	
+			}
+			else {
+				l = sc.getNetwork().getLinks().get(Id.createLinkId("97952992_link20"));
+			}
+
+			l.setAllowedModes(modes );
+			sc.getNetwork().addLink(l);
+
+			Activity work = popFact.createActivityFromLinkId("work",l.getId());
+
+			plan.addLeg(leg);
+
+			plan.addActivity(work);
+			p.addPlan(plan);
+
+			sc.getPopulation().addPerson(p);
+		}
+
 		ActivityParams workAct = new ActivityParams("work");
 		workAct.setTypicalDuration(8*3600);
 		sc.getConfig().planCalcScore().addActivityParams(workAct);
@@ -132,33 +119,44 @@ public class PatnaBikeTestControler {
 		ActivityParams homeAct = new ActivityParams("home");
 		homeAct.setTypicalDuration(12*3600);
 		sc.getConfig().planCalcScore().addActivityParams(homeAct);
-		
-		sc.getConfig().qsim().setMainModes(Arrays.asList(mode));
-		
+
+		List<String> mainModes = Arrays.asList("car","bike");
+		sc.getConfig().qsim().setMainModes(mainModes);
+
 		ModeRoutingParams mrp = new ModeRoutingParams("walk");
 		mrp.setTeleportedModeSpeed(5./3.6);
 		mrp.setBeelineDistanceFactor(1.5);
 		sc.getConfig().plansCalcRoute().addModeRoutingParams(mrp);
-		
-		sc.getConfig().controler().setLastIteration(0);
+
+		sc.getConfig().controler().setLastIteration(10);
 		sc.getConfig().controler().setOutputDirectory(outputDir);
 		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		ModeParams modeParam = new ModeParams(mode);
+
+		ModeParams modeParam = new ModeParams("bike");
 		modeParam.setConstant(0.);
 		sc.getConfig().planCalcScore().addModeParams(modeParam);
+
+		sc.getConfig().plansCalcRoute().setNetworkModes(mainModes);
 		
-		
-		sc.getConfig().plansCalcRoute().setNetworkModes(Arrays.asList(mode));
+		StrategySettings expChangeBeta = new StrategySettings();
+		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		expChangeBeta.setWeight(0.7);
+		sc.getConfig().strategy().addStrategySettings(expChangeBeta);
+
+		StrategySettings reRoute = new StrategySettings();
+		reRoute.setStrategyName(DefaultStrategy.ReRoute.name());
+		reRoute.setWeight(0.3);
+		sc.getConfig().strategy().addStrategySettings(reRoute);
+		sc.getConfig().strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
 		Controler controler = new Controler(sc);
-		
-		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory(mode, config.planCalcScore());
+
+		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addTravelTimeBinding(mode).to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding(mode).toInstance(builder_bike);
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
 			}
 		});
 		controler.run();
