@@ -2,11 +2,14 @@ package playground.tschlenther.parkingSearch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -113,7 +116,8 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 	private void insertFreeFloatingTripWhenEndingActivity(double now) {
 		// (_next_ plan element is (presumably) a leg)
-		
+		Map<FFCSVehicle, Link> ffvehiclesmap = this.carSharingVehicles.getFfvehiclesMap();
+
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
 
@@ -139,8 +143,10 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 		String ffVehId = vehicleToBeUsed.getVehicleId();
 		
-		final Link stationLink = vehicleToBeUsed.getLink() ;
-		this.carSharingVehicles.getFreeFLoatingVehicles().removeVehicle(vehicleToBeUsed); 
+		final Link stationLink = ffvehiclesmap.get(vehicleToBeUsed) ;
+		Coord coordStation = stationLink.getCoord();
+		this.carSharingVehicles.getFfVehicleLocationQuadTree().remove(coordStation.getX(),
+				coordStation.getY(), vehicleToBeUsed); 
 		
 		Route routeToCar = routeFactory.createRoute( Route.class, currentLink.getId(), stationLink.getId() ) ; 
 		final double dist = CoordUtils.calcEuclideanDistance(currentLink.getCoord(), stationLink.getCoord()) * beelineFactor;
@@ -213,19 +219,22 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 
 	private void parkCSVehicle() {
-		String currentLegMode = ((Leg) this.basicAgentDelegate.getCurrentPlanElement() ).getMode() ;
+		Leg currentLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
+
+		String currentLegMode = currentLeg.getMode() ;
 		if (currentLegMode.equals("freefloating")) {
+			Network network = this.basicAgentDelegate.getScenario().getNetwork();
 			FFCSVehicle vehicleToBeReturned = this.ffVehicles.get(this.ffVehicles.size() - 1);
-			
-			this.carSharingVehicles.getFreeFLoatingVehicles()
-				.addVehicle(vehicleToBeReturned);
+			Link endLink = network.getLinks().get(currentLeg.getRoute().getEndLinkId());
+			Coord coord = endLink.getCoord();
+			this.carSharingVehicles.getFfVehicleLocationQuadTree().put(coord.getX(), coord.getY(), vehicleToBeReturned);
 			ffVehicles.remove(vehicleToBeReturned);
 		}
 	}
 	
 	private FFCSVehicle findClosestAvailableCar(Link link) {
-		FFCSVehicle vehicle = this.carSharingVehicles
-				.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
+		FFCSVehicle vehicle = this.carSharingVehicles.getFfVehicleLocationQuadTree()
+				.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		return vehicle;
 	}
 	void resetCaches() {

@@ -85,7 +85,7 @@ public class ParkSearchAndCarsharingQsimFactory implements Provider<Netsim>{
 		
 		//we need to park carsharing vehicles on the network
 		ParkCSVehicles parkSource = new ParkCSVehicles(sc.getPopulation(), agentFactory, qSim,
-					carSharingVehicles.getFreeFLoatingVehicles(), carSharingVehicles.getOneWayVehicles(), carSharingVehicles.getTwoWayVehicles());
+					carSharingVehicles);
 		qSim.addAgentSource(agentSource);
 		qSim.addAgentSource(parkSource);
 		
