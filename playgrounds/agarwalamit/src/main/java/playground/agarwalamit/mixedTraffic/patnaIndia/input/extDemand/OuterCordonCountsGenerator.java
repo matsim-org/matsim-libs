@@ -35,6 +35,7 @@ import org.matsim.counts.Counts;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.MapUtils;
 
 /**
  * @author amit
@@ -149,9 +150,6 @@ public class OuterCordonCountsGenerator {
 				if( line.startsWith("time") ){
 					String [] labels = line.split("\t"); // time car 2w truck cycle total
 					mode2index = Arrays.asList(labels);
-//					for (int index = 0;index<labels.length;index++){
-//						mode2index.add(labels[index]);
-//					}
 					line = reader.readLine();
 					continue;
 				}
@@ -163,10 +161,14 @@ public class OuterCordonCountsGenerator {
 					String mode = mode2index.get(index);
 					if(mode.equals("2w")) mode = "motorbike";
 					else if(mode.equals("cycle")) mode = "bike";
-					else if(mode.equals("total")) continue;
+					else if(mode.equals("total")) {
+						if (MapUtils.doubleValueSum(mode2count)!=Double.valueOf(parts[index])){
+							throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
+						}
+						continue;
+					}
 					
 					mode = mode.concat("_ext");
-					
 					mode2count.put(mode, Double.valueOf(parts[index]));
 				}
 

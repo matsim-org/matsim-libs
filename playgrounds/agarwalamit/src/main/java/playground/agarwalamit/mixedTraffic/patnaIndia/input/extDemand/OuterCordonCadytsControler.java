@@ -85,7 +85,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class OuterCordonCadytsControler {
 
 	private static String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded/";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/";
 
 	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
 
@@ -100,7 +100,7 @@ public class OuterCordonCadytsControler {
 			spf.run(inPlans);
 			spf.writePlans(plansFile);
 
-			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonOutput_10pct_OC1Excluded_ctd/";
+			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded_ctd/";
 			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/outerCordonVehicles_10pct_ctd.xml.gz";
 		}
 
@@ -178,6 +178,7 @@ public class OuterCordonCadytsControler {
 		
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);
+		config.strategy().setMaxAgentPlanMemorySize(10);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

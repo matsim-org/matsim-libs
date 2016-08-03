@@ -78,7 +78,6 @@ public class OuterCordonCountsWriter {
 			for(Integer i : countStation2time2countInfo_out.get(mcs).keySet()){
 				double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(i) * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR);
 				c.createVolume(i, vol );
-				c.setCsId("mode");
 			}
 		}
 		new CountsWriter(counts).write(outCountsFile);
@@ -116,6 +115,9 @@ public class OuterCordonCountsWriter {
 				for ( int ii =1 ; ii<=4; ii++){
 					totalCount += Double.valueOf(parts[ii]);
 				}
+				
+				if(totalCount!=Double.valueOf(parts[5])) throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
+				
 				time2count.put(timebin, totalCount);
 				line = reader.readLine();	
 			}

@@ -119,9 +119,8 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 					averages = this.linkStats;
 				}
 
-				String filename = controlerIO.getIterationFilename(event.getIteration(), "multiMode_countscompare.txt");
-				BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-				try {
+				String filename = controlerIO.getIterationFilename(event.getIteration(), "multiMode_hourlyCountscompare.txt");
+				try(BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
 					writer.write("linkID\tMode\t");
 					for(int t =1; t <=24; t++) {
 						writer.write(t+"\t");

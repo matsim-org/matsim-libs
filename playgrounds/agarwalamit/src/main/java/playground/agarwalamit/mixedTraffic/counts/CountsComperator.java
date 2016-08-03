@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonLinks;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.MapUtils;
 
@@ -38,9 +40,9 @@ public class CountsComperator {
 
 	private final String inputCountsFile_urban = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
 	private final String inputCountsFile_external = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
-	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/c1/ITERS/it.100/100.multiMode_countscompare.txt";
+	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/ITERS/it.100/100.multiMode_countscompare.txt";
 
-	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/c1/analysis/modalCountsComparison.txt";
+	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/ITERS/it.100/100.multiMode_AWTVcountscompare.txt";
 
 	private final Map<String, Map<String,Map<Integer,Double>>> link2mode2time2count_input = new HashMap<>();
 
@@ -50,7 +52,7 @@ public class CountsComperator {
 
 	private void run () {
 
-		readCountsAndStoreMap(inputCountsFile_urban);
+//		readCountsAndStoreMap(inputCountsFile_urban);
 		readCountsAndStoreMap(inputCountsFile_external);
 
 		Map<String,Map<String,Double>> link2mode2count = new HashMap<>();
@@ -123,6 +125,13 @@ public class CountsComperator {
 				} 
 				String parts [] = line.split("\t");
 				String linkId = parts[1];
+				
+				double outTripReductionFactor = 1;
+				OuterCordonLinks ocl = new OuterCordonLinks(PatnaUtils.PATNA_NETWORK_TYPE);
+				String countinStation = ocl.getCountingStation(linkId); 
+				if ( countinStation!=null && countinStation.split("_")[1].equals("P2X") ) {
+					outTripReductionFactor = OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR;
+				}
 
 				Map<String, Map<Integer,Double>> mode2time2count = link2mode2time2count_input.get(linkId);
 
@@ -141,6 +150,7 @@ public class CountsComperator {
 				for (int i=3;i<parts.length-1;i++) { // length -1 to exclude total
 					String mode = index2mode.get(i);	
 					double count = Double.valueOf(parts[i]);
+					count = Math.round( outTripReductionFactor*count );
 					Map<Integer,Double> time2count = mode2time2count.get(mode);
 					if (time2count.containsKey(time)) {
 						time2count.put( time, time2count.get(time) + count );
