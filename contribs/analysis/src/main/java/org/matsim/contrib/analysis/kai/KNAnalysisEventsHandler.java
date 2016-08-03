@@ -435,9 +435,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		//write statistics:
 		for ( StatType type : StatType.values() ) {
 			String filename = filenameTmp + type.toString() + ".txt" ;
-			BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
-			writeStatsHorizontal(type, legStatsFile );
-			try {
+			try ( BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename) ) {
+				writeStatsHorizontal(type, legStatsFile );
 				legStatsFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -476,11 +475,10 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			cnt.get(subPopType)[bin] ++ ;
 		}
 
-		try {
-			for ( String subPopType : subPopTypes ) {
-				double sum2 = 0. ;
-				final String filename = filenameTmp + "payment_" + subPopType.toString() + ".txt" ;
-				BufferedWriter out = IOUtils.getBufferedWriter(filename) ;
+		for ( String subPopType : subPopTypes ) {
+			double sum2 = 0. ;
+			final String filename = filenameTmp + "payment_" + subPopType.toString() + ".txt" ;
+			try ( BufferedWriter out = IOUtils.getBufferedWriter(filename) ) {
 				out.write( 0 + "\t" + 0 + "\n" ) ;
 				for ( int ii=0 ; ii<cnt.get(subPopType).length ; ii++ ) {
 					if ( cnt.get(subPopType)[ii] > 0 ) {
@@ -489,9 +487,9 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 					}
 				}
 				out.close();
+			} catch ( IOException e ) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 
@@ -504,15 +502,10 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		new ObjectAttributesXmlWriter( this.linkAttribs ).writeFile("networkAttributes.xml.gz");
 
 		{
-			BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ;
-			for (  Entry<Id<Vehicle>, Double> entry : this.vehicleGantryCounts.entrySet() ) {
-				try {
+			try ( BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ) {
+				for (  Entry<Id<Vehicle>, Double> entry : this.vehicleGantryCounts.entrySet() ) {
 					writer.write( entry.getKey() + "\t" + entry.getValue() + "\t 1 ") ; // the "1" makes automatic processing a bit easier. kai, mar'14
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
-			}
-			try {
 				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();

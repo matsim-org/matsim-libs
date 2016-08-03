@@ -28,8 +28,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,7 +40,7 @@ class KNBerlinControler {
 	public static void main ( String[] args ) {
 		OutputDirectoryLogging.catchLogEntries();
 
-		log.warn("here") ;
+		log.info("Starting KNBerlinControler ...") ;
 		
 		final double sampleFactor = 0.02 ;
 
@@ -48,9 +48,11 @@ class KNBerlinControler {
 		Config config = ConfigUtils.createConfig( new NoiseConfigGroup() ) ;
 		
 		// paths and related:
-		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
+//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
+//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
+		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
 		
-		config.plans().setInputFile("~/kairuns/a100/21jul2011-long-base/base_plans.xml.gz");
+		config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
 
@@ -73,8 +75,8 @@ class KNBerlinControler {
 			config.controler().setWritePlansUntilIteration(-1); // for fast turn-around, don't write at all
 			config.controler().setWriteEventsUntilIteration(-1); 
 		} else {
-			config.controler().setWritePlansUntilIteration(-1); // for fast turn-around, don't write at all
-			config.controler().setWriteEventsUntilIteration(0); // under normal circumstances, write at least the 0th iteration
+			config.controler().setWritePlansUntilIteration(-1); 
+			config.controler().setWriteEventsUntilIteration(0); 
 		}
 		config.vspExperimental().setWritingOutputEvents(true);
 		
@@ -98,14 +100,19 @@ class KNBerlinControler {
 		config.parallelEventHandling().setNumberOfThreads(1);
 		
 		// qsim:
+		
+		config.qsim().setEndTime(36*3600);
 
 		config.controler().setMobsim( MobsimType.qsim.toString() );
 		config.qsim().setFlowCapFactor( sampleFactor );
 		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
 
-		config.qsim().setTrafficDynamics( TrafficDynamics.assignmentEmulating );
-//		config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
+		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
+		
+		if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
+			config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
+		}
 
 		config.qsim().setNumberOfThreads(6);
 		config.qsim().setUsingFastCapacityUpdate(true);
@@ -176,7 +183,7 @@ class KNBerlinControler {
 				link.setFreespeed( 0.5 * link.getFreespeed() );
 			}
 		}
-
+		
 		// ===
 
 		// prepare the control(l)er:
