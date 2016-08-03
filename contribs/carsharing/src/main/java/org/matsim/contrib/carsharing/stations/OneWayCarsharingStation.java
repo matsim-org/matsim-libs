@@ -4,25 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 
 
-public class OneWayCarsharingStation extends AbstractCarSharingStation {
+public class OneWayCarsharingStation  {
 
 	private Map<String, Integer> vehiclesPerType = new HashMap<String, Integer>();
 	private Map<String, ArrayList<StationBasedVehicle>> vehicleIDsPerType = new HashMap<String, ArrayList<StationBasedVehicle>>();
 	private String stationId;
 	private int avaialbleParkingSpots;
-
-
-	public Map<String, ArrayList<StationBasedVehicle>> getVehicleIDsPerType() {
-		return vehicleIDsPerType;
-	}
+	private Id<Link> linkId;
 
 	public OneWayCarsharingStation(String stationId, Link link, Map<String, Integer> vehiclesPerType,
 			Map<String, ArrayList<StationBasedVehicle>> vehicleIDsPerType, int availableParkingSpots) {
-		super(link) ;
+		this.linkId = link.getId();
 		this.stationId = stationId;
 		this.vehiclesPerType = vehiclesPerType;
 		this.vehicleIDsPerType = vehicleIDsPerType;
@@ -79,6 +76,14 @@ public class OneWayCarsharingStation extends AbstractCarSharingStation {
 
 	public int getAvaialbleParkingSpots() {
 		return avaialbleParkingSpots;
+	}
+	
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+
+	public Map<String, ArrayList<StationBasedVehicle>> getVehicleIDsPerType() {
+		return vehicleIDsPerType;
 	}
 	
 }

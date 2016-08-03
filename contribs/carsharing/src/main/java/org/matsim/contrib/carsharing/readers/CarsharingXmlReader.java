@@ -8,12 +8,12 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.carsharing.stations.FreeFloatingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -28,11 +28,51 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	private ArrayList<TwoWayCarsharingStation> twStations = new ArrayList<TwoWayCarsharingStation>();
 	private ArrayList<OneWayCarsharingStation> owStations = new ArrayList<OneWayCarsharingStation>();
 	private ArrayList<FFCSVehicle> ffVehicles = new ArrayList<FFCSVehicle>();    
+	
+	private QuadTree<FFCSVehicle> ffVehicleLocationQuadTree;	
+	private QuadTree<OneWayCarsharingStation> owvehicleLocationQuadTree;	
+	private QuadTree<TwoWayCarsharingStation> twvehicleLocationQuadTree;
+
+	private Map<String, TwoWayCarsharingStation> twowaycarsharingstationsMap = new HashMap<String, TwoWayCarsharingStation>();
+	private Map<String, OneWayCarsharingStation> onewaycarsharingstationsMap = new HashMap<String, OneWayCarsharingStation>();
+
+	public Map<String, TwoWayCarsharingStation> getTwowaycarsharingstationsMap() {
+		return twowaycarsharingstationsMap;
+	}
+
+	public Map<String, OneWayCarsharingStation> getOnewaycarsharingstationsMap() {
+		return onewaycarsharingstationsMap;
+	}
+
+	private Map<FFCSVehicle, Link> ffvehiclesMap = new HashMap<FFCSVehicle, Link>();	
+	
+
 	public CarsharingXmlReader(Network network) {
 		
-		this.network = network;
+		this.network = network;		
+		createQuadTrees();
 	}
 	
+	private void createQuadTrees() {
+
+	    double minx = (1.0D / 0.0D);
+	    double miny = (1.0D / 0.0D);
+	    double maxx = (-1.0D / 0.0D);
+	    double maxy = (-1.0D / 0.0D);
+
+        for (Link l : this.network.getLinks().values()) {
+	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
+	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
+	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
+	      if (l.getCoord().getY() <= maxy) continue; maxy = l.getCoord().getY();
+	    }
+	    minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
+
+	    ffVehicleLocationQuadTree = new QuadTree<FFCSVehicle>(minx, miny, maxx, maxy);
+	    owvehicleLocationQuadTree = new QuadTree<OneWayCarsharingStation>(minx, miny, maxx, maxy);
+	    twvehicleLocationQuadTree = new QuadTree<TwoWayCarsharingStation>(minx, miny, maxx, maxy);		
+	}
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		
@@ -56,7 +96,9 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 			Coord coordStation = new Coord(Double.parseDouble(lat), Double.parseDouble(lon));
 				
 			link = (Link)NetworkUtils.getNearestLinkExactly(network, coordStation);
-			ffVehicles.add(new FFCSVehicle(type, atts.getValue("id"), link));
+			FFCSVehicle ffcsvehicle = new FFCSVehicle(type, atts.getValue("id"));
+			ffVehicleLocationQuadTree.put(coordStation.getX(), coordStation.getY(), ffcsvehicle);
+			ffvehiclesMap.put(ffcsvehicle, link);
 			
 			
 		}
@@ -97,11 +139,17 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 			}
 			if (name.equals("twowaycarsharing")) {
 				TwoWayCarsharingStation station = new TwoWayCarsharingStation(id, link, numberOfVehiclesPerType, vehiclesPerType);
+				
+				twvehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), station);
+				this.twowaycarsharingstationsMap.put(id, station);
 				twStations.add(station);
 			}
 			else {
 				OneWayCarsharingStation station = new OneWayCarsharingStation(id, link, numberOfVehiclesPerType,
 						vehiclesPerType, avaialbleParkingSpots);
+				
+				owvehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), station);
+				this.onewaycarsharingstationsMap.put(id, station);
 				owStations.add(station);
 				
 			}
@@ -110,6 +158,18 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 		
 	}
 	
+	public QuadTree<FFCSVehicle> getFfVehicleLocationQuadTree() {
+		return ffVehicleLocationQuadTree;
+	}
+
+	public QuadTree<OneWayCarsharingStation> getOwvehicleLocationQuadTree() {
+		return owvehicleLocationQuadTree;
+	}
+
+	public QuadTree<TwoWayCarsharingStation> getTwvehicleLocationQuadTree() {
+		return twvehicleLocationQuadTree;
+	}
+
 	public ArrayList<TwoWayCarsharingStation> getTwStations() {
 		return twStations;
 	}
@@ -121,4 +181,8 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	public ArrayList<FFCSVehicle> getFFVehicles() {
 		return this.ffVehicles;
 	}	
+	
+	public Map<FFCSVehicle, Link> getFfvehiclesMap() {
+		return ffvehiclesMap;
+	}
 }

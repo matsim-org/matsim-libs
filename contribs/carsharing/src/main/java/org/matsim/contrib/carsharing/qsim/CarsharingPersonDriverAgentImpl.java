@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.management.RuntimeErrorException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +23,6 @@ import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
-import org.matsim.contrib.carsharing.stations.FreeFloatingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
@@ -165,6 +165,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private void insertFreeFloatingTripWhenEndingActivity(double now) {
 		// (_next_ plan element is (presumably) a leg)
 		
+		Map<FFCSVehicle, Link> ffvehiclesmap = this.carSharingVehicles.getFfvehiclesMap();
+		
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
 
@@ -188,8 +190,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		ffVehicles.add(vehicleToBeUsed);
 		String ffVehId = vehicleToBeUsed.getVehicleId();
 		
-		final Link stationLink = vehicleToBeUsed.getLink() ;
-		this.carSharingVehicles.getFreeFLoatingVehicles().removeVehicle(vehicleToBeUsed); 
+		final Link stationLink = ffvehiclesmap.get(vehicleToBeUsed) ;
+		Coord coordStation = stationLink.getCoord();
+		this.carSharingVehicles.getFfVehicleLocationQuadTree().remove(coordStation.getX(),
+				coordStation.getY(), vehicleToBeUsed); 
 		
 		trip.add( createWalkLeg(currentLink, stationLink, "walk_ff", now) );
 
@@ -251,7 +255,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		endStationOW.reserveParkingSpot();
 		
 		owcsVehicles.add(vehicleToBeUsed);
-		this.carSharingVehicles.getOneWayVehicles().removeVehicle(typeOfVehicle, vehicleToBeUsed);
+		station.removeCar(typeOfVehicle, vehicleToBeUsed);
+		//this.carSharingVehicles.getOneWayVehicles().removeVehicle(typeOfVehicle, vehicleToBeUsed);
 
 		final Link endStationLink = scenario.getNetwork().getLinks().get( endStationOW.getLinkId() ) ;
 
@@ -302,7 +307,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 				StationBasedVehicle currentVehicle = this.twcsVehicles.get(this.twcsVehicles.size() - 1);
 				TwoWayCarsharingStation returnStation = 
-						this.carSharingVehicles.getTwoWayVehicles().getStationWIthId(currentVehicle.getStationId());
+						this.carSharingVehicles.getTwowaycarsharingstationsMap().get(currentVehicle.getStationId());
 				Link endStationLink = network.getLinks().get(returnStation.getLinkId());
 				
 				String vehId = this.vehicleIdLocation.get(startLink.getId()).toString();
@@ -350,7 +355,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				// === create a car leg of the trip: ===
 				
 				String vehId = vehicleToBeUsed.getVehicleId();
-				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(typeOfVehicle, vehicleToBeUsed);
+				pickUpStation.removeCar(typeOfVehicle, vehicleToBeUsed);
+				//this.carSharingVehicles.getTwoWayVehicles().removeVehicle(typeOfVehicle, vehicleToBeUsed);
 			
 				trip.add(createCarLeg(startStationLink, destinationLink, "twowaycarsharing", vehId, now));
 			}
@@ -362,7 +368,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				// === create a car leg of the trip: ===
 				
 				String vehId = vehicleToBeUsed.getVehicleId();
-				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(typeOfVehicle, vehicleToBeUsed);
+				pickUpStation.removeCar(typeOfVehicle, vehicleToBeUsed);
+
+				//this.carSharingVehicles.getTwoWayVehicles().removeVehicle(typeOfVehicle, vehicleToBeUsed);
 			
 				trip.add(createCarLeg(startStationLink, startStationLink, "twowaycarsharing", vehId, now));
 				
@@ -468,14 +476,20 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		if (currentLeg.getMode().equals("onewaycarsharing")) {
 			StationBasedVehicle vehicleToBeReturned = owcsVehicles.get(owcsVehicles.size() - 1);
 			vehicleToBeReturned.setStationId(endStationOW.getStationId());
-			this.carSharingVehicles.getOneWayVehicles().addVehicle("car", vehicleToBeReturned);
+			
+			OneWayCarsharingStation returnStation = 
+					this.carSharingVehicles.getOnewaycarsharingstationsMap().get(vehicleToBeReturned.getStationId());
+			returnStation.addCar("car", vehicleToBeReturned);
 			owcsVehicles.remove(vehicleToBeReturned);
 		}
 		else if (currentLeg.getMode().equals("walk_ow_sb") &&
 				this.basicAgentDelegate.getNextPlanElement() instanceof Leg) {
-			
 			StationBasedVehicle vehicleToGet = owcsVehicles.get(owcsVehicles.size() - 1);
-			this.carSharingVehicles.getOneWayVehicles().getStationWIthId(vehicleToGet.getStationId()).freeParkingSpot();
+
+			OneWayCarsharingStation pickupStation = 
+					this.carSharingVehicles.getOnewaycarsharingstationsMap().get(vehicleToGet.getStationId());
+			
+			pickupStation.freeParkingSpot();
 			
 		}
 		else if (currentLeg.getMode().equals("twowaycarsharing") 
@@ -487,8 +501,11 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
 				
 				StationBasedVehicle vehicleToBeReturned = this.twcsVehicles.get(this.twcsVehicles.size() - 1);
+				
+				TwoWayCarsharingStation returnStation = 
+						this.carSharingVehicles.getTwowaycarsharingstationsMap().get(vehicleToBeReturned.getStationId());
 								
-				this.carSharingVehicles.getTwoWayVehicles().addVehicle("car", 
+				returnStation.addCar("car", 
 						vehicleToBeReturned);
 
 				this.twcsVehicles.remove(vehicleToBeReturned);
@@ -500,11 +517,11 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			this.vehicleIdLocation.put(currentLeg.getRoute().getEndLinkId(), ((LinkNetworkRouteImpl)currentLeg.getRoute()).getVehicleId());
 		}
 		else if (currentLeg.getMode().equals("freefloating")) {
-
+			Network network = this.basicAgentDelegate.getScenario().getNetwork();
 			FFCSVehicle vehicleToBeReturned = this.ffVehicles.get(this.ffVehicles.size() - 1);
-		
-			this.carSharingVehicles.getFreeFLoatingVehicles()
-				.addVehicle(vehicleToBeReturned);
+			Link endLink = network.getLinks().get(currentLeg.getRoute().getEndLinkId());
+			Coord coord = endLink.getCoord();
+			this.carSharingVehicles.getFfVehicleLocationQuadTree().put(coord.getX(), coord.getY(), vehicleToBeReturned);
 			ffVehicles.remove(vehicleToBeReturned);
 		}
 	}
@@ -515,36 +532,40 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		String vehicleType = "car";
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
+		Network network = scenario.getNetwork();
 		TwoWayCarsharingConfigGroup twConfigGroup = (TwoWayCarsharingConfigGroup) 
 				scenario.getConfig().getModule("TwoWayCarsharing");
 		
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		double searchDistance = twConfigGroup.getsearchDistance();
 		Collection<TwoWayCarsharingStation> location = 
-				this.carSharingVehicles.getTwoWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), 
+				this.carSharingVehicles.getTwvehicleLocationQuadTree().getDisk(link.getCoord().getX(), 
 						link.getCoord().getY(), searchDistance );
 		if (location.isEmpty()) 
 			return null;
 		
 		TwoWayCarsharingStation closest = null;
 		for(TwoWayCarsharingStation station: location) {
-			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < searchDistance 
+			Coord coord = network.getLinks().get(station.getLinkId()).getCoord();
+
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < searchDistance 
 					&& station.getNumberOfVehicles(vehicleType) > 0) {
 				closest = station;
-				searchDistance = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
+				searchDistance = CoordUtils.calcEuclideanDistance(link.getCoord(), coord);
 			}	
 		}
 		return closest;
 	}	
 
 	private FFCSVehicle findClosestAvailableCar(Link link) {
-		FFCSVehicle vehicle = this.carSharingVehicles
-				.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
+		FFCSVehicle vehicle = this.carSharingVehicles.getFfVehicleLocationQuadTree()
+				.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		return vehicle;
 	}
 
 	private OneWayCarsharingStation findClosestAvailableOWCar(Link link) {
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
+		Network network = scenario.getNetwork();
 		String vehicleType = "car";
 
 		//find the closest available car and reserve it (make it unavailable)
@@ -554,16 +575,19 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		double distanceSearch = owConfigGroup.getsearchDistance() ;
 
 		Collection<OneWayCarsharingStation> location = 
-				this.carSharingVehicles.getOneWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), 
+				this.carSharingVehicles.getOwvehicleLocationQuadTree().getDisk(link.getCoord().getX(), 
 						link.getCoord().getY(), distanceSearch);
 		if (location.isEmpty()) return null;
 
 		OneWayCarsharingStation closest = null;
 		for(OneWayCarsharingStation station: location) {
-			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch 
+			
+			Coord coord = network.getLinks().get(station.getLinkId()).getCoord();
+			
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < distanceSearch 
 					&& station.getNumberOfVehicles(vehicleType) > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), coord);
 			}
 		}	
 		return closest;
@@ -571,6 +595,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	private OneWayCarsharingStation findClosestAvailableParkingSpace(Link link) {
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
+		Network network = scenario.getNetwork();
 
 		//find the closest available parking space and reserve it (make it unavailable)
 		//if there are no parking spots within search radius, return null
@@ -580,16 +605,19 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		double distanceSearch = owConfigGroup.getsearchDistance();
 
 		Collection<OneWayCarsharingStation> location = 
-				this.carSharingVehicles.getOneWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), 
+				this.carSharingVehicles.getOwvehicleLocationQuadTree().getDisk(link.getCoord().getX(), 
 						link.getCoord().getY(), distanceSearch);
 		if (location.isEmpty()) return null;
 
 		OneWayCarsharingStation closest = null;
 		for(OneWayCarsharingStation station: location) {
-			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch 
+			
+			Coord coord = network.getLinks().get(station.getLinkId()).getCoord();
+			
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < distanceSearch 
 					&& station.getAvaialbleParkingSpots() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), coord);
 			}
 		}
 		return closest;

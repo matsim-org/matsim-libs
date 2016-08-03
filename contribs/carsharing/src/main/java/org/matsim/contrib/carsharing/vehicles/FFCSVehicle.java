@@ -1,19 +1,14 @@
 package org.matsim.contrib.carsharing.vehicles;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-
 public class FFCSVehicle {
 	
 	private String type;
 	private String vehicleId;
-	private Link link;
 	
-	public FFCSVehicle(String type, String vehicleId, Link link) {
+	public FFCSVehicle(String type, String vehicleId) {
 		
 		this.setType(type);
 		this.setVehicleId(vehicleId);
-		this.setLink(link);
 	}
 
 	public String getType() {
@@ -32,12 +27,6 @@ public class FFCSVehicle {
 		this.vehicleId = vehicleId;
 	}
 
-	public Link getLink() {
-		return link;
-	}
-
-	public void setLink(Link link) {
-		this.link = link;
-	}
+	
 
 }

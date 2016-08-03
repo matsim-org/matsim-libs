@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE stations SYSTEM "CarsharingStations.dtd">
+<stations>
+	<twowaycarsharing id="1" lat="-375" lon="0" >
+		<vehicle type="car" vehicleID="TW_1" />
+		<vehicle type="car" vehicleID="TW_2" />
+	</twowaycarsharing>
+	<twowaycarsharing id="2" lat="0" lon="375" >
+		<vehicle type="car" vehicleID="TW_3" />
+		<vehicle type="car" vehicleID="TW_4" />
+	</twowaycarsharing>
+	<onewaycarsharing id="1" lat="-375" lon="0" freeparking="2">
+		<vehicle type="car" vehicleID="OW_1" />
+		<vehicle type="car" vehicleID="OW_2" />
+	</onewaycarsharing>
+	
+	<freefloating id="FF_1" lat="-375" lon="0" type="car" />
+		
+</stations>

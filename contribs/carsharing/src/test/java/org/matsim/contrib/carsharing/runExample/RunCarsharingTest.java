@@ -77,8 +77,8 @@ public class RunCarsharingTest {
 		OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule( OneWayCarsharingConfigGroup.GROUP_NAME ) ;
 		oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
 
-		//TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
-		//twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
+		TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
+		twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 
 		// ---
 

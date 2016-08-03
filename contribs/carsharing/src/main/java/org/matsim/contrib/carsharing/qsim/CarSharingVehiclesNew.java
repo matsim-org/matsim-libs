@@ -1,41 +1,41 @@
 package org.matsim.contrib.carsharing.qsim;
 
 
-import org.apache.log4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReader;
-import org.matsim.contrib.carsharing.vehicles.FreeFloatingVehiclesLocation;
-import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
-import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
+import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
+import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
+import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
+import org.matsim.core.utils.collections.QuadTree;
 
 public class CarSharingVehiclesNew {
 	
 	//private static final Logger log = Logger.getLogger(CarSharingVehicles.class);
 
-	private Scenario scenario;
-	private FreeFloatingVehiclesLocation ffvehiclesLocation;
-	private OneWayCarsharingVehicleLocation owvehiclesLocation;
-	private TwoWayCarsharingVehicleLocation twvehiclesLocation;
+	private Scenario scenario;	
+	private QuadTree<FFCSVehicle> ffVehicleLocationQuadTree;	
+	private QuadTree<OneWayCarsharingStation> owvehicleLocationQuadTree;	
+	private QuadTree<TwoWayCarsharingStation> twvehicleLocationQuadTree;
+	private Map<String, TwoWayCarsharingStation> twowaycarsharingstationsMap;
+	public Map<String, TwoWayCarsharingStation> getTwowaycarsharingstationsMap() {
+		return twowaycarsharingstationsMap;
+	}
+
+	public Map<String, OneWayCarsharingStation> getOnewaycarsharingstationsMap() {
+		return onewaycarsharingstationsMap;
+	}
+
+	private Map<String, OneWayCarsharingStation> onewaycarsharingstationsMap;
+
+	private Map<FFCSVehicle, Link> ffvehiclesMap = new HashMap<FFCSVehicle, Link>();
 	
 	public CarSharingVehiclesNew(Scenario scenario) {
 		this.scenario = scenario;
-	}
-	
-	public FreeFloatingVehiclesLocation getFreeFLoatingVehicles() {
-		
-		return this.ffvehiclesLocation;
-	}
-	
-	public OneWayCarsharingVehicleLocation getOneWayVehicles() {
-		
-		
-		return this.owvehiclesLocation;
-	}
-	
-	public TwoWayCarsharingVehicleLocation getTwoWayVehicles() {
-		
-		return this.twvehiclesLocation;
 	}
 	
 	public void readVehicleLocations() {
@@ -46,11 +46,32 @@ public class CarSharingVehiclesNew {
 				scenario.getConfig().getModule( TwoWayCarsharingConfigGroup.GROUP_NAME );
 
 		carsharingReader.readFile(configGrouptw.getvehiclelocations());
-		this.twvehiclesLocation = new TwoWayCarsharingVehicleLocation(scenario, carsharingReader.getTwStations());
-		this.owvehiclesLocation = new OneWayCarsharingVehicleLocation(scenario, carsharingReader.getOwStations());
-		this.ffvehiclesLocation = new FreeFloatingVehiclesLocation(scenario, carsharingReader.getFFVehicles());
-
 		
+		this.ffVehicleLocationQuadTree = carsharingReader.getFfVehicleLocationQuadTree();
+		this.owvehicleLocationQuadTree = carsharingReader.getOwvehicleLocationQuadTree();
+		this.twvehicleLocationQuadTree = carsharingReader.getTwvehicleLocationQuadTree();
+		this.onewaycarsharingstationsMap = carsharingReader.getOnewaycarsharingstationsMap();
+		this.twowaycarsharingstationsMap = carsharingReader.getTwowaycarsharingstationsMap();
+		this.ffvehiclesMap = carsharingReader.getFfvehiclesMap();			
 	}
+	
+	public QuadTree<FFCSVehicle> getFfVehicleLocationQuadTree() {
+		return ffVehicleLocationQuadTree;
+	}
+
+	public QuadTree<OneWayCarsharingStation> getOwvehicleLocationQuadTree() {
+		return owvehicleLocationQuadTree;
+	}
+
+	public QuadTree<TwoWayCarsharingStation> getTwvehicleLocationQuadTree() {
+		return twvehicleLocationQuadTree;
+	}
+
+	public Map<FFCSVehicle, Link> getFfvehiclesMap() {
+		return ffvehiclesMap;
+	}
+	
+	
+		
 
 }

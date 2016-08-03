@@ -67,7 +67,7 @@
 	</module>
     
 	<module name="TwoWayCarsharing" >
-		<param name="vehiclelocationsTwoWayCarsharing" value="&INBASE;/Stations.txt" />	
+		<param name="vehiclelocationsTwoWayCarsharing" value="&INBASE;/CarsharingStations.xml" />	
 		<param name="travelingTwoWayCarsharing" value="-6.0" />
 		<param name="constantTwoWayCarsharing" value="-0.4" />
         <param name="timeFeeTwoWayCarsharing" value="-0.0" />

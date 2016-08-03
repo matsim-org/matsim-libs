@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+<!ELEMENT stations          (twowaycarsharing*,onewaycarsharing*,freefloating*)>
+<!ATTLIST stations
+          name           CDATA   #IMPLIED
+          reference_layer  CDATA #IMPLIED
+          xml:lang       NMTOKEN "de-CH">
+
+<!ELEMENT twowaycarsharing          (vehicle*)>
+<!ATTLIST twowaycarsharing
+          id           CDATA   #REQUIRED
+          lat  	       CDATA #REQUIRED
+          lon       CDATA #REQUIRED>
+
+<!ELEMENT onewaycarsharing          (vehicle*)>
+<!ATTLIST onewaycarsharing
+          id           CDATA   #REQUIRED
+          lat  	       CDATA #REQUIRED
+          lon       CDATA #REQUIRED
+	  freeparking	CDATA #REQUIRED>
+
+<!ELEMENT freefloating          EMPTY>
+<!ATTLIST freefloating
+          id           CDATA   #REQUIRED
+          lat  	       CDATA #REQUIRED
+          lon       CDATA #REQUIRED
+	  type	CDATA #REQUIRED>
+
+<!ELEMENT vehicle         EMPTY>
+<!ATTLIST vehicle
+          type             CDATA                    #REQUIRED
+          vehicleID            CDATA                    #REQUIRED>
+          
