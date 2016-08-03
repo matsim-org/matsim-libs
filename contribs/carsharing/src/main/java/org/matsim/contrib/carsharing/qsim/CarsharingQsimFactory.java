@@ -21,7 +21,6 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**

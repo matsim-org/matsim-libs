@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -471,7 +470,6 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	private void parkCSVehicle() {
 		Leg currentLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
-		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 
 		if (currentLeg.getMode().equals("onewaycarsharing")) {
 			StationBasedVehicle vehicleToBeReturned = owcsVehicles.get(owcsVehicles.size() - 1);
