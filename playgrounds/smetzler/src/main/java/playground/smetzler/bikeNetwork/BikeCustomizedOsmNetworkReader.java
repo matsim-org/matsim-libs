@@ -191,18 +191,18 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 
 			//for cycleways
-			//highway=
+			//highway=    ( http://wiki.openstreetmap.org/wiki/Key:highway )
 			this.setHighwayDefaults(7, "track",			 1,  10.0/3.6, 1.0,  50);	
 			this.setHighwayDefaults(7, "cycleway",		 1,  10.0/3.6, 1.0,  50);
 
 			this.setHighwayDefaults(8, "service",		 1,  10.0/3.6, 1.0,  50);	
-			this.setHighwayDefaults(8, "path", 		   	 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes oder designated
-			this.setHighwayDefaults(8, "pedestrian", 	 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes, sonst nur schieben(=langsam!)
-			this.setHighwayDefaults(8, "footway", 		 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes			
-			//			this.setHighwayDefaults(9, "steps", 		 1,   2.0/3.6, 1.0,  50);
+			this.setHighwayDefaults(8, "path", 		   	 1,  10.0/3.6, 1.0,  50); // if bicycle=yes or designated
+			this.setHighwayDefaults(8, "pedestrian", 	 1,  10.0/3.6, 1.0,  50); // if bicycle=yes, otherwise just pushing the bike (=slow) //TODO is this already implemented?
+			this.setHighwayDefaults(8, "footway", 		 1,  10.0/3.6, 1.0,  50); // if bicycle=yes			
+			//	this.setHighwayDefaults(9, "steps", 		 1,   2.0/3.6, 1.0,  50);
 
-			/// unterscheidung der einzelenen cyclewaytypes? http://wiki.openstreetmap.org/wiki/Key:highway
-			// lane, track, shared_busway
+			///what cyclewaytypes do exist on osm? - lane, track, shared_busway
+		
 		}
 	}
 
@@ -786,7 +786,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			case "cycleway": 			bike_freespeed_highway= 18; break;
 
 			case "path":				bike_freespeed_highway= 12; break; 
-			case "footway": 			bike_freespeed_highway=  8; break; //TODO lets rethink this
+			case "footway": 			bike_freespeed_highway=  8; break; //TODO lets rethink this (some as footways tagged links are actually very good cycleways in terms of speed)
 			case "pedestrian":			bike_freespeed_highway=  8; break; 
 			case "track": 				bike_freespeed_highway= 12; break; 
 			case "service": 			bike_freespeed_highway= 14; break; 
@@ -796,8 +796,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			case "unclassified":		bike_freespeed_highway= 16; break;  // if no other highway applies
 			case "road": 				bike_freespeed_highway= 12; break;  // unknown road
 
-//			case "trunk": 				bike_freespeed_highway= 18; break;  // should be used by bikes anyways
-//			case "trunk_link":			bike_freespeed_highway= 18; break; 	// should be used by bikes anyways
+//			case "trunk": 				bike_freespeed_highway= 18; break;  // shouldnt be used by bikes anyways
+//			case "trunk_link":			bike_freespeed_highway= 18; break; 	// shouldnt be used by bikes anyways
 			case "primary": 			bike_freespeed_highway= 18; break; 
 			case "primary_link":		bike_freespeed_highway= 18; break; 
 			case "secondary":			bike_freespeed_highway= 18; break; 
@@ -879,7 +879,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		double slopeTag = getSlope(way, fromNode, toNode, length, hinweg, matsimID);
 		double slopeSpeedFactor = 1; 
 
-		if (slopeTag > 0.10) {								//// bergauf
+		if (slopeTag > 0.10) {								//// uphill
 			slopeSpeedFactor= 0.1;
 		} else if (slopeTag <=  0.10 && slopeTag >  0.05) {		
 			slopeSpeedFactor= 0.4;		
@@ -887,9 +887,9 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			slopeSpeedFactor= 0.6;	
 		} else if (slopeTag <=  0.03 && slopeTag >  0.01) {
 			slopeSpeedFactor= 0.8;
-		} else if (slopeTag <=  0.01 && slopeTag > -0.01) { //// eben
+		} else if (slopeTag <=  0.01 && slopeTag > -0.01) { //// flat
 			slopeSpeedFactor= 1;
-		} else if (slopeTag <= -0.01 && slopeTag > -0.03) {	//// bergab
+		} else if (slopeTag <= -0.01 && slopeTag > -0.03) {	//// downhill
 			slopeSpeedFactor= 1.2;
 		} else if (slopeTag <= -0.03 && slopeTag > -0.05) {	
 			slopeSpeedFactor= 1.3;
@@ -900,7 +900,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 
 
-		// Geschwindigkeit von links, die auf eine Ampel führen, wird um 10% reduziert
+		// speed on links that lead to a signal crossing are reduced by 10%
 		double signalSpeedReductionFactor = 1;
 		for (Long SigNodeID : signalNodes) {
 			if (toNode.id == SigNodeID){
@@ -965,14 +965,24 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
 			countCyclewaytype++;
 		};
+		
+		//highwaytype
+		String highwayTag = way.tags.get(TAG_HIGHWAY);
+		if (highwayTag != null) {
+			bikeAttributes.putAttribute(matsimId, "highway", highwayTag);
+			//countHighway++;
+		};
 
-		//surfacetype  //TODO add "asphalt" to prim and sec highways
+		//surfacetype
 		String surfaceTag = way.tags.get(TAG_SURFACE);
 		if (surfaceTag != null) {
 			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
 			countSurface++;
 		};
-		
+			//osm defaeult for prim and sec highways is asphalt
+			if ((surfaceTag != null) && (highwayTag.equals("primary") || highwayTag.equals("secondary"))){
+			bikeAttributes.putAttribute(matsimId, "surface", "asphalt");
+			};
 
 		//smoothness
 		String smoothnessTag = way.tags.get(TAG_SMOOTHNESS);
@@ -981,12 +991,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			countSmoothness++;
 		};
 
-		//highwaytype
-		String highwayTag = way.tags.get(TAG_HIGHWAY);
-		if (highwayTag != null) {
-			bikeAttributes.putAttribute(matsimId, "highway", highwayTag);
-			//countHighway++;
-		};
+
 
 		//bicycleTag
 		String bicycleTag = way.tags.get(TAG_BICYCLE);
