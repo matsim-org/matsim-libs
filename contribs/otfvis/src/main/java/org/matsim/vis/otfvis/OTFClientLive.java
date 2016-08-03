@@ -93,7 +93,7 @@ public class OTFClientLive {
 				OTFControlBar hostControlBar = new OTFControlBar(server, hostControl, mainDrawer);
 				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);
 
-				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);

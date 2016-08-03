@@ -99,16 +99,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 		}
 
 		@Override
-		public void addTrackedAgent(Id<Person> agentId) {
-
-		}
-
-		@Override
-		public void removeTrackedAgent(Id<Person> agentId) {
-
-		}
-
-		@Override
 		public VisNetwork getVisNetwork() {
 			return visMobsim.getVisNetwork();
 		}

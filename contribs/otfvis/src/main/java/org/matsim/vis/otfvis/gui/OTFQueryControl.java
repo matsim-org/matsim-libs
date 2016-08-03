@@ -70,8 +70,6 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private IdResolver agentIdResolver = new MyIdResolver();;
 
-	private final OTFControlBar hostControlBar;
-
 	private final OTFServer server;
 
 	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<OTFQueryRemote, OTFQueryResult>();
@@ -92,9 +90,8 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	private final OTFVisConfigGroup config;
 
-	public OTFQueryControl(OTFServer server, OTFControlBar handler, final OTFVisConfigGroup config) {
+	public OTFQueryControl(OTFServer server, final OTFVisConfigGroup config) {
 		this.config = config;
-		this.hostControlBar = handler;
 		this.server = server;
 	}
 
@@ -177,8 +174,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 
 	public OTFQueryResult createQuery(AbstractQuery query) {
 		OTFQueryRemote remoteQuery = doQuery(query);
-		OTFQueryResult queryResult;
-		queryResult = remoteQuery.query();
+		OTFQueryResult queryResult = remoteQuery.query();
 		queryEntries.put(remoteQuery, queryResult);
 		return queryResult;
 	}

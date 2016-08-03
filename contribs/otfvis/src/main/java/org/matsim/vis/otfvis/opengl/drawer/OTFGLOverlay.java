@@ -39,10 +39,10 @@ class OTFGLOverlay extends OTFGLAbstractDrawable {
 
 	@Override
 	public void onInit(GL2 gl) {
-		
+
 		// From:
 		// http://wiki.tankaar.com/index.php?title=Displaying_an_Image_in_JOGL_%28Part_1%29
-		
+
 		BufferedImage bufferedImage = null;
 		w = 0;
 		h = 0;
@@ -53,7 +53,7 @@ class OTFGLOverlay extends OTFGLAbstractDrawable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		WritableRaster raster = 
+		WritableRaster raster =
 			Raster.createInterleavedRaster (DataBuffer.TYPE_BYTE,
 					w,
 					h,
@@ -66,7 +66,7 @@ class OTFGLOverlay extends OTFGLAbstractDrawable {
 					false,
 					ComponentColorModel.TRANSLUCENT,
 					DataBuffer.TYPE_BYTE);
-		BufferedImage dukeImg = 
+		BufferedImage dukeImg =
 			new BufferedImage (colorModel,
 					raster,
 					false,
@@ -123,13 +123,13 @@ class OTFGLOverlay extends OTFGLAbstractDrawable {
 		gl.glEnable(GL2.GL_TEXTURE_2D);
 		gl.glBindTexture(GL2.GL_TEXTURE_2D, textureName.get(0));
 		gl.glBegin(GL2.GL_QUADS);
-		gl.glTexCoord2f(0,1); 
+		gl.glTexCoord2f(0,1);
 		gl.glVertex3f(startX, startY,z);
-		gl.glTexCoord2f(1,1); 
+		gl.glTexCoord2f(1,1);
 		gl.glVertex3f(startX + length, startY,z);
-		gl.glTexCoord2f(1,0); 
+		gl.glTexCoord2f(1,0);
 		gl.glVertex3f(startX + length, startY + height,z);
-		gl.glTexCoord2f(0,0); 
+		gl.glTexCoord2f(0,0);
 		gl.glVertex3f(startX, startY + height,z);
 		gl.glEnd();
 		gl.glDisable(GL2.GL_TEXTURE_2D);

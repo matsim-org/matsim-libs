@@ -77,7 +77,6 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 		private transient FloatBuffer vert = null;
 		private transient ByteBuffer colors =  null;
-		private transient InfoText agentText = null;
 		private int[] count = null;
 		private boolean calcOffset = true;
 		private float[] vertex = null;
@@ -120,8 +119,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				}
 
 				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
-				this.agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
-				this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+				InfoText agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
+				agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			}
 
 			this.vert.position(0);

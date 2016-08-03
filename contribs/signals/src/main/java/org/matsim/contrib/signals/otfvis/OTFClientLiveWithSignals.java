@@ -95,7 +95,7 @@ public class OTFClientLiveWithSignals {
 				clientQuadTree.getConstData();
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, otfVisConfigGroup, canvas, hostControl);
 				OTFControlBar hostControlBar = new OTFControlBar(server, hostControl, mainDrawer);
-				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);

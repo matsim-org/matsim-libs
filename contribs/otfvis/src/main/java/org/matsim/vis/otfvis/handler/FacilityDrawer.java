@@ -157,9 +157,9 @@ public class FacilityDrawer {
 				}
 				for (VisBusStop stop : this.stops) {
 					if ( stop.linkId!=null ) {
-						stop.stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f); 
+						InfoText stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f);
 						OTFOGLDrawer drawer = OTFClientControl.getInstance().getMainOTFDrawer();
-						stop.stopText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+						stopText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 					}
 				}
 			}
@@ -181,7 +181,6 @@ public class FacilityDrawer {
 		public String id = null;
 		public String linkId;
 		private int nOfPeople = 0;
-		private InfoText stopText;
 
 		public void setnOfPeople(int nOfPeople) {
 			this.nOfPeople = nOfPeople;
