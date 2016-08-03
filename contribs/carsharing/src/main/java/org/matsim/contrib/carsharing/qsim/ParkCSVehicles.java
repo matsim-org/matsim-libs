@@ -72,7 +72,7 @@ public class ParkCSVehicles implements AgentSource {
 		
 		if (owvehiclesLocationqt != null)
 			for (OneWayCarsharingStation owstation: owvehiclesLocationqt.values()) {
-				Set<String> vehicleTypesAtStation = owstation.getVehicleIDsPerType().keySet();
+				Set<String> vehicleTypesAtStation = owstation.getVehiclesPerType().keySet();
 
 				for (String type : vehicleTypesAtStation) {
 					
@@ -88,7 +88,7 @@ public class ParkCSVehicles implements AgentSource {
 		if (twvehiclesLocationqt != null) {
 			for (TwoWayCarsharingStation twstation: twvehiclesLocationqt.values()) {
 				
-				Set<String> vehicleTypesAtStation = twstation.getVehicleIDsPerType().keySet();
+				Set<String> vehicleTypesAtStation = twstation.getVehiclesPerType().keySet();
 				
 				for (String type : vehicleTypesAtStation) {
 					
