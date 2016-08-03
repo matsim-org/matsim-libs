@@ -280,14 +280,30 @@ class AssignmentEmulatingQLane extends QLaneI {
 		lastLinkEntryTime = now ;
 		
 		double freeTravelTime = this.length / linkSpeedCalculator.getMaximumVelocity(veh, this.qLink.getLink(), now);
-		
 
 		double flow_per_sec = 1./avHeadway/context.qsimConfig.getFlowCapFactor() ;
-		final double cap_per_sec = this.qLink.getLink().getFlowCapacityPerSec(now)/2 ;
+		final double cap_per_sec = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		
-		double linkTTime = freeTravelTime * Math.min( 1 + 0.15 * Math.pow( flow_per_sec/cap_per_sec , 4 ),50. ) ;
+		// yyyyyy 0.15 * ( flow/(cap/2) )^4 is same as 2.4 * (flow/cap)^2 !!!!
+		
+//		double linkTTime = freeTravelTime * Math.min( 1 + Math.pow( flow_per_sec/cap_per_sec , 4 ),50. ) ;
 //		// see https://en.wikipedia.org/wiki/Route_assignment.  Volume and capacity can be given in arbitrary units as long as they
 //		// are the same since they cancel out.
+		
+		/*
+		 * Die IVV-Funktionen (BVWP Hauptbericht 2003 s.150) lassen sich ganz gut approximieren mit:
+		 * if ( flow < cap ) {
+		 *    v = (1+flow/cap)*(1-flow/cap)*vmax ;
+		 * } else {
+		 *    v = 5km/h or 10km/h or 20km/h ; // replace by 0.1*vmax
+		 * }
+		 * Verweist auf EWS; dort stehen tatsächlich die Formeln; das ist hyper-aufwändig mit exp, coth, etc. etc. 
+		 */
+		
+		
+		double mult = 1. / (1+flow_per_sec/cap_per_sec) / (1-flow_per_sec/cap_per_sec) ;
+		if ( mult>10 ) mult=10. ;
+		double linkTTime = mult * freeTravelTime ;
 		
 		if ( now > 8*3600 ) {
 			if ( cnt < 10 ) {
