@@ -19,33 +19,47 @@
 
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
-
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
 /**
- * @author nagel
- *
+ * @author amit
  */
-class LinkLookUp implements LookUpItemFromId<Link>{
-	
-	private Network network;
 
-	LinkLookUp( Scenario sc ) {
-		this.network = sc.getNetwork();
-	}
+public class ModalLink implements Identifiable<ModalLink> {
 	
-	LinkLookUp( Network net ) {
-		this.network = net ;
-	}
+	private final String mode;
+	private final Id<Link> linkId;
+	private final Id<ModalLink> id;
 	
+	private static final String seperator = "_&_";
+	
+	public String getMode() {
+		return mode;
+	}
+
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+
+	public ModalLink(final String mode, final Id<Link> linkId) {
+		this.mode = mode;
+		this.linkId = linkId;
+		this.id = Id.create(this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString()), ModalLink.class);
+	}
+
 	@Override
-	public Link getItem( Id<Link> id ) {
-		return this.network.getLinks().get( id ) ;
+	public String toString(){
+		return this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString());
+	}
+	
+	public static String getModeLinkSplittor(){
+		return seperator;
 	}
 
+	@Override
+	public Id<ModalLink> getId() {
+		return this.id;
+	}
 }

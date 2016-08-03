@@ -19,14 +19,18 @@
 
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
-import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
+/**
+ * @author amit
+ */
 
-public interface ModalCadytsContextI<T> {
-	
-	AnalyticalCalibrator<T> getCalibrator(String mode) ;
+public class ModalLinkLookUp implements LookUpItemFromId<ModalLink> {
 
-	PlansTranslator<T> getPlansTranslator();
-
+	@Override
+	public ModalLink getItem( Id<ModalLink> id ) {
+		String strs [] = id.toString().split(ModalLink.getModeLinkSplittor());
+		return new ModalLink(strs[0], Id.createLinkId(strs[1]));
+	}
 }

@@ -7,25 +7,23 @@ import org.matsim.api.core.v01.network.Link;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
-/*package*/ class ModalSimResultsContainerImpl implements SimResults<Link> {
+/*package*/ class ModalSimResultsContainerImpl implements SimResults<ModalLink> {
 	
 	private static final long serialVersionUID = 1L;
 	private final VolumesAnalyzer volumesAnalyzer;
 	private final double countsScaleFactor;
-	private final String mode;
 
-	ModalSimResultsContainerImpl(final VolumesAnalyzer volumesAnalyzer, final double countsScaleFactor, final String mode) {
+	ModalSimResultsContainerImpl(final VolumesAnalyzer volumesAnalyzer, final double countsScaleFactor) {
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.countsScaleFactor = countsScaleFactor;
-		this.mode = mode;
 	}
 
 	@Override
-	public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
+	public double getSimValue(final ModalLink modalLinkCounter, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
 
-		Id<Link> linkId = link.getId();
+		Id<Link> linkId = modalLinkCounter.getLinkId();
 //		double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
-		double [] values= volumesAnalyzer.getVolumesPerHourForLink(linkId, mode);
+		double [] values= volumesAnalyzer.getVolumesPerHourForLink(linkId, modalLinkCounter.getMode());
 		
 		if (values == null) {
 			return 0;
@@ -58,7 +56,6 @@ import cadyts.supply.SimResults;
 	public String toString() {
 		final StringBuffer stringBuffer2 = new StringBuffer();
 		final String LINKID = "linkId: ";
-		final String MODE	= "; mode: ";
 		final String VALUES = "; values:";
 		final char TAB = '\t';
 		final char RETURN = '\n';
@@ -66,12 +63,11 @@ import cadyts.supply.SimResults;
 		for (Id<Link> linkId : this.volumesAnalyzer.getLinkIds()) { // Only occupancy!
 			StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append(LINKID);
-			stringBuffer.append(MODE);
 			stringBuffer.append(linkId);
 			stringBuffer.append(VALUES);
 
 			boolean hasValues = false; // only prints stops with volumes > 0
-			int[] values = this.volumesAnalyzer.getVolumesForLink(linkId, this.mode);
+			int[] values = this.volumesAnalyzer.getVolumesForLink(linkId); // AA_TODO : this is not mode-specific.
 
 			for (int ii = 0; ii < values.length; ii++) {
 				hasValues = hasValues || (values[ii] > 0);

@@ -20,7 +20,9 @@
 
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -44,7 +46,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
-public class ModalPlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
+public class ModalPlansTranslatorBasedOnEvents implements PlansTranslator<ModalLink>, LinkLeaveEventHandler, 
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 	private static final Logger log = Logger.getLogger(ModalPlansTranslatorBasedOnEvents.class);
@@ -52,6 +54,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final Scenario scenario;
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Map<Id<Person>,String> personId2Mode = new HashMap<>();
 	
 	private int iteration = -1;
 
@@ -76,15 +79,15 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<Link> getCadytsPlan(final Plan plan) {
+	public final cadyts.demand.Plan<ModalLink> getCadytsPlan(final Plan plan) {
 		@SuppressWarnings("unchecked")
-		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+		PlanBuilder<ModalLink> planStepFactory = (PlanBuilder<ModalLink>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;
 			return null;
 		}
 		this.plansFound++;
-		final cadyts.demand.Plan<Link> planSteps = planStepFactory.getResult();
+		final cadyts.demand.Plan<ModalLink> planSteps = planStepFactory.getResult();
 		return planSteps;
 	}
 
@@ -102,11 +105,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 			delegate.handleEvent(event);
+			this.personId2Mode.put(event.getPersonId(), event.getNetworkMode());
 	}
 	
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		delegate.handleEvent(event);
+		this.personId2Mode.remove(event.getPersonId());
 	}
 	
 	@Override
@@ -128,31 +133,31 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		Plan selectedPlan = person.getSelectedPlan();
 		
 		// get the planStepFactory for the plan (or create one):
-		PlanBuilder<Link> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
+		PlanBuilder<ModalLink> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
 		
 		if (tmpPlanStepFactory != null) {
 						
-			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+			String mode = this.personId2Mode.get(driverId);
 					
 			// add the "turn" to the planStepfactory
-			tmpPlanStepFactory.addTurn(link, (int) event.getTime());
+			tmpPlanStepFactory.addTurn(new ModalLink(mode,event.getLinkId()), (int) event.getTime());
 		}
 	}
 
 	// ###################################################################################
 	// only private functions below here (low level functionality)
 
-	private PlanBuilder<Link> getPlanStepFactoryForPlan(final Plan selectedPlan) {
-		PlanBuilder<Link> planStepFactory = null;
+	private PlanBuilder<ModalLink> getPlanStepFactoryForPlan(final Plan selectedPlan) {
+		PlanBuilder<ModalLink> planStepFactory = null;
 
-		planStepFactory = (PlanBuilder<Link>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+		planStepFactory = (PlanBuilder<ModalLink>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
 		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
 			// attach the iteration number to the plan:
 			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
 
 			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<Link>();
+			planStepFactory = new PlanBuilder<ModalLink>();
 			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
 
 			// memorize the plan as being seen:

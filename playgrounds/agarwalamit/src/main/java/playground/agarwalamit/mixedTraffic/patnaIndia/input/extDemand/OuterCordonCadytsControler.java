@@ -20,16 +20,15 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -69,7 +68,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsScoring;
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.JointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
@@ -174,7 +173,7 @@ public class OuterCordonCadytsControler {
 		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator();
 		occg.run();
 		
-		Map<String, Counts<Link>> mode2counts = occg.getMode2Counts();
+		Counts<ModalLink> modalLinkCounts = occg.getModalLinkCounts();
 		
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);
@@ -183,7 +182,7 @@ public class OuterCordonCadytsControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Key.get(new TypeLiteral<Map<String, Counts<Link>>>(){}, Names.named("calibration"))).toInstance(mode2counts);
+				bind(Key.get(new TypeLiteral<Counts<ModalLink>>(){}, Names.named("calibration"))).toInstance(modalLinkCounts);
 				
 				bind(ModalCadytsContext.class).asEagerSingleton();
 				addControlerListenerBinding().to(ModalCadytsContext.class);
@@ -208,7 +207,7 @@ public class OuterCordonCadytsControler {
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final ModalCadytsScoring<Link> scoringFunction = new ModalCadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
+				final CadytsScoring<ModalLink> scoringFunction = new CadytsScoring<ModalLink>(person.getSelectedPlan(), config, cContext);
 				final double cadytsScoringWeight = 15.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				sumScoringFunction.addScoringFunction(scoringFunction );

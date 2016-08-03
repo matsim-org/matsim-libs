@@ -21,8 +21,6 @@
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -37,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -50,7 +49,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
@@ -60,32 +58,30 @@ import cadyts.supply.SimResults;
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
  */
-public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
+public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
 	private final static Logger log = Logger.getLogger(ModalCadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
-	
+
 	private final double countsScaleFactor;
-	private final Set<String> modes ;
-	private final Map<String,Counts<Link>> mode2calibrationCounts ;
+	private final Counts<ModalLink> calibrationCounts;
 	private final boolean writeAnalysisFile;
 
-	private Map<String,AnalyticalCalibrator<Link>> mode2calibrator = new HashMap<>();
+	private AnalyticalCalibrator<ModalLink> calibrator;
 	private ModalPlansTranslatorBasedOnEvents plansTranslator;
-	private SimResults<Link> simResults;
+	private SimResults<ModalLink> simResults;
 	private Scenario scenario;
 	private EventsManager eventsManager;
 	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	ModalCadytsContext(Config config, @Named("calibration") Map<String,Counts<Link>> mode2calibrationCounts, Scenario scenario, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
-		this.modes = CollectionUtils.stringToSet( config.counts().getAnalyzedModes() );
-		this.mode2calibrationCounts = mode2calibrationCounts;
-		
+		this.calibrationCounts = calibrationCounts;
+
 		this.eventsManager = eventsManager;
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.controlerIO = controlerIO;
@@ -95,12 +91,11 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
 
-
 		Set<String> countedLinks = new TreeSet<>();
-		for (String mode : this.modes) {
-			for (Id<Link> id : this.mode2calibrationCounts.get(mode).getCounts().keySet()) {
-				countedLinks.add(id.toString());
-			}
+		for (Id<ModalLink> id : this.calibrationCounts.getCounts().keySet()) {
+			ModalLinkLookUp llu = new ModalLinkLookUp();
+			Link l = this.scenario.getNetwork().getLinks().get( llu.getItem(id).getLinkId() );
+			countedLinks.add(l.getId().toString());
 		}
 		cadytsConfig.setCalibratedItems(countedLinks);
 
@@ -108,21 +103,19 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 	}
 
 	@Override
-	public PlansTranslator<Link> getPlansTranslator() {
+	public PlansTranslator<ModalLink> getPlansTranslator() {
 		return this.plansTranslator;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		this.simResults = new ModalSimResultsContainerImpl(volumesAnalyzer, countsScaleFactor);
+		
 		// this collects events and generates cadyts plans from it
 		this.plansTranslator = new ModalPlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);
-		
-		for (String mode : this.modes ) {
-			this.simResults = new ModalSimResultsContainerImpl(volumesAnalyzer, countsScaleFactor, mode);
-			AnalyticalCalibrator<Link> analyticalCalibration = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.mode2calibrationCounts.get(mode) , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
-			this.mode2calibrator.put(mode, analyticalCalibration);
-		}
+
+		this.calibrator =  CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp() /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
 	}
 
 	@Override
@@ -132,32 +125,28 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 		// This is fine, since the number of these plans will go to zero in normal simulations,
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			for (String mode : this.modes){
-				this.mode2calibrator.get(mode).addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
-			}
+		for (Person person : scenario.getPopulation().getPersons().values()) { // this is wrong. adding plan 
+			this.calibrator.addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		for (String mode : this.modes){
-			if (this.writeAnalysisFile) {
-				String analysisFilepath = null;
-				if (isActiveInThisIteration(event.getIteration(), scenario.getConfig())) {
-					analysisFilepath = controlerIO.getIterationFilename(event.getIteration(), mode+"_"+FLOWANALYSIS_FILENAME);
-				}
-				this.mode2calibrator.get(mode).setFlowAnalysisFile(analysisFilepath);
+		if (this.writeAnalysisFile) {
+			String analysisFilepath = null;
+			if (isActiveInThisIteration(event.getIteration(), scenario.getConfig())) {
+				analysisFilepath = controlerIO.getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 			}
-			this.mode2calibrator.get(mode).afterNetworkLoading(this.simResults);
-			// write some output
-			String filename = controlerIO.getIterationFilename(event.getIteration(), mode+"_"+LINKOFFSET_FILENAME);
-			try {
-				new CadytsCostOffsetsXMLFileIO<>(new LinkLookUp(scenario), Link.class)
-				.write(filename, this.mode2calibrator.get(mode).getLinkCostOffsets());
-			} catch (IOException e) {
-				log.error("Could not write link cost offsets!", e);
-			}
+			this.calibrator.setFlowAnalysisFile(analysisFilepath);
+		}
+		this.calibrator.afterNetworkLoading(this.simResults);
+		// write some output
+		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+		try {
+			new CadytsCostOffsetsXMLFileIO<ModalLink>(new ModalLinkLookUp(), ModalLink.class)
+			.write(filename, this.calibrator.getLinkCostOffsets());
+		} catch (IOException e) {
+			log.error("Could not write link cost offsets!", e);
 		}
 	}
 
@@ -165,8 +154,8 @@ public class ModalCadytsContext implements ModalCadytsContextI<Link>, StartupLis
 	 * for testing purposes only
 	 */
 	@Override
-	public AnalyticalCalibrator<Link> getCalibrator(String mode) {
-		return this.mode2calibrator.get(mode);
+	public AnalyticalCalibrator<ModalLink> getCalibrator() {
+		return this.calibrator;
 	}
 
 	// ===========================================================================================================================

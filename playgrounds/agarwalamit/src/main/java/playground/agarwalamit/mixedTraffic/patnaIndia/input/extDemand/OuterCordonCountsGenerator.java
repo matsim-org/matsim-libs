@@ -33,6 +33,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.MapUtils;
@@ -45,7 +46,7 @@ public class OuterCordonCountsGenerator {
 
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo_out = new HashMap<>();
-	private final Map<String,Counts<Link>> mode2counts = new HashMap<>();
+	private Counts<ModalLink> counts;
 
 	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/";
 
@@ -65,46 +66,42 @@ public class OuterCordonCountsGenerator {
 		storeModalCounts();
 	}
 	
-	public Counts<Link> getCounts(String mode) {
-		return this.mode2counts.get(mode);
-	}
-
-	public Map<String, Counts<Link>> getMode2Counts() {
-		return this.mode2counts;
+	public Counts<ModalLink> getModalLinkCounts() {
+		return this.counts;
 	}
 	
 	private void storeModalCounts(){
 
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo_in.keySet()){
 			for (String mode : this.countStation2time2countInfo_in.get(mcs).keySet()) {
-				Counts<Link> counts = mode2counts.get(mode);
 				if(counts==null) {
-					counts = new Counts<Link>();
+					counts = new Counts<ModalLink>();
 					counts.setYear(2008);
 					counts.setName("Patna_counts");
 					counts.setDescription(mode);
 				}
-
-				Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
+				
+				ModalLink ml = new ModalLink(mode, mcs.getFirst());
+				Id<ModalLink> modalLinkId = Id.create(ml.getId(), ModalLink.class);
+				Count<ModalLink> c = counts.createAndAddCount(modalLinkId, mcs.getSecond());
 				for(Integer i : countStation2time2countInfo_in.get(mcs).get(mode).keySet()){
 					double vol = countStation2time2countInfo_in.get(mcs).get(mode).get(i) ;
 					c.createVolume(i, vol );
 				}
-				mode2counts.put(mode, counts);
 			}
 		}
 
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo_out.keySet()){
 			for (String mode : this.countStation2time2countInfo_out.get(mcs).keySet()) {
-				Counts<Link> counts = mode2counts.get(mode);
 
-				Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
+				ModalLink ml = new ModalLink(mode, mcs.getFirst());
+				Id<ModalLink> modalLinkId = Id.create(ml.getId(), ModalLink.class);
+				Count<ModalLink> c = counts.createAndAddCount(modalLinkId, mcs.getSecond());
 				for(Integer i : countStation2time2countInfo_out.get(mcs).get(mode).keySet()){
 					double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(mode).get(i) * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR);
 					c.createVolume(i, vol );
 					c.setCsId("mode");
 				}
-				mode2counts.put(mode, counts);
 			}
 		}
 	}

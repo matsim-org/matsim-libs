@@ -20,7 +20,8 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,9 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -40,30 +39,35 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.DefaultRoutingModules;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
+ * Trying to check if an agent is routed on multi-mode network.
+ * 
+ * a) only bike track
+ * b) bike track with one car link
+ * 
  * @author amit
  */
 
 public class PatnaBikeTestControler {
 	
 	public static void main(String[] args) {
+		
 		String mode = "bike";
 		String net = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
+		String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/testBikeTrack/";
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(net);
+		
+		//== allowing car on home and work activity locations
+		
+		//==
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		PopulationFactory popFact = sc.getPopulation().getFactory();
@@ -71,6 +75,14 @@ public class PatnaBikeTestControler {
 		Plan plan = popFact.createPlan();
 		
 		Link l = sc.getNetwork().getLinks().get(Id.createLinkId("256501411_link178"));
+		
+		Set<String> modes = new HashSet<>();
+		modes.add("car");
+		modes.add("bike");
+		modes.add("bike_ext");
+		l.setAllowedModes(modes );
+		sc.getNetwork().addLink(l);
+		
 		Activity home = popFact.createActivityFromLinkId("home", l.getId());
 		home.setEndTime(9.*3600.);
 		plan.addActivity(home);
@@ -129,7 +141,7 @@ public class PatnaBikeTestControler {
 		sc.getConfig().plansCalcRoute().addModeRoutingParams(mrp);
 		
 		sc.getConfig().controler().setLastIteration(0);
-		sc.getConfig().controler().setOutputDirectory("./output/");
+		sc.getConfig().controler().setOutputDirectory(outputDir);
 		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		ModeParams modeParam = new ModeParams(mode);
@@ -145,15 +157,10 @@ public class PatnaBikeTestControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-
 				addTravelTimeBinding(mode).to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding(mode).toInstance(builder_bike);
-				
 			}
 		});
-		
 		controler.run();
-		
 	}
-
 }
