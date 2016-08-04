@@ -20,11 +20,16 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.HashSet;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -41,7 +46,22 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Counts;
+
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 
 import playground.agarwalamit.analysis.StatsWriter;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
@@ -51,9 +71,12 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForTruck;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonCountsGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
@@ -73,8 +96,7 @@ public class JointCalibrationControler {
 	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 	
-	private static boolean updatingASC = false;
-	private static int updateASCAfterIt = 10;
+	private static boolean isUsingCadyts = false;
 	
 	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/c000/";
 
@@ -85,8 +107,7 @@ public class JointCalibrationControler {
 		if(args.length>0){
 			ConfigUtils.loadConfig(config, args[0]);
 			OUTPUT_DIR = args [1];
-			updatingASC = Boolean.valueOf( args[2] );
-			if(args.length>3) updateASCAfterIt = Integer.valueOf(args[3]);
+			isUsingCadyts = Boolean.valueOf( args[2] );
 			config.controler().setOutputDirectory( OUTPUT_DIR );
 		} else {
 			config = pjc.createBasicConfigSettings();
@@ -157,23 +178,9 @@ public class JointCalibrationControler {
 		// add income dependent scoring function factory
 		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
 		
-		// dont use asc updator amit july 25, 2016
-//		// add asc updator
-//		if(updatingASC){
-//			SortedMap<String, Double> initialModalShare = new TreeMap<>();
-//			initialModalShare.put("car", 2.0);
-//			initialModalShare.put("motorbike", 14.0);
-//			initialModalShare.put("bike", 33.0);
-//			initialModalShare.put("pt", 22.0);
-//			initialModalShare.put("walk", 29.0);
-//			ASCFromModalSplitCalibrator msc = new ASCFromModalSplitCalibrator(initialModalShare , updateASCAfterIt);
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					this.addControlerListenerBinding().toInstance(msc);
-//				}
-//			});
-//		}
+		// add cadyts
+		if (isUsingCadyts) addCadytsSetting(controler,config);
+		
 		controler.run();
 
 		// delete unnecessary iterations folder here.
@@ -197,6 +204,56 @@ public class JointCalibrationControler {
 		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents.txt");
 
 		StatsWriter.run(OUTPUT_DIR);
+	}
+	
+private static void addCadytsSetting(final Controler controler, final Config config){
+		
+		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator();
+		occg.run();
+		
+		Counts<ModalLink> modalLinkCounts = occg.getModalLinkCounts();
+		
+		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
+		config.counts().setAnalyzedModes(modes);
+		config.counts().setFilterModes(true);
+		config.strategy().setMaxAgentPlanMemorySize(10);
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Key.get(new TypeLiteral<Counts<ModalLink>>(){}, Names.named("calibration"))).toInstance(modalLinkCounts);
+				
+				bind(ModalCadytsContext.class).asEagerSingleton();
+				addControlerListenerBinding().to(ModalCadytsContext.class);
+			}
+		});
+		
+		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+		cadytsConfigGroup.setStartTime(0);
+		cadytsConfigGroup.setEndTime(24*3600-1);
+		
+		// scoring function
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			@Inject Network network;
+			@Inject ModalCadytsContext cContext;
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+
+				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				final CadytsScoring<ModalLink> scoringFunction = new CadytsScoring<ModalLink>(person.getSelectedPlan(), config, cContext);
+				final double cadytsScoringWeight = 15.0;
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				sumScoringFunction.addScoringFunction(scoringFunction );
+
+				return sumScoringFunction;
+			}
+		}) ;
 	}
 
 	/**
