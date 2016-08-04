@@ -19,14 +19,15 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -38,30 +39,38 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public final class PatnaBikeTrackCreator {
 
-	public static void run(Network network){
+	public static void main (String [] args){
 
-//		PatnaBikeTrackGenerator bikeTrack = new PatnaBikeTrackGenerator();
-//		bikeTrack.process();
+		String networkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+
+		PatnaBikeTrackCreator pbtc = new PatnaBikeTrackCreator();
+		Network network = scenario.getNetwork();
+		pbtc.addBikeTrackOnly(network);
+		new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithBikeTrack.xml.gz");
 		
+		// now apply traffic restrain to this network
+		PatnaTrafficRestrainer.run(network);
+		new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestricationAndBikeTrack.xml.gz");
+	}
+	
+	private void addBikeTrackOnly(final Network network){
 		// is using with cluster, provide bike track network.
 		String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
-		if ( ! new File(bikeTrack).exists()) bikeTrack = "/net/ils4/agarwal/patnaIndia/run108/input/bikeTrack.xml.gz"; 
-		
 		Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(bikeTrack).getNetwork();
 
 		// put everything to the original network
-		
 		for (Node n : bikeNetwork.getNodes().values()){
-			// cant simply add the network because it also has information about in-/out- links from the node
-			// adding the same in- out- link will throw exception (while adding a link, in-/out-links are added to to-/from-nodes.)
+			// cant simply add the nodes because it also has information about in-/out- links from the node
+			// adding the same in- out- link again will throw exception (because while adding a link, in-/out-links are added to to-/from-nodes.)
 			Node nNew = network.getFactory().createNode(n.getId(), n.getCoord());
 			network.addNode(nNew);
 		}
-		
+
 		for (Link l: bikeNetwork.getLinks().values() ) {
 			network.addLink(l);
 		}
-		
+
 		// now connect track with the network.
 		{// connection on the right (Ashok rajpath and NH 31 junction)
 			Node n1 = network.getNodes().get(Id.createNodeId("256501411_node103"));
@@ -112,14 +121,15 @@ public final class PatnaBikeTrackCreator {
 			createAndAddLink(network, new Node [] {n2,  n1}, "connector");
 		}
 	}
-	private static void createAndAddLink(Network network, Node [] nodes, String osmId) {
+
+	private void createAndAddLink(Network network, Node [] nodes, String osmId) {
 		int noOfLinks = network.getLinks().size();
 		String id = osmId+"_link"+noOfLinks;
 		double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
 		Set<String> modes = new HashSet<>();
 		modes.add("bike");
 		modes.add("bike_ext");
-		
+
 		Id<Link> linkId = Id.createLinkId(id);
 		Link l = network.getFactory().createLink(linkId, nodes[0], nodes[1]);
 		l.setAllowedModes(modes );

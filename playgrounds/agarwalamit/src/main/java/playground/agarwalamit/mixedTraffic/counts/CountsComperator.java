@@ -128,7 +128,7 @@ public class CountsComperator {
 				OuterCordonLinks ocl = new OuterCordonLinks(PatnaUtils.PATNA_NETWORK_TYPE);
 				String countinStation = ocl.getCountingStation(linkId); 
 				if ( countinStation!=null && countinStation.split("_")[1].equals("P2X") ) {
-					outTripReductionFactor = OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR;
+					outTripReductionFactor = OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR;  //AA_TODO: not sure if this factor should be calculated for total counts or only main modes counts.
 				}
 
 				Map<String, Map<Integer,Double>> mode2time2count = link2mode2time2count_input.get(linkId);

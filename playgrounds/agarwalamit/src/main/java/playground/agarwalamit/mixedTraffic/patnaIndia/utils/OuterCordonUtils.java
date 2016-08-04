@@ -42,7 +42,7 @@ public class OuterCordonUtils {
 	/**
 	 * correction factor only from car/motorbike/truck/bike and not from all vehicles (additionally, walk, cycle rickshaw, pt)
 	 */
-	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.853; 
+	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.853; //AA_TODO: not sure if this factor should be calculated for total counts or only main modes counts.
 
 	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
 		Map<String, List<Integer>> areas2zones = new HashMap<>();

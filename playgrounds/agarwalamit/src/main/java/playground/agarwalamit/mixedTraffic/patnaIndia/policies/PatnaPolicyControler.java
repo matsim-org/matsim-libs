@@ -56,6 +56,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.Bike
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * @author amit
@@ -63,10 +64,10 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 
 public class PatnaPolicyControler {
 	
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/baseCaseCtd/";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
 	private static String configFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/input/configBaseCaseCtd.xml";
 	private static boolean applyTrafficRestrain = false;
-	private static boolean addBikeTrack = false;
+	private static boolean addBikeTrack = true;
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -77,47 +78,31 @@ public class PatnaPolicyControler {
 		
 			applyTrafficRestrain = Boolean.valueOf(args[2]);
 			addBikeTrack = Boolean.valueOf(args[3]);
+			ConfigUtils.loadConfig(config, configFile);
+		} else {
+			ConfigUtils.loadConfig(config, configFile);
+			if(applyTrafficRestrain && addBikeTrack) config.controler().setOutputDirectory(outputDir+"/both/");
+			else if(addBikeTrack) config.controler().setOutputDirectory(outputDir+"/bikeTrack/");
+			else if(applyTrafficRestrain && addBikeTrack) config.controler().setOutputDirectory(outputDir+"/trafficRestrain/");
+			else config.controler().setOutputDirectory(outputDir+"/baseCaseCtd/");
 		}
 		
-		ConfigUtils.loadConfig(config, configFile);
-		config.controler().setOutputDirectory(outputDir);
-				
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+		config.controler().setWriteEventsInterval(1);
+
 		// policies if any
-		if (applyTrafficRestrain ) {
-			// if appying this, remove all routes from the plan.
-			PatnaTrafficRestrainer.run(scenario.getNetwork());
-			//since some links are now removed, route in the plans will throw exception, remove them.
-			for (Person p : scenario.getPopulation().getPersons().values()){
-				List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
-				for (PlanElement pe :pes ){
-					if (pe instanceof Activity) { 
-						Activity act = ((Activity)pe);
-						Id<Link> linkId = act.getLinkId();
-						if(! scenario.getNetwork().getLinks().containsKey(linkId) ){
-							// if activities are on such links, remove links 
-							act.setLinkId(null);
-							Coord cord = act.getCoord();
-							if (cord == null ) { // and if cord is not assigned to acitivity, assign it. 
-								act.setCoord( scenario.getNetwork().getLinks().get(linkId).getCoord());
-							}
-						} 
-					} else if ( pe instanceof Leg){
-						Leg leg = (Leg) pe;
-						leg.setRoute(null);
-					}
-				}
-			}
-		} 
-		
-		if(addBikeTrack) {
-			PatnaBikeTrackCreator.run(scenario.getNetwork());
+		if (applyTrafficRestrain && addBikeTrack ) {
+			config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestricationAndBikeTrack.xml.gz");
+		} else if (applyTrafficRestrain ) {
+			config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestrication.xml.gz");
+		} else if(addBikeTrack) {
+			config.network().setInputFile(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithBikeTrack.xml.gz");
 		}
 		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 		
+		if(applyTrafficRestrain ) removeRoutes(scenario); // removal of some links may lead to exception if routes are not removed from leg.
 		
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
@@ -196,5 +181,30 @@ public class PatnaPolicyControler {
 		msc.writeResults(outputDir+"/analysis/modalShareFromEvents.txt");
 
 		StatsWriter.run(outputDir);
+	}
+	
+	private static void removeRoutes(Scenario scenario){
+		//since some links are now removed, route in the plans will throw exception, remove them.
+		for (Person p : scenario.getPopulation().getPersons().values()){
+			List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
+			for (PlanElement pe :pes ){
+				if (pe instanceof Activity) { 
+					Activity act = ((Activity)pe);
+					Id<Link> linkId = act.getLinkId();
+					Coord cord = act.getCoord();
+					
+					if (cord == null && linkId == null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
+					else if (linkId == null ) { /*nothing to do*/ }
+					else if (cord==null && ! scenario.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
+					else {
+						cord = scenario.getNetwork().getLinks().get(linkId).getCoord();
+						act.setCoord(cord);
+					}
+				} else if ( pe instanceof Leg){
+					Leg leg = (Leg) pe;
+					leg.setRoute(null);
+				}
+			}
+		}
 	}
 }
