@@ -43,8 +43,8 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**

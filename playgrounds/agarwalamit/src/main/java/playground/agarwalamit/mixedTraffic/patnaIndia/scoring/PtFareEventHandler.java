@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.ptFare;
+package playground.agarwalamit.mixedTraffic.patnaIndia.scoring;
 
 import java.util.HashMap;
 import java.util.Map;

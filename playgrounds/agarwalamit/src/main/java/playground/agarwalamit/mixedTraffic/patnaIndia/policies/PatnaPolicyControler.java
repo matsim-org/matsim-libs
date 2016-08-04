@@ -50,12 +50,12 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.JointCalibrationControler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.PatnaScoringFunctionFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.BikeTimeDistanceTravelDisutilityFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForTruck;
-import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
+import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PatnaScoringFunctionFactory;
+import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**

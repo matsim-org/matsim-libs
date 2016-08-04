@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;

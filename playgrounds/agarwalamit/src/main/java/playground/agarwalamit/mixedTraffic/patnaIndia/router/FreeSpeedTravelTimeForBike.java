@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,37 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
+package playground.agarwalamit.mixedTraffic.patnaIndia.router;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
-import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
-import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 /**
  * @author amit
  */
 
-public class JointDemandModalSplit {
+public class FreeSpeedTravelTimeForBike implements TravelTime {
 
-	public static void main(String[] args) {
-		new JointDemandModalSplit().run();
-	}
-	
-	private void run (){
-		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/patnaIndia/run108/calibration/";
-		String folder = "c1/ITERS/it.";
-		String itNr = "100";
-		String plansFile = dir+folder+itNr+"/"+itNr+".plans.xml.gz";
-		
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
-		Population pop = sc.getPopulation();
-		ModalShareFromPlans msg = new ModalShareFromPlans(pop);
-		msg.run();
-		
-		String outFile = dir+folder+itNr+"/"+itNr+".modalSplit.txt";
-		
-		msg.writeResults(outFile);
-	}
+		@Override
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return link.getLength() / Math.min( MixedTrafficVehiclesUtils.getSpeed("bike"), link.getFreespeed(time) );
+		}
 }

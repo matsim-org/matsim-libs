@@ -17,32 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
+package playground.agarwalamit.mixedTraffic.patnaIndia.router;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
-
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author amit
  */
 
-public class JointCountsWriter {
-	
-	private static final String urbanCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/urbanCounts_excl_rckw_incl_truck.xml.gz";
-	private static final String externalCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/outerCordonCounts_10pct_OC1Excluded.xml.gz";
-	private static final String jointCountFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz";
-	
-	public static void main(String[] args) {
+final class BikeTimeDistanceTravelDisUtility implements TravelDisutility  {
 
-		Counts<Link> counts = new Counts<>();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.readFile(urbanCountFile);
-		reader.readFile(externalCountFile);
+	private final TravelTime timeCalculator;
+	private final double marginalCostOfTime;
+	private final double marginalCostOfDistance;
+	
+	BikeTimeDistanceTravelDisUtility(
+			final TravelTime timeCalculator,
+			final double marginalCostOfTime_s,
+			final double marginalCostOfDistance_m ){
+		this.timeCalculator = timeCalculator;
+		this.marginalCostOfTime = marginalCostOfTime_s;
+		this.marginalCostOfDistance = marginalCostOfDistance_m;
 		
-		new CountsWriter(counts).write(jointCountFile);
+	}
+	
+	@Override
+	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+		return this.marginalCostOfTime * travelTime +  this.marginalCostOfDistance * link.getLength();
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime + this.marginalCostOfDistance * link.getLength();
 	}
 }

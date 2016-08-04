@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
 import java.util.ArrayList;
 import java.util.Arrays;

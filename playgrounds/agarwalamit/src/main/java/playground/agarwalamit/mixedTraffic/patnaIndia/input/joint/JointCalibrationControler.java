@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
 import java.io.File;
 import java.util.HashSet;
@@ -72,11 +72,12 @@ import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.BikeTimeDistanceTravelDisutilityFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonCountsGenerator;
-import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
+import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PatnaScoringFunctionFactory;
+import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
