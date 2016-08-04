@@ -28,7 +28,6 @@ import java.util.Comparator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 
 
@@ -65,7 +64,6 @@ public class SceneGraph {
 	private Rect rect;
 	
 	private OGLAgentPointLayer agentLayer = new OGLAgentPointLayer();
-	private OGLSimpleStaticNetLayer networkLayer = new OGLSimpleStaticNetLayer();
 	private SimpleSceneLayer miscellaneousLayer = new SimpleSceneLayer();
 
 	private ArrayList<SceneLayer> drawingLayers;
@@ -74,8 +72,7 @@ public class SceneGraph {
 		this.rect = rect;
 		this.drawingLayers = new ArrayList<>();
 		this.drawingLayers.add(miscellaneousLayer);
-		this.drawingLayers.add(networkLayer);
-		this.drawingLayers.add(agentLayer);	
+		this.drawingLayers.add(agentLayer);
 	}
 
 	public Rect getRect() {
@@ -90,10 +87,6 @@ public class SceneGraph {
 		miscellaneousLayer.addItem(item);
 	}
 
-	public void addStaticItem(OTFGLAbstractDrawable item) {
-		networkLayer.addItem(item);
-	}
-	
 	public void finish() {
 		Collections.sort(drawingLayers, new LayerDrawingOrderComparator());
 	}

@@ -177,7 +177,6 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 
 	@Override
 	public void invalidate(SceneGraph graph) {
-		this.quadReceiver.addToSceneGraph(graph);
 	}
 
 	public OGLSimpleQuadDrawer getQuadReceiver() {

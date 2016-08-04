@@ -45,8 +45,8 @@ import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
-import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -63,7 +63,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
 import java.util.List;
-import java.util.Map.Entry;
 
 public class OTFOGLDrawer implements GLEventListener {
 
@@ -82,6 +81,8 @@ public class OTFOGLDrawer implements GLEventListener {
 	private Rectangle currentRect = null;
 
 	private double scale = 1.;
+	private double translateX = 0.;
+	private double translateY = 0.;
 
 	private int button = 0;
 
@@ -127,13 +128,16 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private OTFVisConfigGroup otfVisConfig;
 
-	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFVisConfigGroup otfVisConfig, Component canvas, OTFHostControl otfHostControl) {
+	public OTFOGLDrawer(OTFClientQuadTree clientQ, final OTFVisConfigGroup otfVisConfig, Component canvas, OTFHostControl otfHostControl) {
+		OTFClientControl.getInstance().setMainOTFDrawer(this);
 		this.clientQ = clientQ;
 		this.hostControlBar = otfHostControl;
 		this.otfVisConfig = otfVisConfig;
 		this.canvas = canvas;
+		((GLAutoDrawable) canvas).addGLEventListener(new OGLSimpleStaticNetLayer());
 		((GLAutoDrawable) canvas).addGLEventListener(this);
 		((GLAutoDrawable) canvas).addGLEventListener(new OTFScaleBarDrawer());
+		clientQ.getConstData();
 
 		MouseInputAdapter mouseMan = new MouseInputAdapter() {
 			@Override
@@ -153,7 +157,8 @@ public class OTFOGLDrawer implements GLEventListener {
 					Point3f excenter = getOGLPos(viewport[2]/2+deltax, viewport[3]/2+deltay);
 					float glDeltaX = excenter.x - center.x;
 					float glDeltaY = excenter.y - center.y;
-					viewBounds = new Rect(viewBounds.minX + glDeltaX, viewBounds.minY + glDeltaY, viewBounds.maxX + glDeltaX, viewBounds.maxY + glDeltaY);
+					setTranslateX(getTranslateX() + glDeltaX);
+					setTranslateY(getTranslateY() + glDeltaY);
 					OTFOGLDrawer.this.canvas.repaint();
 				}
 			}
@@ -178,13 +183,7 @@ public class OTFOGLDrawer implements GLEventListener {
 				}
 				switch (function) {
 					case "Zoom":
-						if (OTFClientControl.getInstance().getOTFVisConfig().isMapOverlayMode()) {
-							// Zooming via a rectangle is disabled in map overlay mode,
-							// because we can only zoom in straight powers of two. Compare Google maps.
-							button = 0;
-						} else {
-							button = 1;
-						}
+						button = 1;
 						break;
 					case "Pan":
 						button = 2;
@@ -213,17 +212,24 @@ public class OTFOGLDrawer implements GLEventListener {
 				if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
 					if (button == 1 || button == 4) {
 						if (button == 1) {
-							int startxy[] = new int[]{start.x, start.y};
+							int startxy[] = new int[]{OTFOGLDrawer.this.start.x, OTFOGLDrawer.this.start.y};
 							((GLAutoDrawable) OTFOGLDrawer.this.canvas).getNativeSurface().convertToPixelUnits(startxy);
 							int endxy[] = new int[]{e.getX(), e.getY()};
 							((GLAutoDrawable) OTFOGLDrawer.this.canvas).getNativeSurface().convertToPixelUnits(endxy);
 							int deltax = Math.abs(startxy[0] - endxy[0]);
 							int deltay = Math.abs(startxy[1] - endxy[1]);
 							double ratio =( (startxy[1] - endxy[1]) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
-							Rectangle2D scaledNewViewBounds = quadTreeRectToRectangle2D(viewBounds.scale(ratio - 1, ratio - 1));
-							Rectangle2D scaledAndTranslatedNewViewBounds = new Rectangle2D.Double(scaledNewViewBounds.getX() + (currentRect.getCenterX() - viewBounds.centerX), scaledNewViewBounds.getY() + (currentRect.getCenterY() - viewBounds.centerY), scaledNewViewBounds.getWidth(), scaledNewViewBounds.getHeight());
-							Animator viewBoundsAnimator = PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "viewBounds", quadTreeRectToRectangle2D(viewBounds), scaledAndTranslatedNewViewBounds);
-							viewBoundsAnimator.start();
+							Point3f start = getOGLPos(OTFOGLDrawer.this.start.x, OTFOGLDrawer.this.start.y);
+							Point3f end = getOGLPos(e.getX(), e.getY());
+							double translatex = (start.getX() + end.getX()) / 2 - getViewBoundsAsQuadTreeRect().centerX;
+							double translatey = (start.getY() + end.getY()) / 2 - getViewBoundsAsQuadTreeRect().centerY;
+							double newScale = getScale() * ratio;
+							if (otfVisConfig.isMapOverlayMode()) {
+								newScale = nearestPowerOfTwo(newScale);
+							}
+							PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "scale", newScale).start();
+							PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "translateX", getTranslateX() + translatex).start();
+							PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "translateY", getTranslateY() + translatey).start();
 							Animator rectFader = PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "alpha", 1.0f, 0.f);
 							rectFader.setStartDelay(200);
 							rectFader.setAcceleration(0.4f);
@@ -272,7 +278,10 @@ public class OTFOGLDrawer implements GLEventListener {
 							@Override
 							public void actionPerformed( ActionEvent e11) {
 								showZoomDialog();
-								if(OTFOGLDrawer.this.lastZoom != null) OTFOGLDrawer.this.setViewBounds(OTFOGLDrawer.this.lastZoom.getZoomstart());
+								if(OTFOGLDrawer.this.lastZoom != null) {
+									Rectangle2D viewBounds1 = OTFOGLDrawer.this.lastZoom.getZoomstart();
+									OTFOGLDrawer.this.viewBounds = new Rect(viewBounds1.getMinX(), viewBounds1.getMinY(), viewBounds1.getMaxX(), viewBounds1.getMaxY());
+								}
 							}
 						} );
 						popmen.add( new AbstractAction("Delete last Zoom") {
@@ -304,7 +313,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
 		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
 		if (initialZoom != null) {
-			this.setViewBounds(initialZoom);
+			this.viewBounds = new Rect(initialZoom.getMinX(), initialZoom.getMinY(), initialZoom.getMaxX(), initialZoom.getMaxY());
 		}
 	}
 
@@ -348,26 +357,15 @@ public class OTFOGLDrawer implements GLEventListener {
 			this.queryHandler.updateQueries();
 		}
 		GL2 gl = drawable.getGL().getGL2();
-		OTFGLAbstractDrawable.setGl(drawable);
-		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
-		gl.glClearColor(components[0], components[1], components[2], components[3]);
-		gl.glClear( GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_FILL);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		this.setFrustrum(gl);
-		components = otfVisConfig.getNetworkColor().getColorComponents(components);
-		gl.glColor4d(components[0], components[1], components[2], components[3]);
 		if (this.currentSceneGraph != null) {
 			this.currentSceneGraph.draw();
 		}
 		if (this.queryHandler != null) {
 			this.queryHandler.drawQueries(this);
-		}
-
-		if (otfVisConfig.isDrawingLinkIds() && isZoomBigEnoughForLabels()) {
-			Map<Coord, String> coordStringPairs = findVisibleLinks();
-			displayLinkIds(coordStringPairs, drawable);
 		}
 
 		if (otfVisConfig.drawTime()) {
@@ -410,40 +408,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 		++nRedrawn;
 	}
-	
-	private void displayLinkIds(Map<Coord, String> linkIds, GLAutoDrawable glAutoDrawable) {
-		String testText = "0000000";
-		Rectangle2D test = textRenderer.getBounds(testText);
-		Map<Coord, Boolean> xymap = new HashMap<>(); // Why is here a Map used, and not a Set?
-		double xRaster = test.getWidth(), yRaster = test.getHeight();
-		for( Entry<Coord, String> e : linkIds.entrySet()) {
-			Coord coord = e.getKey();
-			String linkId = e.getValue();
-			float east = (float)coord.getX() ;
-			float north = (float)coord.getY() ;
-			float textX = (float) (((int)(east / xRaster) +1)*xRaster);
-			float textY = north -(float)(north % yRaster) +80;
-			Coord text = new Coord((double) textX, (double) textY);
-			int i = 1;
-			while (xymap.get(text) != null) {
-				text = new Coord((double) textX, (double) (i * (float) yRaster + textY));
-				if(xymap.get(text) == null) break;
-				text = new Coord((double) (textX + i * (float) xRaster), (double) textY);
-				if(xymap.get(text) == null) break;
-				i++;
-			}
-			xymap.put(text, Boolean.TRUE);
-            GL2 gl = glAutoDrawable.getGL().getGL2();
-			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
-			gl.glLineWidth(2);
-			gl.glBegin(GL2.GL_LINE_STRIP);
-			gl.glVertex3d(east, north, 0);
-			gl.glVertex3d((float) text.getX(), (float) text.getY(), 0);
-			gl.glEnd();
-			InfoText infoText = new InfoText(linkId, (float)text.getX(), (float)text.getY());
-			infoText.draw(textRenderer, glAutoDrawable, this.getViewBoundsAsQuadTreeRect());
-		}
-	}
 
 	private void drawFrameRate(GLAutoDrawable drawable, int now) {
 
@@ -461,14 +425,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.textRenderer.beginRendering(drawable.getSurfaceWidth(), drawable.getSurfaceHeight());
 		this.textRenderer.draw(Time.writeTime(now, ':'), x, y);
 		this.textRenderer.endRendering();
-	}
-
-	private Map<Coord, String> findVisibleLinks() {
-		Rect rect = this.getViewBoundsAsQuadTreeRect();
-		Rectangle2D.Double dest = new Rectangle2D.Double(rect.minX , rect.minY , rect.maxX - rect.minX, rect.maxY - rect.minY);
-		CollectDrawLinkId linkIdQuery = new CollectDrawLinkId(dest);
-		linkIdQuery.prepare(this.clientQ);
-        return linkIdQuery.getLinkIds();
 	}
 
 	private void fireChangeListeners() {
@@ -500,7 +456,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		return new Point3f(posX, posY, 0);
 	}
 
-	private Coord getPixelsize() {
+	public Coord getPixelsize() {
 		Point3f p1 = getOGLPos(300,300);
 		Point3f p2 = getOGLPos(301,301);
 		return new Coord((double) Math.abs(p2.x - p1.x), (double) Math.abs(p2.y - p1.y));
@@ -511,7 +467,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	public double getScale() {
-		return OTFOGLDrawer.this.scale;
+		return this.scale;
 	}
 
 	public QuadTree.Rect getViewBoundsAsQuadTreeRect() {
@@ -522,7 +478,6 @@ public class OTFOGLDrawer implements GLEventListener {
 	public void init(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		this.textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
-		OTFGLAbstractDrawable.setGl(drawable);
 		gl.setSwapInterval(0);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		gl.glClearColor(components[0], components[1], components[2], components[3]);
@@ -538,31 +493,24 @@ public class OTFOGLDrawer implements GLEventListener {
 			double pixelRatio = (double) drawable.getSurfaceHeight() / (double) (maxNorthing-minNorthing);
 			this.scale = 1.0f / (float) pixelRatio;
 			this.viewBounds =  new QuadTree.Rect(minEasting, minNorthing, minEasting + (maxNorthing - minNorthing) * aspectRatio, maxNorthing);
-			setZoomToNearestInteger();
+			if (otfVisConfig.isMapOverlayMode()) {
+				setScale(nearestPowerOfTwo(this.scale));
+			}
 			int time = this.hostControlBar.getSimTime();
 			QuadTree.Rect rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 			this.currentSceneGraph = this.clientQ.getSceneGraph(time, rect);
 		}
 		marker = GLUtils.createTexture(gl, MatsimResource.getAsInputStream("otfvis/marker.png"));
-		setFrustrum(gl);
 		currentSceneGraph.glInit();
 		glInited = true;
 	}
 
-	private void setZoomToNearestInteger() {
-		int zoom = (int) log2(scale);
-		setScale(Math.pow(2, zoom));
+	private double nearestPowerOfTwo(double scale) {
+		return Math.pow(2, (int) log2(scale));
 	}
 
 	private static double log2 (double scale) {
 		return Math.log(scale) / Math.log(2);
-	}
-
-	private boolean isZoomBigEnoughForLabels() {
-		Coord size = getPixelsize();
-		final double cellWidth = otfVisConfig.getLinkWidth();
-		final double pixelsizeStreet = 5;
-		return (size.getX()*pixelsizeStreet < cellWidth) && (size.getX()*pixelsizeStreet < cellWidth);
 	}
 
 	private Rectangle2D quadTreeRectToRectangle2D(QuadTree.Rect viewBounds) {
@@ -612,7 +560,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.canvas.repaint();
 	}
 
-	private void setFrustrum(GL2 gl) {
+	public void setFrustrum(GL2 gl) {
 		GLU glu = new GLU();
 		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
@@ -634,10 +582,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		scaleNetworkRelative(scaleFactor);
 	}
 
-	private void setViewBounds(Rectangle2D viewBounds) {
-		this.viewBounds = new QuadTree.Rect(viewBounds.getMinX(), viewBounds.getMinY(), viewBounds.getMaxX(), viewBounds.getMaxY());
-	}
-	
 	private void showZoomDialog() {
 		this.zoomD = new JDialog();
 		this.zoomD.setUndecorated(true);
@@ -662,7 +606,8 @@ public class OTFOGLDrawer implements GLEventListener {
 				public void actionPerformed( ActionEvent e ) {
 					int num = Integer.parseInt(e.getActionCommand());
 					OTFOGLDrawer.this.lastZoom = zooms.get(num);
-					OTFOGLDrawer.this.setViewBounds(OTFOGLDrawer.this.lastZoom.getZoomstart());
+					Rectangle2D viewBounds1 = OTFOGLDrawer.this.lastZoom.getZoomstart();
+					OTFOGLDrawer.this.viewBounds = new Rect(viewBounds1.getMinX(), viewBounds1.getMinY(), viewBounds1.getMaxX(), viewBounds1.getMaxY());
 					OTFOGLDrawer.this.zoomD.setVisible(false);
 				}
 			} );
@@ -715,4 +660,21 @@ public class OTFOGLDrawer implements GLEventListener {
 	@Override
 	public void dispose(GLAutoDrawable arg0) {}
 
+	public double getTranslateX() {
+		return translateX;
+	}
+
+	public void setTranslateX(double translateX) {
+		this.viewBounds = new Rect(viewBounds.minX + (translateX - this.translateX), viewBounds.minY, viewBounds.maxX + (translateX - this.translateX), viewBounds.maxY);
+		this.translateX = translateX;
+	}
+
+	public double getTranslateY() {
+		return translateY;
+	}
+
+	public void setTranslateY(double translateY) {
+		this.viewBounds = new Rect(viewBounds.minX, viewBounds.minY + (translateY - this.translateY), viewBounds.maxX, viewBounds.maxY + (translateY - this.translateY));
+		this.translateY = translateY;
+	}
 }

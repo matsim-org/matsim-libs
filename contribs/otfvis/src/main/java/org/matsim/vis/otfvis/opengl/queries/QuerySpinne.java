@@ -38,6 +38,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -125,7 +126,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 				InfoText agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
-				agentText.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+				agentText.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 			}
 
 			this.vert.position(0);
@@ -169,7 +170,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
 			double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
 			double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
-			GL2 gl = OTFGLAbstractDrawable.getDrawable().getGL().getGL2();
+			GL2 gl = GLContext.getCurrentGL().getGL2();
 			Color color = new Color(255,255,255,200);
 			gl.glEnable(GL.GL_BLEND);
 			drawQuad(gl, minX, maxX, minY, maxY, color);
@@ -188,15 +189,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double a=1,b=4,c=1,d=3;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
 			InfoText text1 = new InfoText("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text1.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			text1.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=5;d=7;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
 			InfoText text2 = new InfoText("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text2.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			text2.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=9;d=11;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 			InfoText text3 = new InfoText("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text3.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			text3.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

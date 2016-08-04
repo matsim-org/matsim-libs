@@ -325,7 +325,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void drawActivityTexts() {
-			GLAutoDrawable drawable = OTFGLAbstractDrawable.getDrawable();
+			GLAutoDrawable drawable = OTFClientControl.getInstance().getMainOTFDrawer().getCanvas();
 			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 			textRenderer.setColor(new Color(50, 50, 128, 128));
 			for (ActivityInfo activityEntry : this.acts ) {
@@ -409,7 +409,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 			InfoText agentText = new InfoText(this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			agentText.setAlpha(0.7f);
-			agentText.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			agentText.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override
