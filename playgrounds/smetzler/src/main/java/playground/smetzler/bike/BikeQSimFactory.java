@@ -91,8 +91,6 @@ public class BikeQSimFactory implements Provider<Mobsim> {
 		bike.setMaximumVelocity(30.0/3.6);
 		bike.setPcuEquivalents(0.0);
 		modeVehicleTypes.put("bike", bike);
-
-		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes).configure(qSim);
 		
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 
