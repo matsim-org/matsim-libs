@@ -193,13 +193,15 @@ public class JointCalibrationControler {
 		new File(OUTPUT_DIR+"/analysis/").mkdir();
 		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
 		// write some default analysis
-		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile);
+		
+		String userGroup = PatnaUserGroup.urban.toString();
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
 		mtta.run();
-		mtta.writeResults(OUTPUT_DIR+"/analysis/modalTravelTime.txt");
+		mtta.writeResults(OUTPUT_DIR+"/analysis/modalTravelTime_"+userGroup+".txt");
 
-		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
 		msc.run();
-		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents.txt");
+		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents_"+userGroup+".txt");
 
 		StatsWriter.run(OUTPUT_DIR);
 	}
