@@ -44,7 +44,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -67,19 +66,7 @@ import org.matsim.withinday.utils.EditRoutes;
  * @author balac
  */
 public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
-	/**
-	 * 2016-02-17 It seems that this whole class could be simplified a lot by observing the following:<ul>
-	 * <li> avoid copy and paste.  There is a lot of code repetition
-	 * <li> define more meaningful local variables.  This can be done by "extract local variable" re-factorings in eclipse.
-	 * <li> consider using the {@link EditRoutes} infrastructure.  It does similar splicing.
-	 * </ul> kai, feb'16
-	 * <p/>
-	 * 2016-02-18 After trying around with this, coming up with the following intuitions:<ul>
-	 * <li> Code can be made easier to read, see {@link #insertFreeFloatingTripWhenEndingActivity()}.  The main device is to
-	 * replace repeated chained variable lookups by local variables.  This can be done automatically: re-factor --> "extract local variable".
-	 * <li> The "behavioral" {@link TripRouter} (which may try to insert additional access/egress walk legs) <i> can indeed </i> be replaced by
-	 * the "computer science" {@link LeastCostPathCalculator} with the same results.  
-	 * Again see see {@link #insertFreeFloatingTripWhenEndingActivity()}.
+	/** 
 	 * <li> {@link EditRoutes} could probably be used to re-route the car leg. 
 	 * <li> It should be possible to extract the agent behavior into something analog to {@link NetworkRoutingInclAccessEgressModule}.
 	 * </ul> kai, feb'16

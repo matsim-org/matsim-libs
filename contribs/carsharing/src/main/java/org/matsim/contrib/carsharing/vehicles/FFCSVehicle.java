@@ -1,5 +1,7 @@
 package org.matsim.contrib.carsharing.vehicles;
-
+/** 
+ * @author balac
+ */
 public class FFCSVehicle {
 	
 	private String type;

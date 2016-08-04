@@ -1,5 +1,7 @@
 package org.matsim.contrib.carsharing.vehicles;
-
+/** 
+ * @author balac
+ */
 public class StationBasedVehicle {
 	
 	private String type;

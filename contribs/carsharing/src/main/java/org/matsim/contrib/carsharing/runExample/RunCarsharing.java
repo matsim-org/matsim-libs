@@ -15,6 +15,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+/** 
+ * @author balac
+ */
+
 public class RunCarsharing {
 
 	public static void main(String[] args) {
