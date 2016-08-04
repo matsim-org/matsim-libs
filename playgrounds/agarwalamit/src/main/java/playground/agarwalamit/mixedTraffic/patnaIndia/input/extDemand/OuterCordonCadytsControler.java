@@ -65,6 +65,7 @@ import com.google.inject.name.Names;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
@@ -163,6 +164,13 @@ public class OuterCordonCadytsControler {
 			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
 			IOUtils.deleteDirectory(new File(dirToDel),false);
 		}
+		
+		new File(outputDir+"/analysis/").mkdir();
+		String outputEventsFile = outputDir+"/output_events.xml.gz";
+		
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
+		msc.run();
+		msc.writeResults(outputDir+"/analysis/modalShareFromEvents.txt");
 	}
 
 	private void addCadytsSetting(final Controler controler, final Config config){
