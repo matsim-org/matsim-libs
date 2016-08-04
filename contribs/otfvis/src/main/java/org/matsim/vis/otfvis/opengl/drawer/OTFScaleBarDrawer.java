@@ -9,6 +9,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 
 import java.awt.*;
 
@@ -33,8 +34,8 @@ class OTFScaleBarDrawer implements GLEventListener {
 	public void init(GLAutoDrawable glAutoDrawable) {
 		GL2 gl = (GL2) glAutoDrawable.getGL();
 		this.textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 30), true, false);
-		this.back = OTFOGLDrawer.createTexture(gl, getClass().getResourceAsStream("/res/otfvis/sb_background.png"));
-		this.sc = OTFOGLDrawer.createTexture(gl, getClass().getResourceAsStream("/res/otfvis/scalebar.png"));
+		this.back = GLUtils.createTexture(gl, getClass().getResourceAsStream("/res/otfvis/sb_background.png"));
+		this.sc = GLUtils.createTexture(gl, getClass().getResourceAsStream("/res/otfvis/scalebar.png"));
 	}
 
 	@Override

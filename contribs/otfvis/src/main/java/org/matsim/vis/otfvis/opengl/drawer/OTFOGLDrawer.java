@@ -29,7 +29,6 @@ import com.jogamp.opengl.util.awt.ImageUtil;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
-import com.jogamp.opengl.util.texture.TextureIO;
 import org.apache.log4j.Logger;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
@@ -44,8 +43,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
-import org.matsim.vis.otfvis.gui.ValueColorizer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
@@ -62,85 +61,11 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
 
 public class OTFOGLDrawer implements GLEventListener {
-
-	public static class FastColorizer {
-
-		final int grain;
-		Color [] fastValues;
-		double minVal, maxVal, valRange;
-
-		public FastColorizer(double[] ds, Color[] colors) {
-			this(ds, colors, 1000);
-		}
-
-		public FastColorizer(double[] ds, Color[] colors, int grain) {
-			ValueColorizer helper = new ValueColorizer(ds,colors);
-			this.grain = grain;
-			this.fastValues = new Color[grain];
-			this.minVal = ds[0];
-			this.maxVal = ds[ds.length-1];
-			this.valRange = this.maxVal - this.minVal;
-			// calc prerendered Values
-			double step = this.valRange/grain;
-			for(int i = 0; i< grain; i++) {
-				double value = i*step + this.minVal;
-				this.fastValues[i] = helper.getColor(value);
-			}
-		}
-
-		public Color getColor(double value) {
-			if (value >= this.maxVal) return this.fastValues[this.grain-1];
-			if (value < this.minVal) return this.fastValues[0];
-			return this.fastValues[(int)((value-this.minVal)*this.grain/this.valRange)];
-		}
-
-		public Color getColorZeroOne( double value ) {
-			if ( value >= 1. ) return this.fastValues[this.grain-1] ;
-			if ( value <= 0. ) return this.fastValues[0] ;
-			return this.fastValues[(int)(value*this.grain)] ;
-		}
-
-	}
-
-	static public Texture createTexture(GL2 gl, final InputStream data) {
-		Texture t = null;
-		try {
-			t = TextureIO.newTexture(data, true, null);
-			t.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-			t.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-		} catch (IOException e) {
-			log.error("Error loading Texture from stream.", e);
-		}
-		try {
-			data.close();
-		} catch (IOException e) {
-			log.warn("Exception when closing resource.", e);
-		}
-		return t;
-	}
-
-	static public Texture createTexture(GL gl, String filename) {
-		Texture t = null;
-		if (filename.startsWith("./res/")){
-			filename = filename.substring(6);
-		}
-		try {
-			t = TextureIO.newTexture(MatsimResource.getAsInputStream(filename),
-					true, null);
-			t.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
-			t.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-		} catch (IOException e) {
-			log.error("Error loading " + filename, e);
-		}
-		return t;
-	}
 
 	private final static Logger log = Logger.getLogger(OTFOGLDrawer.class);
 
@@ -171,8 +96,6 @@ public class OTFOGLDrawer implements GLEventListener {
     private final OTFClientQuadTree clientQ;
 
 	private int lastShot = -1;
-
-	private final List<OTFGLAbstractDrawable> overlayItems = new ArrayList<>();
 
 	private OTFQueryHandler queryHandler = null;
 
@@ -380,7 +303,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		canvas.addMouseListener(mouseMan);
 		canvas.addMouseMotionListener(mouseMan);
 		canvas.addMouseWheelListener(mouseMan);
-		this.overlayItems.add(new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
+		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
 		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
 		if (initialZoom != null) {
 			this.setViewBounds(initialZoom);
@@ -461,12 +384,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		} else {
 			this.currentRect = null;
 			this.alpha = 1.0f;
-		}
-
-		if(otfVisConfig.drawOverlays()) {
-			for (OTFGLAbstractDrawable item : this.overlayItems) {
-				item.draw();
-			}
 		}
 
 		if (otfVisConfig.renderImages() && (this.lastShot < now)){
@@ -631,11 +548,8 @@ public class OTFOGLDrawer implements GLEventListener {
 			QuadTree.Rect rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 			this.currentSceneGraph = this.clientQ.getSceneGraph(time, rect);
 		}
-		marker = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("otfvis/marker.png"));
+		marker = GLUtils.createTexture(gl, MatsimResource.getAsInputStream("otfvis/marker.png"));
 		setFrustrum(gl);
-		for (OTFGLAbstractDrawable item : this.overlayItems) {
-			item.glInit();
-		}
 		currentSceneGraph.glInit();
 		glInited = true;
 	}
@@ -725,7 +639,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		scaleNetworkRelative(scaleFactor);
 	}
 
-	public void setViewBounds(Rectangle2D viewBounds) {
+	private void setViewBounds(Rectangle2D viewBounds) {
 		this.viewBounds = new QuadTree.Rect(viewBounds.getMinX(), viewBounds.getMinY(), viewBounds.getMaxX(), viewBounds.getMaxY());
 	}
 	

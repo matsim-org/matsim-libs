@@ -56,6 +56,7 @@ import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
+import org.matsim.vis.otfvis.opengl.drawer.FastColorizer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
@@ -81,7 +82,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		private boolean calcOffset = true;
 		private float[] vertex = null;
 		private String linkIdString = null;
-		private transient OTFOGLDrawer.FastColorizer colorizer3 = null;
+		private transient FastColorizer colorizer3 = null;
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
@@ -100,7 +101,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				int maxCount = 0;
 				for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
 
-				colorizer3 = new OTFOGLDrawer.FastColorizer(
+				colorizer3 = new FastColorizer(
 						new double[] { 0.0, maxCount}, new Color[] {
 								Color.WHITE, Color.BLUE});
 
