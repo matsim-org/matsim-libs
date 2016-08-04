@@ -71,6 +71,7 @@ import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListen
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.CountsInserter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
@@ -176,10 +177,11 @@ public class OuterCordonCadytsControler {
 
 	private void addCadytsSetting(final Controler controler, final Config config){
 		
-		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator(inputLocation);
-		occg.run();
+		CountsInserter jcg = new CountsInserter();
+		jcg.processInputFile( inputLocation+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
+		jcg.run();
 		
-		Counts<ModalLink> modalLinkCounts = occg.getModalLinkCounts();
+		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
 		
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);

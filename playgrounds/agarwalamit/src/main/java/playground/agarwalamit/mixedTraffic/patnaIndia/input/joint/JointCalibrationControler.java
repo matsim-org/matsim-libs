@@ -72,6 +72,7 @@ import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.CountsInserter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
@@ -208,9 +209,10 @@ public class JointCalibrationControler {
 
 	private static void addCadytsSetting(final Controler controler, final Config config){
 
-		JointCountsGenerator jcg = new JointCountsGenerator(inputLocation);
+		CountsInserter jcg = new CountsInserter();
+		jcg.processInputFile( inputLocation+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
+		jcg.processInputFile( inputLocation+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
 		jcg.run();
-
 		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
 
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));

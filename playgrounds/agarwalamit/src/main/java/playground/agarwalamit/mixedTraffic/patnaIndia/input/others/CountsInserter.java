@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.others;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,7 +35,6 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonCountsGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.MapUtils;
 
@@ -43,36 +42,24 @@ import playground.agarwalamit.utils.MapUtils;
  * @author amit
  */
 
-public class JointCountsGenerator {
+public class CountsInserter {
 
-	public JointCountsGenerator(final String inputFolder) {
-		this.inputFolder= inputFolder;
-	}
-
-	private String inputFolder;
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo = new HashMap<>();
 	private Counts<ModalLink> counts;
 
 	public static void main(String[] args) {
 		String inputFolder = PatnaUtils.INPUT_FILES_DIR;
-		JointCountsGenerator jcg = new JointCountsGenerator(inputFolder);
+		CountsInserter jcg = new CountsInserter();
+		jcg.processInputFile( inputFolder+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
+		jcg.processInputFile( inputFolder+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
 		jcg.run();
-	}
-
-	public void run(){
-		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator(this.inputFolder);
-		occg.run();
-		counts = occg.getModalLinkCounts();
-
-		processCountingStations( inputFolder+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
-		storeModalCounts();
 	}
 
 	public Counts<ModalLink> getModalLinkCounts() {
 		return this.counts;
 	}
 
-	private void storeModalCounts(){
+	public void run(){
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
 			for (String mode : this.countStation2time2countInfo.get(mcs).keySet()) {
 				if(counts==null) {
@@ -93,7 +80,7 @@ public class JointCountsGenerator {
 		}
 	}
 
-	private void processCountingStations(final String file){
+	public void processInputFile(final String file){
 		Map<Integer,  Map<String,Double>> time2count = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
 			String line = reader.readLine();
