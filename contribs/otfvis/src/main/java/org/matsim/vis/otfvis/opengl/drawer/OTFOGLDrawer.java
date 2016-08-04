@@ -182,8 +182,6 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private final Component canvas;
 
-	private final OTFScaleBarDrawer scaleBar;
-
 	private BufferedImage current;
 
 	private ZoomEntry lastZoom = null;
@@ -214,6 +212,8 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.otfVisConfig = otfVisConfig;
 		this.canvas = canvas;
 		((GLAutoDrawable) canvas).addGLEventListener(this);
+		((GLAutoDrawable) canvas).addGLEventListener(new OTFScaleBarDrawer());
+
 		MouseInputAdapter mouseMan = new MouseInputAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
@@ -380,7 +380,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		canvas.addMouseListener(mouseMan);
 		canvas.addMouseMotionListener(mouseMan);
 		canvas.addMouseWheelListener(mouseMan);
-		this.scaleBar = new OTFScaleBarDrawer();
 		this.overlayItems.add(new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
 		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
 		if (initialZoom != null) {
@@ -468,10 +467,6 @@ public class OTFOGLDrawer implements GLEventListener {
 			for (OTFGLAbstractDrawable item : this.overlayItems) {
 				item.draw();
 			}
-		}
-
-		if (otfVisConfig.drawScaleBar()) {
-			this.scaleBar.draw();
 		}
 
 		if (otfVisConfig.renderImages() && (this.lastShot < now)){
