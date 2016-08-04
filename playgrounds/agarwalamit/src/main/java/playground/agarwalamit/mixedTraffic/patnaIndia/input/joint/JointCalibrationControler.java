@@ -72,7 +72,6 @@ import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonCountsGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
@@ -89,13 +88,15 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class JointCalibrationControler {
 
+	private static String inputLocation = PatnaUtils.INPUT_FILES_DIR;
+
 	private final static double SAMPLE_SIZE = 0.10;
 
-	private static final String NET_FILE = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz"; //
-	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
-	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
-	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
-	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
+	private static final String NET_FILE = inputLocation+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz"; //
+	private static final String JOINT_PLANS_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
+	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_COUNTS_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 
 	private static boolean isUsingCadyts = false;
 
@@ -106,8 +107,10 @@ public class JointCalibrationControler {
 		JointCalibrationControler pjc = new JointCalibrationControler();
 
 		if(args.length>0){
+			String dir = "/net/ils4/agarwal/patnaIndia/run108/";
+			inputLocation = dir+"/input/";
 			ConfigUtils.loadConfig(config, args[0]);
-			OUTPUT_DIR = args [1];
+			OUTPUT_DIR = dir+args [1];
 			isUsingCadyts = Boolean.valueOf( args[2] );
 			config.controler().setOutputDirectory( OUTPUT_DIR );
 		} else {
@@ -203,10 +206,10 @@ public class JointCalibrationControler {
 
 	private static void addCadytsSetting(final Controler controler, final Config config){
 
-		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator();
-		occg.run();
+		JointCountsGenerator jcg = new JointCountsGenerator(inputLocation);
+		jcg.run();
 
-		Counts<ModalLink> modalLinkCounts = occg.getModalLinkCounts();
+		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
 
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);

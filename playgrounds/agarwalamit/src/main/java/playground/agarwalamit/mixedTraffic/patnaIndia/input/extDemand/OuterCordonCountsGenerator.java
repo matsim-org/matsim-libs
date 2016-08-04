@@ -44,14 +44,18 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class OuterCordonCountsGenerator {
 
+	public OuterCordonCountsGenerator(final String inputFolder) {
+		INPUT_FILES_DIR = inputFolder+"/raw/counts/externalDemandCountsFile/";
+	}
+
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo_out = new HashMap<>();
 	private Counts<ModalLink> counts;
 
-	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/";
+	private static String INPUT_FILES_DIR ;
 
 	public static void main(String[] args) {
-		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
+		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator(PatnaUtils.INPUT_FILES_DIR);
 		pcg.run();
 	}
 	

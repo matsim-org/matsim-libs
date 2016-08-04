@@ -1,0 +1,162 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+
+import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonCountsGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.MapUtils;
+
+/**
+ * @author amit
+ */
+
+public class JointCountsGenerator {
+
+	public JointCountsGenerator(final String inputFolder) {
+		this.inputFolder= inputFolder;
+	}
+
+	private String inputFolder;
+	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo = new HashMap<>();
+	private Counts<ModalLink> counts;
+
+	public static void main(String[] args) {
+		String inputFolder = PatnaUtils.INPUT_FILES_DIR;
+		JointCountsGenerator jcg = new JointCountsGenerator(inputFolder);
+		jcg.run();
+	}
+
+	public void run(){
+		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator(this.inputFolder);
+		occg.run();
+		counts = occg.getModalLinkCounts();
+
+		processCountingStations( inputFolder+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
+		storeModalCounts();
+	}
+
+	public Counts<ModalLink> getModalLinkCounts() {
+		return this.counts;
+	}
+
+	private void storeModalCounts(){
+		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
+			for (String mode : this.countStation2time2countInfo.get(mcs).keySet()) {
+				if(counts==null) {
+					counts = new Counts<ModalLink>();
+					counts.setYear(2008);
+					counts.setName("Patna_counts");
+					counts.setDescription(mode);
+				}
+
+				ModalLink ml = new ModalLink(mode, mcs.getFirst());
+				Id<ModalLink> modalLinkId = Id.create(ml.getId(), ModalLink.class);
+				Count<ModalLink> c = counts.createAndAddCount(modalLinkId, mcs.getSecond());
+				for(Integer i : countStation2time2countInfo.get(mcs).get(mode).keySet()){
+					double vol = countStation2time2countInfo.get(mcs).get(mode).get(i) ;
+					c.createVolume(i, vol );
+				}
+			}
+		}
+	}
+
+	private void processCountingStations(final String file){
+		Map<Integer,  Map<String,Double>> time2count = new HashMap<>();
+		try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
+			String line = reader.readLine();
+
+			List<String> mode2index = new ArrayList<>();
+			Tuple<Id<Link>,String> link2stationNumber = null;
+
+			while(line != null ) {
+				if( line.startsWith("survey") ){
+					String [] labels = line.split("\t"); // time car 2w truck cycle total
+					mode2index = Arrays.asList(labels);
+					line = reader.readLine();
+					continue;
+				}
+
+				String parts[]	= line.split("\t");
+				String surveyLocation = parts[0];
+				String linkId = parts[1];
+
+				Tuple<Id<Link>,String> nowTuple = new Tuple<Id<Link>, String>(Id.createLinkId(linkId), surveyLocation);
+
+				if  ( link2stationNumber == null ) link2stationNumber = nowTuple;
+
+				int timebin = Integer.valueOf(parts[2]);
+				Map<String,Double> mode2count = new HashMap<>();
+
+				for (int index = 3; index < parts.length; index++){
+					String mode = mode2index.get(index);
+					if(mode.equals("2w")) mode = "motorbike";
+					else if(mode.equals("cycle")) mode = "bike";
+					else if(mode.equals("total")) {
+						if (MapUtils.doubleValueSum(mode2count)!=Double.valueOf(parts[index])){
+							throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
+						}
+						continue;
+					}
+					mode2count.put(mode, Double.valueOf(parts[index]));
+				}
+
+				time2count.put(timebin, mode2count);
+				line = reader.readLine();	
+
+				// store the data here
+				this.countStation2time2countInfo.put(link2stationNumber, keyReversal(time2count));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written. Reason :"+e);
+		}
+	}
+
+	private Map<String, Map<Integer, Double>> keyReversal(Map<Integer, Map<String, Double>> inCounts ) {
+		Map<String, Map<Integer, Double>> mode2bin2count = new HashMap<>();
+		for(Integer ii :inCounts.keySet()) {
+			for(String mode : inCounts.get(ii).keySet()){
+				Map<Integer,Double> bin2count = mode2bin2count.get(mode);
+				if (bin2count == null) {
+					bin2count = new HashMap<>();
+				}
+				bin2count.put(ii, inCounts.get(ii).get(mode));
+				mode2bin2count.put(mode, bin2count);
+			}
+		}
+		return mode2bin2count;
+	}
+
+}
