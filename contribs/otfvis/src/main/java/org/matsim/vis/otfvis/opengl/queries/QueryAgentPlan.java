@@ -64,7 +64,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -321,7 +321,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private static void drawCircleAroundAgent(Point2D.Double pos, GL2 gl) {
 			float scale = (float) OTFClientControl.getInstance().getMainOTFDrawer().getScale();
 			float size = 10.f * scale;
-			DrawingUtils.drawCircle(gl, (float) pos.x, (float) pos.y, size);
+			GLUtils.drawCircle(gl, (float) pos.x, (float) pos.y, size);
 		}
 
 		private void drawActivityTexts() {
@@ -406,9 +406,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void drawLabelText(OTFOGLDrawer drawer, Point2D.Double pos) {
+			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 			InfoText agentText = new InfoText(this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			agentText.setAlpha(0.7f);
-			agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			agentText.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

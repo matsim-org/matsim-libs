@@ -20,7 +20,7 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -38,6 +38,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import com.jogamp.opengl.util.awt.TextRenderer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -83,12 +84,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		private float[] vertex = null;
 		private String linkIdString = null;
 		private transient FastColorizer colorizer3 = null;
+		private TextRenderer textRenderer;
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
+			textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+
 			if(this.vertex == null) return;
 
-			if( this.calcOffset == true) {
+			if(this.calcOffset) {
 				float east = (float)drawer.getQuad().offsetEast;
 				float north = (float)drawer.getQuad().offsetNorth;
 
@@ -99,7 +103,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				}
 
 				int maxCount = 0;
-				for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
+				for (int aCount : this.count) if (aCount > maxCount) maxCount = aCount;
 
 				colorizer3 = new FastColorizer(
 						new double[] { 0.0, maxCount}, new Color[] {
@@ -107,21 +111,21 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 				this.colors = ByteBuffer.allocateDirect(this.count.length*4*2);
 
-				for (int i = 0; i< this.count.length; i++) {
-					Color mycolor = colorizer3.getColor(this.count[i]);
-					this.colors.put((byte)mycolor.getRed());
-					this.colors.put((byte)mycolor.getGreen());
-					this.colors.put((byte)mycolor.getBlue());
-					this.colors.put((byte)120);
-					this.colors.put((byte)mycolor.getRed());
-					this.colors.put((byte)mycolor.getGreen());
-					this.colors.put((byte)mycolor.getBlue());
-					this.colors.put((byte)120);
+				for (int aCount : this.count) {
+					Color mycolor = colorizer3.getColor(aCount);
+					this.colors.put((byte) mycolor.getRed());
+					this.colors.put((byte) mycolor.getGreen());
+					this.colors.put((byte) mycolor.getBlue());
+					this.colors.put((byte) 120);
+					this.colors.put((byte) mycolor.getRed());
+					this.colors.put((byte) mycolor.getGreen());
+					this.colors.put((byte) mycolor.getBlue());
+					this.colors.put((byte) 120);
 				}
 
 				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 				InfoText agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
-				agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+				agentText.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			}
 
 			this.vert.position(0);
@@ -173,7 +177,9 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double verOf = (maxX-minX)/12;
 
 			int maxCount = 0;
-			for(int i= 0;i< this.count.length; i++) if (this.count[i] > maxCount) maxCount = this.count[i];
+			for (int aCount : this.count) {
+				if (aCount > maxCount) maxCount = aCount;
+			}
 
 			Color c1 = colorizer3.getColor(0.0);
 			Color c2 = colorizer3.getColor(maxCount/2.);
@@ -182,15 +188,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double a=1,b=4,c=1,d=3;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
 			InfoText text1 = new InfoText("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text1.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			text1.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=5;d=7;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
 			InfoText text2 = new InfoText("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text2.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			text2.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=9;d=11;
 			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 			InfoText text3 = new InfoText("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text3.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+			text3.draw(textRenderer, OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override
@@ -204,7 +210,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		}
 	}
 
-	protected Id<Link> queryLinkId;
+	private Id<Link> queryLinkId;
 	private transient Map<Id<Link>, Integer> drivenLinks = null;
 	private SimulationViewForQueries simulationView;
 
@@ -246,7 +252,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	}
 
 	private List<Plan> getPersonsNOW() {
-		List<Plan> actPersons = new ArrayList<Plan>();
+		List<Plan> actPersons = new ArrayList<>();
 		VisLink link = simulationView.getVisNetwork().getVisLinks().get(this.queryLinkId);
 		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
 		for( VisVehicle veh : vehs) {
@@ -259,7 +265,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	}
 
 	private List<Plan> getPersons(Map<Id<Person>, Plan> plans) {
-		List<Plan> actPersons = new ArrayList<Plan>();
+		List<Plan> actPersons = new ArrayList<>();
 		for (Plan plan : plans.values()) {
 			List<PlanElement> actslegs = plan.getPlanElements();
 			for (PlanElement pe : actslegs) {
@@ -312,7 +318,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		}
 	}
 
-	protected void collectLinks(List<Plan> actPersons) {
+	private void collectLinks(List<Plan> actPersons) {
 		for (Plan plan : actPersons) {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -337,7 +343,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		this.simulationView = simulationView;
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();
-		this.drivenLinks = new HashMap<Id<Link>, Integer>();
+		this.drivenLinks = new HashMap<>();
 
 		List<Plan> actPersons = nowOnly ? getPersonsNOW() : getPersons(simulationView.getPlans());
 

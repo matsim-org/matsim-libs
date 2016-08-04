@@ -37,10 +37,6 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
  */
 public abstract class  OTFDataReader {
 
-	public static String getVersionString(int major, int minor) {
-		return "V" + major + "." + minor;
-	}
-
 	private OTFDataWriter src;
 	public void setSrc(OTFDataWriter src) {
 		this.src = src;

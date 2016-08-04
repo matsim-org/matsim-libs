@@ -50,7 +50,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
  */
 public class OGLSimpleStaticNetLayer implements SceneLayer {
 
-	private final List<OTFGLAbstractDrawable> items = new ArrayList<OTFGLAbstractDrawable>();
+	private final List<OTFGLAbstractDrawable> items = new ArrayList<>();
 
 	private static Rect cachedRect = null ;
 

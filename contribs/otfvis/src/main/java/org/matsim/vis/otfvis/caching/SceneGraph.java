@@ -46,8 +46,7 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
 
 	@Override
 	public int compare(SceneLayer o1, SceneLayer o2) {
-		int diff = (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
-		return diff;
+		return (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
 	}
 
 }
@@ -73,7 +72,7 @@ public class SceneGraph {
 
 	public SceneGraph(Rect rect) {
 		this.rect = rect;
-		this.drawingLayers = new ArrayList<SceneLayer>();
+		this.drawingLayers = new ArrayList<>();
 		this.drawingLayers.add(miscellaneousLayer);
 		this.drawingLayers.add(networkLayer);
 		this.drawingLayers.add(agentLayer);	

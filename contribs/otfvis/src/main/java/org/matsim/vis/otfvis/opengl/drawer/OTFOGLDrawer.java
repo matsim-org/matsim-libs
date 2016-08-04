@@ -43,7 +43,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
-import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
+import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
@@ -97,7 +97,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private int lastShot = -1;
 
-	private OTFQueryHandler queryHandler = null;
+	private OTFQueryControl queryHandler = null;
 
 	public GLAutoDrawable getCanvas() {
 		return (GLAutoDrawable) canvas;
@@ -128,8 +128,6 @@ public class OTFOGLDrawer implements GLEventListener {
 	private OTFVisConfigGroup otfVisConfig;
 
 	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFVisConfigGroup otfVisConfig, Component canvas, OTFHostControl otfHostControl) {
-		Font font = new Font("SansSerif", Font.PLAIN, 32);
-		this.textRenderer = new TextRenderer(font, true, false);
 		this.clientQ = clientQ;
 		this.hostControlBar = otfHostControl;
 		this.otfVisConfig = otfVisConfig;
@@ -516,10 +514,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		return OTFOGLDrawer.this.scale;
 	}
 
-	public TextRenderer getTextRenderer() {
-		return textRenderer;
-	}
-
 	public QuadTree.Rect getViewBoundsAsQuadTreeRect() {
 		return viewBounds;
 	}
@@ -527,6 +521,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
+		this.textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 		OTFGLAbstractDrawable.setGl(drawable);
 		gl.setSwapInterval(0);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
@@ -630,7 +625,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		gl.glGetIntegerv( GL2.GL_VIEWPORT, viewport,0 );
 	}
 
-	public void setQueryHandler(OTFQueryHandler queryHandler) {
+	public void setQueryHandler(OTFQueryControl queryHandler) {
 		this.queryHandler = queryHandler;
 	}
 

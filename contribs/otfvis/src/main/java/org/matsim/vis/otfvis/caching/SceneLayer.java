@@ -43,11 +43,11 @@ public interface SceneLayer {
 	 * two graphics frameworks with completely different protocols behind a common interface.
 	 * 
 	 */
-	public void glInit();
+	void glInit();
 
-	public void draw();
+	void draw();
 	
-	public int getDrawOrder();
+	int getDrawOrder();
 	
 }
 
