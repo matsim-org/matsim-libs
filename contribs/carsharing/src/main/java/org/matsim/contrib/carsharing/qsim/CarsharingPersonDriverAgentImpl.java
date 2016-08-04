@@ -22,6 +22,7 @@ import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
+import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
@@ -91,14 +92,14 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private final PlanBasedDriverAgentImpl driverAgentDelegate ;
 
 	private LeastCostPathCalculator pathCalculator;
-
+	private KeepingTheCarModel keepCarModel;
 
 
 	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, 
-			CarSharingVehiclesNew carSharingVehicles, LeastCostPathCalculator pathCalculator) {
+			CarSharingVehiclesNew carSharingVehicles, LeastCostPathCalculator pathCalculator, KeepingTheCarModel keepCarModel) {
 		this.pathCalculator = pathCalculator;
 		Scenario scenario = simulation.getScenario() ;
-
+		this.keepCarModel = keepCarModel;
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
 		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
