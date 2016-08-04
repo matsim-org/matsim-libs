@@ -23,7 +23,7 @@ public class DemandGeneratorOnePersonV2 {
 
 	public static void main(String[] args) {
 		// Parameters
-		double scalingFactor = 0.1;
+		double scalingFactor = 1.;
 		double carShareInterior = 1.;
 		double carShareExterior = 1.;
 		double allWorkersToSociallySecuredWorkersRatio = 1.52;
