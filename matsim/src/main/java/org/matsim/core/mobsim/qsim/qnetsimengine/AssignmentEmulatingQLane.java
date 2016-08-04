@@ -21,10 +21,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +32,6 @@ import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
@@ -41,6 +39,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStop
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.vis.VisLinkWLanes;
@@ -65,7 +64,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	private Queue<QVehicle> buffer = new LinkedList<>() ;
+	private Queue<QVehicle> buffer = new ConcurrentLinkedQueue<>() ;
 
 	private final AbstractQLink qLink;
 
@@ -73,7 +72,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	private VisData visData = new VisDataImpl() ;
 
-	private double endsAtMetersFromLinkEnd = 0. ;
+	//	private double endsAtMetersFromLinkEnd = 0. ;
 
 	// get properties no longer from qlink, but have them by yourself:
 	// NOTE: we need to have qlink since we need access e.g. for vehicle arrival or for public transit
@@ -81,16 +80,13 @@ class AssignmentEmulatingQLane extends QLaneI {
 	// may be divided between parallel lanes.  So we need both.
 	private final double length ;
 
-	private Map<Id<Vehicle>,Double> vehEnterTimeMap = new HashMap<>() ;
-
 	private final NetsimEngineContext context;
 
 	private final LinkSpeedCalculator linkSpeedCalculator;
 
 	private double lastLinkEntryTime = Double.NaN ;
-
-	private double avHeadway = Double.NaN ;
-
+	private double avHeadway = Double.POSITIVE_INFINITY ;
+	Queue<Tuple<Double,Double>> linkEnterQueue = new LinkedList<>() ;
 
 	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
 			NetsimEngineContext context, LinkSpeedCalculator linkSpeedCalculator ) {
@@ -103,9 +99,8 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 	@Override
 	public final void addFromWait(final QVehicle veh) {
-		double now = context.getSimTimer().getTimeOfDay() ;
-		this.vehEnterTimeMap.put( veh.getId(), now ) ;
-
+		veh.setLinkEnterTime(Double.NaN);
+		veh.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
 		addToBuffer(veh);
 	}
 
@@ -179,7 +174,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		qLink.addParkedVehicle(veh);
 		qLink.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh);
-		
+
 		// remove _after_ processing the arrival to keep link active:
 		removeVehicleFromQueue( ) ;
 	}
@@ -226,7 +221,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 		if (this.context.qsimConfig.isUseLanes()) {
 			this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
 		}
-		vehEnterTimeMap.remove(veh) ;
 		return veh;
 	}
 
@@ -255,41 +249,119 @@ class AssignmentEmulatingQLane extends QLaneI {
 		}
 		buffer.clear();
 	}
-	
+
 	private static int cnt = 0 ;
 
 	@Override
 	public final void addFromUpstream(final QVehicle veh) {
+		// yyyyyy PCU??
+
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 		qLink.activateLink();
-		this.vehEnterTimeMap.put( veh.getId(), now ) ;
-		
-		// yyyyyy following does not honour PCU et al! kai, aug'16
-		final double alpha = 0.9 ;
-		double headway = now - lastLinkEntryTime ;
+		veh.setLinkEnterTime(now);
+
+
+		double freeTravelTime = this.length / linkSpeedCalculator.getMaximumVelocity(veh, this.qLink.getLink(), now);
+		final double cap_per_sec = this.qLink.getLink().getFlowCapacityPerSec(now) ;
+
+		double flow_per_sec = flowBasedOnSimpleAverage(now) ;
+		double linkTTime = freeTravelTime * factorBasedOnEWS(cap_per_sec, flow_per_sec) ;
+
+		if ( now > 8*3600 ) {
+			if ( cnt < 10 ) {
+				cnt++ ;
+				log.warn("flow_per_sec=" + flow_per_sec + "; cap_per_sec=" + cap_per_sec  ) ;
+			}
+		}
+
+		veh.setEarliestLinkExitTime(now + linkTTime);
+		veh.setCurrentLink(qLink.getLink());
+		vehQueue.add(veh);
+
+		if (this.context.qsimConfig.isUseLanes()) {
+			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
+				context.getEventsManager() .processEvent(new LaneEnterEvent(now, veh.getId(), this.qLink.getLink().getId(), this.getId()));
+			}
+		}
+	}
+	private double flowBasedOnTimeWeightedAverage(double now) {
+		final double newHeadway = now - lastLinkEntryTime ;
+		/*
+		 * Want something like
+		 *    weight = exp( - headway/tau ) ;
+		 *    alpha = sum weights * headways / sum weights
+		 * with tau in the area of 0.5 to 1 hour.
+		 */
+
+		double theAvHeadway ;
 		if ( Double.isNaN( lastLinkEntryTime ) ) {
-			// do nothing
+			theAvHeadway = Double.POSITIVE_INFINITY ;
 		} else {
-			if ( Double.isNaN( avHeadway ) ) {
-				avHeadway = headway ;
+			while( !linkEnterQueue.isEmpty() && linkEnterQueue.peek().getFirst() < now - 7200. ) {
+				linkEnterQueue.remove() ;
+			}
+			linkEnterQueue.add(new Tuple<>( now, newHeadway ) ) ;
+			double sum = 0. ;
+			double sumWeights = 0. ;
+			for ( Tuple<Double,Double> tuple : linkEnterQueue ) {
+				final double weight = Math.exp(-(now-tuple.getFirst())/1800.);
+//				final double weight = 1. ;
+				sum += weight* tuple.getSecond() ;
+				sumWeights += weight ;
+			}
+			theAvHeadway = sum/sumWeights ;
+		}
+
+		lastLinkEntryTime = now ;
+
+		return 1./theAvHeadway/context.qsimConfig.getFlowCapFactor();
+	}
+	private double flowBasedOnSimpleAverage(double now ) {
+		double newHeadway = now - lastLinkEntryTime ;
+		if ( Double.isNaN( lastLinkEntryTime ) ) {
+			avHeadway = Double.POSITIVE_INFINITY ;
+		} else {
+			if ( avHeadway==Double.POSITIVE_INFINITY ) {
+				avHeadway = newHeadway ;
 			} else {
-				avHeadway = alpha * avHeadway + (1-alpha) * headway ;
+				final double oldWeight = 0.9 ;
+				avHeadway = (1-oldWeight) * newHeadway + oldWeight * avHeadway  ;
 			}
 		}
 		lastLinkEntryTime = now ;
-		
-		double freeTravelTime = this.length / linkSpeedCalculator.getMaximumVelocity(veh, this.qLink.getLink(), now);
+		return 1./avHeadway/context.qsimConfig.getFlowCapFactor() ;
+	}
+	private double flowBasedOnLinkAverage(double now) {
+		// ===
+		/*
+		 * q = rho * v ; rho = nVeh/len ; v = len * sum[ 1 / ( earliestLinkLeaveTime - vehicleEnterTime) ]/ nVeh )
+		 * 
+		 * --> q = nVeh^2 * sum[ 1/( earliestLinkLeaveTime - vehicleEnterTime ) ] 
+		 */
+		double sum = 0. ;
+		int cnt2 = 0 ;
+		for ( QVehicle vv : this.vehQueue ) {
+			sum += 1./( vv.getEarliestLinkExitTime() - vv.getLinkEnterTime() );
+			cnt2++ ;
+		}
+		for ( QVehicle vv : this.buffer ) {
+			if ( !Double.isNaN( vv.getLinkEnterTime() ) ) {
+				sum += 1./( vv.getEarliestLinkExitTime() - vv.getLinkEnterTime() ) ;
+				cnt2++ ;
+			}
+		}
+		if ( cnt2==0 ) {
+			return 0 ;
+		} else {
+			return cnt2*cnt2 * sum ;
+		}
+	}
+	private double factorBasedOnEWS(final double cap_per_sec, double flow_per_sec2) {
+		double mult = 1. / (1+flow_per_sec2/cap_per_sec) / (1-flow_per_sec2/cap_per_sec) ;
+		if ( mult>10 ) mult=10. ;
+		return mult;
 
-		double flow_per_sec = 1./avHeadway/context.qsimConfig.getFlowCapFactor() ;
-		final double cap_per_sec = this.qLink.getLink().getFlowCapacityPerSec(now) ;
-		
-		// yyyyyy 0.15 * ( flow/(cap/2) )^4 is same as 2.4 * (flow/cap)^2 !!!!
-		
-//		double linkTTime = freeTravelTime * Math.min( 1 + Math.pow( flow_per_sec/cap_per_sec , 4 ),50. ) ;
-//		// see https://en.wikipedia.org/wiki/Route_assignment.  Volume and capacity can be given in arbitrary units as long as they
-//		// are the same since they cancel out.
-		
 		/*
 		 * Die IVV-Funktionen (BVWP Hauptbericht 2003 s.150) lassen sich ganz gut approximieren mit:
 		 * if ( flow < cap ) {
@@ -299,30 +371,14 @@ class AssignmentEmulatingQLane extends QLaneI {
 		 * }
 		 * Verweist auf EWS; dort stehen tatsächlich die Formeln; das ist hyper-aufwändig mit exp, coth, etc. etc. 
 		 */
-		
-		
-		double mult = 1. / (1+flow_per_sec/cap_per_sec) / (1-flow_per_sec/cap_per_sec) ;
-		if ( mult>10 ) mult=10. ;
-		double linkTTime = mult * freeTravelTime ;
-		
-		if ( now > 8*3600 ) {
-			if ( cnt < 10 ) {
-				cnt++ ;
-				log.warn("flow_per_sec=" + flow_per_sec + "; cap_per_sec=" + cap_per_sec + "; avHeadway=" + avHeadway + "; headway=" + headway ) ;
-			}
-		}
-		
-		double earliestExitTime = now + linkTTime ;
+	}
+	private double factorBasedOnBPR(double cap_per_sec, double flow_per_sec ) {
 
-		veh.setEarliestLinkExitTime(earliestExitTime);
-		veh.setCurrentLink(qLink.getLink());
-		vehQueue.add(veh);
+		return Math.min( 1 + Math.pow( flow_per_sec/cap_per_sec , 4 ),50. ) ;
+		// see https://en.wikipedia.org/wiki/Route_assignment.  Volume and capacity can be given in arbitrary units as long as they
+		// are the same since they cancel out.
 
-		if (this.context.qsimConfig.isUseLanes()) {
-			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
-				context.getEventsManager() .processEvent(new LaneEnterEvent(now, veh.getId(), this.qLink.getLink().getId(), this.getId()));
-			}
-		}
+		// NOTE: 0.15 * ( flow/(cap/2) )^4 is same as 2.4 * (flow/cap)^2 !!!!
 	}
 	private double additionalTimeBasedOnDensity() {
 		final double MAX_FLOW_DENSITY_PER_KM = 15 ;
@@ -407,10 +463,14 @@ class AssignmentEmulatingQLane extends QLaneI {
 			lastDistanceFromFromNode = snapshotInfoBuilder.calculateOdometerDistanceFromFromNode(length, spacing, 
 					lastDistanceFromFromNode, now, freespeedTravelTime, remainingTravelTime);
 			Integer lane = VisUtils.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-			final Double vehEnterTime = vehEnterTimeMap.get(veh.getId());
-			Gbl.assertNotNull(vehEnterTime);
-			double speedValue = freespeedTravelTime / ( veh.getEarliestLinkExitTime() - vehEnterTime ) ;
-			if ( speedValue>1. ) { speedValue=1. ; }
+			double speedValue ;
+			double vehEnterTime = veh.getLinkEnterTime() ;
+			if ( Double.isNaN(vehEnterTime) ) { // vehicle has entered from wait
+				speedValue = 1. ; // vehicle will be green
+			} else {
+				speedValue = freespeedTravelTime / ( veh.getEarliestLinkExitTime() - vehEnterTime ) ;
+				if ( speedValue>1. ) { speedValue=1. ; }
+			}
 			if (this.otfLink != null){
 				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
 						length, veh, lastDistanceFromFromNode, lane, speedValue);

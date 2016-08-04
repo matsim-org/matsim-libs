@@ -24,6 +24,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationSco
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -48,9 +49,9 @@ class KNBerlinControler {
 		Config config = ConfigUtils.createConfig( new NoiseConfigGroup() ) ;
 		
 		// paths and related:
-//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
+		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
 //		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
-		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
+//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
 		
 		config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
@@ -108,10 +109,13 @@ class KNBerlinControler {
 		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
 
-		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
+		config.qsim().setTrafficDynamics( TrafficDynamics.assignmentEmulating );
 		
 		if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
 			config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
+		}
+		if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
+			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		}
 
 		config.qsim().setNumberOfThreads(6);
