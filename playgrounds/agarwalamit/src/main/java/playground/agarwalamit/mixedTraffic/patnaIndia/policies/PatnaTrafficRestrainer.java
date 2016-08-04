@@ -24,10 +24,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Remove certain links on the network so that the traffic along Gandhi setu disappears
@@ -37,9 +36,11 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 public final class PatnaTrafficRestrainer {
 
 	public static void main(String[] args) {
-		String filename = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestrication.xml.gz";
+		String networkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		String filename = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestrication.xml.gz";
+
 		PatnaTrafficRestrainer.run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(filename);
 	}
