@@ -34,7 +34,7 @@ public class RunCadyts4PtExample {
 		final int lastIteration = 100;
 
 		String inputDir = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/pt/input/";
-		String outputDir = "output/Cadyts4PtExample/";
+		String outputDir = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/pt/blupp/output/Cadyts4PtExample/";
 
 		final Config config = createConfig(inputDir, outputDir);
 

@@ -77,6 +77,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 			configFile = "../../../shared-svn/projects/ptManuel/calibration/my_config_dz.xml";
 //			cadytsScoringWeight = 0.0;
 			cadytsScoringWeight = 100.0;
+//			cadytsScoringWeight = 0.0;
 		}else{
 			configFile = args[0];
 			cadytsScoringWeight = Double.parseDouble(args[1]);
