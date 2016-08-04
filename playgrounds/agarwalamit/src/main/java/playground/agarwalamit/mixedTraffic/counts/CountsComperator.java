@@ -40,7 +40,7 @@ public class CountsComperator {
 
 	private final String inputCountsFile_urban = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
 	private final String inputCountsFile_external = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
-	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/ITERS/it.100/100.multiMode_countscompare.txt";
+	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/ITERS/it.100/100.multiMode_hourlyCounts.txt";
 
 	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/ITERS/it.100/100.multiMode_AWTVcountscompare.txt";
 
@@ -71,9 +71,7 @@ public class CountsComperator {
 				String linkId = parts[0];
 
 				Map<String,Double> mode2count = link2mode2count.get(linkId);
-				if(mode2count == null) {
-					mode2count = new HashMap<>();
-				}
+				if ( mode2count == null ) mode2count = new HashMap<>();
 
 				String mode = parts[1];
 				mode = mode.split("_")[0];
@@ -83,8 +81,8 @@ public class CountsComperator {
 					outCountSum+=Double.valueOf( parts[i] );
 				}
 
-				if(mode2count.containsKey(mode)) mode2count.put( mode , mode2count.get(mode) + outCountSum );
-				else mode2count.put(mode, outCountSum);
+				if ( mode2count.containsKey( mode ) ) throw new RuntimeException("should not happen. Aborting...");
+				else mode2count.put( mode, outCountSum );
 
 				link2mode2count.put(linkId, mode2count);
 				line = reader.readLine();

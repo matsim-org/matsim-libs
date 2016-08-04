@@ -177,6 +177,7 @@ public class OuterCordonCadytsControler {
 		
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);
+		config.counts().setFilterModes(true);
 		config.strategy().setMaxAgentPlanMemorySize(10);
 
 		controler.addOverridingModule(new AbstractModule() {
