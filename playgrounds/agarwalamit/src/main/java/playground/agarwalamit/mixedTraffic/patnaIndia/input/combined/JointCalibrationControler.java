@@ -19,7 +19,6 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 
 import javax.inject.Inject;
@@ -95,9 +94,9 @@ public class JointCalibrationControler {
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
 	private static final String JOINT_COUNTS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
-	
+
 	private static boolean isUsingCadyts = false;
-	
+
 	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/c000/";
 
 	public static void main(String[] args) {
@@ -127,7 +126,7 @@ public class JointCalibrationControler {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
-		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck", config.planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -136,16 +135,11 @@ public class JointCalibrationControler {
 				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
 
-				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
+				addTravelTimeBinding("truck").to(FreeSpeedTravelTimeForTruck.class);
+				addTravelDisutilityFactoryBinding("truck").toInstance(builder_truck);
 
-				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
-				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
-
-				for(String mode : Arrays.asList("car_ext","motorbike_ext","motorbike")){
-					addTravelTimeBinding(mode).to(networkTravelTime());
-					addTravelDisutilityFactoryBinding(mode).to(carTravelDisutilityFactoryKey());					
-				}
+				addTravelTimeBinding("motorbike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());					
 			}
 		});
 
@@ -177,10 +171,10 @@ public class JointCalibrationControler {
 
 		// add income dependent scoring function factory
 		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
-		
+
 		// add cadyts
 		if (isUsingCadyts) addCadytsSetting(controler,config);
-		
+
 		controler.run();
 
 		// delete unnecessary iterations folder here.
@@ -205,14 +199,14 @@ public class JointCalibrationControler {
 
 		StatsWriter.run(OUTPUT_DIR);
 	}
-	
-private static void addCadytsSetting(final Controler controler, final Config config){
-		
+
+	private static void addCadytsSetting(final Controler controler, final Config config){
+
 		OuterCordonCountsGenerator occg = new OuterCordonCountsGenerator();
 		occg.run();
-		
+
 		Counts<ModalLink> modalLinkCounts = occg.getModalLinkCounts();
-		
+
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);
 		config.counts().setFilterModes(true);
@@ -222,16 +216,16 @@ private static void addCadytsSetting(final Controler controler, final Config con
 			@Override
 			public void install() {
 				bind(Key.get(new TypeLiteral<Counts<ModalLink>>(){}, Names.named("calibration"))).toInstance(modalLinkCounts);
-				
+
 				bind(ModalCadytsContext.class).asEagerSingleton();
 				addControlerListenerBinding().to(ModalCadytsContext.class);
 			}
 		});
-		
+
 		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfigGroup.setStartTime(0);
 		cadytsConfigGroup.setEndTime(24*3600-1);
-		
+
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
@@ -408,10 +402,8 @@ private static void addCadytsSetting(final Controler controler, final Config con
 			modeParam.setConstant(0.);
 			switch(mode){
 			case "car":
-			case "car_ext": 
 				modeParam.setMarginalUtilityOfTraveling(-0.64);
 				modeParam.setMonetaryDistanceRate(-3.7*Math.pow(10, -5)); break;
-			case "motorbike_ext" :
 			case "motorbike" :
 				modeParam.setMarginalUtilityOfTraveling(-0.18);
 				modeParam.setMonetaryDistanceRate(-1.6*Math.pow(10, -5)); break;
@@ -423,7 +415,6 @@ private static void addCadytsSetting(final Controler controler, final Config con
 				modeParam.setMonetaryDistanceRate(0.0); 
 				modeParam.setMarginalUtilityOfDistance(-0.0002); break;
 			case "bike" :
-			case "bike_ext" :
 				modeParam.setMarginalUtilityOfTraveling(-0.0);
 				modeParam.setMonetaryDistanceRate(0.0); 
 				modeParam.setMarginalUtilityOfDistance(-0.0002); 

@@ -164,8 +164,6 @@ public class OuterCordonCountsGenerator {
 						}
 						continue;
 					}
-					
-					mode = mode.concat("_ext");
 					mode2count.put(mode, Double.valueOf(parts[index]));
 				}
 

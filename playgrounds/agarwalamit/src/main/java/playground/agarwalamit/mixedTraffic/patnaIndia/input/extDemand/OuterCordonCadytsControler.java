@@ -119,25 +119,22 @@ public class OuterCordonCadytsControler {
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike_ext", config.planCalcScore());
-		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck_ext", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck", config.planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 
-				addTravelTimeBinding("car_ext").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("car_ext").to(carTravelDisutilityFactoryKey());
-
-				addTravelTimeBinding("motorbike_ext").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("motorbike_ext").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("motorbike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 
 				// due to speed difference of bike and truck, using configured free speed travel time, builder should also use this.
-				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
 
-				addTravelTimeBinding("truck_ext").to(FreeSpeedTravelTimeForTruck.class);
-				addTravelDisutilityFactoryBinding("truck_ext").toInstance(builder_truck);
+				addTravelTimeBinding("truck").to(FreeSpeedTravelTimeForTruck.class);
+				addTravelDisutilityFactoryBinding("truck").toInstance(builder_truck);
 			}
 		});
 
@@ -282,24 +279,24 @@ public class OuterCordonCadytsControler {
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
 
-		ModeParams car = new ModeParams("car_ext");
+		ModeParams car = new ModeParams("car");
 		car.setConstant(0.0);
 		car.setMarginalUtilityOfTraveling(-0.64);
 		car.setMonetaryDistanceRate(-3.7*Math.pow(10, -5));
 		config.planCalcScore().addModeParams(car);
 
-		ModeParams bike = new ModeParams("bike_ext");
+		ModeParams bike = new ModeParams("bike");
 		bike.setConstant(0.0);
 		bike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(bike);
 
-		ModeParams motorbike = new ModeParams("motorbike_ext");
+		ModeParams motorbike = new ModeParams("motorbike");
 		motorbike.setConstant(0.0);
 		motorbike.setMarginalUtilityOfTraveling(-0.18);
 		motorbike.setMonetaryDistanceRate(-1.6*Math.pow(10, -5));
 		config.planCalcScore().addModeParams(motorbike);
 
-		ModeParams truck = new ModeParams("truck_ext"); // using default for them.
+		ModeParams truck = new ModeParams("truck"); // using default for them.
 		truck.setConstant(0.0);
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);

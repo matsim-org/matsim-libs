@@ -90,8 +90,6 @@ public class PatnaScoringFunctionFactory implements ScoringFunctionFactory{
 				// which eventaully become negative infinity.  Amit July, 16
 				double marginalUtil_traveling_fromInitialConfig = Double.NEGATIVE_INFINITY;
 				
-				mode = mode.split("_")[0]; // take care of modes
-				
 				if(mode.equals("car")) marginalUtil_traveling_fromInitialConfig = -0.64;
 				else if(mode.equals("motorbike")) marginalUtil_traveling_fromInitialConfig = -0.18;
 				else if(mode.equals("pt")) marginalUtil_traveling_fromInitialConfig = -0.29;

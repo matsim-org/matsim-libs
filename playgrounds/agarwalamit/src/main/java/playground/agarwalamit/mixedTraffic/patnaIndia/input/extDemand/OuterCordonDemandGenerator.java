@@ -58,7 +58,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class OuterCordonDemandGenerator {
 	private static final Logger LOG = Logger.getLogger(OuterCordonDemandGenerator.class);
 	private Scenario scenario;
-	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandInputFiles/";
+	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/";
 	private Random random = MatsimRandom.getRandom();
 	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz";
 	public static void main(String[] args) {
@@ -374,10 +374,10 @@ public class OuterCordonDemandGenerator {
 				double truckCount = Double.valueOf(parts[3]); //truck
 				double bikeCount = Double.valueOf(parts[4]); //bike
 
-				mode2Count.put("car_ext", carCount);
-				mode2Count.put("motorbike_ext", motorbikeCount);
-				mode2Count.put("truck_ext", truckCount);
-				mode2Count.put("bike_ext", bikeCount);
+				mode2Count.put("car", carCount);
+				mode2Count.put("motorbike", motorbikeCount);
+				mode2Count.put("truck", truckCount);
+				mode2Count.put("bike", bikeCount);
 				time2mode2count.put(timebin, mode2Count);
 				line=reader.readLine();
 			}

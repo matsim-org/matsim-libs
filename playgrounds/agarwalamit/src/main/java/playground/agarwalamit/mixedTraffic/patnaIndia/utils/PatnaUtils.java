@@ -65,11 +65,11 @@ public final class PatnaUtils {
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
 
-	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car_ext","motorbike_ext","bike_ext","truck_ext");
+	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck"); //Arrays.asList("car_ext","motorbike_ext","bike_ext","truck_ext");
 
-	public static final Collection <String> ALL_MAIN_MODES =  Arrays.asList("car","motorbike","bike","car_ext","motorbike_ext","bike_ext","truck_ext");
+	public static final Collection <String> ALL_MAIN_MODES =  Arrays.asList("car","motorbike","bike","truck"); //Arrays.asList("car","motorbike","bike","car_ext","motorbike_ext","bike_ext","truck_ext");
 //			
-	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
+	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","bike","truck", "pt", "walk"); //Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
 	
 
 	private PatnaUtils(){} 

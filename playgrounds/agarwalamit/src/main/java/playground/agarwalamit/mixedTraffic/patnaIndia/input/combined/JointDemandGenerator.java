@@ -122,7 +122,6 @@ public class JointDemandGenerator {
 			for(PlanElement pe : pes){
 				if(pe instanceof Leg) {
 					String mode = ((Leg) pe).getMode();
-					mode = mode.contains("ext") ? mode : mode.concat("_ext");
 					planOut.addLeg(pf.createLeg(mode));
 				} else {
 					planOut.addActivity((Activity)pe);

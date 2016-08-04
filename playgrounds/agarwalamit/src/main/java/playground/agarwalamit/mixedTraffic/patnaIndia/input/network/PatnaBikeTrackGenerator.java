@@ -130,7 +130,6 @@ public class PatnaBikeTrackGenerator {
 		double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
 		Set<String> modes = new HashSet<>();
 		modes.add("bike");
-		modes.add("bike_ext");
 		
 		Id<Link> linkId = Id.createLinkId(id);
 		Link l = network.getFactory().createLink(linkId, nodes[0], nodes[1]);
