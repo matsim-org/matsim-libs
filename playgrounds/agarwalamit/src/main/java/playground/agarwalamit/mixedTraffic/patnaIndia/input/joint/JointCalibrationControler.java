@@ -100,7 +100,7 @@ public class JointCalibrationControler {
 
 	private static boolean isUsingCadyts = false;
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/c000/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/multiModalCadyts/c0/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();

@@ -18,16 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -49,7 +42,8 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class JointDemandGenerator {
 
-	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/output_plans.xml.gz"; // calibrated from cadyts.
+	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/input/"+PatnaUtils.PATNA_NETWORK_TYPE+"/cordonOutput_plans_10pct_selected.xml.gz"; 
+			//"../../../../repos/runs-svn/patnaIndia/run108/external/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadyts/outerCordonOutput_10pct_OC1Excluded/output_plans.xml.gz"; // calibrated from cadyts.
 	private static final String JOINT_PLANS_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_personAttributes_10pct.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
@@ -81,7 +75,7 @@ public class JointDemandGenerator {
 
 	private void combinedPlans(){
 		Population popUrban = getUrbanPlans();
-		Population popExtDemand = getExternalPlans();
+		Population popExtDemand = LoadMyScenarios.loadScenarioFromPlans(EXT_PLANS).getPopulation();
 
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -103,32 +97,5 @@ public class JointDemandGenerator {
 		UrbanDemandGenerator pudg = new UrbanDemandGenerator(CLONING_FACTOR);// 10% sample
 		pudg.startProcessing();
 		return pudg.getPopulation();
-	}
-
-	private Population getExternalPlans(){ // take only selected plans, add 'ext' suffix to leg mode (if does not exists) so that mode choice is enabled for sub population.
-		Population popIn = LoadMyScenarios.loadScenarioFromPlans(EXT_PLANS).getPopulation();
-
-		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population popOut = scOut.getPopulation();
-		PopulationFactory pf = popOut.getFactory();
-
-		for(Person p : popIn.getPersons().values() ){
-			Plan plan = p.getSelectedPlan();
-			Person pOut = pf.createPerson(p.getId());
-			Plan planOut = pf.createPlan();
-			pOut.addPlan(planOut);
-
-			List<PlanElement> pes = plan.getPlanElements();
-			for(PlanElement pe : pes){
-				if(pe instanceof Leg) {
-					String mode = ((Leg) pe).getMode();
-					planOut.addLeg(pf.createLeg(mode));
-				} else {
-					planOut.addActivity((Activity)pe);
-				}
-			}
-			popOut.addPerson(pOut);
-		}
-		return popOut;
 	}
 }
