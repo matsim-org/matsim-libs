@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author amit
  */
 
-public class PatnaPersonFilter{
+public class PatnaPersonFilter implements PersonFilter{
 	
 	public enum PatnaUserGroup {
 		urban, commuter, through;
@@ -63,5 +63,11 @@ public class PatnaPersonFilter{
 		else if(isPersonBelongsToCommuter(personId)) return PatnaUserGroup.commuter;
 		else if (isPersonBelongsToThroughTraffic(personId)) return PatnaUserGroup.through;
 		else throw new RuntimeException("Person id "+personId+" do not belong to any of the predefined user group. Aborting ...");
+	}
+
+	@Override
+	public String getUserGroupFromPersonId(Id<Person> personId) {
+		PatnaUserGroup pug = PatnaPersonFilter.getUserGroup(personId);
+		return pug.toString();
 	}
 }

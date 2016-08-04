@@ -78,6 +78,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.combined.router.Free
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonCountsGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.ptFare.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
@@ -168,7 +169,6 @@ public class JointCalibrationControler {
 		mp.setMarginalUtilityOfDistance(0.0);
 		mp.setMonetaryDistanceRate(0.0);
 
-
 		// add income dependent scoring function factory
 		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
 
@@ -193,7 +193,7 @@ public class JointCalibrationControler {
 		mtta.run();
 		mtta.writeResults(OUTPUT_DIR+"/analysis/modalTravelTime.txt");
 
-		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
 		msc.run();
 		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents.txt");
 
