@@ -103,8 +103,8 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(counts==null) return;
-		else if ( event.getIteration() == 0 ){	
-			// write the data for it.0 also
+		else if ( event.getIteration() == controlerConfigGroup.getFirstIteration()){	
+			// write the data for first iteration too
 			addVolumes(volumesAnalyzer);
 			writeData(event, this.linkStats);
 			reset();
