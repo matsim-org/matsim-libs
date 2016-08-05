@@ -64,9 +64,9 @@ class KNBerlinControler {
 			config.plans().setInputFile("plans2000.xml.gz");
 		} else {
 			config = ConfigUtils.createConfig( new NoiseConfigGroup() ) ;
-			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
+//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
 			//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
-			//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
+			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
 			config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
 		}
 
