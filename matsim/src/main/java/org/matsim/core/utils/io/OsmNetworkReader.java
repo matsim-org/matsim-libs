@@ -143,7 +143,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections. 
 			// If someone does a systematic study, please report.  kai, jul'16
 			this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
+			this.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 1000);
 			this.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(5, "tertiary_link",      1,  25.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(6, "minor",         1,  20.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(6, "residential",   1,  15.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(6, "living_street", 1,  10.0/3.6, 1.0,  300);
