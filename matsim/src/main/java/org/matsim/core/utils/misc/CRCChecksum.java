@@ -44,6 +44,7 @@ public class CRCChecksum {
 				/* Read until the end of the stream is reached. */
 			}
 			check = crc.getValue();
+			cis.close();
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
