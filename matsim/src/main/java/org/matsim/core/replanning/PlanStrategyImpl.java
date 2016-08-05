@@ -20,12 +20,12 @@
 
 package org.matsim.core.replanning;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
-
-import java.util.ArrayList;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
@@ -70,5 +70,5 @@ public final class PlanStrategyImpl extends GenericPlanStrategyImpl<Plan, Person
 	public PlanStrategyImpl(final PlanSelector<Plan, Person> planSelector) {
 		super(planSelector);
 	}
-
+	
 }

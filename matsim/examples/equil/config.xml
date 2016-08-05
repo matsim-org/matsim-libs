@@ -53,7 +53,7 @@
 		<param name="activityType_1"            value="w" /> <!-- work -->
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
-		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityOpeningTime_1"     value="06:00:00" />
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />

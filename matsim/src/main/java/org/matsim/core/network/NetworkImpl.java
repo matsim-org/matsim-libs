@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -262,8 +263,7 @@ import org.matsim.core.utils.collections.QuadTree;
 			// kai, jul'16
 		}
 		for (NetworkChangeEvent event : events) {
-			final NetworkChangeEvent event1 = event;
-			NetworkUtils.addNetworkChangeEvent(this,event1);
+			this.addNetworkChangeEvent(event);
 		}
 	}
 

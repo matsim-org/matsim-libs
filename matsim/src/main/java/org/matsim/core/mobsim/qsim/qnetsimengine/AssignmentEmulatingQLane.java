@@ -96,6 +96,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		this.context = context;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.length = this.qLink.getLink().getLength() ;
+		throw new RuntimeException("do not use") ;
 	}
 	@Override
 	public final void addFromWait(final QVehicle veh) {
