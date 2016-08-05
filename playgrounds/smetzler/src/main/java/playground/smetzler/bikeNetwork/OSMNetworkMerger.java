@@ -1,6 +1,5 @@
 package playground.smetzler.bikeNetwork;
 
-import org.openstreetmap.osmosis.core.Osmosis;
 
 public class OSMNetworkMerger {
 
