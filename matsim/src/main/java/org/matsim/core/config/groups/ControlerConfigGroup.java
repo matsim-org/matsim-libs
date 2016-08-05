@@ -347,7 +347,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		this.writePlansUntilIteration = val ;
 	}
 	// ---
-	int writeEventsUntilIteration = 1 ;
+	int writeEventsUntilIteration = 0 ; // old default of this was 0, not 1 as for plans. kai, aug'16
 	public int getWriteEventsUntilIteration() {
 		return this.writeEventsUntilIteration ;
 	}
