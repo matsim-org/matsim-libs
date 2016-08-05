@@ -70,7 +70,11 @@ final class MySpeedProvider implements BeforeMobsimListener,AfterMobsimListener 
 			}
 		}
 		int time2bin(double time) {
-			return (int) (time/3600.) ;
+			int bin = (int) (time/3600.);
+			if ( bin > cnt.length - 1 ) {
+				bin = cnt.length - 1 ;
+			}
+			return bin ;
 		}
 	}
 

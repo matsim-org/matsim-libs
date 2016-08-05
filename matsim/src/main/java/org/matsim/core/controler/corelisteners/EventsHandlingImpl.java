@@ -77,7 +77,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		eventsManager.resetHandlers(event.getIteration());
 		final boolean writingEventsAtAll = this.writeEventsInterval > 0;
-		final boolean regularWriteEvents = event.getIteration()>0 && event.getIteration() % writeEventsInterval == 0;
+		final boolean regularWriteEvents = writingEventsAtAll && (event.getIteration()>0 && event.getIteration() % writeEventsInterval == 0);
 		final boolean earlyIteration = event.getIteration() <= writeMoreUntilIteration ;
 		if (writingEventsAtAll && (regularWriteEvents||earlyIteration) ) {
 			for (EventsFileFormat format : eventsFileFormats) {
