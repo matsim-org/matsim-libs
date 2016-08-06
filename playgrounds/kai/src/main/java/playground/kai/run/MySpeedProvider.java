@@ -109,7 +109,8 @@ final class MySpeedProvider implements BeforeMobsimListener,AfterMobsimListener 
 		events.addHandler( observer );
 		this.network = network ;
 	}
-	private static double speedFactorBasedOnEWS(final double cap_per_sec, double flow_per_sec2) {
+	private static double speedFactorBasedOnEWS(double cap_per_sec, double flow_per_sec2) {
+		cap_per_sec *= KNBerlinControler.capFactorForEWS ;
 		double mult = (1+flow_per_sec2/cap_per_sec) * (1-flow_per_sec2/cap_per_sec) ;
 		if ( mult<0.1 ) mult=0.1 ;
 		return mult;

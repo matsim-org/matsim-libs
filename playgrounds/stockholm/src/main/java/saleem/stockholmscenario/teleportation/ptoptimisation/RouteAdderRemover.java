@@ -304,7 +304,7 @@ public class RouteAdderRemover {
 		Node tonode = null;
 		int i=0;
 		while(i++<numofstops){
-			Collection<Node> nodes = NetworkUtils.getNearestNodes2(network, fromnode.getCoord(), 2000);//Nodes within a 1000 meters
+			Collection<Node> nodes = NetworkUtils.getNearestNodes(network, fromnode.getCoord(), 2000);//Nodes within a 1000 meters
 			tonode = getNextNode(distancefromorigin, origincords, nodes);//Get next node to the current node out of the neighboring nodes
 																	  //such that the overall distance to the node from origin keeps increasing to avoid weird detours
 			distancefromorigin = NetworkUtils.getEuclideanDistance(origincords, tonode.getCoord());

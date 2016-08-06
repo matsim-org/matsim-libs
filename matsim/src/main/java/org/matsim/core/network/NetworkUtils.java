@@ -472,11 +472,11 @@ public class NetworkUtils {
 	 * even if there is only one link going to the right.
 	 *
 	 * @param inLink The inLink given
-	 * @return outLink, or null if there is only one outLink back to the inLinks fromNode.
+	 * @return outLink, or null if there is only one outLink back to the inLink's fromNode.
 	 */
-	public static Link getLeftLane(Link inLink){
+	public static Link getLeftmostTurnExcludingU(Link inLink){
 
-		TreeMap<Double, Link> result = getOutLinksSortedByAngle(inLink);
+		TreeMap<Double, Link> result = getOutLinksSortedClockwiseByAngle(inLink);
 
 		if (result.size() == 0){
 			return null;
@@ -485,16 +485,24 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * Calculates the orientation of downstream links (MATSim slang is 'outLinks') for a given 
-	 * upstream link (slang inLink)beginning from the right if the inLink goes 
+	 * Calculates the orientation of outgoing links for a given 
+	 * incoming link beginning from the right if the inLink goes 
 	 * north to south. The most 'left' outLink comes last. The link back to the 
-	 * inLinks upstream Node (slang fromNode) is ignored. 
-	 *
+	 * inLink's upstream Node is ignored. 
+	 * <br><br>
+	 * Comments/questions:<ul>
+	 * <li> What does the "north to south" part mean?  Can't we just sort outLinks right to left no matter where we come from?  kai, aug'16
+	 * <li> In fact, a test ({@link NetworkUtilsTest#getOutLinksSortedByAngleTest()}) does not confirm the javadoc.  The "north to south"
+	 * is irrelevant.  But instead, it sorts links <i> left to right </i> instead of right to left.
+	 * <br>
+	 * </ul>
+	 * If someone can confirm this, please comment out all these remarks. kai, aug'16
+	 * <br><br>
 	 * @param inLink The inLink given
-	 * @return Collection of outLinks, or an empty collection, if there is only
-	 * one outLink back to the inLinks fromNode.
+	 * @return Collection of outLinks, or an empty collection if there are only
+	 *  outLinks back to the inLink's fromNode.
 	 */
-	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
+	public static TreeMap<Double, Link> getOutLinksSortedClockwiseByAngle(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<>();
@@ -746,7 +754,7 @@ public class NetworkUtils {
 	}
 
 
-	public static Collection<Node> getNearestNodes2(Network network, final Coord coord, final double distance) {
+	public static Collection<Node> getNearestNodes(Network network, final Coord coord, final double distance) {
 		if ( network instanceof SearchableNetwork ) {
 			return ((SearchableNetwork)network).getNearestNodes(coord, distance);
 		} else {
@@ -754,8 +762,9 @@ public class NetworkUtils {
 		}
 	}
 
-
+	@Deprecated // use network.getFactory() instead
 	public static LinkFactoryImpl createLinkFactory() {
+		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
 		return new LinkFactoryImpl();
 	}
 }

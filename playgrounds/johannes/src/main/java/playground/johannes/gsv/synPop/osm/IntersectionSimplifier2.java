@@ -174,7 +174,7 @@ public class IntersectionSimplifier2 {
 	}
 
 	private Node getNearestConnected(Node seed) {
-		Collection<Node> nodes = NetworkUtils.getNearestNodes2(network,seed.getCoord(), maxSearchRadius);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes(network,seed.getCoord(), maxSearchRadius);
 		nodes.remove(seed);
 		Node nearest = null;
 		if (!nodes.isEmpty()) {

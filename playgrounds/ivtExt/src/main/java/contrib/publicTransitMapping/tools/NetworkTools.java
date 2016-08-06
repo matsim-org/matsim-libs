@@ -101,11 +101,11 @@ public class NetworkTools {
 		Link closestLink = null;
 		double minDistance = Double.MAX_VALUE;
 
-		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes2(network, coord, nodeSearchRadius);
+		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes(network, coord, nodeSearchRadius);
 
 		while(nearestNodes.size() == 0) {
 			nodeSearchRadius *= 2;
-			nearestNodes = NetworkUtils.getNearestNodes2(network, coord, nodeSearchRadius);
+			nearestNodes = NetworkUtils.getNearestNodes(network, coord, nodeSearchRadius);
 		}
 		// check every in- and outlink of each node
 		for(Node node : nearestNodes) {
@@ -161,7 +161,7 @@ public class NetworkTools {
 	 */
 	public static List<Link> findClosestLinks(Network network, Coord coord, double nodeSearchRadius, int maxNLinks, double toleranceFactor, Set<String> networkTransportModes, double maxLinkDistance) {
 		List<Link> closestLinks = new ArrayList<>();
-		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes2(network, coord, nodeSearchRadius);
+		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes(network, coord, nodeSearchRadius);
 
 		if(nearestNodes.size() != 0) {
 			// fetch every in- and outlink of each node

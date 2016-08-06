@@ -245,11 +245,11 @@ public class Bast2Counts {
 		double minsize = 5;
 		final double distance = delta;
 		
-		Collection<Node> nodes = NetworkUtils.getNearestNodes2(network,node.getCoord(), distance);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes(network,node.getCoord(), distance);
 		while(nodes.size() < minsize) {
 			delta += step;
 			final double distance1 = delta;
-			nodes = NetworkUtils.getNearestNodes2(network,node.getCoord(), distance1);
+			nodes = NetworkUtils.getNearestNodes(network,node.getCoord(), distance1);
 		}
 //		nodes.remove(node);
 		

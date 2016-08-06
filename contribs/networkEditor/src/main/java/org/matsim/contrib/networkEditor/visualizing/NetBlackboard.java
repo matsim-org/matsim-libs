@@ -899,7 +899,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}
 	
 	private static Collection<Node> getNearestNodes2( Network net, MutableCoord coord, double distance ) {
-		return NetworkUtils.getNearestNodes2(net, new Coord( coord.getX(), coord.getY() ), distance) ;
+		return NetworkUtils.getNearestNodes(net, new Coord( coord.getX(), coord.getY() ), distance) ;
 	}
 
 	private boolean insideSquare(Link l, MutableCoord startS, MutableCoord endS) {

@@ -46,6 +46,8 @@ class KNBerlinControler {
 	static final boolean equil = false ;
 	static double sampleFactor ;
 
+	static double capFactorForEWS = Double.NaN ;
+
 	public static void main ( String[] args ) {
 		OutputDirectoryLogging.catchLogEntries();
 
@@ -67,11 +69,13 @@ class KNBerlinControler {
 			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
 			//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
 //			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
+//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_storkower_ext.xml.gz") ;
 			config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
 		}
 
 		if ( assignment ) {
 			config.network().setTimeVariantNetwork(true);
+			capFactorForEWS = 1.4 ;  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		}
 
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
@@ -84,7 +88,7 @@ class KNBerlinControler {
 			config.counts().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml" ) ;
 			config.counts().setOutputFormat("all");
 			config.counts().setCountsScaleFactor(1./sampleFactor);
-			config.counts().setWriteCountsInterval(0);
+			config.counts().setWriteCountsInterval(100);
 		}
 
 		config.controler().setOutputDirectory( System.getProperty("user.home") + "/kairuns/a100/output" );
@@ -208,7 +212,10 @@ class KNBerlinControler {
 			config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 		}
 
-		ConfigUtils.loadConfig(config, System.getProperty("user.home") + "/kairuns/a100/additional-config.xml") ;
+//		ConfigUtils.loadConfig(config, System.getProperty("user.home") + "/kairuns/a100/additional-config.xml") ;
+		if ( args.length >=1 && args[0]!=null ) {
+			ConfigUtils.loadConfig( config, args[0] ) ;
+		}
 
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();

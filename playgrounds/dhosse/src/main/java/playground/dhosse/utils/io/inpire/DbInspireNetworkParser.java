@@ -389,8 +389,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			Id<Node> fromNodeId = Id.createNodeId(link.fromNodeId);
 			Id<Node> toNodeId = Id.createNodeId(link.toNodeId + "_2");
 			
-			List<Node> nodes = (List<Node>) NetworkUtils.getNearestNodes2(((Network)this.network),link.fromCoord, (double) 0);
-			List<Node> nodes2 = (List<Node>) NetworkUtils.getNearestNodes2(((Network)this.network),link.toCoord, (double) 0);
+			List<Node> nodes = (List<Node>) NetworkUtils.getNearestNodes(((Network)this.network),link.fromCoord, (double) 0);
+			List<Node> nodes2 = (List<Node>) NetworkUtils.getNearestNodes(((Network)this.network),link.toCoord, (double) 0);
 			
 			Node fromNode = nodes.size() > 0 ? nodes.get(0) : null;
 			if(fromNode == null){
