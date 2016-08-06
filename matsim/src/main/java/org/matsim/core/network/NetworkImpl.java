@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -43,7 +42,7 @@ import org.matsim.core.utils.collections.QuadTree;
  * Design thoughts:<ul>
  * <li> This class is final, since it is sitting behind an interface, and thus delegation can be used for 
  * implementation modifications.  Access to the quad tree might be justified in some cases, but should then be realized
- * by specific methods and not via inheritance of the field (I would think
+ * by specific methods and not via inheritance of the field (I would think).
 
  </ul>
  * 
@@ -302,7 +301,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 	@Override
 	public Map<Id<Node>, Node> getNodes() {
-		return this.nodes;
+		return Collections.unmodifiableMap(this.nodes);
 	}
 
 	@Override public Link getNearestLinkExactly(final Coord coord) {
