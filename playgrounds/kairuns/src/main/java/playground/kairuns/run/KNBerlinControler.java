@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 class KNBerlinControler {
 	private static final Logger log = Logger.getLogger(KNBerlinControler.class);
 
-	static final boolean assignment = true ;
+	static final boolean assignment = false ;
 	static final boolean equil = false ;
 	static double sampleFactor ;
 
@@ -173,39 +173,9 @@ class KNBerlinControler {
 
 		// strategy:
 
-		{
-			StrategySettings stratSets = new StrategySettings( ) ;
-			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() ) ;
-			stratSets.setWeight(0.9);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		{
-			StrategySettings stratSets = new StrategySettings( ) ;
-			stratSets.setStrategyName( DefaultStrategy.ReRoute.name() ) ;
-			stratSets.setWeight(0.1);
-			config.strategy().addStrategySettings(stratSets);
-			if ( !equil ) {
-				config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-				config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
-//				config.travelTimeCalculator().setTravelTimeAggregatorType("experimental_LastMile");
-				config.travelTimeCalculator().setTraveltimeBinSize(10);
-			}
-		}
-		//		{
-		//			StrategySettings stratSets = new StrategySettings( ) ;
-		//			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
-		//			stratSets.setWeight(0.1);
-		//			config.strategy().addStrategySettings(stratSets);
-		//			config.changeMode().setModes(new String[] {"walk","bike","car","pt","pt2"});
-		//		}
-		{
-			//			StrategySettings stratSets = new StrategySettings( ) ;
-			//			stratSets.setStrategyName( DefaultStrategy.TimeAllocationMutator.name() );
-			//			stratSets.setWeight(0.1);
-			//			config.strategy().addStrategySettings(stratSets);
-			config.timeAllocationMutator().setMutationRange(7200.);
-			config.timeAllocationMutator().setAffectingDuration(false);
-		}
+		setStrategies(config);
+		
+		// other:
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		if ( equil ) {
@@ -254,11 +224,13 @@ class KNBerlinControler {
 
 //		controler.addOverridingModule( new OTFVisLiveModule() );
 
-		controler.addOverridingModule( new AbstractModule() {
-			@Override public void install() {
-				this.addControlerListenerBinding().to( MySpeedProvider.class ) ;
-			}
-		});
+		if ( assignment ) {
+			controler.addOverridingModule( new AbstractModule() {
+				@Override public void install() {
+					this.addControlerListenerBinding().to( MySpeedProvider.class ) ;
+				}
+			});
+		}
 
 		// ===
 
@@ -270,6 +242,42 @@ class KNBerlinControler {
 
 		//		computeNoise(sampleFactor, config, scenario);
 
+	}
+
+	private static void setStrategies(Config config) {
+		{
+			StrategySettings stratSets = new StrategySettings( ) ;
+			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() ) ;
+			stratSets.setWeight(0.9);
+			config.strategy().addStrategySettings(stratSets);
+		}
+		{
+			StrategySettings stratSets = new StrategySettings( ) ;
+			stratSets.setStrategyName( DefaultStrategy.ReRoute.name() ) ;
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+			if ( !equil ) {
+				config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+				config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+//				config.travelTimeCalculator().setTravelTimeAggregatorType("experimental_LastMile");
+				config.travelTimeCalculator().setTraveltimeBinSize(10);
+			}
+		}
+		//		{
+		//			StrategySettings stratSets = new StrategySettings( ) ;
+		//			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
+		//			stratSets.setWeight(0.1);
+		//			config.strategy().addStrategySettings(stratSets);
+		//			config.changeMode().setModes(new String[] {"walk","bike","car","pt","pt2"});
+		//		}
+		{
+			//			StrategySettings stratSets = new StrategySettings( ) ;
+			//			stratSets.setStrategyName( DefaultStrategy.TimeAllocationMutator.name() );
+			//			stratSets.setWeight(0.1);
+			//			config.strategy().addStrategySettings(stratSets);
+			config.timeAllocationMutator().setMutationRange(7200.);
+			config.timeAllocationMutator().setAffectingDuration(false);
+		}
 	}
 
 	private static void computeNoise(final double sampleFactor, Config config, Scenario scenario) {
