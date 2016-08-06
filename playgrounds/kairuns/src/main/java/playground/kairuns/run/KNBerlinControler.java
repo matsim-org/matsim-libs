@@ -1,4 +1,4 @@
-package playground.kai.run;
+package playground.kairuns.run;
 
 import java.util.Arrays;
 import java.util.Collection;
