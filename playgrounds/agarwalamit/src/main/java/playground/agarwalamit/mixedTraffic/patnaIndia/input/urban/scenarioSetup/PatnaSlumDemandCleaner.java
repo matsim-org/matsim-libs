@@ -9,7 +9,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
+ *   pdc program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -33,7 +32,6 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup.PatnaCalibrationUtils.PatnaDemandLabels;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
-import playground.agarwalamit.utils.RandomNumberUtils;
 
 /**
  * Reading the raw input data, cleaning it, getting data randomly if not available and then writing it back.
@@ -41,18 +39,20 @@ import playground.agarwalamit.utils.RandomNumberUtils;
  * @author amit
  */
 
-public class PatnaSlumDemandCleaner {
+public class PatnaSlumDemandCleaner  {
 
 	private BufferedWriter writer  ;
 	private final String outFile ;
+
+	private PatnaDemandImputer pdc = new PatnaDemandImputer();
 
 	public PatnaSlumDemandCleaner(String outFile){
 		this.outFile = outFile;
 	}
 
 	public static void main(String[] args) {
-		String inputFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/raw_uncleanData/slum_allZones_uncleanedData.txt"; 
-		String outFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";
+		String inputFile = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/raw_uncleanData/slum_allZones_uncleanedData.txt"; 
+		String outFile = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/slum_allZones_cleanedData.txt";
 
 		PatnaSlumDemandCleaner pdfc = new PatnaSlumDemandCleaner(outFile);
 		pdfc.run(inputFile);
@@ -70,9 +70,40 @@ public class PatnaSlumDemandCleaner {
 			throw new RuntimeException(". Reason "+e);
 		}
 
-		storeRandomDataForUnknownFields();
+		// store data 
+		pdc.readFileToFillCounter(inputFile);
 
-		readZonesFileAndWriteData(inputFile);
+		// -- desired distributions
+		//  update the mode instead of NA --- 480 such plans see Table 5-13
+		SortedMap<String, Double> modeDistriCMP = new TreeMap<>();
+		modeDistriCMP.put("motorbike", 7.);
+		modeDistriCMP.put("bike", 35.); 
+		modeDistriCMP.put("pt", 19.); 
+		modeDistriCMP.put("walk", 38.);	
+
+
+		// daily expenditure 1215 plans with no data; table 5-8
+		SortedMap<String, Double> costDataCMP = new TreeMap<>();
+		costDataCMP.put("1", 0.32);
+		costDataCMP.put("2", 0.64);
+		costDataCMP.put("3", 0.03);
+		costDataCMP.put("4", 0.01);
+
+		// monthly income -- 1244 unknown data fields ; table 5-7
+		SortedMap<String, Double> incomeDataCMP = new TreeMap<>();
+		incomeDataCMP.put("1", 0.01);
+		incomeDataCMP.put("2", 0.10);
+		incomeDataCMP.put("3", 0.53);
+		incomeDataCMP.put("4", 0.23);
+		incomeDataCMP.put("5", 0.11);
+		incomeDataCMP.put("6", 0.01);
+		incomeDataCMP.put("7", 0.01);
+
+		// get the distribution
+		pdc.processForUnknownData(modeDistriCMP, costDataCMP, incomeDataCMP);
+
+		// now write everything back to desired format
+		readZonesFileToWriteData(inputFile);
 
 		try{
 			writer.close();
@@ -81,46 +112,7 @@ public class PatnaSlumDemandCleaner {
 		}
 	}
 
-	private List<String> randomModes;
-	private List<String> dailyCostInterval;
-	private List<String> monthlyIncInterval;
-
-	private void storeRandomDataForUnknownFields(){
-		{ // travel modes
-			// update the mode instead of 9999 --- 480 such plans 
-			// using aggregate distribution; see Table 5-13
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("motorbike", 7.);
-			groupNumbers.put("bike", 35.); //groupNumbers.put("bike", 39.);
-			groupNumbers.put("pt", 19.); // groupNumbers.put("pt", 15.);
-			groupNumbers.put("walk", 38.);
-
-			// to remove the top element, linkedlist is used.
-			this.randomModes = new LinkedList<>( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, 480) );
-		}
-		{ // daily expenditure 1215 such plans
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("1", 0.32);
-			groupNumbers.put("2", 0.64);
-			groupNumbers.put("3", 0.03);
-			groupNumbers.put("4", 0.01);
-			dailyCostInterval = new LinkedList<>(  RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, 1215) );
-		}
-
-		{ // monthly income 1244 such plans 
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("1", 0.01);
-			groupNumbers.put("2", 0.10);
-			groupNumbers.put("3", 0.53);
-			groupNumbers.put("4", 0.23);
-			groupNumbers.put("5", 0.11);
-			groupNumbers.put("6", 0.01);
-			groupNumbers.put("7", 0.01);
-			monthlyIncInterval = new LinkedList<>(  RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, 1244) );
-		}
-	}
-
-	public void readZonesFileAndWriteData(final String inputFile) {
+	public void readZonesFileToWriteData(final String inputFile) {
 
 		BufferedReader reader = IOUtils.getBufferedReader(inputFile);
 
@@ -163,17 +155,17 @@ public class PatnaSlumDemandCleaner {
 				tripPurpose = PatnaCalibrationUtils.getTripPurpose(tripPurpose);
 
 				if (mode.equals("9999")) {
-					mode = randomModes.remove(0); // always take what is on top.
+					mode = pdc.randomModes.remove(0); // always take what is on top.
 				} else if (Integer.valueOf(mode) <= 9 ) {
 					mode = PatnaCalibrationUtils.getTravelModeFromCode(mode);
 				}
 
 				if(monthlyIncome.equals("a") ) {
-					monthlyIncome = monthlyIncInterval.remove(0);
+					monthlyIncome = pdc.monthlyIncInterval.remove(0);
 				}
 
 				if(dailyExpenditure.equals("a") || dailyExpenditure.equals("") || dailyExpenditure.equals("9999")) {
-					dailyExpenditure = dailyCostInterval.remove(0);
+					dailyExpenditure = pdc.dailyCostInterval.remove(0);
 				}
 
 				monthlyIncome = String.valueOf(PatnaCalibrationUtils.getIncomeInterval(monthlyIncome));

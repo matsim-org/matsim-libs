@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -34,7 +33,6 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup.PatnaCalibrationUtils.PatnaDemandLabels;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
-import playground.agarwalamit.utils.RandomNumberUtils;
 
 /**
  * Reading the raw input data, cleaning it, getting data randomly if not available and then writing it back.
@@ -46,17 +44,19 @@ public class PatnaNonSlumDemandCleaner {
 
 	private BufferedWriter writer  ;
 	private final String outFile ;
-
+	
+	private PatnaDemandImputer pdc = new PatnaDemandImputer();
+	
 	public PatnaNonSlumDemandCleaner(String outFile){
 		this.outFile = outFile;
 	}
 
 	public static void main(String[] args) {
-		String inputFile1 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
-		String inputFile2 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
-		String inputFile3 = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
+		String inputFile1 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
+		String inputFile2 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
+		String inputFile3 = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
 
-		String outFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
+		String outFile = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
 
 		PatnaNonSlumDemandCleaner pdfc = new PatnaNonSlumDemandCleaner(outFile);
 		pdfc.run(inputFile1, inputFile2, inputFile3);
@@ -74,8 +74,43 @@ public class PatnaNonSlumDemandCleaner {
 			throw new RuntimeException(". Reason "+e);
 		}
 
-		storeRandomDataForUnknownFields();
+		//store data
+		pdc.readFileToFillCounter(inputFile1);
+		pdc.readFileToFillCounter(inputFile2);
+		pdc.readFileToFillCounter(inputFile3); // this is cleaned file. However, good to just add it to the same file.
 
+		// -- desired distributions
+		// update the mode instead of 9999 --- 71 such plans only in 27-42 zones file
+		// Table 5-14, HBW , car 8, motorbike 38, bike 37, pt 11, walk 5
+		SortedMap<String, Double> modeDistriCMP = new TreeMap<>();
+		modeDistriCMP.put("car", 5.);
+		modeDistriCMP.put("motorbike", 25.);
+		modeDistriCMP.put("bike", 29.); //groupNumbers.put("bike", 37.);
+		modeDistriCMP.put("pt", 27.); // groupNumbers.put("pt", 11.);
+		modeDistriCMP.put("walk", 14.);
+
+		// daily expenditure 4138 such plans in restZonesFile only. 
+		SortedMap<String, Double> costDataCMP = new TreeMap<>(); // Table 5-8
+		costDataCMP.put("1", 0.22);
+		costDataCMP.put("2", 0.52);
+		costDataCMP.put("3", 0.14);
+		costDataCMP.put("4", 0.08);
+		costDataCMP.put("5", 0.03);
+
+		// monthly income 4065 such plans in restZonesFile only.
+		SortedMap<String, Double> incomeDataCMP = new TreeMap<>();
+		incomeDataCMP.put("1", 0.01);
+		incomeDataCMP.put("2", 0.01);
+		incomeDataCMP.put("3", 0.21);
+		incomeDataCMP.put("4", 0.27);
+		incomeDataCMP.put("5", 0.18);
+		incomeDataCMP.put("6", 0.13);
+		incomeDataCMP.put("7", 0.19);
+
+		// get the distribution
+		pdc.processForUnknownData(modeDistriCMP,costDataCMP,incomeDataCMP);
+		
+		// now write everthing back to desired format
 		readZonesFileAndWriteData(inputFile1, true);
 		readZonesFileAndWriteData(inputFile2, false);
 		readZonesFileAndWriteData(inputFile3, false); // this is cleaned file. However, good to just add it to the same file.
@@ -84,47 +119,6 @@ public class PatnaNonSlumDemandCleaner {
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to the file. Reason :"+e);
-		}
-	}
-
-	private List<String> randomModes;
-	private List<String> dailyCostInterval;
-	private List<String> monthlyIncInterval;
-
-	private void storeRandomDataForUnknownFields(){
-		{ // travel modes
-			// update the mode instead of 9999 --- 71 such plans only in 27-42 zones file
-			// Table 5-14, HBW , car 8, motorbike 38, bike 37, pt 11, walk 5
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("car", 8.);
-			groupNumbers.put("motorbike", 38.);
-			groupNumbers.put("bike", 35.); //groupNumbers.put("bike", 37.);
-			groupNumbers.put("pt", 13.); // groupNumbers.put("pt", 11.);
-			groupNumbers.put("walk", 5.);
-
-			// to remove the top element, linkedlist is used.
-			this.randomModes = new LinkedList<>( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, 71) );
-		}
-		{ // daily expenditure 4138 such plans in restZonesFile only. 
-			SortedMap<String, Double> groupNumbers = new TreeMap<>(); // Table 5-8
-			groupNumbers.put("1", 0.22);
-			groupNumbers.put("2", 0.52);
-			groupNumbers.put("3", 0.14);
-			groupNumbers.put("4", 0.08);
-			groupNumbers.put("5", 0.03);
-			dailyCostInterval = new LinkedList<>(  RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, 4138) );
-		}
-
-		{ // monthly income 4065 such plans in restZonesFile only.
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("1", 0.01);
-			groupNumbers.put("2", 0.01);
-			groupNumbers.put("3", 0.21);
-			groupNumbers.put("4", 0.27);
-			groupNumbers.put("5", 0.18);
-			groupNumbers.put("6", 0.13);
-			groupNumbers.put("7", 0.19);
-			monthlyIncInterval = new LinkedList<>(  RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, 4065) );
 		}
 	}
 
@@ -175,7 +169,7 @@ public class PatnaNonSlumDemandCleaner {
 				} else tripPurpose = PatnaCalibrationUtils.getTripPurpose(tripPurpose);
 
 				if (mode.equals("9999")) {
-					mode = randomModes.remove(0); // always take what is on top.
+					mode = pdc.randomModes.remove(0); // always take what is on top.
 				} else if (PatnaUtils.ALL_MODES.contains(mode)) {
 					// nothing to do.
 				} else if (Integer.valueOf(mode) <= 9 ) {
@@ -183,11 +177,11 @@ public class PatnaNonSlumDemandCleaner {
 				}
 
 				if(monthlyIncome.equals("a") || monthlyIncome.equals("99999")) {
-					monthlyIncome = monthlyIncInterval.remove(0);
+					monthlyIncome = pdc.monthlyIncInterval.remove(0);
 				}
 
 				if(dailyExpenditure.equals("a")) {
-					dailyExpenditure = dailyCostInterval.remove(0);
+					dailyExpenditure = pdc.dailyCostInterval.remove(0);
 				}
 
 				monthlyIncome = String.valueOf(PatnaCalibrationUtils.getIncomeInterval(monthlyIncome));
