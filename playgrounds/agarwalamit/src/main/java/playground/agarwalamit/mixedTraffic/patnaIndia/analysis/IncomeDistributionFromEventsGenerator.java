@@ -38,7 +38,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  * @author amit
  */
 
-public class IncomeDistributionGenerator {
+public class IncomeDistributionFromEventsGenerator {
 
 	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
 	private final int iterationNumber = 100;
@@ -49,7 +49,7 @@ public class IncomeDistributionGenerator {
 	private final double USD2INRRate = 66.6; // 08 June 2016 
 
 	public static void main(String[] args) {
-		IncomeDistributionGenerator idg = new IncomeDistributionGenerator();
+		IncomeDistributionFromEventsGenerator idg = new IncomeDistributionFromEventsGenerator();
 		idg.parseFile();
 		idg.writeData();
 	}
