@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 class KNBerlinControler {
 	private static final Logger log = Logger.getLogger(KNBerlinControler.class);
 
-	static final boolean assignment = false ;
+	static final boolean assignment = true ;
 	static final boolean equil = false ;
 	static double sampleFactor ;
 
