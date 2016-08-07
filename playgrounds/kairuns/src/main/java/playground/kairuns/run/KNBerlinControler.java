@@ -258,9 +258,9 @@ class KNBerlinControler {
 			config.strategy().addStrategySettings(stratSets);
 			if ( !equil ) {
 				config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-				config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+//				config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 //				config.travelTimeCalculator().setTravelTimeAggregatorType("experimental_LastMile");
-				config.travelTimeCalculator().setTraveltimeBinSize(10);
+//				config.travelTimeCalculator().setTraveltimeBinSize(10);
 			}
 		}
 		//		{
