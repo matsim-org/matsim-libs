@@ -130,5 +130,4 @@ public class PatnaDemandImputer {
 			throw new RuntimeException(". Reason "+e);
 		}
 	}
-
 }

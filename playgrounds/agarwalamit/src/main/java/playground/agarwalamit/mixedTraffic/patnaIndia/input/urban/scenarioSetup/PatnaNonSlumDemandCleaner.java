@@ -44,9 +44,9 @@ public class PatnaNonSlumDemandCleaner {
 
 	private BufferedWriter writer  ;
 	private final String outFile ;
-	
+
 	private PatnaDemandImputer pdc = new PatnaDemandImputer();
-	
+
 	public PatnaNonSlumDemandCleaner(String outFile){
 		this.outFile = outFile;
 	}
@@ -75,19 +75,19 @@ public class PatnaNonSlumDemandCleaner {
 		}
 
 		//store data
-		pdc.readFileToFillCounter(inputFile1);
-		pdc.readFileToFillCounter(inputFile2);
-		pdc.readFileToFillCounter(inputFile3); // this is cleaned file. However, good to just add it to the same file.
+		readFileToFillCounter(inputFile1,true);
+		readFileToFillCounter(inputFile2,false);
+		readFileToFillCounter(inputFile3,false); // this is cleaned file. However, good to just add it to the same file.
 
 		// -- desired distributions
 		// update the mode instead of 9999 --- 71 such plans only in 27-42 zones file
 		// Table 5-14, HBW , car 8, motorbike 38, bike 37, pt 11, walk 5
 		SortedMap<String, Double> modeDistriCMP = new TreeMap<>();
-		modeDistriCMP.put("car", 5.);
-		modeDistriCMP.put("motorbike", 25.);
-		modeDistriCMP.put("bike", 29.); //groupNumbers.put("bike", 37.);
-		modeDistriCMP.put("pt", 27.); // groupNumbers.put("pt", 11.);
-		modeDistriCMP.put("walk", 14.);
+		modeDistriCMP.put("car", 8.);
+		modeDistriCMP.put("motorbike", 38.);
+		modeDistriCMP.put("bike", 37.); //groupNumbers.put("bike", 37.);
+		modeDistriCMP.put("pt", 11.); // groupNumbers.put("pt", 11.);
+		modeDistriCMP.put("walk", 5.);
 
 		// daily expenditure 4138 such plans in restZonesFile only. 
 		SortedMap<String, Double> costDataCMP = new TreeMap<>(); // Table 5-8
@@ -109,11 +109,11 @@ public class PatnaNonSlumDemandCleaner {
 
 		// get the distribution
 		pdc.processForUnknownData(modeDistriCMP,costDataCMP,incomeDataCMP);
-		
+
 		// now write everthing back to desired format
 		readZonesFileAndWriteData(inputFile1, true);
 		readZonesFileAndWriteData(inputFile2, false);
-		readZonesFileAndWriteData(inputFile3, false); // this is cleaned file. However, good to just add it to the same file.
+		readZonesFileAndWriteData(inputFile3, false); 
 
 		try{
 			writer.close();
@@ -210,6 +210,68 @@ public class PatnaNonSlumDemandCleaner {
 			} catch (IOException e) {
 				throw new RuntimeException(". Reason "+e);
 			}
+		}
+	}
+
+	private void readFileToFillCounter(final String inputFile, final boolean isZoneBW27To42){
+		try (BufferedReader reader = IOUtils.getBufferedReader(inputFile)) {
+			String line = reader.readLine();
+			List<String> labels = new ArrayList<>();
+
+			while(line!=null) {
+				String row [] = line.split("\t");
+				List<String> strs = Arrays.asList(row);
+
+				if( row[0].substring(0, 1).matches("[A-Za-z]") // labels 
+						&& !row[0].startsWith("NA") // "NA" could also be inside the data 
+						) {
+					for (String s : strs){ 
+						labels.add(s); 
+					}
+				} else { // main data
+
+					String mode = strs.get( labels.indexOf( PatnaDemandLabels.mode.toString() ));
+					String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyIncome.toString() )); 
+					String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyTransportCost.toString() ));
+					
+					String tripPurpose = strs.get( labels.indexOf( PatnaDemandLabels.tripPurpose.toString() ));
+					
+					if(tripPurpose.equals("9999") && isZoneBW27To42 ) {
+						tripPurpose = PatnaUrbanActivityTypes.work.toString();
+					} else tripPurpose = PatnaCalibrationUtils.getTripPurpose(tripPurpose);
+
+					//--
+					if(PatnaUtils.ALL_MODES.contains(mode)) ;// one of non-slum file have modes instead of codes.
+					else if(Integer.valueOf(mode) <=9) mode = PatnaCalibrationUtils.getTravelModeFromCode(mode);
+					else mode = "NA";
+
+					if(tripPurpose.equalsIgnoreCase(PatnaUrbanActivityTypes.work.toString()) ){  // only work trips; distri is also taken for work trips
+						if ( pdc.mode2counter.containsKey(mode) ) pdc.mode2counter.put(mode, pdc.mode2counter.get(mode)+1 );
+						else pdc.mode2counter.put(mode, 1);
+					}
+					//--
+
+					//--
+					if( ! monthlyIncome.equals("a") && !monthlyIncome.equals("99999") ) monthlyIncome = String.valueOf(PatnaCalibrationUtils.getIncomeInterval(monthlyIncome));
+					else monthlyIncome = "NA";
+
+					if ( pdc.inc2counter.containsKey(monthlyIncome) ) pdc.inc2counter.put(monthlyIncome, pdc.inc2counter.get(monthlyIncome)+1 );
+					else pdc.inc2counter.put(monthlyIncome, 1);
+					//--
+
+					//--
+					if (  ! dailyExpenditure.equals("a") &&  ! dailyExpenditure.equals("") && ! dailyExpenditure.equals("9999") ){
+						dailyExpenditure = String.valueOf(PatnaCalibrationUtils.getDailyExpenditureInterval(dailyExpenditure));
+					} else dailyExpenditure = "NA";
+
+					if ( pdc.dailyExp2counter.containsKey(dailyExpenditure) ) pdc.dailyExp2counter.put(dailyExpenditure, pdc.dailyExp2counter.get(dailyExpenditure)+1 );
+					else pdc.dailyExp2counter.put(dailyExpenditure, 1);
+					//--
+				}
+				line = reader.readLine();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(". Reason "+e);
 		}
 	}
 }
