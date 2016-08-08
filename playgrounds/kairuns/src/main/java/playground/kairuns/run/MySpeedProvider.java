@@ -60,7 +60,7 @@ final class MySpeedProvider implements BeforeMobsimListener,AfterMobsimListener 
 			int bin = time2bin(time) ;
 			cnt[bin]++ ;
 		}
-		double getFlowPerSec( double time ) {
+		double getRawFlowPerSec( double time ) {
 			int bin = time2bin(time) ;
 			return cnt[bin]/3600. ;
 		}
@@ -141,7 +141,7 @@ final class MySpeedProvider implements BeforeMobsimListener,AfterMobsimListener 
 
 					double cap_per_sec = link.getFlowCapacityPerSec() * KNBerlinControler.sampleFactor ;
 
-					double flow_per_sec = info.getFlowPerSec(hour*3600+1) ; // yyyyyy 
+					double flow_per_sec = info.getRawFlowPerSec(hour*3600+1) ; // yyyyyy 
 
 					final double speedFactor = speedFactorBasedOnEWS(cap_per_sec,  flow_per_sec);
 
