@@ -85,6 +85,7 @@ public class IncomeDistributionGenerator {
 
 	private void printStats(){
 		Map<String,List<Double> > mode2list = new HashMap<>();
+		List<Double> allModesList= new ArrayList<>();
 
 		for(Double d : this.avgInc2mode2Count.keySet()){
 			for(String mode : this.avgInc2mode2Count.get(d).keySet()) {
@@ -92,24 +93,39 @@ public class IncomeDistributionGenerator {
 				if (list==null) list = new ArrayList<>();
 				for (int i=0; i< this.avgInc2mode2Count.get(d).get(mode);i++) {
 					list.add(d);
+					allModesList.add(d);
 				}
 				mode2list.put(mode, list);
 			}
 		}
 
+		Percentile ptile = new Percentile();
 		for(String mode : mode2list.keySet()) {
 			List<Double> list = mode2list.get(mode);
 			double d [] = new double [list.size()];
 			for(int index = 0 ; index < list.size(); index++){
 				d[index] = list.get(index);
 			}
+			System.out.println(list.size());
 			System.out.println("The mean of incomes for mode "+mode+ " is "+ ListUtils.doubleMean(list));
 			System.out.println("The 25%, 50% and 75% quartiles for the mode " + mode + " are "+ NumberUtils.quartile(d, 25)+ "\t"
 			+ NumberUtils.quartile(d, 50) + "\t"+  NumberUtils.quartile(d, 74));
-			Percentile ptile = new Percentile();
 			System.out.println("The 25%, 50% and 75% quartiles for the mode " + mode + " are "+
 			ptile.evaluate(d,25) +"\t"+ptile.evaluate(d,50)+"\t"+ptile.evaluate(d,75));
 		}
+
+		// all modes
+		double dAllModes [] = new double [allModesList.size()];
+		for(int index = 0 ; index < allModesList.size(); index++){
+			dAllModes[index] = allModesList.get(index);
+		}
+		System.out.println(allModesList.size());
+		System.out.println("The mean of incomes for all modes is "+ ListUtils.doubleMean(allModesList));
+		System.out.println("The 25%, 50% and 75% quartiles for all modes are "+ NumberUtils.quartile(dAllModes, 25)+ "\t"
+		+ NumberUtils.quartile(dAllModes, 50) + "\t"+  NumberUtils.quartile(dAllModes, 74));
+		System.out.println("The 25%, 50% and 75% quartiles for all modes are "+
+		ptile.evaluate(dAllModes,25) +"\t"+ptile.evaluate(dAllModes,50)+"\t"+ptile.evaluate(dAllModes,75));
+		
 	}
 
 	private void parseFile(){
