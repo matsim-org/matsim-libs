@@ -33,7 +33,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 import playground.michalm.util.matrices.MatrixUtils;
 
 public class ZoneExtractor
@@ -73,24 +73,24 @@ public class ZoneExtractor
             
             Matrix currentMatrix = matrices.getMatrix(sdf.format(currentHour));
             try {
-            for (Entry e : currentMatrix.getFromLocEntries(BerlinZoneUtils.TXL_LOR_ID.toString())){
+            for (Entry e : currentMatrix.getFromLocEntries(TaxiBerlinZoneUtils.TXL_LOR_ID.toString())){
                 fromTXL.createEntry(e.getToLocation(), sdf.format(currentHour), e.getValue());
             }
             } catch (NullPointerException e) {}
             try {
-            for (Entry e : currentMatrix.getToLocEntries(BerlinZoneUtils.TXL_LOR_ID.toString())){
+            for (Entry e : currentMatrix.getToLocEntries(TaxiBerlinZoneUtils.TXL_LOR_ID.toString())){
                 toTXL.createEntry(e.getFromLocation(), sdf.format(currentHour), e.getValue());
             }
             } catch (NullPointerException e) {}
             try {
             
-            for (Entry e : currentMatrix.getFromLocEntries(BerlinZoneUtils.SXF_LOR_ID.toString())){
+            for (Entry e : currentMatrix.getFromLocEntries(TaxiBerlinZoneUtils.SXF_LOR_ID.toString())){
                 fromSXF.createEntry(e.getToLocation(), sdf.format(currentHour), e.getValue());
             }
             } catch (NullPointerException e) {}
             try {
         
-            for (Entry e : currentMatrix.getToLocEntries(BerlinZoneUtils.SXF_LOR_ID.toString())){
+            for (Entry e : currentMatrix.getToLocEntries(TaxiBerlinZoneUtils.SXF_LOR_ID.toString())){
                 toSXF.createEntry(e.getFromLocation(), sdf.format(currentHour), e.getValue());
             } 
             } catch (NullPointerException e) {}

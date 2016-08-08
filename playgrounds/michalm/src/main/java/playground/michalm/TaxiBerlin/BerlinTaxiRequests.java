@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.berlin;
+package playground.michalm.TaxiBerlin;
 
 import java.util.Map;
 

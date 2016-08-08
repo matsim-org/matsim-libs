@@ -29,7 +29,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.*;
 
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 import playground.michalm.demand.DefaultActivityCreator;
 
 
@@ -46,16 +46,16 @@ public class BerlinTaxiActivityCreator
     public Activity createActivity(Zone zone, String actType)
     {
         Link link;
-        if (zone.getId().equals(BerlinZoneUtils.TXL_LOR_ID)) {
+        if (zone.getId().equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
             if (actType.equals("arrival")) {
-                link = network.getLinks().get(BerlinZoneUtils.TO_TXL_LINK_ID);
+                link = network.getLinks().get(TaxiBerlinZoneUtils.TO_TXL_LINK_ID);
                 Coord coord = link.getCoord();
                 Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
                 return activity;
             }
             else {
-                link = network.getLinks().get(BerlinZoneUtils.FROM_TXL_LINK_ID);
+                link = network.getLinks().get(TaxiBerlinZoneUtils.FROM_TXL_LINK_ID);
                 Coord coord = link.getCoord();
                 Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
@@ -63,16 +63,16 @@ public class BerlinTaxiActivityCreator
 
             }
         }
-        else if (zone.getId().equals(BerlinZoneUtils.SXF_LOR_ID)) {
+        else if (zone.getId().equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
             if (actType.equals("arrival")) {
-                link = network.getLinks().get(BerlinZoneUtils.TO_SXF_LINK_ID);
+                link = network.getLinks().get(TaxiBerlinZoneUtils.TO_SXF_LINK_ID);
                 Coord coord = link.getCoord();
                 Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
                 return activity;
             }
             else {
-                link = network.getLinks().get(BerlinZoneUtils.FROM_SXF_LINK_ID);
+                link = network.getLinks().get(TaxiBerlinZoneUtils.FROM_SXF_LINK_ID);
                 Coord coord = link.getCoord();
                 Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
                 activity.setLinkId(link.getId());
@@ -104,7 +104,7 @@ public class BerlinTaxiActivityCreator
         while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
 
         Coord coord = new Coord(p.getX(), p.getY());
-        Coord coordt = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
+        Coord coordt = TaxiBerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
         Link link = NetworkUtils.getNearestLink(network, coordt);
 
         Activity activity = (Activity)pf.createActivityFromCoord(actType, coordt);

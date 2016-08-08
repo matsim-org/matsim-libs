@@ -40,7 +40,7 @@ import org.matsim.core.utils.io.tabularFileParser.*;
 
 import com.vividsolutions.jts.geom.*;
 
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 
 
 /**
@@ -291,19 +291,19 @@ public class TaxiDemandWriter
         Plan plan = population.getFactory().createPlan();
         Coord fromCoord;
         Coord toCoord;
-        if (from.equals(BerlinZoneUtils.TXL_LOR_ID)) {
+        if (from.equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
 
-            fromCoord = BerlinZoneUtils.createFromTxlCoord();
+            fromCoord = TaxiBerlinZoneUtils.createFromTxlCoord();
             TaxiDemandWriter.fromTXL++;
         }
         else {
             fromCoord = this.shoot(from);
         }
-        if (to.equals(BerlinZoneUtils.TXL_LOR_ID)) {
+        if (to.equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
 
-            toCoord = BerlinZoneUtils.createToTxlCoord();
+            toCoord = TaxiBerlinZoneUtils.createToTxlCoord();
             TaxiDemandWriter.toTXL++;
-            if (from.equals(BerlinZoneUtils.TXL_LOR_ID)) {
+            if (from.equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
                 fromCoord = this.shoot(from);
                 toCoord = this.shoot(to);
                 //quite a lot of trips are TXL to TXL
@@ -313,19 +313,19 @@ public class TaxiDemandWriter
             toCoord = this.shoot(to);
         }
 
-        if (from.equals(BerlinZoneUtils.SXF_LOR_ID)) {
+        if (from.equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
 
-            fromCoord = BerlinZoneUtils.createSxfCentroid();
+            fromCoord = TaxiBerlinZoneUtils.createSxfCentroid();
             //TaxiDemandWriter.fromTXL++; // SXF?, michalm
         }
         else {
             fromCoord = this.shoot(from);
         }
-        if (to.equals(BerlinZoneUtils.SXF_LOR_ID)) {
+        if (to.equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
 
-            toCoord = BerlinZoneUtils.createSxfCentroid();
+            toCoord = TaxiBerlinZoneUtils.createSxfCentroid();
             //TaxiDemandWriter.toTXL++; // SXF?, michalm
-            if (from.equals(BerlinZoneUtils.SXF_LOR_ID)) {
+            if (from.equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
                 fromCoord = this.shoot(from);
                 toCoord = this.shoot(to);
                 //quite a lot of trips are TXL to TXL
@@ -390,7 +390,7 @@ public class TaxiDemandWriter
         if (this.municipalityMap.containsKey(zoneId.toString())) {
             point = getRandomPointInFeature(this.rnd, this.municipalityMap.get(zoneId.toString()));
             Coord coord = new Coord(point.getX(), point.getY());
-            return BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
+            return TaxiBerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
         }
         else {
             log.error(zoneId.toString() + "does not exist in shapedata");

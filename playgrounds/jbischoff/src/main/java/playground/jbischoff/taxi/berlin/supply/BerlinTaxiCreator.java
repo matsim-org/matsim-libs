@@ -34,7 +34,7 @@ import org.matsim.contrib.zone.Zone;
 import org.matsim.core.network.NetworkUtils;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -91,7 +91,7 @@ public class BerlinTaxiCreator
 //        log.info(id);
         Point p = TaxiDemandWriter.getRandomPointInFeature(RND, this.zones.get(id)
                 .getMultiPolygon());
-        Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(new Coord(p.getX(), p.getY()));
+        Coord coord = TaxiBerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(new Coord(p.getX(), p.getY()));
 	final Coord coord1 = coord;
         Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 

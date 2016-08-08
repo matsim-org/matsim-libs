@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 
 public class BeelineDistanceExractor
 {
@@ -44,7 +44,7 @@ public class BeelineDistanceExractor
     public BeelineDistanceExractor()
     {
         this.zones = new TreeMap<>();
-        this.zones.putAll(BerlinZoneUtils.readZones("C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/shp_merged/zones.xml",
+        this.zones.putAll(TaxiBerlinZoneUtils.readZones("C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/shp_merged/zones.xml",
                 "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/shp_merged/zones.shp"));                 
         
         

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.berlin;
+package playground.michalm.TaxiBerlin;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
-public class BerlinZoneUtils
+public class TaxiBerlinZoneUtils
 {
     public static final String ZONE_COORD_SYSTEM = "EPSG:25833";//ETRS89_UTM33N
     public static final String NETWORK_COORD_SYSTEM = TransformationFactory.DHDN_GK4;
