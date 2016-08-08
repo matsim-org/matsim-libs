@@ -159,8 +159,8 @@ public class PatnaNonSlumDemandCleaner {
 				String destinationWard = strs.get( labels.indexOf( PatnaDemandLabels.destinationZone.toString() ));
 				String tripPurpose = strs.get( labels.indexOf( PatnaDemandLabels.tripPurpose.toString() ));
 				String mode = strs.get( labels.indexOf( PatnaDemandLabels.mode.toString() ));
-				String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyIncome.toString() )); 
-				String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyTransportCost.toString() ));
+				String monthlyIncome = strs.get( labels.indexOf( PatnaDemandLabels.monthlyIncome.toString() ));  // Rs or na
+				String dailyExpenditure = strs.get( labels.indexOf( PatnaDemandLabels.dailyTransportCost.toString() )); // Rs or na
 
 				String tripFreq = strs.get( labels.indexOf( PatnaDemandLabels.tripFrequency.toString() ));
 
@@ -177,11 +177,13 @@ public class PatnaNonSlumDemandCleaner {
 				}
 
 				if(monthlyIncome.equals("a") || monthlyIncome.equals("99999")) {
-					monthlyIncome = pdc.monthlyIncInterval.remove(0);
+					monthlyIncome = pdc.monthlyIncInterval.remove(0); // interval and NOT actual income
+					monthlyIncome = String.valueOf( PatnaUtils.getAverageIncome(monthlyIncome) );
 				}
 
 				if(dailyExpenditure.equals("a")) {
-					dailyExpenditure = pdc.dailyCostInterval.remove(0);
+					dailyExpenditure = pdc.dailyCostInterval.remove(0);// interval and NOT actual cost
+					dailyExpenditure = String.valueOf( PatnaUtils.getAverageDailyTranportCost(dailyExpenditure) );
 				}
 
 				monthlyIncome = String.valueOf(PatnaCalibrationUtils.getIncomeInterval(monthlyIncome));

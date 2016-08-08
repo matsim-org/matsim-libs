@@ -162,10 +162,12 @@ public class PatnaSlumDemandCleaner  {
 
 				if(monthlyIncome.equals("a") ) {
 					monthlyIncome = pdc.monthlyIncInterval.remove(0);
+					monthlyIncome = String.valueOf( PatnaUtils.getAverageIncome(monthlyIncome) );
 				}
 
 				if(dailyExpenditure.equals("a") || dailyExpenditure.equals("") || dailyExpenditure.equals("9999")) {
 					dailyExpenditure = pdc.dailyCostInterval.remove(0);
+					dailyExpenditure = String.valueOf( PatnaUtils.getAverageDailyTranportCost(dailyExpenditure) );
 				}
 
 				monthlyIncome = String.valueOf(PatnaCalibrationUtils.getIncomeInterval(monthlyIncome));

@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
@@ -61,20 +62,30 @@ public class PatnaDemandImputer {
 	}
 
 	private static LinkedList<String> getRandomModesFromDistributions(SortedMap<String,Double> groupNumbers, Map<String,Integer> obj2counter, String identifier){
+		int unknownDataCounter = obj2counter.get("NA");
+		if (unknownDataCounter == 0) return new LinkedList<>();
+
+		// share of each category
 		groupNumbers = MapUtils.getDoublePercentShare(groupNumbers);
 
-		// desired number of legs
+		// exclude if some count is already same/above desired number 
+		SortedMap<String,Double> category2share = new TreeMap<>(groupNumbers);
+
 		int totalLegs = MapUtils.intValueSum( obj2counter );
 		for(String str : groupNumbers.keySet()){
-			double desireNumberOfLegs = Math.round( groupNumbers.get(str)*totalLegs / 100. ) ;
+			double desireNumberOfLegs = Math.round( groupNumbers.get(str) * totalLegs / 100. ) ;
 			double existingNumberOfLegs = obj2counter.get(str) == null ?  0. : obj2counter.get(str);
 			double requiredNumber = desireNumberOfLegs-existingNumberOfLegs;
 			if (requiredNumber < 0){
-				LOG.warn("The trip diary had "+existingNumberOfLegs + " " +str+" "+identifier+" and desired "+str+" "+identifier+" are "+desireNumberOfLegs+"; making this difference to zero.");
+				requiredNumber = 0;
+				LOG.warn("The trip diary had "+existingNumberOfLegs + " " +str+" "+identifier+" and desired "+str+" "+identifier+" are "+desireNumberOfLegs
+						+"; making this difference to zero and distributing it to other categories.");
+				category2share.remove(str);
 			}
-			groupNumbers.put(str, requiredNumber );
 		}
-		return new LinkedList<>( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, obj2counter.get("NA")) );
+		
+		// desired number of legs
+		return new LinkedList<>( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(category2share, unknownDataCounter) );
 	}
 
 	void readFileToFillCounter(final String inputFile){
