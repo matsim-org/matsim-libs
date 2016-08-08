@@ -19,7 +19,7 @@
 
 package playground.michalm.ev;
 
-public class UnitConversionRatios
+public class EvUnitConversions
 {
     public static final double W_PER_kW = 1_000;// W per kW
     public static final double J_PER_kWh = 3_600_000;// J per kWh

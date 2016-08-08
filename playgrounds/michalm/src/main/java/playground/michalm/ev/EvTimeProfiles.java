@@ -59,7 +59,7 @@ public class EvTimeProfiles
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
                     mean.increment(ev.getBattery().getSoc());
                 }
-                return (mean.getResult() / UnitConversionRatios.J_PER_kWh) + "";//print out in [kWh]
+                return (mean.getResult() / EvUnitConversions.J_PER_kWh) + "";//print out in [kWh]
             }
         };
     }
@@ -79,7 +79,7 @@ public class EvTimeProfiles
             {
                 List<String> vals = new ArrayList<>(evData.getElectricVehicles().size());
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    vals.add( (ev.getBattery().getSoc() / UnitConversionRatios.J_PER_kWh) + "");
+                    vals.add( (ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh) + "");
                 }
                 return vals.toArray(new String[vals.size()]);
             }

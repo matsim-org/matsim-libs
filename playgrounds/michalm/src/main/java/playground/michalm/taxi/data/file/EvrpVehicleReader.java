@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.*;
 import org.xml.sax.Attributes;
 
-import playground.michalm.ev.UnitConversionRatios;
+import playground.michalm.ev.EvUnitConversions;
 import playground.michalm.taxi.data.EvrpVehicle;
 
 
@@ -43,9 +43,9 @@ public class EvrpVehicleReader
             double t1, Attributes atts)
     {
         double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20)
-                * UnitConversionRatios.J_PER_kWh;
+                * EvUnitConversions.J_PER_kWh;
         double initialSoc = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * batteryCapacity)
-                * UnitConversionRatios.J_PER_kWh;
+                * EvUnitConversions.J_PER_kWh;
         return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity, initialSoc);
     }
 }

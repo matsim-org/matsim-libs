@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.michalm.ev.UnitConversionRatios;
+import playground.michalm.ev.EvUnitConversions;
 import playground.michalm.ev.data.*;
 
 
@@ -69,7 +69,7 @@ public class ChargerReader
         Id<Charger> id = Id.create(atts.getValue("id"), Charger.class);
         Link link = links.get(Id.createLinkId(atts.getValue("link")));
         double power = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER)
-                * UnitConversionRatios.W_PER_kW;
+                * EvUnitConversions.W_PER_kW;
         int plugs = ReaderUtils.getInt(atts, "capacity", DEFAULT_CHARGER_CAPACITY);
         return new ChargerImpl(id, power, plugs, link);
     }

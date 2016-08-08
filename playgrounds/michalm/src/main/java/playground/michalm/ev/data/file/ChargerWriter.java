@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.michalm.ev.UnitConversionRatios;
+import playground.michalm.ev.EvUnitConversions;
 import playground.michalm.ev.data.Charger;
 
 
@@ -57,7 +57,7 @@ public class ChargerWriter
             List<Tuple<String, String>> atts = new ArrayList<>();
             atts.add(new Tuple<String, String>("id", c.getId().toString()));
             atts.add(new Tuple<String, String>("link", c.getLink().getId() + ""));
-            double powerInKW = c.getPower() / UnitConversionRatios.W_PER_kW;
+            double powerInKW = c.getPower() / EvUnitConversions.W_PER_kW;
             atts.add(new Tuple<String, String>("power", powerInKW + ""));
             atts.add(new Tuple<String, String>("capacity", c.getPlugs() + ""));
             writeStartTag("charger", atts, true);
