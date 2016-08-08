@@ -20,9 +20,14 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.analysis;
 
 import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -33,36 +38,43 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.ListUtils;
+import playground.agarwalamit.utils.NumberUtils;
 
 /**
  * @author amit
  */
 
-public class IncomeDistributionFromEventsGenerator {
+public class IncomeDistributionGenerator {
 
-	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
+	private final String dir = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/";
+	//"../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
 	private final int iterationNumber = 100;
-	private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
-	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
-	
+	//	private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
+	private final String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_plans_1pct.xml.gz";
+	//	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
+	private final String personAttributeFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_persionAttributes_1pct.xml.gz";
+
 	private final SortedMap<Double, SortedMap<String, Integer>> avgInc2mode2Count = new TreeMap<>();
 	private final double USD2INRRate = 66.6; // 08 June 2016 
 
 	public static void main(String[] args) {
-		IncomeDistributionFromEventsGenerator idg = new IncomeDistributionFromEventsGenerator();
+		IncomeDistributionGenerator idg = new IncomeDistributionGenerator();
 		idg.parseFile();
 		idg.writeData();
+		idg.printStats();
 	}
 
 	private void writeData(){
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it."+iterationNumber+".txt")) {
+		//		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it."+iterationNumber+".txt")) {
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/avgIncToCount_1pct.txt")) {
 			writer.write("avgIncomUSD\tmode\tcount\n");
 
 			for (Double d : this.avgInc2mode2Count.keySet()){
 				for(String str : this.avgInc2mode2Count.get(d).keySet()){
 					writer.write(Math.round(d/USD2INRRate)+"\t"+str+"\t"+this.avgInc2mode2Count.get(d).get(str)+"\n");
 				}
-//				writer.write(Math.round(d/USD2INRRate)+"\t"+"total\t"+MapUtils.intValueSum(this.avgInc2mode2Count.get(d))+"\n");
+				//writer.write(Math.round(d/USD2INRRate)+"\t"+"total\t"+MapUtils.intValueSum(this.avgInc2mode2Count.get(d))+"\n");
 			}
 			writer.close();
 
@@ -71,14 +83,42 @@ public class IncomeDistributionFromEventsGenerator {
 		}
 	}
 
+	private void printStats(){
+		Map<String,List<Double> > mode2list = new HashMap<>();
+
+		for(Double d : this.avgInc2mode2Count.keySet()){
+			for(String mode : this.avgInc2mode2Count.get(d).keySet()) {
+				List<Double> list = mode2list.get(mode);
+				if (list==null) list = new ArrayList<>();
+				for (int i=0; i< this.avgInc2mode2Count.get(d).get(mode);i++) {
+					list.add(d);
+				}
+				mode2list.put(mode, list);
+			}
+		}
+
+		for(String mode : mode2list.keySet()) {
+			List<Double> list = mode2list.get(mode);
+			double d [] = new double [list.size()];
+			for(int index = 0 ; index < list.size(); index++){
+				d[index] = list.get(index);
+			}
+			System.out.println("The mean of incomes for mode "+mode+ " is "+ ListUtils.doubleMean(list));
+			System.out.println("The 25%, 50% and 75% quartiles for the mode " + mode + " are "+ NumberUtils.quartile(d, 25)+ "\t"
+			+ NumberUtils.quartile(d, 50) + "\t"+  NumberUtils.quartile(d, 74));
+			Percentile ptile = new Percentile();
+			System.out.println("The 25%, 50% and 75% quartiles for the mode " + mode + " are "+
+			ptile.evaluate(d,25) +"\t"+ptile.evaluate(d,50)+"\t"+ptile.evaluate(d,75));
+		}
+	}
+
 	private void parseFile(){
 		Config config = ConfigUtils.createConfig();
-		config.addCoreModules();
 		config.plans().setInputFile(plansFile);
 		config.plans().setInputPersonAttributeFile(personAttributeFile);
-		
+
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		
+
 		for (Person p: sc.getPopulation().getPersons().values()) {
 
 			if(! PatnaPersonFilter.isPersonBelongsToUrban(p.getId())) continue;
