@@ -11,7 +11,7 @@ import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
  * @author balac
  */
 
-public class OneWayCarsharingStation  {
+public class OneWayCarsharingStation implements CarsharingStation{
 
 	private Map<String, Integer> numberOfvehiclesPerType = new HashMap<String, Integer>();
 	private Map<String, ArrayList<StationBasedVehicle>> vehiclesPerType = new HashMap<String, ArrayList<StationBasedVehicle>>();

@@ -5,9 +5,12 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.carsharing.events.EndRentalEvent;
+import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -18,6 +21,8 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private Config config;
 	
 	private ArrayList<Stats> freefloatingRentals = new ArrayList<Stats>();
+	
+	private double totalffRentalTime = 0.0;
 	
 	private ArrayList<Stats> owcsRentals = new ArrayList<Stats>();
 	
@@ -43,6 +48,26 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		distancetw = 0.0;
 	}
 
+	@Override
+	public void handleEvent(Event event) {
+		if ( event instanceof EndRentalEvent ) {
+			
+			if (((EndRentalEvent) event).getvehicleId().startsWith("FF"))
+				totalffRentalTime += event.getTime();
+		
+		}
+		else if (event instanceof StartRentalEvent) {
+			
+			if (((StartRentalEvent) event).getvehicleId().startsWith("FF"))
+				totalffRentalTime -= event.getTime();
+			
+		}
+		super.handleEvent(event);
+
+		
+	}
+	
+	
 	@Override
 	public void finish() {		
 		super.finish();
@@ -94,7 +119,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			score += distance * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("distanceFeeFreeFloating"));
 			score += time * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeFeeFreeFloating"));
 			score += specialTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeFee"));
-			
+			score += (totalffRentalTime - time - specialTime) * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeParkingFeeFreeFloating"));
 			
 		}
 		distance = 0.0;

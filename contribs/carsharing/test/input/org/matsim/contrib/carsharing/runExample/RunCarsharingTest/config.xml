@@ -12,7 +12,7 @@
 
 	<module name="controler" >
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="20" />
 		<param name="outputDirectory" value="&OUTBASE;" />
 				<param name="eventsFileFormat" value="xml" />
 		<param name="writePlansInterval" value="1" />
@@ -45,10 +45,12 @@
         
 	<module name="FreeFloating" >
 		<param name="vehiclelocationsFreefloating" value="&INBASE;/Stations.txt" />	
-		<param name="travelingFreeFloating" value="-1.0" />
+		<param name="travelingFreeFloating" value="-0.1" />
 		<param name="constantFreeFloating" value="-0.0" />
-        <param name="timeFeeFreeFloating" value="-0.001" />
-		<param name="distanceFeeFreeFloating" value="-0.001" />
+        <param name="timeFeeFreeFloating" value="-0.01" />
+        <param name="timeParkingFeeFreeFloating" value="-0.005" />
+        
+		<param name="distanceFeeFreeFloating" value="-0.00" />
    		<param name="specialTimeStart" value="0" />
 		<param name="specialTimeEnd" value="0" />
 		<param name="specialTimeFee" value="0" />
@@ -62,7 +64,7 @@
 		<param name="constantOneWayCarsharing" value="-0.4" />
         <param name="timeFeeOneWayCarsharing" value="-0.0" />
 		<param name="distanceFeeOneWayCarsharing" value="-0.0" />
-        <param name="useOneWayCarsharing" value="true" />
+        <param name="useOneWayCarsharing" value="false" />
         <param name="searchDistanceOneWayCarsharing" value="2000.0" />		
 	</module>
     
@@ -72,7 +74,7 @@
 		<param name="constantTwoWayCarsharing" value="-0.4" />
         <param name="timeFeeTwoWayCarsharing" value="-0.0" />
 		<param name="distanceFeeTwoWayCarsharing" value="-0.0" />
-        <param name="useTwoWayCarsharing" value="true" />
+        <param name="useTwoWayCarsharing" value="false" />
         <param name="searchDistanceTwoWayCarsharing" value="1000.0" />
 
 	</module>

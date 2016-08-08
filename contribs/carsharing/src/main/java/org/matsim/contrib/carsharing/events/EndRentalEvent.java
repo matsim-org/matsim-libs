@@ -4,21 +4,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.api.internal.HasPersonId;
 
-public class EndRentalEvent extends Event{
+public class EndRentalEvent extends Event implements HasPersonId{
 
 	private final Id<Link> linkId;
 	
 	private final Id<Person> personId;
 	
-	private final Id<Vehicle> vehicleId;
+	private final String vehicleId;
 	
 	public static final String EVENT_TYPE = "Rental End";
 
-	public EndRentalEvent(double time, Id<Link> linkId, Id<Person> personId, Id<Vehicle> vehicleId) {
+	public EndRentalEvent(double time, Id<Link> linkId, Id<Person> personId, String vehicleId) {
 		super(time);
-		// TODO Auto-generated constructor stub
 		this.linkId = linkId;
 		this.personId = personId;
 		this.vehicleId = vehicleId;
@@ -27,7 +26,6 @@ public class EndRentalEvent extends Event{
 
 	@Override
 	public String getEventType() {
-		// TODO Auto-generated method stub
 		return EVENT_TYPE;
 	}
 	
@@ -39,7 +37,7 @@ public class EndRentalEvent extends Event{
 		return this.personId;
 	}
 	
-	public Id<Vehicle> getvehicleId(){
+	public String getvehicleId(){
 		return this.vehicleId;
 	}
 

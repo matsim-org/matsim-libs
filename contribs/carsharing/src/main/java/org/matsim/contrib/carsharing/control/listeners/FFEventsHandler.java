@@ -2,28 +2,30 @@ package org.matsim.contrib.carsharing.control.listeners;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.events.EndRentalEvent;
+import org.matsim.contrib.carsharing.events.StartRentalEvent;
+import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
+import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
 import org.matsim.vehicles.Vehicle;
 
-public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler{
-	private HashMap<Id<Person>, ArrayList<RentalInfoFF>> ffRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfoFF>>();
+public class FFEventsHandler implements PersonLeavesVehicleEventHandler, 
+PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler{
+	private Map<String, RentalInfoFF> statsPerVehicle = new HashMap<String, RentalInfoFF>();
+	
 	private ArrayList<RentalInfoFF> arr = new ArrayList<RentalInfoFF>();
-	private HashMap<Id<Person>, Boolean> inVehicle = new HashMap<Id<Person>, Boolean>();
-	private HashMap<Id<Vehicle>, Id<Person>> personVehicles = new HashMap<Id<Vehicle>, Id<Person>>();
+	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();
 
 	private Network network;
 	public FFEventsHandler(Network network) {
@@ -33,86 +35,67 @@ public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		ffRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfoFF>>();
 		arr = new ArrayList<RentalInfoFF>();
-		inVehicle = new HashMap<Id<Person>, Boolean>();
-		personVehicles = new HashMap<Id<Vehicle>, Id<Person>>();
 
 	}
 	
 	@Override
+	public void handleEvent(StartRentalEvent event) {
+		RentalInfoFF info = new RentalInfoFF();
+		info.accessStartTime = event.getTime();
+		info.startTime = event.getTime();
+		info.personId = event.getPersonId();
+		info.originLinkId = event.getOriginLinkId();
+		info.pickupLinkId = event.getPickuplinkId();
+				
+		this.statsPerVehicle.put(event.getvehicleId(), info);
+
+	}
+	
+	@Override
+	public void handleEvent(EndRentalEvent event) {
+		
+		RentalInfoFF info = this.statsPerVehicle.get(event.getvehicleId());
+		this.statsPerVehicle.remove(event.getvehicleId());
+		info.endTime = event.getTime();
+		info.endLinkId = event.getLinkId();		
+		arr.add(info);		
+	}
+	
+	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// TODO Auto-generated method stub
-		personVehicles.remove(event.getVehicleId());
+		// === calculate in-vehicle time and add it to the total  in-vehicle time ===
+		if (event.getVehicleId().toString().startsWith("FF")){
+			double enterTime = this.enterVehicleTimes.get(event.getPersonId());
+			
+			double totalTime = event.getTime() - enterTime;
+			RentalInfoFF info = this.statsPerVehicle.get(event.getVehicleId().toString());
+			info.inVehicleTime += totalTime;
+			
+		}
+			
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		// TODO Auto-generated method stub
-		if (event.getVehicleId().toString().startsWith("FF"))
-			personVehicles.put(event.getVehicleId(), event.getPersonId());
+		// === store the enter vehicle time ===
+		if (event.getVehicleId().toString().startsWith("FF")) {
+			this.enterVehicleTimes.put(event.getPersonId(), event.getTime());
+			RentalInfoFF info = this.statsPerVehicle.get(event.getVehicleId().toString());			
+			if (info.accessEndTime == 0.0)
+				info.accessEndTime = event.getTime();
+			
+
+		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getVehicleId().toString().startsWith("FF")) {
-			Id<Person> perid = personVehicles.get(event.getVehicleId());
 			
-			RentalInfoFF info = ffRentalsStats.get(perid).get(ffRentalsStats.get(perid).size() - 1);
+			RentalInfoFF info = this.statsPerVehicle.get(event.getVehicleId().toString());
 			info.vehId = event.getVehicleId();
 			info.distance += network.getLinks().get(event.getLinkId()).getLength();
-			
-		}
-		
-	}
-
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		// TODO Auto-generated method stub
-		inVehicle.put(event.getPersonId(), false);
-		if (event.getLegMode().equals("walk_ff")) {
-			
-			RentalInfoFF info = new RentalInfoFF();
-			info.accessStartTime = event.getTime();
-			info.personId = event.getPersonId();
-			ArrayList<RentalInfoFF> temp1 = new ArrayList<RentalInfoFF>();
-			if (ffRentalsStats.get(event.getPersonId()) == null) {
-				
-				temp1.add(info);
-				ffRentalsStats.put(event.getPersonId(), temp1);
-
-			}
-			else {
-				ffRentalsStats.get(event.getPersonId()).add(info);
-				
-			}
-			
-		}
-		else if (event.getLegMode().equals("freefloating")) {
-			inVehicle.put(event.getPersonId(), true);
-
-			RentalInfoFF info = ffRentalsStats.get(event.getPersonId()).get(ffRentalsStats.get(event.getPersonId()).size() - 1);
-			
-			info.startTime = event.getTime();
-			info.startLinkId = event.getLinkId();
-			info.accessEndTime = event.getTime();
-		}
-		
-	}
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		// TODO Auto-generated method stub
-		
-		if (event.getLegMode().equals("freefloating")) {
-			RentalInfoFF info = ffRentalsStats.get(event.getPersonId()).get(ffRentalsStats.get(event.getPersonId()).size() - 1);
-			info.endTime = event.getTime();
-			info.endLinkId = event.getLinkId();
-			
-			arr.add(info);
-
-			
 			
 		}
 		
@@ -127,9 +110,11 @@ public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		private Id<Person> personId = null;
 		private double startTime = 0.0;
 		private double endTime = 0.0;
-		private Id<Link> startLinkId = null;
+		private Id<Link> originLinkId = null;
+		private Id<Link> pickupLinkId = null;
 		private Id<Link> endLinkId = null;
 		private double distance = 0.0;
+		private double inVehicleTime = 0.0;
 		private double accessStartTime = 0.0;
 		private double accessEndTime = 0.0;
 		private double egressStartTime = 0.0;
@@ -138,9 +123,9 @@ public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		public String toString() {
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +
-			startLinkId.toString() + " " +	endLinkId.toString()+ " " + Double.toString(distance)
-			+ " " +	Double.toString(accessEndTime - accessStartTime)+ 
-			" " + Double.toString(egressEndTime - egressStartTime) +
+					originLinkId.toString() + " " + pickupLinkId.toString() + " " +	endLinkId.toString() + " " + 
+					Double.toString(distance) + " " + Double.toString(inVehicleTime) + " " +
+					Double.toString(accessEndTime - accessStartTime)+ " " + Double.toString(egressEndTime - egressStartTime) +
 			" " + vehId;
 		}
 	}

@@ -15,5 +15,8 @@
 	</onewaycarsharing>
 	
 	<freefloating id="FF_1" lat="-375" lon="0" type="car" />
+			<freefloating id="FF_2" lat="0" lon="-375" type="car" />
+			<freefloating id="FF_3" lat="-375" lon="0" type="car" />
+			<freefloating id="FF_4" lat="0" lon=".75" type="car" />
 		
 </stations>

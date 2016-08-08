@@ -97,7 +97,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 				
 			link = (Link)NetworkUtils.getNearestLinkExactly(network, coordStation);
 			FFCSVehicle ffcsvehicle = new FFCSVehicle(type, atts.getValue("id"));
-			ffVehicleLocationQuadTree.put(coordStation.getX(), coordStation.getY(), ffcsvehicle);
+			ffVehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), ffcsvehicle);
 			ffvehiclesMap.put(ffcsvehicle, link);
 			
 			
