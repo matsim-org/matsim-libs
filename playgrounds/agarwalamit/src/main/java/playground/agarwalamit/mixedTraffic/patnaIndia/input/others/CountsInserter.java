@@ -35,8 +35,9 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
-import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.NumberUtils;
 
 /**
  * @author amit
@@ -106,18 +107,24 @@ public class CountsInserter {
 
 				int timebin = Integer.valueOf(parts[2]);
 				Map<String,Double> mode2count = new HashMap<>();
-
+				
 				for (int index = 3; index < parts.length; index++){
 					String mode = mode2index.get(index);
 					if(mode.equals("2w")) mode = "motorbike";
 					else if(mode.equals("cycle")) mode = "bike";
-					else if(mode.equals("total")) {
-						if (MapUtils.doubleValueSum(mode2count)!=Double.valueOf(parts[index])){
-							throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
-						}
-						continue;
+//					else if(mode.equals("total")) {
+//						if (MapUtils.doubleValueSum(mode2count)!=Double.valueOf(parts[index])){
+//							throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
+//						}
+//						continue;
+//					}
+
+					double countAdjustmentFactor = 1; // only for out external traffic.
+					if(OuterCordonUtils.getInternalToExternalCountStationLinkIds(PatnaUtils.PATNA_NETWORK_TYPE).contains(Id.createLinkId(linkId))){
+						countAdjustmentFactor = OuterCordonUtils.getModalOutTrafficAdjustmentFactor().get(mode);
 					}
-					mode2count.put(mode, Double.valueOf(parts[index]));
+					
+					mode2count.put(mode, NumberUtils.round( countAdjustmentFactor * Double.valueOf(parts[index]), 0) );
 				}
 
 				time2count.put(timebin, mode2count);

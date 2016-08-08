@@ -124,13 +124,7 @@ public class MultiModalCountsComperator {
 				String parts [] = line.split("\t");
 				String linkId = parts[1];
 				
-				double outTripReductionFactor = 1;
 				OuterCordonLinks ocl = new OuterCordonLinks(PatnaUtils.PATNA_NETWORK_TYPE);
-				String countinStation = ocl.getCountingStation(linkId); 
-				if ( countinStation!=null && countinStation.split("_")[1].equals("P2X") ) {
-					outTripReductionFactor = OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR;  //AA_TODO: not sure if this factor should be calculated for total counts or only main modes counts.
-				}
-
 				Map<String, Map<Integer,Double>> mode2time2count = link2mode2time2count_input.get(linkId);
 
 				if ( mode2time2count == null) {
@@ -144,10 +138,18 @@ public class MultiModalCountsComperator {
 
 				Integer time = Integer.valueOf(parts[2]);
 
+				String countinStation = ocl.getCountingStation(linkId); 
+				
 				// store info
 				for (int i=3;i<parts.length-1;i++) { // length -1 to exclude total
 					String mode = index2mode.get(i);	
 					double count = Double.valueOf(parts[i]);
+					
+					double outTripReductionFactor = 1;
+					if ( countinStation!=null && countinStation.split("_")[1].equals("P2X") ) {
+						outTripReductionFactor = OuterCordonUtils.getModalOutTrafficAdjustmentFactor().get(mode);  
+					}
+					
 					count = Math.round( outTripReductionFactor*count );
 					Map<Integer,Double> time2count = mode2time2count.get(mode);
 					if (time2count.containsKey(time)) {
@@ -161,6 +163,4 @@ public class MultiModalCountsComperator {
 			throw new RuntimeException("Data is not written. Reason :"+e);
 		}
 	}
-
-
 }
