@@ -29,7 +29,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class BerlinNetworkChangeEvents
+public class FilterNetworkChangeEventsWithinBerlin
 {
     private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/network/";
     private static final String BERLIN_BRB_NET_FILE = DIR + "berlin_brb.xml.gz";

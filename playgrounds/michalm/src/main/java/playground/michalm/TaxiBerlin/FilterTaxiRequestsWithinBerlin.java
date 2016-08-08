@@ -32,7 +32,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class BerlinTaxiRequests
+public class FilterTaxiRequestsWithinBerlin
 {
     private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
     private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
