@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.audiAV;
+package playground.michalm.audiAV.flowPaper;
 
 import java.util.*;
 
