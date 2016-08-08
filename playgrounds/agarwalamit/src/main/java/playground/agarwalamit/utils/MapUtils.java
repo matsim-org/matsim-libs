@@ -21,6 +21,7 @@ package playground.agarwalamit.utils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -83,24 +84,24 @@ public final class MapUtils {
 		return outMap;
 	}
 
-	public static SortedMap<String, Double> getIntPercentShare(final SortedMap<String, Integer> inMap){
-		SortedMap<String, Double> outMap = new TreeMap<>();
+	public static <T> SortedMap<T, Double> getIntPercentShare(final SortedMap<T, Integer> inMap){
+		SortedMap<T, Double> outMap = new TreeMap<>();
 		double valueSum = (double) MapUtils.intValueSum(inMap);
-		for(String str : inMap.keySet()) {
-			double legs = (double) inMap.get(str);
+		for(Entry<T,Integer> e : inMap.entrySet()){
+			double legs = (double) e.getValue();
 			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
-			outMap.put(str, pctShare);
+			outMap.put(e.getKey(), pctShare);
 		}
 		return outMap;
 	}
-	
-	public static SortedMap<String, Double> getDoublePercentShare(final SortedMap<String, Double> inMap){
-		SortedMap<String, Double> outMap = new TreeMap<>();
+
+	public static <T> SortedMap<T, Double> getDoublePercentShare(final SortedMap<T, Double> inMap){
+		SortedMap<T, Double> outMap = new TreeMap<>();
 		double valueSum = MapUtils.doubleValueSum(inMap);
-		for(String str : inMap.keySet()) {
-			double legs = (double) inMap.get(str);
+		for(Entry<T,Double> e : inMap.entrySet()){
+			double legs = (double) e.getValue();
 			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
-			outMap.put(str, pctShare);
+			outMap.put(e.getKey(), pctShare);
 		}
 		return outMap;
 	}
