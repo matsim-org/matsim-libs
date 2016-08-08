@@ -29,6 +29,7 @@ import org.matsim.core.controler.*;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
+import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
 
