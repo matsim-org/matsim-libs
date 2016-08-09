@@ -44,7 +44,7 @@ public class CountDropoffsPerLink
         String dir = "../../../shared-svn/projects/audi_av/scenario/";
         String networkFile = dir + "networkc.xml.gz";
         String plansFile = dir + "plans.xml.gz";
-        String dropoffCountsFile = dir + "JAIHC_paper/dropoffs_per_link.csv";
+        String dropoffCountsFile = dir + "JAIHC_paper/dropoffs_per_link.txt";
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);

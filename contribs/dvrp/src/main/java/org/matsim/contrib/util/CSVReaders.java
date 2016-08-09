@@ -22,6 +22,7 @@ package org.matsim.contrib.util;
 import java.io.*;
 import java.util.List;
 
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import com.opencsv.*;
@@ -49,7 +50,7 @@ public class CSVReaders
 
     public static List<String[]> readFile(String file, char separator)
     {
-        try (CSVReader reader = new CSVReader(new FileReader(file), separator)) {
+        try (CSVReader reader = new CSVReader(IOUtils.getBufferedReader(file), separator)) {
             return reader.readAll();
         }
         catch (IOException e) {
