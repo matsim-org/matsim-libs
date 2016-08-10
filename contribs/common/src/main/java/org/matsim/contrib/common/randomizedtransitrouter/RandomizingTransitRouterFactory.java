@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+package org.matsim.contrib.common.randomizedtransitrouter;/* *********************************************************************** *
  * project: org.matsim.*
  * RandomizedTransitRouterFacotry
  *                                                                         *
@@ -17,12 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.randomizedtransitrouter;
 
 import org.matsim.core.config.Config;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,14 +30,14 @@ import javax.inject.Provider;
  * @author dgrether
  *
  */
-public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
+public class RandomizingTransitRouterFactory implements Provider<TransitRouter> {
 
 	private TransitRouterConfig trConfig;
 	private TransitSchedule schedule;
 	private TransitRouterNetwork routerNetwork;
 
     @Inject
-	RandomizedTransitRouterFactory(Config config, TransitSchedule schedule) {
+	RandomizingTransitRouterFactory(Config config, TransitSchedule schedule) {
 		this.trConfig = new TransitRouterConfig(config);
 		this.schedule = schedule;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
@@ -47,9 +45,9 @@ public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
 	
 	@Override
 	public TransitRouter get() {
-		RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
-		ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
-		ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
+		RandomizingTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizingTransitRouterTravelTimeAndDisutility(trConfig);
+		ttCalculator.setDataCollection(RandomizingTransitRouterTravelTimeAndDisutility.DataCollection.randomizedParameters, true) ;
+		ttCalculator.setDataCollection(RandomizingTransitRouterTravelTimeAndDisutility.DataCollection.additionalInformation, false) ;
 		return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 	}
 

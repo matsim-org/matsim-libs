@@ -1,4 +1,4 @@
-/*
+package org.matsim.contrib.common.randomizedtransitrouter;/*
  *  *********************************************************************** *
  *  * project: org.matsim.*
  *  * RandomizedTransitRouterModule.java
@@ -20,14 +20,12 @@
  *  * ***********************************************************************
  */
 
-package playground.vsp.randomizedtransitrouter;
-
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
 
-public class RandomizedTransitRouterModule extends AbstractModule {
+public class RandomizingTransitRouterModule extends AbstractModule {
     @Override
     public void install() {
-        bind(TransitRouter.class).toProvider(RandomizedTransitRouterFactory.class);
+        bind(TransitRouter.class).toProvider(RandomizingTransitRouterFactory.class);
     }
 }
