@@ -28,6 +28,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtModule;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -50,8 +51,6 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 
 public class CadytsScoringFunctionAndRndRouterLauncher {
 
