@@ -73,7 +73,7 @@ public class Example {
 		c.controler().setLastIteration(0);
 		c.controler().setWriteEventsInterval(1);
 
-
+        c.qsim().setEndTime(3600);
 
 
 		final Scenario sc = ScenarioUtils.createScenario(c);
@@ -115,7 +115,6 @@ public class Example {
 		scb.setSeed(42);
 		HybridSimProto.Environment.Builder eb = scb.getEnvironmentBuilder();
 		HybridSimProto.Room.Builder rb = eb.addRoomBuilder();
-
 
 		rb.setId(0);
 		rb.setCaption("hall");
