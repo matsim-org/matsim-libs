@@ -49,7 +49,7 @@ import java.util.Map;
  * @author dgrether
  *
  */
-public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRouterNetworkTravelTimeAndDisutility {
+public class RandomizingTransitRouterTravelTimeAndDisutility  extends TransitRouterNetworkTravelTimeAndDisutility {
 
 	public enum DataCollection {randomizedParameters, additionalInformation}
 	private Id<Person> cachedPersonId = null ;
@@ -64,7 +64,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 	private Map<DataCollection,Boolean> dataCollectionConfig = new HashMap<DataCollection,Boolean>() ;
 	private Map<DataCollection,StringBuffer> dataCollectionStrings = new HashMap<DataCollection,StringBuffer>() ;
 	
-	public RandomizedTransitRouterTravelTimeAndDisutility(TransitRouterConfig routerConfig) {
+	public RandomizingTransitRouterTravelTimeAndDisutility(TransitRouterConfig routerConfig) {
 		super(routerConfig);
 		
 		prepareDataCollection();

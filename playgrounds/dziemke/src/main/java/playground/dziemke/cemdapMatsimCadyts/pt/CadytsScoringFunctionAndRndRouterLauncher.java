@@ -28,7 +28,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtModule;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterTravelTimeAndDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -59,8 +59,8 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		new Provider<TransitRouter>() {
 			@Override
 			public TransitRouter get() {
-				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = 
-					new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
+				RandomizingTransitRouterTravelTimeAndDisutility ttCalculator = 
+					new RandomizingTransitRouterTravelTimeAndDisutility(trConfig);
 				//ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
 				//ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
 				return new TransitRouterImpl(trConfig, preparedSchedule, routerNetwork, ttCalculator, ttCalculator);

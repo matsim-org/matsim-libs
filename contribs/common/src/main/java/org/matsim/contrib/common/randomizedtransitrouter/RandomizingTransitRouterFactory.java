@@ -30,14 +30,14 @@ import javax.inject.Provider;
  * @author dgrether
  *
  */
-public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
+public class RandomizingTransitRouterFactory implements Provider<TransitRouter> {
 
 	private TransitRouterConfig trConfig;
 	private TransitSchedule schedule;
 	private TransitRouterNetwork routerNetwork;
 
     @Inject
-	RandomizedTransitRouterFactory(Config config, TransitSchedule schedule) {
+	RandomizingTransitRouterFactory(Config config, TransitSchedule schedule) {
 		this.trConfig = new TransitRouterConfig(config);
 		this.schedule = schedule;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
@@ -45,9 +45,9 @@ public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
 	
 	@Override
 	public TransitRouter get() {
-		RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
-		ttCalculator.setDataCollection(RandomizedTransitRouterTravelTimeAndDisutility.DataCollection.randomizedParameters, true) ;
-		ttCalculator.setDataCollection(RandomizedTransitRouterTravelTimeAndDisutility.DataCollection.additionalInformation, false) ;
+		RandomizingTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizingTransitRouterTravelTimeAndDisutility(trConfig);
+		ttCalculator.setDataCollection(RandomizingTransitRouterTravelTimeAndDisutility.DataCollection.randomizedParameters, true) ;
+		ttCalculator.setDataCollection(RandomizingTransitRouterTravelTimeAndDisutility.DataCollection.additionalInformation, false) ;
 		return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 	}
 

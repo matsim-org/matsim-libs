@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.common.randomizedtransitrouter;
+package org.matsim.contrib.common.randomizingtransitrouter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -48,8 +49,8 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public class RandomizedTransitRouterIT {
-	private static Logger log = Logger.getLogger( RandomizedTransitRouterIT.class ) ;
+public class RandomizingTransitRouterIT {
+	private static Logger log = Logger.getLogger( RandomizingTransitRouterIT.class ) ;
 	
 	private static final class MyObserver implements PersonEntersVehicleEventHandler {
 //		private enum ObservedVehicle{ pt_1009_1 /*direct, fast, with wait*/, pt_2009_1 /*direct, slow*/, pt_3009_1 /*with interchange*/} ;
@@ -144,7 +145,7 @@ public class RandomizedTransitRouterIT {
 		Controler controler = new Controler( scenario ) ;
 //		controler.setDirtyShutdown(true);
 		
-		controler.addOverridingModule( new RandomizedTransitRouterModule() );
+		controler.addOverridingModule( new RandomizingTransitRouterModule() );
 
 		final MyObserver observer = new MyObserver();
 		controler.getEvents().addHandler(observer);
