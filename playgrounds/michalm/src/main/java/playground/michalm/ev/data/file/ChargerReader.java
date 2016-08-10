@@ -37,7 +37,7 @@ public class ChargerReader
     private final static String CHARGER = "charger";
 
     private final static int DEFAULT_CHARGER_CAPACITY = 1;
-    private final static int DEFAULT_CHARGER_POWER = 50;//[kW]
+    private final static int DEFAULT_CHARGER_POWER_kW = 50;//[kW]
 
     private final EvData data;
     private Map<Id<Link>, ? extends Link> links;
@@ -68,9 +68,8 @@ public class ChargerReader
     {
         Id<Charger> id = Id.create(atts.getValue("id"), Charger.class);
         Link link = links.get(Id.createLinkId(atts.getValue("link")));
-        double power = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER)
-                * EvUnitConversions.W_PER_kW;
+        double power_kW = ReaderUtils.getDouble(atts, "power", DEFAULT_CHARGER_POWER_kW);
         int plugs = ReaderUtils.getInt(atts, "capacity", DEFAULT_CHARGER_CAPACITY);
-        return new ChargerImpl(id, power, plugs, link);
+        return new ChargerImpl(id, power_kW * EvUnitConversions.W_PER_kW, plugs, link);
     }
 }
