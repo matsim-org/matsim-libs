@@ -5,7 +5,10 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
-
+/** 
+ * 
+ * @author balac
+ */
 public class EndRentalEvent extends Event implements HasPersonId{
 
 	private final Id<Link> linkId;
@@ -20,8 +23,7 @@ public class EndRentalEvent extends Event implements HasPersonId{
 		super(time);
 		this.linkId = linkId;
 		this.personId = personId;
-		this.vehicleId = vehicleId;
-		
+		this.vehicleId = vehicleId;		
 	}
 
 	@Override
@@ -36,9 +38,9 @@ public class EndRentalEvent extends Event implements HasPersonId{
 	public Id<Person> getPersonId(){
 		return this.personId;
 	}
-	
-	public String getvehicleId(){
-		return this.vehicleId;
+
+	public String getvehicleId() {
+		return vehicleId;
 	}
 
 }

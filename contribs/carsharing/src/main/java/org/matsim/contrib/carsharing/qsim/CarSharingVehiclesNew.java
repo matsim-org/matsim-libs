@@ -10,7 +10,7 @@ import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReader;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
-import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
+import org.matsim.contrib.carsharing.vehicles.FFVehicle;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class CarSharingVehiclesNew {
@@ -18,7 +18,13 @@ public class CarSharingVehiclesNew {
 	//private static final Logger log = Logger.getLogger(CarSharingVehicles.class);
 
 	private Scenario scenario;	
-	private QuadTree<FFCSVehicle> ffVehicleLocationQuadTree;	
+	private QuadTree<FFVehicle> ffVehicleLocationQuadTree;	
+	private Map<String, FFVehicle> ffvehicleIdMap = new HashMap<String, FFVehicle>();
+
+	public Map<String, FFVehicle> getFfvehicleIdMap() {
+		return ffvehicleIdMap;
+	}
+
 	private QuadTree<OneWayCarsharingStation> owvehicleLocationQuadTree;	
 	private QuadTree<TwoWayCarsharingStation> twvehicleLocationQuadTree;
 	private Map<String, TwoWayCarsharingStation> twowaycarsharingstationsMap;
@@ -32,7 +38,7 @@ public class CarSharingVehiclesNew {
 
 	private Map<String, OneWayCarsharingStation> onewaycarsharingstationsMap;
 
-	private Map<FFCSVehicle, Link> ffvehiclesMap = new HashMap<FFCSVehicle, Link>();
+	private Map<FFVehicle, Link> ffvehiclesMap = new HashMap<FFVehicle, Link>();
 	
 	public CarSharingVehiclesNew(Scenario scenario) {
 		this.scenario = scenario;
@@ -52,10 +58,11 @@ public class CarSharingVehiclesNew {
 		this.twvehicleLocationQuadTree = carsharingReader.getTwvehicleLocationQuadTree();
 		this.onewaycarsharingstationsMap = carsharingReader.getOnewaycarsharingstationsMap();
 		this.twowaycarsharingstationsMap = carsharingReader.getTwowaycarsharingstationsMap();
-		this.ffvehiclesMap = carsharingReader.getFfvehiclesMap();			
+		this.ffvehiclesMap = carsharingReader.getFfvehiclesMap();	
+		this.ffvehicleIdMap = carsharingReader.getFfvehicleIdMap();
 	}
 	
-	public QuadTree<FFCSVehicle> getFfVehicleLocationQuadTree() {
+	public QuadTree<FFVehicle> getFfVehicleLocationQuadTree() {
 		return ffVehicleLocationQuadTree;
 	}
 
@@ -67,7 +74,7 @@ public class CarSharingVehiclesNew {
 		return twvehicleLocationQuadTree;
 	}
 
-	public Map<FFCSVehicle, Link> getFfvehiclesMap() {
+	public Map<FFVehicle, Link> getFfvehiclesMap() {
 		return ffvehiclesMap;
 	}
 	

@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import org.matsim.contrib.carsharing.control.listeners.FFEventsHandler.RentalInfoFF;
 import org.matsim.contrib.carsharing.control.listeners.NoParkingEventHandler.NoParkingInfo;
 import org.matsim.contrib.carsharing.control.listeners.NoVehicleEventHandler.NoVehicleInfo;
@@ -16,24 +18,26 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
-
+/** 
+ * 
+ * @author balac
+ */
 public class CarsharingListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	TwoWayEventsHandler cshandler;
 	FFEventsHandler ffhandler;
 	OWEventsHandler owhandler;
 	NoVehicleEventHandler noVehicleHandler;
 	NoParkingEventHandler noParkingHandler;
-	MatsimServices controler;
-	int frequency = 0;
-	
-	public CarsharingListener(MatsimServices controler, int frequency) {
-				
-		this.controler = controler;
-		this.frequency = frequency;
-		
-	}
+	@Inject MatsimServices controler;
+	int frequency = 1;
+	@Inject private FixedOrderSimulationListener fosl;
+	@Inject private ActivityReplanningMap activityReplanningMap;
+	@Inject private MobsimDataProvider mobsimDataProvider;
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -152,6 +156,8 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
+		fosl.addSimulationListener(this.mobsimDataProvider);
+		fosl.addSimulationListener(this.activityReplanningMap);
 
         this.cshandler = new TwoWayEventsHandler(event.getServices().getScenario().getNetwork());
 

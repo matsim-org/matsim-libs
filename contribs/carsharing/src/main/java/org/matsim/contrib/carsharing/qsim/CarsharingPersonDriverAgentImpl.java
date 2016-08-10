@@ -1,4 +1,4 @@
-package org.matsim.contrib.carsharing.qsim;
+/*package org.matsim.contrib.carsharing.qsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +59,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.utils.EditRoutes;
 
 
-/**
+*//**
  * Current version includes:<ul>
  * <li> two-way carsharing with reservation of the vehicle at the end of the activity preceding the rental.
  * <li> one-way carsharing with each station having a parking capacity with the reservation system as the one with two-way
@@ -67,13 +67,13 @@ import org.matsim.withinday.utils.EditRoutes;
  * <li> end of the free-floating rental is always on the link of the next activity, therefore no egress walk leg
  * </ul>
  * @author balac
- */
+ *//*
 public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
-	/** 
+	*//** 
 	 * <li> {@link EditRoutes} could probably be used to re-route the car leg. 
 	 * <li> It should be possible to extract the agent behavior into something analog to {@link NetworkRoutingInclAccessEgressModule}.
 	 * </ul> kai, feb'16
-	 */
+	 *//*
 
 	private OneWayCarsharingStation endStationOW;
 
@@ -815,3 +815,4 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 
 }
+*/

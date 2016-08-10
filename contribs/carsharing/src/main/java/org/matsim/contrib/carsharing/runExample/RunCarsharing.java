@@ -4,11 +4,14 @@ package org.matsim.contrib.carsharing.runExample;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
+import org.matsim.contrib.carsharing.control.listeners.CarsharingMobsimListener;
+import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
+import org.matsim.contrib.carsharing.manager.CarsharingManager;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
+import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
@@ -16,9 +19,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.name.Names;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 /** 
  * @author balac
@@ -53,7 +57,8 @@ public class RunCarsharing {
 		//=== example how to add a model for agents to decide whether or not they should keep the 
 		//=== carsharing vehicle during the activity
 		//=== could be completely random or based on some empirical data ===
-		
+		final CarSharingVehiclesNew carsharingVehcilesData = new CarSharingVehiclesNew(controler.getScenario());
+		carsharingVehcilesData.readVehicleLocations();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -78,19 +83,26 @@ public class RunCarsharing {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider( CarsharingQsimFactory.class );
+		        bind(FixedOrderSimulationListener.class).asEagerSingleton();
+				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
+		        addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
+		        addControlerListenerBinding().to(CarsharingListener.class);
+		        addControlerListenerBinding().to(CarsharingManager.class);
+		        bind(MobsimDataProvider.class).asEagerSingleton();
+		        
 				//setting up the scoring function factory, inside different scoring functions are set-up
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
+		        bind(ActivityReplanningMap.class).asEagerSingleton();
+		        addMobsimListenerBinding().to(CarsharingMobsimListener.class) ;
+		        bind(CarSharingVehiclesNew.class).toInstance(carsharingVehcilesData);
+		        bind(CarsharingManager.class).asEagerSingleton();
+		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
+
+
 			}
 		});
 
-		controler.addOverridingModule(CarsharingUtils.createModule());
-
-			
-
-		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) controler.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
-		controler.addControlerListener(new CarsharingListener(controler,
-				csConfig.getStatsWriterFrequency() ) ) ;
+		controler.addOverridingModule(CarsharingUtils.createModule());			
 	}
 
 }
