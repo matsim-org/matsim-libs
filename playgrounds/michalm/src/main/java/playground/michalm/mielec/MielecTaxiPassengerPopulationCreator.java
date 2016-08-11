@@ -35,7 +35,7 @@ public class MielecTaxiPassengerPopulationCreator
 {
     public static void process(String suffix)
     {
-        String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
+        String dir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
         String demandFile = dir + "taxi_demand_" + suffix + ".txt";
         String planFile = dir + "plans_only_taxi_mini_benchmark_" + suffix + ".xml.gz";
         
