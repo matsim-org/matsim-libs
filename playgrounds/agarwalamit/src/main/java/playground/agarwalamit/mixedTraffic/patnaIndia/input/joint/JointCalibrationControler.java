@@ -27,12 +27,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -57,6 +61,7 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
+import org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -76,7 +81,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.CountsInserte
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
-import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PatnaScoringFunctionFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
@@ -99,7 +103,7 @@ public class JointCalibrationControler {
 	private static final String JOINT_COUNTS_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 
-	private static boolean isUsingCadyts = false;
+	private static boolean isUsingCadyts = true;
 
 	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/multiModalCadyts/c0/";
 
@@ -114,6 +118,13 @@ public class JointCalibrationControler {
 			OUTPUT_DIR = dir+args [1];
 			isUsingCadyts = Boolean.valueOf( args[2] );
 			config.controler().setOutputDirectory( OUTPUT_DIR );
+
+			config.planCalcScore().getOrCreateModeParams("car").setConstant(Double.valueOf(args[3]));
+			config.planCalcScore().getOrCreateModeParams("bike").setConstant(Double.valueOf(args[4]));
+			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(Double.valueOf(args[5]));
+			config.planCalcScore().getOrCreateModeParams("pt").setConstant(Double.valueOf(args[6]));
+			config.planCalcScore().getOrCreateModeParams("walk").setConstant(Double.valueOf(args[7]));
+
 		} else {
 			config = pjc.createBasicConfigSettings();
 
@@ -169,16 +180,17 @@ public class JointCalibrationControler {
 				this.addEventHandlerBinding().to(PtFareEventHandler.class);
 			}
 		});
+
 		// for above make sure that util_dist and monetary dist rate for pt are zero.
 		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
 		mp.setMarginalUtilityOfDistance(0.0);
 		mp.setMonetaryDistanceRate(0.0);
 
 		// add income dependent scoring function factory
-		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
+		//		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
 
-		// add cadyts
-		if (isUsingCadyts) addCadytsSetting(controler,config);
+		// add cadyts or scoring function only or both
+		addScoringFunction(controler,config);
 
 		controler.run();
 
@@ -194,7 +206,7 @@ public class JointCalibrationControler {
 		new File(OUTPUT_DIR+"/analysis/").mkdir();
 		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
 		// write some default analysis
-		
+
 		String userGroup = PatnaUserGroup.urban.toString();
 		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
 		mtta.run();
@@ -207,12 +219,13 @@ public class JointCalibrationControler {
 		StatsWriter.run(OUTPUT_DIR);
 	}
 
-	private static void addCadytsSetting(final Controler controler, final Config config){
-
-		CountsInserter jcg = new CountsInserter();
+	private static void addScoringFunction(final Controler controler, final Config config){
+		
+		CountsInserter jcg = new CountsInserter();		
 		jcg.processInputFile( inputLocation+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
 		jcg.processInputFile( inputLocation+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
 		jcg.run();
+
 		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
 
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
@@ -238,21 +251,44 @@ public class JointCalibrationControler {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Inject Network network;
+			@Inject Population population;
+			@Inject PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
+			@Inject ScenarioConfigGroup scenarioConfig;
 			@Inject ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
+				
 				final CadytsScoring<ModalLink> scoringFunction = new CadytsScoring<ModalLink>(person.getSelectedPlan(), config, cContext);
-				final double cadytsScoringWeight = 15.0;
-				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-				sumScoringFunction.addScoringFunction(scoringFunction );
+				
+				if(isUsingCadyts){
+					final double cadytsScoringWeight = 15.0;
+					scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+					sumScoringFunction.addScoringFunction(scoringFunction );	
+				}
 
+				Double ratioOfInc = 1.0;
+
+				if ( PatnaPersonFilter.isPersonBelongsToUrban(person.getId())) { // inc is not available for commuters and through traffic
+					Double monthlyInc = (Double) population.getPersonAttributes().getAttribute(person.getId().toString(), PatnaUtils.INCOME_ATTRIBUTE);
+					Double avgInc = PatnaUtils.MEADIAM_INCOME;
+					ratioOfInc = avgInc/monthlyInc;
+				}
+
+				planCalcScoreConfigGroup.setMarginalUtilityOfMoney(ratioOfInc );				
+
+				ScoringParameterSet scoringParameterSet = planCalcScoreConfigGroup.getScoringParameters( null ); // parameters set is same for all subPopulations 
+
+				CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(
+						planCalcScoreConfigGroup, scoringParameterSet, scenarioConfig);
+				final CharyparNagelScoringParameters modifiedParams = builder.build();
+
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(modifiedParams, network));
+				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(modifiedParams));
 				return sumScoringFunction;
 			}
 		}) ;

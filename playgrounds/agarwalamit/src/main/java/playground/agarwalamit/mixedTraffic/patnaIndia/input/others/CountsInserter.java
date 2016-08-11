@@ -46,7 +46,7 @@ import playground.agarwalamit.utils.NumberUtils;
 public class CountsInserter {
 
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo = new HashMap<>();
-	private Counts<ModalLink> counts;
+	private Counts<ModalLink> counts = new Counts<>();
 
 	public static void main(String[] args) {
 		String inputFolder = PatnaUtils.INPUT_FILES_DIR;

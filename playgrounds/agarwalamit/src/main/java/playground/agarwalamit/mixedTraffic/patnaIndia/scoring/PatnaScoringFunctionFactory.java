@@ -73,7 +73,7 @@ public class PatnaScoringFunctionFactory implements ScoringFunctionFactory{
 		if ( PatnaPersonFilter.isPersonBelongsToUrban(person.getId())) { // inc is not available for commuters and through traffic
 
 			Double monthlyInc = (Double) population.getPersonAttributes().getAttribute(person.getId().toString(), PatnaUtils.INCOME_ATTRIBUTE);
-			Double avgInc = PatnaPersonFilter.isPersonBelongsToSlum(person.getId()) ? PatnaUtils.NONSLUM_AVG_INCOME : PatnaUtils.NONSLUM_AVG_INCOME; 
+			Double avgInc = PatnaUtils.MEADIAM_INCOME;//PatnaPersonFilter.isPersonBelongsToSlum(person.getId()) ? PatnaUtils.NONSLUM_AVG_INCOME : PatnaUtils.NONSLUM_AVG_INCOME; 
 
 			double ratioOfInc = avgInc/monthlyInc;
 			double marginalUtilityOfMoney = ratioOfInc; // marginalUtilMoney = avgIncome / monthlyIncome,
