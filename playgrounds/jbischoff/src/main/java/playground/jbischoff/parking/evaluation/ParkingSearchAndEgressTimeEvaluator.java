@@ -25,11 +25,14 @@ package playground.jbischoff.parking.evaluation;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -37,7 +40,10 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -56,8 +62,10 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 	Map<Id<Person>,Double> searchTime = new HashMap<>();
 	Map<Id<Vehicle>,Id<Person>> drivers = new HashMap<>();
 	private Set<Id<Link>> monitoredLinks;
+	private List<String> coordTimeStamps = new ArrayList<>();
 	private double[] parkingCounts = new double[24];
 	private double[] parkingTime = new double[24];
+	private Network network;
 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
@@ -71,8 +79,9 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 	/**
 	 * 
 	 */
-	public ParkingSearchAndEgressTimeEvaluator(Set<Id<Link>> monitoredLinks) {
+	public ParkingSearchAndEgressTimeEvaluator(Set<Id<Link>> monitoredLinks, Network network) {
 		this.monitoredLinks = monitoredLinks;
+		this.network = network;
 		Locale.setDefault(new Locale("en", "US"));
 
 	}
@@ -94,6 +103,23 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 		}	
 		
 	}
+	public void writeCoordTimeStamps(String filename){
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		DecimalFormat df = new DecimalFormat("##.##");	
+			try {
+				bw.write("time;coordX;coordY;Xwgs;Ywgs;searchTime");
+				for (String s: this.coordTimeStamps){
+					bw.newLine();
+					bw.write(s);
+				}
+				bw.flush();
+				bw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+			
+		}
 	
 
 	
@@ -134,6 +160,11 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 			if (hour<24){
 				this.parkingCounts[hour]++;
 				this.parkingTime[hour]+=parkingTime;
+				CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4, TransformationFactory.WGS84);
+				Coord coord = this.network.getLinks().get(event.getLinkId()).getCoord();
+				Coord t = ct.transform(coord);
+				String stamp = event.getTime()+";"+coord.getX()+";"+coord.getY()+";"+t.getX()+";"+t.getY()+";"+parkingTime;
+				this.coordTimeStamps.add(stamp);
 			}
 		}
 			}
