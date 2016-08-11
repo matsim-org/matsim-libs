@@ -9,25 +9,18 @@ public class FFVehicleImpl implements FFVehicle{
 	
 	public FFVehicleImpl(String type, String vehicleId) {
 		
-		this.setType(type);
-		this.setVehicleId(vehicleId);
+		this.type = type;
+		this.vehicleId = vehicleId;
 	}
-	@Override
 	public String getType() {
 		return type;
 	}
-	@Override
-	public void setType(String type) {
-		this.type = type;
-	}
+	
 	@Override
 	public String getVehicleId() {
 		return vehicleId;
 	}
-	@Override
-	public void setVehicleId(String vehicleId) {
-		this.vehicleId = vehicleId;
-	}
+	
 
 	
 
