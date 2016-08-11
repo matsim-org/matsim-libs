@@ -19,11 +19,11 @@
 
 package playground.michalm.ev;
 
-import java.util.*;
-
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.util.stats.TimeProfiles;
+
+import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.data.*;
 
@@ -65,23 +65,31 @@ public class EvTimeProfiles
     }
 
 
+    private static final int MAX_VEHICLE_COLUMNS = 50;
+
+
     public static ProfileCalculator createIndividualSocCalculator(final EvData evData)
     {
-        List<String> ids = new ArrayList<>(evData.getElectricVehicles().size());
-        for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-            ids.add(ev.getId() + "");
+        int columns = Math.min(evData.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
+        Iterable<ElectricVehicle> selectedEvs = Iterables
+                .limit(evData.getElectricVehicles().values(), columns);
+
+        String[] header = new String[columns];
+        int col = 0;
+        for (ElectricVehicle ev : selectedEvs) {
+            header[col++] = ev.getId() + "";
         }
-        String[] header = ids.toArray(new String[ids.size()]);
 
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
             public String[] calcValues()
             {
-                List<String> vals = new ArrayList<>(evData.getElectricVehicles().size());
-                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    vals.add( (ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh) + "");//print out in [kWh]
+                String[] vals = new String[columns];
+                int col = 0;
+                for (ElectricVehicle ev : selectedEvs) {
+                    vals[col++] = (ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh) + "";//print out in [kWh]
                 }
-                return vals.toArray(new String[vals.size()]);
+                return vals;
             }
         };
     }

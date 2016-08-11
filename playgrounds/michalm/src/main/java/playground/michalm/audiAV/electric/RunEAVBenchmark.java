@@ -26,6 +26,7 @@ import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
@@ -57,6 +58,9 @@ public class RunEAVBenchmark
 
     public static Controler createControler(Config config, int runs)
     {
+        //TODO temp
+        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+        
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         EvConfigGroup evCfg = EvConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());

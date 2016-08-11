@@ -90,12 +90,12 @@ public class RuleBasedETaxiOptimizer
             chargeIdleUnderchargedVehicles(Collections.singleton(veh));
         }
     }
-    
-    
+
+
     @Override
     protected boolean isWaitStay(TaxiTask task)
     {
-        return task.getTaxiTaskType() == TaxiTaskType.STAY && !(task instanceof ETaxiChargingTask);
+        return task.getTaxiTaskType() == TaxiTaskType.STAY && ! (task instanceof ETaxiChargingTask);
     }
 
 
