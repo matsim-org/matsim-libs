@@ -44,18 +44,18 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class PatnaUrbanPlansBeelineDistanceAnalyzer {
+public class BeelineDistanceFromActivitiesAnalyzer {
 
-	private static final Logger LOG = Logger.getLogger(PatnaUrbanPlansBeelineDistanceAnalyzer.class);
+	private static final Logger LOG = Logger.getLogger(BeelineDistanceFromActivitiesAnalyzer.class);
 
 	private final List<Integer> distanceClasses = new ArrayList<>(Arrays.asList( 2000, 4000, 6000, 8000, 10000, 20000000 // last dist class sufficiently high
 			));
-	private final String inputUrbanPlansFile = PatnaUtils.INPUT_FILES_DIR+"/initial_urban_plans_1pct_withoutImputedData.xml.gz";
+	private final String inputUrbanPlansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE+"/initial_urban_plans_1pct.xml.gz";
 	private final Map<Integer, Map<String, Integer>> distanceClass2Mode2Count = new TreeMap<>();
 	private final Map<Integer, Integer> distanceClass2Count = new TreeMap<>();
 
 	public static void main(String[] args) {
-		PatnaUrbanPlansBeelineDistanceAnalyzer pupbda = new PatnaUrbanPlansBeelineDistanceAnalyzer();
+		BeelineDistanceFromActivitiesAnalyzer pupbda = new BeelineDistanceFromActivitiesAnalyzer();
 		pupbda.initializeMaps();
 		pupbda.parsePlansFile();
 		pupbda.writeData(PatnaUtils.INPUT_FILES_DIR+ "/tripDiary_tripLengthDistributionData.txt");
@@ -130,6 +130,8 @@ public class PatnaUrbanPlansBeelineDistanceAnalyzer {
 					else mode2Count.put(leg,  1 );
 
 					this.distanceClass2Count.put(distClass, this.distanceClass2Count.get(distClass) + 1 );
+					dist = Double.NaN;
+					startCoord = null;
 				}
 			}
 		}
