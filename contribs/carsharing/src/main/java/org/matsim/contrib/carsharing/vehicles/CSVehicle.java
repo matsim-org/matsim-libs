@@ -1,6 +1,6 @@
 package org.matsim.contrib.carsharing.vehicles;
 
-public interface FFVehicle {
+public interface CSVehicle {
 
 	public String getVehicleId();
 

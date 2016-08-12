@@ -54,11 +54,11 @@ public class TwoWayCarsharingStation implements CarsharingStation {
 		currentNumberOfVehicles++;
 		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);	
 	}
-
+	@Override
 	public String getStationId() {
 		return stationId;
 	}	
-	
+	@Override
 	public Id<Link> getLinkId() {
 		return linkId;
 	}

@@ -7,7 +7,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingMobsimListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
+import org.matsim.contrib.carsharing.manager.CSPersonVehicle;
+import org.matsim.contrib.carsharing.manager.CSPersonVehiclesContainer;
 import org.matsim.contrib.carsharing.manager.CarsharingManager;
+import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTrip;
+import org.matsim.contrib.carsharing.manager.routers.RouteFreefloatingTrip;
+import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
+import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
 import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
@@ -53,20 +59,22 @@ public class RunCarsharing {
 
 	public static void installCarSharing(final Controler controler) {
 		
-		//====================//
-		//=== example how to add a model for agents to decide whether or not they should keep the 
-		//=== carsharing vehicle during the activity
-		//=== could be completely random or based on some empirical data ===
+		
 		final CarSharingVehiclesNew carsharingVehcilesData = new CarSharingVehiclesNew(controler.getScenario());
 		carsharingVehcilesData.readVehicleLocations();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
-
+		final RouterProvider routerProvider = new RouterProviderImpl();
+		final CSPersonVehicle pesronVehiclesContainer = new CSPersonVehiclesContainer();
+		final RouteCarsharingTrip ffRouter = new RouteFreefloatingTrip();
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
 			public void install() {
 				bind(KeepingTheCarModel.class)
-				.toInstance(keepingCarModel);				
+				.toInstance(keepingCarModel);
+				bind(RouterProvider.class).toInstance(routerProvider);
+				bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
+				bind(RouteFreefloatingTrip.class).asEagerSingleton();
 			}			
 		});		
 		

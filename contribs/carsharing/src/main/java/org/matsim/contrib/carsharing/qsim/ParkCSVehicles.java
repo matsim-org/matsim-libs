@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
-import org.matsim.contrib.carsharing.vehicles.FFVehicle;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -28,7 +28,7 @@ public class ParkCSVehicles implements AgentSource {
 	private Collection<String> mainModes;
 	private QuadTree<OneWayCarsharingStation> owvehiclesLocationqt;
 	private QuadTree<TwoWayCarsharingStation> twvehiclesLocationqt;
-	private Map<FFVehicle, Link> ffvehiclesMap;
+	private Map<CSVehicle, Link> ffvehiclesMap;
 	private final static Logger log = Logger.getLogger(ParkCSVehicles.class);
 	
 	public ParkCSVehicles(QSim qSim,
@@ -60,7 +60,7 @@ public class ParkCSVehicles implements AgentSource {
 
 		if (!this.ffvehiclesMap.isEmpty()) {
 			
-			for (FFVehicle ffvehicle : this.ffvehiclesMap.keySet()) {
+			for (CSVehicle ffvehicle : this.ffvehiclesMap.keySet()) {
 				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(ffvehicle.getVehicleId(), Vehicle.class),
 						modeVehicleTypes.get("freefloating")), this.ffvehiclesMap.get(ffvehicle).getId() ) ;
 				counterFF++;

@@ -2,7 +2,7 @@ package org.matsim.contrib.carsharing.vehicles;
 /** 
  * @author balac
  */
-public class FFVehicleImpl implements FFVehicle{
+public class FFVehicleImpl implements CSVehicle{
 	
 	private String type;
 	private String vehicleId;

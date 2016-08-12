@@ -42,9 +42,11 @@ public class CarsharingMobsimListener implements MobsimBeforeSimStepListener{
 			int nextElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(ma) + 1;
 			
 			PlanElement pe = plan.getPlanElements().get(nextElementIndex);
+			Leg legToBerouted = (Leg)pe;
 			if (carsharingLeg(pe)) {
 				
-				List<PlanElement> newTrip = carsharingManager.reserveAndrouteCarsharingTrip(plan.getPerson(), plan, "freefloating", nextElementIndex, e.getSimulationTime());
+				List<PlanElement> newTrip = carsharingManager.reserveAndrouteCarsharingTrip(plan, "freefloating", 
+						legToBerouted, e.getSimulationTime());
 				if (newTrip == null)
 					ma.setStateToAbort(e.getSimulationTime());
 				else {

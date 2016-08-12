@@ -58,6 +58,7 @@ public class OneWayCarsharingStation implements CarsharingStation{
 		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);	
 	}
 
+	@Override
 	public String getStationId() {
 		return stationId;
 	}
@@ -79,7 +80,7 @@ public class OneWayCarsharingStation implements CarsharingStation{
 	public int getAvaialbleParkingSpots() {
 		return avaialbleParkingSpots;
 	}
-	
+	@Override
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
