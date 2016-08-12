@@ -68,7 +68,7 @@ public class RunETaxiScenario
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerTimeProfileCollectorProvider.class);
             }
         });
 

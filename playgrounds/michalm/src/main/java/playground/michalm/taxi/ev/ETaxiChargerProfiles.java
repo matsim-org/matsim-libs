@@ -27,7 +27,7 @@ import playground.michalm.ev.data.*;
 
 public class ETaxiChargerProfiles
 {
-    public static ProfileCalculator createChargerCalculator(final EvData evData)
+    public static ProfileCalculator createChargerOccupancyCalculator(final EvData evData)
     {
         String[] header = { "plugged", "queued", "assigned" };
         return new TimeProfiles.MultiValueProfileCalculator(header) {

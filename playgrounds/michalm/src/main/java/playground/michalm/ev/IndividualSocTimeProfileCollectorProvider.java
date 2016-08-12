@@ -49,6 +49,6 @@ public class IndividualSocTimeProfileCollectorProvider
     {
         ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
                 EvTimeProfiles.createIndividualSocCalculator(evData));
-        return new TimeProfileCollector(calc, 300, "ev_indiv_soc_time_profiles.txt", matsimServices);
+        return new TimeProfileCollector(calc, 300, "individual_soc_time_profiles", matsimServices);
     }
 }

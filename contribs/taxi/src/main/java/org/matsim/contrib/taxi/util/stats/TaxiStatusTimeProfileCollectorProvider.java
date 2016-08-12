@@ -50,6 +50,6 @@ public class TaxiStatusTimeProfileCollectorProvider
                 TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
                 TaxiTimeProfiles.createRequestsWithStatusCounter(taxiData,
                         TaxiRequestStatus.UNPLANNED));
-        return new TimeProfileCollector(calc, 300, "taxi_status_time_profiles.txt", matsimServices);
+        return new TimeProfileCollector(calc, 300, "taxi_status_time_profiles", matsimServices);
     }
 }

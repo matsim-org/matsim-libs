@@ -22,6 +22,7 @@ package playground.michalm.ev;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.util.stats.TimeProfiles;
+import org.matsim.contrib.util.histogram.UniformHistogram;
 
 import com.google.common.collect.Iterables;
 
@@ -30,20 +31,25 @@ import playground.michalm.ev.data.*;
 
 public class EvTimeProfiles
 {
-    public static ProfileCalculator createUnderchargedVehiclesCounter(final EvData evData,
-            final double relativeSoc)
+    public static ProfileCalculator createSocHistogramCalculator(final EvData evData)
     {
-        return new TimeProfiles.SingleValueProfileCalculator("undercharged") {
+        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+" };
+        return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String calcValue()
+            public String[] calcValues()
             {
-                int count = 0;
+                UniformHistogram histogram = new UniformHistogram(0.1, header.length);
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    if (ev.getBattery().getSoc() < relativeSoc * ev.getBattery().getCapacity()) {
-                        count++;
-                    }
+                    histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
                 }
-                return count + "";
+
+                String[] values = new String[header.length];
+                int aggregatedCount = 0;
+                for (int b = 0; b < header.length; b++) {
+                    aggregatedCount += histogram.getCount(b);
+                    values[b] = aggregatedCount + "";
+                }
+                return values;
             }
         };
     }

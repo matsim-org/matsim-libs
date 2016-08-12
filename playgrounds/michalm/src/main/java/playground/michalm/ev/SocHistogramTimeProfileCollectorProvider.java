@@ -19,7 +19,7 @@
 
 package playground.michalm.ev;
 
-import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -29,7 +29,7 @@ import com.google.inject.*;
 import playground.michalm.ev.data.EvData;
 
 
-public class AggregatedSocTimeProfileCollectorProvider
+public class SocHistogramTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
     private final EvData evData;
@@ -37,7 +37,7 @@ public class AggregatedSocTimeProfileCollectorProvider
 
 
     @Inject
-    public AggregatedSocTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
+    public SocHistogramTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
     {
         this.evData = evData;
         this.matsimServices = matsimServices;
@@ -47,9 +47,7 @@ public class AggregatedSocTimeProfileCollectorProvider
     @Override
     public MobsimListener get()
     {
-        ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-                EvTimeProfiles.createMeanSocCalculator(evData),
-                EvTimeProfiles.createUnderchargedVehiclesCounter(evData, 0.3));
-        return new TimeProfileCollector(calc, 300, "ev_agg_soc_time_profiles.txt", matsimServices);
+        ProfileCalculator calc = EvTimeProfiles.createSocHistogramCalculator(evData);
+        return new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles", matsimServices);
     }
 }
