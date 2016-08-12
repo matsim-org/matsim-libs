@@ -303,8 +303,8 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 					break;
 				}
 				HybridSimProto.Link.Builder llb = HybridSimProto.Link.newBuilder();
-				llb.setId(linkId.toString());
-				HybridSimProto.Coordinate.Builder cb = HybridSimProto.Coordinate.newBuilder();
+                llb.setStrId(linkId.toString());
+                HybridSimProto.Coordinate.Builder cb = HybridSimProto.Coordinate.newBuilder();
 				cb.setX(l.getCoord().getX());
 				cb.setY(l.getCoord().getY());
 				llb.setCentroid(cb);

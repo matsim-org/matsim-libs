@@ -180,7 +180,8 @@ message Leg {
 
 message Link {
     Coordinate centroid = 1;
-    string id = 2;
+    int32 id = 2;
+    string str_id = 3;
 }
 
 message Coordinate {
