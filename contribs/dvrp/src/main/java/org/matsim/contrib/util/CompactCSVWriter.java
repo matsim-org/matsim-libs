@@ -52,6 +52,15 @@ public class CompactCSVWriter
     }
 
 
+    public void writeNext(String head, String[] tail)
+    {
+        String[] nextLine = new String[tail.length + 1];
+        nextLine[0] = head;
+        System.arraycopy(tail, 0, nextLine, 1, tail.length);
+        writeNext(nextLine);
+    }
+
+
     public void writeNextEmpty()
     {
         writeNext(EMPTY_LINE);

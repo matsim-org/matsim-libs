@@ -5,16 +5,16 @@ import java.util.Collection;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
-import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils.*;
+import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
+import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.*;
 import org.matsim.contrib.taxi.schedule.*;
 
 
-public class TaxiScheduleChartUtils
+public class TaxiScheduleCharts
 {
     public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles)
     {
-        return ScheduleChartUtils.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR,
+        return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR,
                 TAXI_PAINT_SELECTOR);
     }
 

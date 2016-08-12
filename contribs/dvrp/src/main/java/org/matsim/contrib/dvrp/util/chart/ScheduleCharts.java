@@ -37,7 +37,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 
-public class ScheduleChartUtils
+public class ScheduleCharts
 {
     public static JFreeChart chartSchedule(List<? extends Vehicle> vehicles)
     {

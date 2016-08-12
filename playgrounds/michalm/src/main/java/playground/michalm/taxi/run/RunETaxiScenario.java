@@ -57,7 +57,7 @@ public class RunETaxiScenario
         TaxiData taxiData = new TaxiData();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario, evData).readFile(evCfg.getChargerFile());
+        new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);
 
         Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);

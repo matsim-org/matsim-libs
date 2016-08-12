@@ -39,7 +39,7 @@ import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
 /**
  * @author michalm
  */
-public class RouteChartUtils
+public class RouteCharts
 {
     public static JFreeChart chartRoutes(Collection<? extends Vehicle> vehicles)
     {

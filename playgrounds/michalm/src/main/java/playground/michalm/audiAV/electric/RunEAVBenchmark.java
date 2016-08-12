@@ -70,7 +70,7 @@ public class RunEAVBenchmark
         final TaxiData taxiData = new TaxiData();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario, evData).readFile(evCfg.getChargerFile());
+        new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         EAVUtils.initEvData(taxiData, evData);
 
         Controler controler = RunTaxiBenchmark.createControler(scenario, taxiData, runs);

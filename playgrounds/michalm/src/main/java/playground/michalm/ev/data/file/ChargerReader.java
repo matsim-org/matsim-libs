@@ -22,7 +22,7 @@ package playground.michalm.ev.data.file;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -43,10 +43,10 @@ public class ChargerReader
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public ChargerReader(Scenario scenario, EvData data)
+    public ChargerReader(Network network, EvData data)
     {
         this.data = data;
-        links = scenario.getNetwork().getLinks();
+        links = network.getLinks();
     }
 
 
