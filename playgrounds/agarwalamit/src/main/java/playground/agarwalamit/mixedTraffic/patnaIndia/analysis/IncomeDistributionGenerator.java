@@ -39,6 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.ListUtils;
+import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.NumberUtils;
 
 /**
@@ -47,13 +48,14 @@ import playground.agarwalamit.utils.NumberUtils;
 
 public class IncomeDistributionGenerator {
 
-	private final String dir = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/";
-	//"../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/incomeDependent/c13/";
-	private final int iterationNumber = 100;
-	//	private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
-	private final String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_plans_1pct.xml.gz";
-	//	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
-	private final String personAttributeFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_persionAttributes_1pct.xml.gz";
+	private final String dir = 
+			//PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/";
+	"../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/multiModalCadytsAndIncome/c5/";
+	private final int iterationNumber = 0;
+		private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
+//	private final String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_plans_1pct.xml.gz";
+		private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
+//	private final String personAttributeFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_persionAttributes_1pct.xml.gz";
 
 	private final SortedMap<Double, SortedMap<String, Integer>> avgInc2mode2Count = new TreeMap<>();
 	private final double USD2INRRate = 66.6; // 08 June 2016 
@@ -66,13 +68,26 @@ public class IncomeDistributionGenerator {
 	}
 
 	private void writeData(){
-		//		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it."+iterationNumber+".txt")) {
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/avgIncToCount_1pct.txt")) {
-			writer.write("avgIncomUSD\tmode\tcount\n");
+				try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/avgIncToCount_it."+iterationNumber+".txt")) {
+//		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/avgIncToCount_1pct.txt")) {
+			writer.write("avgIncomUSD\tmode\tcount\tshareOfModeInPct\tshareOfIncGrpInPct\n");
 
+			Map<String,Double> mode2Legs = new HashMap<>();
 			for (Double d : this.avgInc2mode2Count.keySet()){
 				for(String str : this.avgInc2mode2Count.get(d).keySet()){
-					writer.write(Math.round(d/USD2INRRate)+"\t"+str+"\t"+this.avgInc2mode2Count.get(d).get(str)+"\n");
+					if (mode2Legs.containsKey(str)) mode2Legs.put(str, mode2Legs.get(str)+this.avgInc2mode2Count.get(d).get(str));
+					else  mode2Legs.put(str, (double) this.avgInc2mode2Count.get(d).get(str));
+				}
+			}
+			
+			for (Double d : this.avgInc2mode2Count.keySet()){
+				double incSum = MapUtils.intValueSum(this.avgInc2mode2Count.get(d));
+				for(String str : this.avgInc2mode2Count.get(d).keySet()){
+					double sum = mode2Legs.get(str);
+					double count = this.avgInc2mode2Count.get(d).get(str);
+					writer.write(Math.round(d/USD2INRRate)+"\t"+str+"\t"+count
+							+"\t"+NumberUtils.round(100*count/sum, 2)+
+							"\t"+NumberUtils.round(100*count/incSum, 2)+"\n");
 				}
 				//writer.write(Math.round(d/USD2INRRate)+"\t"+"total\t"+MapUtils.intValueSum(this.avgInc2mode2Count.get(d))+"\n");
 			}
