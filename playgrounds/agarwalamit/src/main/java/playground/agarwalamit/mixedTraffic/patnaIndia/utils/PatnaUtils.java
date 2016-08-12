@@ -71,7 +71,8 @@ public final class PatnaUtils {
 	public static final Collection <String> ALL_MAIN_MODES =  Arrays.asList("car","motorbike","bike","truck"); //Arrays.asList("car","motorbike","bike","car_ext","motorbike_ext","bike_ext","truck_ext");
 //			
 	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","bike","truck", "pt", "walk"); //Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
-	
+
+	public static final Double INR_USD_RATE = 66.6; // 08 June 2016 
 
 	private PatnaUtils(){} 
 

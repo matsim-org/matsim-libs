@@ -39,27 +39,36 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.NumberUtils;
 
 /**
  * @author amit
  */
 
-public class BeelineDistDitributionGenerator {
+public class BeelineDistanceDistributionGenerator {
 
-	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/multiModalCadytsAndIncome/c5/";
+	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/multiModalCadytsAndIncome/c7/";
 	private final int iterationNumber = 0;
 	private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
 	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
 
 	private final List<Double> distanceClasses = new ArrayList<>(Arrays.asList( 2000., 4000., 6000., 8000., 10000., Double.MAX_VALUE ));
-
+	private final Map<Double,String> distanceClass2Labels = new HashMap<>();
 
 	public static void main(String[] args) {
-		new BeelineDistDitributionGenerator().run();
+		new BeelineDistanceDistributionGenerator().run();
 	}
 
 	private void run(){
 
+		distanceClass2Labels.put(2000.0, "0-2");
+		distanceClass2Labels.put(4000.0, "2-4");
+		distanceClass2Labels.put(6000.0, "4-6");
+		distanceClass2Labels.put(8000.0, "6-8");
+		distanceClass2Labels.put(10000.0, "8-10");
+		distanceClass2Labels.put(Double.MAX_VALUE, "10+");
+		
 		LegModeBeelineDistanceDistributionHandler beelineCalculator = new LegModeBeelineDistanceDistributionHandler();
 
 		Config config = ConfigUtils.createConfig();
@@ -72,12 +81,11 @@ public class BeelineDistDitributionGenerator {
 		beelineCalculator.preProcessData();
 		beelineCalculator.postProcessData();
 
-
 		SortedMap<String, Map<Id<Person>, List<Double>>>mode2id2dists = beelineCalculator.getMode2PersonId2RouteDistances();
 		SortedMap<String,SortedMap<Double,Integer>> mode2class2count = new TreeMap<>();
 
 		// initialize
-		for(String mode : mode2id2dists.keySet()) {
+		for(String mode : PatnaUtils.URBAN_ALL_MODES) {
 			SortedMap<Double, Integer> clas2count = new TreeMap<>();
 			for (Double d : distanceClasses) {
 				clas2count.put(d, 0);
@@ -86,12 +94,11 @@ public class BeelineDistDitributionGenerator {
 		}
 
 		// get the data
-		for(String mode : mode2id2dists.keySet()) {
+		for(String mode : PatnaUtils.URBAN_ALL_MODES) {
 			for (Id<Person> pId : mode2id2dists.get(mode).keySet()){
 				if ( ! PatnaPersonFilter.isPersonBelongsToUrban(pId) ) continue;
 				for (Double d : mode2id2dists.get(mode).get(pId)){
 					SortedMap<Double, Integer> clas2count = mode2class2count.get(mode);
-
 					for(Double dClass : distanceClasses) {
 						if (d <= dClass ) {
 							clas2count.put(dClass, clas2count.get(dClass)+1);
@@ -105,10 +112,12 @@ public class BeelineDistDitributionGenerator {
 
 		// write it
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/modalDistanceDistribution.it."+iterationNumber+".txt")) {
-			writer.write("mode\tdistanceClass\tcount\n");
+			writer.write("mode\tdistanceClass\tcount\tshare\n");
 			for(String mode : mode2class2count.keySet()){
 				for(Double d  : mode2class2count.get(mode).keySet()){
-					writer.write(mode+"\t"+d+"\t"+mode2class2count.get(mode).get(d)+"\n");					
+					double sum = getDistClassSum(mode2class2count, d);
+					Integer count = mode2class2count.get(mode).get(d);
+					writer.write(mode+"\t"+distanceClass2Labels.get(d)+"\t"+count+"\t"+NumberUtils.round(count*100/sum, 2)+"\n");					
 				}
 			}
 			writer.close();
@@ -126,7 +135,7 @@ public class BeelineDistDitributionGenerator {
 
 		SortedMap<String, SortedMap<Double, SortedMap<Double, Integer>>> mode2inc2distcounter = new TreeMap<>();
 		// initialize
-		for(String mode : mode2id2dists.keySet()) {
+		for(String mode : PatnaUtils.URBAN_ALL_MODES) {
 			SortedMap<Double, SortedMap<Double,Integer>> inc2dist2count = new TreeMap<>();
 			for( Double inc : person2income.values()) {
 				SortedMap<Double, Integer> dist2count = new TreeMap<>();
@@ -139,7 +148,7 @@ public class BeelineDistDitributionGenerator {
 		}
 
 		// get the data
-		for(String mode : mode2id2dists.keySet()) {
+		for(String mode : PatnaUtils.URBAN_ALL_MODES) {
 			for (Id<Person> pId : mode2id2dists.get(mode).keySet()){
 				if ( ! PatnaPersonFilter.isPersonBelongsToUrban(pId) ) continue;
 				double inc = person2income.get(pId);
@@ -161,7 +170,7 @@ public class BeelineDistDitributionGenerator {
 			for(String mode : mode2inc2distcounter.keySet()){
 				for (Double inc : mode2inc2distcounter.get(mode).keySet()) {
 					for(Double d  : mode2inc2distcounter.get(mode).get(inc).keySet()){
-						writer.write(mode+"\t"+inc+"\t"+d+"\t"+mode2inc2distcounter.get(mode).get(inc).get(d)+"\n");					
+						writer.write(mode+"\t"+Math.round(inc/PatnaUtils.INR_USD_RATE)+"\t"+distanceClass2Labels.get(d)+"\t"+mode2inc2distcounter.get(mode).get(inc).get(d)+"\n");					
 					}
 				}
 			}
@@ -169,6 +178,15 @@ public class BeelineDistDitributionGenerator {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason :"+e);
 		}
-
+	}
+	
+	private double getDistClassSum(SortedMap<String,SortedMap<Double,Integer>> mode2class2count, Double distanceClass){
+		SortedMap<String,Integer> mode2counter = new TreeMap<>();
+		for (String mode : mode2class2count.keySet()) {
+			int count = mode2class2count.get(mode).get(distanceClass);
+			 if (mode2counter.containsKey(mode) ) mode2counter.put(mode, mode2counter.get(mode)+count);
+			 else mode2counter.put(mode, count);
+		}
+		return (double) MapUtils.intValueSum(mode2counter);
 	}
 }

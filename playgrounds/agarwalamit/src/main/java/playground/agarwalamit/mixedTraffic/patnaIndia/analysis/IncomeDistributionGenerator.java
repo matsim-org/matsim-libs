@@ -50,15 +50,14 @@ public class IncomeDistributionGenerator {
 
 	private final String dir = 
 			//PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/";
-	"../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/multiModalCadytsAndIncome/c5/";
-	private final int iterationNumber = 0;
+	"../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/multiModalCadytsAndIncome/c7/";
+	private final int iterationNumber = 200;
 		private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
 //	private final String plansFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_plans_1pct.xml.gz";
 		private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
 //	private final String personAttributeFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/shpNetwork/initial_urban_persionAttributes_1pct.xml.gz";
 
 	private final SortedMap<Double, SortedMap<String, Integer>> avgInc2mode2Count = new TreeMap<>();
-	private final double USD2INRRate = 66.6; // 08 June 2016 
 
 	public static void main(String[] args) {
 		IncomeDistributionGenerator idg = new IncomeDistributionGenerator();
@@ -85,7 +84,7 @@ public class IncomeDistributionGenerator {
 				for(String str : this.avgInc2mode2Count.get(d).keySet()){
 					double sum = mode2Legs.get(str);
 					double count = this.avgInc2mode2Count.get(d).get(str);
-					writer.write(Math.round(d/USD2INRRate)+"\t"+str+"\t"+count
+					writer.write(Math.round(d/PatnaUtils.INR_USD_RATE)+"\t"+str+"\t"+count
 							+"\t"+NumberUtils.round(100*count/sum, 2)+
 							"\t"+NumberUtils.round(100*count/incSum, 2)+"\n");
 				}

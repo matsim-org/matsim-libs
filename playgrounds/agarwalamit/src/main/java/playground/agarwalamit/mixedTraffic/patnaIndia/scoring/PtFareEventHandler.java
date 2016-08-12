@@ -35,6 +35,8 @@ import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEvent
 
 import com.google.inject.Inject;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+
 /**
  * The fare calculation is taken from KumarEtc2004PTCost.
  * 
@@ -43,7 +45,6 @@ import com.google.inject.Inject;
 
 public class PtFareEventHandler implements PersonDepartureEventHandler, TeleportationArrivalEventHandler{
 
-	private final double USD2INRRate = 66.6; // 08 June 2016 
 	private final Map<Id<Person>,String> person2mode = new HashMap<>();
 	
 	@Inject
@@ -70,7 +71,7 @@ public class PtFareEventHandler implements PersonDepartureEventHandler, Teleport
 		double fareInRs = Double.NEGATIVE_INFINITY;
 		if(distance < 4000) fareInRs = 0.01 * 300;
 		else fareInRs = 0.01* ( 300 + (distance/1000 - 4)*31 );
-		return fareInRs/USD2INRRate;
+		return fareInRs/PatnaUtils.INR_USD_RATE;
 	}
 
 	@Override
