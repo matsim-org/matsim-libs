@@ -31,6 +31,7 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 	public AssignmentEmulatingQLaneNetworkFactory( Scenario scenario, EventsManager events ) {
 		this.scenario = scenario ;
 		this.events = events ;
+		throw new RuntimeException( AssignmentEmulatingQLane.DO_NOT_USE_ASSIGNMENT_EMULATING_QLANE ) ;
 	}
 
 	@Override

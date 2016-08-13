@@ -147,9 +147,9 @@ class KNBerlinControler {
 			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
 				config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
 			}
-			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
-				config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
-			}
+//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
+//				config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
+//			}
 		}
 
 		config.qsim().setNumberOfThreads(6);

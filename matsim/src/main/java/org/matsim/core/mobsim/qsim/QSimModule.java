@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
-import org.matsim.core.mobsim.qsim.qnetsimengine.AssignmentEmulatingQLaneNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
@@ -32,9 +31,9 @@ public class QSimModule extends AbstractModule {
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
 		} else {
 			switch( config.qsim().getTrafficDynamics() ) {
-			case assignmentEmulating:
-				bind(QNetworkFactory.class).to( AssignmentEmulatingQLaneNetworkFactory.class ) ;
-				break;
+//			case assignmentEmulating:
+//				bind(QNetworkFactory.class).to( AssignmentEmulatingQLaneNetworkFactory.class ) ;
+//				break;
 			case queue:
 			case withHoles:
 				bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
