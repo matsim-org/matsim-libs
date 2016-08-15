@@ -21,11 +21,9 @@
 
 package contrib.publicTransitMapping.mapping;
 
-import contrib.publicTransitMapping.config.CreateDefaultConfig;
-
 /**
- * Provides the contract for an implementation
- * of public transit mapping.
+ * Allows to run an implementation
+ * of public transit mapping via config file path.
  *
  * Currently redirects to the only implementation
  * {@link PTMapperImpl}.
@@ -38,7 +36,7 @@ public class RunPublicTransitMapper {
 	 * Routes the unmapped MATSim Transit Schedule to the network using the file
 	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
 	 *
-	 * @see CreateDefaultConfig
+	 * @see contrib.publicTransitMapping.config.CreateDefaultConfig
 	 *
 	 * @param args <br/>[0] PublicTransitMapping config file<br/>
 	 */
@@ -54,7 +52,7 @@ public class RunPublicTransitMapper {
 	 * Routes the unmapped MATSim Transit Schedule to the network using the file
 	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
 	 *
-	 * @see CreateDefaultConfig
+	 * @see contrib.publicTransitMapping.config.CreateDefaultConfig
 	 *
 	 * @param configFile the PublicTransitMapping config file
 	 */
