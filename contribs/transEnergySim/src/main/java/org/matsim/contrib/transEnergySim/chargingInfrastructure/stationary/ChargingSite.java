@@ -23,6 +23,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract Coord getCoord();
 	
 	abstract boolean isStationOpen(double time, double duration);
+	abstract boolean isResidentialCharger();
 	
 	abstract void addChargingPoint(ChargingPoint chargingPoint);
 	abstract void addChargingPlug(ChargingPlug plug);
