@@ -59,7 +59,7 @@ public class PTMapperUtils {
 	}
 
 	/**
-	 * If link candidates have the same link for boths stop facilities, the link candidate is
+	 * If link candidates have the same link for both stop facilities, the link candidate is
 	 * assigned to the stop facility that is closer (i.e. removed from the other set).
 	 */
 	public static void separateLinkCandidates(Set<LinkCandidate> linkCandidatesCurrent, Set<LinkCandidate> linkCandidatesNext) {

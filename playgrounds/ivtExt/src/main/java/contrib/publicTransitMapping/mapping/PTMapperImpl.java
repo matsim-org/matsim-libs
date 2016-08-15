@@ -63,7 +63,7 @@ import java.util.*;
  */
 public class PTMapperImpl implements PTMapper {
 
-	protected static Logger log = Logger.getLogger(RunPublicTransitMapper.class);
+	protected static Logger log = Logger.getLogger(PTMapperImpl.class);
 
 	private PublicTransitMappingConfigGroup config;
 	private Network network;
