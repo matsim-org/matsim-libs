@@ -23,6 +23,7 @@ package org.matsim.contrib.hybridsim.simulation;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -44,14 +45,17 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 	private final Scenario sc;
 	private final EventsManager em;
 	private final HybridNetworkFactory netFac;
+    private final IdIntMapper mapper;
 
-	@Inject
-	HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac) {
-		this.sc = sc;
+
+    @Inject
+    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper) {
+        this.sc = sc;
 		this.em = eventsManager;
 		this.netFac = netFac;
-		
-	}
+        this.mapper = mapper;
+
+    }
 
 	@Override
 	public Mobsim get() {
@@ -67,8 +71,8 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		ExternalEngine e = new ExternalEngine(this.em, qSim);
-		this.netFac.setExternalEngine(e);
+        ExternalEngine e = new ExternalEngine(this.em, qSim, mapper);
+        this.netFac.setExternalEngine(e);
 //		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
 //		this.netFac.putNetsimNetworkFactory("2ext", eFac);
 //		this.netFac.putNetsimNetworkFactory("ext2", eFac);
