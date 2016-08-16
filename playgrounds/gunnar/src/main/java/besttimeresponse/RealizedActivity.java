@@ -3,60 +3,61 @@ package besttimeresponse;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import floetteroed.utilities.Units;
+
 /**
  * 
  * @author Gunnar Flötteröd
  *
  */
-public class RealizedActivity {
+class RealizedActivity {
 
 	// -------------------- CONSTANTS --------------------
 
-	public final PlannedActivity plannedActivity;
+	final PlannedActivity plannedActivity;
 
-	public final double realizedArrivalTime_s;
+	final TripTimes nextTripTravelTime;
 
-	public final double realizedDepartureTime_s;
+	final boolean isLateArrival;
 
-	public final InterpolatedTripTravelTime nextTripTravelTime;
+	final boolean isEarlyDeparture;
+
+	final boolean isClosedAtArrival;
+
+	final boolean isClosedAtDeparture;
+
+	final double effectiveDuration_s;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RealizedActivity(final PlannedActivity plannedActivity, final double realizedArrivalTime_s,
-			final double realizedDepartureTime_s, final InterpolatedTripTravelTime nextTripTravelTime) {
+	RealizedActivity(final PlannedActivity plannedActivity, final TripTimes nextTripTimes,
+			final double realizedArrivalTime_s, final double realizedDepartureTime_s) {
+
 		this.plannedActivity = plannedActivity;
-		this.realizedArrivalTime_s = realizedArrivalTime_s;
-		this.realizedDepartureTime_s = realizedDepartureTime_s;
-		this.nextTripTravelTime = nextTripTravelTime;
+		this.nextTripTravelTime = nextTripTimes;
+
+		this.isLateArrival = (realizedArrivalTime_s > this.plannedActivity.latestArrivalTime_s);
+		this.isEarlyDeparture = (realizedDepartureTime_s < this.plannedActivity.earliestDepartureTime_s);
+
+		this.isClosedAtArrival = ((realizedArrivalTime_s < this.plannedActivity.openingTime_s)
+				|| (realizedArrivalTime_s > this.plannedActivity.closingTime_s));
+		this.isClosedAtDeparture = ((realizedDepartureTime_s < this.plannedActivity.openingTime_s)
+				|| (realizedDepartureTime_s > this.plannedActivity.closingTime_s));
+		
+		if (realizedArrivalTime_s <= realizedDepartureTime_s) {
+			// within-day activity
+			final double effectiveStartTime_s = max(this.plannedActivity.openingTime_s, realizedArrivalTime_s);
+			final double effectiveEndTime_s = min(this.plannedActivity.closingTime_s, realizedDepartureTime_s);
+			this.effectiveDuration_s = max(0.0, effectiveEndTime_s - effectiveStartTime_s);
+		} else {
+			// overnight activity (compute durations before and after midnight separately)
+			this.effectiveDuration_s = (Units.S_PER_D - realizedArrivalTime_s) + realizedDepartureTime_s;
+		}
 	}
 
 	// -------------------- GETTERS --------------------
 
-	public boolean isLateArrival() {
-		return (this.realizedArrivalTime_s > this.plannedActivity.latestArrivalTime_s);
-	}
-
-	public boolean isEarlyDeparture() {
-		return (this.realizedDepartureTime_s < this.plannedActivity.earliestDepartureTime_s);
-	}
-
-	public boolean isClosedAtArrival() {
-		return ((this.realizedArrivalTime_s < this.plannedActivity.openingTime_s)
-				|| (this.realizedArrivalTime_s > this.plannedActivity.closingTime_s));
-	}
-
-	public boolean isClosedAtDeparture() {
-		return ((this.realizedDepartureTime_s < this.plannedActivity.openingTime_s)
-				|| (this.realizedDepartureTime_s > this.plannedActivity.closingTime_s));
-	}
-
-	public double getEffectiveDuration_s() {
-		final double effectiveStartTime_s = max(this.plannedActivity.openingTime_s, this.realizedArrivalTime_s);
-		final double effectiveEndTime_s = min(this.plannedActivity.closingTime_s, this.realizedDepartureTime_s);
-		return Math.max(0.0, effectiveEndTime_s - effectiveStartTime_s);
-	}
-
 	public double getEffectiveTimePressure() {
-		return this.getEffectiveDuration_s() / this.plannedActivity.desiredDuration_s;
+		return this.effectiveDuration_s / this.plannedActivity.desiredDuration_s;
 	}
 }
