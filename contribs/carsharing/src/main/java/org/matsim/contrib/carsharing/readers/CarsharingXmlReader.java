@@ -8,6 +8,7 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -28,28 +29,35 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	private int avaialbleParkingSpots;
 	private ArrayList<StationBasedVehicle> vehicles;
 	private Link link;	
+	private String csType;
 	
 	private ArrayList<TwoWayCarsharingStation> twStations = new ArrayList<TwoWayCarsharingStation>();
-	private ArrayList<OneWayCarsharingStation> owStations = new ArrayList<OneWayCarsharingStation>();
+	private ArrayList<CarsharingStation> owStations = new ArrayList<CarsharingStation>();
 	private ArrayList<CSVehicle> ffVehicles = new ArrayList<CSVehicle>();    
 	
 	private QuadTree<CSVehicle> ffVehicleLocationQuadTree;	
-	private QuadTree<OneWayCarsharingStation> owvehicleLocationQuadTree;	
+	private QuadTree<CarsharingStation> owvehicleLocationQuadTree;	
 	private QuadTree<TwoWayCarsharingStation> twvehicleLocationQuadTree;
 
 	private Map<String, TwoWayCarsharingStation> twowaycarsharingstationsMap = new HashMap<String, TwoWayCarsharingStation>();
-	private Map<String, OneWayCarsharingStation> onewaycarsharingstationsMap = new HashMap<String, OneWayCarsharingStation>();
+	private Map<String, CarsharingStation> onewaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
 
 	public Map<String, TwoWayCarsharingStation> getTwowaycarsharingstationsMap() {
 		return twowaycarsharingstationsMap;
 	}
 
-	public Map<String, OneWayCarsharingStation> getOnewaycarsharingstationsMap() {
+	public Map<String, CarsharingStation> getOnewaycarsharingstationsMap() {
 		return onewaycarsharingstationsMap;
 	}
 
 	private Map<CSVehicle, Link> ffvehiclesMap = new HashMap<CSVehicle, Link>();	
 	private Map<String, CSVehicle> ffvehicleIdMap = new HashMap<String, CSVehicle>();
+	private Map<String, CSVehicle> owvehicleIdMap = new HashMap<String, CSVehicle>();
+	private Map<CSVehicle, Link> owvehiclesMap = new HashMap<CSVehicle, Link>();
+
+	public Map<String, CSVehicle> getOwvehicleIdMap() {
+		return owvehicleIdMap;
+	}
 
 	public Map<String, CSVehicle> getFfvehicleIdMap() {
 		return ffvehicleIdMap;
@@ -77,7 +85,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	    minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
 
 	    ffVehicleLocationQuadTree = new QuadTree<CSVehicle>(minx, miny, maxx, maxy);
-	    owvehicleLocationQuadTree = new QuadTree<OneWayCarsharingStation>(minx, miny, maxx, maxy);
+	    owvehicleLocationQuadTree = new QuadTree<CarsharingStation>(minx, miny, maxx, maxy);
 	    twvehicleLocationQuadTree = new QuadTree<TwoWayCarsharingStation>(minx, miny, maxx, maxy);		
 	}
 
@@ -85,7 +93,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		
 		if (name.equals("twowaycarsharing") || name.equals("onewaycarsharing")) {
-			
+			csType = name;
 			id = atts.getValue("id");
 			String lat = atts.getValue("lat");
 			String lon = atts.getValue("lon");
@@ -112,7 +120,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 		}
 		else if (name.equals("vehicle")) {
 			
-			StationBasedVehicle vehicle = new StationBasedVehicle(atts.getValue("type"), atts.getValue("vehicleID"), id);
+			StationBasedVehicle vehicle = new StationBasedVehicle(atts.getValue("type"), atts.getValue("vehicleID"), id, csType);
 			vehicles.add(vehicle);
 			
 		}
@@ -123,26 +131,29 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 		
 		if (name.equals("twowaycarsharing") || name.equals("onewaycarsharing")) {
 			Map<String, Integer> numberOfVehiclesPerType = new HashMap<String, Integer>();
-			Map<String, ArrayList<StationBasedVehicle>> vehiclesPerType = new HashMap<String, ArrayList<StationBasedVehicle>>();
+			Map<String, ArrayList<CSVehicle>> vehiclesPerType = new HashMap<String, ArrayList<CSVehicle>>();
 			
 			for (StationBasedVehicle vehicle : vehicles) {
-				
-				if (numberOfVehiclesPerType.containsKey(vehicle.getType())) {
+				if (name.equals("onewaycarsharing")) {
+					this.owvehicleIdMap.put(vehicle.getVehicleId(), vehicle);
+					this.owvehiclesMap.put(vehicle, link);
+				}
+				if (numberOfVehiclesPerType.containsKey(vehicle.getVehicleType())) {
 					
-					int number = numberOfVehiclesPerType.get(vehicle.getType());
-					ArrayList<StationBasedVehicle> oldArray = vehiclesPerType.get(vehicle.getType());
+					int number = numberOfVehiclesPerType.get(vehicle.getVehicleType());
+					ArrayList<CSVehicle> oldArray = vehiclesPerType.get(vehicle.getVehicleType());
 					number++;
 					oldArray.add(vehicle);
-					numberOfVehiclesPerType.put(vehicle.getType(), number);
-					vehiclesPerType.put(vehicle.getType(), oldArray);
+					numberOfVehiclesPerType.put(vehicle.getVehicleType(), number);
+					vehiclesPerType.put(vehicle.getVehicleType(), oldArray);
 					
 				}
 				else {
 					
-					numberOfVehiclesPerType.put(vehicle.getType(), 1);
-					ArrayList<StationBasedVehicle> newArray = new ArrayList<StationBasedVehicle>();
+					numberOfVehiclesPerType.put(vehicle.getVehicleType(), 1);
+					ArrayList<CSVehicle> newArray = new ArrayList<CSVehicle>();
 					newArray.add(vehicle);
-					vehiclesPerType.put(vehicle.getType(), newArray);
+					vehiclesPerType.put(vehicle.getVehicleType(), newArray);
 				}
 			}
 			if (name.equals("twowaycarsharing")) {
@@ -170,7 +181,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 		return ffVehicleLocationQuadTree;
 	}
 
-	public QuadTree<OneWayCarsharingStation> getOwvehicleLocationQuadTree() {
+	public QuadTree<CarsharingStation> getOwvehicleLocationQuadTree() {
 		return owvehicleLocationQuadTree;
 	}
 
@@ -182,7 +193,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 		return twStations;
 	}
 
-	public ArrayList<OneWayCarsharingStation> getOwStations() {
+	public ArrayList<CarsharingStation> getOwStations() {
 		return this.owStations;
 	}
 
@@ -192,5 +203,10 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	
 	public Map<CSVehicle, Link> getFfvehiclesMap() {
 		return ffvehiclesMap;
+	}
+
+	public Map<CSVehicle, Link> getOwvehiclesMap() {
+		// TODO Auto-generated method stub
+		return owvehiclesMap;
 	}
 }

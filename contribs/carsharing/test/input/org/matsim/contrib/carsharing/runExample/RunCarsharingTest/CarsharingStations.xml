@@ -9,10 +9,10 @@
 		<vehicle type="car" vehicleID="TW_3" />
 		<vehicle type="car" vehicleID="TW_4" />
 	</twowaycarsharing>
-	<onewaycarsharing id="1" lat="-375" lon="0" freeparking="2">
+	<oneway id="1" lat="-375" lon="0" freeparking="2">
 		<vehicle type="car" vehicleID="OW_1" />
 		<vehicle type="car" vehicleID="OW_2" />
-	</onewaycarsharing>
+	</oneway>
 	
 	<freefloating id="FF_1" lat="-375" lon="0" type="car" />
 			<freefloating id="FF_2" lat="0" lon="-375" type="car" />

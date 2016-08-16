@@ -7,6 +7,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,7 +39,7 @@ public class RouteFreefloatingTrip implements RouteCarsharingTrip {
 	
 	@Override
 	public List<PlanElement> routeCarsharingTrip(Plan plan, Leg legToBeRouted, double time, 
-			CSVehicle vehicle, Link vehicleLinkLocation, boolean keepTheCarForLaterUse, boolean hasVehicle) {
+			CSVehicle vehicle, Link vehicleLinkLocation, Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle) {
 		PopulationFactory pf = scenario.getPopulation().getFactory();
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 		
@@ -60,10 +61,17 @@ public class RouteFreefloatingTrip implements RouteCarsharingTrip {
 					person, currentLink, destinationLink, "freefloating", 
 					vehicle.getVehicleId(), time));		
 			
-			if (!keepTheCarForLaterUse) 			
+			if (!keepTheCarForLaterUse) { 			
 
+				Activity activityE = scenario.getPopulation().getFactory().createActivityFromLinkId("ff_interaction",
+						destinationLink.getId());
+				activityE.setMaximumDuration(0);
+				
+				trip.add(activityE);
+				
 				trip.add( RouterUtils.createWalkLeg(pf, 
-						destinationLink, destinationLink, "egress_walk_ff", time) );							
+						destinationLink, destinationLink, "egress_walk_ff", time) );		
+			}
 		
 		}
 		else {		
@@ -71,14 +79,26 @@ public class RouteFreefloatingTrip implements RouteCarsharingTrip {
 			String ffVehId = vehicle.getVehicleId();			
 			trip.add( RouterUtils.createWalkLeg(scenario.getPopulation().getFactory(),
 					currentLink, vehicleLinkLocation, "access_walk_ff", time) );
-
+			
+			Activity activityS = scenario.getPopulation().getFactory().createActivityFromLinkId("ff_interaction",
+					vehicleLinkLocation.getId());
+			activityS.setMaximumDuration(0);
+			
+			trip.add(activityS);
 			// === car leg: ===							
 			
 			trip.add(RouterUtils.createCarLeg(pf, pathCalculator,
 					person, vehicleLinkLocation, destinationLink, "freefloating",
 					ffVehId, time));			
 			
-			if (!keepTheCarForLaterUse)  {			
+			if (!keepTheCarForLaterUse)  {	
+				
+				Activity activityE = scenario.getPopulation().getFactory().createActivityFromLinkId("ff_interaction",
+						destinationLink.getId());
+				activityE.setMaximumDuration(0);
+				
+				trip.add(activityE);
+				
 				trip.add( RouterUtils.createWalkLeg(pf, 
 						destinationLink, destinationLink, "egress_walk_ff", time) );
 			}

@@ -1,5 +1,6 @@
 package org.matsim.contrib.carsharing.manager;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -11,15 +12,20 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.stations.CarsharingStation;
+import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import com.google.inject.Inject;
 
@@ -41,61 +47,157 @@ public class CarsharingManager implements IterationEndsListener{
 		Network network = scenario.getNetwork();
 		Person person = plan.getPerson();
 		Link startLink = network.getLinks().get(legToBeRouted.getRoute().getStartLinkId());
-		Link endLink = network.getLinks().get(legToBeRouted.getRoute().getEndLinkId());
-		//=== it is assumed that the freefloating vehicle will be parked at the destination link upon ending the rental===
-		//=== the case when we want it parked somewhere else would need a return information from the router===
-		//=== if not, other approach could be that csPersonVehicles is updated somewhere else, when the agent exits vehicle===
+		Link destinationLink = network.getLinks().get(legToBeRouted.getRoute().getEndLinkId());
+		Link endLink = null;
+		CarsharingStation parkingStation = null;
+		CSVehicle vehicle = getVehicleAtLocation(startLink,	plan.getPerson(), type);		
 		
-		if (type.equals("freefloating")) {
+		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextACtivity(0.0, plan.getPerson(), type);
+		
+		if (type.equals("oneway") && !keepTheCar) {
 			
-			CSVehicle vehicle = getVehicleAtLocation(startLink,	plan.getPerson(), type);		
+			parkingStation = this.findClosestAvailableParkingSpace(destinationLink);
+			if (parkingStation == null)
+				return null;
+			endLink = network.getLinks().get(parkingStation.getLinkId());
+		}
+		
+		if (vehicle != null) {
+
+			this.csPersonVehicles.getVehicleLocationForType(person.getId(), type).remove(startLink.getId());
 			
-			if (vehicle != null) {
-				this.csPersonVehicles.getVehicleLocationForType(person.getId(), type).remove(startLink.getId());
-								
-				if (keepTheCarModel.keepTheCarDuringNextACtivity(0.0, plan.getPerson())) {
-					this.csPersonVehicles.getVehicleLocationForType(person.getId(), type).put(endLink.getId(), vehicle);
-					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, "freefloating", vehicle,
-							startLink, true, true);
-				}
-				else
-					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, "freefloating", vehicle,
-							startLink, false, true);
-
-
+			if (keepTheCar) {
+				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, type, vehicle,
+						startLink, endLink, true, true);
 			}
 			else {
-				CSVehicle newVehicle = findClosestAvailableCar(startLink);
-				Link stationLink = this.carsharingStationsData.getFfvehiclesMap().get(newVehicle);
-				this.carsharingStationsData.getFfvehiclesMap().remove(vehicle);
+				if (type.equals("oneway"))
+					this.carsharingStationsData.reserveParkingSlot(parkingStation);
 
-				if (newVehicle == null)
-					return null;
-				eventsManager.processEvent(new StartRentalEvent(time, startLink, stationLink, person.getId(), newVehicle.getVehicleId()));
+				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, type, vehicle,
+						startLink, endLink, false, true);
+				
+			}
 			
-				if (keepTheCarModel.keepTheCarDuringNextACtivity(0.0, plan.getPerson())) {
-					this.csPersonVehicles.getVehicleLocationForType(person.getId(), type).put(endLink.getId(), vehicle);
-
-					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, "freefloating", newVehicle, 
-							stationLink, true, false);
-				}
-				else
-					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, "freefloating", newVehicle, 
-							stationLink, false, false);			
-			}		
+			
 		}
-		return null;		
+		
+		else {
+			vehicle = findClosestAvailableCar(startLink, type,"car");
+			if (vehicle == null)
+				return null;
+			Link stationLink = this.carsharingStationsData.getLocationVehicle(vehicle);
+			this.carsharingStationsData.reserveVehicle(vehicle);
+			
+			eventsManager.processEvent(new StartRentalEvent(time, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
+			
+			if (keepTheCar) {
+
+				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, type, vehicle, 
+						stationLink, endLink, true, false);
+			}
+			else
+				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, type, vehicle, 
+						stationLink, endLink, false, false);
+		}			
+		
 	}
 	
-	public void returnCarsharingVehicle(Id<Person> personId, Id<Link> linkId, double time, String ffVehicleId) {
+	private CSVehicle findClosestAvailableOWCar(Link link, String vehicleType) {
+		Network network = scenario.getNetwork();
 
+		//find the closest available car and reserve it (make it unavailable)
+		//if no cars within certain radius return null
+		final OneWayCarsharingConfigGroup owConfigGroup = (OneWayCarsharingConfigGroup)
+				scenario.getConfig().getModule("OneWayCarsharing");
+		double distanceSearch = owConfigGroup.getsearchDistance() ;
+
+		Collection<CarsharingStation> location = 
+				this.carsharingStationsData.getOwvehicleLocationQuadTree().getDisk(link.getCoord().getX(), 
+						link.getCoord().getY(), distanceSearch);
+		if (location.isEmpty()) return null;
+
+		CarsharingStation closest = null;
+		for(CarsharingStation station: location) {
+			
+			Coord coord = network.getLinks().get(station.getLinkId()).getCoord();
+			
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < distanceSearch 
+					&& ((OneWayCarsharingStation)station).getNumberOfVehicles(vehicleType) > 0) {
+				closest = station;
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), coord);
+			}
+		}	
+		
+		if (closest != null) {
+			//TODO: remove this vehicle from the station
+			CSVehicle vehicleToBeUsed = ((OneWayCarsharingStation)closest).getVehicles(vehicleType).get(0);
+			return vehicleToBeUsed;
+		}
+		
+		return null;
+	}
+
+	private CarsharingStation findClosestAvailableParkingSpace(Link link) {
+		Network network = scenario.getNetwork();
+
+		//find the closest available parking space and reserve it (make it unavailable)
+		//if there are no parking spots within search radius, return null
+		OneWayCarsharingConfigGroup owConfigGroup = (OneWayCarsharingConfigGroup) 
+				scenario.getConfig().getModule("OneWayCarsharing");
+		
+		double distanceSearch = owConfigGroup.getsearchDistance();
+
+		Collection<CarsharingStation> location = 
+				this.carsharingStationsData.getOwvehicleLocationQuadTree().getDisk(link.getCoord().getX(), 
+						link.getCoord().getY(), distanceSearch);
+		if (location.isEmpty()) return null;
+
+		CarsharingStation closest = null;
+		for(CarsharingStation station: location) {
+			
+			Coord coord = network.getLinks().get(station.getLinkId()).getCoord();
+			
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < distanceSearch 
+					&& ((OneWayCarsharingStation)station).getAvaialbleParkingSpots() > 0) {
+				closest = station;
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), coord);
+			}
+		}
+		return closest;
+	}
+	
+	private CSVehicle findClosestAvailableCar(Link startLink, String csType, String vehicleType) {
+
+		if (csType.equals("freefloating"))
+			return findClosestAvailableCar(startLink);
+		else if (csType.equals("oneway"))
+			return findClosestAvailableOWCar(startLink, vehicleType);
+		return null;
+	}
+
+	public void returnCarsharingVehicle(Id<Person> personId, Id<Link> linkId, double time, String vehicleId) {
 		Network network = scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
-		CSVehicle ffVehicle = this.carsharingStationsData.getFfvehicleIdMap().get(ffVehicleId);
-		this.carsharingStationsData.getFfVehicleLocationQuadTree().put(link.getCoord().getX(), link.getCoord().getY(), ffVehicle);
-		this.carsharingStationsData.getFfvehiclesMap().put(ffVehicle, link);
+		Coord coord = link.getCoord();
+		if (vehicleId.startsWith("FF")) {
 		
-		eventsManager.processEvent(new EndRentalEvent(time, linkId, personId, ffVehicle.getVehicleId()));		
+			CSVehicle ffVehicle = this.carsharingStationsData.getFfvehicleIdMap().get(vehicleId);
+			this.carsharingStationsData.getFfVehicleLocationQuadTree().put(link.getCoord().getX(), link.getCoord().getY(), ffVehicle);
+			this.carsharingStationsData.getFfvehiclesMap().put(ffVehicle, link);
+			
+			eventsManager.processEvent(new EndRentalEvent(time, linkId, personId, ffVehicle.getVehicleId()));		
+		}
+		else if (vehicleId.startsWith("OW")) {
+			
+			CSVehicle owVehicle = this.carsharingStationsData.getOwvehicleIdMap().get(vehicleId);
+			this.carsharingStationsData.getOwvehiclesMap().put(owVehicle, link);
+			
+			CarsharingStation station = this.carsharingStationsData.getOwvehicleLocationQuadTree().getClosest(coord.getX(), coord.getY());
+			((OneWayCarsharingStation)station).addCar(((StationBasedVehicle)owVehicle).getVehicleType(),  owVehicle);
+			
+			
+		}
 	}	
 
 	@Override
@@ -127,6 +229,16 @@ public class CarsharingManager implements IterationEndsListener{
 			this.carsharingStationsData.getFfVehicleLocationQuadTree().remove(coord.getX(), coord.getY(), vehicle);
 		}
 		return vehicle;
+	}
+
+	public void freeParkingSpot(Id<Link> linkId) {
+
+		Network network = scenario.getNetwork();
+		Link link = network.getLinks().get(linkId);
+		Coord coord = link.getCoord();
+		OneWayCarsharingStation station = (OneWayCarsharingStation) this.carsharingStationsData.getOwvehicleLocationQuadTree().getClosest(coord.getX(), coord.getY());
+		station.freeParkingSpot();
+		
 	}
 	
 }

@@ -45,7 +45,7 @@ public class CarsharingMobsimListener implements MobsimBeforeSimStepListener{
 			Leg legToBerouted = (Leg)pe;
 			if (carsharingLeg(pe)) {
 				
-				List<PlanElement> newTrip = carsharingManager.reserveAndrouteCarsharingTrip(plan, "freefloating", 
+				List<PlanElement> newTrip = carsharingManager.reserveAndrouteCarsharingTrip(plan, legToBerouted.getMode(), 
 						legToBerouted, e.getSimulationTime());
 				if (newTrip == null)
 					ma.setStateToAbort(e.getSimulationTime());
@@ -63,7 +63,7 @@ public class CarsharingMobsimListener implements MobsimBeforeSimStepListener{
 
 	private boolean carsharingLeg(PlanElement pe) {
 		String mode = ((Leg)pe).getMode();
-		if (mode.equals("freefloating"))
+		if (mode.equals("freefloating") || mode.equals("oneway"))
 			return true;
 		
 		return false;

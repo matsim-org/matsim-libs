@@ -14,6 +14,6 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 public interface RouteCarsharingTrip {	
 
 	public List<PlanElement> routeCarsharingTrip(Plan plan, Leg legToBeRouted, double time, 
-			CSVehicle vehicle, Link vehicleLinkLocation, boolean keepTheCarForLaterUse, boolean hasVehicle);
+			CSVehicle vehicle, Link vehicleLinkLocation, Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle);
 
 }

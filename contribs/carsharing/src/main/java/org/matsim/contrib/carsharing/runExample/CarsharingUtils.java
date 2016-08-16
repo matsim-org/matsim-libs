@@ -43,7 +43,7 @@ public class CarsharingUtils {
             public void install() {
                 addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCarsharingRoutingModule());
                 addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
-                addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
+                addRoutingModuleBinding("oneway").toInstance(new OneWayCarsharingRoutingModule());
                 bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
                     final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
 
@@ -57,8 +57,8 @@ public class CarsharingUtils {
                             if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
                                 return "twowaycarsharing";
                             }
-                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
-                                return "onewaycarsharing";
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "oneway" ) ) {
+                                return "oneway";
                             }
                             else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
                                 return "freefloating";

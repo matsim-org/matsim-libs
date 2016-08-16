@@ -3,7 +3,7 @@
 <!-- $Id$ -->
 
 <!-- ============================================================ -->
-<!ELEMENT stations          (twowaycarsharing*,onewaycarsharing*,freefloating*)>
+<!ELEMENT stations          (twowaycarsharing*,oneway*,freefloating*)>
 <!ATTLIST stations
           name           CDATA   #IMPLIED
           reference_layer  CDATA #IMPLIED
@@ -15,8 +15,8 @@
           lat  	       CDATA #REQUIRED
           lon       CDATA #REQUIRED>
 
-<!ELEMENT onewaycarsharing          (vehicle*)>
-<!ATTLIST onewaycarsharing
+<!ELEMENT oneway          (vehicle*)>
+<!ATTLIST oneway
           id           CDATA   #REQUIRED
           lat  	       CDATA #REQUIRED
           lon       CDATA #REQUIRED

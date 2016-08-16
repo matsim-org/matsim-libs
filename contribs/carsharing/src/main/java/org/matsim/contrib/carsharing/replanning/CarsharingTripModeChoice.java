@@ -35,7 +35,7 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
 			
 			this.availableModes = new String[1];
-			this.availableModes[0] = "onewaycarsharing";
+			this.availableModes[0] = "oneway";
 		}
 		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") )) {
 			if (this.availableModes == null) {
@@ -44,7 +44,7 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 			}
 			else {
 				this.availableModes = new String[2];
-				this.availableModes[0] = "onewaycarsharing";
+				this.availableModes[0] = "oneway";
 			this.availableModes[1] = "freefloating";
 			}
 		}

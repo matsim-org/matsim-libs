@@ -29,37 +29,55 @@ public class CSPersonVehiclesContainer implements CSPersonVehicle{
 			if (vehicleInfoPerPerson.get(personId) != null)
 				return vehicleInfoPerPerson.get(personId).getFfvehicleIdLocation();
 		}
-			
+		else if (type.equals("oneway")) {
+			if (vehicleInfoPerPerson.get(personId) != null)
+				return vehicleInfoPerPerson.get(personId).getOwvehicleIdLocation();
+		}
 		return null;
 	}
 
 	
 
-	public boolean hasVehicleOnLink(Link link, Id<Person> personId) {
+	public boolean hasVehicleOnLink(Link link, Id<Person> personId, String type) {
+		if (type.equals("freefloating")) {
+			if (vehicleInfoPerPerson.get(personId).getFfvehicleIdLocation().containsKey(link.getId()))
+				return true;
+		}
+		else if (type.equals("oneway")) {
+			if (vehicleInfoPerPerson.get(personId).getOwvehicleIdLocation().containsKey(link.getId()))
+				return true;
+		}
 		
-		if (vehicleInfoPerPerson.get(personId).getFfvehicleIdLocation().containsKey(link.getId()))
-			return true;
-		else
-			return false;
+		return false;
 	}
 	
-	public CSVehicle getVehicleOnLink(Link link, Id<Person> personId) {
+	public CSVehicle getVehicleOnLink(Link link, Id<Person> personId, String type) {
+		if (type.equals("freefloating"))
+			return vehicleInfoPerPerson.get(personId).getFfvehicleIdLocation().get(link.getId());
+		else if (type.equals("oneway"))
+			return vehicleInfoPerPerson.get(personId).getOwvehicleIdLocation().get(link.getId());
+		else return null;
 		
-		return vehicleInfoPerPerson.get(personId).getFfvehicleIdLocation().get(link.getId());
 	}
 
 	@Override
 	public boolean addVehicle(Id<Person> personId, Link link, CSVehicle vehicle, String type) {
 
-		this.vehicleInfoPerPerson.get(personId).ffvehicleIdLocation.put(link.getId(), vehicle);
+		if (type.equals("freefloating"))
+			this.vehicleInfoPerPerson.get(personId).ffvehicleIdLocation.put(link.getId(), vehicle);
+		else if (type.equals("oneway"))
+			this.vehicleInfoPerPerson.get(personId).owvehicleIdLocation.put(link.getId(), vehicle);
+
 		
 		return true;
 	}
 	@Override
 	public boolean removeVehicle(Id<Person> personId, Link link, CSVehicle vehicle, String type) {
-		if (type=="freefloating")
+		if (type.equals("freefloating"))
 			this.vehicleInfoPerPerson.get(personId).ffvehicleIdLocation.remove(link.getId());
-		
+		else if (type.equals("oneway"))
+			this.vehicleInfoPerPerson.get(personId).owvehicleIdLocation.remove(link.getId());
+
 		return true;
 	}
 	
@@ -69,6 +87,10 @@ public class CSPersonVehiclesContainer implements CSPersonVehicle{
 
 		public Map<Id<Link>, CSVehicle> getFfvehicleIdLocation() {
 			return ffvehicleIdLocation;
+		}
+		
+		public Map<Id<Link>, CSVehicle> getOwvehicleIdLocation() {
+			return owvehicleIdLocation;
 		}
 		
 	}

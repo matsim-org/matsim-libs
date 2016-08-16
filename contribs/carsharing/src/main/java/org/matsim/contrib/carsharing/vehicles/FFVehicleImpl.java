@@ -6,6 +6,7 @@ public class FFVehicleImpl implements CSVehicle{
 	
 	private String type;
 	private String vehicleId;
+	private String csType= "freefloating";
 	
 	public FFVehicleImpl(String type, String vehicleId) {
 		
@@ -19,6 +20,10 @@ public class FFVehicleImpl implements CSVehicle{
 	@Override
 	public String getVehicleId() {
 		return vehicleId;
+	}
+	@Override
+	public String getCsType() {
+		return csType;
 	}
 	
 

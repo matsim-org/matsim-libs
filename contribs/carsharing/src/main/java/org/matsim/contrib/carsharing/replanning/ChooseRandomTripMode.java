@@ -67,7 +67,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
-					Collections.singletonList( PopulationUtils.createLeg("onewaycarsharing") ),
+					Collections.singletonList( PopulationUtils.createLeg("oneway") ),
 					trip.getDestinationActivity());
 		}
 		else {
@@ -80,7 +80,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 		}
 		}
 		else if (possibleModes.length == 1 && possibleModes[0] != null){
-			if ((possibleModes[0].equals("freefloating") && ffcard) || (possibleModes[0].equals("onewaycarsharing") && owcard))
+			if ((possibleModes[0].equals("freefloating") && ffcard) || (possibleModes[0].equals("oneway") && owcard))
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),

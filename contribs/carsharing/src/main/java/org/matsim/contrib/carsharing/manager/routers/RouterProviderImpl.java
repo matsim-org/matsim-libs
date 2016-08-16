@@ -18,10 +18,10 @@ public class RouterProviderImpl implements RouterProvider {
 
 	@Override
 	public List<PlanElement> routeCarsharingTrip(Plan plan, double time, Leg legToBeRouted, String carsharingType,
-			CSVehicle vehicle, Link vehicleLinkLocation,boolean keepTheCarForLaterUse, boolean hasVehicle) {
+			CSVehicle vehicle, Link vehicleLinkLocation, Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle) {
 		if (carsharingType.equals("freefloating"))
 			return freefloatingRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
-					vehicleLinkLocation, keepTheCarForLaterUse, hasVehicle);
+					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
 		return null;
 	}
 	

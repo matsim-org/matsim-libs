@@ -34,7 +34,7 @@
 			<param name="endTime" value="30:00:00"   />
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
-			<param name="mainMode" value="car,onewaycarsharing,freefloating,twowaycarsharing"   />
+			<param name="mainMode" value="car,oneway,freefloating,twowaycarsharing"   />
 		</module>
 		
     <module name="Carsharing" >
@@ -64,7 +64,7 @@
 		<param name="constantOneWayCarsharing" value="-0.4" />
         <param name="timeFeeOneWayCarsharing" value="-0.0" />
 		<param name="distanceFeeOneWayCarsharing" value="-0.0" />
-        <param name="useOneWayCarsharing" value="false" />
+        <param name="useOneWayCarsharing" value="true" />
         <param name="searchDistanceOneWayCarsharing" value="2000.0" />		
 	</module>
     
@@ -160,13 +160,13 @@
 		<param name="performing" value="6.0" />
 		<param name="earlyDeparture" value="0" />
 		<param name="waiting" value="0" />
-          <param name="activityType_0" value="h" />
-          <param name="activityClosingTime_0" value="23:59:59" />
-          <param name="activityEarliestEndTime_0" value="undefined" />
-          <param name="activityLatestStartTime_0" value="undefined" />
-          <param name="activityMinimalDuration_0" value="08:00:00" />
-          <param name="activityOpeningTime_0" value="00:00:00" />
-          <param name="activityTypicalDuration_0" value="08:00:00" />	
+        <param name="activityType_0" value="h" />
+        <param name="activityClosingTime_0" value="23:59:59" />
+        <param name="activityEarliestEndTime_0" value="undefined" />
+        <param name="activityLatestStartTime_0" value="undefined" />
+        <param name="activityMinimalDuration_0" value="08:00:00" />
+        <param name="activityOpeningTime_0" value="00:00:00" />
+        <param name="activityTypicalDuration_0" value="08:00:00" />	
 
 	   <param name="activityType_7" value="w" />
           <param name="activityClosingTime_7" value="23:59:59" />
@@ -175,7 +175,13 @@
           <param name="activityMinimalDuration_7" value="06:00:00" />
           <param name="activityOpeningTime_7" value="08:00:00" />
           <param name="activityTypicalDuration_7" value="06:00:00" />
-
+ 		<param name="activityType_8" value="ff_interaction" />
+        <param name="activityClosingTime_8" value="00:00:00" />
+        <param name="activityEarliestEndTime_8" value="undefined" />
+        <param name="activityLatestStartTime_8" value="undefined" />
+        <param name="activityMinimalDuration_8" value="00:00:00" />
+        <param name="activityOpeningTime_8" value="08:00:00" />
+        <param name="activityTypicalDuration_8" value="00:02:00" />
 
 	</module>
 <!-- ====================================================================== -->
