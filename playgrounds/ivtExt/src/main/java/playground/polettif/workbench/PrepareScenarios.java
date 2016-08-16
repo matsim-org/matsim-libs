@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,9 +43,9 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.SAXException;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import contrib.publicTransitMapping.tools.NetworkTools;
+import contrib.publicTransitMapping.tools.ScheduleCleaner;
+import contrib.publicTransitMapping.tools.ScheduleTools;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -60,9 +61,9 @@ import static org.matsim.contrib.accessibility.FacilityTypes.*;
  *
  * @author polettif
  */
-public class Prepare {
+public class PrepareScenarios {
 
-	protected static Logger log = Logger.getLogger(Prepare.class);
+	protected static Logger log = Logger.getLogger(PrepareScenarios.class);
 
 	private Config config;
 
@@ -86,7 +87,7 @@ public class Prepare {
 		final Config micro = createConfig(scenName);
 		micro.qsim().setFlowCapFactor(1.0);
 
-		Prepare prepMicro = new Prepare(micro, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		PrepareScenarios prepMicro = new PrepareScenarios(micro, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
 		prepMicro.removeInvalidLines();
 		prepMicro.cutSchedule();
 		prepMicro.population();
@@ -101,7 +102,7 @@ public class Prepare {
 		final Config configCH = createConfig(scenName);
 		configCH.qsim().setFlowCapFactor(0.1);
 
-		Prepare prepareCH = new Prepare(configCH, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		PrepareScenarios prepareCH = new PrepareScenarios(configCH, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
 		prepareCH.removeInvalidLines();
 //		prepareCH.cutSchedule();
 		prepareCH.population();
@@ -122,7 +123,7 @@ public class Prepare {
 		final Config configZH1 = createConfig(scenName);
 		configZH1.qsim().setFlowCapFactor(1.0);
 
-		Prepare prepareZH1 = new Prepare(configZH1, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		PrepareScenarios prepareZH1 = new PrepareScenarios(configZH1, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
 		prepareZH1.removeInvalidLines();
 		prepareZH1.cutSchedule();
 		prepareZH1.population();
@@ -137,7 +138,7 @@ public class Prepare {
 		final Config configZH10 = createConfig(scenName);
 		configZH10.qsim().setFlowCapFactor(0.1);
 
-		Prepare prepareZH10 = new Prepare(configZH10, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		PrepareScenarios prepareZH10 = new PrepareScenarios(configZH10, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
 		prepareZH10.removeInvalidLines();
 		prepareZH10.cutSchedule();
 		prepareZH10.population();
@@ -154,7 +155,7 @@ public class Prepare {
 		configZH10Tel.qsim().setFlowCapFactor(0.1);
 		configZH10Tel.transit().setUseTransit(false);
 
-		Prepare prepareZH10Tel = new Prepare(configZH10Tel, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
+		PrepareScenarios prepareZH10Tel = new PrepareScenarios(configZH10Tel, inputNetwork, inputSchedule, inputVehicles, inputPopulation);
 		prepareZH10Tel.removeInvalidLines();
 		prepareZH10Tel.cutSchedule();
 		prepareZH10Tel.population();
@@ -162,7 +163,7 @@ public class Prepare {
 		prepareZH10Tel.writeFiles(scenName);
 	}
 
-	public Prepare(Config config, String inputNetwork, String inputSchedule, String inputVehicles, String inputPopulation) {
+	public PrepareScenarios(Config config, String inputNetwork, String inputSchedule, String inputVehicles, String inputPopulation) {
 		this.config = config;
 		this.network = NetworkTools.readNetwork(inputNetwork);
 		this.schedule = ScheduleTools.readTransitSchedule(inputSchedule);
@@ -175,7 +176,7 @@ public class Prepare {
 	}
 
 
-	public Prepare(Config config, Network network, String inputSchedule, String inputVehicles, String inputPopulation) {
+	public PrepareScenarios(Config config, Network network, String inputSchedule, String inputVehicles, String inputPopulation) {
 		this.config = config;
 		this.network = network;
 		this.schedule = ScheduleTools.readTransitSchedule(inputSchedule);
@@ -205,7 +206,8 @@ public class Prepare {
 	 * modifiy population
 	 */
 	private void population() {
-		Network carNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("car"));
+		Network activityLinkNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("car"));
+		new NetworkCleaner().run(activityLinkNetwork);
 
 		// only home and work activities
 		log.info("adapting plans...");
@@ -227,7 +229,7 @@ public class Prepare {
 								activity.setType(OTHER);
 						}
 						activity.setFacilityId(null);
-						activity.setLinkId(NetworkTools.getNearestLink(carNetwork, activity.getCoord()).getId());
+						activity.setLinkId(NetworkTools.getNearestLink(activityLinkNetwork, activity.getCoord()).getId());
 					}
 				}
 			}
