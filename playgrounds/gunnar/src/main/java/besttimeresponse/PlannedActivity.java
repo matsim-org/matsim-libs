@@ -7,19 +7,23 @@ package besttimeresponse;
  */
 public class PlannedActivity {
 
-	final Object location;
+	// -------------------- CONSTANTS --------------------
 
-	final Object departureMode;
+	public final Object location;
 
-	final double desiredDuration_s;
+	public final Object departureMode;
 
-	final double openingTime_s;
+	public final double desiredDuration_s;
 
-	final double closingTime_s;
+	public final double openingTime_s;
 
-	final double latestArrivalTime_s;
+	public final double closingTime_s;
 
-	final double earliestDepartureTime_s;
+	public final double latestArrivalTime_s;
+
+	public final double earliestDepartureTime_s;
+
+	// -------------------- CONSTRUCTION --------------------
 
 	public PlannedActivity(final Object location, final Object departureMode, final double desiredDuration_s,
 			final double openingTime_s, final double closingTime_s, final double latestArrivalTime_s,
