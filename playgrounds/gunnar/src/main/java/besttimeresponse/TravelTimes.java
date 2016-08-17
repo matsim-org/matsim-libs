@@ -7,6 +7,6 @@ package besttimeresponse;
  */
 public interface TravelTimes {
 
-	public double getTravelTime_s(double dptTime_s, Object mode);
+	public double getTravelTime_s(Object origin, Object destination, double dptTime_s, Object mode);
 
 }

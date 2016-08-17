@@ -5,7 +5,7 @@ package besttimeresponse;
  * @author Gunnar Flötteröd
  *
  */
-class TripTimes {
+class TripTime {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -19,8 +19,15 @@ class TripTimes {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TripTimes(final double dTT_dDptTime, final double ttOffset_s, final double minDptTime_s,
-			final double maxDptTime_s) {
+	TripTime(final double dTT_dDptTime, final double ttOffset_s, final double minDptTime_s, final double maxDptTime_s) {
+		if (dTT_dDptTime <= -(1.0 - 1e-8)) {
+			throw new RuntimeException("FIFO problem: dTT/dDptTime = " + dTT_dDptTime + " is (almost) below -1.0.");
+		}
+		if (minDptTime_s > maxDptTime_s) {
+			throw new RuntimeException(
+					"Infeasible departure time interval [" + minDptTime_s + "s, " + maxDptTime_s + "s].");
+		}
+
 		this.dTT_dDptTime = dTT_dDptTime;
 		this.ttOffset_s = ttOffset_s;
 		this.minDptTime_s = minDptTime_s;

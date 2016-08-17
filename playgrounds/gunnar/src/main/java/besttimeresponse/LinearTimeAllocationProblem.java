@@ -39,6 +39,8 @@ public class LinearTimeAllocationProblem {
 	// coefficient for late arrival
 	private final double betaLateArr_1_s;
 
+	private final double slack_s = 1.0;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public LinearTimeAllocationProblem(final List<RealizedActivity> realizedActivities, final double betaDur_1_s,
@@ -73,13 +75,13 @@ public class LinearTimeAllocationProblem {
 
 			// current activity duration
 			if (!act.isClosedAtDeparture) {
-				dScore_dDptTimes__1_s.addToEntry(q, this.betaDur_1_s * act.getEffectiveTimePressure());
+				dScore_dDptTimes__1_s.addToEntry(q, this.betaDur_1_s * act.getDesiredOverEffectiveDuration());
 			}
 
 			// next activity duration
 			if (!nextAct.isClosedAtArrival) {
 				dScore_dDptTimes__1_s.addToEntry(q,
-						(-1.0) * (1.0 + a) * this.betaDur_1_s * nextAct.getEffectiveTimePressure());
+						(-1.0) * (1.0 + a) * this.betaDur_1_s * nextAct.getDesiredOverEffectiveDuration());
 			}
 
 			// early departure from current activity
@@ -103,12 +105,12 @@ public class LinearTimeAllocationProblem {
 	public LinearConstraintSet getConstraints() {
 
 		// For consistency with formula write-up.
-		
+
 		final int _N = this.realizedActivities.size();
 		final double[] a = new double[_N];
 		final double[] b = new double[_N];
 		for (int q = 0; q < _N; q++) {
-			final TripTimes tripTravelTime = this.realizedActivities.get(q).nextTripTravelTime;
+			final TripTime tripTravelTime = this.realizedActivities.get(q).nextTripTravelTime;
 			a[q] = tripTravelTime.dTT_dDptTime;
 			b[q] = tripTravelTime.ttOffset_s;
 		}
@@ -123,34 +125,34 @@ public class LinearTimeAllocationProblem {
 		}
 
 		// Departure from an activity must not happen before arrival.
-		for (int q = 0; q < _N; q++) {
+		for (int q = 0; q < _N - 1; q++) {
 			final RealVector coeffs = new ArrayRealVector(_N);
 			coeffs.setEntry(q, 1.0 + a[q]);
-			coeffs.setEntry((q < _N - 1) ? (q + 1) : 0, -1.0);
+			coeffs.setEntry(q + 1, -1.0);
 			constraints.add(new LinearConstraint(coeffs, LEQ, -b[q]));
 		}
-		
+
 		// The last arrival must not occur before midnight.
 		{
 			final RealVector coeffs = new ArrayRealVector(_N);
 			coeffs.setEntry(_N - 1, (1.0 + a[_N - 1]));
-			constraints.add(new LinearConstraint(coeffs, LEQ, Units.S_PER_D - b[_N-1]));			
+			constraints.add(new LinearConstraint(coeffs, LEQ, Units.S_PER_D - b[_N - 1]));
 		}
 
 		// lower bound on departure time due to time discretization
 		for (int q = 0; q < _N; q++) {
 			final RealVector coeffs = new ArrayRealVector(_N);
 			coeffs.setEntry(q, 1.0);
-			constraints.add(
-					new LinearConstraint(coeffs, GEQ, this.realizedActivities.get(q).nextTripTravelTime.minDptTime_s));
+			constraints.add(new LinearConstraint(coeffs, GEQ,
+					this.realizedActivities.get(q).nextTripTravelTime.minDptTime_s - this.slack_s));
 		}
 
 		// upper bound on departure time due to time discretization
 		for (int q = 0; q < _N; q++) {
 			final RealVector coeffs = new ArrayRealVector(_N);
 			coeffs.setEntry(q, 1.0);
-			constraints.add(
-					new LinearConstraint(coeffs, LEQ, this.realizedActivities.get(q).nextTripTravelTime.maxDptTime_s));
+			constraints.add(new LinearConstraint(coeffs, LEQ,
+					this.realizedActivities.get(q).nextTripTravelTime.maxDptTime_s + this.slack_s));
 		}
 
 		return new LinearConstraintSet(constraints);
