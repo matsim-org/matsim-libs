@@ -41,25 +41,28 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 	
 	@Override
 	public void handleEvent(StartRentalEvent event) {
-		RentalInfoFF info = new RentalInfoFF();
-		info.accessStartTime = event.getTime();
-		info.startTime = event.getTime();
-		info.personId = event.getPersonId();
-		info.originLinkId = event.getOriginLinkId();
-		info.pickupLinkId = event.getPickuplinkId();
-				
-		this.statsPerVehicle.put(event.getvehicleId(), info);
-
+		
+		if (event.getvehicleId().startsWith("FF")){
+			RentalInfoFF info = new RentalInfoFF();
+			info.accessStartTime = event.getTime();
+			info.startTime = event.getTime();
+			info.personId = event.getPersonId();
+			info.originLinkId = event.getOriginLinkId();
+			info.pickupLinkId = event.getPickuplinkId();
+					
+			this.statsPerVehicle.put(event.getvehicleId(), info);
+		}
 	}
 	
 	@Override
 	public void handleEvent(EndRentalEvent event) {
-		
-		RentalInfoFF info = this.statsPerVehicle.get(event.getvehicleId());
-		this.statsPerVehicle.remove(event.getvehicleId());
-		info.endTime = event.getTime();
-		info.endLinkId = event.getLinkId();		
-		arr.add(info);		
+		if (event.getvehicleId().startsWith("FF")){
+			RentalInfoFF info = this.statsPerVehicle.get(event.getvehicleId());
+			this.statsPerVehicle.remove(event.getvehicleId());
+			info.endTime = event.getTime();
+			info.endLinkId = event.getLinkId();		
+			arr.add(info);		
+		}
 	}
 	
 	@Override

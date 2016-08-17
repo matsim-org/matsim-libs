@@ -92,7 +92,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		
-		if (name.equals("twowaycarsharing") || name.equals("onewaycarsharing")) {
+		if (name.equals("twowaycarsharing") || name.equals("oneway")) {
 			csType = name;
 			id = atts.getValue("id");
 			String lat = atts.getValue("lat");
@@ -101,7 +101,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 				
 			link = (Link)NetworkUtils.getNearestLinkExactly(network, coordStation);
 			vehicles = new ArrayList<StationBasedVehicle>();
-			if (name.equals("onewaycarsharing"))
+			if (name.equals("oneway"))
 				avaialbleParkingSpots = Integer.parseInt(atts.getValue("freeparking"));
 			
 		}
@@ -129,12 +129,12 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		
-		if (name.equals("twowaycarsharing") || name.equals("onewaycarsharing")) {
+		if (name.equals("twowaycarsharing") || name.equals("oneway")) {
 			Map<String, Integer> numberOfVehiclesPerType = new HashMap<String, Integer>();
 			Map<String, ArrayList<CSVehicle>> vehiclesPerType = new HashMap<String, ArrayList<CSVehicle>>();
 			
 			for (StationBasedVehicle vehicle : vehicles) {
-				if (name.equals("onewaycarsharing")) {
+				if (name.equals("oneway")) {
 					this.owvehicleIdMap.put(vehicle.getVehicleId(), vehicle);
 					this.owvehiclesMap.put(vehicle, link);
 				}

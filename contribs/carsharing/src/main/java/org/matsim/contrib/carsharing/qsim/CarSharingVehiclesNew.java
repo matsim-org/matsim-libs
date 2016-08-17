@@ -29,10 +29,13 @@ public class CarSharingVehiclesNew {
 
 	private Map<CSVehicle, Link> ffvehiclesMap = new HashMap<CSVehicle, Link>();
 	private Map<CSVehicle, Link> owvehiclesMap = new HashMap<CSVehicle, Link>();
+	//private Map<CSVehicle, String> owvehiclesStationMap = new HashMap<CSVehicle, String>();
+
+	
+	
 	public Map<CSVehicle, Link> getOwvehiclesMap() {
 		return owvehiclesMap;
 	}
-	private Map<CSVehicle, String> owvehiclesStationMap = new HashMap<CSVehicle, String>();
 
 	public CarSharingVehiclesNew(Scenario scenario) {
 		this.scenario = scenario;
@@ -109,16 +112,22 @@ public class CarSharingVehiclesNew {
 		else if (vehicle.getCsType().equals("oneway")) {
 			Link link = this.owvehiclesMap.get(vehicle);
 			Coord coord = link.getCoord();
-			this.owvehiclesMap.remove(vehicle);
-			String stationId = this.owvehiclesStationMap.get(vehicle);
-			this.owvehiclesStationMap.remove(vehicle);
-			CarsharingStation station = this.onewaycarsharingstationsMap.get(stationId);			
-			this.owvehicleLocationQuadTree.remove(coord.getX(), coord.getY(), station);
+			this.owvehiclesMap.remove(vehicle);			
+			CarsharingStation station = owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
+			
+			((OneWayCarsharingStation)station).removeCar(vehicle);
 			
 		}
 		
 		
 	}
+	
+	public void parkVehicle(CSVehicle vehicle, Link link) {
+		
+		
+		
+	}
+	
 	public void reserveParkingSlot(CarsharingStation parkingStation) {
 
 		((OneWayCarsharingStation)parkingStation).reserveParkingSpot();		

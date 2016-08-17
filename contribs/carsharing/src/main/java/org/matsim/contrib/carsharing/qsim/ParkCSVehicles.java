@@ -8,15 +8,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -48,7 +45,7 @@ public class ParkCSVehicles implements AgentSource {
 		modeVehicleTypes.put("twowaycarsharing", VehicleUtils.getDefaultVehicleType());
 		modeVehicleTypes.put("freefloating", VehicleUtils.getDefaultVehicleType());
 
-		modeVehicleTypes.put("onewaycarsharing", VehicleUtils.getDefaultVehicleType());
+		modeVehicleTypes.put("oneway", VehicleUtils.getDefaultVehicleType());
 		
 		
 	}
@@ -80,8 +77,8 @@ public class ParkCSVehicles implements AgentSource {
 					for (CSVehicle vehicle : ((OneWayCarsharingStation)owstation).getVehicles(type)) {
 						
 						qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(vehicle.getVehicleId(), Vehicle.class),
-								modeVehicleTypes.get("onewaycarsharing")), owstation.getLinkId());
-						counterTW++;
+								modeVehicleTypes.get("oneway")), owstation.getLinkId());
+						counterOW++;
 						
 					}					
 				}				
@@ -103,7 +100,7 @@ public class ParkCSVehicles implements AgentSource {
 				}				
 			}
 			log.info("Parked " + counterTW + " twowaycarsharing vehicles.");
-			log.info("Parked " + counterOW + " onewaycarsharing vehicles.");
+			log.info("Parked " + counterOW + " oneway vehicles.");
 			log.info("Parked " + counterFF + " freefloatingcarsharing vehicles.");
 
 		}

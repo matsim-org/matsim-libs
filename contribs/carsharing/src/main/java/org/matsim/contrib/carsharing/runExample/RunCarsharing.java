@@ -10,8 +10,8 @@ import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandl
 import org.matsim.contrib.carsharing.manager.CSPersonVehicle;
 import org.matsim.contrib.carsharing.manager.CSPersonVehiclesContainer;
 import org.matsim.contrib.carsharing.manager.CarsharingManager;
-import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTrip;
 import org.matsim.contrib.carsharing.manager.routers.RouteFreefloatingTrip;
+import org.matsim.contrib.carsharing.manager.routers.RouteOneWayTrip;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
@@ -65,7 +65,6 @@ public class RunCarsharing {
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CSPersonVehicle pesronVehiclesContainer = new CSPersonVehiclesContainer();
-		final RouteCarsharingTrip ffRouter = new RouteFreefloatingTrip();
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -75,6 +74,8 @@ public class RunCarsharing {
 				bind(RouterProvider.class).toInstance(routerProvider);
 				bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
 				bind(RouteFreefloatingTrip.class).asEagerSingleton();
+				bind(RouteOneWayTrip.class).asEagerSingleton();
+
 			}			
 		});		
 		

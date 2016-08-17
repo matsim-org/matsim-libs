@@ -195,7 +195,8 @@ public class CarsharingManager implements IterationEndsListener{
 			
 			CarsharingStation station = this.carsharingStationsData.getOwvehicleLocationQuadTree().getClosest(coord.getX(), coord.getY());
 			((OneWayCarsharingStation)station).addCar(((StationBasedVehicle)owVehicle).getVehicleType(),  owVehicle);
-			
+			eventsManager.processEvent(new EndRentalEvent(time, linkId, personId, owVehicle.getVehicleId()));		
+
 			
 		}
 	}	
