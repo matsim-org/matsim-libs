@@ -83,24 +83,24 @@ public class TtAnalyzedResultsWriter {
 		for (int routeNr=0; routeNr < numberOfRoutes; routeNr++){
 			header += "\tavg tt[s] " + routeNr;
 		}
+		for (int routeNr=0; routeNr < numberOfRoutes; routeNr++){
+			header += "\tavg toll " + routeNr;
+		}
 		header += "\t#stucked";
 		this.overallItWritingStream.println(header);
 	}
 
 	public void writeIterationResults(int iteration) {	
 		log.info("Starting to write analysis of iteration " + iteration + "...");
-		addLineToOverallItResults(iteration);
-		writeItOnlyResults(iteration);
-	}
-	
-	private void addLineToOverallItResults(int iteration){
-		// get results
+		
+		// collect results of this iteration
 		double totalTTIt = handler.getTotalTT();
 		double[] avgRouteTTsIt = handler.calculateAvgRouteTTs();
 		int[] routeUsersIt = handler.getRouteUsers();
 		int numberOfStuckedAgents = handler.getNumberOfStuckedAgents();
-		
-		// write results
+		double[] avgRouteTollsIt = handler.calculateAvgRouteTolls();
+
+		// add line with results to overallItWritingStream
 		StringBuffer line = new StringBuffer();
 		line.append(iteration + "\t" + totalTTIt);
 		for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
@@ -109,22 +109,24 @@ public class TtAnalyzedResultsWriter {
 		for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
 			line.append("\t" + avgRouteTTsIt[routeNr]);
 		}
+		for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
+			line.append("\t" + avgRouteTollsIt[routeNr]);
+		}
 		line.append("\t" + numberOfStuckedAgents);
 		this.overallItWritingStream.println(line.toString());
-	}
-
-	private void writeItOnlyResults(int iteration) {
+		
 		// create output dir for this iteration analysis
 		String outputDir = this.outputDirBase + "ITERS/it." + iteration + "/analysis/";
 		new File(outputDir).mkdir();
-		
+
 		// write iteration specific analysis
 		log.info("Results of iteration " + iteration + ":");
-		writeFinalResults(outputDir, handler.getTotalTT(), handler.getTotalRouteTTs(), handler.calculateAvgRouteTTs(), handler.getRouteUsers(), handler.getNumberOfStuckedAgents());
+		writeFinalResults(outputDir, totalTTIt, avgRouteTTsIt, avgRouteTollsIt, routeUsersIt, numberOfStuckedAgents);
 		writeOnRoutes(outputDir, handler.getOnRoutePerSecond());
 		writeRouteStarts(outputDir, handler.getRouteDeparturesPerSecond());
-		writeSummedRouteStarts(outputDir, handler.getSummedRouteDeparturesPerSecond());
+		writeSummedRouteStarts(outputDir, handler.calculateSummedRouteDeparturesPerSecond());
 		writeAvgRouteTTs(outputDir, "Departure", handler.calculateAvgRouteTTsByDepartureTime());
+		writeAvgRouteTolls(outputDir, handler.calculateAvgRouteTollsByDepartureTime());
 	}
 
 	private void writeSummedRouteStarts(String outputDir, Map<Double, int[]> summedRouteDeparturesPerSecond) {
@@ -163,11 +165,10 @@ public class TtAnalyzedResultsWriter {
 	}
 
 	/**
-	 * Create result file for the specific iteration (FinalResults.txt) and write some
-	 * results to the console.
+	 * Create result file for the specific iteration (FinalResults.txt) and
+	 * write some results to the console.
 	 */
-	private void writeFinalResults(String outputDir, double totalTT, double[] totalRouteTTs,
-			double[] avgRouteTTs, int[] routeUsers, int numberOfStuckedAgents) {
+	private void writeFinalResults(String outputDir, double totalTT, double[] avgRouteTTs, double[] avgRouteTolls, int[] routeUsers, int numberOfStuckedAgents) {
 
 		PrintStream stream;
 		String filename = outputDir + "FinalResults.txt";
@@ -198,6 +199,14 @@ public class TtAnalyzedResultsWriter {
 			header += "\tavg tt[s] " + routeNr;
 			resultLine.append("\t" + avgRouteTTs[routeNr]);
 			latexFormat += " & " + (Double.isNaN(avgRouteTTs[routeNr]) ? "-" : (int)avgRouteTTs[routeNr]);
+		}
+		
+		log.info("Average tolls: (route: avg toll)");
+		for (int routeNr=0; routeNr < numberOfRoutes; routeNr++){
+			log.info("\t" + routeNr + ": " + avgRouteTolls[routeNr]);
+			header += "\tavg toll " + routeNr;
+			resultLine.append("\t" + avgRouteTolls[routeNr]);
+			latexFormat += " & " + (Double.isNaN(avgRouteTolls[routeNr]) ? "-" : (int)avgRouteTolls[routeNr]);
 		}
 		
 		log.info("Number of stucked agents: " + numberOfStuckedAgents);
@@ -296,7 +305,7 @@ public class TtAnalyzedResultsWriter {
 
 		String header = eventType + "Time";
 		for (int routeNr=0; routeNr < numberOfRoutes; routeNr++){
-			header += "\t#avg tt " + routeNr;
+			header += "\tavg tt " + routeNr;
 		}
 		stream.println(header);
 		for (Double eventTime : avgTTs.keySet()) {
@@ -306,6 +315,37 @@ public class TtAnalyzedResultsWriter {
 			line.append(eventTime);
 			for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
 				line.append("\t" + avgRouteTTs[routeNr]);
+			}
+			stream.println(line.toString());
+		}
+
+		stream.close();
+		
+		log.info("output written to " + filename);
+	}
+	
+	private void writeAvgRouteTolls(String outputDir, Map<Double, double[]> avgTolls) {
+		PrintStream stream;
+		String filename = outputDir + "avgRouteTollsPerDeparture" + ".txt";
+		try {
+			stream = new PrintStream(new File(filename));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		String header = "DepartureTime";
+		for (int routeNr=0; routeNr < numberOfRoutes; routeNr++){
+			header += "\tavg toll " + routeNr;
+		}
+		stream.println(header);
+		for (Double eventTime : avgTolls.keySet()) {
+			StringBuffer line = new StringBuffer();
+			double[] avgRouteTolls = avgTolls.get(eventTime);
+			
+			line.append(eventTime);
+			for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
+				line.append("\t" + avgRouteTolls[routeNr]);
 			}
 			stream.println(line.toString());
 		}

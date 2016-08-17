@@ -116,7 +116,7 @@ private static final Logger log = Logger.getLogger(TtWriteAnalysis.class);
 		writeFinalResults(outputDir, analyzer.getTotalTT(), analyzer.getTotalRouteTTs(), analyzer.calculateAvgRouteTTs(), analyzer.getRouteUsers(), analyzer.getNumberOfStuckedAgents());
 		writeOnRoutes(outputDir, analyzer.getOnRoutePerSecond());
 		writeRouteStarts(outputDir, analyzer.getRouteDeparturesPerSecond());
-		writeSummedRouteStarts(outputDir, analyzer.getSummedRouteDeparturesPerSecond());
+		writeSummedRouteStarts(outputDir, analyzer.calculateSummedRouteDeparturesPerSecond());
 		writeAvgRouteTTs(outputDir, "Departure", analyzer.calculateAvgRouteTTsByDepartureTime());
 	}
 
