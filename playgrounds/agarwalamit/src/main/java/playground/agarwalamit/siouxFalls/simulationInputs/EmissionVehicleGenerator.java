@@ -33,24 +33,21 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-
 /**
  * @author amit after benjamin
- *
  */
-//ZZ_TODO : probably mode this to some templates.
-public class EmissionVehicleGeneration {
+public class EmissionVehicleGenerator {
 
 
 	private final String outputVehicleFile;
 	private Scenario scenario;
 
-	public EmissionVehicleGeneration(Scenario scenario, String outputVehicleFile) {
+	public EmissionVehicleGenerator(Scenario scenario, String outputVehicleFile) {
 		this.outputVehicleFile = outputVehicleFile;
 		this.scenario = scenario;
 	}
 
-	private static final Logger LOG = Logger.getLogger(EmissionVehicleGeneration.class);
+	private static final Logger LOG = Logger.getLogger(EmissionVehicleGenerator.class);
 
 	public static void main(String[] args) {
 		//		NetworkSimplifier networkSimplifier = new NetworkSimplifier();
@@ -58,14 +55,14 @@ public class EmissionVehicleGeneration {
 		String outputVehicleFile = "./input/emissionFiles/SiouxFalls_emissionVehicles.xml"; 
 		String populationFile = "./input/baseCase/SiouxFalls_population_probably_v3.xml";//"./input/output_plans.xml";
 		String networkWithRoadType = "./input/baseCase/SiouxFalls_networkWithRoadType.xml.gz";//"./input/output_networkWithRoadType.xml.gz";
-		
+
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkWithRoadType);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		
-		EmissionVehicleGeneration evg = new EmissionVehicleGeneration(scenario, outputVehicleFile);
+
+
+		EmissionVehicleGenerator evg = new EmissionVehicleGenerator(scenario, outputVehicleFile);
 		evg.run();
 	}
 
