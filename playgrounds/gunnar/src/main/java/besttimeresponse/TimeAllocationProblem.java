@@ -20,7 +20,7 @@ import floetteroed.utilities.Units;
  * @author Gunnar Flötteröd
  *
  */
-public class LinearTimeAllocationProblem {
+public class TimeAllocationProblem {
 
 	// -------------------- MEMBERS --------------------
 
@@ -43,7 +43,7 @@ public class LinearTimeAllocationProblem {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public LinearTimeAllocationProblem(final List<RealizedActivity> realizedActivities, final double betaDur_1_s,
+	public TimeAllocationProblem(final List<RealizedActivity> realizedActivities, final double betaDur_1_s,
 			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s) {
 		this.realizedActivities = unmodifiableList(realizedActivities);
 		this.betaDur_1_s = betaDur_1_s;
@@ -53,6 +53,24 @@ public class LinearTimeAllocationProblem {
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
+
+	public double getScore() {
+		final int _N = this.realizedActivities.size();
+		double result = 0.0;
+		for (int q = 0; q < _N; q++) {
+			final RealizedActivity act = this.realizedActivities.get(q);
+			result += this.betaDur_1_s * act.plannedActivity.desiredDur_s * Math.log(act.effectiveDuration_s);
+			if (act.isLateArrival) {
+				result += this.betaLateArr_1_s * (act.realizedArrTime_s - act.plannedActivity.latestArrTime_s);
+			}
+			if (act.isEarlyDeparture) {
+				result += this.betaEarlyDpt_1_s * (act.plannedActivity.earliestDptTime_s - act.realizedDptTime_s);
+			}
+			result += this.betaTravel_1_s
+					* (this.realizedActivities.get(q < _N - 1 ? q + 1 : 0).realizedArrTime_s - act.realizedDptTime_s);
+		}
+		return result;
+	}
 
 	public RealVector get__dScore_dDptTimes__1_s() {
 

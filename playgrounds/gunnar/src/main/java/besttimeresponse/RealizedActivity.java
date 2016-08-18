@@ -17,6 +17,10 @@ class RealizedActivity {
 
 	final TripTime nextTripTravelTime;
 
+	final double realizedArrTime_s;
+	
+	final double realizedDptTime_s;
+	
 	final boolean isLateArrival;
 
 	final boolean isEarlyDeparture;
@@ -34,6 +38,8 @@ class RealizedActivity {
 
 		this.plannedActivity = plannedActivity;
 		this.nextTripTravelTime = nextTripTimes;
+		this.realizedArrTime_s = realizedArrTime_s;
+		this.realizedDptTime_s = realizedDptTime_s;
 
 		this.isLateArrival = this.plannedActivity.isLateArrival(realizedArrTime_s);
 		this.isEarlyDeparture = this.plannedActivity.isEarlyDeparture(realizedDptTime_s);
