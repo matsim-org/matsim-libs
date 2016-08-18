@@ -30,13 +30,13 @@ public class TripAnalyzerExtended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerExtended.class);
 	
 	/* Parameters */
-	private static final String runId = "run_160";	// <----------
-	private static final String usedIteration = "150"; // most frequently used value: 150 // <----------
+	private static final String runId = "run_200";	// <----------
+	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlyCar = false; // "car"; should be used for runs with ChangeLegMode enabled
+	private static final boolean onlyCar = true; // "car"; should be used for runs with ChangeLegMode enabled
 	private static final boolean onlyInterior = false; // "int"
 	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis // <----------
 	

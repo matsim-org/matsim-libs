@@ -23,7 +23,7 @@ public class DemandGeneratorOnePersonV2 {
 
 	public static void main(String[] args) {
 		// Parameters
-		double scalingFactor = 1.;
+		double scalingFactor = 0.01;
 		double carShareInterior = 1.;
 		double carShareExterior = 1.;
 		double allWorkersToSociallySecuredWorkersRatio = 1.52;
@@ -40,7 +40,7 @@ public class DemandGeneratorOnePersonV2 {
 		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/23/";
+		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/25/";
 		
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
