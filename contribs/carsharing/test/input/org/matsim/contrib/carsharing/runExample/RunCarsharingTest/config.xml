@@ -143,6 +143,8 @@
 
 	<!-- triangle -->
 	<module name="planCalcScore" >
+			<param name="writeExperiencedPlans" value="true" />
+	
 		<param name="PathSizeLogitBeta" value="1.0" />
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />

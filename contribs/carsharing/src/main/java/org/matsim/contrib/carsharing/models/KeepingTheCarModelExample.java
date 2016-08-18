@@ -19,7 +19,7 @@ public class KeepingTheCarModelExample implements KeepingTheCarModel {
 	@Override
 	public boolean keepTheCarDuringNextACtivity(double durationOfActivity, Person person, String csType) {
 
-		return false;
+		return true;
 		//if (durationOfActivity < 2 *3600) {
 			
 		//	return 	MatsimRandom.getRandom().nextDouble() > durationOfActivity / (2.0 * 3600.0);

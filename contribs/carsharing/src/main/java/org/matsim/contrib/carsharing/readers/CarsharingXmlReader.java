@@ -54,7 +54,7 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 	private Map<String, CSVehicle> ffvehicleIdMap = new HashMap<String, CSVehicle>();
 	private Map<String, CSVehicle> owvehicleIdMap = new HashMap<String, CSVehicle>();
 	private Map<CSVehicle, Link> owvehiclesMap = new HashMap<CSVehicle, Link>();
-
+	private Map<String, CSVehicle> csvehicleIdMap = new HashMap<String, CSVehicle>();
 	public Map<String, CSVehicle> getOwvehicleIdMap() {
 		return owvehicleIdMap;
 	}
@@ -116,12 +116,14 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 			ffVehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), ffcsvehicle);
 			ffvehiclesMap.put(ffcsvehicle, link);
 			ffvehicleIdMap.put(atts.getValue("id"), ffcsvehicle);
-			
+			this.csvehicleIdMap.put(atts.getValue("id"), ffcsvehicle);
 		}
 		else if (name.equals("vehicle")) {
 			
 			StationBasedVehicle vehicle = new StationBasedVehicle(atts.getValue("type"), atts.getValue("vehicleID"), id, csType);
 			vehicles.add(vehicle);
+			this.csvehicleIdMap.put(atts.getValue("vehicleID"), vehicle);
+
 			
 		}
 	}
@@ -209,4 +211,8 @@ public class CarsharingXmlReader extends MatsimXmlParser {
 		// TODO Auto-generated method stub
 		return owvehiclesMap;
 	}
+
+	public Map<String, CSVehicle> getCsehiclesMap() {
+		return csvehicleIdMap;
+	}	
 }

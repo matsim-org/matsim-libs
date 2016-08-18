@@ -14,10 +14,13 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.manager.CSPersonVehicle;
 import org.matsim.contrib.carsharing.manager.CarsharingManager;
 import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 /** 
@@ -32,12 +35,15 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 	@Inject	private CarsharingManager carsharingManager;
 	@Inject private CSPersonVehicle csPersonVehicles;
 	@Inject private CarSharingVehiclesNew carsharingStationsData;
-
+	@Inject EventsManager eventsManager;
 	Map<Id<Person>, String> personVehicleArrival = new HashMap<Id<Person>, String>();
 	Map<Id<Person>, Id<Link>> personArrivalMap = new HashMap<Id<Person>, Id<Link>>();
-	
+	Map<Id<Person>, Id<Vehicle>> personLeavesVehicleMap = new HashMap<Id<Person>, Id<Vehicle>>();
+
 	@Override
 	public void reset(int iteration) {
+		personLeavesVehicleMap = new HashMap<Id<Person>, Id<Vehicle>>();
+		personArrivalMap = new HashMap<Id<Person>, Id<Link>>();
 		personVehicleArrival = new HashMap<Id<Person>, String>();
 	}
 	
@@ -45,52 +51,53 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 	public void handleEvent(PersonDepartureEvent event) {
 		String legMode = event.getLegMode();
 		if (legMode.equals("egress_walk_ff")) {
-			String vehId = personVehicleArrival.get(event.getPersonId());
+			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
-
-			carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
+			carsharingManager.parkVehicle(vehId, linkId);
+			//carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
 			this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), "freefloating").remove(linkId);
+			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
 		}
 		else if (legMode.equals("egress_walk_ow")) {
-			String vehId = personVehicleArrival.get(event.getPersonId());
+			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
-
-			carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
+			carsharingManager.parkVehicle(vehId, linkId);
+			//carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
 			this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), "oneway").remove(linkId);
-			
+			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
+
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		String vehId = event.getVehicleId().toString();
-		if (vehId.startsWith("FF") || 
-				vehId.startsWith("OW")) {			
-			
-			personVehicleArrival.put(event.getPersonId(), vehId);
-			String type = "";
-			if (vehId.startsWith("FF"))
-				type = "freefloating";
-			else
-				type = "oneway";
-			CSVehicle vehicle = this.carsharingStationsData.getFfvehicleIdMap().get(vehId);
-			
-			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
-			if (this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), type) != null)
-				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), type).put(linkId, vehicle);
-			else {				
-				this.csPersonVehicles.addNewPersonInfo(event.getPersonId());
-				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), type).put(linkId, vehicle);
-
-			}
-			
-		}
+		personLeavesVehicleMap.put(event.getPersonId(), event.getVehicleId());
+	
 	}	
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
+		String mode = event.getLegMode();
+		
+		if (mode.startsWith("free") || 
+				mode.startsWith("one")) {			
+			
+			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
+			
+			CSVehicle vehicle = this.carsharingStationsData.getCsvehicleIdMap().get(vehId);
+			
+			Id<Link> linkId = event.getLinkId();
+			if (this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), mode) != null)
+				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), mode).put(linkId, vehicle);
+			else {				
+				this.csPersonVehicles.addNewPersonInfo(event.getPersonId());
+				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), mode).put(linkId, vehicle);
 
+			}
+			
+		}
+		
 		personArrivalMap.put(event.getPersonId(), event.getLinkId());
 		
 	}

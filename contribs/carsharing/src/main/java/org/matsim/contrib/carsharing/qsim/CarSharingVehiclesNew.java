@@ -13,12 +13,19 @@ import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class CarSharingVehiclesNew {
 
 	private Scenario scenario;	
 	private QuadTree<CSVehicle> ffVehicleLocationQuadTree;	
+	
+	private Map<String, CSVehicle> csvehicleIdMap = new HashMap<String, CSVehicle>();
+	public Map<String, CSVehicle> getCsvehicleIdMap() {
+		return csvehicleIdMap;
+	}
+
 	private Map<String, CSVehicle> ffvehicleIdMap = new HashMap<String, CSVehicle>();
 	private Map<String, CSVehicle> owvehicleIdMap = new HashMap<String, CSVehicle>();
 
@@ -31,25 +38,9 @@ public class CarSharingVehiclesNew {
 	private Map<CSVehicle, Link> owvehiclesMap = new HashMap<CSVehicle, Link>();
 	//private Map<CSVehicle, String> owvehiclesStationMap = new HashMap<CSVehicle, String>();
 
-	
-	
-	public Map<CSVehicle, Link> getOwvehiclesMap() {
-		return owvehiclesMap;
-	}
-
 	public CarSharingVehiclesNew(Scenario scenario) {
 		this.scenario = scenario;
 	}
-	public Map<String, CSVehicle> getFfvehicleIdMap() {
-		return ffvehicleIdMap;
-	}
-	public Map<String, TwoWayCarsharingStation> getTwowaycarsharingstationsMap() {
-		return twowaycarsharingstationsMap;
-	}
-
-	public Map<String, CarsharingStation> getOnewaycarsharingstationsMap() {
-		return onewaycarsharingstationsMap;
-	}	
 	
 	public void readVehicleLocations() {
 		
@@ -70,7 +61,24 @@ public class CarSharingVehiclesNew {
 
 		this.ffvehicleIdMap = carsharingReader.getFfvehicleIdMap();
 		this.owvehicleIdMap = carsharingReader.getOwvehicleIdMap();
+		this.csvehicleIdMap = carsharingReader.getCsehiclesMap();
 	}
+
+	public Map<CSVehicle, Link> getOwvehiclesMap() {
+		return owvehiclesMap;
+	}
+
+	
+	public Map<String, CSVehicle> getFfvehicleIdMap() {
+		return ffvehicleIdMap;
+	}
+	public Map<String, TwoWayCarsharingStation> getTwowaycarsharingstationsMap() {
+		return twowaycarsharingstationsMap;
+	}
+
+	public Map<String, CarsharingStation> getOnewaycarsharingstationsMap() {
+		return onewaycarsharingstationsMap;
+	}	
 	
 	public QuadTree<CSVehicle> getFfVehicleLocationQuadTree() {
 		return ffVehicleLocationQuadTree;
@@ -121,10 +129,25 @@ public class CarSharingVehiclesNew {
 		
 		
 	}
-	
-	public void parkVehicle(CSVehicle vehicle, Link link) {
-		
-		
+
+	public void parkVehicle(String vehicleId, Link link) {
+		CSVehicle vehicle = this.csvehicleIdMap.get(vehicleId);
+		Coord coord = link.getCoord();
+		if (vehicleId.startsWith("FF")) {
+			
+			ffVehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
+			ffvehiclesMap.put(vehicle, link);
+			
+		}
+		else if (vehicleId.startsWith("OW")) {
+			
+			owvehiclesMap.put(vehicle, link);
+			
+			CarsharingStation station = owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
+			((OneWayCarsharingStation)station).addCar(((StationBasedVehicle)vehicle).getVehicleType(),  vehicle);
+
+			
+		}
 		
 	}
 	
