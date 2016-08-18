@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.inputs;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -48,7 +48,7 @@ public class SubPopInputs4Munich {
 
 	PersonFilter pf = new PersonFilter();
 	private final String subPopAttributeName = "userGroup";
-	private String outPopAttributeFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz";
+	private String outPopAttributeFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/personsAttributes_1pct_usrGrp.xml.gz";
 
 	public static void main(String[] args) {
 		SubPopInputs4Munich inputs = new SubPopInputs4Munich();
@@ -59,8 +59,8 @@ public class SubPopInputs4Munich {
 	private void writePersonAttributes(){
 
 		// read plans with subActivities (basically these are inital plans from different sources + subActivities)
-		String initialPlans = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
-		String outPlansFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz";
+		String initialPlans = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
+		String outPlansFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 		Population pop = sc.getPopulation();	
@@ -93,8 +93,8 @@ public class SubPopInputs4Munich {
 	private void modifyConfig(){
 
 		// I think, config with all sub activities info can be taken.
-		String existingConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_baseCase_msa.xml"; 
-		String outConfigFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_usrGrp_baseCase_msa.xml"; // need manual verification later
+		String existingConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_baseCase.xml"; 
+		String outConfigFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml"; // need manual verification later
 
 		Config config =  ConfigUtils.loadConfig(existingConfig);
 
@@ -102,6 +102,13 @@ public class SubPopInputs4Munich {
 		config.plans().setInputPersonAttributeFile(outPopAttributeFile);
 
 		String usrGrps [] = {"OTHERS","COMMUTER_REV_COMMUTER"};
+		
+		// get the existing strategies and add others user grp to it.
+		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
+		
+		for(StrategySettings ss : strategySettings){
+			ss.setSubpopulation(usrGrps[0]);
+		}
 
 		// once subPop attribute is set, strategy for all sub pop groups neet to set seprately.
 		StrategySettings reroute = new StrategySettings();
@@ -118,7 +125,8 @@ public class SubPopInputs4Munich {
 		config.strategy().addStrategySettings(expBeta);
 
 		StrategySettings modeChoiceComm = new StrategySettings();
-		modeChoiceComm.setStrategyName("SubtourModeChoice_".concat(usrGrps[1]));
+//		modeChoiceComm.setStrategyName("SubtourModeChoice_".concat(usrGrps[1]));
+		modeChoiceComm.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name());
 		modeChoiceComm.setDisableAfter(800);
 		modeChoiceComm.setWeight(0.15);
 		modeChoiceComm.setSubpopulation(usrGrps[1]);
@@ -137,11 +145,11 @@ public class SubPopInputs4Munich {
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
-		Logger.getLogger(SubPopInputs4Munich.class).warn("Config from this is not the final config used for calibration. Some unavoidable modifications are made manually in the .xml file. For e.g. "
-				+ "\n 1) existing strategies are taken for urban and freight and for reverse commuters and commuters new modules are added."
-//				+ "\n 2) At the moment, same module name can not be used for two different sub populations and \n therefore parameters are added with different name in config "
-//				+ " and then added to controler directly."
-				);
+//		Logger.getLogger(SubPopInputs4Munich.class).warn("Config from this is not the final config used for calibration. Some unavoidable modifications are made manually in the .xml file. For e.g. "
+//				+ "\n 1) existing strategies are taken for urban and freight and for reverse commuters and commuters new modules are added."
+////				+ "\n 2) At the moment, same module name can not be used for two different sub populations and \n therefore parameters are added with different name in config "
+////				+ " and then added to controler directly."
+//				);
 
 		new ConfigWriter(config).write(outConfigFile);
 	}

@@ -41,6 +41,7 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,7 +75,7 @@ public class SubPopMunichControler {
 								"false",
 								"false",
 								"false",
-								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_baseCase.xml",
+								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml",
 								"1.0",
 								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/output/baseCase/",
 								"false",
@@ -101,7 +102,7 @@ public class SubPopMunichControler {
 		
 		if(offline){
 			config.network().setInputFile("network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
-			config.plans().setInputFile("mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz");
+			config.plans().setInputFile("mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz");
 			config.plans().setInputPersonAttributeFile("personsAttributes_1pct_usrGrp.xml.gz");
 			config.counts().setInputFile("counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
 		}
@@ -114,7 +115,7 @@ public class SubPopMunichControler {
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name()).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
 					String[] chainBasedModes = {"car", "bike"};
 					@Inject Scenario sc;
