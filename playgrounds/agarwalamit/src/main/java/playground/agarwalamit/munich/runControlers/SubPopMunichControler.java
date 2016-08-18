@@ -18,8 +18,14 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.runControlers;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -61,10 +67,19 @@ public class SubPopMunichControler {
 
 		boolean offline = false;
 
+		if(args.length==0) offline = true;
+		
 		if(offline){
-
-			args = new String [] {"false","false","false","../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_usrGrp_baseCase_msa_typDurRelative.xml"
-					,"1.0","../../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/baseCase/","true","false"};
+			args = new String [] {
+								"false",
+								"false",
+								"false",
+								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_baseCase.xml",
+								"1.0",
+								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/output/baseCase/",
+								"false",
+								"false"
+								};
 		}
 
 		boolean internalizeEmission = Boolean.valueOf(args [0]); 
@@ -85,13 +100,15 @@ public class SubPopMunichControler {
 		config.controler().setOutputDirectory(outputDir);
 		
 		if(offline){
-			config.network().setInputFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
-			config.plans().setInputFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz");
-			config.plans().setInputPersonAttributeFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz");
-			config.counts().setInputFile("../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
+			config.network().setInputFile("network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
+			config.plans().setInputFile("mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz");
+			config.plans().setInputPersonAttributeFile("personsAttributes_1pct_usrGrp.xml.gz");
+			config.counts().setInputFile("counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
 		}
 
-		final Controler controler = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		final Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -100,12 +117,13 @@ public class SubPopMunichControler {
 				addPlanStrategyBinding("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
 					String[] chainBasedModes = {"car", "bike"};
-
+					@Inject Scenario sc;
+					
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
-						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
+						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
 						return builder.build();
 					}
 				});
@@ -178,8 +196,24 @@ public class SubPopMunichControler {
 				}
 			});
 			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (MutableScenario) controler.getScenario(), tollHandler));
-
 		}
+		
+		// ride is one of network mode, thus travel disutility is required and every link must allow rider too
+		Set<String> modes = new HashSet<>();
+		modes.add("car");modes.add("ride");
+		
+		for(Link l : controler.getScenario().getNetwork().getLinks().values()) {
+			l.setAllowedModes(modes);
+		}
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addTravelTimeBinding("ride").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
+			}
+		});
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?

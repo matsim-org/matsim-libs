@@ -44,14 +44,13 @@ public class ReadAndAddSubActivities {
 	private String inputConfig;
 	private Scenario sc;
 	
-	
 	public static void main(String[] args) {
 		
 		String initialPlans = "../../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_munich_1pct_baseCase_modified.xml";
+		String initialConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/config_munich_1pct_baseCase_fromBK_modified.xml";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_baseCase_msa.xml";
-		String outPlans = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
+		String outConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_baseCase.xml";
+		String outPlans = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
 		ReadAndAddSubActivities add2Config =  new ReadAndAddSubActivities(initialConfig,sc);
 		add2Config.readConfig();
 		add2Config.addDataAndWriteConfig(outConfig,outPlans);
@@ -90,5 +89,4 @@ public class ReadAndAddSubActivities {
 		
 		new ConfigWriter(config).write(outConfig);
 	}
-
 }
