@@ -343,7 +343,7 @@ public final class TtCreateBraessSignals {
 			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
+		case "signal2_3.2": // signals for going straight on (upper route) at node 3
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = linkTTSmall;
@@ -401,7 +401,7 @@ public final class TtCreateBraessSignals {
 			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
+		case "signal2_3.2": // signals for going straight on (upper route) at node 3
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = linkTTSmall;
