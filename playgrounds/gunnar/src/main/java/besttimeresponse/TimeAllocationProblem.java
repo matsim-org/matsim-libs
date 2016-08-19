@@ -13,8 +13,6 @@ import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.LinearConstraintSet;
 import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 
-import floetteroed.utilities.Units;
-
 /**
  * 
  * @author Gunnar Flötteröd
@@ -150,12 +148,13 @@ public class TimeAllocationProblem {
 			constraints.add(new LinearConstraint(coeffs, LEQ, -b[q]));
 		}
 
-		// The last arrival must not occur before midnight.
-		{
-			final RealVector coeffs = new ArrayRealVector(_N);
-			coeffs.setEntry(_N - 1, (1.0 + a[_N - 1]));
-			constraints.add(new LinearConstraint(coeffs, LEQ, Units.S_PER_D - b[_N - 1]));
-		}
+		// The last arrival must occur before midnight.
+		// {
+		// final RealVector coeffs = new ArrayRealVector(_N);
+		// coeffs.setEntry(_N - 1, (1.0 + a[_N - 1]));
+		// constraints.add(new LinearConstraint(coeffs, LEQ, Units.S_PER_D -
+		// b[_N - 1]));
+		// }
 
 		// lower bound on departure time due to time discretization
 		for (int q = 0; q < _N; q++) {

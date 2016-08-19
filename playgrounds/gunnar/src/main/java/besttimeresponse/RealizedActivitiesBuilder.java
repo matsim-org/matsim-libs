@@ -23,6 +23,8 @@ public class RealizedActivitiesBuilder {
 
 	private final TravelTimes travelTimes;
 
+	private final boolean repairTimeStructure;
+
 	private final LinkedList<PlannedActivity> plannedActs = new LinkedList<>();
 
 	private final LinkedList<Double> dptTimes_s = new LinkedList<>();
@@ -31,9 +33,11 @@ public class RealizedActivitiesBuilder {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RealizedActivitiesBuilder(final TimeDiscretization timeDiscr, final TravelTimes travelTimes) {
+	public RealizedActivitiesBuilder(final TimeDiscretization timeDiscr, final TravelTimes travelTimes,
+			final boolean repairTimeStructure) {
 		this.timeDiscr = timeDiscr;
 		this.travelTimes = travelTimes;
+		this.repairTimeStructure = repairTimeStructure;
 	}
 
 	// -------------------- BUILDING PROCESS --------------------
@@ -46,6 +50,13 @@ public class RealizedActivitiesBuilder {
 		this.dptTimes_s.add(dptTime_s);
 	}
 
+	private double withinDayTime_s(double time_s) {
+		while (time_s >= Units.S_PER_D) {
+			time_s -= Units.S_PER_D;
+		}
+		return time_s;
+	}
+
 	public void build() {
 
 		final int _N = this.plannedActs.size();
@@ -54,12 +65,17 @@ public class RealizedActivitiesBuilder {
 		}
 
 		final LinkedList<TripTime> tripTimes = new LinkedList<>();
-		double lastArrTime_s = 0.0;
+		double lastArrTime_s = PlannedActivity.minActDur_s; // just before
+															// midnight
 		for (int q = 0; q < _N; q++) {
 
-			if (this.dptTimes_s.get(q) < lastArrTime_s) {
-				throw new RuntimeException("Departure time is " + this.dptTimes_s.get(q)
-						+ "s but the last arrival time is " + lastArrTime_s + "s. This is not feasible.");
+			if (this.dptTimes_s.get(q) < lastArrTime_s + PlannedActivity.minActDur_s) {
+				if (this.repairTimeStructure) {
+					this.dptTimes_s.set(q, lastArrTime_s + PlannedActivity.minActDur_s);
+				} else {
+					throw new RuntimeException("Departure time is " + this.dptTimes_s.get(q)
+							+ "s but the last arrival time is " + lastArrTime_s + "s. This is not feasible.");
+				}
 			}
 
 			final PlannedActivity prevAct = this.plannedActs.get(q);
@@ -75,25 +91,29 @@ public class RealizedActivitiesBuilder {
 			final double ttOffset_s = ttAtDptTimeBinStart_s - dTT_dDptTime * this.timeDiscr.getBinStartTime_s(dptBin);
 
 			lastArrTime_s = (1.0 + dTT_dDptTime) * this.dptTimes_s.get(q) + ttOffset_s;
-			if (lastArrTime_s >= Units.S_PER_D) {
-				throw new RuntimeException(
-						"Arrival time " + lastArrTime_s + "s is beyond midnight, this is not allowed.");
-			}
+			// if (lastArrTime_s >= Units.S_PER_D) {
+			// throw new RuntimeException(
+			// "Arrival time " + lastArrTime_s + "s is beyond midnight, this is
+			// not allowed.");
+			// }
 			final int arrBin = this.timeDiscr.getBin(lastArrTime_s);
 
 			final double minDptTime_s = max(this.timeDiscr.getBinStartTime_s(dptBin),
 					(this.timeDiscr.getBinStartTime_s(arrBin) - ttOffset_s) / (1.0 + dTT_dDptTime));
 			final double maxDptTime_s = min(this.timeDiscr.getBinEndTime_s(dptBin),
 					(this.timeDiscr.getBinEndTime_s(arrBin) - ttOffset_s) / (1.0 + dTT_dDptTime));
-			tripTimes.add(new TripTime(dTT_dDptTime, ttOffset_s, minDptTime_s, maxDptTime_s));
+			tripTimes.add(new TripTime(dTT_dDptTime, ttOffset_s, this.withinDayTime_s(minDptTime_s),
+					this.withinDayTime_s(maxDptTime_s)));
 		}
 
 		this.result = new ArrayList<>(_N);
 		this.result.add(new RealizedActivity(this.plannedActs.get(0), tripTimes.getFirst(),
-				tripTimes.getLast().getArrTime_s(this.dptTimes_s.getLast()), this.dptTimes_s.getFirst()));
+				this.withinDayTime_s(tripTimes.getLast().getArrTime_s(this.dptTimes_s.getLast())),
+				this.withinDayTime_s(this.dptTimes_s.getFirst())));
 		for (int q = 1; q < _N; q++) {
 			this.result.add(new RealizedActivity(this.plannedActs.get(q), tripTimes.get(q),
-					tripTimes.get(q - 1).getArrTime_s(this.dptTimes_s.get(q - 1)), this.dptTimes_s.get(q)));
+					this.withinDayTime_s(tripTimes.get(q - 1).getArrTime_s(this.dptTimes_s.get(q - 1))),
+					this.withinDayTime_s(this.dptTimes_s.get(q))));
 		}
 	}
 

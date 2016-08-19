@@ -18,9 +18,9 @@ class RealizedActivity {
 	final TripTime nextTripTravelTime;
 
 	final double realizedArrTime_s;
-	
+
 	final double realizedDptTime_s;
-	
+
 	final boolean isLateArrival;
 
 	final boolean isEarlyDeparture;
@@ -44,21 +44,19 @@ class RealizedActivity {
 		this.isLateArrival = this.plannedActivity.isLateArrival(realizedArrTime_s);
 		this.isEarlyDeparture = this.plannedActivity.isEarlyDeparture(realizedDptTime_s);
 
-		// TOOD CONTINUE HERE
-
 		if (plannedActivity.isOvernight) {
 
-			if (realizedArrTime_s <= realizedDptTime_s) {
-				throw new RuntimeException("Realized arrival time is " + realizedArrTime_s
-						+ "s and realized departure time is " + realizedDptTime_s
-						+ "s but in an _overnight_ activity, the arrival time must be strictly greater than "
-						+ "the departure time.");
-			}
-
 			// proper overnight activity
-			this.isClosedAtArrival = false; // no opening times for
-			this.isClosedAtDeparture = false; // overnight activity
-			this.effectiveDuration_s = (Units.S_PER_D - realizedArrTime_s) + realizedDptTime_s;
+			this.isClosedAtArrival = false; // no overnight opening times
+			this.isClosedAtDeparture = false; // no overnight closing times
+
+			if (realizedArrTime_s < realizedDptTime_s) {
+				// arrival is beyond midnight, i.e. just as departure in the following day
+				this.effectiveDuration_s = max(0.0, realizedArrTime_s - realizedDptTime_s);
+			} else {
+				// arrival is before midnight, departure is after midnight the following day
+				this.effectiveDuration_s = (Units.S_PER_D - realizedArrTime_s) + realizedDptTime_s;
+			}
 
 		} else { // !plannedActivity.isOvernight
 
@@ -68,7 +66,6 @@ class RealizedActivity {
 						+ "s but in a _within-day_ activity, the arrival time must not be greater than "
 						+ "the departure time.");
 			}
-
 			// proper within-day activity
 			this.isClosedAtArrival = this.plannedActivity.isClosed(realizedArrTime_s);
 			this.isClosedAtDeparture = this.plannedActivity.isClosed(realizedDptTime_s);
