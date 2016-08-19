@@ -40,6 +40,8 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class ExtendedPersonFilter extends PersonFilter implements playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter{
 
+	public enum MunichUserGroup {Urban, Rev_Commuter, Freight}
+	
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	private PersonFilter pf = new PersonFilter();
 	private Collection<SimpleFeature> munichFeatures;
@@ -85,10 +87,14 @@ public class ExtendedPersonFilter extends PersonFilter implements playground.aga
 
 	@Override
 	public String getUserGroupAsStringFromPersonId (final Id<Person> personId) {
-		return getUserGroupFromPersonId(personId).toString();
+		return getMunichUserGroupFromPersonId(personId).toString();
 	}
 	
-	public UserGroup getUserGroupFromPersonId (final Id<Person> personId) {
+	
+	/**
+	 * A translation between 
+	 */
+	private UserGroup getUserGroupFromPersonId (final Id<Person> personId) {
 		UserGroup outUG = UserGroup.URBAN;
 		for(UserGroup ug : UserGroup.values()){
 			if(pf.isPersonIdFromUserGroup(personId, ug)) {
@@ -100,22 +106,23 @@ public class ExtendedPersonFilter extends PersonFilter implements playground.aga
 	}
 
 	/**
-	 * @param personId
 	 * @return Urban or (Rev) commuter or Freight from person id.
 	 */
-	public String getMyUserGroupFromPersonId(final Id<Person> personId) {
-		return getMyUserGroup(getUserGroupFromPersonId(personId));
+	public MunichUserGroup getMunichUserGroupFromPersonId(final Id<Person> personId) {
+		return getMunichUserGroup(getUserGroupFromPersonId(personId));
 	}
-
+	
 	/**
-	 * @param ug
+	 * A translation between UserGroup and MunichUserGroup 
 	 * Helpful for writing data to files.
 	 */
-	public String getMyUserGroup(final UserGroup ug){
-		if(ug.equals(UserGroup.URBAN)) return "Urban";
-		else if(ug.equals(UserGroup.COMMUTER)) return "(Rev)commuter";
-		else if(ug.equals(UserGroup.REV_COMMUTER)) return "(Rev)commuter";
-		else if (ug.equals(UserGroup.FREIGHT)) return "Freight";
-		else throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
+	private MunichUserGroup getMunichUserGroup(final UserGroup ug){
+		switch(ug){
+		case REV_COMMUTER:
+		case COMMUTER: return MunichUserGroup.Rev_Commuter;
+		case FREIGHT: return MunichUserGroup.Freight;
+		case URBAN: return MunichUserGroup.Urban;
+		default: throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
+		}
 	}
 }

@@ -42,11 +42,10 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionHandler;
 import playground.agarwalamit.analysis.emission.filtering.FilteredWarmEmissionHandler;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.internalization.EmissionCostFactors;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -118,7 +117,6 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 //		}
 
 	public static void main(String[] args) {
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
 //		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -129,9 +127,9 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		try{
 			writer.write("scenario \t userGroup \t totalCostEUR \n");
 			for(String str : runCases){
-				for(UserGroup ug :UserGroup.values()) {
+				for(MunichUserGroup ug :MunichUserGroup.values()) {
 					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
-					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), pf.getMyUserGroup(ug));
+					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug.toString());
 //					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug);
 					ela.preProcessData();
 					ela.postProcessData();

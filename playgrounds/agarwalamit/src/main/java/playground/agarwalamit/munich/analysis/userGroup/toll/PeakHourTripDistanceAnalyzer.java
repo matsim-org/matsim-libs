@@ -40,9 +40,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.trip.TripDistanceHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
@@ -105,13 +105,13 @@ public class PeakHourTripDistanceAnalyzer  {
 	}
 
 	private void storeUserGroupData(){
-		for(UserGroup ug : UserGroup.values()){
-			usrGrp2Dists.put(pf.getMyUserGroup(ug), new Tuple<Double, Double>(0., 0.));
-			usrGrp2TripCounts.put(pf.getMyUserGroup(ug), new Tuple<Integer, Integer>(0, 0));
+		for(MunichUserGroup ug : MunichUserGroup.values()){
+			usrGrp2Dists.put(ug.toString(), new Tuple<Double, Double>(0., 0.));
+			usrGrp2TripCounts.put(ug.toString(), new Tuple<Integer, Integer>(0, 0));
 		}
 		//first store peak hour data
 		for (Id<Person> personId : this.person2DistsPkHr.keySet()) {
-			String ug = pf.getMyUserGroupFromPersonId(personId);
+			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double pkDist = usrGrp2Dists.get(ug).getFirst() + ListUtils.doubleSum(this.person2DistsPkHr.get(personId));
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
 			usrGrp2Dists.put(ug, new Tuple<Double, Double>(pkDist, 0.));
@@ -120,7 +120,7 @@ public class PeakHourTripDistanceAnalyzer  {
 
 		//now store off-peak hour data
 		for (Id<Person> personId : this.person2DistsOffPkHr.keySet()) {
-			String ug = pf.getMyUserGroupFromPersonId(personId);
+			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double offpkDist = usrGrp2Dists.get(ug).getSecond() + ListUtils.doubleSum(this.person2DistsOffPkHr.get(personId));
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
 			usrGrp2Dists.put(ug, new Tuple<Double, Double>(usrGrp2Dists.get(ug).getFirst(), offpkDist));

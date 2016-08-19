@@ -33,8 +33,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -47,8 +47,8 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 	private final ExtendedPersonFilter pf ;
 	private final String suffixForSoring = "_sorted";
 
-	private final SortedMap<Double, SortedMap<UserGroup, Integer>> userGroup2TollPayers = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
-	private final SortedMap<Double,SortedMap<UserGroup, Integer>> userGroup2TolledTrips = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
+	private final SortedMap<Double, SortedMap<MunichUserGroup, Integer>> userGroup2TollPayers = new TreeMap<>();
+	private final SortedMap<Double,SortedMap<MunichUserGroup, Integer>> userGroup2TolledTrips = new TreeMap<>();
 	private final SortedMap<Double,Integer> timeBin2TolledLinks = new TreeMap<Double,Integer>();
 	
 	public TollCounterInfoWriter(final String eventsFile, final Scenario sc, final int noOfTimeBins, final boolean isSortingForMunich) {
@@ -84,9 +84,9 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 
 		// initialize
 		for(Double d : timeBin2PersonInfo.keySet()){
-			SortedMap<UserGroup, Integer> usrGrp2Cnt = new TreeMap<UserGroup, Integer>();
-			SortedMap<UserGroup, Integer> usrGrp2Cnt2 = new TreeMap<UserGroup, Integer>();
-			for(UserGroup ug:UserGroup.values()){
+			SortedMap<MunichUserGroup, Integer> usrGrp2Cnt = new TreeMap<>();
+			SortedMap<MunichUserGroup, Integer> usrGrp2Cnt2 = new TreeMap<>();
+			for(MunichUserGroup ug:MunichUserGroup.values()){
 				usrGrp2Cnt.put(ug, 0);
 				usrGrp2Cnt2.put(ug, 0);
 			}
@@ -97,10 +97,10 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 
 		//timeBin2UserGrp2TolledPerson
 		for(Double d : timeBin2PersonInfo.keySet()){
-			SortedMap<UserGroup,Integer> usrGrp2Person = this.userGroup2TollPayers.get(d);
+			SortedMap<MunichUserGroup,Integer> usrGrp2Person = this.userGroup2TollPayers.get(d);
 			for(Id<Person> personId : timeBin2PersonInfo.get(d).keySet()){
 				if(timeBin2PersonInfo.get(d).get(personId)==0.) continue;
-				UserGroup ug = this.pf.getUserGroupFromPersonId(personId);
+				MunichUserGroup ug = this.pf.getMunichUserGroupFromPersonId(personId);
 				usrGrp2Person.put(ug, usrGrp2Person.get(ug)+1);
 			}
 		}
@@ -133,7 +133,7 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 		try {
 			writer.write("TimeBin \t UserGroup \t totaltollPayers \t totalTolledTrips \n");
 			for(Double d : this.userGroup2TollPayers.keySet()){
-				for(UserGroup ug : this.userGroup2TollPayers.get(d).keySet()){
+				for(MunichUserGroup ug : this.userGroup2TollPayers.get(d).keySet()){
 					writer.write(d+"\t"+ug+"\t"+this.userGroup2TollPayers.get(d).get(ug)+"\t"+this.userGroup2TolledTrips.get(d).get(ug)+"\n");
 				}
 			}

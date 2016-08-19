@@ -39,8 +39,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
@@ -55,7 +55,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private Map<Id<Person>, Double> personId2UserWelfareUtils;
 	private Map<Id<Person>, Double> personId2MonetarizedUserWelfare;
 	private Map<Id<Person>, Double> personId2MonetaryPayments;
-	private SortedMap<UserGroup, Double>  userGrp2ExcludedToll;
+	private SortedMap<MunichUserGroup, Double>  userGrp2ExcludedToll;
 	private Scenario scenario;
 	private int lastIteration;
 	private boolean considerAllPersonsInSumOfTolls;
@@ -94,9 +94,9 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 			storeUserBenefitsMaps(runCase);
 			getPersonId2MonetaryPayment(runCase);
 
-			SortedMap<UserGroup, Double> userGroupToUserWelfareUtils = getParametersPerUserGroup(this.personId2UserWelfareUtils);
-			SortedMap<UserGroup, Double> userGroupToUserWelfareMoney = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
-			SortedMap<UserGroup, Double> userGroupToTotalPayment = getTollsPerUserGroup(this.personId2MonetaryPayments);
+			SortedMap<MunichUserGroup, Double> userGroupToUserWelfareUtils = getParametersPerUserGroup(this.personId2UserWelfareUtils);
+			SortedMap<MunichUserGroup, Double> userGroupToUserWelfareMoney = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
+			SortedMap<MunichUserGroup, Double> userGroupToTotalPayment = getTollsPerUserGroup(this.personId2MonetaryPayments);
 
 			String outputFile = this.outputDir+runCase+"/analysis/userGrpWelfareAndTollPayments_"+this.wm+".txt";
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
@@ -108,7 +108,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 			try {
 				writer.write("UserGroup \t userWelfareUtils \t userWelfareMoney \t tollPayments \t excludedTollIfAny \n");
-				for(UserGroup ug : userGroupToTotalPayment.keySet()){
+				for(MunichUserGroup ug : userGroupToTotalPayment.keySet()){
 					writer.write(ug+"\t"+userGroupToUserWelfareUtils.get(ug)+"\t"
 							+userGroupToUserWelfareMoney.get(ug)+"\t"
 							+userGroupToTotalPayment.get(ug)+"\t"
@@ -127,14 +127,14 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		}
 	}
 
-	private SortedMap<UserGroup, Double> getParametersPerUserGroup(final Map<Id<Person>, Double> inputMap) { 
-		SortedMap<UserGroup, Double> outMap = new TreeMap<UserGroup, Double>();
-		for(UserGroup ug : UserGroup.values()){
+	private SortedMap<MunichUserGroup, Double> getParametersPerUserGroup(final Map<Id<Person>, Double> inputMap) { 
+		SortedMap<MunichUserGroup, Double> outMap = new TreeMap<>();
+		for(MunichUserGroup ug : MunichUserGroup.values()){
 			outMap.put(ug, 0.0);
 		}
 
 		for(Id<Person> id:inputMap.keySet()){
-			UserGroup ug = pf.getUserGroupFromPersonId(id);
+			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
 			double value2add = inputMap.get(id) ;
 			double newValue = value2add+valueSoFar;
@@ -143,15 +143,15 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		return outMap;
 	}
 
-	private SortedMap<UserGroup, Double> getTollsPerUserGroup(final Map<Id<Person>, Double> inputMap) { 
-		SortedMap<UserGroup, Double> outMap = new TreeMap<UserGroup, Double>();
-		for(UserGroup ug : UserGroup.values()){
+	private SortedMap<MunichUserGroup, Double> getTollsPerUserGroup(final Map<Id<Person>, Double> inputMap) { 
+		SortedMap<MunichUserGroup, Double> outMap = new TreeMap<>();
+		for(MunichUserGroup ug : MunichUserGroup.values()){
 			outMap.put(ug, 0.0);
 			userGrp2ExcludedToll.put(ug, 0.0);
 		}
 
 		for(Id<Person> id:inputMap.keySet()){
-			UserGroup ug = pf.getUserGroupFromPersonId(id);
+			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
 			double value2add = inputMap.get(id) ;
 

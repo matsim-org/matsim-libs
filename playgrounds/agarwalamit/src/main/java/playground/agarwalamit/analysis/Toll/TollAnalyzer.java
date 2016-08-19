@@ -38,9 +38,9 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -105,14 +105,13 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 
 		for(int ii=0; ii<areas.length;ii++) {
 			SortedMap<String, Double> usrGrpToToll = new TreeMap<>();
-			for( UserGroup ug : UserGroup.values() ) {
-				String myUg = pf.getMyUserGroup(ug);
-				if(usrGrpToToll.containsKey(myUg)) continue;
+			for( MunichUserGroup ug : MunichUserGroup.values() ) {
+				if(usrGrpToToll.containsKey(ug.toString())) continue;
 
-				TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, areas[ii], network, myUg);
+				TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, areas[ii], network, ug.toString());
 				ata.preProcessData();
 				ata.postProcessData();
-				usrGrpToToll.put(myUg, MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
+				usrGrpToToll.put(ug.toString(), MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
 			}
 			usrGrpToToll.put("allPersons", MapUtils.doubleValueSum(usrGrpToToll));
 			area2usrGrp2Toll.put(areasName[ii], usrGrpToToll);

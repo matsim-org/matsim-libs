@@ -39,9 +39,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
@@ -94,7 +94,7 @@ public class PeakHourTripTollAnalyzer {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+pricingScheme+"_pkHr"+".txt");
 		try {
 			for(Id<Person> p : person2TollsPkHr.keySet()){
-				String ug = pf.getMyUserGroupFromPersonId(p);
+				String ug = pf.getUserGroupAsStringFromPersonId(p);
 				for(double d: person2TollsPkHr.get(p)){
 					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d+"\n");
 				}
@@ -108,7 +108,7 @@ public class PeakHourTripTollAnalyzer {
 		writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+pricingScheme+"_offPkHr"+".txt");
 		try {
 			for(Id<Person> p : person2TollsOffPkHr.keySet()){
-				String ug = pf.getMyUserGroupFromPersonId(p);
+				String ug = pf.getUserGroupAsStringFromPersonId(p);
 				for(double d: person2TollsOffPkHr.get(p)){
 					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d+"\n");
 				}
@@ -135,13 +135,13 @@ public class PeakHourTripTollAnalyzer {
 	}
 
 	private void storeUserGroupData(){
-		for(UserGroup ug : UserGroup.values()){
-			usrGrp2Tolls.put(pf.getMyUserGroup(ug), new Tuple<Double, Double>(0., 0.));
-			usrGrp2TripCounts.put(pf.getMyUserGroup(ug), new Tuple<Integer, Integer>(0, 0));
+		for(MunichUserGroup ug : MunichUserGroup.values()){
+			usrGrp2Tolls.put(ug.toString(), new Tuple<Double, Double>(0., 0.));
+			usrGrp2TripCounts.put(ug.toString(), new Tuple<Integer, Integer>(0, 0));
 		}
 		//first store peak hour data
 		for (Id<Person> personId : this.person2TollsPkHr.keySet()) {
-			String ug = pf.getMyUserGroupFromPersonId(personId);
+			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double pkToll = usrGrp2Tolls.get(ug).getFirst() + ListUtils.doubleSum(this.person2TollsPkHr.get(personId));
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
 			usrGrp2Tolls.put(ug, new Tuple<Double, Double>(pkToll, 0.));
@@ -150,7 +150,7 @@ public class PeakHourTripTollAnalyzer {
 
 		//now store off-peak hour data
 		for (Id<Person> personId : this.person2TollsOffPkHr.keySet()) {
-			String ug = pf.getMyUserGroupFromPersonId(personId);
+			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double offpkToll = usrGrp2Tolls.get(ug).getSecond() + ListUtils.doubleSum(this.person2TollsOffPkHr.get(personId));
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
 			usrGrp2Tolls.put(ug, new Tuple<Double, Double>(usrGrp2Tolls.get(ug).getFirst(), offpkToll));

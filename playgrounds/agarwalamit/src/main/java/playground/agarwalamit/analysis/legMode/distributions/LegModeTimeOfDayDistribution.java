@@ -35,6 +35,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -145,7 +146,7 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
-			UserGroup thisUserGroup = this.pf.getUserGroupFromPersonId(event.getPersonId());
+			MunichUserGroup thisUserGroup = this.pf.getMunichUserGroupFromPersonId(event.getPersonId());
 			if(this.ug != null && !this.ug.equals(thisUserGroup)) return;
 
 			Double time = event.getTime();

@@ -88,7 +88,7 @@ public class BAUDelayAnalyzer {
 			writer.write("timeBin \t personId \t userGroup \t delayInHr \n");
 			for (double d : timeBin2CausingPerson2Delay.keySet()){
 				for (Id<Person> personId : timeBin2CausingPerson2Delay.get(d).keySet()){
-					writer.write(d+"\t"+personId+"\t"+pf.getUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
+					writer.write(d+"\t"+personId+"\t"+pf.getMunichUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
 				}
 			}
 			writer.close();
@@ -115,7 +115,7 @@ public class BAUDelayAnalyzer {
 		try {
 			writer.write("personId\tuserGroup\taffectedDelayInHr\tcausedDelayInHr\n");
 			for (Id<Person> id :causedPerson2Delay.keySet()){
-				writer.write(id+"\t"+pf.getUserGroupFromPersonId(id)+"\t"+affectedperson2Delay.get(id) / 3600+"\t"+causedPerson2Delay.get(id) / 3600+"\n");
+				writer.write(id+"\t"+pf.getMunichUserGroupFromPersonId(id)+"\t"+affectedperson2Delay.get(id) / 3600+"\t"+causedPerson2Delay.get(id) / 3600+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {

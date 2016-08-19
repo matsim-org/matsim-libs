@@ -34,8 +34,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * A class to get absolute experienced delays and delays costs per user group.
@@ -57,7 +57,7 @@ public class ExperiencedDelaysUserGroup {
 	public static Logger logger = Logger.getLogger(ExperiencedDelaysUserGroup.class);
 	private String outputDir;
 
-	private SortedMap<UserGroup, Double> userGroupToDelays;
+	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
 	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
@@ -70,9 +70,9 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
+		this.userGroupToDelays  = new TreeMap<MunichUserGroup, Double>();
 		this.time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
-		for (UserGroup ug:UserGroup.values()) {
+		for (MunichUserGroup ug:MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
 		
@@ -105,7 +105,7 @@ public class ExperiencedDelaysUserGroup {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t delaySeconds \t delaysMoney \n");
-			for(UserGroup ug:this.userGroupToDelays.keySet()){
+			for(MunichUserGroup ug:this.userGroupToDelays.keySet()){
 				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\t"+this.userGroupToDelays.get(ug)*this.vttsCar+"\n");
 			}
 			writer.close();
@@ -118,7 +118,7 @@ public class ExperiencedDelaysUserGroup {
 	private void getTotalDelayPerUserGroup(final Map<Double, Map<Id<Person>, Double>> delaysPerPersonPerTimeBin){
 		for(double d:delaysPerPersonPerTimeBin.keySet()){
 			for(Id<Person> personId : delaysPerPersonPerTimeBin.get(d).keySet()){
-				UserGroup ug = pf.getUserGroupFromPersonId(personId);
+				MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(personId);
 				double delaySoFar = this.userGroupToDelays.get(ug);
 				double newDelays = delaySoFar+delaysPerPersonPerTimeBin.get(d).get(personId);
 				this.userGroupToDelays.put(ug, newDelays);

@@ -106,11 +106,11 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 			Id<Person> driverId = Id.createPersonId(event.getVehicleId());
 			if ( ! this.zonalGeoms.isEmpty()  ) { // filtering for both
 				Link link = network.getLinks().get(event.getLinkId());
-				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
 					delegate.handleEvent(event);
 				}
 			} else { // filtering for user group only
-				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  ) {
 					delegate.handleEvent(event);
 				}
 			}

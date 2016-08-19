@@ -19,6 +19,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -112,7 +113,7 @@ public class RoadTypeInfoAnalyzer {
 		public void handleEvent(LinkLeaveEvent event) {
 			Id<Link> linkId = event.getLinkId();
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
-			UserGroup ug = pf.getUserGroupFromPersonId(personId);
+			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(personId);
 			String roadType = NetworkUtils.getType(((Link)net.getLinks().get(linkId)));
 
 			Map<String, Integer> road2count = userGrp2roadType2Count.get(ug);

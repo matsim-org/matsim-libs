@@ -37,9 +37,9 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
 import playground.agarwalamit.analysis.trip.TripDistanceHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
@@ -92,10 +92,10 @@ public class HourlyTripTollPerKmWriter {
 		for(double d : timebin2persontoll.keySet()){
 			userGroup2timebin2tolls.put(d, new TreeMap<String, List<Double>>());
 				SortedMap<String, List<Double>> time2totalToll = new TreeMap<>();
-				for(UserGroup ug : UserGroup.values()){
-					String userGroup = pf.getMyUserGroup(ug);
-				time2totalToll.put(userGroup, new ArrayList<Double>());
-			}
+				
+				for(MunichUserGroup ug : MunichUserGroup.values()){
+					time2totalToll.put(ug.toString(), new ArrayList<Double>());
+				}
 				userGroup2timebin2tolls.put(d, time2totalToll);
 		}
 
@@ -103,7 +103,7 @@ public class HourlyTripTollPerKmWriter {
 		for(double d : timebin2persontoll.keySet()){
 			SortedMap<String, List<Double>> usrGrp2tolls = userGroup2timebin2tolls.get(d); 
 			for(Id<Person> p : timebin2persontoll.get(d).keySet()){
-				String ug = pf.getMyUserGroupFromPersonId(p);
+				String ug = pf.getUserGroupAsStringFromPersonId(p);
 				List<Double> tollsInEurCt = ListUtils.scalerProduct( timebin2persontoll.get(d).get(p), 100.);
 				List<Double> distInKm =  ListUtils.scalerProduct( timebin2persondist.get(d).get(p), 1./1000.);
 				List<Double> tollPerKm = ListUtils.divide(tollsInEurCt, distInKm);

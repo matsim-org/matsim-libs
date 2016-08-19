@@ -70,7 +70,7 @@ ActivityStartEventHandler, PersonStuckEventHandler {
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		String ug = pf.getMyUserGroupFromPersonId(event.getPersonId());
+		String ug = pf.getUserGroupAsStringFromPersonId(event.getPersonId());
 		if( ug != null && ug.equals(userGroup)) {
 			delegate.handleEvent(event);
 		} else {
