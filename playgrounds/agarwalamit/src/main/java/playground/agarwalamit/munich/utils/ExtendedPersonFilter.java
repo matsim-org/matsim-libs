@@ -38,7 +38,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 
-public class ExtendedPersonFilter extends PersonFilter {
+public class ExtendedPersonFilter extends PersonFilter implements playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter{
 
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	private PersonFilter pf = new PersonFilter();
@@ -83,6 +83,11 @@ public class ExtendedPersonFilter extends PersonFilter {
 		return isInsideMunich;
 	}
 
+	@Override
+	public String getUserGroupAsStringFromPersonId (final Id<Person> personId) {
+		return getUserGroupFromPersonId(personId).toString();
+	}
+	
 	public UserGroup getUserGroupFromPersonId (final Id<Person> personId) {
 		UserGroup outUG = UserGroup.URBAN;
 		for(UserGroup ug : UserGroup.values()){

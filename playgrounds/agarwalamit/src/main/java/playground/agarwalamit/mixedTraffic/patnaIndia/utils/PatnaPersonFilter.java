@@ -66,7 +66,7 @@ public class PatnaPersonFilter implements PersonFilter{
 	}
 
 	@Override
-	public String getUserGroupFromPersonId(Id<Person> personId) {
+	public String getUserGroupAsStringFromPersonId(Id<Person> personId) {
 		PatnaUserGroup pug = PatnaPersonFilter.getUserGroup(personId);
 		return pug.toString();
 	}

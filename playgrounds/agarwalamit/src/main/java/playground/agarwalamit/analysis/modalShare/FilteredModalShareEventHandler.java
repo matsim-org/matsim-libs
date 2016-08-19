@@ -68,7 +68,7 @@ public class FilteredModalShareEventHandler implements PersonDepartureEventHandl
 	public void handleEvent(PersonStuckEvent event) {
 		if (this.userGroup == null || this.pf == null ) this.delegate.handleEvent(event);
 		else {
-			if(this.userGroup.equals(this.pf.getUserGroupFromPersonId(event.getPersonId()))) {
+			if(this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(event.getPersonId()))) {
 				this.delegate.handleEvent(event);
 			}
 		}
@@ -78,7 +78,7 @@ public class FilteredModalShareEventHandler implements PersonDepartureEventHandl
 	public void handleEvent(ActivityStartEvent event) {
 		if (this.userGroup == null || this.pf == null ) this.delegate.handleEvent(event);
 		else {
-			if(this.userGroup.equals(this.pf.getUserGroupFromPersonId(event.getPersonId()))) {
+			if(this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(event.getPersonId()))) {
 				this.delegate.handleEvent(event);
 			}
 		}
@@ -88,7 +88,7 @@ public class FilteredModalShareEventHandler implements PersonDepartureEventHandl
 	public void handleEvent(TransitDriverStartsEvent event) {
 		if (this.userGroup == null || this.pf == null ) this.delegate.handleEvent(event);
 		else {
-			if(this.userGroup.equals(this.pf.getUserGroupFromPersonId(event.getDriverId()))) {
+			if(this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(event.getDriverId()))) {
 				this.delegate.handleEvent(event);
 			}
 		}
@@ -98,7 +98,7 @@ public class FilteredModalShareEventHandler implements PersonDepartureEventHandl
 	public void handleEvent(PersonDepartureEvent event) {
 		if (this.userGroup == null || this.pf == null ) this.delegate.handleEvent(event);
 		else {
-			if(this.userGroup.equals(this.pf.getUserGroupFromPersonId(event.getPersonId()))) {
+			if(this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(event.getPersonId()))) {
 				this.delegate.handleEvent(event);
 			}
 		}	
