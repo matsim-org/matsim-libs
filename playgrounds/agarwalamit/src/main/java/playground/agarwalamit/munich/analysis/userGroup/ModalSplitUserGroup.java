@@ -22,55 +22,80 @@ import java.io.BufferedWriter;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
  */
 public class ModalSplitUserGroup {
+	
+	private final static Logger LOG = Logger.getLogger(ModalSplitUserGroup.class);
 
-	private SortedMap<UserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<UserGroup, SortedMap<String,Integer>>();
-	private SortedMap<UserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,Double>>();
+	private SortedMap<MunichUserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<>();
+	private SortedMap<MunichUserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<>();
 
 	private SortedMap<String, Double> wholePopPctModalShare ;
 	private SortedMap<String, Integer> wholePopMode2Legs;
 
 	public static void main(String[] args) {
 		
-		String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/";
-		String [] runCases =  {"ExI","5ExI","10ExI","15ExI","20ExI","25ExI"};
+		String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/output/";
+		String [] runCases =  {"baseCase"};
+
+		ModalSplitUserGroup msUG = new ModalSplitUserGroup();
 		
 		for(String runCase :runCases){
-			ModalSplitUserGroup msUG = new ModalSplitUserGroup();
-			int it = 1500;
-			msUG.run(outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz");
+			int it = 1000;
+//			String outputEventsFile = outputDir+"/"+runCase+"/output_events.xml.gz";
+			String outputEventsFile = outputDir+"/"+runCase+"/ITERS/it."+it+"/"+it+".events.xml.gz";
+
+			String plansFile = outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz";
+			msUG.run(outputEventsFile, plansFile);
 			msUG.writeResults(outputDir+runCase+"/analysis/usrGrpToModalShare_it."+it+".txt");
 		}
 	}
 
-	public void run(String populationFile){
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(populationFile);
-		PersonFilter pf = new PersonFilter();
+	public void run( String eventsFile, String plansFile){
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
+		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		
-		ModalShareFromPlans msg = new ModalShareFromPlans(sc.getPopulation());
-
-		wholePopPctModalShare = msg.getModeToPercentOfLegs();
-		wholePopMode2Legs = msg.getModeToNumberOfLegs();
-
-		for(UserGroup ug:UserGroup.values()){
-			Population usrGrpPop = pf.getPopulation(sc.getPopulation(), ug);
-			msg = new ModalShareFromPlans(usrGrpPop);
-			SortedMap<String, Double> modalSplitPop = msg.getModeToPercentOfLegs();
-			this.userGrp2ModalSplit.put(ug, modalSplitPop);
-			this.userGrp2Mode2Legs.put(ug, msg.getModeToNumberOfLegs());
+		for( MunichUserGroup ug : MunichUserGroup.values()) {
+			ModalShareFromEvents msc = new ModalShareFromEvents(eventsFile, ug.toString(), pf);
+			msc.run();
+			SortedMap<String, Integer> mode2legs_events = msc.getModeToNumberOfLegs();
+			SortedMap<String, Double> mode2share_events = msc.getModeToPercentOfLegs();
+			
+			this.userGrp2ModalSplit.put(ug, mode2share_events);
+			this.userGrp2Mode2Legs.put(ug, mode2legs_events);
+			
+			// it is possible to get the modal share from plans and it could match with share from events provided plans are experienced plans.
+			ModalShareFromPlans msp = new ModalShareFromPlans(sc.getPopulation(),ug.toString(), pf);
+			msp.run();
+			SortedMap<String, Integer> mode2legs_plans = msp.getModeToNumberOfLegs();
+//			SortedMap<String, Double> mode2share_plans = msp.getModeToPercentOfLegs();
+			
+			LOG.info("The modal share from events and plans for user group "+ ug.toString()+ " are as follows.");
+			LOG.info("Mode \t\t legsFromPlans \t\t legsFromEvents \n");
+			
+			for(String mode : mode2legs_events.keySet()){
+				LOG.info(mode+"\t\t"+mode2legs_plans.get(mode)+"\t\t"+mode2legs_events.get(mode)+"\n");
+			}
+			LOG.warn("If any agent is stuck, aborted trips are counted in plans but not in events.");
 		}
+		
+		ModalShareFromEvents msc = new ModalShareFromEvents(eventsFile);
+		msc.run();
+		
+		wholePopPctModalShare = msc.getModeToPercentOfLegs();
+		wholePopMode2Legs = msc.getModeToNumberOfLegs();
 	}
 
 	public void writeResults(String outputFile){
@@ -90,7 +115,7 @@ public class ModalSplitUserGroup {
 				writer.write(wholePopPctModalShare.get(str)+"\t");
 			}
 			writer.newLine();
-			for(UserGroup ug:this.userGrp2Mode2Legs.keySet()){
+			for(MunichUserGroup ug:this.userGrp2Mode2Legs.keySet()){
 				writer.write(ug+"\t");
 				for(String str:wholePopPctModalShare.keySet()){
 					if(this.userGrp2Mode2Legs.get(ug).get(str)!=null){
