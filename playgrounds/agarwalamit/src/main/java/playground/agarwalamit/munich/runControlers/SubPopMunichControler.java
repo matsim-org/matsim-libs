@@ -18,12 +18,14 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.runControlers;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -45,11 +47,16 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.munich.controlerListner.MyEmissionCongestionMoneyEventControlerListner;
 import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
@@ -69,18 +76,18 @@ public class SubPopMunichControler {
 		boolean offline = false;
 
 		if(args.length==0) offline = true;
-		
+
 		if(offline){
 			args = new String [] {
-								"false",
-								"false",
-								"false",
-								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml",
-								"1.0",
-								"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/output/baseCase/",
-								"false",
-								"false"
-								};
+					"false",
+					"false",
+					"false",
+					"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml",
+					"1.0",
+					"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/output/baseCase2/",
+					"false",
+					"false"
+			};
 		}
 
 		boolean internalizeEmission = Boolean.valueOf(args [0]); 
@@ -99,7 +106,7 @@ public class SubPopMunichControler {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
-		
+
 		if(offline){
 			config.network().setInputFile("network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
 			config.plans().setInputFile("mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz");
@@ -108,18 +115,19 @@ public class SubPopMunichControler {
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		final Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name()).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
+				String ug = MunichUserGroup.Rev_Commuter.toString();
+				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes = {"car", "pt_".concat(ug)};
 					String[] chainBasedModes = {"car", "bike"};
 					@Inject Scenario sc;
-					
+
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
@@ -149,7 +157,7 @@ public class SubPopMunichControler {
 			ecg.setEmissionRoadTypeMappingFile("../../../input/munich/roadTypeMapping.txt");
 			ecg.setEmissionVehicleFile("../../../input/munich/emissionVehicles_1pct.xml.gz");
 		}
-		
+
 		ecg.setUsingDetailedEmissionCalculation(true);
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
@@ -198,17 +206,17 @@ public class SubPopMunichControler {
 			});
 			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (MutableScenario) controler.getScenario(), tollHandler));
 		}
-		
+
 		// ride is one of network mode, thus travel disutility is required and every link must allow rider too
 		Set<String> modes = new HashSet<>();
 		modes.add("car");modes.add("ride");
-		
+
 		for(Link l : controler.getScenario().getNetwork().getLinks().values()) {
 			l.setAllowedModes(modes);
 		}
-		
+
 		controler.addOverridingModule(new AbstractModule() {
-			
+
 			@Override
 			public void install() {
 				addTravelTimeBinding("ride").to(networkTravelTime());
@@ -216,10 +224,7 @@ public class SubPopMunichControler {
 			}
 		});
 
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
@@ -238,5 +243,32 @@ public class SubPopMunichControler {
 		}
 
 		controler.run();
+
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		String OUTPUT_DIR = config.controler().getOutputDirectory();
+		for (int index =firstIt+1; index <lastIt; index ++){
+			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
+			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			IOUtils.deleteDirectory(new File(dirToDel),false);
+		}
+
+		new File(OUTPUT_DIR+"/analysis/").mkdir();
+		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
+		// write some default analysis
+		
+		{
+			String userGroup = MunichUserGroup.Urban.toString();
+			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new ExtendedPersonFilter());
+			msc.run();
+			msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents_"+userGroup+".txt");	
+		}
+		{
+			String userGroup = MunichUserGroup.Rev_Commuter.toString();
+			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new ExtendedPersonFilter());
+			msc.run();
+			msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents_"+userGroup+".txt");
+		}
 	}
 }

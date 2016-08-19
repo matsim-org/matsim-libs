@@ -22,13 +22,12 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
-
 
 /**
  * @author amit
@@ -48,26 +47,22 @@ public class ReadAndAddSubActivities {
 		
 		String initialPlans = "../../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 		String initialConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/config_munich_1pct_baseCase_fromBK_modified.xml";
+		
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
+		
 		String outConfig = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_baseCase.xml";
 		String outPlans = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
+		
 		ReadAndAddSubActivities add2Config =  new ReadAndAddSubActivities(initialConfig,sc);
-		add2Config.readConfig();
 		add2Config.addDataAndWriteConfig(outConfig,outPlans);
-
 	}
 	
-	private void readConfig(){
-		config = new Config();
-		config.addCoreModules();
-		ConfigReader reader = new ConfigReader(config);
-		reader.readFile(inputConfig);
-	}
-	
-	private void addDataAndWriteConfig(String outConfig, String inputPlans){
+	private void addDataAndWriteConfig(String outConfig, String outPlans){
+		config = ConfigUtils.loadConfig(inputConfig);
+		
 		ActivityClassifier newPlans= new ActivityClassifier(sc);
 		newPlans.run();
-		newPlans.writePlans(inputPlans);
+		newPlans.writePlans(outPlans);
 		SortedMap<String, Double> acts = newPlans.getActivityType2TypicalDuration();
 		
 		for(String act :acts.keySet()){
@@ -84,8 +79,8 @@ public class ReadAndAddSubActivities {
 		}
 		
 		config.controler().setOutputDirectory(null);
-		config.plans().setInputFile(inputPlans);
-		config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.8);
+		config.plans().setInputFile(outPlans);
+		config.vspExperimental().setWritingOutputEvents(true);
 		
 		new ConfigWriter(config).write(outConfig);
 	}

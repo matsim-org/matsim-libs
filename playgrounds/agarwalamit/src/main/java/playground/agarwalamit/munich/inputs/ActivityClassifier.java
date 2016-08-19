@@ -38,8 +38,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 
 /**
  * It classifies activities into sub-activities for Munich scenario by assuming stated activities as typical duration.
@@ -62,7 +62,7 @@ public class ActivityClassifier {
 	private int zeroDurCount =0;
 	private SortedMap<String, Double> actType2TypDur;
 	private Scenario scOut;
-	private PersonFilter pf = new PersonFilter();
+	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private int skippedPersons = 0;
 
 	/**
@@ -80,12 +80,12 @@ public class ActivityClassifier {
 
 		for(Person p : sc.getPopulation().getPersons().values()){
 
-			if(pf.isPersonIdFromUserGroup(p.getId(), UserGroup.URBAN)){
+			if( pf.getUserGroupAsStringFromPersonId(p.getId()).equals(MunichUserGroup.Urban.toString()) ){
 
 				boolean skipPerson = false;
 
 				Person pOut = popFactory.createPerson(p.getId());
-				
+
 				Plan planOut = popFactory.createPlan();
 				pOut.addPlan(planOut);
 
@@ -103,9 +103,9 @@ public class ActivityClassifier {
 				if(firstAct == null || lastAct == null) throw new RuntimeException("First and last plan elements are not instanceof Activity. Aborting...");
 
 				boolean isFirstAndLastActSame = firstAct.getType().equals(lastAct.getType());
-				
+
 				if( isFirstAndLastActSame ){ // only define act type and typ dur
-					
+
 					double homeDur = firstAct.getEndTime();
 					homeDur = homeDur +  24*3600 - lastAct.getStartTime(); 
 					/* here 30*00 may not be necessary, because, this step only decide about typical duration 
@@ -115,9 +115,9 @@ public class ActivityClassifier {
 					if(homeDur == 0) throw new RuntimeException("First and last activities are same, yet total duration is 0. Aborting...");
 
 					homeTypDur = Math.max(Math.floor(homeDur/3600), 0.5) * 3600;
-					
+
 				} else {
-					
+
 					if(firstAct.getEndTime() == 0.) { 
 						/*
 						 * If first and last act are not same, 1800 sec will be assigned to first act during "durationConsistencyCheck(...)".
@@ -126,9 +126,8 @@ public class ActivityClassifier {
 						LOG.warn("First activity has zero end time and first and last activities are different and thus scored differently. "
 								+ "Setting a minimum duration of 1800 sec for first activity.");
 					}
-					
 				}
-				
+
 				// start adding sub-activities to the plans
 				for(int ii = 0; ii<pes.size();ii++) {
 					PlanElement pe = pes.get(ii);
@@ -177,7 +176,7 @@ public class ActivityClassifier {
 									//time shift is required for first activity also, for e.g. activities having zero end time.
 									act.setEndTime(firstAct.getEndTime()+timeShift); 
 									planOut.addActivity(act);
-								
+
 								} else { // last
 
 									if(lastAct.getStartTime() >= 24*3600) {
@@ -202,9 +201,8 @@ public class ActivityClassifier {
 									act.setStartTime(lastAct.getStartTime()+ timeShift);
 									planOut.addActivity(act);
 								}
-							
 							}
-							
+
 						} else { // all intermediate activities
 
 							Activity currentAct = (Activity) pe;
@@ -217,7 +215,7 @@ public class ActivityClassifier {
 
 							actType = currentAct.getType().substring(0, 4).concat(typDur/3600+"H");
 							Activity a1 = popFactory.createActivityFromCoord(actType, cord);
-							
+
 							a1.setStartTime(currentAct.getStartTime() + timeShift); 
 
 							timeShift += durAndTimeShift.getSecond();
@@ -232,12 +230,12 @@ public class ActivityClassifier {
 						actType2TypDur.put(actType, typDur);
 					} 
 				}
-				
+
 				if(!skipPerson) popOut.addPerson(pOut);
 				else skippedPersons++;
 
-			} else if(pf.isPersonIdFromUserGroup(p.getId(), UserGroup.COMMUTER) || pf.isPersonIdFromUserGroup(p.getId(), UserGroup.REV_COMMUTER) ){
-				
+			} else if( pf.getUserGroupAsStringFromPersonId(p.getId()).equals(MunichUserGroup.Rev_Commuter.toString()) ){
+
 				//removing end time from the last act
 				Person pOut = popFactory.createPerson(p.getId());
 
@@ -267,7 +265,6 @@ public class ActivityClassifier {
 	}
 
 	private Tuple<Double, Double> durationConsistencyCheck (double duration){
-
 		double timeShift = 0.;
 		double dur = 0;
 
