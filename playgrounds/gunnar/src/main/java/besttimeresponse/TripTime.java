@@ -27,7 +27,6 @@ class TripTime {
 			throw new RuntimeException(
 					"Infeasible departure time interval [" + minDptTime_s + "s, " + maxDptTime_s + "s].");
 		}
-
 		this.dTT_dDptTime = dTT_dDptTime;
 		this.ttOffset_s = ttOffset_s;
 		this.minDptTime_s = minDptTime_s;

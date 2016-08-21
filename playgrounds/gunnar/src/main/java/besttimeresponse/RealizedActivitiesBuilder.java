@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,9 +26,9 @@ public class RealizedActivitiesBuilder {
 
 	private final boolean repairTimeStructure;
 
-	private final LinkedList<PlannedActivity> plannedActs = new LinkedList<>();
+	private final List<PlannedActivity> plannedActs = new ArrayList<>();
 
-	private final LinkedList<Double> dptTimes_s = new LinkedList<>();
+	private final List<Double> dptTimes_s = new ArrayList<>();
 
 	private List<RealizedActivity> result = null;
 
@@ -51,7 +52,7 @@ public class RealizedActivitiesBuilder {
 	}
 
 	private double withinDayTime_s(double time_s) {
-		while (time_s >= Units.S_PER_D) {
+		while (time_s > Units.S_PER_D) {
 			time_s -= Units.S_PER_D;
 		}
 		return time_s;
@@ -65,8 +66,8 @@ public class RealizedActivitiesBuilder {
 		}
 
 		final LinkedList<TripTime> tripTimes = new LinkedList<>();
-		double lastArrTime_s = PlannedActivity.minActDur_s; // just before
-															// midnight
+		double lastArrTime_s = -PlannedActivity.minActDur_s; // at 23:59:59
+
 		for (int q = 0; q < _N; q++) {
 
 			if (this.dptTimes_s.get(q) < lastArrTime_s + PlannedActivity.minActDur_s) {
@@ -87,15 +88,18 @@ public class RealizedActivitiesBuilder {
 			final double ttAtDptTimeBinEnd_s = this.travelTimes.getTravelTime_s(prevAct.location, nextAct.location,
 					this.timeDiscr.getBinEndTime_s(dptBin), prevAct.departureMode);
 
-			final double dTT_dDptTime = (ttAtDptTimeBinEnd_s - ttAtDptTimeBinStart_s) / this.timeDiscr.getBinSize_s();
+			double dTT_dDptTime = (ttAtDptTimeBinEnd_s - ttAtDptTimeBinStart_s) / this.timeDiscr.getBinSize_s();
+			if (dTT_dDptTime <= -(1.0 - 1e-8)) {
+				if (this.repairTimeStructure) {
+					dTT_dDptTime = -(1.0 - 1e-8);
+				} else {
+					throw new RuntimeException(
+							"FIFO problem: dTT/dDptTime = " + dTT_dDptTime + " is (almost) below -1.0.");
+				}
+			}
 			final double ttOffset_s = ttAtDptTimeBinStart_s - dTT_dDptTime * this.timeDiscr.getBinStartTime_s(dptBin);
 
 			lastArrTime_s = (1.0 + dTT_dDptTime) * this.dptTimes_s.get(q) + ttOffset_s;
-			// if (lastArrTime_s >= Units.S_PER_D) {
-			// throw new RuntimeException(
-			// "Arrival time " + lastArrTime_s + "s is beyond midnight, this is
-			// not allowed.");
-			// }
 			final int arrBin = this.timeDiscr.getBin(lastArrTime_s);
 
 			final double minDptTime_s = max(this.timeDiscr.getBinStartTime_s(dptBin),
@@ -107,14 +111,13 @@ public class RealizedActivitiesBuilder {
 		}
 
 		this.result = new ArrayList<>(_N);
-		this.result.add(new RealizedActivity(this.plannedActs.get(0), tripTimes.getFirst(),
-				this.withinDayTime_s(tripTimes.getLast().getArrTime_s(this.dptTimes_s.getLast())),
-				this.withinDayTime_s(this.dptTimes_s.getFirst())));
-		for (int q = 1; q < _N; q++) {
+		for (int q = 0; q < _N; q++) {
+			final int prevQ = (q - 1 >= 0 ? q - 1 : _N - 1);
 			this.result.add(new RealizedActivity(this.plannedActs.get(q), tripTimes.get(q),
-					this.withinDayTime_s(tripTimes.get(q - 1).getArrTime_s(this.dptTimes_s.get(q - 1))),
+					this.withinDayTime_s(tripTimes.get(prevQ).getArrTime_s(this.dptTimes_s.get(prevQ))),
 					this.withinDayTime_s(this.dptTimes_s.get(q))));
 		}
+		this.result = Collections.unmodifiableList(this.result);
 	}
 
 	public List<RealizedActivity> getResult() {
