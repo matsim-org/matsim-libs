@@ -110,7 +110,9 @@ public class TimeAllocator {
 						 * 
 						 * The line search assumes that g0 > 0 and g1 < 0. One
 						 * hence has (g1 - g0) < 0. The line search uses the
-						 * following expression * 0.5 - (_Q1 - _Q0) / (g1 - g0),
+						 * expression
+						 * 
+						 * 0.5 - (_Q1 - _Q0) / (g1 - g0),
 						 * 
 						 * which then becomes
 						 * 
