@@ -62,6 +62,7 @@ public class CountsInserter {
 
 	public void run(){
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
+			if(mcs.getSecond().equals("total")) continue;
 			for (String mode : this.countStation2time2countInfo.get(mcs).keySet()) {
 				if(counts==null) {
 					counts = new Counts<ModalLink>();
@@ -102,28 +103,29 @@ public class CountsInserter {
 				String linkId = parts[1];
 
 				Tuple<Id<Link>,String> nowTuple = new Tuple<Id<Link>, String>(Id.createLinkId(linkId), surveyLocation);
-
-				if  ( link2stationNumber == null ) link2stationNumber = nowTuple;
+				link2stationNumber = nowTuple;
 
 				int timebin = Integer.valueOf(parts[2]);
 				Map<String,Double> mode2count = new HashMap<>();
-				
+
 				for (int index = 3; index < parts.length; index++){
 					String mode = mode2index.get(index);
 					if(mode.equals("2w")) mode = "motorbike";
 					else if(mode.equals("cycle")) mode = "bike";
-//					else if(mode.equals("total")) {
-//						if (MapUtils.doubleValueSum(mode2count)!=Double.valueOf(parts[index])){
-//							throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
-//						}
-//						continue;
-//					}
+					
+					//					else if(mode.equals("total")) {
+					//						if (MapUtils.doubleValueSum(mode2count)!=Double.valueOf(parts[index])){
+					//							throw new RuntimeException("something went wrong. Check the modal count and total count in input file "+ file);
+					//						}
+					//						continue;
+					//					}
+					// can't check above because external counts are updated based on reduction factor and cant get exact match. Aug 2016.
 
 					double countAdjustmentFactor = 1; // only for out external traffic.
 					if(OuterCordonUtils.getInternalToExternalCountStationLinkIds(PatnaUtils.PATNA_NETWORK_TYPE).contains(Id.createLinkId(linkId))){
 						countAdjustmentFactor = OuterCordonUtils.getModalOutTrafficAdjustmentFactor().get(mode);
 					}
-					
+
 					mode2count.put(mode, NumberUtils.round( countAdjustmentFactor * Double.valueOf(parts[index]), 0) );
 				}
 
