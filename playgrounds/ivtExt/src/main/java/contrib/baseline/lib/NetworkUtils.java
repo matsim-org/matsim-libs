@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,31 +19,31 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
+package contrib.baseline.lib;
 
-import playground.boescpa.analysis.populationAnalysis.ActDurationAnalyzer;
-import playground.boescpa.analysis.populationAnalysis.DepartureTimeAnalyzer;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * WHAT IS IT FOR?
+ * Provides different useful static methods around networks...
  *
  * @author boescpa
  */
-public class CBPopAnalysis {
+public class NetworkUtils {
 
-	public static void main(final String[] args) {
-		final String population = args[0];
-		final String output = args[1];
-		// departures
-		DepartureTimeAnalyzer.main(new String[]{population, output + "depTimeAnalysis.txt"});
-		DepartureTimeAnalyzer.main(new String[]{population, output + "depTimeShopAnalysis.txt", "cbShop"});
-		DepartureTimeAnalyzer.main(new String[]{population, output + "depTimeLeisureAnalysis.txt", "cbLeisure"});
-		DepartureTimeAnalyzer.main(new String[]{population, output + "depTimeWorkAnalysis.txt", "cbWork"});
-		// durations
-		ActDurationAnalyzer.main(new String[]{population, output + "durationAnalysis.txt"});
-		ActDurationAnalyzer.main(new String[]{population, output + "durationShopAnalysis.txt", "cbShop"});
-		ActDurationAnalyzer.main(new String[]{population, output + "durationLeisureAnalysis.txt", "cbLeisure"});
-		ActDurationAnalyzer.main(new String[]{population, output + "durationWorkAnalysis.txt", "cbWork"});
+	/**
+	 * Directly loads and provides a network given a path to a network file.
+	 *
+	 * @param path2Network
+	 * @return Loaded network
+	 */
+	public static Network readNetwork(String path2Network) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(path2Network);
+		return scenario.getNetwork();
 	}
 
 }
