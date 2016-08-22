@@ -127,7 +127,7 @@ public class PreparationScript {
 	private static void createNewScenario() throws IOException {
         log.info(" ------- Create New Scenario ------- ");
         Files.move(Paths.get(pathConfig), Paths.get(pathScenario + CONFIG));
-        Files.move(Paths.get(pathLCConfig), Paths.get(pathScenario + LC_CONFIG));
+        //Files.move(Paths.get(pathLCConfig), Paths.get(pathScenario + LC_CONFIG));
         Files.move(Paths.get(pathFacilities), Paths.get(pathScenario + FACILITIES));
         Files.move(Paths.get(pathHouseholds), Paths.get(pathScenario + HOUSEHOLDS));
         Files.move(Paths.get(pathHouseholdAttributes), Paths.get(pathScenario + HOUSEHOLD_ATTRIBUTES));
