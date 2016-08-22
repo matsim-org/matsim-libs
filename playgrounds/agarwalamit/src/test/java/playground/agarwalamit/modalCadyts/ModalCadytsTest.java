@@ -190,7 +190,6 @@ public class ModalCadytsTest {
 		// check for car
 		String mode = mainModes.get(0);
 		Count<ModalLink> count =  modalLinkCounts.getCount( new ModalLink(mode, Id.createLinkId(19)).getId() );
-		//		Assert.assertEquals("Occupancy counts description is wrong", modalLinkCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "link_19");
 		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON);
@@ -313,7 +312,6 @@ public class ModalCadytsTest {
 			agentSource.setModeVehicleTypes(modeVehicleTypes);
 
 			qSim.addAgentSource(agentSource);
-
 			return qSim ;
 		}
 	}

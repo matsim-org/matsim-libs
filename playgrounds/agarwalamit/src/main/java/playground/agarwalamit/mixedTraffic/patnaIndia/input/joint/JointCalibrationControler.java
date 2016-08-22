@@ -228,6 +228,9 @@ public class JointCalibrationControler {
 		jcg.run();
 
 		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
+		modalLinkCounts.setYear(2008);
+		modalLinkCounts.setName("Patna_counts");
+		
 		Map<String, ModalLink> modalLinkContainer = jcg.getModalLinkContainer();
 
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
