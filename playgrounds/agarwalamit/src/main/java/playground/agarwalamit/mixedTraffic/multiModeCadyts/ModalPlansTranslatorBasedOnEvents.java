@@ -65,14 +65,16 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final String STR_ITERATION = "iteration";
 
 	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
+	private final Map<String,ModalLink> modalLinkContainer;
 
 	@Inject
-	ModalPlansTranslatorBasedOnEvents(final Scenario scenario) {
+	ModalPlansTranslatorBasedOnEvents(final Scenario scenario, Map<String,ModalLink> modalLinkContainer) {
 		this.scenario = scenario;
 		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
 		for ( String str : abc ) {
 			this.calibratedLinks.add( Id.createLinkId(str) ) ;
 		}
+		this.modalLinkContainer = modalLinkContainer;
 	}
 
 	private long plansFound = 0;
@@ -118,12 +120,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-
+		String mode = this.personId2Mode.get(driverId);
 		// should not happen since all modes are considered now
 		if (driverId == null) throw new RuntimeException("Link leave event "+ event.toString() + ". However, "+event.getVehicleId()+" is not entered traffic."); 
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
-		if (!calibratedLinks.contains(event.getLinkId())) 
+		Id<ModalLink> mlId = Id.create(new ModalLink(mode, event.getLinkId()).getId(),ModalLink.class);
+		if (!calibratedLinks.contains(mlId)) 
 			return;
 		
 		// get the "Person" behind the id:
@@ -137,10 +140,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		
 		if (tmpPlanStepFactory != null) {
 						
-			String mode = this.personId2Mode.get(driverId);
-					
 			// add the "turn" to the planStepfactory
-			tmpPlanStepFactory.addTurn(new ModalLink(mode,event.getLinkId()), (int) event.getTime());
+			tmpPlanStepFactory.addTurn(modalLinkContainer.get(mlId.toString()), (int) event.getTime());
 		}
 	}
 

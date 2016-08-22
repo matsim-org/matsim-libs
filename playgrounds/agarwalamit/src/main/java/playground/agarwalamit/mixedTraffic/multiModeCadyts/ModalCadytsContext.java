@@ -21,17 +21,14 @@
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -76,9 +73,12 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 	private EventsManager eventsManager;
 	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
+	
+	private final Map<String,ModalLink> modalLinkContainer;
 
 	@Inject
-	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager, 
+			VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO, Map<String,ModalLink> modalLinkContainer) {
 		this.scenario = scenario;
 		this.calibrationCounts = calibrationCounts;
 
@@ -86,19 +86,14 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.controlerIO = controlerIO;
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
+		this.modalLinkContainer = modalLinkContainer;
 
 		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
 
-		Set<String> countedLinks = new TreeSet<>();
-		for (Id<ModalLink> id : this.calibrationCounts.getCounts().keySet()) {
-			ModalLinkLookUp llu = new ModalLinkLookUp();
-			Link l = this.scenario.getNetwork().getLinks().get( llu.getItem(id).getLinkId() );
-			countedLinks.add(l.getId().toString());
-		}
-		cadytsConfig.setCalibratedItems(countedLinks);
-
+		cadytsConfig.setCalibratedItems(modalLinkContainer.keySet());
+		
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
@@ -112,10 +107,10 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 		this.simResults = new ModalSimResultsContainerImpl(volumesAnalyzer, countsScaleFactor);
 		
 		// this collects events and generates cadyts plans from it
-		this.plansTranslator = new ModalPlansTranslatorBasedOnEvents(scenario);
+		this.plansTranslator = new ModalPlansTranslatorBasedOnEvents(scenario, modalLinkContainer);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator =  CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp() /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
+		this.calibrator =  CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp(modalLinkContainer) /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
 	}
 
 	@Override
@@ -143,7 +138,7 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 		// write some output
 		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<ModalLink>(new ModalLinkLookUp(), ModalLink.class)
+			new CadytsCostOffsetsXMLFileIO<ModalLink>(new ModalLinkLookUp(modalLinkContainer), ModalLink.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);

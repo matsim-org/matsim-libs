@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
@@ -27,10 +29,15 @@ import org.matsim.contrib.cadyts.general.LookUpItemFromId;
  */
 
 public class ModalLinkLookUp implements LookUpItemFromId<ModalLink> {
-
+	
+	private Map<String, ModalLink> mappingOfModalLink ;
+	
+	ModalLinkLookUp (final Map<String, ModalLink> modalLinkContainer){
+		this.mappingOfModalLink = modalLinkContainer;
+	}
+	
 	@Override
 	public ModalLink getItem( Id<ModalLink> id ) {
-		String strs [] = id.toString().split(ModalLink.getModeLinkSplittor());
-		return new ModalLink(strs[0], Id.createLinkId(strs[1]));
+		return this.mappingOfModalLink.get(id.toString());
 	}
 }

@@ -47,6 +47,11 @@ public class CountsInserter {
 
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo = new HashMap<>();
 	private Counts<ModalLink> counts = new Counts<>();
+	private HashMap<String,ModalLink> mappedModalLink = new HashMap<>(); // central database of objects to retrieve, if needed. (similar to links in the scenario)
+
+	public HashMap<String, ModalLink> getModalLinkContainer() {
+		return mappedModalLink;
+	}
 
 	public static void main(String[] args) {
 		String inputFolder = PatnaUtils.INPUT_FILES_DIR;
@@ -62,8 +67,8 @@ public class CountsInserter {
 
 	public void run(){
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
-			if(mcs.getSecond().equals("total")) continue;
 			for (String mode : this.countStation2time2countInfo.get(mcs).keySet()) {
+				if(mode.equals("total")) continue;				
 				if(counts==null) {
 					counts = new Counts<ModalLink>();
 					counts.setYear(2008);
@@ -71,8 +76,10 @@ public class CountsInserter {
 					counts.setDescription(mode);
 				}
 
-				ModalLink ml = new ModalLink(mode, mcs.getFirst());
+				ModalLink ml = new ModalLink(mode, mcs.getFirst()); 
 				Id<ModalLink> modalLinkId = Id.create(ml.getId(), ModalLink.class);
+				mappedModalLink.put(modalLinkId.toString(), ml);
+				
 				Count<ModalLink> c = counts.createAndAddCount(modalLinkId, mcs.getSecond());
 				for(Integer i : countStation2time2countInfo.get(mcs).get(mode).keySet()){
 					double vol = countStation2time2countInfo.get(mcs).get(mode).get(i) ;

@@ -20,6 +20,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -227,6 +228,7 @@ public class JointCalibrationControler {
 		jcg.run();
 
 		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
+		Map<String, ModalLink> modalLinkContainer = jcg.getModalLinkContainer();
 
 		String modes = CollectionUtils.setToString(new HashSet<>(PatnaUtils.EXT_MAIN_MODES));
 		config.counts().setAnalyzedModes(modes);
@@ -237,6 +239,7 @@ public class JointCalibrationControler {
 			@Override
 			public void install() {
 				bind(Key.get(new TypeLiteral<Counts<ModalLink>>(){}, Names.named("calibration"))).toInstance(modalLinkCounts);
+				bind(Key.get(new TypeLiteral<Map<String,ModalLink>>(){})).toInstance(modalLinkContainer);
 
 				bind(ModalCadytsContext.class).asEagerSingleton();
 				addControlerListenerBinding().to(ModalCadytsContext.class);

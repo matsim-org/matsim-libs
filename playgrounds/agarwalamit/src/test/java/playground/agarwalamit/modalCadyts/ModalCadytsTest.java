@@ -21,6 +21,7 @@ package playground.agarwalamit.modalCadyts;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.config.Config;
@@ -78,7 +78,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.CountsInserte
  * 
  * after CadytsCarIT in cadyts contrib.
  */
-public class MultiModeCadytsTest {
+public class ModalCadytsTest {
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -108,9 +108,10 @@ public class MultiModeCadytsTest {
 		CountsInserter jcg = new CountsInserter();		
 		jcg.processInputFile( inputDir+"/countsCar.txt" );
 		jcg.run();
-		
 		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
-				com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
+		Map<String, ModalLink> modalLinkContainer = jcg.getModalLinkContainer();
+
+		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
 			public void install() {
 				install(new NewControlerModule());
@@ -120,7 +121,8 @@ public class MultiModeCadytsTest {
 					public void install() {
 						
 						bind(Key.get(new TypeLiteral<Counts<ModalLink>>(){}, Names.named("calibration"))).toInstance(modalLinkCounts);
-
+						bind(Key.get(new TypeLiteral<Map<String,ModalLink>>(){})).toInstance(modalLinkContainer);
+						
 						bind(ModalCadytsContext.class).asEagerSingleton();
 						addControlerListenerBinding().to(ModalCadytsContext.class);
 						
@@ -149,7 +151,6 @@ public class MultiModeCadytsTest {
 					}
 				}));
 				install(new ScenarioByConfigModule());
-				install(new CadytsCarModule());
 			}
 		});
 		ControlerI controler = injector.getInstance(ControlerI.class);
@@ -183,7 +184,7 @@ public class MultiModeCadytsTest {
 		Id<Link> locId11 = Id.create(11, Link.class);
 		simValues = reader.getSimulatedValues(locId11);
 		realValues= reader.getRealValues(locId11);
-		Assert.assertEquals("Volume of hour 6 is wrong", 1.0, simValues[6], MatsimTestUtils.EPSILON);  // this is wrong yet. expected should be 0.0
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);  
 		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON);
 
 		Id<Link> locId12 = Id.create("12", Link.class);
@@ -195,7 +196,7 @@ public class MultiModeCadytsTest {
 		Id<Link> locId19 = Id.create("19", Link.class);
 		simValues = reader.getSimulatedValues(locId19);
 		realValues= reader.getRealValues(locId19);
-		Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON); // this is also wrong. expected should be 4.0
+		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON); 
 		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
 
 		Id<Link> locId21 = Id.create("21", Link.class);
