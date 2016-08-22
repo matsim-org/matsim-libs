@@ -4,8 +4,8 @@ import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.Charg
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
 
 public interface ChargingSitePolicy {
-	double getParkingPriceQuote(double time, double duration);
+	double getParkingCost(double time, double duration);
 	
-	double getChargingPriceQuote(double time, double duration, ChargingPlugType plugType);
+	double getChargingCost(double time, double duration, ChargingPlugType plugType);
 }
 
