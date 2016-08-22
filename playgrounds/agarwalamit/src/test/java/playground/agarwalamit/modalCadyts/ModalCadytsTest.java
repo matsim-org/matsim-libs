@@ -20,10 +20,14 @@
 package playground.agarwalamit.modalCadyts;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -34,11 +38,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
@@ -47,6 +53,13 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scoring.ScoringFunction;
@@ -60,26 +73,23 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.CountsInserter;
 
 /**
- * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
- * in order to establish an according test for the cadyts car integration.
- * At this stage all original pt code is still included here, but outcommeted, to make the adaptations
- * from pt to car well traceable in case of any errors.
- * 
- * after CadytsCarIT in cadyts contrib.
+ * amit after CadytsCarIT in cadyts contrib.
  */
 public class ModalCadytsTest {
-	
+
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -88,25 +98,29 @@ public class ModalCadytsTest {
 
 		final double beta=30. ;
 		final int lastIteration = 20 ;
-		
+
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
 
 		final Config config = createTestConfig(inputDir, outputDir);
-		
+
+		List<String> mainModes = Arrays.asList("car","bike");
+		config.qsim().setMainModes(mainModes );
+		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
+
 		config.controler().setLastIteration(lastIteration);
-		
+
 		config.planCalcScore().setBrainExpBeta(beta);
-		
+
 		StrategySettings strategySettings = new StrategySettings() ;
 		strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
 		// ===
-		
+
 		CountsInserter jcg = new CountsInserter();		
-		jcg.processInputFile( inputDir+"/countsCar.txt" );
+		jcg.processInputFile( inputDir+"/countsCarBike.txt" );
 		jcg.run();
 		Counts<ModalLink> modalLinkCounts = jcg.getModalLinkCounts();
 		Map<String, ModalLink> modalLinkContainer = jcg.getModalLinkContainer();
@@ -119,14 +133,16 @@ public class ModalCadytsTest {
 				install(AbstractModule.override(Collections.singleton(new ControlerDefaultsModule()), new AbstractModule() {
 					@Override
 					public void install() {
-						
+
+						bindMobsim().toProvider(MultipleModeVehiclesQSimFactory.class);
+
 						bind(Key.get(new TypeLiteral<Counts<ModalLink>>(){}, Names.named("calibration"))).toInstance(modalLinkCounts);
 						bind(Key.get(new TypeLiteral<Map<String,ModalLink>>(){})).toInstance(modalLinkContainer);
-						
+
 						bind(ModalCadytsContext.class).asEagerSingleton();
 						addControlerListenerBinding().to(ModalCadytsContext.class);
-						
-						
+
+
 						bindScoringFunctionFactory().toInstance(new ScoringFunctionFactory() {
 							@Inject private CharyparNagelScoringParametersForPerson parameters;
 							@Inject private Network network;
@@ -148,6 +164,8 @@ public class ModalCadytsTest {
 								return scoringFunctionAccumulator;
 							}
 						});
+
+						this.addControlerListenerBinding().to(MultiModeCountsControlerListener.class);
 					}
 				}));
 				install(new ScenarioByConfigModule());
@@ -159,108 +177,152 @@ public class ModalCadytsTest {
 		//scenario data  test
 		Scenario scenario = injector.getInstance(Scenario.class);
 		Assert.assertEquals("Different number of links in network.", scenario.getNetwork().getLinks().size() , 23 );
-        Assert.assertEquals("Different number of nodes in network.", scenario.getNetwork().getNodes().size() , 15 );
-		
+		Assert.assertEquals("Different number of nodes in network.", scenario.getNetwork().getNodes().size() , 15 );
+
 		Assert.assertNotNull("Population is null.", scenario.getPopulation());
 
-        Assert.assertEquals("Num. of persons in population is wrong.", scenario.getPopulation().getPersons().size(), 5);
+		Assert.assertEquals("Num. of persons in population is wrong.", scenario.getPopulation().getPersons().size(), 9);
 		Assert.assertEquals("Scale factor is wrong.", scenario.getConfig().counts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		
+
 		//counts
-		Assert.assertEquals("Count file is wrong.", scenario.getConfig().counts().getCountsFileName(), inputDir + "counts5.xml");
-				
-		
-		Count<ModalLink> count =  modalLinkCounts.getCount( new ModalLink("car", Id.createLinkId(19)).getId() );
-//		Assert.assertEquals("Occupancy counts description is wrong", modalLinkCounts.getDescription(), "counts values for equil net");
+		Assert.assertEquals("Count file is wrong.", scenario.getConfig().counts().getCountsFileName(), inputDir + "countsCarBike.xml");
+
+		// check for car
+		String mode = mainModes.get(0);
+		Count<ModalLink> count =  modalLinkCounts.getCount( new ModalLink(mode, Id.createLinkId(19)).getId() );
+		//		Assert.assertEquals("Occupancy counts description is wrong", modalLinkCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "link_19");
 		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON);
 
-		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".countscompare.txt";
-		CountsReaderCar reader = new CountsReaderCar(outCounts);
+		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".multiMode_hourlyCounts.txt";
+		ModalCountsReader reader = new ModalCountsReader(outCounts);
 		double[] simValues;
-		double[] realValues;
+		double realValue;
 
 		Id<Link> locId11 = Id.create(11, Link.class);
-		simValues = reader.getSimulatedValues(locId11);
-		realValues= reader.getRealValues(locId11);
+		simValues = reader.getSimulatedValues(locId11, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId11, mode, 7); //6-7 am
 		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);  
-		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValue, MatsimTestUtils.EPSILON);
 
 		Id<Link> locId12 = Id.create("12", Link.class);
-		simValues = reader.getSimulatedValues(locId12);
-		realValues= reader.getRealValues(locId12);
+		simValues = reader.getSimulatedValues(locId12, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId12, mode, 7);
 		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6] , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValue , MatsimTestUtils.EPSILON);
 
 		Id<Link> locId19 = Id.create("19", Link.class);
-		simValues = reader.getSimulatedValues(locId19);
-		realValues= reader.getRealValues(locId19);
+		simValues = reader.getSimulatedValues(locId19, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId19, mode, 7); 
 		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON); 
-		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValue, MatsimTestUtils.EPSILON);
 
 		Id<Link> locId21 = Id.create("21", Link.class);
-		simValues = reader.getSimulatedValues(locId21); 
-		realValues= reader.getRealValues(locId21);
+		simValues = reader.getSimulatedValues(locId21, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId21, mode, 7);
 		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValue, MatsimTestUtils.EPSILON);
 
-		// test calibration statistics
-		String testCalibStatPath = outputDir + "calibration-stats.txt";
-		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
-		new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
+		// check for bike 
+		mode = mainModes.get(1);
+		count =  modalLinkCounts.getCount( new ModalLink(mode, Id.createLinkId(11)).getId() );
+		//		Assert.assertEquals("Occupancy counts description is wrong", modalLinkCounts.getDescription(), "counts values for equil net");
+		Assert.assertEquals("CsId is wrong.", count.getCsId() , "link_11");
+		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
-		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
-		// Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
-		// Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
-//			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
-		Assert.assertEquals("different Link_lambda_avg", "3.2261421242498865E-5", outStatData.getLink_lambda_avg() );
-//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
-//			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
-//			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9", outStatData.getLink_lambda_stddev());
-//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
-//			Assert.assertEquals("different Plan_lambda_avg", "-7.233575164452594E-9", outStatData.getPlan_lambda_avg() );
-//			Assert.assertEquals("different Plan_lambda_max", "-7.233575164452593E-9" , outStatData.getPlan_lambda_max() );
-//			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
-//			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
-		// Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
-		Assert.assertEquals("different Total_ll", "0.0", outStatData.getTotal_ll() );
+		outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".multiMode_hourlyCounts.txt";
+		reader = new ModalCountsReader(outCounts);
 
-		//test link offsets
-		final Network network = scenario.getNetwork();
-		String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
+		locId11 = Id.create(11, Link.class);
+		simValues = reader.getSimulatedValues(locId11, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId11, mode, 7);
+		Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);  
+		Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValue, MatsimTestUtils.EPSILON);
 
-//		CadytsCostOffsetsXMLFileIO<Link> offsetReader = new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(network), Link.class);
-//
-//		DynamicData<Link> linkOffsets = offsetReader.read(linkOffsetFile);
-//
-//		Link link11 = network.getLinks().get(locId11);
-//		Link link19 = network.getLinks().get(locId19);
-//
-//		//find first offset value different from null to compare. Useful to test with different time bin sizes
-//		int binIndex=-1;
-//		boolean isZero;
-//		do {
-//			binIndex++;
-//			isZero = (Math.abs(linkOffsets.getBinValue(link19 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
-//		}while (isZero && binIndex<86400);
-//
-//		Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
-//
-//		Assert.assertEquals("Wrong link offset of link 11", 0.0, linkOffsets.getBinValue(link11 , binIndex), MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Wrong link offset of link 19", 0.0014707121641471912, linkOffsets.getBinValue(link19 , binIndex), MatsimTestUtils.EPSILON);
+		locId12 = Id.create(12, Link.class);
+		simValues = reader.getSimulatedValues(locId12, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId12, mode, 7);
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValue , MatsimTestUtils.EPSILON);
+
+		locId19 = Id.create(19, Link.class);
+		simValues = reader.getSimulatedValues(locId19, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId19, mode, 7); 
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON); 
+		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValue, MatsimTestUtils.EPSILON);
+
+		locId21 = Id.create(21, Link.class);
+		simValues = reader.getSimulatedValues(locId21, mode);
+		realValue = getCountRealValue(modalLinkCounts, locId21, mode, 8); // bike is slow; will enter link 21 after 7am
+		Assert.assertEquals("Volume of hour 7 is wrong", 4.0, simValues[7], MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Volume of hour 7 is wrong", 4.0, realValue, MatsimTestUtils.EPSILON);
 	}
-	
-	
+
 	//--------------------------------------------------------------
+	private double getCountRealValue(Counts<ModalLink> counts, Id<Link> linkId, String mode, int hour) {
+		Count<ModalLink> count =  counts.getCount( new ModalLink(mode, linkId).getId() );
+		return count.getVolume(hour).getValue();
+	}
 
+	private static class MultipleModeVehiclesQSimFactory implements Provider<Mobsim> {
 
+		@Inject Scenario scenario;
+		@Inject EventsManager eventsManager;
+
+		@Override
+		public Mobsim get() {
+
+			QSimConfigGroup conf = scenario.getConfig().qsim();
+			if (conf == null) {
+				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+			}
+
+			// construct the QSim:
+			QSim qSim = new QSim(scenario, eventsManager);
+
+			// add the activity engine:
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+			qSim.addMobsimEngine(activityEngine);
+			qSim.addActivityHandler(activityEngine);
+
+			// add the netsim engine:
+			QNetsimEngine netsimEngine = new QNetsimEngine(qSim) ;
+			qSim.addMobsimEngine(netsimEngine);
+			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+
+			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+			qSim.addMobsimEngine(teleportationEngine);
+
+			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+
+			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+			Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
+
+			VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+			car.setMaximumVelocity(100.0/3.6);
+			car.setPcuEquivalents(1.0);
+			modeVehicleTypes.put("car", car);
+
+			VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
+			bike.setMaximumVelocity(50.0/3.6);
+			bike.setPcuEquivalents(0.25);
+			modeVehicleTypes.put("bike", bike);
+
+			agentSource.setModeVehicleTypes(modeVehicleTypes);
+
+			qSim.addAgentSource(agentSource);
+
+			return qSim ;
+		}
+	}
 
 	private static Config createTestConfig(String inputDir, String outputDir) {
 		Config config = ConfigUtils.createConfig() ;
 		config.global().setRandomSeed(4711) ;
 		config.network().setInputFile(inputDir + "network.xml") ;
-		config.plans().setInputFile(inputDir + "plans5.xml") ;
+		config.plans().setInputFile(inputDir + "plans.xml") ;
 		config.controler().setFirstIteration(1) ;
 		config.controler().setLastIteration(10) ;
 		config.controler().setOutputDirectory(outputDir) ;
@@ -274,23 +336,13 @@ public class ModalCadytsTest {
 			ActivityParams params = new ActivityParams("h") ;
 			config.planCalcScore().addActivityParams(params ) ;
 			params.setTypicalDuration(12*60*60.) ;
-		}{
+		}
+		{
 			ActivityParams params = new ActivityParams("w") ;
 			config.planCalcScore().addActivityParams(params ) ;
 			params.setTypicalDuration(8*60*60.) ;
 		}
-		config.counts().setInputFile(inputDir + "counts5.xml");
+		config.counts().setInputFile(inputDir + "countsCarBike.xml");
 		return config;
 	}
-
-	
-	private static class DummyMobsim implements Mobsim {
-		public DummyMobsim() {
-		}
-		@Override
-		public void run() {
-		}
-	}
-
 }
-
