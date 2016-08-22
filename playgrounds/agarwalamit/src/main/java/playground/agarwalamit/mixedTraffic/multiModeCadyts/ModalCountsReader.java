@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.modalCadyts;
+package playground.agarwalamit.mixedTraffic.multiModeCadyts;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -28,7 +28,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.StringUtils;
 
-class ModalCountsReader {
+/**
+ * @author amit
+ */
+public class ModalCountsReader {
 
 	private String countsTextFile;
 	private Map<Id<Link>, Map<String, double[]>> count = new TreeMap<>();
@@ -59,7 +62,6 @@ class ModalCountsReader {
 					for (int index = 2; index <values.length; index++) {
 						vol[index-2] = Double.valueOf( values[index] );
 					}
-
 					this.count.get(id).put(mode, vol);
 				}
 			}
