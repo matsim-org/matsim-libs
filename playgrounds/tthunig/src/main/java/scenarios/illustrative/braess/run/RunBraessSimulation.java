@@ -77,6 +77,9 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
 import scenarios.illustrative.analysis.TtAnalyzedResultsWriter;
 import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
+import scenarios.illustrative.analysis.TtSignalAnalysisListener;
+import scenarios.illustrative.analysis.TtSignalAnalysisTool;
+import scenarios.illustrative.analysis.TtSignalAnalysisWriter;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
@@ -109,7 +112,7 @@ public final class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = null;
 
 	// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_X_SECOND_Z;
 	// if SignalControlType SIGNAL4_X_Seconds_Z or SIGNAL4_RESPONSIVE is used, SECONDS_Z_GREEN gives the green time for Z
 	private static final int SECONDS_Z_GREEN = 1;
 	
@@ -424,6 +427,16 @@ public final class RunBraessSimulation {
 				this.addEventHandlerBinding().to(TtAbstractAnalysisTool.class);
 				this.bind(TtAnalyzedResultsWriter.class);
 				this.addControlerListenerBinding().to(TtListenerToBindAndWriteAnalysis.class);
+				
+				SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
+						SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+				if (signalsConfigGroup.isUseSignalSystems()) {
+					this.bind(TtSignalAnalysisTool.class).asEagerSingleton();
+					this.addEventHandlerBinding().to(TtSignalAnalysisTool.class);
+					this.addControlerListenerBinding().to(TtSignalAnalysisTool.class);
+					this.bind(TtSignalAnalysisWriter.class);
+					this.addControlerListenerBinding().to(TtSignalAnalysisListener.class);
+				}
 			}
 		});
 		
