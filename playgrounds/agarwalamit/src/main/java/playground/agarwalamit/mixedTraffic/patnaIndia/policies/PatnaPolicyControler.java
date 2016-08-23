@@ -76,6 +76,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 /**
@@ -85,7 +86,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class PatnaPolicyControler {
 
 	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
-	private static boolean applyTrafficRestrain = false;
+	private static boolean applyTrafficRestrain = true;
 	private static boolean addBikeTrack = false;
 
 	public static void main(String[] args) {
@@ -103,9 +104,9 @@ public class PatnaPolicyControler {
 
 		ConfigUtils.loadConfig(config, configFile);
 
-		if(applyTrafficRestrain && addBikeTrack) outputDir = dir+"/both/";
+		if(applyTrafficRestrain ) outputDir = dir+"/trafficRestrain/";
 		else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
-		else if(applyTrafficRestrain && addBikeTrack) outputDir = dir+"/trafficRestrain/";
+		else if(applyTrafficRestrain && addBikeTrack) outputDir = dir+"/both/";
 		else outputDir = dir+"/baseCaseCtd/";
 		
 		config.controler().setOutputDirectory(outputDir);
@@ -147,8 +148,10 @@ public class PatnaPolicyControler {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
-
-		if(applyTrafficRestrain ) removeRoutes(scenario); // removal of some links may lead to exception if routes are not removed from leg.
+		
+		// removal of some links may lead to exception if routes are not removed from leg.
+		// do this before setting a new network so that cord from removed links can be extracted.
+		if(applyTrafficRestrain ) removeRoutes(scenario, inputDir+"/network.xml.gz"); 
 
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.getConfig().strategy().setMaxAgentPlanMemorySize(10);
@@ -263,7 +266,10 @@ public class PatnaPolicyControler {
 		});
 	}
 
-	private static void removeRoutes(Scenario scenario){
+	private static void removeRoutes(final Scenario scenario, final String baseCaseNetwork){
+		// this is required because routes are generated from initial base case network; and new network does not have certain links.
+		Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(baseCaseNetwork); 
+		
 		//since some links are now removed, route in the plans will throw exception, remove them.
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
@@ -274,10 +280,11 @@ public class PatnaPolicyControler {
 					Coord cord = act.getCoord();
 
 					if (cord == null && linkId == null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
-					else if (linkId == null ) { /*nothing to do*/ }
-					else if (cord==null && ! scenario.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
+					else if (linkId == null ) { /*nothing to do; cord is assigned*/ }
+					else if (cord==null && ! scNetwork.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
 					else {
-						cord = scenario.getNetwork().getLinks().get(linkId).getCoord();
+						cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
+						act.setLinkId(null);
 						act.setCoord(cord);
 					}
 				} else if ( pe instanceof Leg){
