@@ -84,61 +84,65 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 public class PatnaPolicyControler {
 
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
-	private static String configFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/input/configBaseCaseCtd.xml";
+	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
 	private static boolean applyTrafficRestrain = false;
-	private static boolean addBikeTrack = true;
+	private static boolean addBikeTrack = false;
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 
 		if(args.length>0){
-			configFile = args[0];
-			outputDir = args[1];
+			dir = args[0];
+			applyTrafficRestrain = Boolean.valueOf(args[1]);
+			addBikeTrack = Boolean.valueOf(args[2]);
+		} 
 
-			applyTrafficRestrain = Boolean.valueOf(args[2]);
-			addBikeTrack = Boolean.valueOf(args[3]);
-			ConfigUtils.loadConfig(config, configFile);
-		} else {
-			ConfigUtils.loadConfig(config, configFile);
-			if(applyTrafficRestrain && addBikeTrack) config.controler().setOutputDirectory(outputDir+"/both/");
-			else if(addBikeTrack) config.controler().setOutputDirectory(outputDir+"/bikeTrack/");
-			else if(applyTrafficRestrain && addBikeTrack) config.controler().setOutputDirectory(outputDir+"/trafficRestrain/");
-			else config.controler().setOutputDirectory(outputDir+"/baseCaseCtd/");
-		}
+		String inputDir = dir+"/input/";
+		String configFile = inputDir + "configBaseCaseCtd.xml";
+		String outputDir ;
+
+		ConfigUtils.loadConfig(config, configFile);
+
+		if(applyTrafficRestrain && addBikeTrack) outputDir = dir+"/both/";
+		else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
+		else if(applyTrafficRestrain && addBikeTrack) outputDir = dir+"/trafficRestrain/";
+		else outputDir = dir+"/baseCaseCtd/";
+		
+		config.controler().setOutputDirectory(outputDir);
 
 		//==
 		// after calibration;  departure time is fixed for urban; remove time choice
 		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
 		for(StrategySettings ss : strategySettings){ // departure time is fixed now.
 			if ( ss.getStrategyName().equals(DefaultStrategy.TimeAllocationMutator.toString()) ) {
-				ss.setWeight(0.0);
+				throw new RuntimeException("Time mutation should not be used; fixed departure time must be used after cadyts calibration.");
 			}
 		}
 		//==
-		
+
 		//==
 		// take only selected plans so that time for urban and location for external traffic is fixed.
-		String configPath = config.getContext().getPath();
 		String inPlans = "baseCaseOutput_plans.xml.gz";
 		String outPlans = "selectedPlansOnly.xml.gz";
 		
-		SelectedPlansFilter plansFilter = new SelectedPlansFilter();
-		plansFilter.run(configPath + inPlans);
-		plansFilter.writePlans(config.getContext().getPath() + outPlans);
-		config.plans().setInputFile(outPlans);
+		if (! new File(inputDir+outPlans).exists() ) {
+			SelectedPlansFilter plansFilter = new SelectedPlansFilter();
+			plansFilter.run(inputDir + inPlans);
+			plansFilter.writePlans(inputDir + outPlans);
+		}
+		config.plans().setInputFile(inputDir + outPlans);
 		//==
-		
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setWriteEventsInterval(1);
 
 		// policies if any
 		if (applyTrafficRestrain && addBikeTrack ) {
-			config.network().setInputFile(configPath + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
+			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
 		} else if (applyTrafficRestrain ) {
-			config.network().setInputFile(configPath + "/networkWithTrafficRestrication.xml.gz");
+			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
 		} else if(addBikeTrack) {
-			config.network().setInputFile(configPath + "/networkWithBikeTrack.xml.gz");
+			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -162,8 +166,8 @@ public class PatnaPolicyControler {
 				addTravelTimeBinding("truck").to(FreeSpeedTravelTimeForTruck.class);
 				addTravelDisutilityFactoryBinding("truck").toInstance(builder_truck);
 
-				addTravelTimeBinding("motorbik").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("motorbik").to(carTravelDisutilityFactoryKey());					
+				addTravelTimeBinding("motorbike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());					
 			}
 		});
 
