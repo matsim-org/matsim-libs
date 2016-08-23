@@ -326,7 +326,6 @@ public class JointCalibrationControler {
 		config.counts().setWriteCountsInterval(100);
 		config.counts().setCountsScaleFactor(1/SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
-		//ZZ_TODO : there is something about multipleModes in counts. I could not see any effect of it.
 
 		config.qsim().setFlowCapFactor(SAMPLE_SIZE); //1.06% sample
 		config.qsim().setStorageCapFactor(3*SAMPLE_SIZE);

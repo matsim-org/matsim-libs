@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
+package playground.agarwalamit.templates;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +43,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.utils.MapUtils;
 
 /**
+ * This is just a template which needs to be updated before use. For e.g. run it
+ * 
  * @author amit
  */
 
