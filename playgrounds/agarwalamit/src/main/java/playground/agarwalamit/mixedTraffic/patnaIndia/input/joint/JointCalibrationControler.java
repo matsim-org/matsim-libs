@@ -187,10 +187,7 @@ public class JointCalibrationControler {
 		mp.setMarginalUtilityOfDistance(0.0);
 		mp.setMonetaryDistanceRate(0.0);
 
-		// add income dependent scoring function factory
-		//		controler.setScoringFunctionFactory(new PatnaScoringFunctionFactory(controler.getScenario())) ;
-
-		// add cadyts or scoring function only or both
+		// add cadyts or income-dependent scoring function only or both
 		addScoringFunction(controler,config);
 
 		controler.run();
