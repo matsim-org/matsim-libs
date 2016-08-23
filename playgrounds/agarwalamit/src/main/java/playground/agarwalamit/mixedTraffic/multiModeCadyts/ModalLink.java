@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 
 /**
+ * A class to create a object which contains modal and link information. 
+ * 
  * @author amit
  */
 
@@ -43,7 +45,7 @@ public class ModalLink implements Identifiable<ModalLink> {
 		return linkId;
 	}
 
-	public ModalLink(final String mode, final Id<Link> linkId) {
+	ModalLink(final String mode, final Id<Link> linkId) {
 		this.mode = mode;
 		this.linkId = linkId;
 		this.id = Id.create(this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString()), ModalLink.class);

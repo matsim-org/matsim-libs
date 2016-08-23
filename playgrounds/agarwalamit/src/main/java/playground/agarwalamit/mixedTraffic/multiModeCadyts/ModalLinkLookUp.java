@@ -28,7 +28,7 @@ import org.matsim.contrib.cadyts.general.LookUpItemFromId;
  * @author amit
  */
 
-public class ModalLinkLookUp implements LookUpItemFromId<ModalLink> {
+class ModalLinkLookUp implements LookUpItemFromId<ModalLink> {
 	
 	private Map<String, ModalLink> mappingOfModalLink ;
 	

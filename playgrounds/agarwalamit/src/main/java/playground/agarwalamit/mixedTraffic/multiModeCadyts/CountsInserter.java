@@ -39,6 +39,10 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.NumberUtils;
 
 /**
+ * A class to read the text file for hourly, mode-specific counts and prepare them to insert in multi-mode cadyts context.
+ * As of now, this has some settings for Patna scenario, however, as long as the links in another scenario does not match
+ * Patna network, this will not have any effect.
+ * 
  * @author amit
  */
 
@@ -120,7 +124,6 @@ public class CountsInserter {
 					if(OuterCordonUtils.getInternalToExternalCountStationLinkIds(PatnaUtils.PATNA_NETWORK_TYPE).contains(Id.createLinkId(linkId))){
 						countAdjustmentFactor = OuterCordonUtils.getModalOutTrafficAdjustmentFactor().get(mode);
 					}
-
 					mode2count.put(mode, NumberUtils.round( countAdjustmentFactor * Double.valueOf(parts[index]), 0) );
 				}
 

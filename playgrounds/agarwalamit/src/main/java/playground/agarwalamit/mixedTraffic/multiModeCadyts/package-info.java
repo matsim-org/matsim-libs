@@ -15,7 +15,13 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *//**
- * Cadyts infrastructure for multi (main) modes(s) plan calibration based on link traffic counts.
+ * *********************************************************************** */
+
+/**
+ * Cadyts infrastructure for multi (main) modes(s) calibration based on link traffic counts.
+ * 
+ * See {@link ModalCadytsTest}
+ * @author amit
  */
+
 package playground.agarwalamit.mixedTraffic.multiModeCadyts;
