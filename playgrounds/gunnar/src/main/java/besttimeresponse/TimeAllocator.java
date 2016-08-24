@@ -101,40 +101,42 @@ public class TimeAllocator {
 						final double _Q0 = currentScore;
 						final double _Q1 = newScore;
 
+						final double eta = max(0, min(1.0, 0.5 - (_Q1 - _Q0) / (g1 - g0)));
 						/*
-						 * The line search works as follows.
+						 * The above line search expression works as follows.
+						 * 
+						 * _Q0 and _Q1 are the objective function values at eta
+						 * = 0 and eta = 1, respectively. g0 and g1 are the
+						 * gradients (more specifically, the gradient
+						 * projections onto the line search direction) at eta =
+						 * 0 and eta = 1, respectively.
 						 * 
 						 * The value range is such that eta = 0 falls back to
-						 * the previous solution, eta = 1 takes over new
+						 * the previous solution, eta = 1 takes over the new
 						 * solution, and otherwise an interpolation takes place.
 						 * 
 						 * The line search assumes that g0 > 0 and g1 < 0. One
 						 * hence has (g1 - g0) < 0. The line search uses the
 						 * expression
 						 * 
-						 * 0.5 - (_Q1 - _Q0) / (g1 - g0),
+						 * 0.5 - (_Q1 - _Q0) / (g1 - g0)
 						 * 
-						 * which then becomes
-						 * 
-						 * 0.5 + (_Q1 - _Q0) * (some positive constant).
+						 * = 0.5 + (_Q1 - _Q0) * (some positive constant).
 						 * 
 						 * If _Q0 = _Q1, then both extreme points are equally
 						 * good and the line search returns their average 0.5.
 						 * 
 						 * If _Q1 > _Q0, then the new solution is better and the
-						 * line search returns a value > 0.5, i.e. closed to the
+						 * line search returns a value > 0.5, i.e. closer to the
 						 * new solution.
 						 *
 						 * If _Q0 > _Q1, then the old solution is better and the
 						 * line search returns a value < 0.5, i.e. closer to the
 						 * old solution.
 						 * 
-						 * In addition, if the objective function is truly
-						 * quadratic then the line search returns its *exact*
-						 * maximum.
-						 * 
+						 * In addition, if the objective function is quadratic
+						 * then the line search returns its *exact* maximum.
 						 */
-						final double eta = max(0, min(1.0, 0.5 - (_Q1 - _Q0) / (g1 - g0)));
 
 						final ArrayRealVector interpolDptTime_s = new ArrayRealVector(currentDptTimes_s).combine(1.0,
 								eta, deltaDptTime_s);
