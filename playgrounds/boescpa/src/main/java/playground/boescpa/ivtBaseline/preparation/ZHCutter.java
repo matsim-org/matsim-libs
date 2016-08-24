@@ -51,7 +51,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -148,7 +147,7 @@ public class ZHCutter {
 		ActivityFacilities filteredFacilities = cutter.filterFacilitiesWithPopulation();
 		TransitSchedule filteredSchedule = cutter.cutPT();
 		Vehicles filteredVehicles = cutter.cleanVehicles(filteredSchedule);
-		Network filteredOnlyCarNetwork = cutter.getOnlyCarNetwork();
+		Network filteredOnlyCarNetwork = cutter.getOnlyCarNetwork(cutterConfig.getPathToTargetFolder());
 		Network filteredNetwork = cutter.cutNetwork(filteredSchedule, filteredOnlyCarNetwork);
 		cutter.resetPopulation(filteredPopulation);
 		// write new files
@@ -196,8 +195,7 @@ public class ZHCutter {
 					activity.setMaximumDuration(oldActivity.getMaximumDuration());
 					activity.setStartTime(oldActivity.getStartTime());
 					if (oldActivity.getFacilityId() != null) {
-						final Activity activityImpl = (Activity) activity;
-						activityImpl.setFacilityId(Id.create(oldActivity.getFacilityId().toString(), ActivityFacility.class));
+						activity.setFacilityId(Id.create(oldActivity.getFacilityId().toString(), ActivityFacility.class));
 					}
 					newPlan.addActivity(activity);
 					lastWasLeg = false;
@@ -228,7 +226,7 @@ public class ZHCutter {
 				Id<Link> linkId = Id.createLinkId(lineElements[0].trim());
 				if (filteredNetwork.getLinks().containsKey(linkId)
 						&& CoordUtils.calcEuclideanDistance(center, filteredNetwork.getLinks().get(linkId).getCoord()) <= radius - 5000) {
-							// we keep only counts well (5km) within the area (else border effects to strong)
+					// we keep only counts well (5km) within the area (else border effects to strong)
 					countsToKeep.add(line);
 				}
 				line = reader.readLine();
@@ -244,7 +242,7 @@ public class ZHCutter {
 		}
 	}
 
-	private Network getOnlyCarNetwork() {
+	private Network getOnlyCarNetwork(String pathToTargetFolder) {
 		Network carNetworkToKeep = NetworkUtils.createNetwork();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (link.getAllowedModes().contains("car") && (link.getCapacity() >= 1000 || // we keep all arterial links
@@ -253,7 +251,14 @@ public class ZHCutter {
 			}
 		}
 		new NetworkCleaner().run(carNetworkToKeep);
-		return carNetworkToKeep;
+		new NetworkWriter(carNetworkToKeep).write(pathToTargetFolder + NETWORK);
+		Network carNetworkToKeepCleaned = NetworkUtils.createNetwork();
+		new NetworkReaderMatsimV1(carNetworkToKeepCleaned).readFile(pathToTargetFolder + NETWORK);
+		new NetworkCleaner().run(carNetworkToKeepCleaned);
+		new NetworkWriter(carNetworkToKeepCleaned).write(pathToTargetFolder + NETWORK);
+		Network carNetworkToKeepFullyCleaned = NetworkUtils.createNetwork();
+		new NetworkReaderMatsimV1(carNetworkToKeepFullyCleaned).readFile(pathToTargetFolder + NETWORK);
+		return carNetworkToKeepFullyCleaned;
 	}
 
 	private Network cutNetwork(TransitSchedule filteredSchedule, Network filteredOnlyCarNetwork) {
@@ -306,7 +311,8 @@ public class ZHCutter {
 		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				for (TransitRouteStop transitStop : transitRoute.getStops()) {
-					if (inArea(transitStop.getStopFacility().getCoord())) {
+					// change so that all trains are kept in any case.
+					if (inArea(transitStop.getStopFacility().getCoord()) || transitRoute.getTransportMode().equals("rail")) {
 						Id<TransitLine> newLineId = addLine(filteredSchedule, transitLine);
 						filteredSchedule.getTransitLines().get(newLineId).addRoute(transitRoute);
 						addStopFacilities(filteredSchedule, transitRoute);
@@ -402,8 +408,7 @@ public class ZHCutter {
 					if (personAttributes.getAttribute(p.getId().toString(), "subpopulation") == null) {
 						personAttributes.putAttribute(p.getId().toString(), "subpopulation", commuterTag);
 					}
-				}
-				else {
+				} else {
 					personAttributes.removeAllAttributes(p.getId().toString());
 				}
 			}
@@ -466,6 +471,15 @@ public class ZHCutter {
 						}
 					}
 				}
+			}
+		}
+
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			if (!filteredFacilities.getFacilities().containsValue(facility)
+					&& (facility.getActivityOptions().containsKey(IVTConfigCreator.LEISURE)
+					|| facility.getActivityOptions().containsKey(IVTConfigCreator.SHOP))
+					&& inArea(facility.getCoord())) {
+				filteredFacilities.addActivityFacility(facility);
 			}
 		}
 
