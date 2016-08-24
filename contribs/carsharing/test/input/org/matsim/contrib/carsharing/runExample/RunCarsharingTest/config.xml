@@ -34,7 +34,7 @@
 			<param name="endTime" value="30:00:00"   />
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
-			<param name="mainMode" value="car,oneway,freefloating,twowaycarsharing"   />
+			<param name="mainMode" value="car,oneway,freefloating,twoway"   />
 		</module>
 		
     <module name="Carsharing" >
@@ -55,7 +55,7 @@
 		<param name="specialTimeEnd" value="0" />
 		<param name="specialTimeFee" value="0" />
 
-        <param name="useFreeFloating" value="true" />		
+        <param name="useFreeFloating" value="false" />		
 	</module>
     
 	<module name="OneWayCarsharing" >
@@ -64,8 +64,8 @@
 		<param name="constantOneWayCarsharing" value="-0.4" />
         <param name="timeFeeOneWayCarsharing" value="-0.0" />
 		<param name="distanceFeeOneWayCarsharing" value="-0.0" />
-        <param name="useOneWayCarsharing" value="true" />
-        <param name="searchDistanceOneWayCarsharing" value="10000.0" />		
+        <param name="useOneWayCarsharing" value="false" />
+        <param name="searchDistanceOneWayCarsharing" value="1000.0" />		
 	</module>
     
 	<module name="TwoWayCarsharing" >
@@ -74,8 +74,8 @@
 		<param name="constantTwoWayCarsharing" value="-0.4" />
         <param name="timeFeeTwoWayCarsharing" value="-0.0" />
 		<param name="distanceFeeTwoWayCarsharing" value="-0.0" />
-        <param name="useTwoWayCarsharing" value="false" />
-        <param name="searchDistanceTwoWayCarsharing" value="1000.0" />
+        <param name="useTwoWayCarsharing" value="true" />
+        <param name="searchDistanceTwoWayCarsharing" value="10000.0" />
 
 	</module>
 	
@@ -117,12 +117,12 @@
 		<param name="Module_1" value="SelectExpBeta" />
 		
 		<param name="maxAgentPlanMemorySize" value="5" />	
-		<param name="ModuleProbability_2" value="0.5" />
+		<param name="ModuleProbability_2" value="0.0" />
 
 		<param name="Module_2" value="RandomTripToCarsharingStrategy" />	
 		<param name="ModuleDisableAfterIteration_2" value="1000" />
         
-        <param name="ModuleProbability_3" value="0.5" />
+        <param name="ModuleProbability_3" value="1.0" />
         <param name="Module_3" value="CarsharingSubtourModeChoiceStrategy" />	
 		<param name="ModuleDisableAfterIteration_3" value="1000" />
 
@@ -191,6 +191,13 @@
         <param name="activityMinimalDuration_9" value="00:00:00" />
         <param name="activityOpeningTime_9" value="08:00:00" />
         <param name="activityTypicalDuration_9" value="00:02:00" />
+         <param name="activityType_10" value="tw_interaction" />
+        <param name="activityClosingTime_10" value="00:00:00" />
+        <param name="activityEarliestEndTime_10" value="undefined" />
+        <param name="activityLatestStartTime_10" value="undefined" />
+        <param name="activityMinimalDuration_10" value="00:00:00" />
+        <param name="activityOpeningTime_10" value="08:00:00" />
+        <param name="activityTypicalDuration_10" value="00:02:00" />
 
 	</module>
 <!-- ====================================================================== -->

@@ -44,7 +44,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 		int rndIdx = this.rng.nextInt(cnt);
 		
 		for(Leg l:t.get(rndIdx).getLegsOnly()) 
-			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twowaycarsharing"))
+			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twoway"))
 				return;
 		
 		if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "FF_CARD"))))

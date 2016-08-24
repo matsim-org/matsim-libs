@@ -41,7 +41,7 @@ public class CarsharingUtils {
 
             @Override
             public void install() {
-                addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCarsharingRoutingModule());
+                addRoutingModuleBinding("twoway").toInstance(new TwoWayCarsharingRoutingModule());
                 addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
                 addRoutingModuleBinding("oneway").toInstance(new OneWayCarsharingRoutingModule());
                 bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
@@ -54,8 +54,8 @@ public class CarsharingUtils {
                         // as being twowaycarsharing trips.
                         // This is for instance used at re-routing.
                         for ( PlanElement pe : tripElements ) {
-                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                return "twowaycarsharing";
+                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twoway" ) ) {
+                                return "twoway";
                             }
                             else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "oneway" ) ) {
                                 return "oneway";

@@ -12,6 +12,7 @@ import org.matsim.contrib.carsharing.manager.CSPersonVehiclesContainer;
 import org.matsim.contrib.carsharing.manager.CarsharingManager;
 import org.matsim.contrib.carsharing.manager.routers.RouteFreefloatingTrip;
 import org.matsim.contrib.carsharing.manager.routers.RouteOneWayTrip;
+import org.matsim.contrib.carsharing.manager.routers.RouteTwoWayTrip;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
@@ -50,10 +51,10 @@ public class RunCarsharing {
 
 		final Controler controler = new Controler( sc );
 		
+		//final QSim qsim = new QSim(sc, controler.getEvents());
 		installCarSharing(controler);
 		
 		controler.run();
-
 
 	}
 
@@ -75,6 +76,8 @@ public class RunCarsharing {
 				bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
 				bind(RouteFreefloatingTrip.class).asEagerSingleton();
 				bind(RouteOneWayTrip.class).asEagerSingleton();
+				bind(RouteTwoWayTrip.class).asEagerSingleton();
+				//bind(CarsharingActivityEngine.class).asEagerSingleton();
 
 			}			
 		});		
@@ -97,17 +100,16 @@ public class RunCarsharing {
 		        addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
 		        addControlerListenerBinding().to(CarsharingListener.class);
 		        addControlerListenerBinding().to(CarsharingManager.class);
+		        addMobsimListenerBinding().to(CarsharingMobsimListener.class);
 		        bind(MobsimDataProvider.class).asEagerSingleton();
 		        
 				//setting up the scoring function factory, inside different scoring functions are set-up
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 		        bind(ActivityReplanningMap.class).asEagerSingleton();
-		        addMobsimListenerBinding().to(CarsharingMobsimListener.class) ;
+		       // addMobsimListenerBinding().to(CarsharingActivityEngine.class) ;
 		        bind(CarSharingVehiclesNew.class).toInstance(carsharingVehcilesData);
 		        bind(CarsharingManager.class).asEagerSingleton();
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
-
-
 			}
 		});
 

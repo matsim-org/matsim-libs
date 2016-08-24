@@ -10,7 +10,7 @@ import org.matsim.contrib.carsharing.control.listeners.FFEventsHandler.RentalInf
 import org.matsim.contrib.carsharing.control.listeners.NoParkingEventHandler.NoParkingInfo;
 import org.matsim.contrib.carsharing.control.listeners.NoVehicleEventHandler.NoVehicleInfo;
 import org.matsim.contrib.carsharing.control.listeners.OWEventsHandler.RentalInfoOW;
-import org.matsim.contrib.carsharing.control.listeners.TwoWayEventsHandler.RentalInfo;
+import org.matsim.contrib.carsharing.control.listeners.TwoWayEventsHandler.RentalInfoTW;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -45,13 +45,13 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 		
 		if (event.getIteration() % this.frequency == 0) {
 		
-		ArrayList<RentalInfo> info = cshandler.rentals();
+		ArrayList<RentalInfoTW> info = cshandler.rentals();
 		
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "RT_CS"));
 		try {
 			outLink.write("personID   startTime   endTIme   startLink   distance   accessTime   egressTime	vehicleID");
 			outLink.newLine();
-		for(RentalInfo i: info) {
+		for(RentalInfoTW i: info) {
 			
 			
 				outLink.write(i.toString());

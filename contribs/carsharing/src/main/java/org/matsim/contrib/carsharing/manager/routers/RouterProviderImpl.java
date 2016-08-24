@@ -14,7 +14,8 @@ public class RouterProviderImpl implements RouterProvider {
 
 	@Inject private RouteFreefloatingTrip freefloatingRouter;
 	@Inject private RouteOneWayTrip onewayRouter;
-	
+	@Inject private RouteTwoWayTrip twowayRouter;
+
 
 	@Override
 	public List<PlanElement> routeCarsharingTrip(Plan plan, double time, Leg legToBeRouted, String carsharingType,
@@ -24,6 +25,9 @@ public class RouterProviderImpl implements RouterProvider {
 					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
 		else if (carsharingType.equals("oneway"))
 			return onewayRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
+					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
+		else if (carsharingType.equals("twoway"))
+			return twowayRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
 					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
 		return null;
 	}

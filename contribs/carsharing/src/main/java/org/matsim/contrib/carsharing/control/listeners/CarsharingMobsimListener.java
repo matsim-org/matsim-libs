@@ -5,14 +5,22 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.manager.CarsharingManager;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 import com.google.inject.Inject;
@@ -21,7 +29,9 @@ import com.google.inject.Inject;
 public class CarsharingMobsimListener implements MobsimBeforeSimStepListener{
 
 	private ActivityReplanningMap activityReplanningMap;
-	private CarsharingManager carsharingManager;
+	private CarsharingManager carsharingManager;	
+	@Inject private Scenario scenario;
+	@Inject MobsimDataProvider mobsimDataProvider;
 	
 	@Inject
 	public void ActivityReplanningMap(ActivityReplanningMap activityReplanningMap, CarsharingManager carsharingManager) {
@@ -47,8 +57,10 @@ public class CarsharingMobsimListener implements MobsimBeforeSimStepListener{
 				
 				List<PlanElement> newTrip = carsharingManager.reserveAndrouteCarsharingTrip(plan, legToBerouted.getMode(), 
 						legToBerouted, e.getSimulationTime());
-				if (newTrip == null)
+				if (newTrip == null) {
 					ma.setStateToAbort(e.getSimulationTime());
+					legToBerouted.setRoute(null);
+				}
 				else {
 					List<PlanElement> planElements = plan.getPlanElements();
 	
@@ -63,10 +75,9 @@ public class CarsharingMobsimListener implements MobsimBeforeSimStepListener{
 
 	private boolean carsharingLeg(PlanElement pe) {
 		String mode = ((Leg)pe).getMode();
-		if (mode.equals("freefloating") || mode.equals("oneway"))
+		if (mode.equals("freefloating") || mode.equals("oneway") || mode.equals("twoway"))
 			return true;
 		
 		return false;
-	}
-
+	}	
 }

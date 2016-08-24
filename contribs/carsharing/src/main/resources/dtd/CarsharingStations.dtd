@@ -3,14 +3,14 @@
 <!-- $Id$ -->
 
 <!-- ============================================================ -->
-<!ELEMENT stations          (twowaycarsharing*,oneway*,freefloating*)>
+<!ELEMENT stations          (twoway*,oneway*,freefloating*)>
 <!ATTLIST stations
           name           CDATA   #IMPLIED
           reference_layer  CDATA #IMPLIED
           xml:lang       NMTOKEN "de-CH">
 
-<!ELEMENT twowaycarsharing          (vehicle*)>
-<!ATTLIST twowaycarsharing
+<!ELEMENT twoway          (vehicle*)>
+<!ATTLIST twoway
           id           CDATA   #REQUIRED
           lat  	       CDATA #REQUIRED
           lon       CDATA #REQUIRED>

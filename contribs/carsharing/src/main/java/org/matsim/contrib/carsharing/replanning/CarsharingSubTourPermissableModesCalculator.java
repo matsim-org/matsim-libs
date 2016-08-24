@@ -57,7 +57,7 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 				 && Boolean.parseBoolean((String) scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "RT_CARD"))) {
 			 
 			 
-			 l.add("twowaycarsharing");
+			 l.add("twoway");
 			 
 		 }
 		

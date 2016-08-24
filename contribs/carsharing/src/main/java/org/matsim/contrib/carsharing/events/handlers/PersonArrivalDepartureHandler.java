@@ -68,6 +68,15 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
 		}
+		else if (legMode.equals("egress_walk_tw")) {
+			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
+			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
+			carsharingManager.parkVehicle(vehId, linkId);
+			//carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
+			this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), "twoway").remove(linkId);
+			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
+
+		}
 	}
 
 	@Override
@@ -81,7 +90,7 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 		String mode = event.getLegMode();
 		
 		if (mode.startsWith("free") || 
-				mode.startsWith("one")) {			
+				mode.startsWith("one") || mode.startsWith("two")) {			
 			
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			
@@ -91,7 +100,7 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			if (this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), mode) != null)
 				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), mode).put(linkId, vehicle);
 			else {				
-				this.csPersonVehicles.addNewPersonInfo(event.getPersonId());
+				//this.csPersonVehicles.addNewPersonInfo(event.getPersonId());
 				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), mode).put(linkId, vehicle);
 
 			}

@@ -13,6 +13,7 @@ public interface CSPersonVehicle {
 	public Map<Id<Link>, CSVehicle> getVehicleLocationForType(Id<Person> personId, String type);
 	public boolean addVehicle(Id<Person> personId, Link link, CSVehicle vehicle, String type);
 	public boolean removeVehicle(Id<Person> personId, Link link, CSVehicle vehicle, String type);
+	public void addOriginForTW(Id<Person> personId, Link link, CSVehicle vehicle);
 	public void reset();
 
 }

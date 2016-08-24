@@ -25,7 +25,7 @@ public class ParkCSVehicles implements AgentSource {
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
 	private QuadTree<CarsharingStation> owvehiclesLocationqt;
-	private QuadTree<TwoWayCarsharingStation> twvehiclesLocationqt;
+	private QuadTree<CarsharingStation> twvehiclesLocationqt;
 	private Map<CSVehicle, Link> ffvehiclesMap;
 	private final static Logger log = Logger.getLogger(ParkCSVehicles.class);
 	
@@ -84,13 +84,13 @@ public class ParkCSVehicles implements AgentSource {
 				}				
 			}		
 		if (twvehiclesLocationqt != null) {
-			for (TwoWayCarsharingStation twstation: twvehiclesLocationqt.values()) {
+			for (CarsharingStation twstation: twvehiclesLocationqt.values()) {
 				
-				Set<String> vehicleTypesAtStation = twstation.getVehiclesPerType().keySet();
+				Set<String> vehicleTypesAtStation = ((TwoWayCarsharingStation)twstation).getVehiclesPerType().keySet();
 				
 				for (String type : vehicleTypesAtStation) {
 					
-					for (CSVehicle vehicle : twstation.getVehicles(type)) {
+					for (CSVehicle vehicle : ((TwoWayCarsharingStation)twstation).getVehicles(type)) {
 						
 						qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(vehicle.getVehicleId(), Vehicle.class),
 								modeVehicleTypes.get("twowaycarsharing")), twstation.getLinkId());
@@ -99,7 +99,7 @@ public class ParkCSVehicles implements AgentSource {
 					}					
 				}				
 			}
-			log.info("Parked " + counterTW + " twowaycarsharing vehicles.");
+			log.info("Parked " + counterTW + " twoway vehicles.");
 			log.info("Parked " + counterOW + " oneway vehicles.");
 			log.info("Parked " + counterFF + " freefloatingcarsharing vehicles.");
 

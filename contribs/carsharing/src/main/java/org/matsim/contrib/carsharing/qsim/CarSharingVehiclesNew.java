@@ -30,12 +30,13 @@ public class CarSharingVehiclesNew {
 	private Map<String, CSVehicle> owvehicleIdMap = new HashMap<String, CSVehicle>();
 
 	private QuadTree<CarsharingStation> owvehicleLocationQuadTree;	
-	private QuadTree<TwoWayCarsharingStation> twvehicleLocationQuadTree;
-	private Map<String, TwoWayCarsharingStation> twowaycarsharingstationsMap;
+	private QuadTree<CarsharingStation> twvehicleLocationQuadTree;
+	private Map<String, CarsharingStation> twowaycarsharingstationsMap;
 	private Map<String, CarsharingStation> onewaycarsharingstationsMap;
 
 	private Map<CSVehicle, Link> ffvehiclesMap = new HashMap<CSVehicle, Link>();
 	private Map<CSVehicle, Link> owvehiclesMap = new HashMap<CSVehicle, Link>();
+	private Map<CSVehicle, Link> twvehiclesMap = new HashMap<CSVehicle, Link>();
 	//private Map<CSVehicle, String> owvehiclesStationMap = new HashMap<CSVehicle, String>();
 
 	public CarSharingVehiclesNew(Scenario scenario) {
@@ -54,10 +55,13 @@ public class CarSharingVehiclesNew {
 		this.ffVehicleLocationQuadTree = carsharingReader.getFfVehicleLocationQuadTree();
 		this.owvehicleLocationQuadTree = carsharingReader.getOwvehicleLocationQuadTree();
 		this.twvehicleLocationQuadTree = carsharingReader.getTwvehicleLocationQuadTree();
+		
 		this.onewaycarsharingstationsMap = carsharingReader.getOnewaycarsharingstationsMap();
 		this.twowaycarsharingstationsMap = carsharingReader.getTwowaycarsharingstationsMap();
+		
 		this.ffvehiclesMap = carsharingReader.getFfvehiclesMap();	
 		this.owvehiclesMap = carsharingReader.getOwvehiclesMap();	
+		this.twvehiclesMap = carsharingReader.getTwvehiclesMap();	
 
 		this.ffvehicleIdMap = carsharingReader.getFfvehicleIdMap();
 		this.owvehicleIdMap = carsharingReader.getOwvehicleIdMap();
@@ -72,7 +76,7 @@ public class CarSharingVehiclesNew {
 	public Map<String, CSVehicle> getFfvehicleIdMap() {
 		return ffvehicleIdMap;
 	}
-	public Map<String, TwoWayCarsharingStation> getTwowaycarsharingstationsMap() {
+	public Map<String, CarsharingStation> getTwowaycarsharingstationsMap() {
 		return twowaycarsharingstationsMap;
 	}
 
@@ -88,7 +92,7 @@ public class CarSharingVehiclesNew {
 		return owvehicleLocationQuadTree;
 	}
 
-	public QuadTree<TwoWayCarsharingStation> getTwvehicleLocationQuadTree() {
+	public QuadTree<CarsharingStation> getTwvehicleLocationQuadTree() {
 		return twvehicleLocationQuadTree;
 	}
 
@@ -102,10 +106,12 @@ public class CarSharingVehiclesNew {
 		
 		if (vehicle.getCsType().equals("freefloating"))
 			return ffvehiclesMap.get(vehicle);
-		else if (vehicle.getCsType().equals("oneway")) {			
-			return owvehiclesMap.get(vehicle);			
+		else if (vehicle.getCsType().equals("oneway")) 			
+			return owvehiclesMap.get(vehicle);		
+		else if (vehicle.getCsType().equals("twoway")) 			
+			return twvehiclesMap.get(vehicle);	
 			
-		}
+		
 		return null;
 	}
 	public void reserveVehicle(CSVehicle vehicle) {
@@ -126,8 +132,15 @@ public class CarSharingVehiclesNew {
 			((OneWayCarsharingStation)station).removeCar(vehicle);
 			
 		}
-		
-		
+		else if (vehicle.getCsType().equals("twoway")) {
+			Link link = this.twvehiclesMap.get(vehicle);
+			Coord coord = link.getCoord();
+			this.twvehiclesMap.remove(vehicle);			
+			CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
+			
+			boolean c = ((TwoWayCarsharingStation)station).removeCar(vehicle);
+			System.out.println(c);			
+		}		
 	}
 
 	public void parkVehicle(String vehicleId, Link link) {
@@ -145,6 +158,15 @@ public class CarSharingVehiclesNew {
 			
 			CarsharingStation station = owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
 			((OneWayCarsharingStation)station).addCar(((StationBasedVehicle)vehicle).getVehicleType(),  vehicle);
+
+			
+		}
+		else if (vehicleId.startsWith("TW")) {
+			
+			twvehiclesMap.put(vehicle, link);
+			
+			CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
+			((TwoWayCarsharingStation)station).addCar(((StationBasedVehicle)vehicle).getVehicleType(),  vehicle);
 
 			
 		}
