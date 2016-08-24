@@ -87,7 +87,7 @@ public class PatnaPolicyControler {
 
 	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
 	private static boolean applyTrafficRestrain = true;
-	private static boolean addBikeTrack = false;
+	private static boolean addBikeTrack = true;
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -104,9 +104,10 @@ public class PatnaPolicyControler {
 
 		ConfigUtils.loadConfig(config, configFile);
 
-		if(applyTrafficRestrain ) outputDir = dir+"/trafficRestrain/";
-		else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
-		else if(applyTrafficRestrain && addBikeTrack) outputDir = dir+"/both/";
+		if(applyTrafficRestrain ) {
+			if (addBikeTrack) outputDir = dir+"/both/";
+			else outputDir = dir+"/trafficRestrain/";
+		} else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
 		else outputDir = dir+"/baseCaseCtd/";
 		
 		config.controler().setOutputDirectory(outputDir);
