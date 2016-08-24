@@ -136,9 +136,9 @@ public class DemandGeneratorOnePersonV2 {
 				}
 			}
 		
-			writeToHouseholdsFile(mapOfPersonMaps.get(1), householdMap, outputBase + "households.dat");
+			writeHouseholdsFile(mapOfPersonMaps.get(1), householdMap, outputBase + "households.dat");
 			for (int i=1; i<=numberOfPlansPerPerson; i++) {
-				writeToPersonsFile(mapOfPersonMaps.get(i), outputBase + "persons" + i + ".dat");
+				writePersonsFile(mapOfPersonMaps.get(i), outputBase + "persons" + i + ".dat");
 			}
 		}
 		
@@ -235,7 +235,7 @@ public class DemandGeneratorOnePersonV2 {
 	}
 	
 		
-	public static void writeToPersonsFile(Map <String, SimplePerson> persons, String fileName) {
+	public static void writePersonsFile(Map <String, SimplePerson> persons, String fileName) {
 		BufferedWriter bufferedWriterPersons = null;
 		
 		try {
@@ -243,17 +243,17 @@ public class DemandGeneratorOnePersonV2 {
     		FileWriter fileWriterPersons = new FileWriter(personFile);
     		bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
     		    		    		
-    		for (String key : persons.keySet()) {
-    			int householdId = persons.get(key).getHouseholdId();
-    			String personId = persons.get(key).getpersonId();
-    			int employed = persons.get(key).getEmployed();
-    			int student = persons.get(key).getStudent();
-    			int driversLicence = persons.get(key).getDriversLicence();
-    			int locationOfWork = persons.get(key).getLocationOfWork();
-    			int locationOfSchool = persons.get(key).getLocationOfSchool();
-    			int female = persons.get(key).getSex();
-    			int age = persons.get(key).getAge();
-    			int parent = persons.get(key).getParent();
+    		for (SimplePerson person : persons.values()) {
+    			int householdId = person.getHouseholdId();
+    			String personId = person.getpersonId();
+    			int employed = person.getEmployed();
+    			int student = person.getStudent();
+    			int driversLicence = person.getDriversLicence();
+    			int locationOfWork = person.getLocationOfWork();
+    			int locationOfSchool = person.getLocationOfSchool();
+    			int female = person.getSex();
+    			int age = person.getAge();
+    			int parent = person.getParent();
     			
     			// altogether this creates 59 columns = number in query file
     			// TODO check if column position is correct, especially for "age" and "parent"
@@ -287,7 +287,7 @@ public class DemandGeneratorOnePersonV2 {
     }
 	
 
-	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households,
+	public static void writeHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households,
 			String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		
