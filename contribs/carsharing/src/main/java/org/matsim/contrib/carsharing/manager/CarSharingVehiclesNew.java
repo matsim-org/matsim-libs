@@ -1,4 +1,4 @@
-package org.matsim.contrib.carsharing.qsim;
+package org.matsim.contrib.carsharing.manager;
 
 
 import java.util.HashMap;

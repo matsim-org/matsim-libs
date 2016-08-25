@@ -17,7 +17,6 @@ import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
-import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;

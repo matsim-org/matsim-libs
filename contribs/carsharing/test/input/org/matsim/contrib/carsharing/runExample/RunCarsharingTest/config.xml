@@ -59,6 +59,8 @@
 	</module>
     
 	<module name="OneWayCarsharing" >
+	        <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
+	
 		<param name="vehiclelocationsOneWayCarsharing" value="&INBASE;/Stations.txt" />	
 		<param name="travelingOneWayCarsharing" value="-10.0" />
 		<param name="constantOneWayCarsharing" value="-0.4" />
