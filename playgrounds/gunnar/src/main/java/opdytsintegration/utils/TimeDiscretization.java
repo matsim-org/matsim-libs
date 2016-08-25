@@ -1,5 +1,7 @@
 package opdytsintegration.utils;
 
+import floetteroed.utilities.Time;
+
 /**
  * 
  * @author Gunnar Flötteröd
@@ -35,7 +37,7 @@ public class TimeDiscretization {
 	public int getBin(final double time_s) {
 		return (int) ((time_s - this.startTime_s) / this.binSize_s);
 	}
-	
+
 	// TODO NEW
 	public int getBinCenterTime_s(final int bin) {
 		return bin * this.binSize_s + this.binSize_s / 2;
@@ -49,6 +51,12 @@ public class TimeDiscretization {
 	// TODO NEW
 	public int getBinEndTime_s(final int bin) {
 		return this.getBinStartTime_s(bin + 1);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " start time = " + Time.strFromSec(this.startTime_s) + ", bin size = "
+				+ Time.strFromSec(this.binSize_s) + ", number of bins = " + this.binCnt + ".";
 	}
 
 }
