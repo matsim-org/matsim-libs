@@ -21,6 +21,7 @@
 
 package contrib.baseline.lib;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
@@ -40,7 +41,7 @@ public class NetworkModeFilter {
 		Network networkOnlyMode = org.matsim.core.network.NetworkUtils.createNetwork();
 		NetworkFactory factory = networkOnlyMode.getFactory();
 
-		network.getLinks().values().forEach(link -> {
+		for(Link link : network.getLinks().values()) {
 			if (link.getAllowedModes().contains(args[1])) {
 				if (!networkOnlyMode.getNodes().containsKey(link.getFromNode().getId())) {
 					Node node = network.getNodes().get(link.getFromNode().getId());
@@ -54,9 +55,12 @@ public class NetworkModeFilter {
 				}
 				networkOnlyMode.addLink(link);
 			}
-		});
+		}
 
 		new NetworkCleaner().run(networkOnlyMode);
 		new NetworkWriter(networkOnlyMode).write(args[2]);
+		Network networkToCleanAgain = NetworkUtils.readNetwork(args[2]);
+		new NetworkCleaner().run(networkToCleanAgain);
+		new NetworkWriter(networkToCleanAgain).write(args[2]);
 	}
 }

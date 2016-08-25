@@ -121,9 +121,9 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 			case 1:
 				return 1.5;
 			case 2:
-				return 6.7;
+				return Math.min(getMaxLevel2ChargingPowerInKW(),plugType.getChargingPowerInKW());
 			case 3:
-				return 50;
+				return Math.min(getMaxLevel3ChargingPowerInKW(),plugType.getChargingPowerInKW());
 		}
 		return 0.0;
 	}
@@ -153,7 +153,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return maxLevel2ChargingPowerInKW;
 	}
 
-	public Double getMaxLevel3CharginPowerInKW() {
+	public Double getMaxLevel3ChargingPowerInKW() {
 		return maxLevel3ChargingPowerInKW;
 	}
 

@@ -45,7 +45,7 @@ public class DynQSimConfigConsistencyChecker
         if (qSimConfig.getSimStarttimeInterpretation() != //
         QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime) {
             throw new RuntimeException("DynAgents require simulation from the very beginning,"
-                    + "preferably sec-by-sec from time 0.");
+                    + "preferably sec-by-sec from time 0. Please set \'simStarttimeInterpretation\' in the qSim config module to  \'onlyUseStarttime\' and set the start time to 00:00:00.");
         }
     }
 }

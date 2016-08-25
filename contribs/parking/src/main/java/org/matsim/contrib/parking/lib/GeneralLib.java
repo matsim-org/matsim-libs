@@ -658,6 +658,10 @@ public class GeneralLib {
 		startIntervalTime = projectTimeWithin24Hours(startIntervalTime);
 		endIntervalTime = projectTimeWithin24Hours(endIntervalTime);
 
+		if (startIntervalTime==endIntervalTime){
+			return 0;
+		}
+		
 		if (startIntervalTime < endIntervalTime) {
 			return endIntervalTime - startIntervalTime;
 		} else {
