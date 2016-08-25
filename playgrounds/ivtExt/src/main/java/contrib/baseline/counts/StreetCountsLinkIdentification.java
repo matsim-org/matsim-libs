@@ -21,18 +21,26 @@
 
 package contrib.baseline.counts;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import contrib.baseline.lib.NetworkUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.*;
+
+import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
 /**
  * Identifies for a given count-station(coord) the according street-link in the network.
@@ -43,6 +51,8 @@ public class StreetCountsLinkIdentification {
 
 	private static final Logger log = Logger.getLogger(StreetCountsLinkIdentification.class);
 	private static final Counter counter = new Counter(" handled count input: ");
+	private static final CoordinateTransformation transformation
+			= TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03_Plus_GT);
 
 	public static void main(final String[] args) {
 		final String pathToNetwork = args[0];
@@ -50,87 +60,133 @@ public class StreetCountsLinkIdentification {
 		final String pathToCountsOutput = args[2];
 
 		Network network = NetworkUtils.readNetwork(pathToNetwork);
-		Set<CountInput> countInputs = readCountInputs(pathToCountsInput);
+		List<CountInput> countInputs = readCountInputs(pathToCountsInput);
 		Map<Id<Link>, CountInput> identifiedLinks = identifyLinks(network, countInputs);
 		writeStreetCounts(pathToCountsOutput, identifiedLinks);
 	}
 
 	private static void writeStreetCounts(String pathToCountsOutput, Map<Id<Link>, CountInput> identifiedLinks) {
-		/*BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput);
+		BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput);
 		try {
-			String header = "linkId" + COUNTS_DELIMITER + "countStationDescr" + COUNTS_DELIMITER + "countVolumes";
+			String header = "countStationId" + COUNTS_DELIMITER +
+					"direction" + COUNTS_DELIMITER +
+					"linkId";
 			writer.write(header);
 			writer.newLine();
 			for (Id<Link> linkId : identifiedLinks.keySet()) {
-				writer.write(linkId.toString() + COUNTS_DELIMITER);
-				writer.write(identifiedLinks.get(linkId).descr + COUNTS_DELIMITER);
-				writer.write(Double.toString(identifiedLinks.get(linkId).counts));
+				writer.write(identifiedLinks.get(linkId).id + COUNTS_DELIMITER);
+				writer.write(identifiedLinks.get(linkId).directionDescr + COUNTS_DELIMITER);
+				writer.write(linkId.toString());
 				writer.newLine();
 			}
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
-	private static Map<Id<Link>, CountInput> identifyLinks(Network network, Set<CountInput> countInputs) {
-		Map<Id<Link>, CountInput> identifiedLinks = new HashMap<>();
-		/*counter.reset();
+	private static Map<Id<Link>, CountInput> identifyLinks(Network network, List<CountInput> countInputs) {
+		Map<Id<Link>, CountInput> identifiedLinks = new LinkedHashMap<>();
+		counter.reset();
 		for (CountInput countInput : countInputs) {
-			double distFromNode, distToNode;
-			double totalMinDist = Double.MAX_VALUE, absMinDifferenceStation = Double.MAX_VALUE;
-			Id<Link> currentMinLink = null;
-			for (Link link : network.getLinks().values()) {
-				if (link.getAllowedModes().contains(TransportMode.pt) && link.getId().toString().contains("pt")) {
-					distFromNode = CoordUtils.calcDistance(countInput.fromCoord, link.getFromNode().getCoord());
-					distToNode = CoordUtils.calcDistance(countInput.toCoord, link.getToNode().getCoord());
-					if (distFromNode + distToNode <= (totalMinDist)){/*//*ALLOWED_DISTANCE_FACTOR_IF_MORE_EQUAL_STATION_DISTANCE)
-						//&& Math.abs(distFromNode - distToNode) < absMinDifferenceStation) {
-						totalMinDist = distFromNode + distToNode;
-						absMinDifferenceStation = Math.abs(distFromNode - distToNode);
-						currentMinLink = link.getId();
+			Link nearestLink = org.matsim.core.network.NetworkUtils.getNearestLinkExactly(network, countInput.stationCoord);
+			double distanceNearestLink = CoordUtils.calcEuclideanDistance(nearestLink.getToNode().getCoord(), countInput.directionCoord);
+			double distanceOppositeDirection = CoordUtils.calcEuclideanDistance(nearestLink.getFromNode().getCoord(), countInput.directionCoord);
+			if (distanceNearestLink > distanceOppositeDirection) {
+				Link oppositeDirectionLink = getOppositeDirectionLink(nearestLink);
+				if (oppositeDirectionLink != null) {
+					nearestLink = oppositeDirectionLink;
+				} else {
+					int radius = 1, direction = 0;
+					while (distanceNearestLink > distanceOppositeDirection) {
+						direction -= 4*(direction/4); direction++;
+						Coord movedStationCoord = moveCoord(countInput.stationCoord, radius, direction);
+						nearestLink = org.matsim.core.network.NetworkUtils.getNearestLinkExactly(network, movedStationCoord);
+						distanceNearestLink = CoordUtils.calcEuclideanDistance(nearestLink.getToNode().getCoord(), countInput.directionCoord);
+						distanceOppositeDirection =
+								CoordUtils.calcEuclideanDistance(nearestLink.getFromNode().getCoord(), countInput.directionCoord);
+						radius += direction/4;
 					}
 				}
 			}
-			if (currentMinLink != null) {
-				identifiedLinks.put(currentMinLink, countInput);
-			} else {
-				log.error("For count input " + countInput.descr + " no matching link was found.");
-			}
+			identifiedLinks.put(nearestLink.getId(), countInput);
 			counter.incCounter();
-		}*/
+		}
 		return identifiedLinks;
 	}
 
-	private static Set<CountInput> readCountInputs(String pathToCountsInput) {
-		Set<CountInput> countInputs = new HashSet<>();
-		/*BufferedReader reader = IOUtils.getBufferedReader(pathToCountsInput, Charset.forName("UTF-8"));
+	private static Coord moveCoord(Coord stationCoord, int radius, int direction) {
+		int moveDistance = 10; //meters
+		Coord movedStationCoord = null;
+		switch (direction) {
+			case 1: movedStationCoord = new Coord(stationCoord.getX() + radius*moveDistance, stationCoord.getY()); break;
+			case 2: movedStationCoord = new Coord(stationCoord.getX(), stationCoord.getY() + radius*moveDistance); break;
+			case 3: movedStationCoord = new Coord(stationCoord.getX() - radius*moveDistance, stationCoord.getY()); break;
+			case 4: movedStationCoord = new Coord(stationCoord.getX(), stationCoord.getY() - radius*moveDistance); break;
+		}
+		return movedStationCoord;
+	}
+
+	/**
+	 * Attention: If no opposite direction link exists, the method returns null.
+	 */
+	private static Link getOppositeDirectionLink(Link nearestLink) {
+		Link oppositeDirectionLink = null;
+		for (Link linkCandidate : nearestLink.getToNode().getOutLinks().values()) {
+			if (linkCandidate.getToNode().getId().toString().equals(nearestLink.getFromNode().getId().toString())) {
+				oppositeDirectionLink = linkCandidate;
+				break;
+			}
+		}
+		return oppositeDirectionLink;
+	}
+
+	private static List<CountInput> readCountInputs(String pathToCountsInput) {
+		List<CountInput> countInputs = new ArrayList<>();
+		BufferedReader reader = IOUtils.getBufferedReader(pathToCountsInput, Charset.forName("UTF-8"));
 		try {
-			reader.readLine(); // read header: VON; VON_X; VON_Y; NACH; NACH_X; NACH_Y; ANZAHL
+			reader.readLine(); // read header:
+			// countStationID	xCoord_CountStation	yCoord_CountStation	direction	longDirection	latDirection
 			String line = reader.readLine();
 			while (line != null) {
-				String[] lineElements = line.split(";");
-				countInputs.add(new CountInput(
-						new Coord(Double.parseDouble(lineElements[1]), Double.parseDouble(lineElements[2])),
-						new Coord(Double.parseDouble(lineElements[4]), Double.parseDouble(lineElements[5])),
-						(lineElements[0].replace(" ", "") + "_" + lineElements[3].replace(" ", "")),
-						Double.parseDouble(lineElements[6])
-				));
+				String[] lineElements = line.split("\t");
+				if (lineElements.length > 6) {
+					String[] firstDirection = Arrays.copyOfRange(lineElements, 0, 6);
+					countInputs.add(getCountInput(firstDirection));
+					String[] secondDirection = ArrayUtils.addAll(
+							Arrays.copyOfRange(lineElements, 0, 3), Arrays.copyOfRange(lineElements, 6, 9));
+					countInputs.add(getCountInput(secondDirection));
+				} else {
+					countInputs.add(getCountInput(lineElements));
+				}
 				line = reader.readLine();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 		return countInputs;
 	}
 
-	private static class CountInput {
-		public final Coord stationCoord;
-		public final String descr;
+	private static CountInput getCountInput(String[] lineElements) {
+		return new CountInput(
+				lineElements[0],
+				new Coord(Double.parseDouble(lineElements[1]), Double.parseDouble(lineElements[2])),
+				lineElements[3],
+				transformation.transform(new Coord(Double.parseDouble(lineElements[4]), Double.parseDouble(lineElements[5])))
+		);
+	}
 
-		public CountInput(Coord stationCoord, String descr, double counts) {
+	private static class CountInput {
+		final String id;
+		final Coord stationCoord;
+		final String directionDescr;
+		final Coord directionCoord;
+
+		public CountInput(String id, Coord stationCoord, String directionDescr, Coord directionCoord) {
+			this.id = id;
 			this.stationCoord = stationCoord;
-			this.descr = descr;
+			this.directionDescr = directionDescr;
+			this.directionCoord = directionCoord;
 		}
 	}
 }
