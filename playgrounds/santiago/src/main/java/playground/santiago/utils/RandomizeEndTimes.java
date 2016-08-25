@@ -6,27 +6,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
+
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
 import org.apache.commons.lang.math.IntRange;
 import org.apache.log4j.Logger;
 
@@ -211,9 +197,10 @@ public class RandomizeEndTimes {
 		 
 		 for (int i = 1; i<=n; ++i){
 			 
-			 //Ojo, aqui falta el caso en que no hayan viajes observados en el intervalo.
+
 			 double actual = tsHist.get(i);
 			 double forecast = popHist.get(i);
+			 //TODO: Add a condition to check when actual == 0
 			 error = error + Math.abs(actual-forecast)/Math.abs(actual);
 			 
 			 
@@ -231,9 +218,10 @@ public class RandomizeEndTimes {
 		 
 		 for (int i = 1; i<=n; ++i){
 			 
-			 //Ojo, aqui falta el caso en que no hayan viajes observados en el intervalo.
+
 			 double actual = tsHist.get(i);
 			 double forecast = popHist.get(i);
+			 //TODO: Add a condition to check when actual == 0
 			 distance = distance + (Math.pow((actual-forecast), 2)/(actual+forecast));
 			 
 			 
