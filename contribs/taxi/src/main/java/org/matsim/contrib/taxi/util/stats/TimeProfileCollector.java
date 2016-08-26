@@ -93,11 +93,10 @@ public class TimeProfileCollector
         String file = matsimServices.getControlerIO()
                 .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
         String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
-        String[] header = calculator.getHeader();
 
         try (CompactCSVWriter writer = new CompactCSVWriter(
                 IOUtils.getBufferedWriter(file + ".txt"))) {
-            writer.writeNext("time", header);
+            writer.writeNext("time", calculator.getHeader());
             for (int i = 0; i < timeProfile.size(); i++) {
                 writer.writeNext(Time.writeTime(times.get(i), timeFormat), timeProfile.get(i));
             }

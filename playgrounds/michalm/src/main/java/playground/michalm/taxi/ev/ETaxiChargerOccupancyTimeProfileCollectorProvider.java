@@ -17,62 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package playground.michalm.taxi.ev;
 
-import java.util.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.ChartType;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import com.google.common.collect.Iterables;
+import com.google.inject.*;
+
+import playground.michalm.ev.data.EvData;
 
 
-public class CSVLineBuilder
+public class ETaxiChargerOccupancyTimeProfileCollectorProvider
+    implements Provider<MobsimListener>
 {
-    private final List<String> line = new ArrayList<>();
+    private final EvData evData;
+    private final MatsimServices matsimServices;
 
 
-    public CSVLineBuilder add(String cell)
+    @Inject
+    public ETaxiChargerOccupancyTimeProfileCollectorProvider(EvData evData,
+            MatsimServices matsimServices)
     {
-        line.add(cell);
-        return this;
+        this.evData = evData;
+        this.matsimServices = matsimServices;
     }
 
 
-    public CSVLineBuilder addf(String format, Object cell)
+    @Override
+    public MobsimListener get()
     {
-        line.add(String.format(format, cell));
-        return this;
-    }
-
-
-    public CSVLineBuilder addEmpty()
-    {
-        line.add(null);
-        return this;
-    }
-
-
-    public CSVLineBuilder addAll(Iterable<String> cells)
-    {
-        Iterables.addAll(line, cells);
-        return this;
-    }
-
-
-    public CSVLineBuilder addAll(String... cells)
-    {
-        Collections.addAll(line, cells);
-        return this;
-    }
-
-
-    public CSVLineBuilder addBuilder(CSVLineBuilder builder)
-    {
-        line.addAll(builder.line);
-        return this;
-    }
-
-
-    public String[] build()
-    {
-        return line.toArray(new String[line.size()]);
+        ProfileCalculator calc = ETaxiChargerProfiles.createChargerOccupancyCalculator(evData);
+        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
+                "charger_occupancy_time_profiles", matsimServices);
+        collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+        return collector;
     }
 }

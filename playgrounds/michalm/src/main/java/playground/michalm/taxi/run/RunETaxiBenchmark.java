@@ -76,7 +76,8 @@ public class RunETaxiBenchmark
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiChargerTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
                 //override the binding in RunTaxiBenchmark
                 bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }

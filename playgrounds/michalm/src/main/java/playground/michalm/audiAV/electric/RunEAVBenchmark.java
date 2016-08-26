@@ -32,7 +32,7 @@ import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
-import playground.michalm.taxi.ev.ETaxiChargerTimeProfileCollectorProvider;
+import playground.michalm.taxi.ev.*;
 import playground.michalm.taxi.run.*;
 
 
@@ -81,7 +81,8 @@ public class RunEAVBenchmark
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiChargerTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
                 //override the binding in RunTaxiBenchmark
                 bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }
