@@ -16,7 +16,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.apache.commons.lang.math.IntRange;
 import org.apache.log4j.Logger;
 
-public class RandomizeEndTimes {
+public class FindStandardDeviation {
 	
 
 	private String tripsFolder = "../../../shared-svn/projects/santiago/scenario/trips/" ;
@@ -29,11 +29,11 @@ public class RandomizeEndTimes {
 	private int intervalLength = 15; //size of bins to build the histograms (in minutes). Try pair values or 5 - multiples values.
 	
 	
-	private final static Logger log = Logger.getLogger(RandomizeEndTimes.class);
+	private final static Logger log = Logger.getLogger(FindStandardDeviation.class);
 
 	 public static void main (String[]arg){
-		 RandomizeEndTimes ret = new RandomizeEndTimes();
-		 ret.run();
+		 FindStandardDeviation fsd = new FindStandardDeviation();
+		 fsd.run();
 	 }
 	 
 	 private void run () {
