@@ -23,17 +23,25 @@ public class SamplingAgentsFromPop {
 
 
 	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
-	final String runsSampledDir = "../../../runs-svn/santiago/BASE1/";
+	final String runsSampledDir = "../../../runs-svn/santiago/TMP/";
 
-			
-	final String expandedPlans  = svnWorkingDir + "inputForMATSim/plans/randomized_expanded_plans.xml.gz";
-	final String expandedConfig = svnWorkingDir + "inputForMATSim/randomized_expanded_config.xml";
-			
-	final String sampledPlans   = svnWorkingDir + "inputForMATSim/plans/randomized_sampled_plans.xml.gz";
-	final String sampledConfig  = svnWorkingDir + "inputForMATSim/randomized_sampled_config.xml";
+	final String expandedPlansFolder = svnWorkingDir + "inputForMATSim/plans/2_10pct/";
+	final String expandedPlansFile  = expandedPlansFolder + "randomized_expanded_plans.xml.gz";
 	
-	final static double ORIGINAL_PERCENTAGE = 0.1; /* This is the original sample rate from expanded_plans_final.xml.gz i.e. " x % " */
-	final static double SAMPLED_PERCENTAGE = 0.1; /* This is the percentage that is desired to extract from a "x %" expanded_plans_final.xml.gz */ 
+	
+	final String sampledPlansFolder = svnWorkingDir + "inputForMATSim/plans/3_1pct/";
+	final String sampledPlansFile   = sampledPlansFolder + "randomized_sampled_plans.xml.gz";
+		
+	final String configFolder = svnWorkingDir + "inputForMATSim/";	
+	final String expandedConfigFile = configFolder + "randomized_expanded_config.xml";
+	final String sampledConfigFile  = configFolder + "randomized_sampled_config.xml";
+	
+			
+	
+	
+	
+	final static double ORIGINAL_PERCENTAGE = 0.1; /* This is the original sample rate from expanded_plans_final.xml.gz*/
+	final static double SAMPLED_PERCENTAGE = 0.1; /* This is the percentage that is desired to extract*/ 
 
 	
 
@@ -44,7 +52,7 @@ public class SamplingAgentsFromPop {
 
 
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioTmp).readFile(expandedPlans);
+		new PopulationReader(scenarioTmp).readFile(expandedPlansFile);
 		
 		Population pop = scenarioTmp.getPopulation();
 
@@ -59,7 +67,7 @@ public class SamplingAgentsFromPop {
 		
 	
 		PopulationWriter popwriter = new PopulationWriter(newPop) ;
-		popwriter.write( sampledPlans );
+		popwriter.write( sampledPlansFile );
 
 		System.out.println("done.");
 	}
@@ -67,7 +75,7 @@ public class SamplingAgentsFromPop {
 	void changeAndWriteNewConfigFile () {
 		
 		double finalSampleRate = Math.floor( ORIGINAL_PERCENTAGE * SAMPLED_PERCENTAGE * 1000) / 1000 ;
-		Config config = ConfigUtils.loadConfig( expandedConfig );		
+		Config config = ConfigUtils.loadConfig( expandedConfigFile );		
 
 		QSimConfigGroup qsim = config.qsim();
 		qsim.setFlowCapFactor(finalSampleRate);
@@ -103,7 +111,7 @@ public class SamplingAgentsFromPop {
 		
 
 		
-		new ConfigWriter(config).write( sampledConfig );
+		new ConfigWriter(config).write( sampledConfigFile );
 		
 		
 
