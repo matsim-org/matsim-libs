@@ -67,7 +67,7 @@ public class TaxiStatsWriter
     private void writeVehicleEmptyDriveRatioStats(CompactCSVWriter writer)
     {
         writer.writeNext("Vehicle Empty Drive Ratio");
-        writer.writeNext(getStatsSubheader("fleet"));
+        writer.writeNext(getStatsSubheader("fleetAvg"));
 
         for (TaxiStats s : taxiStats) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
@@ -82,7 +82,7 @@ public class TaxiStatsWriter
     private void writeVehicleWaitRatioStats(CompactCSVWriter writer)
     {
         writer.writeNext("Vehicle Wait Ratio");
-        writer.writeNext(getStatsSubheader("fleet"));
+        writer.writeNext(getStatsSubheader("fleetAvg"));
 
         for (TaxiStats s : taxiStats) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
@@ -96,7 +96,7 @@ public class TaxiStatsWriter
 
     private String[] getStatsSubheader(String header2)
     {
-        return new String[] { "hour", header2, "mean", "sd", null, //
+        return new String[] { "hour", header2, "avg", "sd", null, //
                 "min", "2%ile", "5%ile", "25%ile", "50%ile", "75%ile", "95%ile", "98%ile", "max" };
     }
 

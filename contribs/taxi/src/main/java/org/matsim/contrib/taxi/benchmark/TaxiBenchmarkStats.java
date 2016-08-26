@@ -16,11 +16,11 @@ public class TaxiBenchmarkStats
     implements AfterMobsimListener, ShutdownListener
 {
     public static final String[] HEADER = { "n", "m", //
-            "PassWait", //
-            "PassWait_p95", //
-            "PassWait_max", //
-            "EmptyDriveRatio", //
-            "StayRatio" };
+            "PassWaitTime_avg", //
+            "PassWaitTime_95%ile", //
+            "PassWaitTime_max", //
+            "EmptyDriveRatio_fleetAvg", //
+            "StayRatio_fleetAvg" };
 
     protected final TaxiData taxiData;
     private final OutputDirectoryHierarchy controlerIO;
