@@ -19,8 +19,13 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.awt.*;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.DefaultTableXYDataset;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -50,6 +55,29 @@ public class TaxiStatusTimeProfileCollectorProvider
                 TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
                 TaxiTimeProfiles.createRequestsWithStatusCounter(taxiData,
                         TaxiRequestStatus.UNPLANNED));
-        return new TimeProfileCollector(calc, 300, "taxi_status_time_profiles", matsimServices);
+
+        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
+                "taxi_status_time_profiles", matsimServices);
+
+        collector.setChartCustomizer(new Customizer() {
+            public void customize(JFreeChart chart, ChartType chartType)
+            {
+                TimeProfileCharts.changeSeriesColors(chart,
+                        new Paint[] { new Color(91, 155, 213), // EMPTY_DRIVE
+                                new Color(237, 125, 49), // PICKUP
+                                new Color(165, 165, 165), // OCCUPIED_DRIVE
+                                new Color(255, 192, 0), // DROPOFF
+                                new Color(112, 173, 71), // STAY
+                                new Color(37, 94, 145) }); // UNPLANNED (requests)
+
+                if (chartType == ChartType.StackedArea) {
+                    ((DefaultTableXYDataset)chart.getXYPlot().getDataset()).removeSeries(5);
+                }
+
+            }
+        });
+
+        collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+        return collector;
     }
 }

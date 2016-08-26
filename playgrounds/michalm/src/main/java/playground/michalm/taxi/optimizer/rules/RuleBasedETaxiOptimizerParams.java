@@ -17,35 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent.run;
+package playground.michalm.taxi.optimizer.rules;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.consistency.ConfigConsistencyChecker;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.utils.misc.Time;
+import org.apache.commons.configuration.Configuration;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 
-public class DynQSimConfigConsistencyChecker
-    implements ConfigConsistencyChecker
+public class RuleBasedETaxiOptimizerParams
+    extends RuleBasedTaxiOptimizerParams
 {
-    private static final Logger log = Logger.getLogger(DynQSimConfigConsistencyChecker.class);
+    public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
+    public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
+
+    public final double minRelativeSoc;
+    public final int socCheckTimeStep;
 
 
-    @Override
-    public void checkConsistency(Config config)
+    public RuleBasedETaxiOptimizerParams(Configuration optimizerConfig)
     {
-        QSimConfigGroup qSimConfig = config.qsim();
+        super(optimizerConfig);
 
-        if (qSimConfig.getStartTime() != 0 && qSimConfig.getStartTime() != Time.UNDEFINED_TIME) {
-            log.warn("Simulation should start from time 0. "
-                    + "This is what a typical DynAgent assumes");
-        }
+        //30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
+        //alternatively, in cold winter, it is enough to travel for 1 hour
+        //(for approx. 20 km => 3kWh) with 3 kW-heating on
+        minRelativeSoc = optimizerConfig.getDouble(MIN_RELATIVE_SOC, 0.3);
 
-        if (qSimConfig.getSimStarttimeInterpretation() != //
-        QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime) {
-            throw new RuntimeException("DynAgents require simulation from the very beginning,"
-                    + "preferably sec-by-sec from time 0. Please set \'simStarttimeInterpretation\' in the qSim config module to  \'onlyUseStarttime\' and set the start time to 00:00:00.");
-        }
+        //in cold winter, 3kW heating consumes 1.25% SOC every 5 min
+        socCheckTimeStep = optimizerConfig.getInt(SOC_CHECK_TIME_STEP, 300);
     }
 }

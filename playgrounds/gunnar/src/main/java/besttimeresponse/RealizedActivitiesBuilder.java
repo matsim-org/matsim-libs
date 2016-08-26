@@ -22,7 +22,7 @@ public class RealizedActivitiesBuilder {
 
 	private final TimeDiscretization timeDiscr;
 
-	private final TravelTimes travelTimes;
+	private final TripTravelTimes travelTimes;
 
 	private final boolean repairTimeStructure;
 
@@ -34,7 +34,7 @@ public class RealizedActivitiesBuilder {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RealizedActivitiesBuilder(final TimeDiscretization timeDiscr, final TravelTimes travelTimes,
+	public RealizedActivitiesBuilder(final TimeDiscretization timeDiscr, final TripTravelTimes travelTimes,
 			final boolean repairTimeStructure) {
 		this.timeDiscr = timeDiscr;
 		this.travelTimes = travelTimes;

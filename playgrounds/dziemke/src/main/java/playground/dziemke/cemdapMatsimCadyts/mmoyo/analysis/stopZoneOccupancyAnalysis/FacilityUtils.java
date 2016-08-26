@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.ev;
+package playground.dziemke.cemdapMatsimCadyts.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.google.inject.*;
+abstract class FacilityUtils{
+	final static char POINT = '.';
 
-import playground.michalm.ev.data.EvData;
+	/**
+	 * Converts the id of a stop facility into a stop Zone. (it is the same id, just without the point and suffix)
+	 */
+	static Id<TransitStopFacility> convertFacilitytoZoneId(Id<TransitStopFacility> facId) {
+		String str = getStrUntilPoint(facId.toString());
+		return Id.create(str, TransitStopFacility.class);
+	}
 
-
-public class ETaxiChargerTimeProfileCollectorProvider
-    implements Provider<MobsimListener>
-{
-    private final EvData evData;
-    private final MatsimServices matsimServices;
-
-
-    @Inject
-    public ETaxiChargerTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
-    {
-        this.evData = evData;
-        this.matsimServices = matsimServices;
-    }
-
-
-    @Override
-    public MobsimListener get()
-    {
-        ProfileCalculator calc = ETaxiChargerProfiles.createChargerOccupancyCalculator(evData);
-        return new TimeProfileCollector(calc, 300, "charger_occupancy_time_profiles", matsimServices);
-    }
+	static String getStrUntilPoint(String origStr){
+		int pointIndex = origStr.indexOf(POINT);
+		return origStr.substring(0, pointIndex > -1? pointIndex: origStr.length());
+	}
 }
