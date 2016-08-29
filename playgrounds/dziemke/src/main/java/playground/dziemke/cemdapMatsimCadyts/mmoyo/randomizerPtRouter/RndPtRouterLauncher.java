@@ -54,15 +54,12 @@ public class RndPtRouterLauncher {
 
 	private static Provider<TransitRouter> createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
 		return
-				new Provider<TransitRouter>() {
-					@Override
-					public TransitRouter get() {
-						RandomizingTransitRouterTravelTimeAndDisutility ttCalculator =
-								new RandomizingTransitRouterTravelTimeAndDisutility(trConfig);
-						ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
-						ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
-						return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
-					}
+				() -> {
+					RandomizingTransitRouterTravelTimeAndDisutility ttCalculator =
+							new RandomizingTransitRouterTravelTimeAndDisutility(trConfig);
+					ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
+					ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
+					return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 				};
 	}
 
@@ -120,13 +117,12 @@ public class RndPtRouterLauncher {
 		//set the controler
 		final Controler controler = new Controler(scn);
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 
 		//add cadytsContext as ctrListener
 		final double beta = 30. ;
+		config.planCalcScore().setBrainExpBeta(beta);
 
 //		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
@@ -147,7 +143,7 @@ public class RndPtRouterLauncher {
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 //				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
-				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<TransitStopFacility>(person.getSelectedPlan(), config, cadytsContext);
+				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
 				final double cadytsScoringWeight = cadytsWeight * config.planCalcScore().getBrainExpBeta();
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
