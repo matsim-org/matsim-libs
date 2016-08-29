@@ -68,16 +68,17 @@ public class RndPtRouterLauncher {
 
 	public static void main(final String[] args) {
 
-		final int lastIteration = 10;
+		int lastIteration = 10;
 
 		String configFile ;
 		final double cadytsWeight;
-		if(args.length==0){
-			configFile = "../../../shared-svn/projects/ptManuel/calibration/my_config - gt.xml";
-			cadytsWeight = 30.0;
-		}else{
+		if(args.length==3){
 			configFile = args[0];
-			cadytsWeight = Double.parseDouble(args[1]);
+			lastIteration = Integer.parseInt(args[1]);
+			cadytsWeight = Double.parseDouble(args[2]);
+		}else {
+			cadytsWeight = 30.0;
+			configFile = "../../../shared-svn/projects/ptManuel/calibration/my_config - gt.xml";
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile) ;
