@@ -118,7 +118,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 	public static void main(String[] args) {
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-		String [] runCases =  {"ei"};
+		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
 //		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 
