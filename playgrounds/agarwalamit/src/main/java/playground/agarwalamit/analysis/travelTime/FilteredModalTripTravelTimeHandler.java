@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * @author amit

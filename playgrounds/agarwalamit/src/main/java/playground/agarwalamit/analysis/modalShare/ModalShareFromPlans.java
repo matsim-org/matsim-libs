@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * @author amit

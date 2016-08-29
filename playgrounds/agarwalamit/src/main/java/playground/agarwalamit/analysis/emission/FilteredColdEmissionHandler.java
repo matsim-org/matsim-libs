@@ -35,9 +35,9 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter;
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
 import playground.agarwalamit.utils.GeometryUtils;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 
 /**

@@ -32,8 +32,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter;
 import playground.agarwalamit.utils.ListUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * @author amit

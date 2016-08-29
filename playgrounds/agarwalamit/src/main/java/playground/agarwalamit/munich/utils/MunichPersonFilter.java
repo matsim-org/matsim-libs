@@ -28,7 +28,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 
-public class MunichPersonFilter extends PersonFilter implements playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter{
+public class MunichPersonFilter extends PersonFilter implements playground.agarwalamit.utils.PersonFilter{
 
 	public enum MunichUserGroup {Urban, Rev_Commuter, Freight}
 

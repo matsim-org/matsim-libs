@@ -30,8 +30,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter;
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * (1) This excludes the departure of transit drivers.
