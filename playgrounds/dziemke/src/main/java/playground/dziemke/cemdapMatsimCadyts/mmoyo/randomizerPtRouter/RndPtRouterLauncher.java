@@ -122,7 +122,6 @@ public class RndPtRouterLauncher {
 
 		//add cadytsContext as ctrListener
 		final double beta = 30. ;
-		config.planCalcScore().setBrainExpBeta(beta);
 
 //		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
@@ -144,7 +143,7 @@ public class RndPtRouterLauncher {
 
 //				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
 				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-				final double cadytsScoringWeight = cadytsWeight * config.planCalcScore().getBrainExpBeta();
+				final double cadytsScoringWeight = cadytsWeight * beta;//config.planCalcScore().getBrainExpBeta();
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 
