@@ -55,7 +55,7 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 	
 	public TollCounterInfoWriter(final String eventsFile, final Scenario sc, final int noOfTimeBins, final boolean isSortingForMunich) {
 		super(TollCounterInfoWriter.class.getSimpleName());
-		af = new AreaFilter(isSortingForMunich);
+		af = new AreaFilter();
 		pf = new MunichPersonFilter();
 		this.cda = new CausedDelayAnalyzer(eventsFile, sc, noOfTimeBins, isSortingForMunich);
 	}

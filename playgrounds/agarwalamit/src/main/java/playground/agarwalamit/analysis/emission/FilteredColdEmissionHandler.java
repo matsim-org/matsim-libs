@@ -70,7 +70,6 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 		this.ug=userGroup;
 		this.pf = personFilter;
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
-		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	/**
@@ -80,7 +79,6 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup,final PersonFilter personFilter){
 		this(simulationEndTime,noOfTimeBins,null,null,userGroup,personFilter);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
-		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
 	}
 

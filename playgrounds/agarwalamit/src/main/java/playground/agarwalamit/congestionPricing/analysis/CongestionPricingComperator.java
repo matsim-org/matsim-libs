@@ -66,11 +66,14 @@ public class CongestionPricingComperator {
 	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
 	private Scenario scenario;
 	private String pricingScenario;
+	
 	private final boolean isSortingForInsideMunich = true;
+	private final AreaFilter areaFilter = new AreaFilter();
+	
 	private final String suffixForSoring = "_sorted";
 	private double vttsCar;
 	private final MunichPersonFilter pf = new MunichPersonFilter();
-	private final AreaFilter af = new AreaFilter(isSortingForInsideMunich);
+	private final AreaFilter af = new AreaFilter();
 
 	public static void main(String[] args) {
 		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");
@@ -167,7 +170,7 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime(), isSortingForInsideMunich);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime(), areaFilter);
 		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}

@@ -26,7 +26,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -48,9 +47,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
-
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
-import playground.agarwalamit.utils.AreaFilter;
 
 /**
  * @author amit
@@ -74,29 +70,11 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 
 	private double timeBinSize;
 	private Network network;
-	private final boolean isSortingForInsideMunich ;
-	private final MunichPersonFilter pf;
-	private final AreaFilter af;
 
-	/**
-	 * @param noOfTimeBins
-	 * @param simulationEndTime
-	 * @param scenario must have minimally network, plans and config file.
-	 * @param isSortingForInsideMunich true if outside Munich city area links are not included in analysis
-	 */
-	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final boolean isSortingForInsideMunich){
-		this.isSortingForInsideMunich = isSortingForInsideMunich;
-		af = new AreaFilter(isSortingForInsideMunich);
-		pf = new MunichPersonFilter();
-		if(isSortingForInsideMunich) LOG.warn("Output data will only include links which fall inside the Munich city area");
+	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime){
 		initialize(scenario, noOfTimeBins, simulationEndTime);
 	}
 
-	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndtime){
-		this(scenario, noOfTimeBins, simulationEndtime, false);
-		
-	}
-	
 	private void initialize(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime){
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.network = scenario.getNetwork();
@@ -147,7 +125,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
-			throw new RuntimeException();
+			throw new RuntimeException("Person is already on the link. Cannot happen.");
 		} 
 
 		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
@@ -176,9 +154,6 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		double currentDelay =	actualTravelTime-freeSpeedTime;
 		if(currentDelay<1.)  currentDelay=0.;
 		this.totalDelay+=currentDelay;
-
-		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-		if( this.isSortingForInsideMunich && !af.isCellInsideMunichCityArea(linkCoord) ) return;
 
 		Map<Id<Person>, Double> delayForPerson = this.timebin2PersonId2Delay.get(endOfTimeInterval);
 		Map<Id<Link>, Double> delayOnLink = this.timebin2LinkId2Delay.get(endOfTimeInterval);

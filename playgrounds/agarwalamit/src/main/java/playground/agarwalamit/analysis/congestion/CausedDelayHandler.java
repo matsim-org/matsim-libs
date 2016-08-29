@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.AreaFilter;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -55,7 +54,6 @@ public class CausedDelayHandler implements CongestionEventHandler {
 	private final SortedMap<Double,Set<Id<Person>>> timeBin2ListOfTollPayers = new TreeMap<>();
 	
 	private final Network network;
-	private final MunichPersonFilter pf;
 	private final AreaFilter af;
 	
 	public CausedDelayHandler(final Scenario scenario, final int noOfTimeBin) {
@@ -67,8 +65,7 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		this.timeBinSize = simulatioEndTime /noOfTimeBin;
 		this.network = scenario.getNetwork();
 		this.isSortingForInsideMunich = sortingForInsideMunich;
-		af  = new AreaFilter(isSortingForInsideMunich);
-		pf = new MunichPersonFilter();
+		af  = new AreaFilter();
 		initialize(noOfTimeBin, scenario);
 	}
 	
@@ -113,7 +110,7 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		Id<Link> linkId = event.getLinkId();
 		
 		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-		if(isSortingForInsideMunich && !af.isCellInsideMunichCityArea(linkCoord) ) return;
+		if(isSortingForInsideMunich && !af.isCellInsideShape(linkCoord) ) return;
 		
 		Id<Person> causingAgentId = event.getCausingAgentId();
 

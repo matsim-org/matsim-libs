@@ -37,12 +37,12 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter;
  */
 
 public class AreaFilter {
-	
+
 	private Collection<SimpleFeature> munichFeatures;
 	private boolean isSortingForShapeFile = false;
-	
+
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-	
+
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
 	 */
@@ -52,17 +52,15 @@ public class AreaFilter {
 	}
 
 	/**
-	 * @param isSortingForInsideMunich true if want to sort person for Munich city area.
+	 * if want to sort person for Munich city area.
 	 */
-	public AreaFilter (final boolean isFilteringForInsideMunichCity){
-		if(isFilteringForInsideMunichCity) {
-			this.munichFeatures = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
-			this.isSortingForShapeFile = true;
-			Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
-		}
+	public AreaFilter (){
+		this.munichFeatures = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
+		this.isSortingForShapeFile = true;
+		Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
 	}
 
-	public boolean isCellInsideMunichCityArea(Coord cellCentroid) {
+	public boolean isCellInsideShape(Coord cellCentroid) {
 		if(! this.isSortingForShapeFile) throw new RuntimeException("No shape file is assigned to check if the centroid falls inside it. Aborting ...");
 		boolean isInsideMunich = false;
 		GeometryFactory factory = new GeometryFactory();
