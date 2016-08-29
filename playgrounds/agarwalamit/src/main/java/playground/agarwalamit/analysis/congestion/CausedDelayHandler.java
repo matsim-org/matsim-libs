@@ -25,14 +25,12 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.agarwalamit.utils.AreaFilter;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 
@@ -42,7 +40,6 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 public class CausedDelayHandler implements CongestionEventHandler {
 	
-	private boolean isSortingForInsideMunich;
 	private final double timeBinSize;
 	private final SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<Double, Map<Id<Link>,Double>>();
 	private final SortedMap<Double,Map<Id<Link>,Set<Id<Person>>>> timeBin2Link2Persons = new TreeMap<Double, Map<Id<Link>,Set<Id<Person>>>>();
@@ -54,18 +51,11 @@ public class CausedDelayHandler implements CongestionEventHandler {
 	private final SortedMap<Double,Set<Id<Person>>> timeBin2ListOfTollPayers = new TreeMap<>();
 	
 	private final Network network;
-	private final AreaFilter af;
 	
 	public CausedDelayHandler(final Scenario scenario, final int noOfTimeBin) {
-		this(scenario, noOfTimeBin, false);
-	}
-	
-	public CausedDelayHandler(final Scenario scenario, final int noOfTimeBin, final boolean sortingForInsideMunich) {
 		double simulatioEndTime = scenario.getConfig().qsim().getEndTime();
 		this.timeBinSize = simulatioEndTime /noOfTimeBin;
 		this.network = scenario.getNetwork();
-		this.isSortingForInsideMunich = sortingForInsideMunich;
-		af  = new AreaFilter();
 		initialize(noOfTimeBin, scenario);
 	}
 	
@@ -108,10 +98,6 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
 
 		Id<Link> linkId = event.getLinkId();
-		
-		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-		if(isSortingForInsideMunich && !af.isCellInsideShape(linkCoord) ) return;
-		
 		Id<Person> causingAgentId = event.getCausingAgentId();
 
 		//tolled trip count --> causing agent 

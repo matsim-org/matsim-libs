@@ -71,11 +71,12 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	private double timeBinSize;
 	private Network network;
 
-	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime){
-		initialize(scenario, noOfTimeBins, simulationEndTime);
+	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins){
+		initialize(scenario, noOfTimeBins);
 	}
 
-	private void initialize(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime){
+	private void initialize(final Scenario scenario, final int noOfTimeBins){
+		double simulationEndTime = scenario.getConfig().qsim().getEndTime();
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.network = scenario.getNetwork();
 

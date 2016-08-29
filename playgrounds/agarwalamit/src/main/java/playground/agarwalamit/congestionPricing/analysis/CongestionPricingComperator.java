@@ -135,7 +135,7 @@ public class CongestionPricingComperator {
 	 */
 	private void writeAverageLinkTolls () {
 
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBins,true); // only Munich city area
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBins, new AreaFilter()); // only Munich city area
 		delayAnalyzer.run();
 
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();//delays on each link for each time bin
@@ -170,13 +170,13 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime(), areaFilter);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, areaFilter);
 		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getCausingPersonDelay(int noOfTimeBin){
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBin,isSortingForInsideMunich);
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, new AreaFilter());
 		delayAnalyzer.run();
 		return delayAnalyzer.getTimeBin2CausingPersonId2Delay();
 	}

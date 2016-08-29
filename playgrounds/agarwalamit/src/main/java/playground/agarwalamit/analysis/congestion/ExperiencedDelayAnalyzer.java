@@ -54,28 +54,27 @@ public class ExperiencedDelayAnalyzer {
 	private final Scenario scenario;
 
 	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
-			final double simulationEndTime, final String userGroup, final PersonFilter personFilter, final AreaFilter areaFilter) {
+			final String userGroup, final PersonFilter personFilter, final AreaFilter areaFilter) {
 		this.eventsFile = eventFile;
 		this.scenario = scenario;
-		this.congestionHandler = new FilteredExperienceDelayHandler(this.scenario, noOfTimeBins, simulationEndTime, userGroup, personFilter, areaFilter);
+		this.congestionHandler = new FilteredExperienceDelayHandler(this.scenario, noOfTimeBins, userGroup, personFilter, areaFilter);
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 	}
 	
 	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
-			final double simulationEndTime, final String userGroup, final PersonFilter personFilter) {
-		this(eventFile, scenario, noOfTimeBins, simulationEndTime, userGroup, personFilter, null);
+			final String userGroup, final PersonFilter personFilter) {
+		this(eventFile, scenario, noOfTimeBins, userGroup, personFilter, null);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 	}
 	
 	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
-			final double simulationEndTime, final AreaFilter areaFilter) {
-		this(eventFile, scenario, noOfTimeBins, simulationEndTime, null, null, areaFilter);
+			final AreaFilter areaFilter) {
+		this(eventFile, scenario, noOfTimeBins, null, null, areaFilter);
 		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
 	
-	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
-			final double simulationEndTime) {
-		this(eventFile, scenario, noOfTimeBins, simulationEndTime, null, null, null);
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins) {
+		this(eventFile, scenario, noOfTimeBins, null, null, null);
 		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
 	

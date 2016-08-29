@@ -173,7 +173,7 @@ public class BAUDelayAnalyzer {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime());
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin);
 		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
