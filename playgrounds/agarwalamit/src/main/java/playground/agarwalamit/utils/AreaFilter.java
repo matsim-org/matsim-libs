@@ -38,7 +38,7 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter;
 
 public class AreaFilter {
 
-	private Collection<SimpleFeature> munichFeatures;
+	private Collection<SimpleFeature> features;
 	private boolean isSortingForShapeFile = false;
 
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -48,14 +48,14 @@ public class AreaFilter {
 	 */
 	public AreaFilter (String shapeFile){
 		this.isSortingForShapeFile = true;
-		this.munichFeatures = ShapeFileReader.getAllFeatures(shapeFile);
+		this.features = ShapeFileReader.getAllFeatures(shapeFile);
 	}
 
 	/**
 	 * if want to sort person for Munich city area.
 	 */
 	public AreaFilter (){
-		this.munichFeatures = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
+		this.features = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
 		this.isSortingForShapeFile = true;
 		Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
 	}
@@ -65,7 +65,7 @@ public class AreaFilter {
 		boolean isInsideMunich = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
-		for(SimpleFeature feature : this.munichFeatures){
+		for(SimpleFeature feature : this.features){
 			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
 				isInsideMunich = true;
 				break;

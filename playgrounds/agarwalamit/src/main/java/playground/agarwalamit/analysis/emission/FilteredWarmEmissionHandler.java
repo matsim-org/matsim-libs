@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.emission;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -30,13 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
-import playground.agarwalamit.utils.GeometryUtils;
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 
@@ -46,31 +40,25 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
 
 public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionHandler.class.getName());
-	
+
 	private final EmissionsPerLinkWarmEventHandler delegate;
 	private final PersonFilter pf ;
-	private final Collection<Geometry> zonalGeoms;
 	private final Network network;
 	private final String ug ;
+	private final AreaFilter af;
 
 	/**
 	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
 	 */
-	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
-			final Network network, final String userGroup, final PersonFilter personFilter){
+	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup, final PersonFilter personFilter, 
+			final Network network, final AreaFilter areaFilter){
 		this.delegate = new EmissionsPerLinkWarmEventHandler(simulationEndTime,noOfTimeBins);
 
-		if(shapeFile!=null) {
-			Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(shapeFile);
-			this.zonalGeoms = GeometryUtils.getSimplifiedGeometries(features);
-		}
-		else this.zonalGeoms = new ArrayList<>();
-
+		this.af = areaFilter;
 		this.network = network;
 		this.ug=userGroup;
 		this.pf = personFilter;
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
-		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	/**
@@ -78,17 +66,16 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	 * {@link EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
 	 */
 	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup, final PersonFilter personFilter){
-		this(simulationEndTime,noOfTimeBins,null,null,userGroup,personFilter);
+		this(simulationEndTime,noOfTimeBins,userGroup,personFilter, null, null);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
-		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
 	}
 
 	/**
 	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
 	 */
-	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
-		this(simulationEndTime,noOfTimeBins,shapeFile,network,null,null);
+	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final Network network, final AreaFilter areaFilter){
+		this(simulationEndTime,noOfTimeBins,null,null,network,areaFilter);
 		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
 
@@ -103,25 +90,23 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 
-		if( this.ug != null ) {
-			Id<Person> driverId = Id.createPersonId(event.getVehicleId());
-			if ( ! this.zonalGeoms.isEmpty()  ) { // filtering for both
-				Link link = network.getLinks().get(event.getLinkId());
-				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
-					delegate.handleEvent(event);
-				}
-			} else { // filtering for user group only
-				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  ) {
-					delegate.handleEvent(event);
-				}
+		Id<Person> driverId = Id.createPersonId(event.getVehicleId());// AA_TODO: either it should be mapped to vehicle id or read events file too to get driver id
+
+		if (this.af!=null) { // area filtering
+			Link link = network.getLinks().get(event.getLinkId());
+			if(! this.af.isCellInsideShape(link.getCoord())) return;
+
+			if(this.ug==null || this.pf==null) {// only area filtering
+				delegate.handleEvent(event); 
+			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // both filtering
+				delegate.handleEvent(event);
 			}
-		} else { 
-			if( ! this.zonalGeoms.isEmpty()  ) { // filtering for area only
-				Link link = network.getLinks().get(event.getLinkId());
-				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
-					delegate.handleEvent(event);
-				}
-			} else { // no filtering at all
+
+		} else {
+
+			if(this.ug==null || this.pf==null) {// no filtering
+				delegate.handleEvent(event); 
+			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
 				delegate.handleEvent(event);
 			}
 		}
@@ -137,7 +122,6 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		this.zonalGeoms.clear();
 		delegate.reset(iteration);
 	}
 }

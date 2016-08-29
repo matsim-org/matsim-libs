@@ -42,6 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.internalization.EmissionCostFactors;
@@ -70,8 +71,9 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup, new MunichPersonFilter());
-		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup, new MunichPersonFilter());
+		AreaFilter af = new AreaFilter(shapeFile);
+		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, new MunichPersonFilter(), network, af);
+		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, new MunichPersonFilter(), network, af);
 	}
 
 	/**
@@ -79,7 +81,6 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	 */
 	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, final Network network ) {
 		this(simulationEndTime,emissionEventFile,noOfTimeBins,shapeFile,network,null);
-
 	}
 
 	/**
@@ -117,7 +118,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 	public static void main(String[] args) {
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
+		String [] runCases =  {"ei"};
 //		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 

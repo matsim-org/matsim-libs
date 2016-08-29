@@ -42,31 +42,19 @@ public class MunichPersonFilter extends PersonFilter implements playground.agarw
 	}
 	
 	/**
-	 * A translation between 
-	 */
-	private UserGroup getUserGroupFromPersonId (final Id<Person> personId) {
-		UserGroup outUG = UserGroup.URBAN;
-		for(UserGroup ug : UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(personId, ug)) {
-				outUG =ug;
-				break;
-			}
-		}
-		return outUG;
-	}
-
-	/**
 	 * @return Urban or (Rev) commuter or Freight from person id.
 	 */
 	public MunichUserGroup getMunichUserGroupFromPersonId(final Id<Person> personId) {
-		return getMunichUserGroup(getUserGroupFromPersonId(personId));
+		if (pf.isPersonFreight(personId) ) return MunichUserGroup.Freight;
+		else if (pf.isPersonFromMID(personId)) return MunichUserGroup.Urban;
+		else return MunichUserGroup.Rev_Commuter;
 	}
 	
 	/**
 	 * A translation between UserGroup and MunichUserGroup 
 	 * Helpful for writing data to files.
 	 */
-	private MunichUserGroup getMunichUserGroup(final UserGroup ug){
+	public MunichUserGroup getMunichUserGroup(final UserGroup ug){
 		switch(ug){
 		case REV_COMMUTER:
 		case COMMUTER: return MunichUserGroup.Rev_Commuter;
