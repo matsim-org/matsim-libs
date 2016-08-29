@@ -42,7 +42,8 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	
 	ChargingSitePolicy getChargingSitePolicy();
 
-	abstract Collection<ChargingPlugType> getAllAvailableChargingPlugTypes();
+	abstract Collection<ChargingPlugType> getAllAccessibleChargingPlugTypes();
+	abstract Collection<ChargingPlugType> getAllChargingPlugTypes();
 
 	abstract double estimateChargingSessionDuration(ChargingPlug plug);
 

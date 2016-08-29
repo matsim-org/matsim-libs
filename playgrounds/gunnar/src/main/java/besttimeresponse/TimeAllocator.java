@@ -3,6 +3,7 @@ package besttimeresponse;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class TimeAllocator {
 
 	private final TimeDiscretization timeDiscretization;
 
-	private final TravelTimes travelTimes;
+	private final TripTravelTimes travelTimes;
 
 	private final boolean repairTimeStructure = true;
 
@@ -39,7 +40,7 @@ public class TimeAllocator {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public TimeAllocator(final TimeDiscretization timeDiscretization, final TravelTimes travelTimes,
+	public TimeAllocator(final TimeDiscretization timeDiscretization, final TripTravelTimes travelTimes,
 			final double betaDur_1_s, final double betaTravel_1_s, final double betaLateArr_1_s,
 			final double betaEarlyDpt_1_s) {
 		this.timeDiscretization = timeDiscretization;
@@ -65,6 +66,27 @@ public class TimeAllocator {
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
+
+	private double[] list2array(final List<Double> list) {
+		final double[] result = new double[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			result[i] = list.get(i);
+		}
+		return result;
+	}
+
+	private List<Double> array2list(final double[] array) {
+		final List<Double> result = new ArrayList<>(array.length);
+		for (double val : array) {
+			result.add(val);
+		}
+		return result;
+	}
+
+	public List<Double> optimizeDepartureTimes(final List<PlannedActivity> plannedActivities,
+			List<Double> initialDptTimes_s) {
+		return array2list(this.optimizeDepartureTimes(plannedActivities, this.list2array(initialDptTimes_s)));
+	}
 
 	public double[] optimizeDepartureTimes(final List<PlannedActivity> plannedActivities,
 			final double[] initialDptTimes_s) {

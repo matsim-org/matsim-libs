@@ -38,25 +38,31 @@ public class RandomizeCoordinates {
 	
 
 	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
-	final String runsWorkingDir = "../../../runs-svn/santiago/BASE10/input/";
+	final String runsWorkingDir = "../../../runs-svn/santiago/TMP/input/";
 
 	final ShapeFileReader reader = new ShapeFileReader();
 	Collection<SimpleFeature> features = reader.readFileAndInitialize("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/3_ShapeZonasEOD/zonificacion_eod2012.shp");
 
+	final String plansFolder = svnWorkingDir + "inputForMATSim/plans/2_10pct/";
+	final String plansFile = plansFolder + "expanded_plans_1.xml.gz";
 	
-	final String expandedConfig = svnWorkingDir + "inputForMATSim/expanded_config.xml"; //original config file
-	final String expandedPlans = svnWorkingDir + "inputForMATSim/plans/expanded_plans.xml.gz";
+	final String configFolder = svnWorkingDir + "inputForMATSim/";
+	final String configFile = configFolder + "expanded_config_1.xml";
+	
+	
+	
+
 	
 
 	private void Run(){
 		
 		
 
-		Config config = ConfigUtils.loadConfig(expandedConfig);
+		Config config = ConfigUtils.loadConfig(configFile);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());		
 		PopulationReader pr = new PopulationReader(scenario);		
-		pr.readFile(expandedPlans);		
+		pr.readFile(plansFile);		
 		Population expandedPlans = scenario.getPopulation();		
 		Map <Id,Integer> AgentCondition = getAgentCondition(expandedPlans);
 		Population newPlans = createNewPlans(AgentCondition, expandedPlans, features);
@@ -471,7 +477,7 @@ public class RandomizeCoordinates {
 	private void writeNewPopulation (Population population){
 		
 		PopulationWriter pw = new PopulationWriter(population);
-		pw.write(svnWorkingDir + "inputForMATSim/plans/randomized_expanded_plans.xml.gz");
+		pw.write(plansFolder + "randomized_expanded_plans.xml.gz");
 		
 	}
 	
@@ -479,7 +485,7 @@ public class RandomizeCoordinates {
 		
 		PlansConfigGroup plans = config.plans();
 		plans.setInputFile(runsWorkingDir + "randomized_expanded_plans.xml.gz");
-		new ConfigWriter(config).write(svnWorkingDir + "inputForMATSim/randomized_expanded_config.xml");
+		new ConfigWriter(config).write(configFolder + "randomized_expanded_config.xml");
 		
 	}
 	

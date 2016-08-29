@@ -17,62 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package playground.michalm.taxi.optimizer.rules;
 
-import java.util.*;
+import org.apache.commons.configuration.Configuration;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
-import com.google.common.collect.Iterables;
 
-
-public class CSVLineBuilder
+public class RuleBasedETaxiOptimizerParams
+    extends RuleBasedTaxiOptimizerParams
 {
-    private final List<String> line = new ArrayList<>();
+    public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
+    public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
+
+    public final double minRelativeSoc;
+    public final int socCheckTimeStep;
 
 
-    public CSVLineBuilder add(String cell)
+    public RuleBasedETaxiOptimizerParams(Configuration optimizerConfig)
     {
-        line.add(cell);
-        return this;
-    }
+        super(optimizerConfig);
 
+        //30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
+        //alternatively, in cold winter, it is enough to travel for 1 hour
+        //(for approx. 20 km => 3kWh) with 3 kW-heating on
+        minRelativeSoc = optimizerConfig.getDouble(MIN_RELATIVE_SOC, 0.3);
 
-    public CSVLineBuilder addf(String format, Object cell)
-    {
-        line.add(String.format(format, cell));
-        return this;
-    }
-
-
-    public CSVLineBuilder addEmpty()
-    {
-        line.add(null);
-        return this;
-    }
-
-
-    public CSVLineBuilder addAll(Iterable<String> cells)
-    {
-        Iterables.addAll(line, cells);
-        return this;
-    }
-
-
-    public CSVLineBuilder addAll(String... cells)
-    {
-        Collections.addAll(line, cells);
-        return this;
-    }
-
-
-    public CSVLineBuilder addBuilder(CSVLineBuilder builder)
-    {
-        line.addAll(builder.line);
-        return this;
-    }
-
-
-    public String[] build()
-    {
-        return line.toArray(new String[line.size()]);
+        //in cold winter, 3kW heating consumes 1.25% SOC every 5 min
+        socCheckTimeStep = optimizerConfig.getInt(SOC_CHECK_TIME_STEP, 300);
     }
 }

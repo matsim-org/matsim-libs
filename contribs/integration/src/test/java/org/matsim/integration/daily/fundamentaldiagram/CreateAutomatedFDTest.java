@@ -70,11 +70,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.AssignmentEmulatingQLaneNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -247,12 +244,12 @@ public class CreateAutomatedFDTest {
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 			QNetsimEngine netsimEngine;
-			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
-				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
-				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
-			} else {
+//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
+//				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
+//				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
+//			} else {
 				 netsimEngine = new QNetsimEngine(qSim);
-			}
+//			}
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 

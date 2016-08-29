@@ -53,6 +53,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 class AssignmentEmulatingQLane extends QLaneI {
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(AssignmentEmulatingQLane.class ) ;
+	
+	public static final String DO_NOT_USE_ASSIGNMENT_EMULATING_QLANE = "do not use: result is unstable over time-of-day.  "
+			+ "Better build assignment into iteration loop, currently (Aug'16), KNBerlinControler has such an approach.";
 
 	private double freespeedTravelTime = Double.NaN;
 	/**
@@ -96,7 +99,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		this.context = context;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.length = this.qLink.getLink().getLength() ;
-		throw new RuntimeException("do not use") ;
+		throw new RuntimeException(DO_NOT_USE_ASSIGNMENT_EMULATING_QLANE) ;
 	}
 	@Override
 	public final void addFromWait(final QVehicle veh) {
@@ -252,6 +255,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	private static int cnt = 0 ;
+
 
 	@Override
 	public final void addFromUpstream(final QVehicle veh) {

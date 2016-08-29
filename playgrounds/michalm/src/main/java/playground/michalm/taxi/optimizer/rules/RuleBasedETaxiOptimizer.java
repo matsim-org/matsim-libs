@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.rules;
 
 import java.util.Collections;
 
@@ -33,6 +33,7 @@ import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
 
@@ -61,7 +62,7 @@ public class RuleBasedETaxiOptimizer
     @Override
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
     {
-        if (e.getSimulationTime() % params.socCheckTimeStep == 0) {
+        if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
             chargeIdleUnderchargedVehicles(
                     Iterables.filter(idleTaxiRegistry.getVehicles(), this::isUndercharged));
         }

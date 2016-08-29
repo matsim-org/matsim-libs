@@ -53,8 +53,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
 
-	public static enum TrafficDynamics { @Deprecated assignmentEmulating, queue, withHoles } ;
-	// yy not deprecated but experimental. kai, jul'16
+	public static enum TrafficDynamics { queue, withHoles } ;
 	
 	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;
 	public static enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime } ;

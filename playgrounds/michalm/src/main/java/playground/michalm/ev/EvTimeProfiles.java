@@ -33,7 +33,7 @@ public class EvTimeProfiles
 {
     public static ProfileCalculator createSocHistogramCalculator(final EvData evData)
     {
-        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+" };
+        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
             public String[] calcValues()
@@ -44,10 +44,8 @@ public class EvTimeProfiles
                 }
 
                 String[] values = new String[header.length];
-                int aggregatedCount = 0;
                 for (int b = 0; b < header.length; b++) {
-                    aggregatedCount += histogram.getCount(b);
-                    values[b] = aggregatedCount + "";
+                    values[b] = histogram.getCount(b) + "";
                 }
                 return values;
             }

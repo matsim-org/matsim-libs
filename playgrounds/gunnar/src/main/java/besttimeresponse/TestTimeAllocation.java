@@ -35,7 +35,7 @@ public class TestTimeAllocation {
 
 		// solve the problem
 		
-		final TimeAllocator timeAlloc = new TimeAllocator(discr, new TravelTimes() {
+		final TimeAllocator timeAlloc = new TimeAllocator(discr, new TripTravelTimes() {
 			@Override
 			public double getTravelTime_s(Object origin, Object destination, double dptTime_s, Object mode) {		
 				return 1800.0;

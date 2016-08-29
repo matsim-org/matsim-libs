@@ -23,7 +23,7 @@ import java.awt.*;
 import java.util.List;
 
 import org.jfree.chart.*;
-import org.jfree.chart.axis.*;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.*;
@@ -31,25 +31,37 @@ import org.jfree.data.xy.*;
 
 public class TimeProfileCharts
 {
-    //TODO add some scaling
-    public static JFreeChart chartProfile(String[] series, List<String[]> timeProfile, int interval)
+    public interface Customizer
     {
-        XYSeriesCollection seriesCollection = new XYSeriesCollection();
-        XYSeries[] seriesArray = new XYSeries[series.length];
-        for (int s = 0; s < series.length; s++) {
-            seriesCollection.addSeries(seriesArray[s] = new XYSeries(series[s], false, false));
-        }
+        void customize(JFreeChart chart, ChartType chartType);
+    }
 
-        for (int t = 0; t < timeProfile.size(); t++) {
-            String[] timePoint = timeProfile.get(t);
-            double hour = (double)t * interval / 3600;
-            for (int s = 0; s < series.length; s++) {
-                seriesArray[s].add(hour, Double.parseDouble(timePoint[s]), false);
-            }
-        }
 
-        JFreeChart chart = ChartFactory.createXYLineChart("TimeProfile", "Time [h]", "Values",
-                seriesCollection, PlotOrientation.VERTICAL, true, false, false);
+    public enum ChartType
+    {
+        Line, StackedArea;
+    }
+
+
+    public static JFreeChart chartProfile(String[] series, List<Double> times,
+            List<String[]> timeProfile, ChartType type)
+    {
+        DefaultTableXYDataset dataset = createXYDataset(series, times, timeProfile);
+        JFreeChart chart;
+        switch (type) {
+            case Line:
+                chart = ChartFactory.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset,
+                        PlotOrientation.VERTICAL, true, false, false);
+                break;
+
+            case StackedArea:
+                chart = ChartFactory.createStackedXYAreaChart("TimeProfile", "Time [h]", "Values",
+                        dataset, PlotOrientation.VERTICAL, true, false, false);
+                break;
+
+            default:
+                throw new IllegalArgumentException();
+        }
 
         XYPlot plot = chart.getXYPlot();
         plot.setRangeGridlinesVisible(false);
@@ -59,11 +71,48 @@ public class TimeProfileCharts
         NumberAxis xAxis = (NumberAxis)plot.getDomainAxis();
         xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
+        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+        yAxis.setAutoRange(true);
+
         XYItemRenderer renderer = plot.getRenderer();
         for (int s = 0; s < series.length; s++) {
             renderer.setSeriesStroke(s, new BasicStroke(2));
         }
 
         return chart;
+    }
+
+
+    public static DefaultTableXYDataset createXYDataset(String[] series, List<Double> times,
+            List<String[]> timeProfile)
+    {
+        DefaultTableXYDataset dataset = new DefaultTableXYDataset();
+        XYSeries[] seriesArray = new XYSeries[series.length];
+        for (int s = 0; s < series.length; s++) {
+            seriesArray[s] = new XYSeries(series[s], false, false);
+        }
+
+        for (int t = 0; t < timeProfile.size(); t++) {
+            String[] timePoint = timeProfile.get(t);
+            double hour = times.get(t) / 3600;
+            for (int s = 0; s < series.length; s++) {
+                seriesArray[s].add(hour, Double.parseDouble(timePoint[s]));
+            }
+        }
+
+        for (int s = 0; s < series.length; s++) {
+            dataset.addSeries(seriesArray[s]);
+        }
+
+        return dataset;
+    }
+
+
+    public static void changeSeriesColors(JFreeChart chart, Paint... paints)
+    {
+        XYItemRenderer renderer = chart.getXYPlot().getRenderer();
+        for (int i = 0; i < paints.length; i++) {
+            renderer.setSeriesPaint(i, paints[i]);
+        }
     }
 }

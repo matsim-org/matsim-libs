@@ -17,32 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.ev;
 
-import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+
+import com.google.inject.*;
+
+import playground.michalm.ev.data.*;
+import playground.michalm.util.XYDataCollector;
+import playground.michalm.util.XYDataCollector.XYDataCalculator;
 
 
-public class RuleBasedETaxiOptimizerParams
-    extends RuleBasedTaxiOptimizerParams
+public class ETaxiChargerOccupancyXYDataProvider
+    implements Provider<MobsimListener>
 {
-    public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
-    public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
-
-    public final double minRelativeSoc;
-    public final int socCheckTimeStep;
+    private final EvData evData;
+    private final MatsimServices matsimServices;
 
 
-    public RuleBasedETaxiOptimizerParams(Configuration optimizerConfig)
+    @Inject
+    public ETaxiChargerOccupancyXYDataProvider(EvData evData, MatsimServices matsimServices)
     {
-        super(optimizerConfig);
+        this.evData = evData;
+        this.matsimServices = matsimServices;
+    }
 
-        //30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
-        //alternatively, in cold winter, it is enough to travel for 1 hour
-        //(for approx. 20 km => 3kWh) with 3 kW-heating on
-        minRelativeSoc = optimizerConfig.getDouble(MIN_RELATIVE_SOC, 0.3);
 
-        //in cold winter, 3kW heating consumes 1.25% SOC every 5 min
-        socCheckTimeStep = optimizerConfig.getInt(SOC_CHECK_TIME_STEP, 300);
+    @Override
+    public MobsimListener get()
+    {
+        XYDataCalculator<Charger> calc = ETaxiChargerXYDataUtils
+                .createChargerOccupancyCalculator(evData, false);
+        return new XYDataCollector<>(evData.getChargers().values(), calc, 300,
+                "charger_occupancy_absolute", matsimServices);
     }
 }

@@ -76,6 +76,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
@@ -217,13 +218,14 @@ public class PatnaPolicyControler {
 		new File(outputDir+"/analysis/").mkdir();
 		String outputEventsFile = outputDir+"/output_events.xml.gz";
 		// write some default analysis
-		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile);
+		String userGroup = PatnaUserGroup.urban.toString();
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
 		mtta.run();
-		mtta.writeResults(outputDir+"/analysis/modalTravelTime.txt");
+		mtta.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
 
-		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
 		msc.run();
-		msc.writeResults(outputDir+"/analysis/modalShareFromEvents.txt");
+		msc.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
 
 		StatsWriter.run(outputDir);
 	}

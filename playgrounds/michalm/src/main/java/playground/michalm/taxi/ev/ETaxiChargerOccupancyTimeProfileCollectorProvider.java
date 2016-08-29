@@ -19,7 +19,8 @@
 
 package playground.michalm.taxi.ev;
 
-import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.ChartType;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -29,7 +30,7 @@ import com.google.inject.*;
 import playground.michalm.ev.data.EvData;
 
 
-public class ETaxiChargerTimeProfileCollectorProvider
+public class ETaxiChargerOccupancyTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
     private final EvData evData;
@@ -37,7 +38,8 @@ public class ETaxiChargerTimeProfileCollectorProvider
 
 
     @Inject
-    public ETaxiChargerTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
+    public ETaxiChargerOccupancyTimeProfileCollectorProvider(EvData evData,
+            MatsimServices matsimServices)
     {
         this.evData = evData;
         this.matsimServices = matsimServices;
@@ -48,6 +50,9 @@ public class ETaxiChargerTimeProfileCollectorProvider
     public MobsimListener get()
     {
         ProfileCalculator calc = ETaxiChargerProfiles.createChargerOccupancyCalculator(evData);
-        return new TimeProfileCollector(calc, 300, "charger_occupancy_time_profiles", matsimServices);
+        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
+                "charger_occupancy_time_profiles", matsimServices);
+        collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+        return collector;
     }
 }

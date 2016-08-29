@@ -19,7 +19,11 @@
 
 package playground.michalm.ev;
 
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector;
+import java.awt.*;
+
+import org.jfree.chart.JFreeChart;
+import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -48,6 +52,23 @@ public class SocHistogramTimeProfileCollectorProvider
     public MobsimListener get()
     {
         ProfileCalculator calc = EvTimeProfiles.createSocHistogramCalculator(evData);
-        return new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles", matsimServices);
+        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
+                "soc_histogram_time_profiles", matsimServices);
+
+        collector.setChartCustomizer(new Customizer() {
+            public void customize(JFreeChart chart, ChartType chartType)
+            {
+                Paint[] paints = new Paint[10];
+                for (int i = 0; i < 10; i++) {
+                    float f = (float)Math.sin(Math.PI * (9f - i) / 9 / 2);
+                    paints[i] = new Color(f, (float)Math.sqrt(1 - f * f), 0f);
+                }
+
+                TimeProfileCharts.changeSeriesColors(chart, paints);
+            }
+        });
+
+        collector.setChartTypes(ChartType.StackedArea);
+        return collector;
     }
 }

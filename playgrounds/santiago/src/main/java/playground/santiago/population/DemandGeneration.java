@@ -43,11 +43,11 @@ public class DemandGeneration {
 	private final static Logger log = Logger.getLogger(DemandGeneration.class);
 	
 
-	final String runsWorkingDir = "../../../runs-svn/santiago/BASE10/input/";	
+	final String runsWorkingDir = "../../../runs-svn/santiago/TMP/input/";	
 	
 	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
 	final String originalConfig = svnWorkingDir + "inputForMATSim/config_final.xml";	
-	final String originalPlans = svnWorkingDir + "inputForMATSim/plans/plans_final.xml.gz";
+	final String originalPlans = svnWorkingDir + "inputForMATSim/plans/1_initial/workDaysOnly/plans_final.xml.gz";
 
 
 	
@@ -249,23 +249,23 @@ public class DemandGeneration {
 		}
 		}
 		
-		randomizeEndTimes(originalPopulation);
+		//randomizeEndTimes(originalPopulation);
 
 	
 
-		new PopulationWriter(originalPopulation).write(svnWorkingDir + "inputForMATSim/plans/expanded_plans_preliminar.xml.gz");
-		log.info("expanded_plans_preliminar has the entire population w/ "
-				+ "randomized activity end times but WITHOUT the classification of the activities");
+		new PopulationWriter(originalPopulation).write(svnWorkingDir + "inputForMATSim/plans/2_10pct/expanded_plans_0.xml.gz");
+		log.info("expanded_plans_0 has the entire population WITHOUT "
+				+ "randomized activity end times and WITHOUT the classification of the activities");
 		
 		// Re-classify the activities using the new end_times from the randomizedEndTimes method //		
-		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioTmp).readFile(svnWorkingDir + "inputForMATSim/plans/expanded_plans_preliminar.xml.gz");
-		this.activityClassifier = new ActivityClassifier(scenarioTmp);
-		activityClassifier.run();
-		new PopulationWriter(activityClassifier.getOutPop()).write(svnWorkingDir + "inputForMATSim/plans/expanded_plans.xml.gz");
-
-		log.info("expanded_plans has the entire population w/ randomized activity end times "
-				+ "INCLUDING the classification of the activities");
+//		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		new PopulationReader(scenarioTmp).readFile(svnWorkingDir + "inputForMATSim/plans/expanded_plans_preliminar.xml.gz");
+//		this.activityClassifier = new ActivityClassifier(scenarioTmp);
+//		activityClassifier.run();
+//		new PopulationWriter(activityClassifier.getOutPop()).write(svnWorkingDir + "inputForMATSim/plans/expanded_plans.xml.gz");
+//
+//		log.info("expanded_plans has the entire population w/ randomized activity end times "
+//				+ "INCLUDING the classification of the activities");
 		///////////////////////////////////////////////////////////////////////////////////////////
 		
 		
@@ -288,14 +288,14 @@ public class DemandGeneration {
 		
 		/*Path to new plans file*/		
 		PlansConfigGroup plans = oldConfig.plans();
-		plans.setInputFile(runsWorkingDir + "expanded_plans.xml.gz");
+		plans.setInputFile(runsWorkingDir + "expanded_plans_0.xml.gz");
 		plans.setInputPersonAttributeFile(runsWorkingDir + "expandedAgentAttributes.xml");
 		////////////////////////////////////////////////////////////////////////
 		
 		
 		/*New group of parameters considering the new classification of the activities*/
-		SortedMap<String, Double> acts = activityClassifier.getActivityType2TypicalDuration();
-		setActivityParams(acts, oldConfig);
+//		SortedMap<String, Double> acts = activityClassifier.getActivityType2TypicalDuration();
+//		setActivityParams(acts, oldConfig);
 		////////////////////////////////////////////////////////////////////////
 
 		
@@ -306,7 +306,7 @@ public class DemandGeneration {
 		
 		
 		/*Write the new config_file*/	
-		new ConfigWriter(oldConfig).write(svnWorkingDir + "inputForMATSim/expanded_config.xml");
+		new ConfigWriter(oldConfig).write(svnWorkingDir + "inputForMATSim/expanded_config_0.xml");
 		////////////////////////////////////////////////////////////////////////
 		
 	}
