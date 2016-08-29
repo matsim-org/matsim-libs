@@ -75,7 +75,7 @@ public class RndPtRouterLauncher {
 			cadytsWeight = Double.parseDouble(args[2]);
 		}else {
 			cadytsWeight = 30.0;
-			configFile = "../../../shared-svn/projects/ptManuel/calibration/my_config - gt.xml";
+			configFile = "../../../shared-svn/projects/ptManuel/calibration/moyo_1.xml";
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile) ;
