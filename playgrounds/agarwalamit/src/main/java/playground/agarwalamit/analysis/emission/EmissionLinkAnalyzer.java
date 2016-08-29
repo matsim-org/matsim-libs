@@ -130,7 +130,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 				for(MunichUserGroup ug :MunichUserGroup.values()) {
 					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
 					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug.toString());
-//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug);
+//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug.toString());
 					ela.preProcessData();
 					ela.postProcessData();
 					ela.writeTotalEmissions(dir+str+"/analysis/","MMA_"+ug.toString());

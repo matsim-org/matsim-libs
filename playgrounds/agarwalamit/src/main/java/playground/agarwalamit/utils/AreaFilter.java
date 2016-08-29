@@ -23,8 +23,10 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 
@@ -34,26 +36,30 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter;
 
 public class AreaFilter {
 
-	private Collection<SimpleFeature> features;
+	private Collection<Geometry> features;
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
 	 */
 	public AreaFilter (String shapeFile){
-		this.features = ShapeFileReader.getAllFeatures(shapeFile);
+		this.features = GeometryUtils.getSimplifiedGeometries( ShapeFileReader.getAllFeatures(shapeFile) );
 	}
 
 	/**
 	 * if want to sort person for Munich city area.
 	 */
 	public AreaFilter (){
-		this.features = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
+		this.features = GeometryUtils.getSimplifiedGeometries( ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE) );
 		Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
 	}
 
 	public boolean isCellInsideShape(Coord cellCentroid) {
 		return GeometryUtils.isCoordInsideShare(features, cellCentroid);
+	}
+	
+	public boolean isLinkInsideShape(Link link) {
+		return GeometryUtils.isLinkInsideGeometries(features, link);
 	}
 
 }

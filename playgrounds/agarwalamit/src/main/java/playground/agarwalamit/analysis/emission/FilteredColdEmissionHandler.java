@@ -94,7 +94,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());
-			if(! this.af.isCellInsideShape(link.getCoord())) return;
+			if(! this.af.isLinkInsideShape(link)) return;
 
 			if(this.ug==null || this.pf==null) {// only area filtering
 				delegate.handleEvent(event); 

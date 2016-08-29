@@ -69,10 +69,10 @@ public final class GeometryUtils {
 		return false;
 	}
 	
-	public static boolean isCoordInsideShare(final Collection<SimpleFeature> features, final Coord coord) {
-		Geometry geo = GF.createPoint(new Coordinate(coord.getX(), coord.getY()));
-		for(SimpleFeature sf : features){
-			if ( ( getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(geo) ) {
+	public static boolean isCoordInsideShare(final Collection<Geometry> features, final Coord coord) {
+		Geometry point = GF.createPoint(new Coordinate(coord.getX(), coord.getY()));
+		for(Geometry  geo: features){
+			if ( geo.contains(point) ) {
 				return true;
 			}
 		}
