@@ -33,7 +33,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -68,7 +69,8 @@ public class CongestionPricingComperator {
 	private final boolean isSortingForInsideMunich = true;
 	private final String suffixForSoring = "_sorted";
 	private double vttsCar;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter(isSortingForInsideMunich);
+	private final MunichPersonFilter pf = new MunichPersonFilter();
+	private final AreaFilter af = new AreaFilter(isSortingForInsideMunich);
 
 	public static void main(String[] args) {
 		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");

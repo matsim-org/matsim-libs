@@ -40,8 +40,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.internalization.EmissionCostFactors;
@@ -70,8 +70,8 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup, new ExtendedPersonFilter());
-		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup, new ExtendedPersonFilter());
+		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup, new MunichPersonFilter());
+		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup, new MunichPersonFilter());
 	}
 
 	/**

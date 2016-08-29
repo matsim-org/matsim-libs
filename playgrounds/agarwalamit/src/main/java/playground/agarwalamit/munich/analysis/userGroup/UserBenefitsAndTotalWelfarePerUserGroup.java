@@ -38,8 +38,8 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -59,7 +59,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private Scenario scenario;
 	private int lastIteration;
 	private boolean considerAllPersonsInSumOfTolls;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private MunichPersonFilter pf = new MunichPersonFilter();
 	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 	
 	/**

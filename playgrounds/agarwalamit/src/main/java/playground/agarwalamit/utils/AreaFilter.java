@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,14 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.utils;
+
+package playground.agarwalamit.utils;
 
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -31,31 +30,23 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 
 /**
  * @author amit
  */
 
-public class ExtendedPersonFilter extends PersonFilter implements playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter{
-
-	public enum MunichUserGroup {Urban, Rev_Commuter, Freight}
+public class AreaFilter {
 	
-	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-	private PersonFilter pf = new PersonFilter();
 	private Collection<SimpleFeature> munichFeatures;
 	private boolean isSortingForShapeFile = false;
-
-	/**
-	 * Use this if do not want to load shape file.
-	 */
-	public ExtendedPersonFilter (){};
-
+	
+	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
 	 */
-	public ExtendedPersonFilter (String shapeFile){
+	public AreaFilter (String shapeFile){
 		this.isSortingForShapeFile = true;
 		this.munichFeatures = ShapeFileReader.getAllFeatures(shapeFile);
 	}
@@ -63,11 +54,11 @@ public class ExtendedPersonFilter extends PersonFilter implements playground.aga
 	/**
 	 * @param isSortingForInsideMunich true if want to sort person for Munich city area.
 	 */
-	public ExtendedPersonFilter (final boolean isFilteringForInsideMunichCity){
+	public AreaFilter (final boolean isFilteringForInsideMunichCity){
 		if(isFilteringForInsideMunichCity) {
 			this.munichFeatures = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
 			this.isSortingForShapeFile = true;
-			Logger.getLogger(ExtendedPersonFilter.class).info("Reading Munich city area shape file...");
+			Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
 		}
 	}
 
@@ -85,44 +76,4 @@ public class ExtendedPersonFilter extends PersonFilter implements playground.aga
 		return isInsideMunich;
 	}
 
-	@Override
-	public String getUserGroupAsStringFromPersonId (final Id<Person> personId) {
-		return getMunichUserGroupFromPersonId(personId).toString();
-	}
-	
-	
-	/**
-	 * A translation between 
-	 */
-	private UserGroup getUserGroupFromPersonId (final Id<Person> personId) {
-		UserGroup outUG = UserGroup.URBAN;
-		for(UserGroup ug : UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(personId, ug)) {
-				outUG =ug;
-				break;
-			}
-		}
-		return outUG;
-	}
-
-	/**
-	 * @return Urban or (Rev) commuter or Freight from person id.
-	 */
-	public MunichUserGroup getMunichUserGroupFromPersonId(final Id<Person> personId) {
-		return getMunichUserGroup(getUserGroupFromPersonId(personId));
-	}
-	
-	/**
-	 * A translation between UserGroup and MunichUserGroup 
-	 * Helpful for writing data to files.
-	 */
-	private MunichUserGroup getMunichUserGroup(final UserGroup ug){
-		switch(ug){
-		case REV_COMMUTER:
-		case COMMUTER: return MunichUserGroup.Rev_Commuter;
-		case FREIGHT: return MunichUserGroup.Freight;
-		case URBAN: return MunichUserGroup.Urban;
-		default: throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
-		}
-	}
 }

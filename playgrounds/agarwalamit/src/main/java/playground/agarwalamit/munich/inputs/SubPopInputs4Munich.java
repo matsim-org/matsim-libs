@@ -36,8 +36,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -46,7 +46,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class SubPopInputs4Munich {
 
-	ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	MunichPersonFilter pf = new MunichPersonFilter();
 	private final String subPopAttributeName = "userGroup";
 	private String outPopAttributeFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/personsAttributes_1pct_usrGrp.xml.gz";
 

@@ -18,8 +18,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -101,7 +101,7 @@ public class RoadTypeInfoAnalyzer {
 		}
 
 		private Network net;
-		private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		private MunichPersonFilter pf = new MunichPersonFilter();
 
 		private Map<UserGroup,Map<String,Integer>> userGrp2roadType2Count = new HashMap<UserGroup, Map<String,Integer>>();
 

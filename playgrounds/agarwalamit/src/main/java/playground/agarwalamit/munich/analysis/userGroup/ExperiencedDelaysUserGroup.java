@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -60,7 +60,7 @@ public class ExperiencedDelaysUserGroup {
 	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private MunichPersonFilter pf = new MunichPersonFilter();
 
 	public static void main(String[] args) throws IOException {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/

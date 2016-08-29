@@ -49,7 +49,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.utils.AreaFilter;
 
 /**
  * @author amit
@@ -74,7 +75,8 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	private double timeBinSize;
 	private Network network;
 	private final boolean isSortingForInsideMunich ;
-	private final ExtendedPersonFilter pf;
+	private final MunichPersonFilter pf;
+	private final AreaFilter af;
 
 	/**
 	 * @param noOfTimeBins
@@ -84,7 +86,8 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	 */
 	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final boolean isSortingForInsideMunich){
 		this.isSortingForInsideMunich = isSortingForInsideMunich;
-		pf = new ExtendedPersonFilter(isSortingForInsideMunich);
+		af = new AreaFilter(isSortingForInsideMunich);
+		pf = new MunichPersonFilter();
 		if(isSortingForInsideMunich) LOG.warn("Output data will only include links which fall inside the Munich city area");
 		initialize(scenario, noOfTimeBins, simulationEndTime);
 	}
@@ -175,7 +178,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		this.totalDelay+=currentDelay;
 
 		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-		if( this.isSortingForInsideMunich && !pf.isCellInsideMunichCityArea(linkCoord) ) return;
+		if( this.isSortingForInsideMunich && !af.isCellInsideMunichCityArea(linkCoord) ) return;
 
 		Map<Id<Person>, Double> delayForPerson = this.timebin2PersonId2Delay.get(endOfTimeInterval);
 		Map<Id<Link>, Double> delayOnLink = this.timebin2LinkId2Delay.get(endOfTimeInterval);

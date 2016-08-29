@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 
 /**
  * @author amit
@@ -42,7 +42,7 @@ public class FilteredDepartureTimeHandler implements PersonDepartureEventHandler
 ActivityStartEventHandler, PersonStuckEventHandler {
 
 	private final DepartureTimeHandler delegate ;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final String userGroup ;
 	private static final Logger LOG = Logger.getLogger(FilteredDepartureTimeHandler.class);
 

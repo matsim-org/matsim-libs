@@ -34,8 +34,8 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.internalization.EmissionCostFactors;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -54,7 +54,7 @@ public class EmissionsPerPersonPerUserGroup {
 	private SortedMap<MunichUserGroup, SortedMap<String, Double>> userGroupToEmissions;
 	private Scenario scenario;
 	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public EmissionsPerPersonPerUserGroup(String outputDir) {
 

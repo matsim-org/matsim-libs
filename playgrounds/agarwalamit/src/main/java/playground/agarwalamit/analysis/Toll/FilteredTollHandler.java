@@ -46,7 +46,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -61,7 +61,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final TollInfoHandler delegate;
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
 	private Network network;
 	private final String ug ;
