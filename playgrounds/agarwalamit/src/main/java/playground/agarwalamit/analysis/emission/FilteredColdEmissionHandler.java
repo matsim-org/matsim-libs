@@ -35,8 +35,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PersonFilter;
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 
@@ -48,7 +48,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	private static final Logger LOGGER = Logger.getLogger(FilteredColdEmissionHandler.class.getName());
 	
 	private final EmissionsPerLinkColdEventHandler delegate;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final PersonFilter pf ;
 	private final Collection<Geometry> zonalGeoms;
 	private final Network network;
 	private final String ug ;
@@ -57,7 +57,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
 	 */
 	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
-			final Network network, final String userGroup){
+			final Network network, final String userGroup, final PersonFilter personFilter){
 		this.delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime,noOfTimeBins);
 
 		if(shapeFile!=null) {
@@ -68,6 +68,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 
 		this.network = network;
 		this.ug=userGroup;
+		this.pf = personFilter;
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
@@ -76,8 +77,8 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	 * User group filtering will be used, result will include all links but persons from given user group only. Another class 
 	 * {@link EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
 	 */
-	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup){
-		this(simulationEndTime,noOfTimeBins,null,null,userGroup);
+	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup,final PersonFilter personFilter){
+		this(simulationEndTime,noOfTimeBins,null,null,userGroup,personFilter);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
@@ -87,7 +88,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
 	 */
 	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
-		this(simulationEndTime,noOfTimeBins,shapeFile,network,null);
+		this(simulationEndTime,noOfTimeBins,shapeFile,network,null,null);
 		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
 
@@ -95,7 +96,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	 * No filtering will be used, result will include all links, persons from all user groups.
 	 */
 	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins){
-		this(simulationEndTime,noOfTimeBins,null,null);
+		this(simulationEndTime,noOfTimeBins,null,null,null,null);
 		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
 
