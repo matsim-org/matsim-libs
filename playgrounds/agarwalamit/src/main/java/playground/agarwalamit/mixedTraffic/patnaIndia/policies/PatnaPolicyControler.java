@@ -87,8 +87,9 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class PatnaPolicyControler {
 
 	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
-	private static boolean applyTrafficRestrain = true;
-	private static boolean addBikeTrack = true;
+	private static boolean applyTrafficRestrain = false;
+	private static boolean addBikeTrack = false;
+	private static boolean isAllwoingMotorbikeOnBikeTrack = true;
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -97,6 +98,7 @@ public class PatnaPolicyControler {
 			dir = args[0];
 			applyTrafficRestrain = Boolean.valueOf(args[1]);
 			addBikeTrack = Boolean.valueOf(args[2]);
+			isAllwoingMotorbikeOnBikeTrack = Boolean.valueOf(args[3]);
 		} 
 
 		String inputDir = dir+"/input/";
@@ -106,9 +108,11 @@ public class PatnaPolicyControler {
 		ConfigUtils.loadConfig(config, configFile);
 
 		if(applyTrafficRestrain ) {
+			if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
 			if (addBikeTrack) outputDir = dir+"/both/";
 			else outputDir = dir+"/trafficRestrain/";
 		} else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
+		else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
 		else outputDir = dir+"/baseCaseCtd/";
 		
 		config.controler().setOutputDirectory(outputDir);
@@ -146,6 +150,8 @@ public class PatnaPolicyControler {
 			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
 		} else if(addBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
+		} else if (isAllwoingMotorbikeOnBikeTrack) {
+			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
