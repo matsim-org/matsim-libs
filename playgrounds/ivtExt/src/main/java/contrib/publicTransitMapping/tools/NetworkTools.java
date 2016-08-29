@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
@@ -87,7 +88,7 @@ public class NetworkTools {
 
 	/**
 	 * Returns the nearest link for the given coordinate.
-	 * Looks for nodes within search radius of coord (using {@link NetworkUtils#getNearestNodes2},
+	 * Looks for nodes within search radius of coord (using {@link NetworkUtils#getNearestNodes},
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
 	 * the coordinate on its right side is returned.<p/>
@@ -135,7 +136,7 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link NetworkUtils#getNearestNodes2},
+	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link NetworkUtils#getNearestNodes},
 	 * fetches all in- and outlinks and sorts them ascending by their
 	 * distance to the coordiantes given.
 	 * <p/>
@@ -243,7 +244,9 @@ public class NetworkTools {
 	public static Network filterNetworkByLinkMode(Network network, Set<String> transportModes) {
 		NetworkFilterManager filterManager = new NetworkFilterManager(network);
 		filterManager.addLinkFilter(new LinkFilter(transportModes));
-		return filterManager.applyFilters();
+		Network newNetwork = filterManager.applyFilters();
+		removeNotUsedNodes(newNetwork);
+		return newNetwork;
 	}
 
 	public static Network filterNetworkExceptLinkMode(Network network, Set<String> transportModes) {
@@ -486,6 +489,17 @@ public class NetworkTools {
 			}
 		}
 		return returnSet;
+	}
+
+	/**
+	 * Removes all nodes with no in- or outgoing links from a network
+	 */
+	public static void removeNotUsedNodes(Network network) {
+		for(Node n : new HashSet<>(network.getNodes().values())) {
+			if(n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) {
+				network.removeNode(n.getId());
+			}
+		}
 	}
 
 	/**
