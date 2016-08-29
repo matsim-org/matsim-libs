@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.emission.filtering;
+package playground.agarwalamit.analysis.emission;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -38,16 +38,16 @@ import com.vividsolutions.jts.geom.Geometry;
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
+import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 
 /**
  * @author amit
  */
 
-public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
-	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionHandler.class.getName());
+public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
+	private static final Logger LOGGER = Logger.getLogger(FilteredColdEmissionHandler.class.getName());
 	
-	private final EmissionsPerLinkWarmEventHandler delegate;
+	private final EmissionsPerLinkColdEventHandler delegate;
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
 	private final Network network;
@@ -56,9 +56,9 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	/**
 	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
 	 */
-	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
+	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
 			final Network network, final String userGroup){
-		this.delegate = new EmissionsPerLinkWarmEventHandler(simulationEndTime,noOfTimeBins);
+		this.delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime,noOfTimeBins);
 
 		if(shapeFile!=null) {
 			Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(shapeFile);
@@ -76,7 +76,7 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	 * User group filtering will be used, result will include all links but persons from given user group only. Another class 
 	 * {@link EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
 	 */
-	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup){
+	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup){
 		this(simulationEndTime,noOfTimeBins,null,null,userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
@@ -86,7 +86,7 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	/**
 	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
 	 */
-	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
+	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
 		this(simulationEndTime,noOfTimeBins,shapeFile,network,null);
 		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
@@ -94,44 +94,40 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.
 	 */
-	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins){
+	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins){
 		this(simulationEndTime,noOfTimeBins,null,null);
-		LOGGER.info("No filtering is used, result will include all links, persons from all user groups..");
+		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
 
 	@Override
-	public void handleEvent(WarmEmissionEvent event) {
+	public void handleEvent(ColdEmissionEvent event) {
 
-		if( this.ug != null ) {
+		if(this.ug!=null){ 
 			Id<Person> driverId = Id.createPersonId(event.getVehicleId());
-			if ( ! this.zonalGeoms.isEmpty()  ) { // filtering for both
+			if ( ! this.zonalGeoms.isEmpty() ) { // filtering for both
 				Link link = network.getLinks().get(event.getLinkId());
-				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
 					delegate.handleEvent(event);
 				}
 			} else { // filtering for user group only
-				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug) ) {
 					delegate.handleEvent(event);
 				}
 			}
-		} else { 
+		} else {
 			if( ! this.zonalGeoms.isEmpty()  ) { // filtering for area only
 				Link link = network.getLinks().get(event.getLinkId());
-				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
+				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
 					delegate.handleEvent(event);
 				}
 			} else { // no filtering at all
 				delegate.handleEvent(event);
 			}
-		}
+		} 
 	}
 
-	public Map<Double, Map<Id<Link>, Double>> getTime2linkIdLeaveCount() {
-		return delegate.getTime2linkIdLeaveCount();
-	}
-
-	public Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> getWarmEmissionsPerLinkAndTimeInterval() {
-		return delegate.getWarmEmissionsPerLinkAndTimeInterval();
+	public Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> getColdEmissionsPerLinkAndTimeInterval() {
+		return delegate.getColdEmissionsPerLinkAndTimeInterval();
 	}
 
 	@Override

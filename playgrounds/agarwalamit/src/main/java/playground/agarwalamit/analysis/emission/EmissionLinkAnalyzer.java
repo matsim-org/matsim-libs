@@ -40,8 +40,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionHandler;
-import playground.agarwalamit.analysis.emission.filtering.FilteredWarmEmissionHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
