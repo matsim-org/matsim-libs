@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
@@ -62,6 +63,16 @@ public final class GeometryUtils {
 		Geometry linkGeo = GF.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 		for(Geometry  geo: features){
 			if ( geo.contains(linkGeo) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isCoordInsideShare(final Collection<SimpleFeature> features, final Coord coord) {
+		Geometry geo = GF.createPoint(new Coordinate(coord.getX(), coord.getY()));
+		for(SimpleFeature sf : features){
+			if ( ( getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(geo) ) {
 				return true;
 			}
 		}

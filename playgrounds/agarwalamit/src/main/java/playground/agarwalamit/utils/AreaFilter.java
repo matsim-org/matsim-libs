@@ -26,10 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 
 /**
@@ -39,15 +35,12 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter;
 public class AreaFilter {
 
 	private Collection<SimpleFeature> features;
-	private boolean isSortingForShapeFile = false;
-
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
 	 */
 	public AreaFilter (String shapeFile){
-		this.isSortingForShapeFile = true;
 		this.features = ShapeFileReader.getAllFeatures(shapeFile);
 	}
 
@@ -56,22 +49,11 @@ public class AreaFilter {
 	 */
 	public AreaFilter (){
 		this.features = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
-		this.isSortingForShapeFile = true;
 		Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
 	}
 
 	public boolean isCellInsideShape(Coord cellCentroid) {
-		if(! this.isSortingForShapeFile) throw new RuntimeException("No shape file is assigned to check if the centroid falls inside it. Aborting ...");
-		boolean isInsideMunich = false;
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
-		for(SimpleFeature feature : this.features){
-			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
-				isInsideMunich = true;
-				break;
-			}
-		}
-		return isInsideMunich;
+		return GeometryUtils.isCoordInsideShare(features, cellCentroid);
 	}
 
 }
