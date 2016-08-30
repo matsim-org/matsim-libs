@@ -205,6 +205,9 @@ public class TaxibusScheduler {
 			path = iterator.next();
 
 		} else {
+			for (TaxibusTask task : bestSched.getTasks()){
+				log.error(task.toString()+" " +task.getType() +" "+task.getStatus() );
+			}
 			throw new IllegalStateException();
 		}
 
