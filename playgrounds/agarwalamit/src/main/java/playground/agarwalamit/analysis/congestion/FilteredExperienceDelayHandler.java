@@ -65,7 +65,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.
 	 */
-	public FilteredExperienceDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime){
+	public FilteredExperienceDelayHandler(final Scenario scenario, final int noOfTimeBins){
 		this(scenario, noOfTimeBins, null, null, null);
 		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
@@ -73,7 +73,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	/**
 	 * User group filtering will be used, result will include all links but persons from given user group only. 
 	 */
-	public FilteredExperienceDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final String userGroup, final PersonFilter personFilter){
+	public FilteredExperienceDelayHandler(final Scenario scenario, final int noOfTimeBins, final String userGroup, final PersonFilter personFilter){
 		this(scenario, noOfTimeBins, userGroup, personFilter, null);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 	}
@@ -81,7 +81,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	/**
 	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
 	 */
-	public FilteredExperienceDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final AreaFilter areaFilter){
+	public FilteredExperienceDelayHandler(final Scenario scenario, final int noOfTimeBins, final AreaFilter areaFilter){
 		this(scenario, noOfTimeBins, null, null, areaFilter);
 		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
