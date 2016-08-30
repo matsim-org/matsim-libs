@@ -1,14 +1,16 @@
 package org.matsim.contrib.carsharing.runExample;
 
 
+import java.util.Set;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
-import org.matsim.contrib.carsharing.manager.CSPersonVehicle;
-import org.matsim.contrib.carsharing.manager.CSPersonVehiclesContainer;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
+import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
@@ -24,6 +26,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.common.collect.ImmutableSet;
 
 /** 
  * @author balac
@@ -53,12 +57,17 @@ public class RunCarsharing {
 
 	public static void installCarSharing(final Controler controler) {
 		
+		Set<String> carsharingModesShort = ImmutableSet.of("TW", "OW",
+				"FF");
 		
+		final DemandHandler demandHandler = new DemandHandler(carsharingModesShort);
+		final CarsharingListener carsharingListener = new CarsharingListener(demandHandler);
 		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
-		final CSPersonVehicle pesronVehiclesContainer = new CSPersonVehiclesContainer();
+		//final CSPersonVehicle pesronVehiclesContainer = new CSPersonVehiclesContainer();
+		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -66,7 +75,8 @@ public class RunCarsharing {
 				bind(KeepingTheCarModel.class)
 				.toInstance(keepingCarModel);
 				bind(RouterProvider.class).toInstance(routerProvider);
-				bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
+			//	bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
+				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
 				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
 			}			
 		});		
@@ -85,12 +95,13 @@ public class RunCarsharing {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
-		        addControlerListenerBinding().to(CarsharingListener.class);
+		        addControlerListenerBinding().toInstance(carsharingListener);
 		        addControlerListenerBinding().to(CarsharingManagerNew.class);		        
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 		        bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
 		        bind(CarsharingManagerNew.class).asEagerSingleton();
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
+		        addEventHandlerBinding().toInstance(demandHandler);
 			}
 		});
 

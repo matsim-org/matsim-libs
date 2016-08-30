@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
+import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.contrib.carsharing.manager.supply.CompanyContainer;
@@ -35,7 +36,7 @@ import com.google.inject.Inject;
 public class CarsharingManagerNew implements CarsharingManagerInterface, IterationEndsListener{
 	
 	@Inject private Scenario scenario;
-	@Inject private CSPersonVehicle csPersonVehicles;
+	@Inject private CurrentTotalDemand currentDemand;
 	@Inject private KeepingTheCarModel keepTheCarModel;
 	@Inject private CarsharingSupplyContainer carsharingSupplyContainer;
 	@Inject private EventsManager eventsManager;
@@ -94,8 +95,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			//=== agent does not hold the vehicle, therefore must find a one from the supply side===
 			
 			//TODO: choose the car from a company that maximizes the score when not already having one
-			if (this.csPersonVehicles.getVehicleLocationForType(person.getId(), carsharingType) == null)				
-				this.csPersonVehicles.addNewPersonInfo(person.getId());
+			
 			String companyId = "Mobility";
 			String typeOfVehicle = "car";
 			vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
@@ -108,7 +108,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
 			companyContainer.reserveVehicle(vehicle);
 			
-			eventsManager.processEvent(new StartRentalEvent(time, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
+			eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
 			
 			if (willHaveATripFromLocation && keepTheCar) {
 				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
@@ -175,18 +175,12 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
 		this.carsharingSupplyContainer.populateSupply();
-		this.csPersonVehicles.reset();
+		this.currentDemand.reset();
 	}
 	
 	private CSVehicle getVehicleAtLocation(Link currentLink, Person person, String carsharingType) {
 
-		if (this.csPersonVehicles.getVehicleLocationForType(person.getId(), carsharingType) != null &&
-				this.csPersonVehicles.getVehicleLocationForType(person.getId(), carsharingType).containsKey(currentLink.getId())) {
-
-			CSVehicle vehicle = this.csPersonVehicles.getVehicleLocationForType(person.getId(), carsharingType).get(currentLink.getId());			
-			return vehicle;
-		}
-		return null;
+		return this.currentDemand.getVehicleOnLink(person.getId(), currentLink, carsharingType);	
 		
 	}
 	

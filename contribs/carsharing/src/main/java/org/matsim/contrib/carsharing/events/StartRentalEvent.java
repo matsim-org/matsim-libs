@@ -19,15 +19,19 @@ public class StartRentalEvent extends Event implements HasPersonId{
 	
 	private final String vehicleId;
 	
+	private String carsharingType;
+	
 	public static final String EVENT_TYPE = "Rental Start";
 
-	public StartRentalEvent(double now, Link currentLink, Link stationLink, Id<Person> id, String vehId) {
+	public StartRentalEvent(double now, String carsharingType, 
+			Link currentLink, Link stationLink, Id<Person> id, String vehId) {
 		super(now);
 		this.originlinkId = currentLink.getId();
 		this.pickuplinkId = stationLink.getId();
 
 		this.personId = id;
 		this.vehicleId = vehId;
+		this.carsharingType = carsharingType;
 	}
 
 	@Override
@@ -50,7 +54,9 @@ public class StartRentalEvent extends Event implements HasPersonId{
 	public String getvehicleId(){
 		return this.vehicleId;
 	}
-	
-	
+
+	public String getCarsharingType() {
+		return carsharingType;
+	}
 
 }
