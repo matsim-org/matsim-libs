@@ -1,4 +1,4 @@
-package playground.tschlenther.parkingSearch;
+/*package playground.tschlenther.parkingSearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
-import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
 import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -47,9 +47,9 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-/**
+*//**
  * @author balac, tschlenther
- */
+ *//*
 public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
 
 	private static final Logger log = Logger.getLogger(PSAndCSPersonDriverAgentImpl.class);
@@ -361,13 +361,13 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		this.driverAgentDelegate.notifyMoveOverNode(newLinkId);
 	}
 
-	/**
+	*//**
 	 * when not searching for parking space, method is delegated
 	 * when in searching mode, it is assumed that agents know the surrounding area: they choose the one link out of
 	 * the outlinks of currentlink that has the closest toNode to the toNode of the destination link.
 	 * in networks with high percentage of bidirectional links, this may not be very constructive.
 	 * if the next link is the destination link, the agent is put in search mode.
-	 */
+	 *//*
 	@Override
 	public Id<Link> chooseNextLinkId() {
 		Id<Link> destination = this.getDestinationLinkId();
@@ -413,14 +413,14 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		}
 	}
 	
-	/**
+	*//**
 	 * as long as the agent is not searching for parking space, this method gets delegated.
 	 * it is assumed that agents have a maximum walking time to their activity and know the walking times in
 	 * the surrounding area of their destination link.
 	 * if the destination link's toNode is reachable of the current link's toNode within this time, the agent looks for a parking lot.
 	 * at the moment, availabilty of parking spaces is modeled by a randomly drawn number.
 	 * if the agent does not park on the destination link, a walk leg must be inserted into the plan.
-	 */
+	 *//*
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
 		if ( this.searchMode.equals(ParkingMode.DRIVING) ) {
@@ -468,3 +468,4 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 }
 
+*/

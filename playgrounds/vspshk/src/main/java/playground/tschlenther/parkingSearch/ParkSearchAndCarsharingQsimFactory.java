@@ -1,8 +1,8 @@
-package playground.tschlenther.parkingSearch;
+/*package playground.tschlenther.parkingSearch;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
 import org.matsim.contrib.carsharing.qsim.ParkCSVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -26,9 +26,9 @@ import com.google.inject.Provider;
 
 import java.util.Map;
 
-/**
+*//**
  * only difference to the CarSharingQsimFactory is, that we need to bind our own agentfactory (schlenther 04/16)
- */
+ *//*
 
 public class ParkSearchAndCarsharingQsimFactory implements Provider<Netsim>{
 
@@ -93,3 +93,4 @@ public class ParkSearchAndCarsharingQsimFactory implements Provider<Netsim>{
 	}
 		
 }
+*/

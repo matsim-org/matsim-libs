@@ -1,10 +1,10 @@
-package playground.tschlenther.parkingSearch;
+/*package playground.tschlenther.parkingSearch;
 
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.carsharing.qsim.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -54,3 +54,4 @@ public class ParkSearchAndCarsharingAgentFactory implements AgentFactory{
 		return agent;
 	}
 }
+*/
