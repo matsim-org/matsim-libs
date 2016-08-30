@@ -141,6 +141,7 @@ public class IOUtils {
 				}
 			}
 		} catch (IOException e) {
+			log.fatal("encountered IOException.  This will most probably be fatal.  Note that for relative path names, the root is no longer the Java root, but the directory where the config file resides.");
 			throw new UncheckedIOException(e);
 		}
 
