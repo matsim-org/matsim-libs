@@ -99,44 +99,56 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 	}
 	
+	@Override
 	public void reset(int iteration) {
 		veh2DriverDelegate.reset(iteration);
 		delegate.reset(iteration);
 	}
 
+	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		delegate.handleEvent(event);
+		if (isHandlingEvent(event.getPersonId(), event.getLinkId())) delegate.handleEvent(event);
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Person> driverId = veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
-		
+		if (isHandlingEvent(driverId, event.getLinkId())) delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Id<Person> driverId = veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
+		if (isHandlingEvent(driverId, event.getLinkId())) delegate.handleEvent(event);
+	}
+	
+	private boolean isHandlingEvent(Id<Person> personId, Id<Link> linkId){
+		boolean isHandlingEvent = false;
+
 		if (this.af!=null) { // area filtering
-			Link link = network.getLinks().get(event.getLinkId());
-			if(! this.af.isLinkInsideShape(link)) return;
+			Link link = network.getLinks().get(linkId);
+			if(! this.af.isLinkInsideShape(link)) return false;
 			
 			if(this.userGroup==null || this.pf==null) {// only area filtering
-				delegate.handleEvent(event); 
-			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.userGroup)) { // both filtering
-				delegate.handleEvent(event);
+				return true; 
+			} else if (this.pf.getUserGroupAsStringFromPersonId(personId).equals(this.userGroup)) { // both filtering
+				return true;
 			}
 			
 		} else {
 			
 			if(this.userGroup==null || this.pf==null) {// no filtering
-				delegate.handleEvent(event); 
-			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.userGroup)) { // user group filtering
-				delegate.handleEvent(event);
+				return true;
+			} else if (this.pf.getUserGroupAsStringFromPersonId(personId).equals(this.userGroup)) { // user group filtering
+				return true;
 			}
 		}
+		return isHandlingEvent;
 	}
 
-	public void handleEvent(LinkEnterEvent event) {
-		delegate.handleEvent(event);
-	}
-
+	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		delegate.handleEvent(event);
+		if (isHandlingEvent(event.getPersonId(), event.getLinkId())) delegate.handleEvent(event);
 	}
 
 	public SortedMap<Double, Map<Id<Person>, Double>> getDelayPerPersonAndTimeInterval() {
@@ -155,16 +167,19 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		return delegate.getTime2linkIdLeaveCount();
 	}
 
+	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		veh2DriverDelegate.handleEvent(event);
 		delegate.handleEvent(event);
 	}
 
+	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		veh2DriverDelegate.handleEvent(event);
 		delegate.handleEvent(event);
 	}
 
+	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		delegate.handleEvent(event);
 	}

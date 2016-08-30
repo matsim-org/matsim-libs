@@ -84,11 +84,13 @@ public class FilteredCausedDelayHandler implements CongestionEventHandler {
 		this.network = scenario.getNetwork();
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 	}
-	
+
+	@Override
 	public void reset(int iteration) {
 		delegate.reset(iteration);
 	}
 
+	@Override
 	public void handleEvent(CongestionEvent event) {
 		Id<Person> driverId = event.getCausingAgentId();
 		
