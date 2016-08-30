@@ -18,7 +18,6 @@ public class TwoWayContainer implements VehiclesContainer{
 	private QuadTree<CarsharingStation> twvehicleLocationQuadTree;
 	private Map<String, CarsharingStation> twowaycarsharingstationsMap;
 	private Map<CSVehicle, Link> twvehiclesMap;
-	//private Map<String, CSVehicle> twvehicleIdMap;
 
 	public TwoWayContainer(QuadTree<CarsharingStation> twvehicleLocationQuadTree,
 			Map<String, CarsharingStation> twowaycarsharingstationsMap, Map<CSVehicle, Link> twvehiclesMap) {

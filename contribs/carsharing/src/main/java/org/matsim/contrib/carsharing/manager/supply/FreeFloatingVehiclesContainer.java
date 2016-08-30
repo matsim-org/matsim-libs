@@ -68,7 +68,6 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 
 	@Override
 	public void reserveParking(Link destinationLink) {
-		// TODO Auto-generated method stub
 		
 	}
 	

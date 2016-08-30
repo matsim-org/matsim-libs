@@ -31,11 +31,7 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 	NoVehicleEventHandler noVehicleHandler;
 	NoParkingEventHandler noParkingHandler;
 	@Inject MatsimServices controler;
-	int frequency = 1;
-	//@Inject private FixedOrderSimulationListener fosl;
-	//@Inject private ActivityReplanningMap activityReplanningMap;
-	//@Inject private MobsimDataProvider mobsimDataProvider;
-	
+	int frequency = 1;	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// TODO Auto-generated method stub

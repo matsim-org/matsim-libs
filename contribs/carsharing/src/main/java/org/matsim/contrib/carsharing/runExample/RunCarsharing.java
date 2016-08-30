@@ -84,16 +84,10 @@ public class RunCarsharing {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-		        //bind(FixedOrderSimulationListener.class).asEagerSingleton();
 				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
-		        //addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
 		        addControlerListenerBinding().to(CarsharingListener.class);
-		        addControlerListenerBinding().to(CarsharingManagerNew.class);
-		       // addMobsimListenerBinding().to(CarsharingMobsimListener.class);
-		       // bind(MobsimDataProvider.class).asEagerSingleton();
-		        
+		        addControlerListenerBinding().to(CarsharingManagerNew.class);		        
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
-		       // bind(ActivityReplanningMap.class).asEagerSingleton();
 		        bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
 		        bind(CarsharingManagerNew.class).asEagerSingleton();
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);

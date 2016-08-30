@@ -83,14 +83,11 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 							getVehicleContainer(carsharingType)).getTwowaycarsharingstationsMap().
 							get(((StationBasedVehicle)vehicle).getStationId());
 					destinationLink = parkingStation.getLink();
-				}
-				
+				}			
 				
 				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
-						startLink, destinationLink, false, true);
-				
-			}
-			
+						startLink, destinationLink, false, true);				
+			}			
 		}
 		else {
 			
@@ -125,7 +122,6 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 						return null;
 					
 					vehiclesContainer.reserveParking(parkingStationLink);
-
 					
 					destinationLink = parkingStationLink;
 				}

@@ -53,7 +53,6 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
 			carsharingManager.parkVehicle(vehId, linkId);
-			//carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
 			this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), "freefloating").remove(linkId);
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
@@ -62,7 +61,6 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
 			carsharingManager.parkVehicle(vehId, linkId);
-			//carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
 			this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), "oneway").remove(linkId);
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
@@ -71,7 +69,6 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
 			carsharingManager.parkVehicle(vehId, linkId);
-			//carsharingManager.returnCarsharingVehicle(event.getPersonId(), event.getLinkId(), event.getTime(), vehId);
 			this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), "twoway").remove(linkId);
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
@@ -101,10 +98,8 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			else {				
 				this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), modeCut[0]).put(linkId, vehicle);
 
-			}
-			
-		}
-		
+			}			
+		}		
 		personArrivalMap.put(event.getPersonId(), event.getLinkId());
 		
 	}

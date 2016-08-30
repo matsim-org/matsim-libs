@@ -15,9 +15,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class OneWayContainer implements VehiclesContainer{	
 	
-	//private Map<String, CSVehicle> owvehicleIdMap ;
 	private QuadTree<CarsharingStation> owvehicleLocationQuadTree;	
-	//private Map<String, CarsharingStation> onewaycarsharingstationsMap;
 	private Map<CSVehicle, Link> owvehiclesMap ;	
 	
 	public OneWayContainer(QuadTree<CarsharingStation> owvehicleLocationQuadTree2,
@@ -89,8 +87,7 @@ public class OneWayContainer implements VehiclesContainer{
 	}
 
 	@Override
-	public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDstance) {
-		
+	public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDstance) {		
 
 		//find the closest available parking space and reserve it (make it unavailable)
 		//if there are no parking spots within search radius, return null		

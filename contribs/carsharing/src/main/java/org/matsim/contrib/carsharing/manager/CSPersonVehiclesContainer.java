@@ -120,10 +120,7 @@ public class CSPersonVehiclesContainer implements CSPersonVehicle{
 
 		public Map<Id<Link>, CSVehicle> getTwvehicleOriginLink() {
 			return twvehicleOriginLink;
-		}
-
-		
-		
+		}		
 	}
 
 	@Override
