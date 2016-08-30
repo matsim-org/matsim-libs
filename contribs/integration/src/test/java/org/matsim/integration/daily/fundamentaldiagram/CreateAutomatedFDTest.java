@@ -108,7 +108,8 @@ public class CreateAutomatedFDTest {
 
 	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}; InflowConstraint == {2};")
 	public static Collection<Object[]> createFds() {
-		Object [][] combos2run = new Object [18][3]; // #ld x #td x #ic x #params
+		int combos = LinkDynamics.values().length * TrafficDynamics.values().length * InflowConstraint.values().length;
+		Object [][] combos2run = new Object [combos][3]; // #ld x #td x #ic x #params
 		int index = 0;
 		for (LinkDynamics ld : LinkDynamics.values()) {
 			for (TrafficDynamics td : TrafficDynamics.values()) {
