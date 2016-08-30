@@ -1,21 +1,14 @@
 package org.matsim.contrib.carsharing.scoring;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import com.google.common.collect.ImmutableSet;
@@ -24,30 +17,19 @@ import com.google.common.collect.ImmutableSet;
 public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
 	
-	private Config config;
-	
-	
+	private Config config;	
 	private double totalffRentalTime = 0.0;
 	private double totalowRentalTime = 0.0;
-	private double totaltwRentalTime = 0.0;
-	
-	private Map<String, Stats> vehicleIdStatsMap = new HashMap<String, Stats>();	
-	private ArrayList<Stats> ffcsRentals = new ArrayList<Stats>();
-
-	private ArrayList<Stats> owcsRentals = new ArrayList<Stats>();
-	
-	private ArrayList<Stats> twcsRentals = new ArrayList<Stats>();
-	
-	private HashMap<Id<Link>, Stats> twMap = new HashMap<Id<Link>, Stats>();
+	private double totaltwRentalTime = 0.0;	
 	
 	private Stats ffStats;
 	private Stats owStats;
 	private Stats twStats;
 	
-	static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
+	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
 			"egress_walk_tw", "access_walk_tw", "egress_walk_ff", "access_walk_ff");
 	
-	static final  Set<String> carsharingLegs = ImmutableSet.of("oneway", "twoway",
+	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway", "twoway",
 			"freefloating");
 	
 	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, Config config,  Network network)
@@ -55,18 +37,12 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		super(params, network);
 		this.config = config;
 
-		owcsRentals = new ArrayList<Stats>();
-
-		twcsRentals = new ArrayList<Stats>();
-
-		twMap = new HashMap<Id<Link>, Stats>();
-
 		totalffRentalTime = 0.0;
 		totalowRentalTime = 0.0;
 		totaltwRentalTime = 0.0;
 		ffStats = new Stats();
-		owStats= new Stats();;
-		twStats= new Stats();;
+		owStats= new Stats();
+		twStats= new Stats();
 	}
 
 	@Override
@@ -120,7 +96,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		
 				
 			score += this.twStats.distance * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("distanceFeeTwoWayCarsharing"));
-			score += this.twStats.drivingTime * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeFeeTwoWayCarsharing"));
+			score += this.totaltwRentalTime * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeFeeTwoWayCarsharing"));
 				//score += (s.endTime - s.startTime - s.drivingTime) * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeParkingFeeFreeFloating"));
 			
 					

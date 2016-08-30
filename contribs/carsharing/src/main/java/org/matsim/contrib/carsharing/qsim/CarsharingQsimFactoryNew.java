@@ -3,13 +3,19 @@ package org.matsim.contrib.carsharing.qsim;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 import com.google.inject.Provider;
+
 /** 
  * 
  * @author balac
@@ -18,13 +24,28 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 
 	@Inject Scenario scenario;
 	@Inject EventsManager eventsManager;
-	@Inject CarSharingVehiclesNew carsharingData;
+	@Inject CarsharingSupplyContainer carsharingSupply;
+	@Inject private CarsharingManagerNew carsharingManager;
+
 	@Override
 	public Mobsim get() {
-		final QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
-
+		final QSim qsim = new QSim(scenario, eventsManager);
+		//QSimUtils.createDefaultQSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qsim.getAgentCounter());
+		qsim.addMobsimEngine(activityEngine);
+		qsim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
+		qsim.addMobsimEngine(netsimEngine);
+		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+		qsim.addMobsimEngine(teleportationEngine);
+		qsim.addDepartureHandler(teleportationEngine) ;
+		AgentFactory agentFactory = new CSAgentFactory(qsim, carsharingManager);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qsim);
+        qsim.addAgentSource(agentSource);		
+	
 		ParkCSVehicles parkSource = new ParkCSVehicles( qsim,
-				carsharingData);
+				carsharingSupply);
 		qsim.addAgentSource(parkSource);
 		return qsim;
 	}

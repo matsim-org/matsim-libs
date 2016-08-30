@@ -3,11 +3,16 @@
 <!-- $Id$ -->
 
 <!-- ============================================================ -->
-<!ELEMENT stations          (twoway*,oneway*,freefloating*)>
-<!ATTLIST stations
+<!ELEMENT companies          (company*)>
+<!ATTLIST companies
           name           CDATA   #IMPLIED
           reference_layer  CDATA #IMPLIED
           xml:lang       NMTOKEN "de-CH">
+
+
+<!ELEMENT company          (twoway*,oneway*,freefloating*)>
+<!ATTLIST company
+          name           CDATA   #IMPLIED>   
 
 <!ELEMENT twoway          (vehicle*)>
 <!ATTLIST twoway

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
@@ -18,11 +17,11 @@ public class OneWayCarsharingStation implements CarsharingStation{
 	private Map<String, ArrayList<CSVehicle>> vehiclesPerType = new HashMap<String, ArrayList<CSVehicle>>();
 	private String stationId;
 	private int avaialbleParkingSpots;
-	private Id<Link> linkId;
+	private Link link;
 
 	public OneWayCarsharingStation(String stationId, Link link, Map<String, Integer> numberOfvehiclesPerType,
 			Map<String, ArrayList<CSVehicle>> vehiclesPerType, int availableParkingSpots) {
-		this.linkId = link.getId();
+		this.link = link;
 		this.stationId = stationId;
 		this.numberOfvehiclesPerType = numberOfvehiclesPerType;
 		this.vehiclesPerType = vehiclesPerType;
@@ -82,8 +81,8 @@ public class OneWayCarsharingStation implements CarsharingStation{
 		return avaialbleParkingSpots;
 	}
 	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
+	public Link getLink() {
+		return link;
 	}
 
 	public Map<String, ArrayList<CSVehicle>> getVehiclesPerType() {

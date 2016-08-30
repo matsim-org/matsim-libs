@@ -12,24 +12,16 @@ import com.google.inject.Inject;
 
 public class RouterProviderImpl implements RouterProvider {
 
-	@Inject private RouteFreefloatingTrip freefloatingRouter;
-	@Inject private RouteOneWayTrip onewayRouter;
-	@Inject private RouteTwoWayTrip twowayRouter;
-
+	@Inject private RouteCarsharingTripImpl carsharingTripRouter;
 
 	@Override
 	public List<PlanElement> routeCarsharingTrip(Plan plan, double time, Leg legToBeRouted, String carsharingType,
 			CSVehicle vehicle, Link vehicleLinkLocation, Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle) {
-		if (carsharingType.equals("freefloating"))
-			return freefloatingRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
-					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
-		else if (carsharingType.equals("oneway"))
-			return onewayRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
-					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
-		else if (carsharingType.equals("twoway"))
-			return twowayRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
-					vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
-		return null;
+		
+		return carsharingTripRouter.routeCarsharingTrip(plan, legToBeRouted, time, vehicle, 
+				vehicleLinkLocation, parkingLocation, keepTheCarForLaterUse, hasVehicle);
+		
+		
 	}
 	
 	

@@ -5,17 +5,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.control.listeners.CarsharingMobsimListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
 import org.matsim.contrib.carsharing.manager.CSPersonVehicle;
 import org.matsim.contrib.carsharing.manager.CSPersonVehiclesContainer;
-import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
-import org.matsim.contrib.carsharing.manager.CarsharingManager;
-import org.matsim.contrib.carsharing.manager.routers.RouteFreefloatingTrip;
-import org.matsim.contrib.carsharing.manager.routers.RouteOneWayTrip;
-import org.matsim.contrib.carsharing.manager.routers.RouteTwoWayTrip;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
@@ -26,10 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 /** 
  * @author balac
@@ -51,7 +45,6 @@ public class RunCarsharing {
 
 		final Controler controler = new Controler( sc );
 		
-		//final QSim qsim = new QSim(sc, controler.getEvents());
 		installCarSharing(controler);
 		
 		controler.run();
@@ -61,8 +54,8 @@ public class RunCarsharing {
 	public static void installCarSharing(final Controler controler) {
 		
 		
-		final CarSharingVehiclesNew carsharingVehcilesData = new CarSharingVehiclesNew(controler.getScenario());
-		carsharingVehcilesData.readVehicleLocations();
+		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
+		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CSPersonVehicle pesronVehiclesContainer = new CSPersonVehiclesContainer();
@@ -74,11 +67,7 @@ public class RunCarsharing {
 				.toInstance(keepingCarModel);
 				bind(RouterProvider.class).toInstance(routerProvider);
 				bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
-				bind(RouteFreefloatingTrip.class).asEagerSingleton();
-				bind(RouteOneWayTrip.class).asEagerSingleton();
-				bind(RouteTwoWayTrip.class).asEagerSingleton();
-				//bind(CarsharingActivityEngine.class).asEagerSingleton();
-
+				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
 			}			
 		});		
 		
@@ -95,20 +84,18 @@ public class RunCarsharing {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-		        bind(FixedOrderSimulationListener.class).asEagerSingleton();
+		        //bind(FixedOrderSimulationListener.class).asEagerSingleton();
 				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
-		        addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
+		        //addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
 		        addControlerListenerBinding().to(CarsharingListener.class);
-		        addControlerListenerBinding().to(CarsharingManager.class);
-		        addMobsimListenerBinding().to(CarsharingMobsimListener.class);
-		        bind(MobsimDataProvider.class).asEagerSingleton();
+		        addControlerListenerBinding().to(CarsharingManagerNew.class);
+		       // addMobsimListenerBinding().to(CarsharingMobsimListener.class);
+		       // bind(MobsimDataProvider.class).asEagerSingleton();
 		        
-				//setting up the scoring function factory, inside different scoring functions are set-up
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
-		        bind(ActivityReplanningMap.class).asEagerSingleton();
-		       // addMobsimListenerBinding().to(CarsharingActivityEngine.class) ;
-		        bind(CarSharingVehiclesNew.class).toInstance(carsharingVehcilesData);
-		        bind(CarsharingManager.class).asEagerSingleton();
+		       // bind(ActivityReplanningMap.class).asEagerSingleton();
+		        bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
+		        bind(CarsharingManagerNew.class).asEagerSingleton();
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
 			}
 		});

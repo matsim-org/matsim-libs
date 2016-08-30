@@ -4,5 +4,6 @@ public interface CSVehicle {
 
 	public String getVehicleId();
 	public String getCsType();
+	public String getCompanyId();
 
 }

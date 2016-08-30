@@ -18,10 +18,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 /** 
  * 
@@ -35,9 +32,9 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 	NoParkingEventHandler noParkingHandler;
 	@Inject MatsimServices controler;
 	int frequency = 1;
-	@Inject private FixedOrderSimulationListener fosl;
-	@Inject private ActivityReplanningMap activityReplanningMap;
-	@Inject private MobsimDataProvider mobsimDataProvider;
+	//@Inject private FixedOrderSimulationListener fosl;
+	//@Inject private ActivityReplanningMap activityReplanningMap;
+	//@Inject private MobsimDataProvider mobsimDataProvider;
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -156,8 +153,8 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
-		fosl.addSimulationListener(this.mobsimDataProvider);
-		fosl.addSimulationListener(this.activityReplanningMap);
+		//fosl.addSimulationListener(this.mobsimDataProvider);
+		//fosl.addSimulationListener(this.activityReplanningMap);
 
         this.cshandler = new TwoWayEventsHandler(event.getServices().getScenario().getNetwork());
 
