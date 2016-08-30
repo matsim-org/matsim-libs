@@ -2,6 +2,7 @@ package org.matsim.contrib.carsharing.manager.supply;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -14,7 +15,7 @@ public class CarsharingSupplyContainer {
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
 	private Map<String, CSVehicle> allVehicles = new HashMap<String, CSVehicle>();
 	private Map<CSVehicle, Link> allVehicleLocations = new HashMap<CSVehicle, Link>();
-
+	private Set<String> companyNames;
 	
 	
 	public Map<CSVehicle, Link> getAllVehicleLocations() {
@@ -76,6 +77,10 @@ public class CarsharingSupplyContainer {
 		this.companies = reader.getCompanies();
 		this.allVehicleLocations = reader.getAllVehicleLocations();
 		this.allVehicles = reader.getAllVehicles();
+		this.companyNames = reader.getCompanyNames();
 	}
-	
+
+	public Set<String> getCompanyNames() {
+		return companyNames;
+	}	
 }

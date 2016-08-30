@@ -15,6 +15,8 @@ import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.models.ChooseTheCompany;
+import org.matsim.contrib.carsharing.models.ChooseTheCompanyExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
@@ -60,13 +62,15 @@ public class RunCarsharing {
 		Set<String> carsharingModesShort = ImmutableSet.of("TW", "OW",
 				"FF");
 		
+		//Set<String> carsharingCompanies = ImmutableSet.of("Mobility");
+		
 		final DemandHandler demandHandler = new DemandHandler(carsharingModesShort);
 		final CarsharingListener carsharingListener = new CarsharingListener(demandHandler);
 		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
+		final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
-		//final CSPersonVehicle pesronVehiclesContainer = new CSPersonVehiclesContainer();
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -74,14 +78,13 @@ public class RunCarsharing {
 			public void install() {
 				bind(KeepingTheCarModel.class)
 				.toInstance(keepingCarModel);
+				bind(ChooseTheCompany.class).toInstance(chooseCompany);
 				bind(RouterProvider.class).toInstance(routerProvider);
-			//	bind(CSPersonVehicle.class).toInstance(pesronVehiclesContainer);
 				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
 				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
 			}			
 		});		
 		
-		//=== end of adding the model ===
 		
 		controler.addOverridingModule( new AbstractModule() {
 			@Override

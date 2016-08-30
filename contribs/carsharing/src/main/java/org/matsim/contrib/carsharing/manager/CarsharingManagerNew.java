@@ -18,13 +18,14 @@ import org.matsim.contrib.carsharing.manager.supply.CompanyContainer;
 import org.matsim.contrib.carsharing.manager.supply.OneWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.VehiclesContainer;
+import org.matsim.contrib.carsharing.models.ChooseTheCompany;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
 import com.google.inject.Inject;
 
@@ -33,11 +34,12 @@ import com.google.inject.Inject;
  *  
  * @author balac
  */
-public class CarsharingManagerNew implements CarsharingManagerInterface, IterationEndsListener{
+public class CarsharingManagerNew implements CarsharingManagerInterface, IterationStartsListener{
 	
 	@Inject private Scenario scenario;
 	@Inject private CurrentTotalDemand currentDemand;
 	@Inject private KeepingTheCarModel keepTheCarModel;
+	@Inject private ChooseTheCompany chooseCompany;
 	@Inject private CarsharingSupplyContainer carsharingSupplyContainer;
 	@Inject private EventsManager eventsManager;
 	@Inject private RouterProvider routerProvider;
@@ -94,9 +96,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			
 			//=== agent does not hold the vehicle, therefore must find a one from the supply side===
 			
-			//TODO: choose the car from a company that maximizes the score when not already having one
-			
-			String companyId = "Mobility";
+			String companyId = chooseCompany.pickACompany(plan, legToBeRouted);
 			String typeOfVehicle = "car";
 			vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 					carsharingType, typeOfVehicle, companyId, searchDistance);
@@ -155,9 +155,6 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		}
 		return willUseVehicle;
 	}
-	
-	
-
 	public void returnCarsharingVehicle(Id<Person> personId, Id<Link> linkId, double time, String vehicleId) {
 		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleqWithId(vehicleId);
 
@@ -170,20 +167,11 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		vehiclesContainer.parkVehicle(vehicle, link);
 		
 	}	
-
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-
-		this.carsharingSupplyContainer.populateSupply();
-		this.currentDemand.reset();
-	}
-	
 	private CSVehicle getVehicleAtLocation(Link currentLink, Person person, String carsharingType) {
 
 		return this.currentDemand.getVehicleOnLink(person.getId(), currentLink, carsharingType);	
 		
-	}
-	
+	}	
 	public void freeParkingSpot(String vehicleId, Id<Link> linkId) {
 		
 		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleqWithId(vehicleId);
@@ -202,5 +190,12 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		Link link = network.getLinks().get(linkId);
 		this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId()).parkVehicle(vehicle, link);
 		return false;
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		this.carsharingSupplyContainer.populateSupply();
+		this.currentDemand.reset();
+		this.chooseCompany.setCompanies(this.carsharingSupplyContainer.getCompanyNames());
 	}		
 }

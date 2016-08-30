@@ -3,7 +3,9 @@ package org.matsim.contrib.carsharing.readers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -40,8 +42,11 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 	private boolean hasOW = false;
 	private boolean hasTW = false;
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
-
-	
+	private Set<String> companyNames = new TreeSet<String>();
+	public Set<String> getCompanyNames() {
+		
+		return this.companyNames;
+	}
 	public Map<String, CompanyContainer> getCompanies() {
 		return companies;
 	}
@@ -124,7 +129,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 		if (name.equals("company")) {
 			
 			companyName = atts.getValue("name");
-			
+			this.companyNames.add(companyName);
 			createQuadTrees();
 
 			twowaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
