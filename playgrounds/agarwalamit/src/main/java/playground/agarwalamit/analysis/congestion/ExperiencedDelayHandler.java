@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -47,6 +48,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * @author amit
@@ -63,10 +65,13 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	private final SortedMap<Double, Map<Id<Person>, Double>> timebin2PersonId2Delay = new TreeMap<>();
 	private final Map<Double, Map<Id<Link>, Double>> timebin2LinkId2Delay = new HashMap<>();
 	private final Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<>();
-	private final Map<Id<Link>, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<>();
+	private final Map<Id<Link>, Map<String,Double>> linkId2FreeSpeedLinkTravelTime = new HashMap<>();
 	private final Map<Double, Map<Id<Link>, Integer>> timebin2LinkIdLeaveCount = new HashMap<>();
 	private double totalDelay;
 	private double warnCount = 0;
+	
+	private final Map<Id<Person>, String> personId2Mode = new HashMap<>();
+	private final SortedMap<String, Double> mode2Speed = new TreeMap<>();
 
 	private double timeBinSize;
 	private Network network;
@@ -80,10 +85,22 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.network = scenario.getNetwork();
 
+		for(VehicleType vt :scenario.getVehicles().getVehicleTypes().values()) {
+			mode2Speed.put(vt.getId().toString(), vt.getMaximumVelocity());
+		}
+		
+		if (mode2Speed.isEmpty()) {
+			mode2Speed.put(TransportMode.car, Double.MAX_VALUE);
+		}
+		
 		for (Link link : this.network.getLinks().values()) {
 			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());
-			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
-			this.linkId2FreeSpeedLinkTravelTime.put(link.getId(), freeSpeedLinkTravelTime);
+			Map<String,Double> mode2freeSpeedTime = new HashMap<>();
+			for (String mode : mode2Speed.keySet()) {
+				Double freeSpeedLinkTravelTime = Double.valueOf( Math.floor(link.getLength()/ Math.min( link.getFreespeed(), mode2Speed.get(mode)) ) + 1 );
+				mode2freeSpeedTime.put(mode, freeSpeedLinkTravelTime);
+			}
+			this.linkId2FreeSpeedLinkTravelTime.put(link.getId(), mode2freeSpeedTime);	
 		}
 
 		for(int i =0;i<noOfTimeBins;i++){
@@ -115,6 +132,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		this.timebin2LinkIdLeaveCount.clear();
 		this.transitDriverPersons.clear();
 		LOG.info("Resetting linkLeave counter to " + this.timebin2LinkIdLeaveCount);
+		this.personId2Mode.clear();
 	}
 
 	@Override
@@ -124,13 +142,17 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		
 		if(this.transitDriverPersons.contains(personId)) return;
 		
+		personId2Mode.put(event.getPersonId(), event.getLegMode());
+		
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
 			throw new RuntimeException("Person is already on the link. Cannot happen.");
 		} 
 
+		if( ! mode2Speed.containsKey(event.getLegMode())) return;
+		
 		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
-		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId);
+		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId).get(event.getLegMode());
 		personId2LinkEnterTime.put(personId, derivedLinkEnterTime);
 		this.linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
 	}
@@ -150,7 +172,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 
 		double actualTravelTime = event.getTime()-this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId);
 		this.linkId2PersonIdLinkEnterTime.get(linkId).remove(personId);
-		double freeSpeedTime = this.linkId2FreeSpeedLinkTravelTime.get(linkId);
+		double freeSpeedTime = this.linkId2FreeSpeedLinkTravelTime.get(linkId).get(personId2Mode.get(personId));
 
 		double currentDelay =	actualTravelTime-freeSpeedTime;
 		if(currentDelay<1.)  currentDelay=0.;

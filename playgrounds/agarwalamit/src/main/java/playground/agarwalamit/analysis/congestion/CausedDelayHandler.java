@@ -78,6 +78,8 @@ public class CausedDelayHandler implements CongestionEventHandler {
 				person2del.put(personId, 0.);
 			}
 		}
+		
+		if (scenario.getConfig().qsim().getMainModes().size()>1) throw new RuntimeException("This should not be used with mixed traffic");
 	}
 	
 	@Override

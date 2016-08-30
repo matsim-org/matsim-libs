@@ -62,26 +62,34 @@ public class PatnaExperienceDelayAnalyzer {
 		PatnaPersonFilter personFilter = new PatnaPersonFilter();
 		int noOfTimeBins = 1;
 		double simEndTime = scenario.getConfig().qsim().getEndTime();
-
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
+		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
+		try {
 			writer.write("userGroup\tmode\tdelayInHr\n");
-			for ( PatnaUserGroup pug : PatnaUserGroup.values()) {
-				EventsManager events = EventsUtils.createEventsManager();
-				PatnaExperienceDelayHandler person2modeHandler = new PatnaExperienceDelayHandler();
-				FilteredExperienceDelayHandler congestionHandler = new FilteredExperienceDelayHandler(scenario, noOfTimeBins, pug.toString(), personFilter);
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason :"+ e);
+		}
+		for ( PatnaUserGroup pug : PatnaUserGroup.values()) {
+			EventsManager events = EventsUtils.createEventsManager();
+			PatnaExperienceDelayHandler person2modeHandler = new PatnaExperienceDelayHandler();
+			FilteredExperienceDelayHandler congestionHandler = new FilteredExperienceDelayHandler(scenario, noOfTimeBins, pug.toString(), personFilter);
 
-				events.addHandler(person2modeHandler);
-				events.addHandler(congestionHandler);
+			events.addHandler(person2modeHandler);
+			events.addHandler(congestionHandler);
 
-				new MatsimEventsReader(events).readFile(eventsFile);
+			new MatsimEventsReader(events).readFile(eventsFile);
 
-				SortedMap<String, Double> mode2delay = getMode2Delay(person2modeHandler.personId2Mode, congestionHandler.getDelayPerPersonAndTimeInterval().get(simEndTime));
+			SortedMap<String, Double> mode2delay = getMode2Delay(person2modeHandler.personId2Mode, congestionHandler.getDelayPerPersonAndTimeInterval().get(simEndTime));
 
-				for (String mode : mode2delay.keySet()) {
-					double delay = NumberUtils.round(mode2delay.get(mode)/3600., 2);
+			for (String mode : mode2delay.keySet()) {
+				double delay = NumberUtils.round(mode2delay.get(mode)/3600., 2);
+				try {
 					writer.write(pug.toString()+"\t"+mode+"\t"+delay+"\n");
+				} catch (Exception e) {
+					throw new RuntimeException("Data is not written. Reason :"+ e);
 				}
 			}
+		}
+		try {
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason :"+ e);
