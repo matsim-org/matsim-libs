@@ -21,9 +21,8 @@ package playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -102,7 +101,8 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 			for (int ix = oldcount ;ix>schedule.getCurrentTask().getTaskIdx()+2; ix--){
 				schedule.removeLastTask();
 			}
-			System.out.println(schedule.getTasks().get(schedule.getTaskCount()-1));
+//			Logger.getLogger(getClass()).info(schedule.getTasks().get(schedule.getTaskCount()-1));
+
 			
 			for (TaxibusRequest all : bestPath.requests){
 				all.setDropoffTask(null);

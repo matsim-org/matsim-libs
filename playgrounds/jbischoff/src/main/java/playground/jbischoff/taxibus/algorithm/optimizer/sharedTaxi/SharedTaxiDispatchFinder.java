@@ -182,7 +182,7 @@ public class SharedTaxiDispatchFinder {
 		}
 		if (bestSharedPath != null)
 			{
-			Logger.getLogger(getClass()).info("Shared Ride :" + bestSharedPath.vehicle.getId() + " no "+ sharedRides++);
+//			Logger.getLogger(getClass()).info("Shared Ride :" + bestSharedPath.vehicle.getId() + " no "+ sharedRides++);
 		}
 		if ((bestSharedPath == null)&&(bestNewPath!=null) ){
 			bestNewPath.addPath(VrpPaths.calcAndCreatePath(req.getFromLink(), req.getToLink(), currTime + bestNewVehDispatchTime, router, optimContext.travelTime));
