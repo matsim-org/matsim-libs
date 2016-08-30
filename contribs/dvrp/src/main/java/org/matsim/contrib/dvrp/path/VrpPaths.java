@@ -43,12 +43,18 @@ public class VrpPaths
     }
 
 
+    public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime)
+    {
+        return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromTolink },
+                new double[] { 0 });
+    }
+
+
     public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime,
             Path path, TravelTime travelTime)
     {
         if (fromLink == toLink) {
-            return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromLink },
-                    new double[] { 0 });
+            return createZeroLengthPath(fromLink, departureTime);
         }
 
         int count = path.links.size();

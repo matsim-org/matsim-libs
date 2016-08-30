@@ -116,9 +116,8 @@ public class VehicleAssignmentProblem<D>
     }
 
 
-//    private static int calcPathsForVehiclesCount = 0;
-//    private static int calcPathsForDestinationsCount = 0;
-
+    //private static int calcPathsForVehiclesCount = 0;
+    //private static int calcPathsForDestinationsCount = 0;
 
     private PathData[][] createPathDataMatrix()
     {
@@ -127,19 +126,19 @@ public class VehicleAssignmentProblem<D>
 
         if (dData.getSize() > vData.getSize()) {
             calcPathsForVehicles(pathDataMatrix);
-//            calcPathsForVehiclesCount++;
+            //calcPathsForVehiclesCount++;
         }
         else {
             calcPathsForDestinations(pathDataMatrix);
-//            calcPathsForDestinationsCount++;
+            //calcPathsForDestinationsCount++;
         }
 
-//        if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
-//            System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
-//                    + " PathsForVehicles = " + calcPathsForVehiclesCount);
-//            System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
-//                    + " idleVehs = " + vData.getIdleCount());
-//        }
+        //if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
+        //    System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
+        //        + " PathsForVehicles = " + calcPathsForVehiclesCount);
+        //    System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
+        //        + " idleVehs = " + vData.getIdleCount());
+        //}
 
         return pathDataMatrix;
     }

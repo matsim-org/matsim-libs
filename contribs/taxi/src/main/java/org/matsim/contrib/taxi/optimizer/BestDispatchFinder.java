@@ -33,7 +33,7 @@ public class BestDispatchFinder
 
 
     //typically we search through the 20-40 nearest requests/vehicles
-    private static final int DEFAULT_EXPECTED_NEIGHBOURHOOD_SIZE = 40;
+    public static final int DEFAULT_EXPECTED_NEIGHBOURHOOD_SIZE = 40;
 
     private final TaxiOptimizerContext optimContext;
     private final MultiNodeDijkstra router;
@@ -75,6 +75,10 @@ public class BestDispatchFinder
     }
 
 
+    //We use many-to-one forward search. Therefore, we cannot assess all vehicles.
+    //However, that would be possible if one-to-many backward search were used instead.
+    //TODO intuitively, many-to-one is slower, some performance tests needed before switching to
+    //one-to-many
     public <D> Dispatch<D> findBestVehicle(D destination, Iterable<? extends Vehicle> vehicles,
             LinkProvider<D> destinationToLink)
     {
@@ -152,9 +156,8 @@ public class BestDispatchFinder
             Link link = destinationToLink.getLink(loc);
 
             if (departure.link == link) {
-                VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, link,
-                        departure.time, null, optimContext.travelTime);
-                return new Dispatch<>(veh, loc, vrpPath);
+                return new Dispatch<>(veh, loc, VrpPaths.createZeroLengthPath(departure.link,
+                        departure.time));
             }
 
             Id<Node> locNodeId = link.getFromNode().getId();

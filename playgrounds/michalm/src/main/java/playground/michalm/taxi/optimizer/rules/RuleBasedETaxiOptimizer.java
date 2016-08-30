@@ -44,7 +44,7 @@ public class RuleBasedETaxiOptimizer
     //TODO MIN_RELATIVE_SOC should depend on the weather and time of day
     private final RuleBasedETaxiOptimizerParams params;
     private final EvData evData;
-    private final BestEDispatchFinder eDispatchFinder;
+    private final BestChargerFinder eDispatchFinder;
     private final ETaxiScheduler eScheduler;
 
 
@@ -55,7 +55,7 @@ public class RuleBasedETaxiOptimizer
         this.params = params;
         evData = optimContext.evData;
         eScheduler = (ETaxiScheduler)optimContext.scheduler;
-        eDispatchFinder = new BestEDispatchFinder(dispatchFinder);
+        eDispatchFinder = new BestChargerFinder(dispatchFinder);
     }
 
 
