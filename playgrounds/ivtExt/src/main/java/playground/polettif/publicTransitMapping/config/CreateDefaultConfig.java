@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  *
  * @author polettif
  */
+@Deprecated
 public class CreateDefaultConfig {
 
 	/**

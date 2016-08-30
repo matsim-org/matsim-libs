@@ -28,6 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  *
  * @author polettif
  */
+@Deprecated
 public class ExtractDebugSchedule {
 
 	/**

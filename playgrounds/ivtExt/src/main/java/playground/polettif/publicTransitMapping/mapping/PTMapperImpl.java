@@ -61,6 +61,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperImpl implements PTMapper {
 
 	protected static Logger log = Logger.getLogger(RunPublicTransitMapper.class);
