@@ -1,6 +1,9 @@
 package org.matsim.contrib.carsharing.runExample;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -8,6 +11,10 @@ import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
+import org.matsim.contrib.carsharing.manager.supply.costs.CompanyCosts;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculation;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculationExample;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.router.FreeFloatingRoutingModule;
 import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
 import org.matsim.contrib.carsharing.router.TwoWayCarsharingRoutingModule;
@@ -33,6 +40,27 @@ public class CarsharingUtils {
     	config.addModule(configGroupAll);
     	
     	return config;
+		
+	}
+	public static CostsCalculatorContainer createCompanyCostsStructure(Set<String> companies) {
+		
+		CostsCalculatorContainer companyCostsContainer = new CostsCalculatorContainer();
+		
+		for (String s : companies) {
+			
+			Map<String, CostCalculation> costCalculations = new HashMap<String, CostCalculation>();
+			
+			//=== here costumizeable cost structures come in ===
+			//===what follows is just an example!! and should be modified according to the study at hand===
+			costCalculations.put("freefloating", new CostCalculationExample());
+			costCalculations.put("twoway", new CostCalculationExample());
+			costCalculations.put("oneway", new CostCalculationExample());
+			CompanyCosts companyCosts = new CompanyCosts(costCalculations);
+			
+			companyCostsContainer.getCompanyCostsMap().put(s, companyCosts);
+		}
+		
+		return companyCostsContainer;
 		
 	}
 	public static AbstractModule createModule() {

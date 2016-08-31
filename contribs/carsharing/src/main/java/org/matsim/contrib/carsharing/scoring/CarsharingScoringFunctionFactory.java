@@ -2,6 +2,9 @@ package org.matsim.contrib.carsharing.scoring;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -17,11 +20,17 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	
 	private final Scenario scenario;
 	private final CharyparNagelScoringParametersForPerson params;
-
+	private final DemandHandler demandHandler;
+	private final CostsCalculatorContainer costsCalculatorContainer;
+	private final CarsharingSupplyContainer carsharingSupplyContainer;
 	@Inject
-	CarsharingScoringFunctionFactory( final Scenario sc ) {
+	CarsharingScoringFunctionFactory( final Scenario sc, final DemandHandler demandHandler,
+			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyContainer carsharingSupplyContainer) {
 		this.scenario = sc;
 		this.params = new SubpopulationCharyparNagelScoringParameters( sc );
+		this.demandHandler = demandHandler;
+		this.costsCalculatorContainer = costsCalculatorContainer;
+		this.carsharingSupplyContainer = carsharingSupplyContainer;
 	}
 
 
@@ -33,7 +42,8 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 		scoringFunctionSum.addScoringFunction(
 	    new CarsharingLegScoringFunction( params.getScoringParameters( person ),
 	    								 this.scenario.getConfig(),
-	    								 this.scenario.getNetwork()));
+	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer, 
+	    								 this.carsharingSupplyContainer, person.getId()));
 		scoringFunctionSum.addScoringFunction(
 				new CharyparNagelLegScoring(
 						params.getScoringParameters( person ),

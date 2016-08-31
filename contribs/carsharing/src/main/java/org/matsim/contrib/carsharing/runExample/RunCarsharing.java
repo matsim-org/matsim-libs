@@ -15,6 +15,7 @@ import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
 import org.matsim.contrib.carsharing.models.ChooseTheCompanyExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
@@ -62,7 +63,9 @@ public class RunCarsharing {
 		Set<String> carsharingModesShort = ImmutableSet.of("TW", "OW",
 				"FF");
 		
-		//Set<String> carsharingCompanies = ImmutableSet.of("Mobility");
+		Set<String> carsharingCompanies = ImmutableSet.of("Mobility", "Catchacar");
+		
+		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		
 		final DemandHandler demandHandler = new DemandHandler(carsharingModesShort);
 		final CarsharingListener carsharingListener = new CarsharingListener(demandHandler);
@@ -72,6 +75,7 @@ public class RunCarsharing {
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
+		
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -82,6 +86,7 @@ public class RunCarsharing {
 				bind(RouterProvider.class).toInstance(routerProvider);
 				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
 				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
+				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
 			}			
 		});		
 		
@@ -103,6 +108,7 @@ public class RunCarsharing {
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 		        bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
 		        bind(CarsharingManagerNew.class).asEagerSingleton();
+		        bind(DemandHandler.class).toInstance(demandHandler);
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
 		        addEventHandlerBinding().toInstance(demandHandler);
 			}

@@ -2,12 +2,20 @@ package org.matsim.contrib.carsharing.scoring;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
+import org.matsim.contrib.carsharing.manager.demand.AgentRentals;
+import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
+import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -26,17 +34,28 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private Stats owStats;
 	private Stats twStats;
 	
+	private CostsCalculatorContainer costsCalculatorContainer;
+	private DemandHandler demandHandler;
+	private Id<Person> personId;
+	private CarsharingSupplyContainer carsharingSupplyContainer;
+	
 	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
 			"egress_walk_tw", "access_walk_tw", "egress_walk_ff", "access_walk_ff");
 	
 	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway", "twoway",
 			"freefloating");
 	
-	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, Config config,  Network network)
+	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, 
+			Config config,  Network network, DemandHandler demandHandler,
+			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyContainer carsharingSupplyContainer,
+			Id<Person> personId)
 	{
 		super(params, network);
 		this.config = config;
-
+		this.demandHandler = demandHandler;
+		this.carsharingSupplyContainer = carsharingSupplyContainer;
+		this.costsCalculatorContainer = costsCalculatorContainer;
+		this.personId = personId;
 		totalffRentalTime = 0.0;
 		totalowRentalTime = 0.0;
 		totaltwRentalTime = 0.0;
@@ -78,9 +97,19 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	public void finish() {		
 		super.finish();		
 		
-	
+		AgentRentals agentRentals = this.demandHandler.getAgentRentalsMap().get(personId);
+		
+		if (agentRentals != null) {
 			
-			score += this.ffStats.distance * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("distanceFeeFreeFloating"));
+			for(RentalInfo rentalInfo : agentRentals.getArr()) {
+				CSVehicle vehicle = this.carsharingSupplyContainer.getAllVehicles().get(rentalInfo.getVehId().toString());
+				score += this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo);
+			}
+			
+		}
+		
+			
+		/*	score += this.ffStats.distance * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("distanceFeeFreeFloating"));
 			score += this.ffStats.drivingTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeFeeFreeFloating"));
 			score += (this.totalffRentalTime - this.ffStats.drivingTime) * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeParkingFeeFreeFloating"));
 			
@@ -99,7 +128,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			score += this.totaltwRentalTime * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeFeeTwoWayCarsharing"));
 				//score += (s.endTime - s.startTime - s.drivingTime) * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeParkingFeeFreeFloating"));
 			
-					
+		*/			
 				
 	}	
 	
