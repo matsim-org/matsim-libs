@@ -67,10 +67,8 @@ public class AssignmentTaxiOptimizer
                 optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
                 fastRouterFactory, true);
 
-        assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
-                backwardRouter,
-                StraightLineKnnFinders.createRequestEntryFinder(params.nearestRequestsLimit),
-                StraightLineKnnFinders.createVehicleDepartureFinder(params.nearestVehiclesLimit));
+        assignmentProblem = new VehicleAssignmentProblem<TaxiRequest>(optimContext.travelTime,
+                router, backwardRouter, params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
     }

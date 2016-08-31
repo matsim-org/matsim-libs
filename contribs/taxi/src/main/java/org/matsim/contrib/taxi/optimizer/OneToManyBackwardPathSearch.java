@@ -19,51 +19,46 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.core.router.FastMultiNodeDijkstra;
 
 
-public class LinkProviders
+public class OneToManyBackwardPathSearch
+    extends AbstractOneToManyPathSearch
 {
-    public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
-        public Link apply(TaxiRequest req)
-        {
-            return req.getFromLink();
-        }
-    };
-
-
-    public static <D> LinkProvider<DestEntry<D>> createDestEntryToLink()
+    public OneToManyBackwardPathSearch(FastMultiNodeDijkstra backwardMultiNodeDijkstra)
     {
-        return new LinkProvider<DestEntry<D>>() {
-            @Override
-            public Link apply(DestEntry<D> dest)
-            {
-                return dest.link;
-            }
-        };
+        super(backwardMultiNodeDijkstra);
     }
 
 
-    public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = new LinkProvider<VehicleData.Entry>() {
-        public Link apply(VehicleData.Entry veh)
-        {
-            return veh.link;
-        }
-    };
-
-
-    public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
-            final TaxiScheduleInquiry scheduleInquiry)
+    /**
+     * This is backward search, so the meaning of variables is inverted.</br>
+     * 
+     * @param fromLink destination
+     * @param toLink origin
+     * @param startTime arrivalTime
+     */
+    @Override
+    protected PathData createPathData(Link from, Link to, double time)
     {
-        return new LinkProvider<Vehicle>() {
-            public Link apply(Vehicle veh)
-            {
-                return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
-            }
-        };
+        if (to == from) {
+            //we are already there, so let's use fromNode instead of toNode
+            return new PathData(to.getFromNode(), 0.);
+        }
+        else {
+            //simplified, but works for taxis, since empty drives are short (about 5 mins)
+            //TODO delay can be computed after path search...
+            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(from, time);
+            return new PathData(to.getToNode(), delay);
+        }
+    }
+
+
+    @Override
+    protected Node getFromNode(Link fromLink)
+    {
+        return fromLink.getFromNode();
     }
 }

@@ -83,7 +83,7 @@ public class BestDispatchFinder
             LinkProvider<D> destinationToLink)
     {
         double currTime = optimContext.timer.getTimeOfDay();
-        Link toLink = destinationToLink.getLink(destination);
+        Link toLink = destinationToLink.apply(destination);
         Node toNode = toLink.getFromNode();
 
         Map<Id<Node>, Vehicle> nodeToVehicle = new HashMap<>(expectedNeighbourhoodSize);
@@ -153,7 +153,7 @@ public class BestDispatchFinder
         Map<Id<Node>, D> nodeToDestination = new HashMap<>(expectedNeighbourhoodSize);
         Map<Id<Node>, InitialNode> initialNodes = new HashMap<>(expectedNeighbourhoodSize);
         for (D loc : destinations) {
-            Link link = destinationToLink.getLink(loc);
+            Link link = destinationToLink.apply(loc);
 
             if (departure.link == link) {
                 return new Dispatch<>(veh, loc, VrpPaths.createZeroLengthPath(departure.link,
@@ -185,7 +185,7 @@ public class BestDispatchFinder
         Node toNode = path.nodes.get(path.nodes.size() - 1);
         D bestDestination = nodeToDestination.get(toNode.getId());
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link,
-                destinationToLink.getLink(bestDestination), departure.time, path,
+                destinationToLink.apply(bestDestination), departure.time, path,
                 optimContext.travelTime);
         return new Dispatch<>(veh, bestDestination, vrpPath);
     }
