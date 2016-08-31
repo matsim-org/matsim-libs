@@ -37,15 +37,15 @@ import org.matsim.api.core.v01.network.Node;
  */
 public class ImaginaryNode implements Node {
 
-	/*package*/ final Collection<InitialNode> initialNodes;
+	/*package*/ final Collection<? extends InitialNode> initialNodes;
 	/*package*/ final Coord coord;
 	
-	public ImaginaryNode(Collection<InitialNode> initialNodes, Coord coord) {
+	public ImaginaryNode(Collection<? extends InitialNode> initialNodes, Coord coord) {
 		this.initialNodes = initialNodes;
 		this.coord = coord;
 	}
 	
-	public ImaginaryNode(Collection<InitialNode> initialNodes) {
+	public ImaginaryNode(Collection<? extends InitialNode> initialNodes) {
 		this.initialNodes = initialNodes;
 		
 		double sumX = 0.0;
