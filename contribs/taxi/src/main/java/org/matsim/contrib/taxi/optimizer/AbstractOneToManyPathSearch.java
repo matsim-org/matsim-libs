@@ -29,13 +29,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import com.google.common.collect.Maps;
 
 
-public abstract class OneToManyPathSearch
+public abstract class AbstractOneToManyPathSearch
 {
     public static class PathData
     {
         private final Node node;
         public final double delay;//at both the first and last links
-        Path path;//shortest path
+        private Path path;//shortest path
 
 
         public PathData(Node node, double delay)
@@ -68,7 +68,7 @@ public abstract class OneToManyPathSearch
     private final FastMultiNodeDijkstra multiNodeDijkstra;//forward or backward
 
 
-    public OneToManyPathSearch(FastMultiNodeDijkstra multiNodeDijkstra)
+    public AbstractOneToManyPathSearch(FastMultiNodeDijkstra multiNodeDijkstra)
     {
         this.multiNodeDijkstra = multiNodeDijkstra;
     }

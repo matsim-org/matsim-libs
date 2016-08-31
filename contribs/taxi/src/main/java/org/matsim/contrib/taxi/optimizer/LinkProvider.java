@@ -21,8 +21,11 @@ package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.common.base.Function;
+
 
 public interface LinkProvider<T>
+    extends Function<T, Link>
 {
-    Link getLink(T object);
+    Link apply(T object);
 }

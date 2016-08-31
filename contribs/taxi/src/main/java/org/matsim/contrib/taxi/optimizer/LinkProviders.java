@@ -29,21 +29,27 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 public class LinkProviders
 {
     public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
-        public Link getLink(TaxiRequest req)
+        public Link apply(TaxiRequest req)
         {
             return req.getFromLink();
         }
     };
 
-    public static final LinkProvider<DestEntry<TaxiRequest>> REQUEST_ENTRY_TO_LINK = new LinkProvider<DestEntry<TaxiRequest>>() {
-        public Link getLink(DestEntry<TaxiRequest> dest)
-        {
-            return dest.destination.getFromLink();
-        }
-    };
+
+    public static <D> LinkProvider<DestEntry<D>> createDestEntryToLink()
+    {
+        return new LinkProvider<DestEntry<D>>() {
+            @Override
+            public Link apply(DestEntry<D> dest)
+            {
+                return dest.link;
+            }
+        };
+    }
+
 
     public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = new LinkProvider<VehicleData.Entry>() {
-        public Link getLink(VehicleData.Entry veh)
+        public Link apply(VehicleData.Entry veh)
         {
             return veh.link;
         }
@@ -54,7 +60,7 @@ public class LinkProviders
             final TaxiScheduleInquiry scheduleInquiry)
     {
         return new LinkProvider<Vehicle>() {
-            public Link getLink(Vehicle veh)
+            public Link apply(Vehicle veh)
             {
                 return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
             }

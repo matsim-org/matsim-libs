@@ -44,11 +44,11 @@ public class StraightLineKnnFinder<T, N>
 
     public List<N> findNearest(T obj, Iterable<N> neighbours)
     {
-        Coord objectCoord = objectToLink.getLink(obj).getCoord();
+        Coord objectCoord = objectToLink.apply(obj).getCoord();
         PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
 
         for (N n : neighbours) {
-            Coord nCoord = neighbourToLink.getLink(n).getCoord();
+            Coord nCoord = neighbourToLink.apply(n).getCoord();
             nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
         }
 

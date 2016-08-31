@@ -25,7 +25,7 @@ import org.matsim.core.router.FastMultiNodeDijkstra;
 
 
 public class OneToManyBackwardPathSearch
-    extends OneToManyPathSearch
+    extends AbstractOneToManyPathSearch
 {
     public OneToManyBackwardPathSearch(FastMultiNodeDijkstra backwardMultiNodeDijkstra)
     {
