@@ -67,7 +67,7 @@ public class VrpPaths
         //otherwise it can take much longer)
         double currentTime = departureTime;
         links[0] = fromLink;
-        double linkTT = 1.;
+        double linkTT = FIRST_LINK_TT;
         linkTTs[0] = linkTT;
         currentTime += linkTT;
 
@@ -81,10 +81,19 @@ public class VrpPaths
 
         //there is no extra time spent on queuing at the end of the last link
         links[count + 1] = toLink;
-        linkTT = toLink.getLength() / toLink.getFreespeed(currentTime);//as long as we cannot divert from the last link this is okay
+        linkTT = getLastLinkTT(toLink, currentTime);//as long as we cannot divert from the last link this is okay
         linkTTs[count + 1] = linkTT;
         double totalTT = 1 + path.travelTime + linkTT;
 
         return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
+    }
+
+
+    public static final double FIRST_LINK_TT = 1;
+
+
+    public static double getLastLinkTT(Link lastLink, double time)
+    {
+        return lastLink.getLength() / lastLink.getFreespeed(time);
     }
 }

@@ -51,12 +51,6 @@ public class VehicleAssignmentProblem<D>
         private Path path;//shortest path
 
 
-        public Node getNode()
-        {
-            return node;
-        }
-
-
         public double getDelay()
         {
             return delay;
@@ -172,7 +166,8 @@ public class VehicleAssignmentProblem<D>
                     pathData.node = dest.link.getFromNode();
                     //simplified, but works for taxis, since pickup trips are short (about 5 mins)
                     //TODO delay can be computed after path search...
-                    pathData.delay = 1 + dest.link.getFreespeed(departure.time);
+                    pathData.delay = VrpPaths.FIRST_LINK_TT
+                            + VrpPaths.getLastLinkTT(dest.link, departure.time);
                 }
 
                 if (!destInitialNodes.containsKey(pathData.node.getId())) {
@@ -233,7 +228,8 @@ public class VehicleAssignmentProblem<D>
                     pathData.node = departure.link.getToNode();
                     //simplified, but works for taxis, since pickup trips are short (about 5 mins)
                     //TODO delay can be computed after path search...
-                    pathData.delay = 1 + dest.link.getFreespeed(departure.time);
+                    pathData.delay = VrpPaths.FIRST_LINK_TT
+                            + VrpPaths.getLastLinkTT(dest.link, departure.time);
                 }
 
                 if (!vehInitialNodes.containsKey(pathData.node.getId())) {
@@ -244,7 +240,7 @@ public class VehicleAssignmentProblem<D>
 
             ImaginaryNode fromNodes = backwardRouter.createImaginaryNode(vehInitialNodes.values());
             Path path = backwardRouter.calcLeastCostPath(toNode, fromNodes, dest.time, null, null);
-            Node bestVehNode = path.nodes.get(path.nodes.size() - 1);
+            Node bestVehNode = path.nodes.get(0);
             pathsFromVehNodes.put(bestVehNode.getId(), path);
 
             //get paths for all remaining endNodes 
