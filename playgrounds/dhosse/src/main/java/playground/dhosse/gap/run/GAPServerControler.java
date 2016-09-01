@@ -28,7 +28,7 @@ import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
+import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
@@ -349,9 +349,10 @@ public class GAPServerControler {
 			@Override
 			public void install() {
 				
-				bindMobsim().toProvider( CarsharingQsimFactory.class );
+				bindMobsim().toProvider( CarsharingQsimFactoryNew.class );
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
-				
+				addControlerListenerBinding().to(CarsharingListener.class);
+
 				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to( 
 						RandomTripToCarsharingStrategy.class ) ;
 //				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy").to( 
@@ -385,9 +386,7 @@ public class GAPServerControler {
 			
 		});
 		
-		CarsharingConfigGroup cs = (CarsharingConfigGroup) controler.getConfig().getModule("Carsharing");
-		controler.addControlerListener(new CarsharingListener(controler,
-				cs.getStatsWriterFrequency() ) ) ;
+		
 		
 	}
 

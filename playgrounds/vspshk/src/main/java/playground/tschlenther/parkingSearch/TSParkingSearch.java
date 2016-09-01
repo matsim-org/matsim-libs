@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 package playground.tschlenther.parkingSearch;
 
 import java.util.ArrayList;
@@ -69,21 +69,21 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import playground.tschlenther.createNetwork.Nikolaus;
 
-/**
+*//**
  * @author nagel/schlenther
  *
- */
+ *//*
 final class TSParkingSearch {
 	
 	//defines whether car sharing is considered or not
 	private static final boolean USE_CS = true;
 	
-	/* bind the CS and PS combining QSimFactory, inside the PSAndCSPersonDriverAgentImpl gets bound.
+	 bind the CS and PS combining QSimFactory, inside the PSAndCSPersonDriverAgentImpl gets bound.
 	 * the park search logic is mainly to be found in that class, more precisely in chooseNextLinkId()
 	 * and isWantingToArriveOnCurrentLink()
 	* if CS is not used, we need to bind AgentFactory to ParkingSearchAgentFactory, this gets done in the
 	* ParkinSearchPopulationPlugin
-	*/
+	
 	private static class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 		@Override 
 		protected void configure() {
@@ -149,9 +149,9 @@ final class TSParkingSearch {
 			return new RandomParkingSearchAgent( p.getSelectedPlan(), netsim ) ;
 		}
 	}
-	/**
+	*//**
 	 * @param args
-	 */
+	 *//*
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("C:/Users/Work/svn/shared-svn/studies/tschlenther/ParkSearch/input/Parkingconfig.xml") ;
 		config.controler().setOutputDirectory("C:/Users/Work/VSP/runs/parkSearch/documentation/noCS");
@@ -278,3 +278,4 @@ final class TSParkingSearch {
 	}
 
 }
+*/

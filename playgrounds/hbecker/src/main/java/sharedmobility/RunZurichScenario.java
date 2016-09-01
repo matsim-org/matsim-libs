@@ -37,7 +37,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
+import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
@@ -145,18 +145,12 @@ public class RunZurichScenario {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider( CarsharingQsimFactory.class );
+				bindMobsim().toProvider( CarsharingQsimFactoryNew.class );
+		        addControlerListenerBinding().to(CarsharingListener.class);
 			}
 		});
 
-		controler.addOverridingModule(CarsharingUtils.createModule());
-
-		//setting up the scoring function factory, inside different scoring functions are set-up
-		//controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );
-		
-		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) sc.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
-		controler.addControlerListener(new CarsharingListener(controler,
-				csConfig.getStatsWriterFrequency() ) ) ;
+		controler.addOverridingModule(CarsharingUtils.createModule());		
 	}
 
 

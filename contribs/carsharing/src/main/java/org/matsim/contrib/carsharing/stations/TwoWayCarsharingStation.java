@@ -1,39 +1,79 @@
 package org.matsim.contrib.carsharing.stations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 
+/** 
+ * @author balac
+ */
+public class TwoWayCarsharingStation implements CarsharingStation {
 
-public class TwoWayCarsharingStation extends AbstractCarSharingStation {
+	private Map<String, Integer> numberOfvehiclesPerType = new HashMap<String, Integer>();
+	private Map<String, ArrayList<CSVehicle>> vehiclesPerType = new HashMap<String, ArrayList<CSVehicle>>();
+	private String stationId;
+	private Link link;
 
-	
-	private int numberOfVehicles;
-	private ArrayList<String> vehicleIDs = new ArrayList<String>();
+	public TwoWayCarsharingStation(String stationId, Link link, Map<String, Integer> numberOfvehiclesPerType,
+			Map<String, ArrayList<CSVehicle>> vehiclesPerType) {
+		this.link = link;
+		this.stationId = stationId;
+		this.numberOfvehiclesPerType = numberOfvehiclesPerType;
+		this.vehiclesPerType = vehiclesPerType;
 
-	public TwoWayCarsharingStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
-		super(link) ;
-		this.numberOfVehicles = numberOfVehicles;
-		this.vehicleIDs = vehicleIDs;
 	}
 	
-	public int getNumberOfVehicles() {
+	public int getNumberOfVehicles(String type) {
 		
-		return numberOfVehicles;
-	}
+		return this.numberOfvehiclesPerType.get(type);
+	}	
 	
-	public ArrayList<String> getIDs() {
+	public ArrayList<CSVehicle> getVehicles(String type) {
 		
-		return vehicleIDs;
-	}
-	
-	public void removeCar() {
-		this.numberOfVehicles--;
-	}
-	
-	public void addCar(){
+		return this.vehiclesPerType.get(type);
+	}	
+
+	public void removeCar(String type, CSVehicle vehicle) {
 		
-		this.numberOfVehicles++;
+		ArrayList<CSVehicle> currentVehicles = this.vehiclesPerType.get(type);		
+		currentVehicles.remove(vehicle);
+		int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
+		currentNumberOfVehicles--;
+		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);		
 	}
 	
+	public void addCar(String type, CSVehicle vehicle){
+		
+		ArrayList<CSVehicle> currentVehicles = this.vehiclesPerType.get(type);		
+		currentVehicles.add(vehicle);
+		int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
+		currentNumberOfVehicles++;
+		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);	
+	}
+	@Override
+	public String getStationId() {
+		return stationId;
+	}	
+	@Override
+	public Link getLink() {
+		return link;
+	}
+
+	public Map<String, ArrayList<CSVehicle>> getVehiclesPerType() {
+		return vehiclesPerType;
+	}
+	
+	public boolean removeCar(CSVehicle vehicle) {
+		String type = ((StationBasedVehicle)vehicle).getVehicleType();
+		ArrayList<CSVehicle> currentVehicles = this.vehiclesPerType.get(type);		
+		
+		int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
+		currentNumberOfVehicles--;
+		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);		
+		return currentVehicles.remove(vehicle);
+	}
 }
