@@ -196,6 +196,5 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.carsharingSupplyContainer.populateSupply();
 		this.currentDemand.reset();
-		this.chooseCompany.setCompanies(this.carsharingSupplyContainer.getCompanyNames());
 	}		
 }

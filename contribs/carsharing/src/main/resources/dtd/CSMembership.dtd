@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+<!ELEMENT memberships          (person*)>
+<!ATTLIST memberships
+          name           CDATA   #IMPLIED
+          reference_layer  CDATA #IMPLIED
+          xml:lang       NMTOKEN "de-CH">
+
+
+<!ELEMENT person          (company*)>
+<!ATTLIST person
+          id           CDATA   #IMPLIED>   
+
+<!ELEMENT company          (carsharing*)>
+<!ATTLIST company
+          id           CDATA   #REQUIRED>
+          
+
+<!ELEMENT carsharing         EMPTY>
+<!ATTLIST carsharing
+          name           CDATA   #REQUIRED>

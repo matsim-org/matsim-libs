@@ -6,11 +6,14 @@ import java.util.Set;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
+import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
+import org.matsim.contrib.carsharing.manager.demand.membership.MembershipReader;
 import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
@@ -65,6 +68,13 @@ public class RunCarsharing {
 		
 		Set<String> carsharingCompanies = ImmutableSet.of("Mobility", "Catchacar");
 		
+		MembershipReader membershipReader = new MembershipReader();
+		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
+				controler.getScenario().getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+		membershipReader.readFile(configGroup.getmembership());
+
+		final MembershipContainer memberships = membershipReader.getMembershipContainer();
+		
 		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		
 		final DemandHandler demandHandler = new DemandHandler(carsharingModesShort);
@@ -87,6 +97,7 @@ public class RunCarsharing {
 				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
 				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
+				bind(MembershipContainer.class).toInstance(memberships);
 			}			
 		});		
 		

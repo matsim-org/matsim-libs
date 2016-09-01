@@ -7,6 +7,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -70,10 +71,10 @@ public class CarsharingSupplyContainer {
 		
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(network);
 		
-		final TwoWayCarsharingConfigGroup configGrouptw = (TwoWayCarsharingConfigGroup)
-				scenario.getConfig().getModule( TwoWayCarsharingConfigGroup.GROUP_NAME );
+		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
+				scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
 
-		reader.readFile(configGrouptw.getvehiclelocations());
+		reader.readFile(configGroup.getvehiclelocations());
 		this.companies = reader.getCompanies();
 		this.allVehicleLocations = reader.getAllVehicleLocations();
 		this.allVehicles = reader.getAllVehicles();

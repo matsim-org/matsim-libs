@@ -39,7 +39,8 @@
 		
     <module name="Carsharing" >
 		<param name="statsWriterFrequency" value="1" />	
-				
+			<param name="vehiclelocations" value="&INBASE;/CarsharingStations.xml" />
+			<param name="membership" value="&INBASE;/CSMembership.xml" />	
 	</module>    
         
         
@@ -59,7 +60,7 @@
 	</module>
     
 	<module name="OneWayCarsharing" >
-	        <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
+	    <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
 	
 		<param name="vehiclelocationsOneWayCarsharing" value="&INBASE;/Stations.txt" />	
 		<param name="travelingOneWayCarsharing" value="-10.0" />

@@ -71,14 +71,14 @@ public class RunCarsharingTest {
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
 
-		FreeFloatingConfigGroup ffConfig = (FreeFloatingConfigGroup) config.getModule( FreeFloatingConfigGroup.GROUP_NAME ) ;
-		ffConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
+		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
+		csConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
+		csConfig.setmembership(utils.getClassInputDirectory() + "/CSMembership.xml");
+		//OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule( OneWayCarsharingConfigGroup.GROUP_NAME ) ;
+		//oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
 
-		OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule( OneWayCarsharingConfigGroup.GROUP_NAME ) ;
-		oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
-
-		TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
-		twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
+		//TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
+		//twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 
 		// ---
 
