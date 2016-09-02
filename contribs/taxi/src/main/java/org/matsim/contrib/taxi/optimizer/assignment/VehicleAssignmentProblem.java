@@ -29,7 +29,7 @@ import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.AbstractOneToManyPathSearch.PathData;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.core.router.FastMultiNodeDijkstra;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
@@ -44,7 +44,7 @@ public class VehicleAssignmentProblem<D>
 
 
     private final TravelTime travelTime;
-    private final FastMultiNodeDijkstra router;
+    private final FastAStarEuclidean euclideanRouter;
 
     private final OneToManyForwardPathSearch forwardPathSearch;
     private final OneToManyBackwardPathSearch backwardPathSearch;
@@ -63,16 +63,17 @@ public class VehicleAssignmentProblem<D>
     public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter)
     {
-        this(travelTime, router, backwardRouter, -1, -1);
+        //we do not need Euclidean router when there is not kNN filtering
+        this(travelTime, router, backwardRouter, null, -1, -1);
     }
 
 
     public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
-            BackwardFastMultiNodeDijkstra backwardRouter, int nearestDestinationLimit,
-            int nearestVehicleLimit)
+            BackwardFastMultiNodeDijkstra backwardRouter, FastAStarEuclidean euclideanRouter,
+            int nearestDestinationLimit, int nearestVehicleLimit)
     {
         this.travelTime = travelTime;
-        this.router = router;
+        this.euclideanRouter = euclideanRouter;
 
         forwardPathSearch = new OneToManyForwardPathSearch(router);
         backwardPathSearch = new OneToManyBackwardPathSearch(backwardRouter);
@@ -196,10 +197,9 @@ public class VehicleAssignmentProblem<D>
             PathData pathData = pathDataMatrix[v][d];
 
             //TODO if null is frequent we may be more efficient by increasing the neighbourhood
-            //TODO use FastAStarEuclidean (as in TaxiScheduler)
             VrpPathWithTravelData vrpPath = pathData == null ? //
-                    VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, router,
-                            travelTime)
+                    VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time,
+                            euclideanRouter, travelTime)
                     : VrpPaths.createPath(departure.link, dest.link, departure.time,
                             pathData.getPath(), travelTime);
 

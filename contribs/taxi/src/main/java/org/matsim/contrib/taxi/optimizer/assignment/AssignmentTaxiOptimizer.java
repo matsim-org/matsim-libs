@@ -40,6 +40,7 @@ public class AssignmentTaxiOptimizer
     private final AssignmentTaxiOptimizerParams params;
     protected final FastMultiNodeDijkstra router;
     protected final BackwardFastMultiNodeDijkstra backwardRouter;
+    private final FastAStarEuclidean euclideanRouter;
     private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
     private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
@@ -67,8 +68,19 @@ public class AssignmentTaxiOptimizer
                 optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
                 fastRouterFactory, true);
 
+        PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(
+                optimContext.travelDisutility);
+        preProcessEuclidean.run(optimContext.network);
+
+        RoutingNetwork euclideanRoutingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
+                .createRoutingNetwork(optimContext.network);
+        euclideanRouter = new FastAStarEuclidean(euclideanRoutingNetwork, preProcessEuclidean,
+                optimContext.travelDisutility, optimContext.travelTime,
+                optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
+
         assignmentProblem = new VehicleAssignmentProblem<TaxiRequest>(optimContext.travelTime,
-                router, backwardRouter, params.nearestRequestsLimit, params.nearestVehiclesLimit);
+                router, backwardRouter, euclideanRouter, params.nearestRequestsLimit,
+                params.nearestVehiclesLimit);
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
     }
