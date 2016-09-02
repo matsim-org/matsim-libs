@@ -20,11 +20,8 @@
 package tutorial.fixedTimeSignals;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
