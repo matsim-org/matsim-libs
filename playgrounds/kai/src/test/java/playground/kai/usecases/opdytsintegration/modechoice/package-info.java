@@ -20,4 +20,4 @@
  * @author nagel
  *
  */
-package playground.kai.opdytsintegration.modechoice;
+package playground.kai.usecases.opdytsintegration.modechoice;

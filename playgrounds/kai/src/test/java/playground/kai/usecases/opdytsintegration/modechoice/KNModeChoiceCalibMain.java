@@ -1,7 +1,6 @@
-package playground.kai.usecases.autosensingmarginalutilities;
+package playground.kai.usecases.opdytsintegration.modechoice;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +22,6 @@ import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactory;
-import opdytsintegration.roadinvestment.RoadInvestmentDecisionVariable;
-import opdytsintegration.roadinvestment.RoadInvestmentObjectiveFunction;
-import opdytsintegration.roadinvestment.RoadInvestmentStateFactory;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -44,35 +40,21 @@ class KNModeChoiceCalibMain {
 		config.controler().setLastIteration(100);
 		config.global().setRandomSeed(new Random().nextLong());
 		
-		// ---
+		// ===
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		// ---
+		// ===
 
-		final Map<Link, Double> link2freespeed = Collections .unmodifiableMap(link2freespeed(scenario));
-		final Map<Link, Double> link2capacity = Collections .unmodifiableMap(link2capacity(scenario));
-
-		@SuppressWarnings("unchecked")
-		final MATSimStateFactory<RoadInvestmentDecisionVariable> stateFactory = new RoadInvestmentStateFactory();
-		
-		final ObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
-
-		final FixedIterationNumberConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion( 100, 10);
-
-		Simulator<RoadInvestmentDecisionVariable> simulator = new MATSimSimulator<>( stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18)); 
-
-		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {
-			@Override public List<RoadInvestmentDecisionVariable> newRandomVariations( RoadInvestmentDecisionVariable decisionVariable ) {
+		DecisionVariableRandomizer<ModeChoiceDecisionVariable> randomizer = new DecisionVariableRandomizer<ModeChoiceDecisionVariable>() {
+			@Override public List<ModeChoiceDecisionVariable> newRandomVariations( ModeChoiceDecisionVariable decisionVariable ) {
 				return Arrays.asList(
-						new RoadInvestmentDecisionVariable(
+						new ModeChoiceDecisionVariable(
 								Math.max( 0, Math.min(1, decisionVariable.betaPay() + 0.1 * MatsimRandom.getRandom().nextGaussian())), 
-								Math.max( 0, Math.min(1, decisionVariable.betaAlloc() + 0.1 * MatsimRandom.getRandom().nextGaussian())),
-								link2freespeed, link2capacity),
-						new RoadInvestmentDecisionVariable(
+								Math.max( 0, Math.min(1, decisionVariable.betaAlloc() + 0.1 * MatsimRandom.getRandom().nextGaussian()))),
+						new ModeChoiceDecisionVariable(
 								Math.max( 0, Math.min(1, decisionVariable.betaPay() + 0.1 * MatsimRandom.getRandom().nextGaussian())), 
-								Math.max( 0, Math.min(1, decisionVariable.betaAlloc() + 0.1 * MatsimRandom.getRandom().nextGaussian())),
-								link2freespeed, link2capacity)
+								Math.max( 0, Math.min(1, decisionVariable.betaAlloc() + 0.1 * MatsimRandom.getRandom().nextGaussian())))
 						);
 			}
 		};
@@ -82,15 +64,24 @@ class KNModeChoiceCalibMain {
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 10;
 
-		final RoadInvestmentDecisionVariable initialDecisionVariable = new RoadInvestmentDecisionVariable( 
-				MatsimRandom.getRandom().nextDouble(), MatsimRandom .getRandom().nextDouble(), link2freespeed, link2capacity);
+		final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( 
+				MatsimRandom.getRandom().nextDouble(), MatsimRandom .getRandom().nextDouble());
 		
-		RandomSearch<RoadInvestmentDecisionVariable> randomSearch = new RandomSearch<>( simulator, randomizer,
+		@SuppressWarnings("unchecked")
+		final MATSimStateFactory<ModeChoiceDecisionVariable> stateFactory = new ModeChoiceStateFactory();
+		
+		Simulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18)); 
+
+		final ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction();
+
+		final FixedIterationNumberConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion( 100, 10);
+
+		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>( simulator, randomizer,
 				initialDecisionVariable, convergenceCriterion, maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, objectiveFunction, false);
 		randomSearch.setLogFileName("./randomSearchLog.txt");
 		
-		// ---
+		// ===
 		
 		randomSearch.run(new SelfTuner(0.95));
 
@@ -98,25 +89,8 @@ class KNModeChoiceCalibMain {
 
 	}
 
-	private static Map<Link, Double> link2capacity(Scenario scenario) {
-		Map<Link, Double> link2capacity = new LinkedHashMap<>();
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			link2capacity.put(link, link.getCapacity());
-		}
-		return link2capacity;
-	}
-
-	private static Map<Link, Double> link2freespeed(Scenario scenario) {
-		Map<Link, Double> link2freespeed = new LinkedHashMap<>();
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			link2freespeed.put(link, link.getFreespeed());
-		}
-		return link2freespeed;
-	}
-
 	public static void main(String[] args) {
 
-		// enumerateDecisionVariables();
 		solveFictitiousProblem();
 
 	}
