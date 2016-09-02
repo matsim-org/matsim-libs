@@ -48,8 +48,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 		this.randomPlanSelector = new RandomPlanSelector<>();
 
 		final int startTime_s = 0;
-		final int binSize_s = Integer
-				.parseInt(scenario.getConfig().getModule("travelTimeCalculator").getValue("travelTimeBinSize"));
+		final int binSize_s = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		final int binCnt = (int) Math.ceil(Units.S_PER_D / binSize_s);
 		this.timeDiscr = new TimeDiscretization(startTime_s, binSize_s, binCnt);
 		this.myTravelTime = new BestTimeResponseTravelTimes(this.timeDiscr, mode2tt, scenario.getNetwork());
