@@ -8,7 +8,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-
+/** 
+ * @author balac
+ */
 public class CurrentTotalDemand {
 	
 	private Map<Id<Person>, CarsharingCurrentRentalsInfo> currentDemand = new HashMap<Id<Person>, CarsharingCurrentRentalsInfo>();

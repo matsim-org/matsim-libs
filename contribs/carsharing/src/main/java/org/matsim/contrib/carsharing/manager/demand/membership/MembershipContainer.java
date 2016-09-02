@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
+/** 
+ * @author balac
+ */
 public class MembershipContainer {
 	
 	private Map<Id<Person>, PersonMembership> perPersonMemberships = new HashMap<Id<Person>, PersonMembership>();

@@ -3,7 +3,9 @@ package org.matsim.contrib.carsharing.manager.demand;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
-
+/** 
+ * @author balac
+ */
 public class RentalInfo {
 	private String carsharingType;
 	public String getCarsharingType() {

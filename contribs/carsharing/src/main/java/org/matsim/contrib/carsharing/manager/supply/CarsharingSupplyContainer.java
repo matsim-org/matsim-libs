@@ -8,10 +8,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
-import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-
+/** 
+ * @author balac
+ */
 public class CarsharingSupplyContainer {
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
 	private Map<String, CSVehicle> allVehicles = new HashMap<String, CSVehicle>();

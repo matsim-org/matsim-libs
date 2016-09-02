@@ -2,7 +2,9 @@ package org.matsim.contrib.carsharing.manager.demand.membership;
 
 import java.util.Map;
 import java.util.Set;
-
+/** 
+ * @author balac
+ */
 public class PersonMembership {
 	
 	private Map<String, Set<String>> membershipsPerCompany;

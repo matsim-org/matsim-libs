@@ -2,7 +2,9 @@ package org.matsim.contrib.carsharing.manager.supply;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-
+/** 
+ * @author balac
+ */
 public interface VehiclesContainer {
 	
 	public void reserveVehicle(CSVehicle vehicle);

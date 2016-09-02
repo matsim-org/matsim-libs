@@ -1,7 +1,9 @@
 package org.matsim.contrib.carsharing.manager.supply.costs;
 
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
-
+/** 
+ * @author balac
+ */
 public class CostCalculationExample implements CostCalculation {
 
 	@Override

@@ -6,7 +6,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
+/** 
+ * @author balac
+ */
 public class AgentRentals{
 	private Map<String, RentalInfo> statsPerVehicle = new HashMap<String, RentalInfo>();
 

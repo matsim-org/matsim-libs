@@ -9,7 +9,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.utils.collections.QuadTree;
-
+/** 
+ * @author balac
+ */
 public class CarsharingCurrentRentalsInfo {
 	
 	private Map<String, QuadTree<CSVehicle>> currentRentals = new HashMap<String, QuadTree<CSVehicle>>(); 

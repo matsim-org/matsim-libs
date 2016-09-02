@@ -11,7 +11,9 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
-
+/** 
+ * @author balac
+ */
 public class TwoWayContainer implements VehiclesContainer{
 	
 	

@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
-
+/** 
+ * @author balac
+ */
 public class CostsCalculatorContainer {
 	
 	

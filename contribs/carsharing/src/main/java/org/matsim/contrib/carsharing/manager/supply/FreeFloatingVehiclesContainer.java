@@ -6,7 +6,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.utils.collections.QuadTree;
-
+/** 
+ * @author balac
+ */
 public class FreeFloatingVehiclesContainer implements VehiclesContainer{	
 	
 	private QuadTree<CSVehicle> availableFFVehicleLocationQuadTree;	

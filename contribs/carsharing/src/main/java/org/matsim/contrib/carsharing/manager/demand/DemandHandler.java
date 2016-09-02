@@ -21,7 +21,9 @@ import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
-
+/** 
+ * @author balac
+ */
 public class DemandHandler implements PersonLeavesVehicleEventHandler, 
 PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
 	

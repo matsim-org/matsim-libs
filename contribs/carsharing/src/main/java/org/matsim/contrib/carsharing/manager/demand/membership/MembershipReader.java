@@ -8,7 +8,9 @@ import java.util.TreeSet;
 
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
+/** 
+ * @author balac
+ */
 public class MembershipReader extends MatsimXmlParser{
 
 	private MembershipContainer membershipContainer = new MembershipContainer();

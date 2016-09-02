@@ -9,7 +9,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-
+/** 
+ * @author balac
+ */
 public class CompanyContainer {
 	private String companyId;
 	private Set<String> carsharingTypes = new TreeSet<String>();
