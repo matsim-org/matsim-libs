@@ -164,15 +164,15 @@ public class TaxibusScheduler {
 		Schedule<TaxibusTask> bestSched = (Schedule<TaxibusTask>) best.vehicle.getSchedule();
 
 		TaxibusTask lastTask = Schedules.getLastTask(bestSched);
-		log.info("Bus " + best.vehicle.getId() + " Scheduled Route");
-		for (VrpPathWithTravelData path : best.path) {
-			log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
-		}
-		log.info("End of route");
-		log.info("scheduled to bus: ");
-		for (TaxibusRequest r : best.requests){
-			log.info(r+" Agent: "+ r.getPassenger().getId());
-		}
+//		log.info("Bus " + best.vehicle.getId() + " Scheduled Route");
+//		for (VrpPathWithTravelData path : best.path) {
+//			log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
+//		}
+//		log.info("End of route");
+//		log.info("scheduled to bus: ");
+//		for (TaxibusRequest r : best.requests){
+//			log.info(r+" Agent: "+ r.getPassenger().getId());
+//		}
 		Iterator<VrpPathWithTravelData> iterator = best.path.iterator();
 		double lastEndTime;
 		VrpPathWithTravelData path;
