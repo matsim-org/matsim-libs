@@ -2,7 +2,6 @@ package org.matsim.contrib.carsharing.manager.demand;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -18,6 +17,7 @@ import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
 import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -28,18 +28,13 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
 	
 	@Inject Scenario scenario;
-	
+	@Inject CarsharingSupplyContainer carsharingSupplyContainer;
 	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
 	
 	private Map<Id<Vehicle>, Id<Person>> vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();
 	
-	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();	
 	
-	private Set<String> carsharingModes;
-	public DemandHandler(Set<String> carsharingModes) {
-		
-		this.carsharingModes = carsharingModes;
-	}
 	
 	@Override
 	public void reset(int iteration) {
@@ -129,11 +124,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 	private boolean carsharingTrip(Id<Vehicle> vehicleId) {
 
-		String vid = vehicleId.toString();
-		String[] vidsplit = vid.split("_");
-		if (this.carsharingModes.contains(vidsplit[0]))
-			return true;
-		return false;
+		return this.carsharingSupplyContainer.getAllVehicles().containsKey(vehicleId.toString());		
 	}
 	
 	public Map<Id<Person>, AgentRentals> getAgentRentalsMap() {

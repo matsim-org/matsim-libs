@@ -22,13 +22,12 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CarsharingListener implements IterationEndsListener{
 
-	@Inject MatsimServices controler;
-	private DemandHandler demandHandler;
+	@Inject private MatsimServices controler;
+	@Inject private DemandHandler demandHandler;
 	int frequency = 1;
 	
-	public CarsharingListener(DemandHandler demandHandler) {
+	public CarsharingListener() {		
 		
-		this.demandHandler = demandHandler;
 	}
 	
 	@Override

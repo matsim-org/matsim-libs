@@ -24,6 +24,7 @@ import org.matsim.contrib.carsharing.models.ChooseTheCompanyExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
+import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
@@ -32,9 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.common.collect.ImmutableSet;
-
 /** 
  * @author balac
  */
@@ -61,24 +59,27 @@ public class RunCarsharing {
 
 	}
 
-	public static void installCarSharing(final Controler controler) {
+	public static void installCarSharing(final Controler controler) {		
 		
-		Set<String> carsharingModesShort = ImmutableSet.of("TW", "OW",
-				"FF");
+		final Scenario scenario = controler.getScenario();
+		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
 		
-		Set<String> carsharingCompanies = ImmutableSet.of("Mobility", "Catchacar");
+		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
+				scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+
+		reader.readFile(configGroup.getvehiclelocations());
+		
+		Set<String> carsharingCompanies = reader.getCompanies().keySet();
 		
 		MembershipReader membershipReader = new MembershipReader();
-		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
-				controler.getScenario().getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+		
 		membershipReader.readFile(configGroup.getmembership());
 
 		final MembershipContainer memberships = membershipReader.getMembershipContainer();
 		
 		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		
-		final DemandHandler demandHandler = new DemandHandler(carsharingModesShort);
-		final CarsharingListener carsharingListener = new CarsharingListener(demandHandler);
+		final CarsharingListener carsharingListener = new CarsharingListener();
 		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
@@ -119,9 +120,9 @@ public class RunCarsharing {
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 		        bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
 		        bind(CarsharingManagerNew.class).asEagerSingleton();
-		        bind(DemandHandler.class).toInstance(demandHandler);
+		        bind(DemandHandler.class).asEagerSingleton();
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
-		        addEventHandlerBinding().toInstance(demandHandler);
+		        addEventHandlerBinding().to(DemandHandler.class);
 			}
 		});
 
