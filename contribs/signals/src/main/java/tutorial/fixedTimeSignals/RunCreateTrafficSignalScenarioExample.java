@@ -185,8 +185,7 @@ public class RunCreateTrafficSignalScenarioExample {
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalSystemsConfigGroup).loadSignalsData());
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = new SignalsScenarioLoader(signalSystemsConfigGroup).loadSignalsData();
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);
 		
