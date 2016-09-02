@@ -15,7 +15,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
-import besttimeresponse.TripTravelTimes;
 import floetteroed.utilities.Units;
 import opdytsintegration.utils.TimeDiscretization;
 
@@ -38,8 +37,8 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	private final CharyparNagelScoringParametersForPerson scoringParams;
 
-	private final TripTravelTimes myTravelTime;
-	
+	private final BestTimeResponseTravelTimes myTravelTime;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	@Inject
@@ -52,7 +51,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 		final int binCnt = (int) Math.ceil(Units.S_PER_D / binSize_s);
 		this.timeDiscr = new TimeDiscretization(startTime_s, binSize_s, binCnt);
 		this.myTravelTime = new BestTimeResponseTravelTimes(this.timeDiscr, mode2tt, scenario.getNetwork());
-		
+
 		this.scenario = scenario;
 		this.mode2tt = mode2tt;
 		this.scoringParams = scoringParams;

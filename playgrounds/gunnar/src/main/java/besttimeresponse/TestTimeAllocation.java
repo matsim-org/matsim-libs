@@ -15,14 +15,14 @@ public class TestTimeAllocation {
 	public static void main(String[] args) {
 
 		// specify the problem
-		
+
 		final TimeDiscretization discr = new TimeDiscretization(0, 3600, 24);
 
-		final PlannedActivity home = PlannedActivity.newOvernightActivity("home", "car", 8.0 * 3600, null, null);
-		final PlannedActivity work = PlannedActivity.newWithinDayActivity("office", "car", 8.0 * 3600, 6.0 * 3600,
-				18.0 * 3600, null, null);
-		final PlannedActivity shop = PlannedActivity.newWithinDayActivity("store", "car", 1.0 * 3600, 8.0 * 3600,
-				21.0 * 3600, null, null);
+		final PlannedActivity home = new PlannedActivity("home", "car", 8.0 * 3600, null, null, null, null);
+		final PlannedActivity work = new PlannedActivity("office", "car", 8.0 * 3600, 6.0 * 3600, 18.0 * 3600, null,
+				null);
+		final PlannedActivity shop = new PlannedActivity("store", "car", 1.0 * 3600, 8.0 * 3600, 21.0 * 3600, null,
+				null);
 
 		final double dptFromHome_s = Time.secFromStr("12:00:00");
 		final double dptFromWork_s = Time.secFromStr("12:00:00");
@@ -34,12 +34,13 @@ public class TestTimeAllocation {
 		final double betaEarlyDpt_1_s = -1.0;
 
 		// solve the problem
-		
+
 		final TimeAllocator timeAlloc = new TimeAllocator(discr, new TripTravelTimes() {
 			@Override
-			public double getTravelTime_s(Object origin, Object destination, double dptTime_s, Object mode) {		
+			public double getTravelTime_s(Object origin, Object destination, double dptTime_s, Object mode) {
 				return 1800.0;
-				// return 3600.0 * 0.5 * (1.0 - Math.cos(4.0 * Math.PI * dptTime_s / Units.S_PER_D));
+				// return 3600.0 * 0.5 * (1.0 - Math.cos(4.0 * Math.PI *
+				// dptTime_s / Units.S_PER_D));
 			}
 		}, betaDur_1_s, betaTravel_1_s, betaLateArr_1_s, betaEarlyDpt_1_s);
 		final double[] result = timeAlloc.optimizeDepartureTimes(Arrays.asList(home, work, shop),

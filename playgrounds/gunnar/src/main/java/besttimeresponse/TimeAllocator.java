@@ -3,7 +3,6 @@ package besttimeresponse;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,7 +11,9 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.matsim.core.gbl.MatsimRandom;
 
+import floetteroed.utilities.Units;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -29,6 +30,8 @@ public class TimeAllocator {
 	private final TripTravelTimes travelTimes;
 
 	private final boolean repairTimeStructure = true;
+
+	private final boolean randomSmoothing = true;
 
 	private final double betaDur_1_s;
 
@@ -54,11 +57,18 @@ public class TimeAllocator {
 	// -------------------- INTERNALS --------------------
 
 	private TimeAllocationProblem newTimeAllocationProblem(final List<PlannedActivity> plannedActivities,
-			final double[] dptTimes_s) {
-		RealizedActivitiesBuilder builder = new RealizedActivitiesBuilder(this.timeDiscretization, this.travelTimes,
-				this.repairTimeStructure);
+			double[] initialDptTimes_s) {
+		if (initialDptTimes_s == null) {
+			initialDptTimes_s = new double[plannedActivities.size()];
+			for (int i = 0; i < initialDptTimes_s.length; i++) {
+				initialDptTimes_s[i] = MatsimRandom.getRandom().nextDouble() * Units.S_PER_D;
+			}
+			Arrays.sort(initialDptTimes_s);
+		}
+		final RealizedActivitiesBuilder builder = new RealizedActivitiesBuilder(this.timeDiscretization,
+				this.travelTimes, this.repairTimeStructure);
 		for (int q = 0; q < plannedActivities.size(); q++) {
-			builder.addActivity(plannedActivities.get(q), dptTimes_s[q]);
+			builder.addActivity(plannedActivities.get(q), initialDptTimes_s[q]);
 		}
 		builder.build();
 		return new TimeAllocationProblem(builder.getResult(), this.betaDur_1_s, this.betaTravel_1_s,
@@ -67,32 +77,12 @@ public class TimeAllocator {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	private double[] list2array(final List<Double> list) {
-		final double[] result = new double[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			result[i] = list.get(i);
-		}
-		return result;
-	}
-
-	private List<Double> array2list(final double[] array) {
-		final List<Double> result = new ArrayList<>(array.length);
-		for (double val : array) {
-			result.add(val);
-		}
-		return result;
-	}
-
-	public List<Double> optimizeDepartureTimes(final List<PlannedActivity> plannedActivities,
-			List<Double> initialDptTimes_s) {
-		return array2list(this.optimizeDepartureTimes(plannedActivities, this.list2array(initialDptTimes_s)));
-	}
-
 	public double[] optimizeDepartureTimes(final List<PlannedActivity> plannedActivities,
 			final double[] initialDptTimes_s) {
 
-		double[] currentDptTimes_s = Arrays.copyOf(initialDptTimes_s, initialDptTimes_s.length);
-		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, currentDptTimes_s);
+		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
+
+		double[] currentDptTimes_s = problem.realizedDptTimes_s();
 		LinearObjectiveFunction objFct = problem.getObjectiveFunction();
 		double currentScore = objFct.value(currentDptTimes_s);
 		RealVector currentGradient = objFct.getCoefficients();
@@ -171,6 +161,12 @@ public class TimeAllocator {
 					}
 				}
 
+				if (this.randomSmoothing) {
+					for (int i = 0; i < currentDptTimes_s.length; i++) {
+						currentDptTimes_s[i] += this.timeDiscretization.getBinSize_s()
+								* (MatsimRandom.getRandom().nextDouble() - 0.5);
+					}
+				}
 				return currentDptTimes_s;
 			}
 

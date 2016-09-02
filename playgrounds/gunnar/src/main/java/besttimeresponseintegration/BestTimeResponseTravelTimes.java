@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -54,8 +53,9 @@ class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, Travel
 		}
 	}
 
-	Path getCarPath(final Object origin, final Object destination, final double dptTime_s) {
-		return this.router.calcLeastCostPath((Node) origin, (Node) destination, dptTime_s, null, null);
+	public Path getCarPath(final Object origin, final Object destination, final double dptTime_s) {
+		return this.router.calcLeastCostPath(((Link) origin).getToNode(), ((Link) destination).getFromNode(), dptTime_s,
+				null, null);
 	}
 
 	// -------------------- IMPLEMENTATION OF TravelTime --------------------

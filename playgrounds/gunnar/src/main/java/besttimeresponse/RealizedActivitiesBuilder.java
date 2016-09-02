@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import floetteroed.utilities.Units;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -51,13 +50,6 @@ public class RealizedActivitiesBuilder {
 		this.dptTimes_s.add(dptTime_s);
 	}
 
-	private double withinDayTime_s(double time_s) {
-		while (time_s > Units.S_PER_D) {
-			time_s -= Units.S_PER_D;
-		}
-		return time_s;
-	}
-
 	public void build() {
 
 		final int _N = this.plannedActs.size();
@@ -66,7 +58,7 @@ public class RealizedActivitiesBuilder {
 		}
 
 		final LinkedList<TripTime> tripTimes = new LinkedList<>();
-		double lastArrTime_s = -PlannedActivity.minActDur_s; // at 23:59:59
+		double lastArrTime_s = -PlannedActivity.minActDur_s;
 
 		for (int q = 0; q < _N; q++) {
 
@@ -91,7 +83,7 @@ public class RealizedActivitiesBuilder {
 			double dTT_dDptTime = (ttAtDptTimeBinEnd_s - ttAtDptTimeBinStart_s) / this.timeDiscr.getBinSize_s();
 			if (dTT_dDptTime <= -(1.0 - 1e-8)) {
 				if (this.repairTimeStructure) {
-					dTT_dDptTime = -(1.0 - 1e-8);
+					dTT_dDptTime = -(1.0 - 2e-8);
 				} else {
 					throw new RuntimeException(
 							"FIFO problem: dTT/dDptTime = " + dTT_dDptTime + " is (almost) below -1.0.");
@@ -106,16 +98,14 @@ public class RealizedActivitiesBuilder {
 					(this.timeDiscr.getBinStartTime_s(arrBin) - ttOffset_s) / (1.0 + dTT_dDptTime));
 			final double maxDptTime_s = min(this.timeDiscr.getBinEndTime_s(dptBin),
 					(this.timeDiscr.getBinEndTime_s(arrBin) - ttOffset_s) / (1.0 + dTT_dDptTime));
-			tripTimes.add(new TripTime(dTT_dDptTime, ttOffset_s, this.withinDayTime_s(minDptTime_s),
-					this.withinDayTime_s(maxDptTime_s)));
+			tripTimes.add(new TripTime(dTT_dDptTime, ttOffset_s, minDptTime_s, maxDptTime_s));
 		}
 
 		this.result = new ArrayList<>(_N);
 		for (int q = 0; q < _N; q++) {
 			final int prevQ = (q - 1 >= 0 ? q - 1 : _N - 1);
 			this.result.add(new RealizedActivity(this.plannedActs.get(q), tripTimes.get(q),
-					this.withinDayTime_s(tripTimes.get(prevQ).getArrTime_s(this.dptTimes_s.get(prevQ))),
-					this.withinDayTime_s(this.dptTimes_s.get(q))));
+					tripTimes.get(prevQ).getArrTime_s(this.dptTimes_s.get(prevQ)), this.dptTimes_s.get(q)));
 		}
 		this.result = Collections.unmodifiableList(this.result);
 	}

@@ -54,6 +54,15 @@ class TimeAllocationProblem {
 		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
 	}
 
+	// -------------------- MISC --------------------
+	
+	double[] realizedDptTimes_s() {
+		double[] result = new double[this.realizedActivities.size()];
+		for (int q = 0; q < this.realizedActivities.size(); q++) {
+			result[q] = this.realizedActivities.get(q).realizedDptTime_s;
+		}
+		return result;
+	}
 	// -------------------- IMPLEMENTATION --------------------
 
 	private double getScore() {
