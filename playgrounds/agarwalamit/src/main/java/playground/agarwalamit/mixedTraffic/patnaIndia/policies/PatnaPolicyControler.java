@@ -86,7 +86,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 public class PatnaPolicyControler {
 
-	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
+	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/0.15pcu/";
 	private static boolean applyTrafficRestrain = false;
 	private static boolean addBikeTrack = false;
 	private static boolean isAllwoingMotorbikeOnBikeTrack = true;
@@ -231,7 +231,7 @@ public class PatnaPolicyControler {
 
 		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
 		msc.run();
-		msc.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
+		msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
 
 		StatsWriter.run(outputDir);
 	}
