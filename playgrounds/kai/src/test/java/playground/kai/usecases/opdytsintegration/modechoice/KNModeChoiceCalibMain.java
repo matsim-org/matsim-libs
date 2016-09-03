@@ -1,15 +1,15 @@
 package playground.kai.usecases.opdytsintegration.modechoice;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,7 +35,7 @@ class KNModeChoiceCalibMain {
 
 		System.out.println("STARTED ...");
 
-		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
+		final Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
 		config.controler() .setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(100);
 		config.global().setRandomSeed(new Random().nextLong());
@@ -48,14 +48,21 @@ class KNModeChoiceCalibMain {
 
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> randomizer = new DecisionVariableRandomizer<ModeChoiceDecisionVariable>() {
 			@Override public List<ModeChoiceDecisionVariable> newRandomVariations( ModeChoiceDecisionVariable decisionVariable ) {
-				return Arrays.asList(
-						new ModeChoiceDecisionVariable(
-								Math.max( 0, Math.min(1, decisionVariable.betaPay() + 0.1 * MatsimRandom.getRandom().nextGaussian())), 
-								Math.max( 0, Math.min(1, decisionVariable.betaAlloc() + 0.1 * MatsimRandom.getRandom().nextGaussian()))),
-						new ModeChoiceDecisionVariable(
-								Math.max( 0, Math.min(1, decisionVariable.betaPay() + 0.1 * MatsimRandom.getRandom().nextGaussian())), 
-								Math.max( 0, Math.min(1, decisionVariable.betaAlloc() + 0.1 * MatsimRandom.getRandom().nextGaussian())))
-						);
+				final PlanCalcScoreConfigGroup scoreConfig = decisionVariable.getScoreConfig();
+				List<ModeChoiceDecisionVariable> result = new ArrayList<>() ;
+				for ( int ii=0 ; ii<2 ; ii++ ) {
+					PlanCalcScoreConfigGroup newScoringConfig = new PlanCalcScoreConfigGroup() ;
+					{
+						ModeParams oldModeParams = scoreConfig.getModes().get( TransportMode.car ) ;
+						ModeParams newModeParams = new ModeParams(TransportMode.car) ;
+						newModeParams.setConstant( oldModeParams.getConstant() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+						newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+						newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+						newScoringConfig.addModeParams(newModeParams);
+					}
+					result.add( new ModeChoiceDecisionVariable( newScoringConfig, scenario ) ) ;
+				}
+				return result ;
 			}
 		};
 
@@ -64,8 +71,7 @@ class KNModeChoiceCalibMain {
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 10;
 
-		final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( 
-				MatsimRandom.getRandom().nextDouble(), MatsimRandom .getRandom().nextDouble());
+		final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario ) ;
 		
 		@SuppressWarnings("unchecked")
 		final MATSimStateFactory<ModeChoiceDecisionVariable> stateFactory = new ModeChoiceStateFactory();

@@ -15,9 +15,7 @@ public class ModeChoiceStateFactory implements MATSimStateFactory<ModeChoiceDeci
 
 	@Override
 	public MATSimState newState(Population population, Vector stateVector, ModeChoiceDecisionVariable decisionVariable) {
-		return new ModeChoiceState(population, stateVector,
-				decisionVariable != null ? decisionVariable.betaPay() : null,
-				decisionVariable != null ? decisionVariable.betaAlloc() : null);
+		return new ModeChoiceState(population, stateVector);
 	}
 
 }
