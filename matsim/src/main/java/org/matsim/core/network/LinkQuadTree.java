@@ -51,12 +51,17 @@ public final class LinkQuadTree {
 
 	private static class Node {
 
-		private final static int NO_CHILD = -1;
-		private final static int CHILD_NW = 0;
-		private final static int CHILD_NE = 1;
-		private final static int CHILD_SE = 2;
-		private final static int CHILD_SW = 3;
+//		private final static int NO_CHILD = -1;
+//		private final static int CHILD_NW = 0;
+//		private final static int CHILD_NE = 1;
+//		private final static int CHILD_SE = 2;
+//		private final static int CHILD_SW = 3;
+		
+		private static enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW,NO_CHILD } ;
 
+		// I replaced the "int" by an enum since I find it easier to read, and I needed/wanted to understand the code.  If this causes
+		// computational performance losses, we need to change it back.  kai, sep'16
+		
 		public final double minX;
 		public final double minY;
 		public final double maxX;
@@ -79,42 +84,63 @@ public final class LinkQuadTree {
 				this.links.add(w);
 				// (node now contains this link)
 			} else {
-				int pos = getChildPosition(w);
-				if (pos == NO_CHILD) {
+				ChildPosition pos = getChildPosition(w);
+				if (pos == ChildPosition.NO_CHILD) {
 					// (i.e. link extends over more than one child node, so the current node is the smallest one that fully contains the link.
 					this.links.add(w);
 				} else {
 					if (this.children == null) {
 						split();
 					}
-					this.children[pos].put(w);
+					this.children[pos.ordinal()].put(w);
 				}
 			}
 		}
 
-		public LinkWrapper getNearest(final double x, final double y, final MutableDouble bestDistance) {
+		/**
+		 * @param x
+		 * @param y
+		 * @param bestDistanceIndicator
+		 * @return instance of LinkWrapper that is closest to (x,y) if closer than bestPseudoDistance, null otherwise.  Adjust
+		 * bestPseudoDistance in first case
+		 */
+		public LinkWrapper getNearest(final double x, final double y, final MutableDouble bestDistanceIndicator) {
 			LinkWrapper closest = null;
+			
+			// go through all links in current quadtree node (= box):
 			for (LinkWrapper w : this.links) {
-				double tmp = calcLineSegmentPseudoDistance(x, y, w.link);
-				if (tmp < bestDistance.value) {
-					bestDistance.value = tmp;
+				double tmp = calcLineSegmentDistanceIndicator(x, y, w.link);
+				if (tmp < bestDistanceIndicator.value) {
+					bestDistanceIndicator.value = tmp;
 					closest = w;
 				}
 			}
-			if (this.children != null) {
-				int childNo = this.getChildPosition(x, y);
-				if (childNo != NO_CHILD) {
-					LinkWrapper tmp = this.children[childNo].getNearest(x, y, bestDistance);
+			
+			// if we have child nodes (= child boxes) ...
+			if (this.children != null) { 
+
+				// ... find the correct one ...
+				ChildPosition childPos = this.getChildPosition(x, y); 
+
+				if (childPos != ChildPosition.NO_CHILD) {
+					// (not sure we can have children, but none in the correct "direction"; depends on exact behavior of "split")
+					
+					// Find child in correct "direction" and do recursive call:
+					LinkWrapper tmp = this.children[childPos.ordinal()].getNearest(x, y, bestDistanceIndicator);
 					if (tmp != null) {
 						closest = tmp;
 					}
 
-					// my current intuition is that the following block should be one level up.  kai, jul'12
-					for (int c = 0; c < 4; c++) {
-						if (c != childNo) {
-							Node child = this.children[c];
-							if (child.calcPseudoDistance(x, y) < bestDistance.value) {
-								tmp = child.getNearest(x, y, bestDistance);
+					// now also go through all _other_ children ...
+					for ( ChildPosition c : ChildPosition.values() ) {
+						if (c != childPos && c != ChildPosition.NO_CHILD ) {
+							Node child = this.children[c.ordinal()];
+							
+							// For those other children, check if their bounding box is so close that we also need to look at them:
+							if (child.calcDistanceIndicator(x, y) < bestDistanceIndicator.value) {
+								
+								// Only if the answer is yes, do a recursive call for actual LinkWrapper instances:
+								tmp = child.getNearest(x, y, bestDistanceIndicator);
 								if (tmp != null) {
 									closest = tmp;
 								}
@@ -131,20 +157,21 @@ public final class LinkQuadTree {
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
 			this.children = new Node[4];
-			this.children[CHILD_NW] = new Node(this.minX, centerY, centerX, this.maxY);
-			this.children[CHILD_NE] = new Node(centerX, centerY, this.maxX, this.maxY);
-			this.children[CHILD_SE] = new Node(centerX, this.minY, this.maxX, centerY);
-			this.children[CHILD_SW] = new Node(this.minX, this.minY, centerX, centerY);
+			this.children[ChildPosition.CHILD_NW.ordinal()] = new Node(this.minX, centerY, centerX, this.maxY);
+			this.children[ChildPosition.CHILD_NE.ordinal()] = new Node(centerX, centerY, this.maxX, this.maxY);
+			this.children[ChildPosition.CHILD_SE.ordinal()] = new Node(centerX, this.minY, this.maxX, centerY);
+			this.children[ChildPosition.CHILD_SW.ordinal()] = new Node(this.minX, this.minY, centerX, centerY);
 
 			List<LinkWrapper> keep = new ArrayList<>(this.links.size() / 2);
 			for (LinkWrapper w : this.links) {
-				int pos = getChildPosition(w);
-				if (pos == NO_CHILD) {
+				ChildPosition pos = getChildPosition(w);
+				if (pos == ChildPosition.NO_CHILD) {
 					keep.add(w);
 				} else {
-					this.children[pos].put(w);
-					// (seems to me that this cannot happen to more than one link since the quadtree node will split
+					this.children[pos.ordinal()].put(w);
+					// (seems to me that this cannot happen to more than one link since the quad tree node will split
 					// as soon as a second link is added that can be assigned to a child node.  kai, jul'12)
+					// (hä?  kai, aug'16)
 				}
 			}
 			this.links.clear();
@@ -152,45 +179,49 @@ public final class LinkQuadTree {
 			this.links.addAll(keep);
 		}
 
-		private int getChildPosition(final LinkWrapper w) {
-			// center of the bounding box of this quadtree node:
+		private ChildPosition getChildPosition(final LinkWrapper w) {
+			// center of the bounding box of this quad tree node:
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
 
 			if (w.maxX < centerX && w.minY >= centerY) {
 				// (bounding box of link lies fully to left and above the center of the quadtree node)
-				return CHILD_NW;
+				return ChildPosition.CHILD_NW;
 			}
 			if (w.minX >= centerX && w.minY >= centerY) {
-				return CHILD_NE;
+				return ChildPosition.CHILD_NE;
 			}
 			if (w.minX >= centerX && w.maxY < centerY) {
-				return CHILD_SE;
+				return ChildPosition.CHILD_SE;
 			}
 			if (w.maxX < centerX && w.maxY < centerY) {
-				return CHILD_SW;
+				return ChildPosition.CHILD_SW;
 			}
-			return NO_CHILD;
+			return ChildPosition.NO_CHILD;
 			// (happens when bounding box of link overlaps more than one child node.. i.e. in particular with long links)
 		}
 
-		private int getChildPosition(final double x, final double y) {
+		/**
+		 * @param x
+		 * @param y
+		 * @return quad tree child node (=box) we need to look at if we are at (x,y)
+		 */
+		private ChildPosition getChildPosition(final double x, final double y) {
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
 			if (x < centerX && y >= centerY) {
-				return CHILD_NW;
+				return ChildPosition.CHILD_NW;
 			}
 			if (x >= centerX && y >= centerY) {
-				return CHILD_NE;
+				return ChildPosition.CHILD_NE;
 			}
 			if (x >= centerX && y < centerY) {
-				return CHILD_SE;
+				return ChildPosition.CHILD_SE;
 			}
 			if (x < centerX && y < centerY) {
-				return CHILD_SW;
+				return ChildPosition.CHILD_SW;
 			}
-			// this should never happen...
-			return NO_CHILD;
+			throw new RuntimeException("should never get here since (x,y) has to be _somewhere_ with respect to centerX and centerY") ;
 		}
 
 		/**
@@ -202,7 +233,7 @@ public final class LinkQuadTree {
 		 * @param y up-down location
 		 * @return distance to border, 0 if inside rectangle or on border
 		 */
-		private double calcPseudoDistance(final double x, final double y) {
+		private double calcDistanceIndicator(final double x, final double y) {
 			double distanceX;
 			double distanceY;
 
@@ -217,12 +248,13 @@ public final class LinkQuadTree {
 				distanceY = Math.min(Math.abs(this.minY - y), Math.abs(this.maxY - y));
 			}
 
-			return distanceX * distanceX + distanceY * distanceY; // no Math.sqrt(), as it's only used to compare to each other, thus "pseudo distance"
+			return distanceX * distanceX + distanceY * distanceY; 
+			// (no Math.sqrt(), as it's only used to compare to each other, thus distance "indicator")
 		}
 
 	}
 
-	private static double calcLineSegmentPseudoDistance(final double x, final double y, final Link link) {
+	private static double calcLineSegmentDistanceIndicator(final double x, final double y, final Link link) {
 
 		double fx = link.getFromNode().getCoord().getX();
 		double fy = link.getFromNode().getCoord().getY();
@@ -231,27 +263,28 @@ public final class LinkQuadTree {
 
 		if ((lineDX == 0.0) && (lineDY == 0.0)) {
 			// the line segment is a point without dimension
-			return calcPseudoDistance(fx, fy, x, y);
+			return calcDistanceIndicator(fx, fy, x, y);
 		}
 
 		double u = ((x - fx)*lineDX + (y - fy)*lineDY) / (lineDX*lineDX + lineDY*lineDY);
 
 		if (u <= 0) {
 			// (x | y) is not on the line segment, but before lineFrom
-			return calcPseudoDistance(fx, fy, x, y);
+			return calcDistanceIndicator(fx, fy, x, y);
 		}
 		if (u >= 1) {
 			// (x | y) is not on the line segment, but after lineTo
-			return calcPseudoDistance(fx + lineDX, fy + lineDY, x, y);
+			return calcDistanceIndicator(fx + lineDX, fy + lineDY, x, y);
 		}
-		return calcPseudoDistance(fx + u*lineDX, fy + u*lineDY, x, y);
+		return calcDistanceIndicator(fx + u*lineDX, fy + u*lineDY, x, y);
 
 	}
 
-	private static double calcPseudoDistance(final double fromX, final double fromY, final double toX, final double toY) {
+	private static double calcDistanceIndicator(final double fromX, final double fromY, final double toX, final double toY) {
 		double xDiff = toX - fromX;
 		double yDiff = toY - fromY;
-		return (xDiff*xDiff) + (yDiff*yDiff); // no Math.sqrt, as we use the values only to compare to each other. Thus "pseudo distance"
+		return (xDiff*xDiff) + (yDiff*yDiff); 
+		// (no Math.sqrt(), as it's only used to compare to each other, thus distance "indicator")
 	}
 
 	private static class LinkWrapper {

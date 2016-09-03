@@ -8,13 +8,11 @@ import opdytsintegration.MATSimStateFactory;
 
 /**
  * 
- * @author Gunnar Flötteröd
+ * @author Kai Nagel based on Gunnar Flötteröd
  *
  */
 public class ModeChoiceStateFactory implements MATSimStateFactory<ModeChoiceDecisionVariable> {
-
-	@Override
-	public MATSimState newState(Population population, Vector stateVector, ModeChoiceDecisionVariable decisionVariable) {
+	@Override public MATSimState newState(Population population, Vector stateVector, ModeChoiceDecisionVariable decisionVariable) {
 		return new ModeChoiceState(population, stateVector);
 	}
 
