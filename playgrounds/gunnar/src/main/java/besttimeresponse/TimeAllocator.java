@@ -31,7 +31,9 @@ public class TimeAllocator {
 
 	private final boolean repairTimeStructure = true;
 
-	private final boolean randomSmoothing = true;
+	private final boolean interpolateTravelTimes = false;
+
+	private final boolean randomSmoothing = false;
 
 	private final double betaDur_1_s;
 
@@ -66,7 +68,7 @@ public class TimeAllocator {
 			Arrays.sort(initialDptTimes_s);
 		}
 		final RealizedActivitiesBuilder builder = new RealizedActivitiesBuilder(this.timeDiscretization,
-				this.travelTimes, this.repairTimeStructure);
+				this.travelTimes, this.repairTimeStructure, this.interpolateTravelTimes);
 		for (int q = 0; q < plannedActivities.size(); q++) {
 			builder.addActivity(plannedActivities.get(q), initialDptTimes_s[q]);
 		}

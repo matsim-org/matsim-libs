@@ -1,6 +1,6 @@
 package besttimeresponse;
 
-import static besttimeresponse.PlannedActivity.minActDur_s;
+import static besttimeresponse.PlannedActivity.MINACTDUR_S;
 import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.util.Collections.unmodifiableList;
@@ -71,7 +71,7 @@ class TimeAllocationProblem {
 		for (int q = 0; q < _N; q++) {
 			final RealizedActivity act = this.realizedActivities.get(q);
 			result += this.betaDur_1_s * act.plannedActivity.desiredDur_s
-					* log(max(minActDur_s, act.effectiveDuration_s()));
+					* log(max(MINACTDUR_S, act.effectiveDuration_s()));
 			if (act.isLateArrival()) {
 				result += this.betaLateArr_1_s * (act.realizedArrTime_s - act.plannedActivity.latestArrTime_s);
 			}
@@ -106,13 +106,13 @@ class TimeAllocationProblem {
 			// current activity duration
 			if (!act.isClosedAtDeparture()) {
 				dScore_dDptTimes__1_s.addToEntry(q, this.betaDur_1_s * act.plannedActivity.desiredDur_s
-						/ max(minActDur_s, act.effectiveDuration_s()));
+						/ max(MINACTDUR_S, act.effectiveDuration_s()));
 			}
 
 			// next activity duration
 			if (!nextAct.isClosedAtArrival()) {
 				dScore_dDptTimes__1_s.addToEntry(q, (-1.0) * (1.0 + a) * this.betaDur_1_s
-						* nextAct.plannedActivity.desiredDur_s / max(minActDur_s, nextAct.effectiveDuration_s()));
+						* nextAct.plannedActivity.desiredDur_s / max(MINACTDUR_S, nextAct.effectiveDuration_s()));
 			}
 
 			// early departure from current activity
@@ -165,7 +165,7 @@ class TimeAllocationProblem {
 			final RealVector coeffs = new ArrayRealVector(_N);
 			coeffs.setEntry(q, -(1.0 + a[q]));
 			coeffs.setEntry(q + 1, 1.0);
-			constraints.add(new LinearConstraint(coeffs, GEQ, minActDur_s + b[q]));
+			constraints.add(new LinearConstraint(coeffs, GEQ, MINACTDUR_S + b[q]));
 		}
 
 		// The last arrival must occur before midnight.

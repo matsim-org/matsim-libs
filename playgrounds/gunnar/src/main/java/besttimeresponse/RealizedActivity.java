@@ -1,5 +1,8 @@
 package besttimeresponse;
 
+import static java.lang.Double.NEGATIVE_INFINITY;
+import static java.lang.Double.POSITIVE_INFINITY;
+
 import floetteroed.utilities.Units;
 import floetteroed.utilities.math.MathHelpers;
 
@@ -7,12 +10,17 @@ import floetteroed.utilities.math.MathHelpers;
  * 
  * @author Gunnar Flötteröd
  *
+ * @param L
+ *            the location type (generic such that both link-to-link and
+ *            zone-to-zone are supported)
+ * @param M
+ *            the mode type
  */
-class RealizedActivity {
+class RealizedActivity<L, M> {
 
 	// -------------------- CONSTANTS --------------------
 
-	final PlannedActivity plannedActivity;
+	final PlannedActivity<L, M> plannedActivity;
 
 	final TripTime nextTripTravelTime;
 
@@ -22,7 +30,7 @@ class RealizedActivity {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	RealizedActivity(final PlannedActivity plannedActivity, final TripTime nextTripTimes,
+	RealizedActivity(final PlannedActivity<L, M> plannedActivity, final TripTime nextTripTimes,
 			final double realizedArrTime_s, final double realizedDptTime_s) {
 		this.plannedActivity = plannedActivity;
 		this.nextTripTravelTime = nextTripTimes;
@@ -49,14 +57,16 @@ class RealizedActivity {
 	}
 
 	double effectiveDuration_s() {
-		double firstDayDuration_s = MathHelpers.overlap(this.realizedArrTime_s, this.realizedDptTime_s,
-				(this.plannedActivity.openingTime_s != null) ? this.plannedActivity.openingTime_s : 0.0,
-				(this.plannedActivity.closingTime_s != null) ? this.plannedActivity.closingTime_s : Units.S_PER_D);
-		final double secondDayDuration_s = MathHelpers.overlap(this.realizedArrTime_s, this.realizedDptTime_s,
-				(this.plannedActivity.openingTime_s != null) ? Units.S_PER_D + this.plannedActivity.openingTime_s
-						: Units.S_PER_D,
-				(this.plannedActivity.closingTime_s != null) ? Units.S_PER_D + this.plannedActivity.closingTime_s
-						: Units.S_PER_D + Units.S_PER_D);
-		return firstDayDuration_s + secondDayDuration_s;
+		if (this.realizedArrTime_s > this.realizedDptTime_s) {
+			// Overnight activity, always open.
+			return this.realizedDptTime_s + (Units.S_PER_D - this.realizedArrTime_s);
+		} else {
+			// Within-day activity, possibly closed.
+			return MathHelpers.overlap(this.realizedDptTime_s, this.realizedArrTime_s,
+					(this.plannedActivity.openingTime_s != null) ? this.plannedActivity.openingTime_s
+							: NEGATIVE_INFINITY,
+					(this.plannedActivity.closingTime_s != null) ? this.plannedActivity.closingTime_s
+							: POSITIVE_INFINITY);
+		}
 	}
 }

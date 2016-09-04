@@ -23,6 +23,8 @@ class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, Travel
 
 	// -------------------- MEMBERS --------------------
 
+	private final boolean interpolate = false;
+
 	private final TimeDiscretization timeDiscr;
 
 	private final TravelTime carTT;
@@ -63,25 +65,33 @@ class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, Travel
 	@Override
 	public double getLinkTravelTime(final Link link, final double entryTime_s, final Person person,
 			final Vehicle vehicle) {
-		final int leftBin;
-		final int rightBin;
-		{
-			final int bin = this.timeDiscr.getBin(entryTime_s);
-			if (entryTime_s < this.timeDiscr.getBinCenterTime_s(bin)) {
-				// interpolate to the left (temporally downwards)
-				leftBin = bin - 1;
-				rightBin = bin;
-			} else {
-				// interpolate to the right
-				leftBin = bin;
-				rightBin = bin + 1;
+
+		if (this.interpolate) {
+
+			final int leftBin;
+			final int rightBin;
+			{
+				final int bin = this.timeDiscr.getBin(entryTime_s);
+				if (entryTime_s < this.timeDiscr.getBinCenterTime_s(bin)) {
+					// interpolate to the left (temporally downwards)
+					leftBin = bin - 1;
+					rightBin = bin;
+				} else {
+					// interpolate to the right
+					leftBin = bin;
+					rightBin = bin + 1;
+				}
 			}
+			final double weight = (entryTime_s - this.timeDiscr.getBinCenterTime_s(leftBin))
+					/ this.timeDiscr.getBinSize_s();
+			return weight * this.carTT.getLinkTravelTime(link, this.timeDiscr.getBinCenterTime_s(rightBin), null, null)
+					+ (1.0 - weight) * this.carTT.getLinkTravelTime(link, this.timeDiscr.getBinCenterTime_s(leftBin),
+							null, null);
+		} else {
+
+			return this.carTT.getLinkTravelTime(link, entryTime_s, null, null);
+
 		}
-		final double weight = (entryTime_s - this.timeDiscr.getBinCenterTime_s(leftBin))
-				/ this.timeDiscr.getBinSize_s();
-		return weight * this.carTT.getLinkTravelTime(link, this.timeDiscr.getBinCenterTime_s(rightBin), null, null)
-				+ (1.0 - weight)
-						* this.carTT.getLinkTravelTime(link, this.timeDiscr.getBinCenterTime_s(leftBin), null, null);
 	}
 
 	// --------------- IMPLEMENTATION OF TravelDisutility ---------------

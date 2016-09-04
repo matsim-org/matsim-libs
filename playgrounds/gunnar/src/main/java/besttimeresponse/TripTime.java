@@ -21,7 +21,9 @@ class TripTime {
 
 	TripTime(final double dTT_dDptTime, final double ttOffset_s, final double minDptTime_s, final double maxDptTime_s) {
 		if (dTT_dDptTime <= -(1.0 - 1e-8)) {
-			throw new RuntimeException("FIFO problem: dTT/dDptTime = " + dTT_dDptTime + " is (almost) below -1.0.");
+			throw new RuntimeException("FIFO problem: dTT/dDptTime = " + dTT_dDptTime
+					+ " is (almost) below -1.0. This means that a later departure implies an earlier "
+					+ "arrival, which may cause the numerical solver problems.");
 		}
 		if (minDptTime_s > maxDptTime_s) {
 			throw new RuntimeException(
